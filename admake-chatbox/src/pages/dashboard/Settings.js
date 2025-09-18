@@ -131,7 +131,7 @@ const Settings = () => {
                 
                 <Box p ={2} sx={{width:'100%', border:'1px solid #ccc', borderRadius:1 }}>
                   <Stack direction='column' spacing={3}>
-                    <Avatar sx={{height:150, width:'auto'}} src={'/images/avatar.png'} alt={faker.name.fullName()}/>
+                    <Avatar sx={{height:150, width:150}} src={'/images/avatar.png'} alt={faker.name.fullName()}/>
                     <CurrentDateTime />
                     <Button sx={{background:"#ccc", borderRadius:5}}>Về Sớm</Button>
                   </Stack>

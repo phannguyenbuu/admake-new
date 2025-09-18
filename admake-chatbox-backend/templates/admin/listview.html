@@ -1,0 +1,87 @@
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const toggle = document.getElementById('viewToggle');
+  toggle.checked = true;  // force checked
+  toggle.dispatchEvent(new Event('change'));
+});
+
+
+const toggle = document.getElementById('viewToggle');
+const label = document.getElementById('viewToggleLabel');
+
+toggle.addEventListener('change', () => {
+  const isThumbView = toggle.checked;
+  const listTable = document.querySelector('.table-responsive');
+  const thumbBox = document.getElementById('thumbViewBox');
+
+  if (isThumbView) {
+    listTable.style.display = 'none';
+    thumbBox.style.display = 'flex';
+    thumbBox.style.flexWrap = 'wrap';
+    thumbBox.style.gap = '10px';
+    thumbBox.style.height = '80vh';
+    thumbBox.style.overflow = 'auto';
+    label.textContent = 'Thumb View';
+
+    // Clear trước khi tạo mới
+    thumbBox.innerHTML = '';
+
+    const rows = document.querySelectorAll('.table-responsive tbody tr');
+    rows.forEach(row => {
+      if (window.location.href.includes('user')) {
+        const username = row.querySelector('.col-username')?.textContent.trim();
+        const firstName = row.querySelector('.col-firstName')?.textContent.trim();
+        const lastName = row.querySelector('.col-lastName')?.textContent.trim();
+        const role = row.querySelector('.col-role')?.textContent.trim();
+        const createAt = row.querySelector('.col-createAt')?.textContent.trim();
+        const balanceAmount = row.querySelector('.col-balanceAmount')?.textContent.trim();
+        const companyName = row.querySelector('.col-companyName')?.textContent.trim();
+
+        // Xoá dấu chấm và parse số, rồi làm tròn
+        const balanceInVND = Math.round(parseFloat(balanceAmount.replace(/\./g, '')));
+        const formattedBalance = balanceInVND.toLocaleString('vi-VN') + ' ₫';
+
+        const userBox = document.createElement('div');
+        userBox.style.border = '1px solid #ccc';
+        userBox.style.padding = '20px';
+        userBox.style.width = '200px';
+        userBox.style.maxHeight = '200px';
+        userBox.style.borderRadius = '15px';
+        userBox.style.boxShadow = '0 0 5px #ddd';
+        userBox.style.fontSize = '12px';
+
+        userBox.innerHTML = `
+          <div><strong>${firstName} ${lastName}</strong></div>
+          <div><strong>Bộ phận:</strong> ${companyName}</div>
+          <div><strong>Nick:</strong> ${username}</div>
+          <div><strong>Chức danh:</strong> ${role}</div>
+          <div><strong>Lương tháng:</strong> ${formattedBalance}</div>
+          <div style="font-size:8px;font-style:italic"><strong>Ngày tạo:</strong> ${createAt}</div>
+
+          <div style="display:flex;flex-direction:row; gap: 100px">
+            <a class="icon" href="/admin/user/edit/?id=8&amp;url=/admin/user/?page_size%3D20" title="Edit Record">
+              <span class="fa fa-pencil glyphicon glyphicon-pencil"></span>
+            </a>
+                                      
+            <form class="icon" method="POST" action="/admin/user/delete/">
+              <input id="id" name="id" required="" type="hidden" value="8">
+              <input id="url" name="url" type="hidden" value="/admin/user/?page_size=20">
+              
+              <button style="border:none" onclick="return faHelpers.safeConfirm('Are you sure you want to delete this record?');" title="Delete Record">
+                <span class="fa fa-trash glyphicon glyphicon-trash"></span>
+              </button>
+            </form>
+          </div>
+        `;
+
+        thumbBox.appendChild(userBox);
+      }
+    });
+
+  } else {
+    listTable.style.display = '';
+    thumbBox.style.display = 'none';
+    label.textContent = 'List View';
+  }
+});
+</script>

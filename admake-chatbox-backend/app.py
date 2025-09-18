@@ -1,4 +1,5 @@
 import ssl
+from flask_admin.contrib.sqla.filters import FilterEqual, BaseSQLAFilter
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_socketio import SocketIO, join_room, leave_room, emit
@@ -19,6 +20,10 @@ from flask_admin import Admin
 from flask_admin.contrib.sqla import ModelView
 
 from flask_cors import CORS
+from flask_admin.form import Select2Widget
+from wtforms.fields import SelectField
+from flask_admin.contrib.sqla.filters import DateBetweenFilter
+
 # from flask_migrate import Migrate
 # pg_restore -U postgres -d admake_chat -v --clean admake_chat.dump
 # pip install flask flask-socketio flask-cors flask-admin flask-login werkzeug sqlalchemy
@@ -94,6 +99,8 @@ class GroupMemberAdmin(ModelView):
             'page_size': 10
         }
     }
+
+
 
 import uuid
 
@@ -535,15 +542,151 @@ class AttendanceView(ModelView):
         }
     }
 
-admin = Admin(app, name='Admin Dashboard')
-admin.add_view(UserView(User, db.session, category='Models'))
-admin.add_view(GroupAdmin(Group, db.session))
-admin.add_view(GroupMemberAdmin(GroupMember, db.session))
-admin.add_view(ModelView(Location, db.session, category='Models'))
-admin.add_view(AttendanceView(Attendance, db.session, category='Models'))
-admin.add_view(ModelView(MonthSummary, db.session, category='Models'))
-admin.add_view(ModelView(WorkAssignment, db.session, category='Models'))
-admin.add_view(MessageAdmin(Message, db.session, category='Models'))
+
+
+
+class GroupInFilter(BaseSQLAFilter):
+    def get_options(self, view):
+        # Lấy tất cả nhóm từ DB và thêm option 'Tất cả nhóm'
+        groups = Group.query.all()
+        
+        options = [("", "Tất cả nhóm")]
+        options.extend([(str(g.groupId), g.name) for g in groups])
+
+        # print(options)
+        return options
+
+    def apply(self, query, value, alias=None):
+        if not value:
+            return query  # Tất cả nhóm, không lọc
+        return query.filter(self.column == value)
+
+    def operation(self):
+        return 'bằng'
+
+class MessageView(ModelView):
+    column_searchable_list = ['text']
+    column_filters = [
+        GroupInFilter(Message.group_id, 'Nhóm'),
+        DateBetweenFilter(Message.createAt, 'Ngày tạo'),
+        DateBetweenFilter(Message.updateAt, 'Ngày cập nhật')
+    ]
+
+    def get_filters(self):
+        filters = super().get_filters()
+        # Thay thế filter group_id mặc định bằng filter dropdown có tên nhóm
+        for i, flt in enumerate(filters):
+            if flt.column.name == 'group_id':
+                filters[i] = GroupInFilter(column=flt.column, name='Nhóm')
+        return filters
+
+    def get_query(self):
+        query = super().get_query()
+        group_filter = session.get('group_filter')
+        if group_filter:
+            query = query.filter(Message.group_id == group_filter)
+        return query
+    
+# ------------------------------------------
+from flask import request, redirect, url_for
+
+
+
+@app.route('/admin/filter-group-by-group')
+def filter_group_by_group():
+    group_id = request.args.get('group_id')
+    # Xử lý lưu group_id vào session hoặc chuyển hướng sang view phù hợp
+    # Ví dụ lưu trong session để lọc danh sách hiện tại:
+    if group_id:
+        session['group_filter'] = group_id
+    else:
+        session.pop('group_filter', None)
+    # Chuyển hướng về trang danh sách main (ví dụ view message)
+    return redirect(url_for('message.index_view'))
+
+
+@app.route('/admin/filter-message-by-group')
+def filter_message_by_group():
+    group_id = request.args.get('group_id')
+    # Xử lý lưu group_id vào session hoặc chuyển hướng sang view phù hợp
+    # Ví dụ lưu trong session để lọc danh sách hiện tại:
+    if group_id:
+        session['group_filter'] = group_id
+    else:
+        session.pop('group_filter', None)
+    # Chuyển hướng về trang danh sách main (ví dụ view message)
+    return redirect(url_for('message.index_view'))
+
+@app.route('/admin/filter-location-by-group')
+def filter_location_by_group():
+    group_id = request.args.get('group_id')
+    # Xử lý lưu group_id vào session hoặc chuyển hướng sang view phù hợp
+    # Ví dụ lưu trong session để lọc danh sách hiện tại:
+    if group_id:
+        session['group_filter'] = group_id
+    else:
+        session.pop('group_filter', None)
+    # Chuyển hướng về trang danh sách main (ví dụ view message)
+    return redirect(url_for('message.index_view'))
+
+
+@app.route('/admin/filter-workassignment-by-group')
+def filter_workassignment_by_group():
+    group_id = request.args.get('group_id')
+    # Xử lý lưu group_id vào session hoặc chuyển hướng sang view phù hợp
+    # Ví dụ lưu trong session để lọc danh sách hiện tại:
+    if group_id:
+        session['group_filter'] = group_id
+    else:
+        session.pop('group_filter', None)
+    # Chuyển hướng về trang danh sách main (ví dụ view message)
+    return redirect(url_for('message.index_view'))
+
+@app.route('/admin/filter-monthsummary-by-group')
+def filter_monthsummary_by_group():
+    group_id = request.args.get('group_id')
+    # Xử lý lưu group_id vào session hoặc chuyển hướng sang view phù hợp
+    # Ví dụ lưu trong session để lọc danh sách hiện tại:
+    if group_id:
+        session['group_filter'] = group_id
+    else:
+        session.pop('group_filter', None)
+    # Chuyển hướng về trang danh sách main (ví dụ view message)
+    return redirect(url_for('message.index_view'))
+
+
+
+@app.context_processor
+def inject_groups():
+    groups = Group.query.all()
+    return dict(groups=groups)
+
+# @app.route('/admin/filter-url')
+# def filter_by_group():
+#     group_id = request.args.get('group_id')
+    
+class MyAdmin(Admin):
+    def render(self, template, **kwargs):
+        kwargs['groups'] = Group.query.all()
+        return super().render(template, **kwargs)
+# ------------------------------------------
+
+admin = Admin(app)
+admin.add_view(UserView(User, db.session, name='Quản lý nhân sự'))
+admin.add_view(AttendanceView(Attendance, db.session, name='Chấm công'))
+
+
+admin.add_view(GroupAdmin(Group, db.session, name="Danh sách công trình"))
+admin.add_view(ModelView(WorkAssignment, db.session, name='Kế hoạch công việc'))
+
+
+
+# admin.add_view(GroupMemberAdmin(GroupMember, db.session))
+admin.add_view(ModelView(Location, db.session, name="Địa điểm công việc"))
+
+admin.add_view(ModelView(MonthSummary, db.session, name="Tổng kết tháng"))
+with app.app_context():
+    admin.add_view(MessageView(Message, db.session, name="Tin nhắn"))
 
 import random
 if __name__ == '__main__':
@@ -551,8 +694,4 @@ if __name__ == '__main__':
     # context.load_cert_chain('/etc/letsencrypt/live/archbox.pw/fullchain.pem',  # đường dẫn tới file chứng chỉ
     #                         '/etc/letsencrypt/live/archbox.pw/privkey.pem')
     
-    socketio.run(app, host='0.0.0.0', port=5000, debug=True, 
-                #  certfile='/etc/letsencrypt/live/archbox.pw/fullchain.pem',
-                #  keyfile='/etc/letsencrypt/live/archbox.pw/privkey.pem',
-                #  server_side=True
-                )
+    socketio.run(app, host='0.0.0.0', port=5000, debug=True)
