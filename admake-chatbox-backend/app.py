@@ -529,7 +529,28 @@ def seed_database_user():
                 print(i,'/', total)
 
 class UserView(ModelView):
-    column_searchable_list = ['accountId','username']
+    column_searchable_list = ['accountId','username','firstName','lastName']
+    form_args = {
+        'BalanceAmount': { 'label': 'Lương tháng' }
+    }
+
+    form_labels = {
+        'BalanceAmount': 'Lương tháng',
+        'username': 'Nickname',
+        'firstName': 'Họ & tên đệm',
+        'lastName': 'Tên',
+        'Icon': 'Hình ảnh',
+        'Socialinfor': 'Thông tin liên lạc', #{phone_number,adress,email,facebook,zalo,...}
+        'Orderwebhook': 'Webhook',
+        'Cryptoaddresslist': 'Tài khoản ngân hàng',
+        'Selectedservices': 'Chuyên môn',
+        'Companyname':'Bộ phận',
+        'Role':'Vai trò',
+        'selectedProvider':'Dịch vụ'
+    }
+
+
+
 
 class MessageAdmin(ModelView):
     column_searchable_list = ['text']
@@ -669,6 +690,9 @@ class MyAdmin(Admin):
     def render(self, template, **kwargs):
         kwargs['groups'] = Group.query.all()
         return super().render(template, **kwargs)
+    
+
+
 # ------------------------------------------
 
 admin = Admin(app)

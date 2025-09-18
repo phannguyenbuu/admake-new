@@ -27,21 +27,18 @@
     .form-group:has(#is_active), .form-group:has(#is_anonymous),
     
     
-    .form-group:has(#localeCode), .form-group:has(#languageCode),
-    .form-group:has(#socialInfor), .form-group:has(#orderWebhook),
-    .form-group:has(#cryptoAddressList), .form-group:has(#is_anonymous),
-    .form-group:has(#selectedProvider), .form-group:has(#selectedServices),
+    /* .form-group:has(#localeCode), .form-group:has(#languageCode), */
+    /* .form-group:has(#socialInfor), .form-group:has(#orderWebhook), */
+    /* .form-group:has(#cryptoAddressList), */
+    /* .form-group:has(#selectedProvider), .form-group:has(#selectedServices), */
 
     /* .form-group:has(#createAt), .form-group:has(#updateAt), */
     .form-group:has(#group_members), .form-group:has(#attendances),
     .form-group:has(#month_summaries), .form-group:has(#is_anonymous),
-    .form-group:has(#selectedProvider), .form-group:has(#work_assignments),
-
-    localeCode
+    .form-group:has(#work_assignments)
     {
         display: none;
     }
-
 
     #content .table-responsive {
         max-height: 80vh; /* chiều cao tối đa bằng chiều cao viewport */
@@ -125,8 +122,32 @@
     /* Đổi màu hover dropdown */
     #sidebar .dropdown-menu a:hover {
     background-color: #5a6268 !important;
-    color: white !important;
+    color: #ffffff !important;
     }
+
+    /* Đặt kích thước thanh cuộn */
+    ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+    }
+
+    /* Nền track (nền thanh cuộn) */
+    ::-webkit-scrollbar-track {
+    background: none;
+    border-radius: 10px;
+    }
+
+    /* Thumb (phần kéo được) */
+    ::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 10px;
+    }
+
+    /* Thumb khi hover */
+    ::-webkit-scrollbar-thumb:hover {
+    background: #555;
+    }
+
 
     #sidebar .nav-link.active,
         #sidebar .nav-link:focus,

@@ -20,7 +20,8 @@
     <form method="GET" action="{{ url_for('filter_message_by_group') }}">
         <select name="group_id" size="4" 
             style="font-size:10px; margin-left: 15px; padding: 5px; width: 200px; 
-                border: 1px solid #fff; background:#afafaf;
+                border: none; background:rgba(255,255,255,0.2); 
+                color: #fff; overflow:auto;
                 border-radius:5px; height: 100px;">
             <!-- <option value="">Tất cả công trình</option> -->
             {% for group in groups %}
@@ -56,7 +57,7 @@
   {% include 'admin/listview.html' %}
   {% include 'admin/apply_submit_event.html' %}
   {% include 'admin/bootstrap_scripts.html' %}
-  
+
   <script>
       function cloneFormGroupFilters(originalForm, menuItemHref) {
           const locationMenuItem = document.querySelector(`a[href="/admin/${menuItemHref}/"]`);

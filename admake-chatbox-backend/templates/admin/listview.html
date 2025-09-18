@@ -1,8 +1,37 @@
 <script>
+  jsonArray = {
+        'Balanceamount': 'Lương tháng',
+        'username': 'Nickname',
+        'firstName': 'Họ & tên đệm',
+        'lastName': 'Tên',
+        'Icon': 'Hình ảnh',
+        'Socialinfor': 'Thông tin liên lạc',
+        'Orderwebhook': 'Webhook',
+        'Cryptoaddresslist': 'Tài khoản ngân hàng',
+        'Selectedservices': 'Chuyên môn',
+        'Companyname':'Bộ phận',
+        'Role':'Vai trò',
+        'Localcode':'Dân tộc',
+        'Languagecode':'Trình độ',
+        'selectedProvider':'Dịch vụ'
+    }
+
 document.addEventListener('DOMContentLoaded', () => {
   const toggle = document.getElementById('viewToggle');
   toggle.checked = true;  // force checked
   toggle.dispatchEvent(new Event('change'));
+
+  Object.entries(jsonArray).forEach(([key, value]) => {
+    const labels = document.querySelectorAll('label');
+
+    for (let label of labels) {
+      if (label.textContent.trim().toLowerCase() === key.trim().toLowerCase()) {
+        label.textContent = value;
+        break; // dừng vòng for (labels) nhưng vẫn tiếp tục forEach bên ngoài
+      }
+    }
+  });
+
 });
 
 
@@ -13,6 +42,8 @@ toggle.addEventListener('change', () => {
   const isThumbView = toggle.checked;
   const listTable = document.querySelector('.table-responsive');
   const thumbBox = document.getElementById('thumbViewBox');
+
+  if (!listTable  || !thumbBox) return;
 
   if (isThumbView) {
     listTable.style.display = 'none';
@@ -29,6 +60,8 @@ toggle.addEventListener('change', () => {
     const rows = document.querySelectorAll('.table-responsive tbody tr');
     rows.forEach(row => {
       if (window.location.href.includes('user')) {
+        const checkbox = row.querySelector('td').innerHTML;
+        const buttons = row.querySelector('.list-buttons-column').innerHTML;
         const username = row.querySelector('.col-username')?.textContent.trim();
         const firstName = row.querySelector('.col-firstName')?.textContent.trim();
         const lastName = row.querySelector('.col-lastName')?.textContent.trim();
@@ -41,12 +74,22 @@ toggle.addEventListener('change', () => {
         const balanceInVND = Math.round(parseFloat(balanceAmount.replace(/\./g, '')));
         const formattedBalance = balanceInVND.toLocaleString('vi-VN') + ' ₫';
 
+        const createAtStr = `${createAt}`;  // chuỗi ngày giờ từ server render
+        const date = new Date(createAtStr);
+
+        const day = date.getDate().toString().padStart(2, '0');      // ngày 2 số
+        const month = (date.getMonth() + 1).toString().padStart(2, '0'); // tháng 2 số (0-based nên +1)
+        const year = date.getFullYear();
+
+        const formattedDate = `${day}/${month}/${year}`;  // định dạng dd/mm/yyyy
+
+
         const userBox = document.createElement('div');
         userBox.style.border = '1px solid #ccc';
         userBox.style.padding = '20px';
         userBox.style.width = '200px';
         userBox.style.maxHeight = '200px';
-        userBox.style.borderRadius = '15px';
+        userBox.style.borderRadius = '10px';
         userBox.style.boxShadow = '0 0 5px #ddd';
         userBox.style.fontSize = '12px';
 
@@ -56,22 +99,14 @@ toggle.addEventListener('change', () => {
           <div><strong>Nick:</strong> ${username}</div>
           <div><strong>Chức danh:</strong> ${role}</div>
           <div><strong>Lương tháng:</strong> ${formattedBalance}</div>
-          <div style="font-size:8px;font-style:italic"><strong>Ngày tạo:</strong> ${createAt}</div>
+          
 
-          <div style="display:flex;flex-direction:row; gap: 100px">
-            <a class="icon" href="/admin/user/edit/?id=8&amp;url=/admin/user/?page_size%3D20" title="Edit Record">
-              <span class="fa fa-pencil glyphicon glyphicon-pencil"></span>
-            </a>
-                                      
-            <form class="icon" method="POST" action="/admin/user/delete/">
-              <input id="id" name="id" required="" type="hidden" value="8">
-              <input id="url" name="url" type="hidden" value="/admin/user/?page_size=20">
-              
-              <button style="border:none" onclick="return faHelpers.safeConfirm('Are you sure you want to delete this record?');" title="Delete Record">
-                <span class="fa fa-trash glyphicon glyphicon-trash"></span>
-              </button>
-            </form>
+          <div style="display:flex;flex-direction:row; align-items: center; justify-contents:center; gap: 20px; border-radius: 10px; padding:5px; padding-left: 32px; background-color:rgba(0,0,0,0.1)">
+            ${checkbox}
+            ${buttons}
           </div>
+
+          <div style="font-size:8px;font-style:italic"><strong>Tạo ngày:</strong> ${formattedDate}</div>
         `;
 
         thumbBox.appendChild(userBox);
