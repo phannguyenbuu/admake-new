@@ -1,0 +1,15 @@
+admake-chatbox/node_modules/
+admake-chatbox/public/
+admake-chatbox-backend/venv/
+admake-chatbox-backend/static/
+admake-chatbox-backend/__pycache__/
+admake-chatbox-backend/__scripts/
+quangcao_backend/
+quangcao_website/
+admake_chat.dump
+att_20250918_011436_11.540890_107.826381_2082665486.jpg
+makesim.pem
+quangcao_backend-main.zip
+quangcao_website-main.zip
+react-chat-app-main.zip
+admake-chatbox-backend\requirements.txt
