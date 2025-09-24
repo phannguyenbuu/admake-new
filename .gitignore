@@ -4,12 +4,14 @@ chat-be/venv/
 chat-be/static/
 chat-be/__pycache__/
 chat-be/__scripts/
-quangcao_backend/
-quangcao_website/
+quangcao_web/node_modules/
+quangcao_web/quangcao_website.zip
+quangcao_be/quangcao_backend.zip
+quangcao_be/node_modules/
 admake_chat.dump
 att_20250918_011436_11.540890_107.826381_2082665486.jpg
 makesim.pem
 quangcao_backend-main.zip
 quangcao_website-main.zip
 react-chat-app-main.zip
-chat-be\requirements.txt
+chat-be/requirements.txt

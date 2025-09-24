@@ -1,0 +1,1294 @@
+[
+  {
+    "_id": {
+      "$oid": "68865bc60eebf615034981ed"
+    },
+    "delete_at": null,
+    "title": "Task 1",
+    "description": "M\u00f4 t\u1ea3 task 1",
+    "status": "DONE",
+    "type": "REWARD",
+    "reward": 1000000,
+    "assignIds": [
+      {
+        "$oid": "68864f4845ce873d104a6ead"
+      },
+      {
+        "$oid": "68864f6163e2975c3a8ebef9"
+      },
+      {
+        "$oid": "68766ff358231e4343cb2c21"
+      }
+    ],
+    "workspaceId": {
+      "$oid": "6886555d0313b0e51df39f19"
+    },
+    "customerId": {
+      "$oid": "688047fdfd6519d5bef2a61f"
+    },
+    "materials": [
+      {
+        "materialId": {
+          "$oid": "688b24a53c3ed92bb3dfc21e"
+        },
+        "quantity": 1
+      },
+      {
+        "materialId": {
+          "$oid": "6879f7905e19ca909837d39d"
+        },
+        "quantity": 1
+      },
+      {
+        "materialId": {
+          "$oid": "6879f7905e19ca909837d39e"
+        },
+        "quantity": 1
+      }
+    ],
+    "createById": {
+      "$oid": "68766ff358231e4343cb2c21"
+    },
+    "createdAt": {
+      "$date": "2025-07-27T17:03:02.021Z"
+    },
+    "updatedAt": {
+      "$date": "2025-09-23T17:00:00.095Z"
+    },
+    "__v": 0,
+    "endTime": {
+      "$date": "2025-08-15T17:00:00Z"
+    },
+    "startTime": {
+      "$date": "2025-08-12T17:00:00Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "688afb2b3c3ed92bb3dfb3be"
+    },
+    "deletedAt": null,
+    "title": "task 2",
+    "description": "\u0110\u00e2y l\u00e0 test m\u00f4 t\u1ea3 ",
+    "status": "OPEN",
+    "type": "REWARD",
+    "reward": 0,
+    "assignIds": [
+      {
+        "$oid": "6886503ec296eb29035115eb"
+      }
+    ],
+    "customerId": {
+      "$oid": "687fbd21fd6519d5bef2a3d6"
+    },
+    "materials": [
+      {
+        "materialId": {
+          "$oid": "687f160139071cc78ac40935"
+        },
+        "quantity": 1
+      }
+    ],
+    "createById": {
+      "$oid": "68766ff358231e4343cb2c21"
+    },
+    "createdAt": {
+      "$date": "2025-07-31T05:12:11.855Z"
+    },
+    "updatedAt": {
+      "$date": "2025-07-31T05:12:11.855Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "688afb9d3c3ed92bb3dfb425"
+    },
+    "deletedAt": null,
+    "title": "test 1 ",
+    "description": "check echk",
+    "status": "OPEN",
+    "type": "REWARD",
+    "reward": 0,
+    "assignIds": [
+      {
+        "$oid": "68864f90a25366f488b10786"
+      }
+    ],
+    "customerId": {
+      "$oid": "687fbd21fd6519d5bef2a3d6"
+    },
+    "materials": [
+      {
+        "materialId": {
+          "$oid": "6879f7905e19ca909837d39d"
+        },
+        "quantity": 1
+      }
+    ],
+    "createById": {
+      "$oid": "68766ff358231e4343cb2c21"
+    },
+    "createdAt": {
+      "$date": "2025-07-31T05:14:05.063Z"
+    },
+    "updatedAt": {
+      "$date": "2025-07-31T05:14:05.063Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "688afd853c3ed92bb3dfb540"
+    },
+    "deletedAt": {
+      "$date": "2025-07-31T05:37:37.508Z"
+    },
+    "title": "test",
+    "description": "trrrrr",
+    "status": "REWARD",
+    "type": "REWARD",
+    "reward": 0,
+    "assignIds": [
+      {
+        "$oid": "68864fe7b96bf137d8f20a4f"
+      }
+    ],
+    "workspaceId": {
+      "$oid": "6886555d0313b0e51df39f19"
+    },
+    "customerId": {
+      "$oid": "687fbd21fd6519d5bef2a3d6"
+    },
+    "materials": [
+      {
+        "materialId": {
+          "$oid": "687f160139071cc78ac40935"
+        },
+        "quantity": 1
+      }
+    ],
+    "createById": {
+      "$oid": "68766ff358231e4343cb2c21"
+    },
+    "createdAt": {
+      "$date": "2025-07-31T05:22:13.148Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-10T05:33:06.362Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6896fcc50241a845cfea0204"
+    },
+    "deletedAt": null,
+    "title": "Hello tes test",
+    "description": "a",
+    "status": "DONE",
+    "type": "REWARD",
+    "reward": 100000000,
+    "assignIds": [
+      {
+        "$oid": "68864f6163e2975c3a8ebef9"
+      },
+      {
+        "$oid": "68864f90a25366f488b10786"
+      },
+      {
+        "$oid": "68864fa4529ef24911448750"
+      },
+      {
+        "$oid": "68864fe7b96bf137d8f20a4f"
+      },
+      {
+        "$oid": "689ca91e68b00102ba80a7f4"
+      }
+    ],
+    "workspaceId": {
+      "$oid": "6886555d0313b0e51df39f19"
+    },
+    "customerId": {
+      "$oid": "687fbd21fd6519d5bef2a3d6"
+    },
+    "materials": [
+      {
+        "materialId": {
+          "$oid": "688b24a53c3ed92bb3dfc21e"
+        },
+        "quantity": 1
+      }
+    ],
+    "createById": {
+      "$oid": "68766ff358231e4343cb2c21"
+    },
+    "createdAt": {
+      "$date": "2025-08-09T07:46:13.251Z"
+    },
+    "updatedAt": {
+      "$date": "2025-09-23T17:00:00.183Z"
+    },
+    "__v": 0,
+    "endTime": {
+      "$date": "2025-08-23T17:00:00Z"
+    },
+    "startTime": {
+      "$date": "2025-08-13T17:00:00Z"
+    },
+    "confirmDate": {
+      "$date": "2025-08-13T17:04:29.399Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6896fcdf0241a845cfea020e"
+    },
+    "deletedAt": null,
+    "title": "Ta da",
+    "description": "a",
+    "status": "OPEN",
+    "type": "REWARD",
+    "reward": 10000000,
+    "assignIds": [
+      {
+        "$oid": "68864f4845ce873d104a6ead"
+      }
+    ],
+    "workspaceId": {
+      "$oid": "6886555d0313b0e51df39f19"
+    },
+    "customerId": {
+      "$oid": "687fbd21fd6519d5bef2a3d6"
+    },
+    "materials": [
+      {
+        "materialId": {
+          "$oid": "687f160139071cc78ac40935"
+        },
+        "quantity": 1
+      }
+    ],
+    "createById": {
+      "$oid": "68766ff358231e4343cb2c21"
+    },
+    "createdAt": {
+      "$date": "2025-08-09T07:46:39.799Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-10T05:51:12.357Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6896fd0c0241a845cfea0259"
+    },
+    "deletedAt": null,
+    "title": "a",
+    "description": "a",
+    "status": "OPEN",
+    "type": "REWARD",
+    "reward": 0,
+    "assignIds": [
+      {
+        "$oid": "68766ff358231e4343cb2c21"
+      }
+    ],
+    "workspaceId": {
+      "$oid": "6886555d0313b0e51df39f19"
+    },
+    "customerId": {
+      "$oid": "687fbd21fd6519d5bef2a3d6"
+    },
+    "materials": [
+      {
+        "materialId": {
+          "$oid": "6879f7905e19ca909837d39d"
+        },
+        "quantity": 1
+      }
+    ],
+    "createById": {
+      "$oid": "68766ff358231e4343cb2c21"
+    },
+    "createdAt": {
+      "$date": "2025-08-09T07:47:24.812Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-09T07:47:24.812Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "689ce8e949f0334c7af174b1"
+    },
+    "deletedAt": null,
+    "title": "test test ",
+    "description": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaasddddddddd\u0111",
+    "status": "DONE",
+    "type": "REWARD",
+    "reward": 12222222,
+    "assignIds": [
+      {
+        "$oid": "689ca91e68b00102ba80a7f4"
+      },
+      {
+        "$oid": "6886503ec296eb29035115eb"
+      },
+      {
+        "$oid": "688650abcec88528131529ce"
+      },
+      {
+        "$oid": "68864fe7b96bf137d8f20a4f"
+      },
+      {
+        "$oid": "68864fa4529ef24911448750"
+      }
+    ],
+    "workspaceId": {
+      "$oid": "688a3add8d99dcb88162796f"
+    },
+    "customerId": {
+      "$oid": "688047fdfd6519d5bef2a61f"
+    },
+    "materials": [
+      {
+        "materialId": {
+          "$oid": "688b24a53c3ed92bb3dfc21e"
+        },
+        "quantity": 1
+      },
+      {
+        "materialId": {
+          "$oid": "687f16b839071cc78ac40951"
+        },
+        "quantity": 1
+      },
+      {
+        "materialId": {
+          "$oid": "687f160139071cc78ac40935"
+        },
+        "quantity": 1
+      },
+      {
+        "materialId": {
+          "$oid": "687e5cd9ca77d3cf2c588171"
+        },
+        "quantity": 1
+      }
+    ],
+    "startTime": {
+      "$date": "2025-08-14T17:00:00Z"
+    },
+    "endTime": {
+      "$date": "2025-08-15T17:00:00Z"
+    },
+    "paid": false,
+    "createById": {
+      "$oid": "68766ff358231e4343cb2c21"
+    },
+    "createdAt": {
+      "$date": "2025-08-13T19:35:05.570Z"
+    },
+    "updatedAt": {
+      "$date": "2025-09-23T17:00:00.234Z"
+    },
+    "__v": 0,
+    "confirmDate": {
+      "$date": "2025-09-20T03:58:01.010Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "689e08ea49f0334c7af1857a"
+    },
+    "deletedAt": null,
+    "title": "aaaaaaaaaaaaaaaaaaaaa",
+    "description": "aaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "status": "DONE",
+    "type": "MONTHLY",
+    "reward": 1111111111,
+    "assignIds": [
+      {
+        "$oid": "6886503ec296eb29035115eb"
+      },
+      {
+        "$oid": "68864fe7b96bf137d8f20a4f"
+      }
+    ],
+    "workspaceId": {
+      "$oid": "688a3add8d99dcb88162796f"
+    },
+    "customerId": {
+      "$oid": "688047fdfd6519d5bef2a61f"
+    },
+    "materials": [
+      {
+        "materialId": {
+          "$oid": "687f16b839071cc78ac40951"
+        },
+        "quantity": 1
+      },
+      {
+        "materialId": {
+          "$oid": "687f160139071cc78ac40935"
+        },
+        "quantity": 1
+      }
+    ],
+    "startTime": {
+      "$date": "2025-08-21T17:00:00Z"
+    },
+    "endTime": {
+      "$date": "2025-08-30T17:00:00Z"
+    },
+    "paid": false,
+    "createById": {
+      "$oid": "68766ff358231e4343cb2c21"
+    },
+    "createdAt": {
+      "$date": "2025-08-14T16:03:54.228Z"
+    },
+    "updatedAt": {
+      "$date": "2025-09-23T17:00:00.284Z"
+    },
+    "__v": 0,
+    "confirmDate": {
+      "$date": "2025-09-20T03:59:08.902Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "68a2253449f0334c7af19c7f"
+    },
+    "deletedAt": null,
+    "title": "Hhx j",
+    "description": "Jdndbdbd",
+    "status": "DONE",
+    "type": "MONTHLY",
+    "reward": 45678,
+    "assignIds": [
+      {
+        "$oid": "688650abcec88528131529ce"
+      }
+    ],
+    "workspaceId": {
+      "$oid": "688a3add8d99dcb88162796f"
+    },
+    "customerId": {
+      "$oid": "688047fdfd6519d5bef2a61f"
+    },
+    "materials": [],
+    "startTime": {
+      "$date": "2025-08-28T17:00:00Z"
+    },
+    "endTime": {
+      "$date": "2025-08-30T17:00:00Z"
+    },
+    "paid": false,
+    "createById": {
+      "$oid": "68766ff358231e4343cb2c21"
+    },
+    "createdAt": {
+      "$date": "2025-08-17T18:53:40.453Z"
+    },
+    "updatedAt": {
+      "$date": "2025-09-23T17:00:00.333Z"
+    },
+    "__v": 0,
+    "confirmDate": {
+      "$date": "2025-08-18T01:21:38.400Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "68a27d6f49f0334c7af19e5a"
+    },
+    "deletedAt": null,
+    "title": "Tesst",
+    "description": "Yy",
+    "status": "DONE",
+    "type": "MONTHLY",
+    "reward": 0,
+    "assignIds": [
+      {
+        "$oid": "689ded4749f0334c7af17dc1"
+      },
+      {
+        "$oid": "689ca91e68b00102ba80a7f4"
+      },
+      {
+        "$oid": "68766ff358231e4343cb2c21"
+      }
+    ],
+    "workspaceId": {
+      "$oid": "689dffe449f0334c7af182b7"
+    },
+    "customerId": {
+      "$oid": "688047fdfd6519d5bef2a61f"
+    },
+    "materials": [
+      {
+        "materialId": {
+          "$oid": "6879f7905e19ca909837d39e"
+        },
+        "quantity": 1
+      }
+    ],
+    "startTime": {
+      "$date": "2025-08-18T01:09:11.100Z"
+    },
+    "endTime": {
+      "$date": "2025-08-19T17:00:00Z"
+    },
+    "paid": false,
+    "createById": {
+      "$oid": "68766ff358231e4343cb2c21"
+    },
+    "createdAt": {
+      "$date": "2025-08-18T01:10:07.811Z"
+    },
+    "updatedAt": {
+      "$date": "2025-09-23T17:00:00.385Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "68a280a549f0334c7af1a01e"
+    },
+    "deletedAt": null,
+    "title": "dddd",
+    "description": "ddddddd\u0111",
+    "status": "DONE",
+    "type": "REWARD",
+    "reward": 1111111110,
+    "assignIds": [
+      {
+        "$oid": "689ca91e68b00102ba80a7f4"
+      },
+      {
+        "$oid": "688650abcec88528131529ce"
+      }
+    ],
+    "workspaceId": {
+      "$oid": "688a3add8d99dcb88162796f"
+    },
+    "customerId": {
+      "$oid": "687fbd21fd6519d5bef2a3d6"
+    },
+    "materials": [
+      {
+        "materialId": {
+          "$oid": "689e156749f0334c7af18cb4"
+        },
+        "quantity": 1
+      },
+      {
+        "materialId": {
+          "$oid": "688b24a53c3ed92bb3dfc21e"
+        },
+        "quantity": 1
+      }
+    ],
+    "startTime": {
+      "$date": "2025-08-20T17:00:00Z"
+    },
+    "endTime": {
+      "$date": "2025-08-21T17:00:00Z"
+    },
+    "paid": false,
+    "createById": {
+      "$oid": "68766ff358231e4343cb2c21"
+    },
+    "createdAt": {
+      "$date": "2025-08-18T01:23:49.082Z"
+    },
+    "updatedAt": {
+      "$date": "2025-09-23T17:00:00.436Z"
+    },
+    "__v": 0,
+    "confirmDate": {
+      "$date": "2025-08-18T01:25:57.232Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "68a334c7790b88cf7568a4e6"
+    },
+    "deletedAt": null,
+    "title": "L\u1ed8C",
+    "description": "aaaaaaaaaaaaaaaa",
+    "status": "DONE",
+    "type": "REWARD",
+    "reward": 1111111110,
+    "assignIds": [
+      {
+        "$oid": "68a3fa5835c46914d366025f"
+      },
+      {
+        "$oid": "68a7298535c46914d3663e9d"
+      },
+      {
+        "$oid": "68a7299835c46914d3663ea9"
+      },
+      {
+        "$oid": "689ca91e68b00102ba80a7f4"
+      },
+      {
+        "$oid": "68864f90a25366f488b10786"
+      }
+    ],
+    "workspaceId": {
+      "$oid": "688a3add8d99dcb88162796f"
+    },
+    "customerId": {
+      "$oid": "687fbd21fd6519d5bef2a3d6"
+    },
+    "materials": [
+      {
+        "materialId": {
+          "$oid": "689e156749f0334c7af18cb4"
+        },
+        "quantity": 1
+      }
+    ],
+    "startTime": {
+      "$date": "2025-08-28T17:00:00Z"
+    },
+    "endTime": {
+      "$date": "2025-08-29T17:00:00Z"
+    },
+    "paid": false,
+    "createById": {
+      "$oid": "68766ff358231e4343cb2c21"
+    },
+    "createdAt": {
+      "$date": "2025-08-18T14:12:23.154Z"
+    },
+    "updatedAt": {
+      "$date": "2025-09-23T17:00:00.486Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "68a6d51b35c46914d36636ce"
+    },
+    "deletedAt": null,
+    "title": "aaaaaaaaaaaa",
+    "description": "aaaaaaaaaaa",
+    "status": "DONE",
+    "type": "REWARD",
+    "reward": 111111110,
+    "assignIds": [
+      {
+        "$oid": "68a6c90835c46914d3662abe"
+      },
+      {
+        "$oid": "68a6c65235c46914d3662944"
+      },
+      {
+        "$oid": "68766ff358231e4343cb2c21"
+      },
+      {
+        "$oid": "6886503ec296eb29035115eb"
+      }
+    ],
+    "workspaceId": {
+      "$oid": "688a3add8d99dcb88162796f"
+    },
+    "customerId": {
+      "$oid": "688047fdfd6519d5bef2a61f"
+    },
+    "materials": [
+      {
+        "materialId": {
+          "$oid": "689e156749f0334c7af18cb4"
+        },
+        "quantity": 1
+      },
+      {
+        "materialId": {
+          "$oid": "688b24a53c3ed92bb3dfc21e"
+        },
+        "quantity": 1
+      }
+    ],
+    "startTime": {
+      "$date": "2025-08-21T17:00:00Z"
+    },
+    "endTime": {
+      "$date": "2025-08-23T17:00:00Z"
+    },
+    "paid": false,
+    "createById": {
+      "$oid": "689ca91e68b00102ba80a7f4"
+    },
+    "createdAt": {
+      "$date": "2025-08-21T08:13:15.969Z"
+    },
+    "updatedAt": {
+      "$date": "2025-09-23T17:00:00.537Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "68a7cdea1ec1bc790643b2f0"
+    },
+    "deletedAt": {
+      "$date": "2025-08-25T08:11:29.653Z"
+    },
+    "title": "Kh\u00e0 kh\u00e0 kh\u00e0 test test",
+    "description": "aaaaaaaaaaaaaaaaaaaaaa",
+    "status": "DONE",
+    "type": "REWARD",
+    "reward": 122222222,
+    "assignIds": [
+      {
+        "$oid": "68a7298535c46914d3663e9d"
+      },
+      {
+        "$oid": "689ca91e68b00102ba80a7f4"
+      },
+      {
+        "$oid": "68766ff358231e4343cb2c21"
+      }
+    ],
+    "workspaceId": {
+      "$oid": "688a3add8d99dcb88162796f"
+    },
+    "customerId": {
+      "$oid": "688047fdfd6519d5bef2a61f"
+    },
+    "materials": [
+      {
+        "materialId": {
+          "$oid": "688b24a53c3ed92bb3dfc21e"
+        },
+        "quantity": 1
+      },
+      {
+        "materialId": {
+          "$oid": "689e156749f0334c7af18cb4"
+        },
+        "quantity": 1
+      },
+      {
+        "materialId": {
+          "$oid": "687f160139071cc78ac40935"
+        },
+        "quantity": 1
+      }
+    ],
+    "startTime": {
+      "$date": "2025-08-25T17:00:00Z"
+    },
+    "endTime": {
+      "$date": "2025-09-24T17:00:00Z"
+    },
+    "paid": false,
+    "createById": {
+      "$oid": "68766ff358231e4343cb2c21"
+    },
+    "createdAt": {
+      "$date": "2025-08-22T01:54:50.595Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-25T08:11:29.653Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "68a7df9bdc2c1ea6a3212b50"
+    },
+    "deletedAt": null,
+    "title": "Production",
+    "description": "\u0110\u00e2y l\u00e0 test tr\u00ean production",
+    "status": "DONE",
+    "type": "REWARD",
+    "reward": 1111111,
+    "assignIds": [
+      {
+        "$oid": "68a729e635c46914d3663eef"
+      },
+      {
+        "$oid": "68a729db35c46914d3663ee3"
+      }
+    ],
+    "workspaceId": {
+      "$oid": "68a7df43dc2c1ea6a3212b1b"
+    },
+    "customerId": {
+      "$oid": "688047fdfd6519d5bef2a61f"
+    },
+    "materials": [
+      {
+        "materialId": {
+          "$oid": "688b24a53c3ed92bb3dfc21e"
+        },
+        "quantity": 1
+      },
+      {
+        "materialId": {
+          "$oid": "689e156749f0334c7af18cb4"
+        },
+        "quantity": 1
+      }
+    ],
+    "startTime": {
+      "$date": "2025-08-22T17:00:00Z"
+    },
+    "endTime": {
+      "$date": "2025-08-22T17:00:00Z"
+    },
+    "paid": false,
+    "createById": {
+      "$oid": "68766ff358231e4343cb2c21"
+    },
+    "createdAt": {
+      "$date": "2025-08-22T03:10:19.195Z"
+    },
+    "updatedAt": {
+      "$date": "2025-09-23T17:00:00.589Z"
+    },
+    "__v": 0,
+    "confirmDate": {
+      "$date": "2025-08-22T03:36:27.521Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "68ac0e07a4e729c9cfc8a44b"
+    },
+    "deletedAt": null,
+    "title": "aaaaaaaaaa",
+    "description": "aaaaaaaaaa",
+    "status": "DONE",
+    "type": "REWARD",
+    "reward": 111111,
+    "assignIds": [
+      {
+        "$oid": "68a3fa5835c46914d366025f"
+      }
+    ],
+    "workspaceId": {
+      "$oid": "688a3add8d99dcb88162796f"
+    },
+    "customerId": {
+      "$oid": "68abed13a4e729c9cfc898c5"
+    },
+    "materials": [
+      {
+        "materialId": {
+          "$oid": "6879f7905e19ca909837d39f"
+        },
+        "quantity": 1
+      }
+    ],
+    "paid": false,
+    "createById": {
+      "$oid": "689ca91e68b00102ba80a7f4"
+    },
+    "createdAt": {
+      "$date": "2025-08-25T07:17:27.999Z"
+    },
+    "updatedAt": {
+      "$date": "2025-09-23T17:00:00.639Z"
+    },
+    "__v": 0,
+    "endTime": {
+      "$date": "2025-08-29T17:00:00Z"
+    },
+    "startTime": {
+      "$date": "2025-08-27T17:00:00Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "68ac1081a4e729c9cfc8a5cd"
+    },
+    "deletedAt": null,
+    "title": "aaaaaaaaaaa",
+    "description": "aaaaaaaaaaa",
+    "status": "DONE",
+    "type": "REWARD",
+    "reward": 111111111,
+    "assignIds": [
+      {
+        "$oid": "6886503ec296eb29035115eb"
+      },
+      {
+        "$oid": "68a96de0a4e729c9cfc7eea7"
+      }
+    ],
+    "workspaceId": {
+      "$oid": "688a3add8d99dcb88162796f"
+    },
+    "customerId": {
+      "$oid": "68abed13a4e729c9cfc898c5"
+    },
+    "materials": [
+      {
+        "materialId": {
+          "$oid": "688b24a53c3ed92bb3dfc21e"
+        },
+        "quantity": 1
+      },
+      {
+        "materialId": {
+          "$oid": "687e5cd9ca77d3cf2c588171"
+        },
+        "quantity": 1
+      }
+    ],
+    "startTime": {
+      "$date": "2025-08-25T17:00:00Z"
+    },
+    "endTime": {
+      "$date": "2025-08-29T17:00:00Z"
+    },
+    "paid": false,
+    "createById": {
+      "$oid": "689ca91e68b00102ba80a7f4"
+    },
+    "createdAt": {
+      "$date": "2025-08-25T07:28:01.681Z"
+    },
+    "updatedAt": {
+      "$date": "2025-09-23T17:00:00.690Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "68ac2344a4e729c9cfc8b61a"
+    },
+    "deletedAt": null,
+    "title": "aaaaaavbbbb",
+    "description": "aaaaaaaaaaaa",
+    "status": "DONE",
+    "type": "REWARD",
+    "reward": 11111,
+    "assignIds": [
+      {
+        "$oid": "6886503ec296eb29035115eb"
+      }
+    ],
+    "workspaceId": {
+      "$oid": "688a3add8d99dcb88162796f"
+    },
+    "customerId": {
+      "$oid": "68abed13a4e729c9cfc898c5"
+    },
+    "materials": [
+      {
+        "materialId": {
+          "$oid": "68ac1a4da4e729c9cfc8aa6e"
+        },
+        "quantity": 1
+      }
+    ],
+    "startTime": {
+      "$date": "2025-08-25T17:00:00Z"
+    },
+    "endTime": {
+      "$date": "2025-08-28T17:00:00Z"
+    },
+    "paid": false,
+    "createById": {
+      "$oid": "68766ff358231e4343cb2c21"
+    },
+    "createdAt": {
+      "$date": "2025-08-25T08:48:04.817Z"
+    },
+    "updatedAt": {
+      "$date": "2025-09-23T17:00:00.743Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "68ac567ba4e729c9cfc8c789"
+    },
+    "deletedAt": null,
+    "title": "C\u00f4ng vi\u1ec7c A",
+    "description": "aaaaaaaaaaaaaaaaaaa",
+    "status": "DONE",
+    "type": "REWARD",
+    "reward": 10000,
+    "assignIds": [
+      {
+        "$oid": "68a96de0a4e729c9cfc7eea7"
+      }
+    ],
+    "workspaceId": {
+      "$oid": "68abe6d6a4e729c9cfc8948a"
+    },
+    "customerId": {
+      "$oid": "68ac564ba4e729c9cfc8c75d"
+    },
+    "materials": [
+      {
+        "materialId": {
+          "$oid": "688b24a53c3ed92bb3dfc21e"
+        },
+        "quantity": 1
+      },
+      {
+        "materialId": {
+          "$oid": "6879f7905e19ca909837d39d"
+        },
+        "quantity": 1
+      }
+    ],
+    "startTime": {
+      "$date": "2025-08-25T17:00:00Z"
+    },
+    "endTime": {
+      "$date": "2025-08-29T17:00:00Z"
+    },
+    "paid": false,
+    "createById": {
+      "$oid": "68766ff358231e4343cb2c21"
+    },
+    "createdAt": {
+      "$date": "2025-08-25T12:26:35.825Z"
+    },
+    "updatedAt": {
+      "$date": "2025-09-23T17:00:00.793Z"
+    },
+    "__v": 0,
+    "confirmDate": {
+      "$date": "2025-08-25T22:40:10.515Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "68ace9b2a4e729c9cfc8f82e"
+    },
+    "deletedAt": null,
+    "title": "\u0110\u00e0o m\u00f3ng",
+    "description": "\u0110\u00e0o m\u00f3ng ",
+    "status": "DONE",
+    "type": "REWARD",
+    "reward": 55000000,
+    "assignIds": [
+      {
+        "$oid": "68a96de0a4e729c9cfc7eea7"
+      },
+      {
+        "$oid": "68abd62ba4e729c9cfc88e1f"
+      }
+    ],
+    "workspaceId": {
+      "$oid": "68ace96da4e729c9cfc8f80b"
+    },
+    "customerId": {
+      "$oid": "68ace182a4e729c9cfc8f2ac"
+    },
+    "materials": [
+      {
+        "materialId": {
+          "$oid": "688b24a53c3ed92bb3dfc21e"
+        },
+        "quantity": 2
+      },
+      {
+        "materialId": {
+          "$oid": "687e5cd9ca77d3cf2c588171"
+        },
+        "quantity": 1
+      }
+    ],
+    "startTime": {
+      "$date": "2025-08-26T17:00:00Z"
+    },
+    "endTime": {
+      "$date": "2025-08-30T17:00:00Z"
+    },
+    "paid": false,
+    "createById": {
+      "$oid": "68766ff358231e4343cb2c21"
+    },
+    "createdAt": {
+      "$date": "2025-08-25T22:54:42.727Z"
+    },
+    "updatedAt": {
+      "$date": "2025-09-23T17:00:00.844Z"
+    },
+    "__v": 0,
+    "confirmDate": {
+      "$date": "2025-08-25T22:55:02.991Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "68b440f2d6e6745dc10748fd"
+    },
+    "deletedAt": null,
+    "title": "taaaaa",
+    "description": "aaaaaaaaaa",
+    "status": "DONE",
+    "type": "REWARD",
+    "reward": 1111110,
+    "assignIds": [
+      {
+        "$oid": "68ad17e9a4e729c9cfc90b5c"
+      }
+    ],
+    "workspaceId": {
+      "$oid": "688a3add8d99dcb88162796f"
+    },
+    "customerId": {
+      "$oid": "68ace182a4e729c9cfc8f2ac"
+    },
+    "materials": [
+      {
+        "materialId": {
+          "$oid": "68ac1a4da4e729c9cfc8aa6e"
+        },
+        "quantity": 1
+      }
+    ],
+    "startTime": {
+      "$date": "2025-08-30T17:00:00Z"
+    },
+    "endTime": {
+      "$date": "2025-09-02T17:00:00Z"
+    },
+    "paid": false,
+    "createById": {
+      "$oid": "68766ff358231e4343cb2c21"
+    },
+    "createdAt": {
+      "$date": "2025-08-31T12:32:50.613Z"
+    },
+    "updatedAt": {
+      "$date": "2025-09-23T17:00:00.893Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "68c36c4945bdaed46829e982"
+    },
+    "deletedAt": null,
+    "title": "Bangr hieuej anh ",
+    "description": "Lawps daet 6h sang",
+    "status": "IN_PROGRESS",
+    "type": "MONTHLY",
+    "reward": 8000000,
+    "assignIds": [
+      {
+        "$oid": "68ac2247a4e729c9cfc8b44e"
+      },
+      {
+        "$oid": "68b3187ed6e6745dc106ef5e"
+      },
+      {
+        "$oid": "689ca91e68b00102ba80a7f4"
+      }
+    ],
+    "workspaceId": {
+      "$oid": "688a3add8d99dcb88162796f"
+    },
+    "customerId": {
+      "$oid": "68ac564ba4e729c9cfc8c75d"
+    },
+    "materials": [
+      {
+        "materialId": {
+          "$oid": "68ac1a4da4e729c9cfc8aa6e"
+        },
+        "quantity": 1
+      },
+      {
+        "materialId": {
+          "$oid": "688b24a53c3ed92bb3dfc21e"
+        },
+        "quantity": 1
+      }
+    ],
+    "startTime": {
+      "$date": "2025-09-24T17:00:00Z"
+    },
+    "endTime": {
+      "$date": "2025-09-29T17:00:00Z"
+    },
+    "paid": false,
+    "createById": {
+      "$oid": "68766ff358231e4343cb2c21"
+    },
+    "createdAt": {
+      "$date": "2025-09-12T00:41:45.172Z"
+    },
+    "updatedAt": {
+      "$date": "2025-09-20T03:57:25.315Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "68c5154a3432be900356853f"
+    },
+    "deletedAt": null,
+    "title": "Cong viec",
+    "description": "sale",
+    "status": "DONE",
+    "type": "REWARD",
+    "reward": 22000000,
+    "assignIds": [
+      {
+        "$oid": "68ad17e9a4e729c9cfc90b5c"
+      }
+    ],
+    "workspaceId": {
+      "$oid": "688a3add8d99dcb88162796f"
+    },
+    "customerId": {
+      "$oid": "68ace182a4e729c9cfc8f2ac"
+    },
+    "materials": [
+      {
+        "materialId": {
+          "$oid": "688b24a53c3ed92bb3dfc21e"
+        },
+        "quantity": 1
+      },
+      {
+        "materialId": {
+          "$oid": "687e5cd9ca77d3cf2c588171"
+        },
+        "quantity": 1
+      },
+      {
+        "materialId": {
+          "$oid": "6879f7905e19ca909837d39e"
+        },
+        "quantity": 1
+      }
+    ],
+    "startTime": {
+      "$date": "2025-09-13T17:00:00Z"
+    },
+    "endTime": {
+      "$date": "2025-09-14T17:00:00Z"
+    },
+    "paid": false,
+    "createById": {
+      "$oid": "68c36ef845bdaed46829eba6"
+    },
+    "createdAt": {
+      "$date": "2025-09-13T06:55:06.434Z"
+    },
+    "updatedAt": {
+      "$date": "2025-09-23T17:00:00.948Z"
+    },
+    "__v": 0
+  }
+]

@@ -29,6 +29,7 @@ import { InforDashboard } from "./app/infor/page";
 import { WorkPointsPage } from "./app/dashboard/work-points/page";
 import { useInfo } from "./common/hooks/info.hook";
 import Error403 from "./app/403";
+import { Navigate } from "react-router-dom";
 
 // Route guard: chặn truy cập nếu không có quyền
 function RequireRoles({
@@ -38,11 +39,14 @@ function RequireRoles({
   roles?: UserRole[];
   children: React.ReactElement;
 }) {
-  const { data: user } = useInfo();
-  const userPermissions = user?.role.permissions || [];
-  if (!roles || roles.length === 0) return children;
-  const hasPermission = roles.some((r) => userPermissions.includes(r));
-  return hasPermission ? children : <Error403 />;
+  // const { data: user } = useInfo();
+  // const userPermissions = user?.role.permissions || [];
+  // if (!roles || roles.length === 0) return children;
+  // const hasPermission = roles.some((r) => userPermissions.includes(r));
+  // return hasPermission ? children : <Error403 />;
+
+  console.log(children);
+  return children;
 }
 
 interface TRoute extends Omit<NonIndexRouteObject, "index" | "children"> {
@@ -59,13 +63,27 @@ const routes: TRoute = {
   element: <BaseLayout />,
   errorElement: <Error404 />,
   children: [
+    // {
+    //   path: "/",
+    //   index: true,
+    //   lazy: () => import("./app/login/page"),
+    //   title: "Đăng nhập",
+    //   ignoreInMenu: true,
+    // },
+
     {
-      path: "/",
       index: true,
+      element: <Navigate to="/dashboard" replace />,
+    },
+    {
+      path: "login", // chuyển trang login thành path 'login' tách biệt
       lazy: () => import("./app/login/page"),
       title: "Đăng nhập",
       ignoreInMenu: true,
     },
+
+
+
     {
       path: "/dashboard",
       lazy: () => import("./app/dashboard/page"),
@@ -217,9 +235,11 @@ export function getMainMenuItems(pathname?: string): MenuItem[] {
       if (!route) return acc;
 
       // Kiểm tra nếu route có roles và userPermissions không chứa bất kỳ role nào trong đó
-      const hasPermission =
-        !route.roles ||
-        route.roles.some((role) => userPermissions.includes(role));
+      // const hasPermission =
+      //   !route.roles ||
+      //   route.roles.some((role) => userPermissions.includes(role));
+
+      const hasPermission = true;
 
       if (!route.ignoreInMenu && hasPermission) {
         const push: MenuItem = {

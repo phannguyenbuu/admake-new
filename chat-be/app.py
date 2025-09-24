@@ -718,4 +718,4 @@ if __name__ == '__main__':
     # context.load_cert_chain('/etc/letsencrypt/live/archbox.pw/fullchain.pem',  # đường dẫn tới file chứng chỉ
     #                         '/etc/letsencrypt/live/archbox.pw/privkey.pem')
     
-    socketio.run(app, host='0.0.0.0', port=5000, debug=True)
+    socketio.run(app, host='0.0.0.0', port=5007, debug=True)

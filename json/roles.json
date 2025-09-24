@@ -1,0 +1,137 @@
+[
+  {
+    "_id": {
+      "$oid": "6879cd8e865fb3ae13aab099"
+    },
+    "delete_at": null,
+    "permissions": [
+      "customer:management",
+      "work:management"
+    ],
+    "name": "Nh\u00e2n vi\u00ean",
+    "createdAt": {
+      "$date": "2025-07-18T04:29:02.436Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-25T02:39:46.986Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6879cd8e865fb3ae13aab098"
+    },
+    "delete_at": null,
+    "permissions": [
+      "customer:management",
+      "work:management",
+      "statistics:management",
+      "accounting:management",
+      "warehouse:management"
+    ],
+    "name": "Qu\u1ea3n tr\u1ecb vi\u00ean",
+    "createdAt": {
+      "$date": "2025-07-18T04:29:02.435Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-25T02:38:07.006Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "688923918d99dcb8816275c6"
+    },
+    "deletedAt": null,
+    "permissions": [
+      "user:management",
+      "setting:management",
+      "customer:management",
+      "work:management",
+      "statistics:management",
+      "permission:management",
+      "role:management",
+      "accounting:management",
+      "warehouse:management"
+    ],
+    "name": "Admin",
+    "createdAt": {
+      "$date": "2025-07-29T19:40:01.483Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-25T02:25:08.212Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "689ded9749f0334c7af17ddd"
+    },
+    "deletedAt": null,
+    "permissions": [
+      "work:management",
+      "warehouse:management"
+    ],
+    "name": "Qu\u1ea3n l\u00fd kho",
+    "createdAt": {
+      "$date": "2025-08-14T14:07:19.847Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-25T02:38:44.568Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "689e142749f0334c7af18aab"
+    },
+    "deletedAt": null,
+    "permissions": [
+      "work:management"
+    ],
+    "name": "Thi c\u00f4ng",
+    "createdAt": {
+      "$date": "2025-08-14T16:51:51.830Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-25T02:39:16.381Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "68abcd4fa4e729c9cfc889c9"
+    },
+    "deletedAt": null,
+    "permissions": [
+      "accounting:management",
+      "statistics:management"
+    ],
+    "name": "K\u1ebf to\u00e1n",
+    "createdAt": {
+      "$date": "2025-08-25T02:41:19.215Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-25T02:41:19.215Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "68abcea3a4e729c9cfc88a55"
+    },
+    "deletedAt": null,
+    "permissions": [
+      "user:management",
+      "role:management"
+    ],
+    "name": "Qu\u1ea3n l\u00fd nh\u00e2n s\u1ef1",
+    "createdAt": {
+      "$date": "2025-08-25T02:46:59.144Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-25T02:47:12.878Z"
+    },
+    "__v": 0
+  }
+]

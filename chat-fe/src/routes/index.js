@@ -34,8 +34,8 @@ export default function Router() {
       path: "/",
       element: <DashboardLayout />,
       children: [
-        { element: <Navigate to={DEFAULT_PATH} replace />, index: true },
-        
+        // { element: <Navigate to={DEFAULT_PATH} replace />, index: true },
+        { element: <Navigate to="/dashboard" replace />, index: true },
         { path: "settings", element: <Settings /> },
         { path: "worklist", element: <Settings /> },
         { path: "group", element: <GroupPage /> },
