@@ -1,9 +1,9 @@
-admake-chatbox/node_modules/
-admake-chatbox/public/
-admake-chatbox-backend/venv/
-admake-chatbox-backend/static/
-admake-chatbox-backend/__pycache__/
-admake-chatbox-backend/__scripts/
+chat-fe/node_modules/
+chat-fe/public/
+chat-be/venv/
+chat-be/static/
+chat-be/__pycache__/
+chat-be/__scripts/
 quangcao_backend/
 quangcao_website/
 admake_chat.dump
@@ -12,4 +12,4 @@ makesim.pem
 quangcao_backend-main.zip
 quangcao_website-main.zip
 react-chat-app-main.zip
-admake-chatbox-backend\requirements.txt
+chat-be\requirements.txt

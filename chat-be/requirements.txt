@@ -1,0 +1,13 @@
+Flask
+Flask-SQLAlchemy
+Flask-SocketIO
+flask-login
+Werkzeug
+Flask-Admin
+Flask-CORS
+SQLAlchemy
+python-socketio
+pytz
+psycopg2
+eventlet
+python-dotenv

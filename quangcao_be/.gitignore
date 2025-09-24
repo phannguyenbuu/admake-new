@@ -1,0 +1,11 @@
+node_modules
+dist    
+bun.lock
+uploads
+uploads/*
+uploads/**/*
+
+
+// có thể thêm vào sau khi tạo mới
+
+!uploads/default/logo-default.png
