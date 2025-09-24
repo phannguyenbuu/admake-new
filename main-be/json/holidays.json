@@ -1,0 +1,302 @@
+[
+  {
+    "_id": {
+      "$oid": "6896c317b0effc7ba8fd4a24"
+    },
+    "deletedAt": null,
+    "name": "T\u1ebft Nguy\u00ean \u0110\u00e1n",
+    "startDate": {
+      "$date": "2024-02-10T00:00:00Z"
+    },
+    "endDate": {
+      "$date": "2024-02-14T00:00:00Z"
+    },
+    "type": "PUBLIC_HOLIDAY",
+    "description": "Ngh\u1ec9 T\u1ebft Nguy\u00ean \u0110\u00e1n 2024",
+    "createdBy": {
+      "$oid": "68766ff358231e4343cb2c21"
+    },
+    "forUserId": {
+      "$oid": "507f1f77bcf86cd799439011"
+    },
+    "isActive": true,
+    "daysCount": 5,
+    "createdAt": {
+      "$date": "2025-08-09T03:40:07.745Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-09T03:40:07.745Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6896f1160241a845cfe9feac"
+    },
+    "deletedAt": null,
+    "name": "Ngh\u1ec9 ph\u00e9p 5 ",
+    "startDate": {
+      "$date": "2025-08-13T00:00:00Z"
+    },
+    "endDate": {
+      "$date": "2025-08-14T00:00:00Z"
+    },
+    "type": "PERSONAL_LEAVE",
+    "description": "kkkkkkkkkkkkk",
+    "createdBy": {
+      "$oid": "68766ff358231e4343cb2c21"
+    },
+    "forUserId": {
+      "$oid": "688650abcec88528131529ce"
+    },
+    "isActive": true,
+    "daysCount": 2,
+    "createdAt": {
+      "$date": "2025-08-09T06:56:22.310Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-09T06:56:22.310Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6896f1ea0241a845cfe9fee4"
+    },
+    "deletedAt": null,
+    "name": "aaaaaaaaaaaa",
+    "startDate": {
+      "$date": "2025-08-15T00:00:00Z"
+    },
+    "endDate": {
+      "$date": "2025-08-21T00:00:00Z"
+    },
+    "type": "SICK_LEAVE",
+    "description": "sdddddddddd",
+    "createdBy": {
+      "$oid": "68766ff358231e4343cb2c21"
+    },
+    "forUserId": {
+      "$oid": "688650abcec88528131529ce"
+    },
+    "isActive": true,
+    "daysCount": 7,
+    "createdAt": {
+      "$date": "2025-08-09T06:59:54.029Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-09T06:59:54.029Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "689bf75f6becca34da28eede"
+    },
+    "deletedAt": null,
+    "name": "Tr\u1ea7n Th\u00e1i H\u1ecdc",
+    "startDate": {
+      "$date": "2025-08-13T17:00:00Z"
+    },
+    "endDate": {
+      "$date": "2025-08-22T17:00:00Z"
+    },
+    "type": "PERSONAL_LEAVE",
+    "description": "aaaaaaaaaaaaaaa",
+    "createdBy": {
+      "$oid": "68766ff358231e4343cb2c21"
+    },
+    "forUserId": {
+      "$oid": "688650abcec88528131529ce"
+    },
+    "isActive": true,
+    "daysCount": 10,
+    "createdAt": {
+      "$date": "2025-08-13T02:24:31.058Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-13T02:24:31.058Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "689bf8496becca34da28f03a"
+    },
+    "deletedAt": null,
+    "name": "Tr\u1ea7n Th\u00e1i H\u1ecdc",
+    "startDate": {
+      "$date": "2025-08-13T17:00:00Z"
+    },
+    "endDate": {
+      "$date": "2025-08-14T17:00:00Z"
+    },
+    "type": "PERSONAL_LEAVE",
+    "description": "aaaaaaaaaaaaaaaa",
+    "createdBy": {
+      "$oid": "68766ff358231e4343cb2c21"
+    },
+    "forUserId": {
+      "$oid": "688650abcec88528131529ce"
+    },
+    "isActive": true,
+    "daysCount": 2,
+    "createdAt": {
+      "$date": "2025-08-13T02:28:25.440Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-13T02:28:25.440Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "689cd0c749f0334c7af16fb9"
+    },
+    "deletedAt": null,
+    "name": "Tr\u1ea7n Th\u00e1i H\u1ecdc",
+    "startDate": {
+      "$date": "2025-08-14T17:00:00Z"
+    },
+    "endDate": {
+      "$date": "2025-08-22T17:00:00Z"
+    },
+    "type": "PERSONAL_LEAVE",
+    "description": "aaaaaaaaaaa",
+    "createdBy": {
+      "$oid": "68766ff358231e4343cb2c21"
+    },
+    "forUserId": {
+      "$oid": "689ca91e68b00102ba80a7f4"
+    },
+    "isActive": true,
+    "daysCount": 9,
+    "createdAt": {
+      "$date": "2025-08-13T17:52:07.183Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-13T17:52:07.183Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "689df34449f0334c7af17ff0"
+    },
+    "deletedAt": null,
+    "name": "aaaaaaaaaaa",
+    "startDate": {
+      "$date": "2025-08-14T17:00:00Z"
+    },
+    "endDate": {
+      "$date": "2025-08-16T17:00:00Z"
+    },
+    "type": "PERSONAL_LEAVE",
+    "description": "aaaaaaaaaaaaaaaaaaaaa",
+    "createdBy": {
+      "$oid": "68766ff358231e4343cb2c21"
+    },
+    "forUserId": {
+      "$oid": "689ded4749f0334c7af17dc1"
+    },
+    "isActive": true,
+    "daysCount": 3,
+    "createdAt": {
+      "$date": "2025-08-14T14:31:32.285Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-14T14:31:32.285Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "689df41f49f0334c7af17ffd"
+    },
+    "deletedAt": null,
+    "name": "bbbbbbbbbbbbbbb",
+    "startDate": {
+      "$date": "2025-08-14T17:00:00Z"
+    },
+    "endDate": {
+      "$date": "2025-08-16T17:00:00Z"
+    },
+    "type": "PERSONAL_LEAVE",
+    "description": "aaaaaaaaaaaaaaaaaaaa",
+    "createdBy": {
+      "$oid": "68766ff358231e4343cb2c21"
+    },
+    "forUserId": {
+      "$oid": "689ded4749f0334c7af17dc1"
+    },
+    "isActive": true,
+    "daysCount": 3,
+    "createdAt": {
+      "$date": "2025-08-14T14:35:11.787Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-14T14:35:11.787Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "68abd663a4e729c9cfc88e32"
+    },
+    "deletedAt": null,
+    "name": "Ngh\u1ec9 l\u1ec5 ph\u00e9p",
+    "startDate": {
+      "$date": "2025-08-25T17:00:00Z"
+    },
+    "endDate": {
+      "$date": "2025-08-26T17:00:00Z"
+    },
+    "type": "PERSONAL_LEAVE",
+    "description": "Ngh\u1ec9 l\u1ec5 ph\u00e9p",
+    "createdBy": {
+      "$oid": "68766ff358231e4343cb2c21"
+    },
+    "forUserId": {
+      "$oid": "68abd62ba4e729c9cfc88e1f"
+    },
+    "isActive": true,
+    "daysCount": 2,
+    "createdAt": {
+      "$date": "2025-08-25T03:20:03.588Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-25T03:20:03.588Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "68abd714a4e729c9cfc88e61"
+    },
+    "deletedAt": null,
+    "name": "Ngh\u1ec9 l\u1ec5 Qu\u1ed1c Kh\u00e1nh",
+    "startDate": {
+      "$date": "2025-08-31T17:00:00Z"
+    },
+    "endDate": {
+      "$date": "2025-09-01T17:00:00Z"
+    },
+    "type": "PERSONAL_LEAVE",
+    "description": "Ngh\u1ec9 l\u1ec5 Qu\u1ed1c Kh\u00e1nh",
+    "createdBy": {
+      "$oid": "68766ff358231e4343cb2c21"
+    },
+    "forUserId": {
+      "$oid": "68abd6dca4e729c9cfc88e4e"
+    },
+    "isActive": true,
+    "daysCount": 2,
+    "createdAt": {
+      "$date": "2025-08-25T03:23:00.638Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-25T03:23:00.638Z"
+    },
+    "__v": 0
+  }
+]

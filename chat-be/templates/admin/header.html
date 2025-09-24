@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>{% block title %}{% if admin_view.category %}{{ admin_view.category }} - {% endif %}{{ admin_view.name }} - {{ admin_view.admin.name }}{% endblock %}</title>
+{% block head_meta %}
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="">
+<meta name="author" content="">
+{% endblock %}
+{% block head_css %}
+<link href="{{ admin_static.url(filename='bootstrap/bootstrap4/swatch/{swatch}/bootstrap.min.css'.format(swatch=config.get('FLASK_ADMIN_SWATCH', 'default')), v='4.2.1') }}"
+        rel="stylesheet">
+{% if config.get('FLASK_ADMIN_SWATCH', 'default') == 'default' %}
+<link href="{{ admin_static.url(filename='bootstrap/bootstrap4/css/bootstrap.min.css', v='4.2.1') }}" rel="stylesheet">
+{% endif %}
+<link href="{{ admin_static.url(filename='admin/css/bootstrap4/admin.css', v='1.1.1') }}" rel="stylesheet">
+<link href="{{ admin_static.url(filename='bootstrap/bootstrap4/css/font-awesome.min.css', v='4.7.0') }}" rel="stylesheet">
+{% if admin_view.extra_css %}
+    {% for css_url in admin_view.extra_css %}
+    <link href="{{ css_url }}" rel="stylesheet">
+    {% endfor %}
+{% endif %}
+<style>
+    .form-group:has(#accountId), .form-group:has(#is_authenticated), 
+    .form-group:has(#is_active), .form-group:has(#is_anonymous),
+        
+    /* .form-group:has(#localeCode), .form-group:has(#languageCode), */
+    /* .form-group:has(#socialInfor), .form-group:has(#orderWebhook), */
+    /* .form-group:has(#cryptoAddressList), */
+    /* .form-group:has(#selectedProvider), .form-group:has(#selectedServices), */
+
+    /* .form-group:has(#createAt), .form-group:has(#updateAt), */
+    .form-group:has(#group_members), .form-group:has(#attendances),
+    .form-group:has(#month_summaries), .form-group:has(#is_anonymous),
+    .form-group:has(#work_assignments)
+    {
+        display: none;
+    }
+
+    #content .table-responsive {
+        max-height: 80vh; /* chiều cao tối đa bằng chiều cao viewport */
+        overflow-y: auto;  /* hiện thanh cuộn dọc khi nội dung vượt */
+    }
+
+    ul.pagination {
+        position: fixed;
+        bottom: 10px;  /* Cố định ở dưới cùng cửa sổ, cách đáy 10px */
+        left: 50%;     /* Canh giữa ngang trang */
+        transform: translateX(-50%);
+        background-color: white; /* Nền để nổi bật */
+        padding: 5px 10px;
+        border-radius: 5px;
+        box-shadow: 0 0 5px rgba(0,0,0,0.3);
+        z-index: 1000; /* Đảm bảo hiển thị trên các phần tử khác */
+    }
+
+    ul.nav-tabs {
+        margin-bottom: 10px;
+    }
+
+
+    table, .nav-link {
+        font-size: 12px;
+    }
+    .hide {
+        display: none;
+    }
+
+    /* Sidebar styles */
+    body {
+    display: flex;
+    min-height: 100vh;
+    margin: 0;
+    }
+    #sidebar {
+    width: 250px;
+    background-color: #0ebcbd;
+    color: white;
+    max-height: 100vh;
+    padding-top: 1rem;
+    }
+    #sidebar .nav-link, #sidebar a {
+    color: white;
+    display: block;
+    padding: 0.75rem 1.25rem;
+    text-decoration: none;
+    }
+    #sidebar .nav-link:hover, #sidebar a:hover {
+    background-color: #495057;
+    }
+    #content {
+    flex-grow: 1;
+    max-height: 100vh;
+    overflow-y: hidden;
+    overflow-x: auto;
+    padding: 1.5rem;
+    background: #f8f9fa;
+    }
+    .navbar-brand {
+    padding-left: 1.25rem;
+    padding-bottom: 0.5rem;
+    font-weight: bold;
+    font-size: 1.5rem;
+    display: block;
+    color: white;
+    }
+
+    /* Đổi màu nền dropdown menu thành màu xám */
+    #sidebar .dropdown-menu {
+    background-color: #6c757d !important; /* màu xám Bootstrap */
+    color: white;
+    }
+
+    /* Đổi màu chữ dropdown mặc định */
+    #sidebar .dropdown-menu a {
+    color: white !important;
+    }
+
+    /* Đổi màu hover dropdown */
+    #sidebar .dropdown-menu a:hover {
+    background-color: #5a6268 !important;
+    color: #ffffff !important;
+    }
+
+    /* Đặt kích thước thanh cuộn */
+    ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+    }
+
+    /* Nền track (nền thanh cuộn) */
+    ::-webkit-scrollbar-track {
+    background: none;
+    border-radius: 10px;
+    }
+
+    /* Thumb (phần kéo được) */
+    ::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 10px;
+    }
+
+    /* Thumb khi hover */
+    ::-webkit-scrollbar-thumb:hover {
+    background: #555;
+    }
+
+
+    #sidebar .nav-link.active,
+        #sidebar .nav-link:focus,
+        #sidebar .nav-link:hover {
+        background-color: #6c757d !important; /* Màu xám */
+        color: white !important;
+    }
+
+    .pagination {
+        display: flex;
+        flex-direction: row;
+    }
+
+    #dataContainer.list-view .user-item {
+        display: block;
+        border-bottom: 1px solid #ccc;
+        padding: 10px;
+    }
+
+    #dataContainer.thumb-view {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    #dataContainer.thumb-view .user-item {
+        width: 200px;
+        border: 1px solid #aaa;
+        padding: 10px;
+        border-radius: 5px;
+        box-shadow: 0 0 5px #ddd;
+    }
+
+    #dataContainer.thumb-view .user-item .extra-info {
+        display: none; /* Ẩn phần extra khi ở thumb view */
+    }
+
+    .admin-form fieldset {
+        display: grid;
+        grid-template-columns: repeat(3,1fr);
+        gap: 10px;
+    }
+
+    .submit-row {
+        position: fixed;
+        top: 20px;
+        left: 600px;
+    }
+
+    .switch {
+position: relative;
+display: inline-block;
+width: 60px;
+height: 30px;
+margin-right: 10px;
+}
+
+.switch input {
+opacity: 0;
+width: 0;
+height: 0;
+cursor: pointer;
+}
+
+.slider {
+position: absolute;
+border-radius: 30px;
+top: 0;
+left: 0;
+right: 0;
+bottom: 0;
+background-color: #ccc;
+transition: .4s;
+}
+
+.slider:before {
+position: absolute;
+content: "";
+height: 24px;
+width: 24px;
+left: 3px;
+bottom: 3px;
+background-color: white;
+border-radius: 50%;
+transition: .4s;
+}
+
+input:checked + .slider {
+background-color: #2196F3;
+}
+
+input:checked + .slider:before {
+transform: translateX(30px);
+}
+
+</style>
+{% endblock %}
+{% block head %}
+{% endblock %}
+{% block head_tail %}
+{% endblock %}
+</head>

@@ -1,0 +1,67 @@
+.custom-tabs .ant-tabs-nav {
+  background: #00b4b6;
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-left: 0;
+  padding-right: 0;
+  display: flex;
+  justify-content: flex-start;
+  border-radius: 0.75rem 0.75rem 0 0;
+  min-height: 56px;
+  position: relative;
+  width: auto;
+  max-width: 600px;
+  margin-left: 0;
+  margin-right: auto;
+}
+.custom-tabs .ant-tabs-nav-list {
+  width: auto;
+  display: flex;
+  justify-content: flex-start;
+}
+.custom-tabs .ant-tabs-tab {
+  background: transparent;
+  color: #fff;
+  font-weight: bold;
+  font-size: 1.15rem;
+  border-radius: 0;
+  margin-right: 0;
+  padding: 0.75rem 2.5rem;
+  border: none;
+  border-bottom: 4px solid transparent;
+  transition: background 0.2s, color 0.2s;
+  position: relative;
+  z-index: 1;
+}
+.custom-tabs .ant-tabs-tab:first-child {
+  border-top-left-radius: 0.75rem;
+  border-bottom-left-radius: 0;
+}
+.custom-tabs .ant-tabs-tab:last-child {
+  border-top-right-radius: 0.75rem;
+  border-bottom-right-radius: 0;
+}
+.custom-tabs .ant-tabs-tab-active {
+  background: #fff;
+  color: #00b4b6 !important;
+  border-bottom: 4px solid #00b4b6 !important;
+  z-index: 2;
+  box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.04);
+}
+.ant-tabs-tab.ant-tabs-tab-active .ant-tabs-tab-btn {
+  color: #00b4b6 !important;
+}
+.ant-tabs .ant-tabs-tab + .ant-tabs-tab {
+  margin: 0;
+}
+.custom-tabs .ant-tabs-tab:not(.ant-tabs-tab-active):hover {
+  background: #00b4b6;
+  color: #fff;
+}
+.custom-tabs .ant-tabs-ink-bar {
+  display: none !important;
+}
+.custom-tab {
+  font-size: 1.15rem;
+  font-weight: bold;
+}

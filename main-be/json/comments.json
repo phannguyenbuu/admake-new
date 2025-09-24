@@ -1,0 +1,2118 @@
+[
+  {
+    "_id": {
+      "$oid": "68870027fd74c12d9ae9f405"
+    },
+    "delete_at": null,
+    "createById": {
+      "$oid": "68766ff358231e4343cb2c21"
+    },
+    "content": "Comment 1",
+    "image": null,
+    "taskId": {
+      "$oid": "68865bc60eebf615034981ed"
+    },
+    "createdAt": {
+      "$date": "2025-07-28T04:44:23.168Z"
+    },
+    "updatedAt": {
+      "$date": "2025-07-28T04:44:23.168Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "688700ae1b2a30c1f15ebf5e"
+    },
+    "delete_at": null,
+    "createById": {
+      "$oid": "68766ff358231e4343cb2c21"
+    },
+    "content": "Comment 2",
+    "image": null,
+    "taskId": {
+      "$oid": "68865bc60eebf615034981ed"
+    },
+    "createdAt": {
+      "$date": "2025-07-28T04:46:38.654Z"
+    },
+    "updatedAt": {
+      "$date": "2025-07-28T04:46:38.654Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "688700e5406c64df5ad3a169"
+    },
+    "delete_at": null,
+    "createById": {
+      "$oid": "68766ff358231e4343cb2c21"
+    },
+    "content": "Comment 2",
+    "image": null,
+    "taskId": {
+      "$oid": "68865bc60eebf615034981ed"
+    },
+    "createdAt": {
+      "$date": "2025-07-28T04:47:33.513Z"
+    },
+    "updatedAt": {
+      "$date": "2025-07-28T04:47:33.513Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6887011180454a4826741d62"
+    },
+    "delete_at": null,
+    "createById": {
+      "$oid": "68766ff358231e4343cb2c21"
+    },
+    "content": "Comment 2",
+    "image": null,
+    "taskId": {
+      "$oid": "68865bc60eebf615034981ed"
+    },
+    "createdAt": {
+      "$date": "2025-07-28T04:48:17.165Z"
+    },
+    "updatedAt": {
+      "$date": "2025-07-28T04:48:17.165Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "68870124b17a30e2e3af11d1"
+    },
+    "delete_at": null,
+    "createById": {
+      "$oid": "68766ff358231e4343cb2c21"
+    },
+    "content": "Comment 2",
+    "image": null,
+    "taskId": {
+      "$oid": "68865bc60eebf615034981ed"
+    },
+    "createdAt": {
+      "$date": "2025-07-28T04:48:36.824Z"
+    },
+    "updatedAt": {
+      "$date": "2025-07-28T04:48:36.824Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "68870136b4a6ebf3560d7376"
+    },
+    "delete_at": null,
+    "createById": {
+      "$oid": "68766ff358231e4343cb2c21"
+    },
+    "content": "Comment 2",
+    "image": null,
+    "taskId": {
+      "$oid": "68865bc60eebf615034981ed"
+    },
+    "createdAt": {
+      "$date": "2025-07-28T04:48:54.059Z"
+    },
+    "updatedAt": {
+      "$date": "2025-07-28T04:48:54.059Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6887015d5b7549a9ffa76d81"
+    },
+    "delete_at": null,
+    "createById": {
+      "$oid": "68766ff358231e4343cb2c21"
+    },
+    "content": "Comment 2",
+    "image": null,
+    "taskId": {
+      "$oid": "68865bc60eebf615034981ed"
+    },
+    "createdAt": {
+      "$date": "2025-07-28T04:49:33.464Z"
+    },
+    "updatedAt": {
+      "$date": "2025-07-28T04:49:33.464Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6887016d07f7add0a0bd6457"
+    },
+    "delete_at": null,
+    "createById": {
+      "$oid": "68766ff358231e4343cb2c21"
+    },
+    "content": "Comment 2",
+    "image": null,
+    "taskId": {
+      "$oid": "68865bc60eebf615034981ed"
+    },
+    "createdAt": {
+      "$date": "2025-07-28T04:49:49.415Z"
+    },
+    "updatedAt": {
+      "$date": "2025-07-28T04:49:49.415Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "68870194e7dfcc981d06f721"
+    },
+    "delete_at": null,
+    "createById": {
+      "$oid": "68766ff358231e4343cb2c21"
+    },
+    "content": "Comment 2",
+    "image": "\\comment\\483bd5f1-3127-4cd0-93d5-8834124f7acb.png",
+    "taskId": {
+      "$oid": "68865bc60eebf615034981ed"
+    },
+    "createdAt": {
+      "$date": "2025-07-28T04:50:28.231Z"
+    },
+    "updatedAt": {
+      "$date": "2025-07-28T04:50:28.231Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "68907c0e3c977e7c81b82259"
+    },
+    "deletedAt": null,
+    "createById": {
+      "$oid": "68766ff358231e4343cb2c21"
+    },
+    "content": "comment test test ",
+    "image": "/comment/3ed6a598-9ad6-40d1-aef4-059e503b8952.png",
+    "taskId": {
+      "$oid": "68865bc60eebf615034981ed"
+    },
+    "createdAt": {
+      "$date": "2025-08-04T09:23:26.296Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-04T09:23:26.296Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "689080863c977e7c81b822f3"
+    },
+    "deletedAt": null,
+    "createById": {
+      "$oid": "68766ff358231e4343cb2c21"
+    },
+    "content": "Test 2",
+    "image": null,
+    "taskId": {
+      "$oid": "68865bc60eebf615034981ed"
+    },
+    "createdAt": {
+      "$date": "2025-08-04T09:42:30.128Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-04T09:42:30.128Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "689080c33c977e7c81b82305"
+    },
+    "deletedAt": null,
+    "createById": {
+      "$oid": "68766ff358231e4343cb2c21"
+    },
+    "content": "Coment test test",
+    "image": null,
+    "taskId": {
+      "$oid": "68865bc60eebf615034981ed"
+    },
+    "createdAt": {
+      "$date": "2025-08-04T09:43:31.890Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-04T09:43:31.890Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "689080d83c977e7c81b8230f"
+    },
+    "deletedAt": null,
+    "createById": {
+      "$oid": "68766ff358231e4343cb2c21"
+    },
+    "content": "Test n\u00e8 test n\u00e8 \u0111\u00e2y l\u00e0 test \u00e1 \ud83e\udd23\ud83e\udd23",
+    "image": null,
+    "taskId": {
+      "$oid": "68865bc60eebf615034981ed"
+    },
+    "createdAt": {
+      "$date": "2025-08-04T09:43:52.329Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-04T09:43:52.329Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6890a3633c977e7c81b82919"
+    },
+    "deletedAt": null,
+    "createById": {
+      "$oid": "68766ff358231e4343cb2c21"
+    },
+    "content": "hehe test n\u00e8",
+    "image": "/comment/817aed0c-d623-4087-9e65-0ca9f74e9433.png",
+    "taskId": {
+      "$oid": "68865bc60eebf615034981ed"
+    },
+    "createdAt": {
+      "$date": "2025-08-04T12:11:15.264Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-04T12:11:15.264Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "689822bc34aa23cf5bfd2653"
+    },
+    "deletedAt": null,
+    "createById": {
+      "$oid": "68766ff358231e4343cb2c21"
+    },
+    "content": "",
+    "image": "/task/590d1a49-2df0-4b4e-b8f0-a68318be459b.jpg",
+    "taskId": {
+      "$oid": "68865bc60eebf615034981ed"
+    },
+    "createdAt": {
+      "$date": "2025-08-10T04:40:28.292Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-10T04:40:28.292Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6898244734aa23cf5bfd26bf"
+    },
+    "deletedAt": null,
+    "createById": {
+      "$oid": "68766ff358231e4343cb2c21"
+    },
+    "content": "",
+    "image": "/task/3b2c7d3c-fd45-4fc1-b4b4-e2ee9f97f5d1.jpg",
+    "taskId": {
+      "$oid": "68865bc60eebf615034981ed"
+    },
+    "createdAt": {
+      "$date": "2025-08-10T04:47:03.080Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-10T04:47:03.080Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "689cb7c349f0334c7af1674f"
+    },
+    "deletedAt": null,
+    "createById": {
+      "$oid": "689ca91e68b00102ba80a7f4"
+    },
+    "content": "\u0111asadsa",
+    "image": null,
+    "taskId": {
+      "$oid": "6896fcc50241a845cfea0204"
+    },
+    "createdAt": {
+      "$date": "2025-08-13T16:05:23.309Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-13T16:05:23.309Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "689cb7c349f0334c7af16755"
+    },
+    "deletedAt": null,
+    "createById": {
+      "$oid": "689ca91e68b00102ba80a7f4"
+    },
+    "content": "\u0111asadsa",
+    "image": null,
+    "taskId": {
+      "$oid": "6896fcc50241a845cfea0204"
+    },
+    "createdAt": {
+      "$date": "2025-08-13T16:05:23.519Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-13T16:05:23.519Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "689cb7c349f0334c7af1675b"
+    },
+    "deletedAt": null,
+    "createById": {
+      "$oid": "689ca91e68b00102ba80a7f4"
+    },
+    "content": "\u0111asadsa",
+    "image": null,
+    "taskId": {
+      "$oid": "6896fcc50241a845cfea0204"
+    },
+    "createdAt": {
+      "$date": "2025-08-13T16:05:23.687Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-13T16:05:23.687Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "689cb7c349f0334c7af16761"
+    },
+    "deletedAt": null,
+    "createById": {
+      "$oid": "689ca91e68b00102ba80a7f4"
+    },
+    "content": "\u0111asadsa",
+    "image": null,
+    "taskId": {
+      "$oid": "6896fcc50241a845cfea0204"
+    },
+    "createdAt": {
+      "$date": "2025-08-13T16:05:23.876Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-13T16:05:23.876Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "689e024f49f0334c7af183aa"
+    },
+    "deletedAt": null,
+    "createById": {
+      "$oid": "689ca91e68b00102ba80a7f4"
+    },
+    "content": "H\u00e2hhaah",
+    "image": null,
+    "taskId": {
+      "$oid": "689ce8e949f0334c7af174b1"
+    },
+    "createdAt": {
+      "$date": "2025-08-14T15:35:43.768Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-14T15:35:43.768Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "689e026649f0334c7af183b4"
+    },
+    "deletedAt": null,
+    "createById": {
+      "$oid": "689ca91e68b00102ba80a7f4"
+    },
+    "content": "Test test",
+    "image": "/comment/a0f737c8-f2be-49c4-9d8b-e826081bea5c.jpeg",
+    "taskId": {
+      "$oid": "689ce8e949f0334c7af174b1"
+    },
+    "createdAt": {
+      "$date": "2025-08-14T15:36:06.178Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-14T15:36:06.178Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "68a3371e095282fd696642ca"
+    },
+    "deletedAt": null,
+    "createById": {
+      "$oid": "68766ff358231e4343cb2c21"
+    },
+    "attendanceId": {
+      "$oid": "68a3335449f0334c7af1a9f8"
+    },
+    "content": "\u0110\u00e3 check v\u00e0o l\u00fac 21:22:22 18/08/2025",
+    "image": "/task/89f7d3b0-a3bb-44ce-a858-661e1f8a0b1d.png",
+    "taskId": {
+      "$oid": "68865bc60eebf615034981ed"
+    },
+    "createdAt": {
+      "$date": "2025-08-18T14:22:22.771Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-18T14:22:22.771Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "68a33789b3eb5432d8ad82bb"
+    },
+    "deletedAt": null,
+    "createById": {
+      "$oid": "689ca91e68b00102ba80a7f4"
+    },
+    "attendanceId": {
+      "$oid": "68a3356a790b88cf7568a57f"
+    },
+    "content": "\u0110\u00e3 check ra l\u00fac 21:24:09 18/08/2025",
+    "image": "/task/22b3e787-84e9-48ab-a519-bf2498525f5a.jpg",
+    "taskId": {
+      "$oid": "68a334c7790b88cf7568a4e6"
+    },
+    "createdAt": {
+      "$date": "2025-08-18T14:24:09.327Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-18T14:24:09.327Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "68a337c0b3eb5432d8ad8348"
+    },
+    "deletedAt": null,
+    "createById": {
+      "$oid": "689ca91e68b00102ba80a7f4"
+    },
+    "attendanceId": {
+      "$oid": "68a337a7b3eb5432d8ad8306"
+    },
+    "content": "\u0110\u00e3 check v\u00e0o l\u00fac 21:25:04 18/08/2025",
+    "image": "/task/d72146c9-8406-4d39-a42b-9a54249a6d87.jpg",
+    "taskId": {
+      "$oid": "68a334c7790b88cf7568a4e6"
+    },
+    "createdAt": {
+      "$date": "2025-08-18T14:25:04.360Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-18T14:25:04.360Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "68a3381db3eb5432d8ad83e7"
+    },
+    "deletedAt": null,
+    "createById": {
+      "$oid": "689ca91e68b00102ba80a7f4"
+    },
+    "attendanceId": {
+      "$oid": "68a337f4b3eb5432d8ad83a2"
+    },
+    "content": "\u0110\u00e3 check v\u00e0o l\u00fac 21:26:37 18/08/2025",
+    "image": "/task/ce9c12e8-9411-4c1c-8221-a54a4af606cb.jpg",
+    "taskId": {
+      "$oid": "68a334c7790b88cf7568a4e6"
+    },
+    "createdAt": {
+      "$date": "2025-08-18T14:26:37.144Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-18T14:26:37.144Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "68a33847b3eb5432d8ad83f6"
+    },
+    "deletedAt": null,
+    "createById": {
+      "$oid": "689ca91e68b00102ba80a7f4"
+    },
+    "attendanceId": {
+      "$oid": "68a337f4b3eb5432d8ad83a2"
+    },
+    "content": "\u0110\u00e3 check ra l\u00fac 21:27:19 18/08/2025",
+    "image": "/task/14224f1c-38e9-4658-86c7-5c9aef1671f4.jpg",
+    "taskId": {
+      "$oid": "68a334c7790b88cf7568a4e6"
+    },
+    "createdAt": {
+      "$date": "2025-08-18T14:27:19.956Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-18T14:27:19.956Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "68a33f88dea1782d766c3a06"
+    },
+    "deletedAt": null,
+    "createById": {
+      "$oid": "689ca91e68b00102ba80a7f4"
+    },
+    "attendanceId": {
+      "$oid": "68a33f6cdea1782d766c39c4"
+    },
+    "content": "\u0110\u00e3 check v\u00e0o l\u00fac 21:58:16 18/08/2025",
+    "image": "/task/a4dcd15f-2046-419d-87c2-fdcdefeb9460.jpg",
+    "taskId": {
+      "$oid": "68a334c7790b88cf7568a4e6"
+    },
+    "type": "in",
+    "createdAt": {
+      "$date": "2025-08-18T14:58:16.293Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-18T14:58:16.293Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "68a34080dea1782d766c3ac6"
+    },
+    "deletedAt": null,
+    "createById": {
+      "$oid": "689ca91e68b00102ba80a7f4"
+    },
+    "attendanceId": null,
+    "content": "aaaaaaaaaaaaaa",
+    "image": null,
+    "taskId": {
+      "$oid": "68a334c7790b88cf7568a4e6"
+    },
+    "type": null,
+    "createdAt": {
+      "$date": "2025-08-18T15:02:24.629Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-18T15:02:24.629Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "68a34081dea1782d766c3acc"
+    },
+    "deletedAt": null,
+    "createById": {
+      "$oid": "689ca91e68b00102ba80a7f4"
+    },
+    "attendanceId": null,
+    "content": "aaaaaaaaaaaaaa",
+    "image": null,
+    "taskId": {
+      "$oid": "68a334c7790b88cf7568a4e6"
+    },
+    "type": null,
+    "createdAt": {
+      "$date": "2025-08-18T15:02:25.982Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-18T15:02:25.982Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "68a34093dea1782d766c3ad2"
+    },
+    "deletedAt": null,
+    "createById": {
+      "$oid": "689ca91e68b00102ba80a7f4"
+    },
+    "attendanceId": null,
+    "content": "aaaaaaaaaaaaaaaaaaaaadasdsa",
+    "image": null,
+    "taskId": {
+      "$oid": "68a334c7790b88cf7568a4e6"
+    },
+    "type": null,
+    "createdAt": {
+      "$date": "2025-08-18T15:02:43.488Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-18T15:02:43.488Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "68a34094dea1782d766c3ad8"
+    },
+    "deletedAt": null,
+    "createById": {
+      "$oid": "689ca91e68b00102ba80a7f4"
+    },
+    "attendanceId": null,
+    "content": "aaaaaaaaaaaaaaaaaaaaadasdsa",
+    "image": null,
+    "taskId": {
+      "$oid": "68a334c7790b88cf7568a4e6"
+    },
+    "type": null,
+    "createdAt": {
+      "$date": "2025-08-18T15:02:44.792Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-18T15:02:44.792Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "68a34129dea1782d766c3ae1"
+    },
+    "deletedAt": null,
+    "createById": {
+      "$oid": "689ca91e68b00102ba80a7f4"
+    },
+    "attendanceId": null,
+    "content": "aaaaaaaaaaaaa",
+    "image": null,
+    "taskId": {
+      "$oid": "68a334c7790b88cf7568a4e6"
+    },
+    "type": null,
+    "createdAt": {
+      "$date": "2025-08-18T15:05:13.474Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-18T15:05:13.474Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "68a34152dea1782d766c3aec"
+    },
+    "deletedAt": null,
+    "createById": {
+      "$oid": "68766ff358231e4343cb2c21"
+    },
+    "attendanceId": {
+      "$oid": "68a3335449f0334c7af1a9f8"
+    },
+    "content": "\u0110\u00e3 check v\u00e0o l\u00fac 22:05:54 18/08/2025",
+    "image": "/task/56491486-8948-498a-ac18-8578746dbc8f.png",
+    "taskId": {
+      "$oid": "68a334c7790b88cf7568a4e6"
+    },
+    "type": "in",
+    "createdAt": {
+      "$date": "2025-08-18T15:05:54.930Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-18T15:05:54.930Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "68a341fddea1782d766c3b4c"
+    },
+    "deletedAt": null,
+    "createById": {
+      "$oid": "68766ff358231e4343cb2c21"
+    },
+    "attendanceId": null,
+    "content": "Comment 1",
+    "image": null,
+    "taskId": {
+      "$oid": "68a334c7790b88cf7568a4e6"
+    },
+    "type": null,
+    "createdAt": {
+      "$date": "2025-08-18T15:08:45.613Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-18T15:08:45.613Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "68a34236aea4a496dd61ad3d"
+    },
+    "deletedAt": null,
+    "createById": {
+      "$oid": "68766ff358231e4343cb2c21"
+    },
+    "attendanceId": null,
+    "content": "Comment 1",
+    "image": null,
+    "taskId": {
+      "$oid": "68a334c7790b88cf7568a4e6"
+    },
+    "type": null,
+    "createdAt": {
+      "$date": "2025-08-18T15:09:42.199Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-18T15:09:42.199Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "68a342520c3f58c775a8559b"
+    },
+    "deletedAt": null,
+    "createById": {
+      "$oid": "68766ff358231e4343cb2c21"
+    },
+    "attendanceId": null,
+    "content": "Comment 1",
+    "image": null,
+    "taskId": {
+      "$oid": "68a334c7790b88cf7568a4e6"
+    },
+    "type": null,
+    "createdAt": {
+      "$date": "2025-08-18T15:10:10.280Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-18T15:10:10.280Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "68a342991bc13b54fded5a60"
+    },
+    "deletedAt": null,
+    "createById": {
+      "$oid": "68766ff358231e4343cb2c21"
+    },
+    "attendanceId": null,
+    "content": "Comment 1",
+    "image": null,
+    "taskId": {
+      "$oid": "68a334c7790b88cf7568a4e6"
+    },
+    "type": null,
+    "createdAt": {
+      "$date": "2025-08-18T15:11:21.254Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-18T15:11:21.254Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "68a3429a1bc13b54fded5a66"
+    },
+    "deletedAt": null,
+    "createById": {
+      "$oid": "68766ff358231e4343cb2c21"
+    },
+    "attendanceId": null,
+    "content": "Comment 1",
+    "image": null,
+    "taskId": {
+      "$oid": "68a334c7790b88cf7568a4e6"
+    },
+    "type": null,
+    "createdAt": {
+      "$date": "2025-08-18T15:11:22.673Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-18T15:11:22.673Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "68a34304500525b5d992e25c"
+    },
+    "deletedAt": null,
+    "createById": {
+      "$oid": "68766ff358231e4343cb2c21"
+    },
+    "attendanceId": null,
+    "content": "Comment 1",
+    "image": null,
+    "taskId": {
+      "$oid": "68a334c7790b88cf7568a4e6"
+    },
+    "type": null,
+    "createdAt": {
+      "$date": "2025-08-18T15:13:08.977Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-18T15:13:08.977Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "68a3432b8860e7abd3aa8ac3"
+    },
+    "deletedAt": null,
+    "createById": {
+      "$oid": "68766ff358231e4343cb2c21"
+    },
+    "attendanceId": null,
+    "content": "Comment 1",
+    "image": null,
+    "taskId": {
+      "$oid": "68a334c7790b88cf7568a4e6"
+    },
+    "type": null,
+    "createdAt": {
+      "$date": "2025-08-18T15:13:47.908Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-18T15:13:47.908Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "68a3432d8860e7abd3aa8ac9"
+    },
+    "deletedAt": null,
+    "createById": {
+      "$oid": "68766ff358231e4343cb2c21"
+    },
+    "attendanceId": null,
+    "content": "Comment 1",
+    "image": null,
+    "taskId": {
+      "$oid": "68a334c7790b88cf7568a4e6"
+    },
+    "type": null,
+    "createdAt": {
+      "$date": "2025-08-18T15:13:49.379Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-18T15:13:49.379Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "68a3436e7fde1a1f7764a15f"
+    },
+    "deletedAt": null,
+    "createById": {
+      "$oid": "68766ff358231e4343cb2c21"
+    },
+    "attendanceId": null,
+    "content": "Comment 1",
+    "image": null,
+    "taskId": {
+      "$oid": "68a334c7790b88cf7568a4e6"
+    },
+    "type": null,
+    "createdAt": {
+      "$date": "2025-08-18T15:14:54.142Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-18T15:14:54.142Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "68a3443335c46914d365f2c2"
+    },
+    "deletedAt": null,
+    "createById": {
+      "$oid": "689ca91e68b00102ba80a7f4"
+    },
+    "attendanceId": {
+      "$oid": "68a3441435c46914d365f27a"
+    },
+    "content": "\u0110\u00e3 check v\u00e0o l\u00fac 22:18:11 18/08/2025",
+    "image": "/task/c95246e0-e3bd-4842-903f-7f817c1e4d07.jpg",
+    "taskId": {
+      "$oid": "68a334c7790b88cf7568a4e6"
+    },
+    "type": "in",
+    "createdAt": {
+      "$date": "2025-08-18T15:18:11.862Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-18T15:18:11.862Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "68a344d135c46914d365f37b"
+    },
+    "deletedAt": null,
+    "createById": {
+      "$oid": "689ca91e68b00102ba80a7f4"
+    },
+    "attendanceId": {
+      "$oid": "68a3441435c46914d365f27a"
+    },
+    "content": "\u0110\u00e3 check ra l\u00fac 22:20:49 18/08/2025",
+    "image": "/task/9215a55e-89c8-43a1-bb40-68460dd37f9b.jpg",
+    "taskId": {
+      "$oid": "68a334c7790b88cf7568a4e6"
+    },
+    "type": "out",
+    "createdAt": {
+      "$date": "2025-08-18T15:20:49.987Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-18T15:20:49.987Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "68a3452635c46914d365f405"
+    },
+    "deletedAt": null,
+    "createById": {
+      "$oid": "689ca91e68b00102ba80a7f4"
+    },
+    "attendanceId": null,
+    "content": "test",
+    "image": null,
+    "taskId": {
+      "$oid": "68a334c7790b88cf7568a4e6"
+    },
+    "type": null,
+    "createdAt": {
+      "$date": "2025-08-18T15:22:14.892Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-18T15:22:14.892Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "68a3452935c46914d365f40f"
+    },
+    "deletedAt": null,
+    "createById": {
+      "$oid": "689ca91e68b00102ba80a7f4"
+    },
+    "attendanceId": null,
+    "content": "test",
+    "image": null,
+    "taskId": {
+      "$oid": "68a334c7790b88cf7568a4e6"
+    },
+    "type": null,
+    "createdAt": {
+      "$date": "2025-08-18T15:22:17.806Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-18T15:22:17.806Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "68a3456835c46914d365f452"
+    },
+    "deletedAt": null,
+    "createById": {
+      "$oid": "689ca91e68b00102ba80a7f4"
+    },
+    "attendanceId": {
+      "$oid": "68a3452235c46914d365f3fb"
+    },
+    "content": "\u0110\u00e3 check v\u00e0o l\u00fac 22:23:20 18/08/2025",
+    "image": "/task/ef1ed080-60ad-4f96-9485-f8a30e9c18f1.jpg",
+    "taskId": {
+      "$oid": "68a334c7790b88cf7568a4e6"
+    },
+    "type": "in",
+    "createdAt": {
+      "$date": "2025-08-18T15:23:20.183Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-18T15:23:20.183Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "68a3458135c46914d365f498"
+    },
+    "deletedAt": null,
+    "createById": {
+      "$oid": "689ca91e68b00102ba80a7f4"
+    },
+    "attendanceId": {
+      "$oid": "68a3452235c46914d365f3fb"
+    },
+    "content": "\u0110\u00e3 check ra l\u00fac 22:23:45 18/08/2025",
+    "image": "/task/ccf993bf-d738-4268-8e52-ccb94e3a1c7b.jpg",
+    "taskId": {
+      "$oid": "68a334c7790b88cf7568a4e6"
+    },
+    "type": "out",
+    "createdAt": {
+      "$date": "2025-08-18T15:23:45.538Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-18T15:23:45.538Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "68a345a435c46914d365f4a5"
+    },
+    "deletedAt": null,
+    "createById": {
+      "$oid": "689ca91e68b00102ba80a7f4"
+    },
+    "attendanceId": null,
+    "content": "aaaaaaaaaaaaaa",
+    "image": null,
+    "taskId": {
+      "$oid": "68a334c7790b88cf7568a4e6"
+    },
+    "type": null,
+    "createdAt": {
+      "$date": "2025-08-18T15:24:20.943Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-18T15:24:20.943Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "68a3462c35c46914d365f4b7"
+    },
+    "deletedAt": null,
+    "createById": {
+      "$oid": "689ca91e68b00102ba80a7f4"
+    },
+    "attendanceId": null,
+    "content": "a",
+    "image": null,
+    "taskId": {
+      "$oid": "68a334c7790b88cf7568a4e6"
+    },
+    "type": null,
+    "createdAt": {
+      "$date": "2025-08-18T15:26:36.050Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-18T15:26:36.050Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "68a3463035c46914d365f4c1"
+    },
+    "deletedAt": null,
+    "createById": {
+      "$oid": "689ca91e68b00102ba80a7f4"
+    },
+    "attendanceId": null,
+    "content": "a",
+    "image": null,
+    "taskId": {
+      "$oid": "68a334c7790b88cf7568a4e6"
+    },
+    "type": null,
+    "createdAt": {
+      "$date": "2025-08-18T15:26:40.761Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-18T15:26:40.761Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "68a3463435c46914d365f4cb"
+    },
+    "deletedAt": null,
+    "createById": {
+      "$oid": "689ca91e68b00102ba80a7f4"
+    },
+    "attendanceId": null,
+    "content": "a",
+    "image": null,
+    "taskId": {
+      "$oid": "68a334c7790b88cf7568a4e6"
+    },
+    "type": null,
+    "createdAt": {
+      "$date": "2025-08-18T15:26:44.030Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-18T15:26:44.030Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "68a3463635c46914d365f4d5"
+    },
+    "deletedAt": null,
+    "createById": {
+      "$oid": "689ca91e68b00102ba80a7f4"
+    },
+    "attendanceId": null,
+    "content": "b",
+    "image": null,
+    "taskId": {
+      "$oid": "68a334c7790b88cf7568a4e6"
+    },
+    "type": null,
+    "createdAt": {
+      "$date": "2025-08-18T15:26:46.212Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-18T15:26:46.212Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "68a3476a35c46914d365f60b"
+    },
+    "deletedAt": null,
+    "createById": {
+      "$oid": "689ca91e68b00102ba80a7f4"
+    },
+    "attendanceId": null,
+    "content": "a",
+    "image": null,
+    "taskId": {
+      "$oid": "68a334c7790b88cf7568a4e6"
+    },
+    "type": null,
+    "createdAt": {
+      "$date": "2025-08-18T15:31:54.009Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-18T15:31:54.009Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "68a3476d35c46914d365f615"
+    },
+    "deletedAt": null,
+    "createById": {
+      "$oid": "689ca91e68b00102ba80a7f4"
+    },
+    "attendanceId": null,
+    "content": "b",
+    "image": null,
+    "taskId": {
+      "$oid": "68a334c7790b88cf7568a4e6"
+    },
+    "type": null,
+    "createdAt": {
+      "$date": "2025-08-18T15:31:57.690Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-18T15:31:57.690Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "68a3476f35c46914d365f61f"
+    },
+    "deletedAt": null,
+    "createById": {
+      "$oid": "689ca91e68b00102ba80a7f4"
+    },
+    "attendanceId": null,
+    "content": "c",
+    "image": null,
+    "taskId": {
+      "$oid": "68a334c7790b88cf7568a4e6"
+    },
+    "type": null,
+    "createdAt": {
+      "$date": "2025-08-18T15:31:59.897Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-18T15:31:59.897Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "68a3477235c46914d365f629"
+    },
+    "deletedAt": null,
+    "createById": {
+      "$oid": "689ca91e68b00102ba80a7f4"
+    },
+    "attendanceId": null,
+    "content": "d",
+    "image": null,
+    "taskId": {
+      "$oid": "68a334c7790b88cf7568a4e6"
+    },
+    "type": null,
+    "createdAt": {
+      "$date": "2025-08-18T15:32:02.121Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-18T15:32:02.121Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "68a3477435c46914d365f642"
+    },
+    "deletedAt": null,
+    "createById": {
+      "$oid": "689ca91e68b00102ba80a7f4"
+    },
+    "attendanceId": null,
+    "content": "e",
+    "image": null,
+    "taskId": {
+      "$oid": "68a334c7790b88cf7568a4e6"
+    },
+    "type": null,
+    "createdAt": {
+      "$date": "2025-08-18T15:32:04.551Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-18T15:32:04.551Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "68a347cf35c46914d365f6ce"
+    },
+    "deletedAt": null,
+    "createById": {
+      "$oid": "689ca91e68b00102ba80a7f4"
+    },
+    "attendanceId": {
+      "$oid": "68a3479035c46914d365f687"
+    },
+    "content": "\u0110\u00e3 check v\u00e0o l\u00fac 22:33:35 18/08/2025",
+    "image": "/task/c2445816-0d04-4fac-8134-9258271f64d0.jpg",
+    "taskId": {
+      "$oid": "68a334c7790b88cf7568a4e6"
+    },
+    "type": "in",
+    "createdAt": {
+      "$date": "2025-08-18T15:33:35.382Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-18T15:33:35.382Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "68a348ba35c46914d365f710"
+    },
+    "deletedAt": null,
+    "createById": {
+      "$oid": "689ca91e68b00102ba80a7f4"
+    },
+    "attendanceId": {
+      "$oid": "68a3479035c46914d365f687"
+    },
+    "content": "\u0110\u00e3 check ra l\u00fac 22:37:30 18/08/2025",
+    "image": "/task/df003a41-5d85-4954-a870-b3c7244af450.jpg",
+    "taskId": {
+      "$oid": "68a334c7790b88cf7568a4e6"
+    },
+    "type": "out",
+    "createdAt": {
+      "$date": "2025-08-18T15:37:30.988Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-18T15:37:30.988Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "68a348da35c46914d365f71d"
+    },
+    "deletedAt": null,
+    "createById": {
+      "$oid": "689ca91e68b00102ba80a7f4"
+    },
+    "attendanceId": null,
+    "content": "a",
+    "image": null,
+    "taskId": {
+      "$oid": "68a334c7790b88cf7568a4e6"
+    },
+    "type": null,
+    "createdAt": {
+      "$date": "2025-08-18T15:38:02.763Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-18T15:38:02.763Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "68a3499d35c46914d365f7a1"
+    },
+    "deletedAt": null,
+    "createById": {
+      "$oid": "689ca91e68b00102ba80a7f4"
+    },
+    "attendanceId": {
+      "$oid": "68a3498735c46914d365f75e"
+    },
+    "content": "\u0110\u00e3 check v\u00e0o l\u00fac 22:41:17 18/08/2025",
+    "image": "/task/0f7418dc-778a-423e-b6df-746ecca567bd.jpg",
+    "taskId": {
+      "$oid": "68a334c7790b88cf7568a4e6"
+    },
+    "type": "in",
+    "createdAt": {
+      "$date": "2025-08-18T15:41:17.471Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-18T15:41:17.471Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "68a34a8635c46914d365f7b8"
+    },
+    "deletedAt": null,
+    "createById": {
+      "$oid": "689ca91e68b00102ba80a7f4"
+    },
+    "attendanceId": {
+      "$oid": "68a3498735c46914d365f75e"
+    },
+    "content": "\u0110\u00e3 check ra l\u00fac 22:45:10 18/08/2025",
+    "image": "/task/0a880d4c-20b2-41b4-9f9c-8203931f8e32.jpg",
+    "taskId": {
+      "$oid": "68a334c7790b88cf7568a4e6"
+    },
+    "type": "out",
+    "createdAt": {
+      "$date": "2025-08-18T15:45:10.383Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-18T15:45:10.383Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "68a5df5d35c46914d366190a"
+    },
+    "deletedAt": null,
+    "createById": {
+      "$oid": "689ca91e68b00102ba80a7f4"
+    },
+    "attendanceId": {
+      "$oid": "68a4ad9135c46914d3660e77"
+    },
+    "content": "\u0110\u00e3 check v\u00e0o l\u00fac 21:44:45 20/08/2025",
+    "image": "/task/d6a00dfa-a4b3-4283-a41d-bef465b27c31.jpg",
+    "taskId": {
+      "$oid": "68a334c7790b88cf7568a4e6"
+    },
+    "type": "in",
+    "createdAt": {
+      "$date": "2025-08-20T14:44:45.639Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-20T14:44:45.639Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "68a7ccec1ec1bc790643b21c"
+    },
+    "deletedAt": null,
+    "createById": {
+      "$oid": "68766ff358231e4343cb2c21"
+    },
+    "attendanceId": {
+      "$oid": "68a7ccaf1ec1bc790643b1d2"
+    },
+    "content": "\u0110\u00e3 check v\u00e0o l\u00fac 08:50:36 22/08/2025",
+    "image": "/task/219c73f7-9647-436d-93af-dd057e87edcd.jpg",
+    "taskId": {
+      "$oid": "68a6d51b35c46914d36636ce"
+    },
+    "type": "in",
+    "createdAt": {
+      "$date": "2025-08-22T01:50:36.256Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-22T01:50:36.256Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "68a7cdf51ec1bc790643b314"
+    },
+    "deletedAt": null,
+    "createById": {
+      "$oid": "68766ff358231e4343cb2c21"
+    },
+    "attendanceId": {
+      "$oid": "68a7ccaf1ec1bc790643b1d2"
+    },
+    "content": "\u0110\u00e3 check ra l\u00fac 08:55:01 22/08/2025",
+    "image": "/task/92336046-5f97-4c1e-815e-f8a251337d6d.jpg",
+    "taskId": {
+      "$oid": "68a7cdea1ec1bc790643b2f0"
+    },
+    "type": "out",
+    "createdAt": {
+      "$date": "2025-08-22T01:55:01.305Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-22T01:55:01.305Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "68a7ce0f1ec1bc790643b32b"
+    },
+    "deletedAt": null,
+    "createById": {
+      "$oid": "68766ff358231e4343cb2c21"
+    },
+    "attendanceId": {
+      "$oid": "68a7ccaf1ec1bc790643b1d2"
+    },
+    "content": "\u0110\u00e3 check v\u00e0o l\u00fac 08:55:27 22/08/2025",
+    "image": "/task/0acbc667-2b45-4792-b1be-92ef07cd615f.jpg",
+    "taskId": {
+      "$oid": "68a7cdea1ec1bc790643b2f0"
+    },
+    "type": "in",
+    "createdAt": {
+      "$date": "2025-08-22T01:55:27.980Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-22T01:55:27.980Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "68a7ce191ec1bc790643b342"
+    },
+    "deletedAt": null,
+    "createById": {
+      "$oid": "68766ff358231e4343cb2c21"
+    },
+    "attendanceId": {
+      "$oid": "68a7ccaf1ec1bc790643b1d2"
+    },
+    "content": "\u0110\u00e3 check v\u00e0o l\u00fac 08:55:37 22/08/2025",
+    "image": "/task/7f7513d1-7971-4204-9751-45ef858e74b4.jpg",
+    "taskId": {
+      "$oid": "68a7cdea1ec1bc790643b2f0"
+    },
+    "type": "in",
+    "createdAt": {
+      "$date": "2025-08-22T01:55:37.724Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-22T01:55:37.724Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "68a7ce381ec1bc790643b373"
+    },
+    "deletedAt": null,
+    "createById": {
+      "$oid": "68766ff358231e4343cb2c21"
+    },
+    "attendanceId": {
+      "$oid": "68a7ccaf1ec1bc790643b1d2"
+    },
+    "content": "\u0110\u00e3 check ra l\u00fac 08:56:08 22/08/2025",
+    "image": "/task/ca77465c-9c34-4732-a536-0f49ac221b75.jpg",
+    "taskId": {
+      "$oid": "68a7cdea1ec1bc790643b2f0"
+    },
+    "type": "out",
+    "createdAt": {
+      "$date": "2025-08-22T01:56:08.754Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-22T01:56:08.754Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "68a7d1dddc2c1ea6a3212063"
+    },
+    "deletedAt": null,
+    "createById": {
+      "$oid": "68766ff358231e4343cb2c21"
+    },
+    "attendanceId": null,
+    "content": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "image": null,
+    "taskId": {
+      "$oid": "68a7cdea1ec1bc790643b2f0"
+    },
+    "type": null,
+    "createdAt": {
+      "$date": "2025-08-22T02:11:41.330Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-22T02:11:41.330Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "68a7d1f7dc2c1ea6a321206d"
+    },
+    "deletedAt": null,
+    "createById": {
+      "$oid": "68766ff358231e4343cb2c21"
+    },
+    "attendanceId": null,
+    "content": "\u0110\u00e3 ho\u00e0n th\u00e0nh c\u00f4ng vi\u1ec7c l\u00fac 22/08/2025 t\u1ea1i Bi\u00ean Ho\u00e0 \u0110\u1ed3ng Nai",
+    "image": null,
+    "taskId": {
+      "$oid": "68a7cdea1ec1bc790643b2f0"
+    },
+    "type": null,
+    "createdAt": {
+      "$date": "2025-08-22T02:12:07.578Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-22T02:12:07.578Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "68a7d210dc2c1ea6a3212077"
+    },
+    "deletedAt": null,
+    "createById": {
+      "$oid": "68766ff358231e4343cb2c21"
+    },
+    "attendanceId": null,
+    "content": "\u0110\u00e3 ho\u00e0n th\u00e0nh c\u00f4ng vi\u1ec7c l\u00fac 10:00 ng\u00e0y 22/08/2025",
+    "image": "/comment/8f32f637-034c-446d-87e1-06c7366e1734.jpg",
+    "taskId": {
+      "$oid": "68a7cdea1ec1bc790643b2f0"
+    },
+    "type": null,
+    "createdAt": {
+      "$date": "2025-08-22T02:12:32.009Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-22T02:12:32.009Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "68a7d4c7dc2c1ea6a3212218"
+    },
+    "deletedAt": null,
+    "createById": {
+      "$oid": "689ca91e68b00102ba80a7f4"
+    },
+    "attendanceId": null,
+    "content": "H\u00e1 nh\u00f4 h\u00e1 nh\u00f4 \u0111\u00e2y l\u00e0 test, \u0111\u00e2y l\u00e0 test ",
+    "image": "/comment/7a2ce951-d825-46a3-9370-f9dce50e53c5.jpeg",
+    "taskId": {
+      "$oid": "68a7cdea1ec1bc790643b2f0"
+    },
+    "type": null,
+    "createdAt": {
+      "$date": "2025-08-22T02:24:07.077Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-22T02:24:07.077Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "68a7f413dc2c1ea6a3213585"
+    },
+    "deletedAt": null,
+    "createById": {
+      "$oid": "689ca91e68b00102ba80a7f4"
+    },
+    "attendanceId": {
+      "$oid": "68a7509011c5187866275a5e"
+    },
+    "content": "\u0110\u00e3 check v\u00e0o l\u00fac 11:37:39 22/08/2025",
+    "image": "/task/83f51b8d-c2f2-424c-8be7-0cb4eed682d4.png",
+    "taskId": {
+      "$oid": "68a7cdea1ec1bc790643b2f0"
+    },
+    "type": "in",
+    "createdAt": {
+      "$date": "2025-08-22T04:37:39.512Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-22T04:37:39.512Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "68a8ad8ea4e729c9cfc7ac3a"
+    },
+    "deletedAt": null,
+    "createById": {
+      "$oid": "689ca91e68b00102ba80a7f4"
+    },
+    "attendanceId": {
+      "$oid": "68a8a8a37fff13dc3783e7e9"
+    },
+    "content": "\u0110\u00e3 check ra l\u00fac 00:49:02 23/08/2025",
+    "image": "/task/c8586b71-8bf3-4a62-9056-49ab30cc18a8.jpg",
+    "taskId": {
+      "$oid": "68a7cdea1ec1bc790643b2f0"
+    },
+    "type": "out",
+    "createdAt": {
+      "$date": "2025-08-22T17:49:02.411Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-22T17:49:02.411Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "68a8af5da4e729c9cfc7accf"
+    },
+    "deletedAt": null,
+    "createById": {
+      "$oid": "689ca91e68b00102ba80a7f4"
+    },
+    "attendanceId": {
+      "$oid": "68a8a8a37fff13dc3783e7e9"
+    },
+    "content": "\u0110\u00e3 check v\u00e0o l\u00fac 00:56:45 23/08/2025",
+    "image": "/task/7f298c72-c93e-429a-b69f-9d27dfa5fec1.jpg",
+    "taskId": {
+      "$oid": "68a7cdea1ec1bc790643b2f0"
+    },
+    "type": "in",
+    "createdAt": {
+      "$date": "2025-08-22T17:56:45.831Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-22T17:56:45.831Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "68a8af74a4e729c9cfc7ad29"
+    },
+    "deletedAt": null,
+    "createById": {
+      "$oid": "689ca91e68b00102ba80a7f4"
+    },
+    "attendanceId": {
+      "$oid": "68a8a8a37fff13dc3783e7e9"
+    },
+    "content": "\u0110\u00e3 check v\u00e0o l\u00fac 00:57:08 23/08/2025",
+    "image": "/task/57b8b548-a490-4cdf-b1a2-6567e860d9d8.jpg",
+    "taskId": {
+      "$oid": "68a7cdea1ec1bc790643b2f0"
+    },
+    "type": "in",
+    "createdAt": {
+      "$date": "2025-08-22T17:57:08.233Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-22T17:57:08.233Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "68a8af7ea4e729c9cfc7ad40"
+    },
+    "deletedAt": null,
+    "createById": {
+      "$oid": "689ca91e68b00102ba80a7f4"
+    },
+    "attendanceId": {
+      "$oid": "68a8a8a37fff13dc3783e7e9"
+    },
+    "content": "\u0110\u00e3 check v\u00e0o l\u00fac 00:57:18 23/08/2025",
+    "image": "/task/a3841423-d8ec-47a1-9743-90865e3e68cf.jpg",
+    "taskId": {
+      "$oid": "68a7cdea1ec1bc790643b2f0"
+    },
+    "type": "in",
+    "createdAt": {
+      "$date": "2025-08-22T17:57:18.729Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-22T17:57:18.729Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "68a8af87a4e729c9cfc7ad57"
+    },
+    "deletedAt": null,
+    "createById": {
+      "$oid": "689ca91e68b00102ba80a7f4"
+    },
+    "attendanceId": {
+      "$oid": "68a8a8a37fff13dc3783e7e9"
+    },
+    "content": "\u0110\u00e3 check ra l\u00fac 00:57:27 23/08/2025",
+    "image": "/task/41d0cf71-e931-4c20-a865-a02d07977d7a.jpg",
+    "taskId": {
+      "$oid": "68a7cdea1ec1bc790643b2f0"
+    },
+    "type": "out",
+    "createdAt": {
+      "$date": "2025-08-22T17:57:27.034Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-22T17:57:27.034Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "68a8aff3a4e729c9cfc7adec"
+    },
+    "deletedAt": null,
+    "createById": {
+      "$oid": "689ca91e68b00102ba80a7f4"
+    },
+    "attendanceId": {
+      "$oid": "68a8a8a37fff13dc3783e7e9"
+    },
+    "content": "\u0110\u00e3 check v\u00e0o l\u00fac 00:59:15 23/08/2025",
+    "image": "/task/7f67f78a-5f4a-4d5f-a3b6-db8adb031f06.jpg",
+    "taskId": {
+      "$oid": "68a7cdea1ec1bc790643b2f0"
+    },
+    "type": "in",
+    "createdAt": {
+      "$date": "2025-08-22T17:59:15.505Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-22T17:59:15.505Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "68a932b5a4e729c9cfc7d7bb"
+    },
+    "deletedAt": null,
+    "createById": {
+      "$oid": "689ca91e68b00102ba80a7f4"
+    },
+    "attendanceId": {
+      "$oid": "68a92ff5a4e729c9cfc7d67b"
+    },
+    "content": "\u0110\u00e3 check v\u00e0o l\u00fac 10:17:09 23/08/2025",
+    "image": "/task/64ec48a2-370e-4e72-a6f3-082865375bef.png",
+    "taskId": {
+      "$oid": "68a7cdea1ec1bc790643b2f0"
+    },
+    "type": "in",
+    "createdAt": {
+      "$date": "2025-08-23T03:17:09.436Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-23T03:17:09.436Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "68a932c3a4e729c9cfc7d7d2"
+    },
+    "deletedAt": null,
+    "createById": {
+      "$oid": "689ca91e68b00102ba80a7f4"
+    },
+    "attendanceId": {
+      "$oid": "68a92ff5a4e729c9cfc7d67b"
+    },
+    "content": "\u0110\u00e3 check v\u00e0o l\u00fac 10:17:23 23/08/2025",
+    "image": "/task/98c9ef62-a225-4ccf-ac77-e96e34bcd1e7.jpg",
+    "taskId": {
+      "$oid": "68a7cdea1ec1bc790643b2f0"
+    },
+    "type": "in",
+    "createdAt": {
+      "$date": "2025-08-23T03:17:23.142Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-23T03:17:23.142Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "68a9337ea4e729c9cfc7d890"
+    },
+    "deletedAt": null,
+    "createById": {
+      "$oid": "689ca91e68b00102ba80a7f4"
+    },
+    "attendanceId": {
+      "$oid": "68a93375a4e729c9cfc7d87a"
+    },
+    "content": "\u0110\u00e3 check v\u00e0o l\u00fac 10:20:30 23/08/2025",
+    "image": "/task/85e6854c-d762-4ffc-9d45-2f8bd6395ee9.png",
+    "taskId": {
+      "$oid": "68a7cdea1ec1bc790643b2f0"
+    },
+    "type": "in",
+    "createdAt": {
+      "$date": "2025-08-23T03:20:30.940Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-23T03:20:30.940Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "68a93413a4e729c9cfc7d8e8"
+    },
+    "deletedAt": null,
+    "createById": {
+      "$oid": "689ca91e68b00102ba80a7f4"
+    },
+    "attendanceId": {
+      "$oid": "68a93375a4e729c9cfc7d87a"
+    },
+    "content": "\u0110\u00e3 check ra l\u00fac 10:22:59 23/08/2025",
+    "image": "/task/cf442731-6242-4870-bc73-85407caf44d0.jpg",
+    "taskId": {
+      "$oid": "68a7cdea1ec1bc790643b2f0"
+    },
+    "type": "out",
+    "createdAt": {
+      "$date": "2025-08-23T03:22:59.565Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-23T03:22:59.565Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "68a9369da4e729c9cfc7da4a"
+    },
+    "deletedAt": null,
+    "createById": {
+      "$oid": "689ca91e68b00102ba80a7f4"
+    },
+    "attendanceId": {
+      "$oid": "68a93375a4e729c9cfc7d87a"
+    },
+    "content": "\u0110\u00e3 check v\u00e0o l\u00fac 10:33:49 23/08/2025",
+    "image": "/task/62a7fc51-2d03-4cde-8d90-c504ca021841.jpeg",
+    "taskId": {
+      "$oid": "68a7cdea1ec1bc790643b2f0"
+    },
+    "type": "in",
+    "createdAt": {
+      "$date": "2025-08-23T03:33:49.793Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-23T03:33:49.793Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "68a936aea4e729c9cfc7da61"
+    },
+    "deletedAt": null,
+    "createById": {
+      "$oid": "689ca91e68b00102ba80a7f4"
+    },
+    "attendanceId": {
+      "$oid": "68a93375a4e729c9cfc7d87a"
+    },
+    "content": "\u0110\u00e3 check ra l\u00fac 10:34:06 23/08/2025",
+    "image": "/task/25f25c6c-db64-44c5-8358-16cc54546264.png",
+    "taskId": {
+      "$oid": "68a7cdea1ec1bc790643b2f0"
+    },
+    "type": "out",
+    "createdAt": {
+      "$date": "2025-08-23T03:34:06.338Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-23T03:34:06.338Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "68a936c5a4e729c9cfc7da78"
+    },
+    "deletedAt": null,
+    "createById": {
+      "$oid": "689ca91e68b00102ba80a7f4"
+    },
+    "attendanceId": {
+      "$oid": "68a93375a4e729c9cfc7d87a"
+    },
+    "content": "\u0110\u00e3 check ra l\u00fac 10:34:29 23/08/2025",
+    "image": "/task/8687fa87-efb2-4f0b-9aaa-6f27626f66ef.jpeg",
+    "taskId": {
+      "$oid": "68a7cdea1ec1bc790643b2f0"
+    },
+    "type": "out",
+    "createdAt": {
+      "$date": "2025-08-23T03:34:29.016Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-23T03:34:29.016Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "68a947e5a4e729c9cfc7dfd0"
+    },
+    "deletedAt": null,
+    "createById": {
+      "$oid": "689ca91e68b00102ba80a7f4"
+    },
+    "attendanceId": {
+      "$oid": "68a93375a4e729c9cfc7d87a"
+    },
+    "content": "\u0110\u00e3 check v\u00e0o l\u00fac 11:47:33 23/08/2025",
+    "image": "/task/69c656d4-0b3b-4651-9083-16027993e003.jpg",
+    "taskId": {
+      "$oid": "68a7cdea1ec1bc790643b2f0"
+    },
+    "type": "in",
+    "createdAt": {
+      "$date": "2025-08-23T04:47:33.104Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-23T04:47:33.104Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "68ca17a83432be90035831ce"
+    },
+    "deletedAt": null,
+    "createById": {
+      "$oid": "689ca91e68b00102ba80a7f4"
+    },
+    "attendanceId": null,
+    "content": null,
+    "image": null,
+    "taskId": {
+      "$oid": "68c36c4945bdaed46829e982"
+    },
+    "type": null,
+    "createdAt": {
+      "$date": "2025-09-17T02:06:32.934Z"
+    },
+    "updatedAt": {
+      "$date": "2025-09-17T02:06:32.934Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "68ca18af3432be9003583280"
+    },
+    "deletedAt": null,
+    "createById": {
+      "$oid": "689ca91e68b00102ba80a7f4"
+    },
+    "attendanceId": null,
+    "content": "",
+    "image": null,
+    "taskId": {
+      "$oid": "68c36c4945bdaed46829e982"
+    },
+    "type": null,
+    "createdAt": {
+      "$date": "2025-09-17T02:10:55.900Z"
+    },
+    "updatedAt": {
+      "$date": "2025-09-17T02:10:55.900Z"
+    },
+    "__v": 0
+  }
+]

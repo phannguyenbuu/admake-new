@@ -1,0 +1,31 @@
+.form-material-modal .ant-modal-content {
+  animation: modalScaleIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.form-material-modal .ant-modal-content-appear,
+.form-material-modal .ant-modal-content-leave {
+  animation: modalScaleOut 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.ant-modal .ant-modal-content {
+  padding: 0;
+}
+@keyframes modalScaleIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+@keyframes modalScaleOut {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+}
