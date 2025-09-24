@@ -28,7 +28,7 @@ import { AccountingDashboard } from "./app/dashboard/accounting/page";
 import { InforDashboard } from "./app/infor/page";
 import { WorkPointsPage } from "./app/dashboard/work-points/page";
 import { useInfo } from "./common/hooks/info.hook";
-import Error403 from "./app/403";
+// import Error403 from "./app/403";
 import { Navigate } from "react-router-dom";
 
 // Route guard: chặn truy cập nếu không có quyền
@@ -45,7 +45,8 @@ function RequireRoles({
   // const hasPermission = roles.some((r) => userPermissions.includes(r));
   // return hasPermission ? children : <Error403 />;
 
-  console.log(children);
+  // console.log(children);
+  // console.log(children);
   return children;
 }
 

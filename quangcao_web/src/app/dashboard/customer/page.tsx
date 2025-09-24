@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 import { useState } from "react";
+=======
+import { useState, useEffect } from "react";
+>>>>>>> c0e8eb3d11debb508d0dbb29418540c6b17018be
 import type { IPage, PaginationDto } from "../../../@types/common.type";
 import type { Customer } from "../../../@types/customer.type";
 import { useCustomerQuery } from "../../../common/hooks/customer.hook";
@@ -27,7 +31,26 @@ export const CustomerDashboard: IPage["Component"] = () => {
     data: customers,
     isLoading,
     refetch,
+<<<<<<< HEAD
   } = useCustomerQuery({ ...query, search: debouncedSearch });
+=======
+    error,
+  } = useCustomerQuery({ ...query, search: debouncedSearch });
+
+  useEffect(() => {
+    if (customers) {
+      console.log("Received new data:", customers);
+    }
+  }, [customers]);
+
+  useEffect(() => {
+  if (error) {
+    console.error("Error fetching customers:", error);
+  }
+}, [error]);
+  
+
+>>>>>>> c0e8eb3d11debb508d0dbb29418540c6b17018be
   const [customer, setCustomer] = useState<Customer | null>(null);
 
   const toggle = (key: keyof typeof config) => {

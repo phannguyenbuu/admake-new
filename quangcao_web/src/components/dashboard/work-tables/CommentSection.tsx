@@ -32,7 +32,11 @@ import type {
 } from "../../../@types/comment.type";
 import { useInfo } from "../../../common/hooks/info.hook";
 import { getAddressFromCoordinates } from "../../../common/utils/help.util";
+<<<<<<< HEAD
 import LocationMapModal from "../goong-map/map";
+=======
+// import LocationMapModal from "../goong-map/map";
+>>>>>>> c0e8eb3d11debb508d0dbb29418540c6b17018be
 import { formatTimeAgo } from "../../../utils/convert.util";
 
 dayjs.extend(relativeTime);

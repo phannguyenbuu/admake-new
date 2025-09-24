@@ -1,0 +1,298 @@
+[
+  {
+    "_id": {
+      "$oid": "6886555d0313b0e51df39f19"
+    },
+    "delete_at": null,
+    "name": "Kh\u00f4ng gian l\u00e0m vi\u1ec7c 6",
+    "ownerId": {
+      "$oid": "68766ff358231e4343cb2c21"
+    },
+    "createdAt": {
+      "$date": "2025-07-27T16:35:41.120Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-13T17:49:54.895Z"
+    },
+    "__v": 0,
+    "deletedAt": {
+      "$date": "2025-08-13T17:49:54.894Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "68892d2e8d99dcb88162778a"
+    },
+    "deletedAt": {
+      "$date": "2025-08-13T17:46:13.057Z"
+    },
+    "name": "Kh\u00f4ng gian l\u00e0m vi\u1ec7c 2",
+    "ownerId": {
+      "$oid": "68766ff358231e4343cb2c21"
+    },
+    "createdAt": {
+      "$date": "2025-07-29T20:21:02.122Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-13T17:46:13.058Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "688a3add8d99dcb88162796f"
+    },
+    "deletedAt": null,
+    "name": "Kh\u1ed1i V\u0103n Ph\u00f2ng",
+    "ownerId": {
+      "$oid": "68766ff358231e4343cb2c21"
+    },
+    "createdAt": {
+      "$date": "2025-07-30T15:31:41.433Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-19T09:21:34.475Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "689cd08e49f0334c7af16f49"
+    },
+    "deletedAt": {
+      "$date": "2025-08-13T17:51:15.306Z"
+    },
+    "name": "aaaaaaa",
+    "ownerId": {
+      "$oid": "68766ff358231e4343cb2c21"
+    },
+    "createdAt": {
+      "$date": "2025-08-13T17:51:10.370Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-13T17:51:15.306Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "689dffd249f0334c7af182a2"
+    },
+    "deletedAt": null,
+    "name": "B\u1ea3ng vi\u1ec7c c\u00f4ng",
+    "ownerId": {
+      "$oid": "689ca91e68b00102ba80a7f4"
+    },
+    "createdAt": {
+      "$date": "2025-08-14T15:25:06.238Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-14T15:25:06.238Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "689dffe449f0334c7af182b7"
+    },
+    "deletedAt": null,
+    "name": "B\u1ea3ng b\u1ea3ng",
+    "ownerId": {
+      "$oid": "689ca91e68b00102ba80a7f4"
+    },
+    "createdAt": {
+      "$date": "2025-08-14T15:25:24.939Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-14T15:25:24.939Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "689e007549f0334c7af182e0"
+    },
+    "deletedAt": null,
+    "name": "aaaaaaaaa",
+    "ownerId": {
+      "$oid": "68766ff358231e4343cb2c21"
+    },
+    "createdAt": {
+      "$date": "2025-08-14T15:27:49.311Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-14T15:27:49.311Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "689e00b049f0334c7af182fe"
+    },
+    "deletedAt": null,
+    "name": "bbbbbbbbbbbbb",
+    "ownerId": {
+      "$oid": "68766ff358231e4343cb2c21"
+    },
+    "createdAt": {
+      "$date": "2025-08-14T15:28:48.200Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-14T15:28:48.200Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "68a7dbc1dc2c1ea6a321270b"
+    },
+    "deletedAt": null,
+    "name": "test test 123 123",
+    "ownerId": {
+      "$oid": "68766ff358231e4343cb2c21"
+    },
+    "createdAt": {
+      "$date": "2025-08-22T02:53:53.138Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-22T02:53:53.138Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "68a7df43dc2c1ea6a3212b1b"
+    },
+    "deletedAt": null,
+    "name": "Oke test production",
+    "ownerId": {
+      "$oid": "68766ff358231e4343cb2c21"
+    },
+    "createdAt": {
+      "$date": "2025-08-22T03:08:51.733Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-22T03:08:51.733Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "68a88533dc2c1ea6a321621c"
+    },
+    "deletedAt": null,
+    "name": "aaaaaaaaaaaaaa",
+    "ownerId": {
+      "$oid": "689ca91e68b00102ba80a7f4"
+    },
+    "createdAt": {
+      "$date": "2025-08-22T14:56:51.021Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-22T14:56:51.021Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "68a88536dc2c1ea6a3216224"
+    },
+    "deletedAt": null,
+    "name": "bbbbbbbbbbbbbb",
+    "ownerId": {
+      "$oid": "689ca91e68b00102ba80a7f4"
+    },
+    "createdAt": {
+      "$date": "2025-08-22T14:56:54.595Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-22T14:56:54.595Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "68a88539dc2c1ea6a321622c"
+    },
+    "deletedAt": null,
+    "name": "cccccccccccccccc",
+    "ownerId": {
+      "$oid": "689ca91e68b00102ba80a7f4"
+    },
+    "createdAt": {
+      "$date": "2025-08-22T14:56:57.191Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-22T14:56:57.191Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "68a8853cdc2c1ea6a3216234"
+    },
+    "deletedAt": null,
+    "name": "dddddddddddddddddd",
+    "ownerId": {
+      "$oid": "689ca91e68b00102ba80a7f4"
+    },
+    "createdAt": {
+      "$date": "2025-08-22T14:57:00.693Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-22T14:57:00.693Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "68abb078a4e729c9cfc87cba"
+    },
+    "deletedAt": null,
+    "name": "KH\u1ed0I THI\u1ebeT K\u1ebe",
+    "ownerId": {
+      "$oid": "68766ff358231e4343cb2c21"
+    },
+    "createdAt": {
+      "$date": "2025-08-25T00:38:16.890Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-25T00:38:16.890Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "68abe6d6a4e729c9cfc8948a"
+    },
+    "deletedAt": null,
+    "name": "Kh\u1ed1i Thi C\u00f4ng",
+    "ownerId": {
+      "$oid": "68766ff358231e4343cb2c21"
+    },
+    "createdAt": {
+      "$date": "2025-08-25T04:30:14.150Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-25T04:30:14.150Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "68ace96da4e729c9cfc8f80b"
+    },
+    "deletedAt": null,
+    "name": "PH\u00d2NG THI C\u00d4NG",
+    "ownerId": {
+      "$oid": "68766ff358231e4343cb2c21"
+    },
+    "createdAt": {
+      "$date": "2025-08-25T22:53:33.459Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-25T22:53:33.459Z"
+    },
+    "__v": 0
+  }
+]

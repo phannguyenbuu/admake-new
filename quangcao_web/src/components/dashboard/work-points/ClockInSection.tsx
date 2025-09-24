@@ -6,7 +6,11 @@ import { AttendanceStatus } from "../../../common/enum/attendance.enum";
 import type { ClockSectionProps } from "../../../@types/attendance.type";
 import { useEffect, useState } from "react";
 import ImagePreviewModal from "../../modal/ImagePreviewModal";
+<<<<<<< HEAD
 import LocationMapModal from "../goong-map/map";
+=======
+// import LocationMapModal from "../goong-map/map";
+>>>>>>> c0e8eb3d11debb508d0dbb29418540c6b17018be
 import CheckingForm from "./CheckInForm";
 import { prepareImageForUpload } from "../../../utils/prepareImageForUpload";
 
