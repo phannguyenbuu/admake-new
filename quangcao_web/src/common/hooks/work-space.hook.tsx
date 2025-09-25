@@ -6,6 +6,7 @@ import { TaskService } from "../../services/task.service";
 export const TASK_QUERY_KEY = "task/query";
 export const WORK_SPACE_DETAIL_QUERY_KEY = "workspace/queryDetail";
 export function useWorkSpaceQueryAll() {
+  
   return useQuery({
     queryKey: [WORK_SPACE_DETAIL_QUERY_KEY],
     queryFn: () => WorkSpaceService.getAll(),

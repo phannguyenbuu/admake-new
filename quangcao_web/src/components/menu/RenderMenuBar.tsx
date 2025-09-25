@@ -52,6 +52,8 @@ export default function RenderMenuBar({}) {
   const { data: workSpaces, refetch: refetchWorkSpaces } =
     useWorkSpaceQueryAll();
 
+  console.log("Init works", workSpaces);
+
   const { mutate: createWorkSpace } = useCreateWorkSpace();
 
   const adminMode = useCheckPermission();
@@ -171,7 +173,7 @@ export default function RenderMenuBar({}) {
 
   // Tạo menu items cho Ant Design Menu
   const createMenuItems = () => {
-    console.log(getMainMenuItems(pathname));
+    // console.log(getMainMenuItems(pathname));
     const menuItems = getMainMenuItems(pathname)
       .filter((item) => item.key !== "/dashboard/infor") // Ẩn Profile khỏi desktop menu
       .map((item) => {

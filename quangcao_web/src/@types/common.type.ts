@@ -6,7 +6,7 @@ export interface IPage {
 }
 
 export type BaseEntity = {
-  _id: string;
+  id: number;
   createdAt: Date;
   updatedAt: Date;
   deletedAt?: Date;

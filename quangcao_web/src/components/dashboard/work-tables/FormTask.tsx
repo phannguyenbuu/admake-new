@@ -92,7 +92,7 @@ export default function FormTask({
     return {
       ...taskDetail,
       // @ts-ignore
-      customerId: taskDetail?.customer?._id || null,
+      customerId: taskDetail?.customer?.id || null,
     };
   }, [taskDetail]);
 
@@ -113,7 +113,7 @@ export default function FormTask({
     setMode({
       adminMode: adminMode,
       // @ts-ignore
-      userMode: mappedTask?.assignIds.includes(info?._id || "") || false,
+      userMode: mappedTask?.assignIds.includes(info?.id || "") || false,
     });
   }, [info, mappedTask]);
 
@@ -154,7 +154,7 @@ export default function FormTask({
         ...prev,
         selectedMaterials: checked
           ? [...prev.selectedMaterials, materialObj]
-          : prev.selectedMaterials.filter((m) => m._id !== materialObj._id),
+          : prev.selectedMaterials.filter((m) => m.id !== materialObj.id),
       }));
     }, []),
 
@@ -164,7 +164,7 @@ export default function FormTask({
         delete quantities[material];
         return {
           selectedMaterials: prev.selectedMaterials.filter(
-            (m) => m._id !== material
+            (m) => m.id !== material
           ),
           materialQuantities: quantities,
         };
@@ -228,7 +228,7 @@ export default function FormTask({
         if (selected) {
           setCustomer((prev) => ({
             ...prev,
-            selectedId: selected._id,
+            selectedId: selected.id,
             searchValue: value,
             selectedCustomer: selected,
             isTyping: false,
@@ -329,7 +329,7 @@ export default function FormTask({
         );
         setMaterial({
           selectedMaterials: (mappedTask as any).materials.map((m: any) => ({
-            _id: m.materialId,
+            id: m.materialId,
             name: m.material?.name || "Unknown",
             price: m.material?.price || 0,
             unit: m.material?.unit || "cái",
@@ -402,7 +402,7 @@ export default function FormTask({
         return;
       }
 
-      const task: Omit<Task, "createById" | "_id" | "createdAt" | "updatedAt"> =
+      const task: Omit<Task, "createById" | "id" | "createdAt" | "updatedAt"> =
         {
           title: values.title || "",
           description: values.description || "",
@@ -416,13 +416,13 @@ export default function FormTask({
           endTime: time.endTime?.toDate(), // Convert dayjs về Date
           materials: material.selectedMaterials.map((materialObj) => {
             return {
-              materialId: materialObj._id,
+              materialId: materialObj.id,
               material: {
                 name: materialObj.name,
                 price: materialObj.price || 0,
                 unit: materialObj.unit || "cái",
               },
-              quantity: material.materialQuantities[materialObj._id] || 1,
+              quantity: material.materialQuantities[materialObj.id] || 1,
             };
           }),
         };
@@ -431,7 +431,7 @@ export default function FormTask({
         updateTask.mutateAsync(
           {
             //@ts-ignore
-            id: mappedTask._id,
+            id: mappedTask.id,
             dto: task as Task,
           },
           {
@@ -668,7 +668,7 @@ export default function FormTask({
                     placeholder="Nhập tên, số điện thoại hoặc địa chỉ..."
                     className="!h-9 sm:!h-10 !rounded-lg !border !border-gray-300 focus:!border-cyan-500 focus:!shadow-lg hover:!border-cyan-500 !transition-all !duration-200 !text-xs sm:!text-sm !shadow-sm"
                     options={filteredCustomers.map((c: Customer) => ({
-                      key: c._id,
+                      key: c.id,
                       value: c.fullName,
                       label: (
                         <div className="flex flex-col py-1">
@@ -1099,7 +1099,7 @@ export default function FormTask({
                     const material = m.material;
                     const qty = material.quantity || 1;
                     return (
-                      <div key={material._id} className="p-2 md:p-0">
+                      <div key={material.id} className="p-2 md:p-0">
                         {/* Row responsive */}
                         <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-3">
                           {/* Tên */}
@@ -1157,7 +1157,7 @@ export default function FormTask({
                   {mappedTask?.assigns?.map((user: User) => {
                     return (
                       <div
-                        key={user._id}
+                        key={user.id}
                         className="flex items-center border-b last:border-b-0 py-2"
                       >
                         <span className="text-cyan-600 font-semibold flex-1 cursor-pointer hover:underline">

@@ -25,7 +25,7 @@ export const RoleModal = ({
   const { mutate: createRole, isPending: isCreating } = useCreateRole();
   const { data: permissionsData } = useRolePermission();
   const { mutate: updateRole, isPending: isUpdating } = useUpdateRole();
-  const { data: roleDetail, refetch } = useRoleDetail(role?._id);
+  const { data: roleDetail, refetch } = useRoleDetail(role?.id);
 
   const [formData, setFormData] = useState<RoleFormData>({
     name: "",
@@ -107,7 +107,7 @@ export const RoleModal = ({
 
       if (role) {
         updateRole(
-          { id: role._id, dto: roleData as Role },
+          { id: role.id, dto: roleData as Role },
           {
             onSuccess: () => {
               message.success({

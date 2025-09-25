@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useInfiniteQuery } from "@tanstack/react-query";
 import type { PaginationDto } from "../../@types/common.type";
 import { MaterialService } from "../../services/material.service";
+import type { Material } from "../../@types/material.type";
 
 export const MATERIAL_QUERY_KEY = "material/queryPagination";
 export const MATERIAL_DETAIL_QUERY_KEY = "material/queryDetail";
@@ -11,30 +12,30 @@ export function useMaterialQuery(dto: Partial<PaginationDto> = {}) {
   });
 }
 
-export function useMaterialDetail(id?: string) {
+export function useMaterialDetail(id?: number) {
   return useQuery({
     queryKey: [MATERIAL_DETAIL_QUERY_KEY, id],
-    queryFn: () => MaterialService.getMaterialDetail(id || ""),
+    queryFn: () => MaterialService.getMaterialDetail(id || 0),
     enabled: !!id,
   });
 }
 
 export function useCreateMaterial() {
   return useMutation({
-    mutationFn: (dto: FormData) => MaterialService.createMaterial(dto),
+    mutationFn: (dto: Material) => MaterialService.createMaterial(dto),
   });
 }
 
 export function useUpdateMaterial() {
   return useMutation({
-    mutationFn: ({ dto, id }: { dto: FormData; id: string }) =>
+    mutationFn: ({ dto, id }: { dto: FormData; id: number }) =>
       MaterialService.updateMaterial(id, dto),
   });
 }
 
 export function useDeleteMaterial() {
   return useMutation({
-    mutationFn: (id: string) => MaterialService.deleteMaterial(id),
+    mutationFn: (id: number) => MaterialService.deleteMaterial(id),
   });
 }
 

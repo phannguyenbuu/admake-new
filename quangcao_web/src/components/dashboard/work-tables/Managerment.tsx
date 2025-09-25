@@ -37,8 +37,7 @@ export default function ManagermentBoard({
   // API hooks
   const { data: workspaceData } = useWorkSpaceQueryById(workspaceId);
 
-  const { data: tasksData, refetch: refetchTasks } =
-    useWorkSpaceQueryTaskById(workspaceId);
+  const { data: tasksData, refetch: refetchTasks } = useWorkSpaceQueryTaskById(workspaceId);
   const updateTaskStatusMutation = useUpdateTaskStatusById();
   const deleteTaskMutation = useDeleteTask();
 
@@ -109,7 +108,7 @@ export default function ManagermentBoard({
       // Kiểm tra xem task có đang ở cột "Khoán thưởng" không
       const sourceColumn = columns.find((col) =>
         // @ts-ignore - Bỏ qua type check vì columns có tasks trong runtime
-        col.tasks?.some((task: any) => task._id === start.draggableId)
+        col.tasks?.some((task: any) => task.id === start.draggableId)
       );
 
       if (sourceColumn?.type === "REWARD") {
@@ -320,8 +319,8 @@ export default function ManagermentBoard({
 
           // Cập nhật status của task qua API
           const newStatus = fixedColumns[destColIdx].type;
-          if (movedTask._id) {
-            updateTaskStatus(movedTask._id, newStatus);
+          if (movedTask.id) {
+            updateTaskStatus(movedTask.id, newStatus);
           }
         }
 
@@ -554,8 +553,8 @@ export default function ManagermentBoard({
 
                               return (
                                 <Draggable
-                                  key={task._id}
-                                  draggableId={task._id}
+                                  key={task.id}
+                                  draggableId={task.id}
                                   index={idx}
                                   isDragDisabled={isRewardColumn} // Vô hiệu hóa drag cho task trong cột khoán thưởng
                                 >
@@ -601,7 +600,7 @@ export default function ManagermentBoard({
                                           !isDragging
                                         ) {
                                           setSelectedTask(task);
-                                          setEditingTaskId(task._id);
+                                          setEditingTaskId(task.id);
                                           setShowFormTask(true);
                                         }
                                       }}
@@ -649,7 +648,7 @@ export default function ManagermentBoard({
                                                 e.stopPropagation(); // Ngăn không cho trigger onClick của task card
                                                 setDeleteConfirmModal({
                                                   visible: true,
-                                                  taskId: task._id,
+                                                  taskId: task.id,
                                                   taskTitle: task.title,
                                                 });
                                               }}
@@ -723,7 +722,7 @@ export default function ManagermentBoard({
                                             <div className="w-1.5 h-1.5 bg-gray-200 rounded-full"></div>
                                           </div>
                                           <div className="text-xs text-gray-400 font-mono flex-shrink-0">
-                                            #{task._id?.slice(-4)}
+                                            #{task.id?.slice(-4)}
                                           </div>
                                         </div>
                                       </div>

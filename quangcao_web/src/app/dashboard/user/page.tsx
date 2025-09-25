@@ -84,6 +84,8 @@ export const UserDashboard: IPage["Component"] = () => {
             );
           },
         }}
+
+        
         pagination={{
           pageSize: query.limit,
           current: query.page,

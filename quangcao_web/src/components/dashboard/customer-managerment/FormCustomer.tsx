@@ -45,13 +45,13 @@ export default function FormCustomer({
   const [formValues, setFormValues] = useState<any>({});
   const { mutate: createCustomer, isPending: isCreating } = useCreateCustomer();
   const { mutate: updateCustomer, isPending: isUpdating } = useUpdateCustomer();
-  const { data: customerDetail, isLoading: isLoadingCustomerDetail } =
-    useCustomerDetail(initialValues?._id);
+  const { data: customerDetail, isLoading: isLoadingCustomerDetail } = useCustomerDetail(initialValues?.id);
 
   const isEdit = !!initialValues;
   const isPending = isCreating || isUpdating || isLoadingCustomerDetail;
 
   useEffect(() => {
+    // console.log('initialValues', initialValues);
     if (initialValues) {
       form.setFieldsValue({
         ...initialValues,
@@ -66,7 +66,7 @@ export default function FormCustomer({
   const onFinish = (
     values: Omit<Customer, "createdAt" | "updatedAt" | "deletedAt">
   ) => {
-    console.log("aaaaaaaa", values);
+    
     const formattedValues = {
       ...values,
       ...(values.workInfo && {
@@ -88,9 +88,12 @@ export default function FormCustomer({
         workEnd: dayjs(values.workEnd).format("YYYY-MM-DD"),
       }),
     };
+
+
+    console.log("Customers:", values, initialValues?.id, customerDetail);
     if (customerDetail) {
       updateCustomer(
-        { dto: formattedValues, id: initialValues?._id || "" },
+        { dto: formattedValues, id: initialValues?.id || "" },
         {
           onSuccess: () => {
             message.success("Cập nhật khách hàng thành công");

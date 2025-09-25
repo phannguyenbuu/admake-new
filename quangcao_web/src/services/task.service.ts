@@ -6,7 +6,7 @@ export const TaskService = {
     return axiosClient.get(`/task/${id}`);
   },
   create: (dto: Task) => {
-    return axiosClient.post("/task", dto);
+    return axiosClient.post("/task/", dto);
   },
   update: (id: string, dto: Task) => {
     return axiosClient.put(`/task/${id}`, dto);

@@ -5,6 +5,7 @@ import type { Customer } from "../../@types/customer.type";
 
 export const CUSTOMER_QUERY_KEY = "customer/queryPagination";
 export const CUSTOMER_DETAIL_QUERY_KEY = "customer/queryDetail";
+
 export function useCustomerQuery(dto: Partial<PaginationDto> = {}) {
   return useQuery({
     queryKey: [CUSTOMER_QUERY_KEY, dto],
@@ -12,10 +13,11 @@ export function useCustomerQuery(dto: Partial<PaginationDto> = {}) {
   });
 }
 
-export function useCustomerDetail(id?: string) {
+export function useCustomerDetail(id?: number) {
+  
   return useQuery({
     queryKey: [CUSTOMER_DETAIL_QUERY_KEY, id],
-    queryFn: () => CustomerService.getCustomerDetail(id || ""),
+    queryFn: () => CustomerService.getCustomerDetail(id || 0),
     enabled: !!id,
   });
 }
@@ -35,13 +37,13 @@ export function useUpdateCustomer() {
       id,
     }: {
       dto: Omit<Customer, "createdAt" | "updatedAt" | "deletedAt">;
-      id: string;
+      id: number;
     }) => CustomerService.updateCustomer(id, dto),
   });
 }
 
 export function useDeleteCustomer() {
   return useMutation({
-    mutationFn: (id: string) => CustomerService.deleteCustomer(id),
+    mutationFn: (id: number) => CustomerService.deleteCustomer(id),
   });
 }

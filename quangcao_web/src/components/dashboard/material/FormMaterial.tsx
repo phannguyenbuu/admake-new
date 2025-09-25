@@ -46,7 +46,7 @@ export default function FormMaterial({
     data: materialDetail,
     isLoading: isLoadingMaterialDetail,
     refetch: refetchMaterialDetail,
-  } = useMaterialDetail(material?._id);
+  } = useMaterialDetail(material?.id);
   const { mutate: updateMaterial, isPending: isUpdating } = useUpdateMaterial();
   const [isDragging, setIsDragging] = useState(false);
 
@@ -80,7 +80,7 @@ export default function FormMaterial({
     }
   }, [
     open,
-    material?._id,
+    material?.id,
     form,
     materialDetail,
     isEdit,
@@ -122,10 +122,10 @@ export default function FormMaterial({
     }
 
     // Kiểm tra đúng điều kiện để update
-    if (isEdit && material?._id) {
+    if (isEdit && material?.id) {
       // Trường hợp update - có material ID
       updateMaterial(
-        { dto: formData, id: material._id },
+        { dto: formData, id: material.id },
         {
           onSuccess: () => {
             message.success("Cập nhật vật liệu thành công");
@@ -245,7 +245,7 @@ export default function FormMaterial({
               layout="vertical"
               onFinish={onFinish}
               autoComplete="off"
-              key={material?._id}
+              key={material?.id}
               preserve={true}
               className="space-y-3 sm:space-y-4"
             >

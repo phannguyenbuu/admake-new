@@ -17,6 +17,7 @@ import { useCreateUser, useUpdateUser } from "../../../common/hooks/user.hook";
 import { useSettingQuery } from "../../../common/hooks/setting.hook";
 import { useRoleQuery } from "../../../common/hooks/role.hook";
 import type { Role } from "../../../@types/role.type";
+import type { User } from '../../../@types/user.type';
 
 export default function FormUser({
   onCancel,
@@ -39,14 +40,14 @@ export default function FormUser({
       ?.value as Array<{ id: string; salary: number; index: number }>) || [];
 
   // @ts-ignore
-  const role = roles?.find((role: Role) => role._id === user?.role?._id);
+  const role = roles?.find((role: Role) => role.id === user?.role?.id);
   const isEditing = !!user;
 
   // options
   const rolesData = (Array.isArray(roles) && roles) || [];
   const roleOptions = rolesData.map((role: Role) => ({
     label: role.name,
-    value: role._id,
+    value: role.id,
   }));
 
   const salaryOptions = salaryLevels.map((level) => ({
@@ -66,7 +67,7 @@ export default function FormUser({
         phone: user.phone,
         username: user.username,
         password: user.password,
-        role: role ? role?._id : user.role?._id,
+        role: role ? role?.id : user.role?.id,
         level_salary: user.level_salary,
       });
     } else {
@@ -93,7 +94,7 @@ export default function FormUser({
 
       if (isEditing && user) {
         updateUser(
-          { dto: formData, id: user._id },
+          { dto: formData, id: user.id },
           {
             onSuccess: () => {
               message.success("Cập nhật người dùng thành công!");
@@ -213,6 +214,11 @@ export default function FormUser({
             </div>
           </div>
         </div>
+
+
+
+
+        
 
         {/* Scrollable fields */}
         <div className="flex-1 min-h-0 overflow-y-auto space-y-3 sm:space-y-4 pr-2 scrollbar-thin scrollbar-thumb-cyan-500 scrollbar-track-gray-100 hover:scrollbar-thumb-cyan-600">
@@ -348,7 +354,7 @@ export default function FormUser({
                     Chức vụ:
                   </span>
                 }
-                rules={[{ required: true, message: "Chọn chức vụ" }]}
+                rules={[{ required: false, message: "Chọn chức vụ" }]}
                 className="!mb-0"
               >
                 <Select
@@ -372,7 +378,7 @@ export default function FormUser({
                     Bậc lương:
                   </span>
                 }
-                rules={[{ required: true, message: "Chọn bậc lương" }]}
+                rules={[{ required: false, message: "Chọn bậc lương" }]}
                 className="!mb-0"
               >
                 <Select

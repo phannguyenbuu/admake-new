@@ -8,7 +8,7 @@ import {
 import type { WorkSpace } from "../../../../@types/work-space.type";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useCheckPermission } from "../../../../common/hooks/checkPermission.hook";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import ModalEditWorkSpace from "./ModalEditWorkSpace";
 import ModalDeleteWorkSpace from "./ModalDeleteWorkSpace";
 
@@ -32,6 +32,10 @@ export default function ModalManagerWorkSpace({
   const adminMode = useCheckPermission();
   const { pathname } = useLocation();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    console.log('workSpaces',workSpaces);
+  }, [workSpaces]);
 
   // State cho edit modal
   const [editModalVisible, setEditModalVisible] = useState(false);
@@ -133,7 +137,7 @@ export default function ModalManagerWorkSpace({
                   <div className="w-2 h-2 rounded-full bg-[#0891b2] animate-pulse"></div>
                   <Text className="text-gray-600 text-base font-medium">
                     {/* @ts-ignore */}
-                    {workSpaces?.length || 0} bảng công việc có sẵn
+                    {workSpaces?.data?.length || 0} bảng công việc có sẵn
                   </Text>
                 </div>
               </div>
@@ -154,7 +158,7 @@ export default function ModalManagerWorkSpace({
           <div className="p-8">
             <div className="space-y-4 max-h-[420px] overflow-y-auto custom-scrollbar">
               {/* @ts-ignore */}
-              {workSpaces?.length === 0 ? (
+              {workSpaces?.data?.length === 0 ? (
                 <div className="text-center py-16">
                   <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
                     <TeamOutlined className="!text-3xl !text-gray-400" />
@@ -180,7 +184,7 @@ export default function ModalManagerWorkSpace({
                 </div>
               ) : (
                 /* @ts-ignore */
-                workSpaces?.map((workspace: WorkSpace, index: number) => (
+                workSpaces?.data?.map((workspace: WorkSpace, index: number) => (
                   <div
                     key={workspace._id}
                     className={`group relative flex items-center gap-5 p-5 rounded-2xl border-2 transition-all duration-300 cursor-pointer hover:shadow-xl hover:-translate-y-1 ${
@@ -329,7 +333,7 @@ export default function ModalManagerWorkSpace({
                   <div className="w-2 h-2 rounded-full bg-green-500"></div>
                   <Text className="text-gray-600 text-sm font-medium">
                     Đã tải {/* @ts-ignore */}
-                    {workSpaces?.length || 0} bảng công việc
+                    {workSpaces?.data?.length || 0} bảng công việc
                   </Text>
                 </div>
               </div>

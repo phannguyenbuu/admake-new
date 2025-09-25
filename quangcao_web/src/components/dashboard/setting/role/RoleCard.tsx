@@ -1,5 +1,5 @@
 import { Card, Button, Typography, Popconfirm, message, Modal } from "antd";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   DeleteOutlined,
   EditOutlined,
@@ -27,6 +27,10 @@ export const RoleCard = () => {
   });
   const [role, setRole] = useState<Role>();
 
+  useEffect(()=> {
+    console.log('roles', roles);
+  },[roles]);
+
   const convertPermission = (permissions: string) => {
     switch (permissions) {
       case "user:management":
@@ -52,7 +56,7 @@ export const RoleCard = () => {
     }
   };
 
-  const handleDeleteRole = (roleId: string, roleName: string) => {
+  const handleDeleteRole = (roleId: number, roleName: string) => {
     deleteRole(roleId, {
       onSuccess: () => {
         message.success({
@@ -106,7 +110,7 @@ export const RoleCard = () => {
             {/* @ts-ignore */}
             {roles?.map((role: Role) => (
               <Button
-                key={role._id}
+                key={role.id}
                 className="!border-[#00B4B6] !text-[#0891b2] !shadow-lg !text-sm sm:!text-base md:!text-sm lg:!text-base hover:!shadow-xl hover:!scale-105 !transition-all !duration-300"
                 onClick={() => {
                   setRole(role);
@@ -233,7 +237,7 @@ export const RoleCard = () => {
                 {/* @ts-ignore */}
                 {roles?.map((role: Role, index: number) => (
                   <div
-                    key={role._id}
+                    key={role.id}
                     className="group relative bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-lg hover:border-[#00B4B6]/30 transition-all duration-300 ease-in-out overflow-hidden"
                   >
                     {/* Gradient border effect */}
@@ -329,7 +333,7 @@ export const RoleCard = () => {
                               </div>
                             }
                             onConfirm={() =>
-                              handleDeleteRole(role._id, role.name)
+                              handleDeleteRole(role.id, role.name)
                             }
                             okText="🗑️ Xóa chức vụ"
                             cancelText="❌ Hủy bỏ"

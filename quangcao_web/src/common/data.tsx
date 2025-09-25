@@ -181,6 +181,7 @@ export const columnsUser = [
     key: "role",
     width: 150,
     render: (role: Role) => <span className="!text-base">{role?.name}</span>,
+    // render: (text: string) => <span className="!text-base">{text}</span>,
   },
   {
     title: "Tài khoản",

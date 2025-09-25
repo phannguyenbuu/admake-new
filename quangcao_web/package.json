@@ -10,15 +10,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
-<<<<<<< HEAD
-    "@ant-design/pro-components": "^2.8.9",
-    "@ant-design/v5-patch-for-react-19": "^1.0.3",
-    "@goongmaps/goong-js": "^1.0.9",
-    "@goongmaps/goong-map-react": "^1.1.2",
-=======
     "@ant-design/pro-components": "^3.0.1-0",
     "@ant-design/v5-patch-for-react-19": "^1.0.3",
->>>>>>> c0e8eb3d11debb508d0dbb29418540c6b17018be
     "@hello-pangea/dnd": "^18.0.1",
     "@tailwindcss/vite": "^4.1.10",
     "@tanstack/react-query": "^5.80.10",
@@ -34,13 +27,8 @@
     "lottie-react": "^2.4.1",
     "lucide-react": "^0.525.0",
     "react": "^19.1.0",
-<<<<<<< HEAD
-    "react-konva": "^19.0.6",
-    "react-dom": "^19.1.0",
-=======
     "react-dom": "^19.1.0",
     "react-konva": "^19.0.6",
->>>>>>> c0e8eb3d11debb508d0dbb29418540c6b17018be
     "react-router-dom": "6",
     "react-type-animation": "^3.2.0",
     "socket.io-client": "^4.8.1",

@@ -18,10 +18,10 @@ export function useRolePermission() {
   });
 }
 
-export function useRoleDetail(id?: string) {
+export function useRoleDetail(id?: number) {
   return useQuery({
     queryKey: [ROLE_DETAIL_QUERY_KEY, id],
-    queryFn: () => RoleService.getId(id || ""),
+    queryFn: () => RoleService.getId(id || 0),
     enabled: !!id,
   });
 }
@@ -34,13 +34,13 @@ export function useCreateRole() {
 
 export function useUpdateRole() {
   return useMutation({
-    mutationFn: ({ dto, id }: { dto: Role; id: string }) =>
+    mutationFn: ({ dto, id }: { dto: Role; id: number }) =>
       RoleService.update(id, dto),
   });
 }
 
 export function useDeleteRole() {
   return useMutation({
-    mutationFn: (id: string) => RoleService.delete(id),
+    mutationFn: (id: number) => RoleService.delete(id),
   });
 }

@@ -12,7 +12,7 @@ export default function TableComponents<T>({ ...props }: TableProps<T>) {
           pagination={false}
           bordered={false}
           rowClassName="!text-base !text-gray-800"
-          rowKey="_id"
+          rowKey="id"
           scroll={{ x: "max-content" }}
           {...props}
         />
