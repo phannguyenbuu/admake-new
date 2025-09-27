@@ -18,7 +18,7 @@ ls = response.json()['data']
 print(ls)
 
 # Lấy user đã có theo thứ tự id
-cur.execute("SELECT id, username, password FROM \"user\" ORDER BY id ASC LIMIT %s", (len(ls),))
+cur.execute("SELECT id, username, password, role FROM \"user\" ORDER BY id ASC LIMIT %s", (len(ls),))
 users_in_db = cur.fetchall()  # list of tuples (id, username, password)
 
 # Cập nhật username, password theo JSON ls và thứ tự index
@@ -27,6 +27,7 @@ for i, user in enumerate(users_in_db):
     new_username = ls[i].get('username')
     new_password = ls[i].get('password')
     fullName = ls[i].get('fullName')
+    roleId = ls[i].get('role_id')
 
     if new_username and new_password and fullName:
         ar = fullName.split(' ')
@@ -39,9 +40,9 @@ for i, user in enumerate(users_in_db):
 
         cur.execute(
             '''UPDATE "user" 
-               SET username=%s, "password"=%s, "firstName"=%s, "lastName"=%s 
+               SET username=%s, "password"=%s, "firstName"=%s, "lastName"=%s, "role"=%s
                WHERE id=%s''',
-            (new_username, new_password, firstName, lastName, user_id)
+            (new_username, new_password, firstName, lastName, roleId, user_id)
         )
         print(f"Updated user id={user_id} with username={new_username}, firstName={firstName}, lastName={lastName}")
 

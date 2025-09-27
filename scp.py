@@ -18,17 +18,28 @@ def upload_dir(sftp, local_dir, remote_dir):
         remote_path = remote_dir + '/' + item
         if os.path.isfile(local_path):
             sftp_mkdirs(sftp, os.path.dirname(remote_path))
-            sftp.put(local_path, remote_path)
+            sftp.put(local_path, remote_path, confirm=False)
             print(f"Uploaded {local_path} to {remote_path}")
         elif os.path.isdir(local_path):
             upload_dir(sftp, local_path, remote_path)
 
 def upload_multiple_dirs(sftp, local_dirs, remote_base_dir):
     for local_dir in local_dirs:
-        folder_name = os.path.basename(local_dir.rstrip('/\\'))
-        remote_dir = remote_base_dir.rstrip('/') + '/' + local_dir
-        print(f"Uploading {local_dir} to {remote_dir}")
-        upload_dir(sftp, local_dir, remote_dir)
+        # local_dir = os.path.normpath(local_dir)
+
+        if '.' in local_dir:
+            remote_dir_path = os.path.dirname(remote_base_dir.rstrip('/') + '/' + local_dir)
+            sftp_mkdirs(sftp, remote_dir_path)
+            remote_path = remote_base_dir.rstrip('/') + '/' + local_dir
+            print(f"Uploading file {local_dir} to {remote_path}")
+            sftp.put(local_dir, remote_path)
+        else:
+            remote_dir = remote_base_dir.rstrip('/') + '/' + local_dir
+            print(f"Uploading directory {local_dir} to {remote_dir}")
+            upload_dir(sftp, local_dir, remote_dir)
+
+        # else:
+        #     print(f"Skipping unknown path type: {local_dir}")
 
 def upload_to_vps(host, port, username, password, local_path, remote_path):
     ssh = paramiko.SSHClient()
@@ -60,6 +71,18 @@ def upload_to_vps_multiple(host, port, username, password, local_dirs, remote_ba
     sftp.close()
     ssh.close()
 
+
+def ensure_remote_dir(sftp, remote_directory):
+    dirs = remote_directory.split('/')
+    path = ''
+    for dir in dirs:
+        if dir:
+            path += '/' + dir
+            try:
+                sftp.stat(path)
+            except FileNotFoundError:
+                sftp.mkdir(path)
+
 local_dirs = [
     # "main-be",
     # "quangcao_web/public",
@@ -69,7 +92,12 @@ local_dirs = [
     # "chat-be",
 
 
-    "quangcao_web/src/common/layouts/base"
+    # "quangcao_web/src/common/layouts/base"
+
+    # "scripts",
+
+    # "chat-be/app.py",
+    "main-be/instance/customers.db"
 ]
 
 upload_to_vps_multiple(

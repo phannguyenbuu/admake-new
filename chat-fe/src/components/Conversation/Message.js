@@ -9,7 +9,7 @@ const Message = ({userId, menu, messages, onDelete}) => {
   const bottomRef = useRef(null);
 
  useEffect(() => {
-  // console.log('NEWMES',messages);
+  console.log('NEWMES',messages);
 
   if (bottomRef.current) {
     setTimeout(() => {

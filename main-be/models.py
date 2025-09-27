@@ -122,6 +122,30 @@ class User(db.Model):
     level_salary = db.Column(db.Integer)
     phone = db.Column(db.String(20))
     avatar = db.Column(db.String(255))
+
+
+
+
+
+    is_authenticated = db.Column(db.Boolean, default=False)
+    is_active = db.Column(db.Boolean, default=False)
+    is_anonymous = db.Column(db.Boolean, default=False)
+    balanceAmount = db.Column(db.String(80), nullable=True)
+    firstName = db.Column(db.String(80), nullable=True)
+    lastName = db.Column(db.String(80), nullable=True)
+    icon = db.Column(db.String)
+    companyName = db.Column(db.String(80), nullable=True)
+    localeCode = db.Column(db.String(80), nullable=True)
+    languageCode = db.Column(db.String(80), nullable=True)
+    socialInfor = db.Column(db.JSON)
+    orderWebhook = db.Column(db.String(255), nullable=True)
+    cryptoAddressList = db.Column(db.JSON)
+    selectedProvider = db.Column(db.JSON)
+    selectedServices = db.Column(db.JSON)
+
+
+
+
     delete_at = db.Column(db.DateTime, nullable=True)
     createdAt = db.Column(db.DateTime, default=datetime.utcnow)
     updatedAt = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
@@ -208,12 +232,38 @@ class Workspace(db.Model):
     __tablename__ = "workspaces"
 
     id = db.Column(db.String(24), primary_key=True)  # _id.$oid
-    deleted_at = db.Column(db.DateTime, nullable=True)
+    
     name = db.Column(db.String(255))
     owner_id = db.Column(db.String(24))
+
+    
+
+
+
+    # id = db.Column(db.Integer, primary_key=True)
+    # groupId = db.Column(db.Integer, unique=True)
+    # name = db.Column(db.String(120), nullable=True)
+    description = db.Column(db.String(255))
+    documents = db.Column(db.JSON, default=[])  # Lưu danh sách đường dẫn tài liệu
+    images = db.Column(db.JSON, default=[])     # Lưu danh sách đường dẫn hình ảnh
+    chats = db.Column(db.JSON, default=[])      # Lưu danh sách message ID lưu lại
+    rating_sum = db.Column(db.Integer, default=0)
+    rating_count = db.Column(db.Integer, default=0)
+
+
+
+    state = db.Column(db.String(50))
+    
+
+
+
+    deleted_at = db.Column(db.DateTime, nullable=True)
     created_at = db.Column(db.DateTime)
     updated_at = db.Column(db.DateTime)
     version = db.Column(db.Integer)
+
+
+
 
     def to_dict(self):
         result = {}
@@ -236,7 +286,6 @@ class Workspace(db.Model):
             deleted_at=parse_date(data.get("deletedAt")),
             version=data.get("__v"),
         )
-
     
 class Task(db.Model):
     __tablename__ = "tasks"
@@ -424,20 +473,124 @@ def apply_role_for_user():
     db.session.commit()
 
 
+
+def alter_columns():
+    from sqlalchemy import create_engine, text
+
+    # Khởi tạo engine kết nối SQLite file customer.db
+    engine = create_engine('sqlite:///instance/customers.db')
+
+    # Danh sách các lệnh ALTER TABLE để thêm các cột mới
+    # alter_commands = [
+    #     'ALTER TABLE workspaces ADD COLUMN description VARCHAR(255);',
+    #     'ALTER TABLE workspaces ADD COLUMN documents JSON DEFAULT \'[]\';',
+    #     'ALTER TABLE workspaces ADD COLUMN images JSON DEFAULT \'[]\';',
+    #     'ALTER TABLE workspaces ADD COLUMN chats JSON DEFAULT \'[]\';',
+    #     'ALTER TABLE workspaces ADD COLUMN rating_sum INTEGER DEFAULT 0;',
+    #     'ALTER TABLE workspaces ADD COLUMN rating_count INTEGER DEFAULT 0;',
+    #     'ALTER TABLE workspaces ADD COLUMN state VARCHAR(50);',
+    # ]
+
+    # cmd = "SELECT name FROM sqlite_master WHERE type='table' ORDER BY name;"
+
+
+    alter_commands = [
+        "ALTER TABLE users ADD COLUMN is_authenticated BOOLEAN DEFAULT 0;",
+        "ALTER TABLE users ADD COLUMN is_active BOOLEAN DEFAULT 0;",
+        "ALTER TABLE users ADD COLUMN is_anonymous BOOLEAN DEFAULT 0;",
+        "ALTER TABLE users ADD COLUMN balanceAmount VARCHAR(80);",
+        "ALTER TABLE users ADD COLUMN firstName VARCHAR(80);",
+        "ALTER TABLE users ADD COLUMN lastName VARCHAR(80);",
+        "ALTER TABLE users ADD COLUMN icon TEXT;",
+        "ALTER TABLE users ADD COLUMN companyName VARCHAR(80);",
+        "ALTER TABLE users ADD COLUMN localeCode VARCHAR(80);",
+        "ALTER TABLE users ADD COLUMN languageCode VARCHAR(80);",
+        "ALTER TABLE users ADD COLUMN socialInfor TEXT;",  # SQLite không có JSON native, dùng TEXT
+        "ALTER TABLE users ADD COLUMN orderWebhook VARCHAR(255);",
+        "ALTER TABLE users ADD COLUMN cryptoAddressList TEXT;",  # dùng TEXT để lưu JSON string
+        "ALTER TABLE users ADD COLUMN selectedProvider TEXT;",
+        "ALTER TABLE users ADD COLUMN selectedServices TEXT;",
+    ]
+    
+
+    with engine.connect() as conn:
+        # result = conn.execute(text(cmd))
+        # tables = [row[0] for row in result]
+        
+        # print("Tables in database:")
+        # for table in tables:
+        #     print(table)
+
+        for cmd in alter_commands:
+            try:
+                conn.execute(text(cmd))
+                print(f"Executed: {cmd}")
+            except Exception as e:
+                print(f"Error executing {cmd}: {e}")
+
+
+from sqlalchemy import create_engine, MetaData, Table, select, insert
+from sqlalchemy.sql import func, text
+from psycopg2.extras import Json
+import datetime
+
+def transfer_data_to_postgres():
+    # Kết nối SQLite
+    sqlite_engine = create_engine('sqlite:///instance/customers.db')
+    metadata_sqlite = MetaData()
+    metadata_sqlite.reflect(bind=sqlite_engine)
+    users_sqlite = Table('users', metadata_sqlite, autoload_with=sqlite_engine)
+
+    # Kết nối Postgres
+    pg_engine = create_engine('postgresql+psycopg2://postgres@localhost/admake_chat')
+    metadata_pg = MetaData()
+    metadata_pg.reflect(bind=pg_engine)
+    users_pg = Table('user', metadata_pg, autoload_with=pg_engine)
+
+    with sqlite_engine.connect() as sqlite_conn, pg_engine.connect() as pg_conn:
+        pg_conn.execute(text("DELETE FROM message;"))
+        pg_conn.execute(text("DELETE FROM group_member;"))
+
+        # Đọc tất cả records từ SQLite
+        rows = sqlite_conn.execute(select(users_sqlite)).fetchall()
+        print(f"Read {len(rows)} records from SQLite users")
+
+        # Xóa trắng bảng user trong Postgres
+        pg_conn.execute(users_pg.delete())
+        print("Deleted all records from PostgreSQL user table")
+
+        # Chuẩn bị dữ liệu insert với mapping trường
+        insert_values = []
+        for row in rows:
+            insert_values.append({
+                'id': row['id'],
+                'accountId': row.get('accountId'),
+                'balanceAmount': row.get('balanceAmount'),
+                'icon': row.get('icon'),
+                'companyName': row.get('companyName'),
+                'localeCode': row.get('localeCode'),
+                'languageCode': row.get('languageCode'),
+                'socialInfor': Json(row.get('socialInfor')) if row.get('socialInfor') else None,
+                'orderWebhook': row.get('orderWebhook'),
+                'cryptoAddressList': Json(row.get('cryptoAddressList')) if row.get('cryptoAddressList') else None,
+                'selectedProvider': Json(row.get('selectedProvider')) if row.get('selectedProvider') else None,
+                'selectedServices': Json(row.get('selectedServices')) if row.get('selectedServices') else None,
+                'createAt': row.get('createAt') or datetime.datetime.utcnow(),
+                'updateAt': row.get('updateAt') or datetime.datetime.utcnow(),
+                'role': row.get('role') or 'user',
+                'is_authenticated': row.get('is_authenticated', False),
+                'is_active': row.get('is_active', False),
+                'is_anonymous': row.get('is_anonymous', False),
+                'firstName': row.get('firstName'),
+                'lastName': row.get('lastName'),
+                'username': row.get('username'),
+            })
+
+        # Thực hiện insert batch vào Postgres
+        pg_conn.execute(insert(users_pg), insert_values)
+        print(f"Inserted {len(insert_values)} records into PostgreSQL user table")
+
 if __name__ == "__main__":
-    with app.app_context():
-        db.create_all()
-        # Role.__table__.drop(db.engine)
-        # load_roles()
-
-        # apply_role_for_user()
-        # load_tasks()
-        # load_work_spaces()
-
-
-        tasks_to_delete = Task.query.filter(Task.create_by_id == None).all()  # tìm những task không có create_by_id
-
-        for task in tasks_to_delete:
-            db.session.delete(task)
-
-        db.session.commit()
+    
+    # alter_columns()
+    transfer_data_to_postgres()

@@ -1,4 +1,5 @@
 import ssl
+import requests
 from flask_admin.contrib.sqla.filters import FilterEqual, BaseSQLAFilter
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
@@ -176,6 +177,16 @@ def get_group(group_id):
         print("Missing userId")
         return jsonify({"error": "Missing userId"}), 400
     
+
+
+    response = requests.get("http://31.97.76.62:5273/role/")
+    roles = response.json()
+
+
+
+    
+
+    
     group = Group.query.get_or_404(group_id)
     
     messages = group.all_messages
@@ -184,6 +195,8 @@ def get_group(group_id):
     for m in messages:
         user = User.query.filter_by(accountId=str(m.user_id)).first()
         
+        role = [itm["name"] for itm in roles if str(itm["id"]) == user.role]
+
         if user:
             messages_list.append({
                 'id': m.id,
@@ -196,6 +209,7 @@ def get_group(group_id):
                 'type':m.type,
                 'file_url':m.file_url,
                 'incoming': user_id != m.user_id,
+                'user_role': role,
                 'user_id': m.user_id,
                 'group_id': m.group_id,
             })
@@ -699,11 +713,8 @@ admin = Admin(app)
 admin.add_view(UserView(User, db.session, name='Quản lý nhân sự'))
 admin.add_view(AttendanceView(Attendance, db.session, name='Chấm công'))
 
-
 admin.add_view(GroupAdmin(Group, db.session, name="Danh sách công trình"))
 admin.add_view(ModelView(WorkAssignment, db.session, name='Kế hoạch công việc'))
-
-
 
 # admin.add_view(GroupMemberAdmin(GroupMember, db.session))
 admin.add_view(ModelView(Location, db.session, name="Địa điểm công việc"))

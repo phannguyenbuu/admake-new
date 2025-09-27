@@ -4,8 +4,8 @@ import { useUser } from './UserContext';
 
 const Login = () => {
     const { login } = useUser();
-    const [username, setUsername] = useState('Dungx_Toxic');
-    const [password, setPassword] = useState('27007310944b');
+    const [username, setUsername] = useState('tun');
+    const [password, setPassword] = useState('Tun@123456');
     const [error, setError] = useState(null);
 
     const handleSubmit = async (e) => {

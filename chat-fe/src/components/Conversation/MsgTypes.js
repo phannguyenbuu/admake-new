@@ -193,8 +193,8 @@ const TextMsg = ({el, menu, onDelete}) => {
     // const [bkColor, setBkColor ] = useState("#fff");
     // const [textColor, setTextColor ] = useState("#000");
 
-    const isIncoming = username !== el.username;
-    // console.log('TextMsg',username, el.username);
+    const isIncoming = username !== el.user_role;
+    // console.log('TextMsg',username, el.user_role);
 
     const bkColor = isIncoming
     ? '#fff'
@@ -212,9 +212,9 @@ const TextMsg = ({el, menu, onDelete}) => {
                 sx={{ backgroundColor: bkColor, borderRadius: 1.5, width: 'max-content', height:'fit-content'}}>
                 {isIncoming && 
                     <Stack direction='row' alignItems="center" spacing={1}>
-                        <Avatar alt={el.username} src={el.icon || '/images/avatar.png'} sx={{ width: 24, height: 24 }} />
+                        <Avatar alt={el.user_role} src={el.icon || '/images/avatar.png'} sx={{ width: 24, height: 24 }} />
                         <Typography key={`DefaultMsg-${el.message_id}-Username`} variant="subtitle2" color={textColor}>
-                        {el.username}
+                        {el.user_role}
                         </Typography>
                     </Stack>
                 }
@@ -245,9 +245,9 @@ const TimeLine = ({ el }) => {
 
 const MessageOptions = ({el, onDelete }) => {
     const { userId, username } = useUser();
-    const isIncoming = username !== el.username;
+    const isIncoming = username !== el.user_role;
 
-    // console.log('MessageOptions',username, el.username);
+    // console.log('MessageOptions',username, el.user_role);
 
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
