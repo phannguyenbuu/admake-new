@@ -5,7 +5,7 @@ import { useDispatch } from 'react-redux';
 import { UpdateSidebarType } from '../redux/slices/app';
 import { CaretLeft, X } from 'phosphor-react';
 import { faker } from '@faker-js/faker';
-import { SHARED_DOCS, SHARED_LINKS } from '../data';
+
 import {DocMsg, LinkMsg} from './Conversation/MsgTypes'
 import Message from './Conversation/Message';
 

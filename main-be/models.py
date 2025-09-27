@@ -288,18 +288,17 @@ class Task(db.Model):
             return out
 
         return Task(
-            id=data.get("_id", {}).get("$oid"),
-            
+            id=generate_datetime_id(),
             title=data.get("title"),
             description=data.get("description"),
             status=data.get("status"),
             type=data.get("type"),
             reward=data.get("reward"),
-            assign_ids=parse_oid_list(data.get("assignIds")),
-            workspace_id=data.get("workspaceId", {}).get("$oid"),
-            customer_id=data.get("customerId", {}).get("$oid"),
-            materials=parse_materials(data.get("materials")),
-            create_by_id=data.get("createById", {}).get("$oid"),
+            assign_ids=data.get("assignIds"),
+            workspace_id=data.get("workspaceId"),
+            customer_id=data.get("customerId"),
+            materials=data.get("materials"),
+            create_by_id=data.get("createById"),
             
             version=data.get("__v"),
             end_time=parse_date(data.get("endTime")),
@@ -433,4 +432,12 @@ if __name__ == "__main__":
 
         # apply_role_for_user()
         # load_tasks()
-        load_work_spaces()
+        # load_work_spaces()
+
+
+        tasks_to_delete = Task.query.filter(Task.create_by_id == None).all()  # tìm những task không có create_by_id
+
+        for task in tasks_to_delete:
+            db.session.delete(task)
+
+        db.session.commit()

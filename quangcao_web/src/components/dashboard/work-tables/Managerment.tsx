@@ -37,7 +37,13 @@ export default function ManagermentBoard({
   // API hooks
   const { data: workspaceData } = useWorkSpaceQueryById(workspaceId);
 
+  console.log('MAN_WSPACE', workspaceData);
+
   const { data: tasksData, refetch: refetchTasks } = useWorkSpaceQueryTaskById(workspaceId);
+
+
+  console.log('MAN_TASK', tasksData);
+
   const updateTaskStatusMutation = useUpdateTaskStatusById();
   const deleteTaskMutation = useDeleteTask();
 

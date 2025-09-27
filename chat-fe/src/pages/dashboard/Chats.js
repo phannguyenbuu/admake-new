@@ -3,8 +3,8 @@ import { Box, IconButton, Stack, Typography, InputBase, Button, Divider, Avatar,
 import { ArchiveBox, CircleDashed, MagnifyingGlass } from 'phosphor-react';
 import {useTheme } from '@mui/material/styles';
 import React from 'react';
-import { faker } from '@faker-js/faker';
-import {ChatList} from '../../data';
+
+
 import { Search, SearchIconWrapper, StyledInputBase } from '../../components/Search';
 import ChatElement, {WorkElement} from '../../components/ChatElement';
 import infors from '../../json/works.json';

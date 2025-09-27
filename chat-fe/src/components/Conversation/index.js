@@ -24,7 +24,7 @@ const Conversation = ({title,status,messages,setMessages, groupId,userId,usernam
   }, []);
 
   return (
-    <Stack ref={boxRef} minHeight={'80vh'}>
+    <Stack ref={boxRef} minHeight={'79vh'} sx={{background:'url("/backGround.png")'}} >
         {/* Chat header */}
         <Header title={title} status={status}/>
         {/* Msg */}

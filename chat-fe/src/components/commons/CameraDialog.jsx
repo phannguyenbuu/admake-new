@@ -132,7 +132,6 @@ const CameraDialog = ({ open, setOpen, dialogTitle }) => {
     return devices.filter(device => device.kind === 'videoinput');
   }
 
-
   const checkCameraAccess = async () => {
     const videoDevices = await getVideoDevices();
 

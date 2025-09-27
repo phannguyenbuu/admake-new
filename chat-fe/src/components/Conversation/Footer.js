@@ -230,15 +230,15 @@ const Footer = forwardRef(({ userId, username, groupId, setMessages }, ref) => {
   // };
 
   return (
-    <Box>
+    <>
       {/* {showFileUpload && <FileUpload onUploadComplete={handleUploadComplete} />} */}
       <Box p={2} sx={{
         position: 'fixed',
         top: height - 100,
-        width: width + 40,
-        left: 0,
-        scale: {xs:0.8, sm:1},
-        backgroundColor: '#F8FAFF',
+        width: {xs:320, sm:width + 40},
+        ml: {xs:0, sm:5},
+        
+        backgroundColor: '#fff8f8ff',
         boxShadow: '0px 0px 2px rgba(0,0,0,0.25)'
       }}>
         <Stack direction='row' alignItems='center' spacing={3}>
@@ -261,7 +261,7 @@ const Footer = forwardRef(({ userId, username, groupId, setMessages }, ref) => {
           </Box>
         </Stack>
       </Box>
-    </Box>
+    </>
   );
 });
 

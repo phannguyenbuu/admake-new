@@ -137,7 +137,7 @@ export default function ModalManagerWorkSpace({
                   <div className="w-2 h-2 rounded-full bg-[#0891b2] animate-pulse"></div>
                   <Text className="text-gray-600 text-base font-medium">
                     {/* @ts-ignore */}
-                    {workSpaces?.data?.length || 0} bảng công việc có sẵn
+                    {workSpaces?.length || 0} bảng công việc có sẵn
                   </Text>
                 </div>
               </div>
@@ -158,7 +158,7 @@ export default function ModalManagerWorkSpace({
           <div className="p-8">
             <div className="space-y-4 max-h-[420px] overflow-y-auto custom-scrollbar">
               {/* @ts-ignore */}
-              {workSpaces?.data?.length === 0 ? (
+              {workSpaces?.length === 0 ? (
                 <div className="text-center py-16">
                   <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
                     <TeamOutlined className="!text-3xl !text-gray-400" />
@@ -184,11 +184,11 @@ export default function ModalManagerWorkSpace({
                 </div>
               ) : (
                 /* @ts-ignore */
-                workSpaces?.data?.map((workspace: WorkSpace, index: number) => (
+                workSpaces?.map((workspace: WorkSpace, index: number) => (
                   <div
-                    key={workspace._id}
+                    key={workspace.id}
                     className={`group relative flex items-center gap-5 p-5 rounded-2xl border-2 transition-all duration-300 cursor-pointer hover:shadow-xl hover:-translate-y-1 ${
-                      pathname === `/dashboard/work-tables/${workspace._id}`
+                      pathname === `/dashboard/work-tables/${workspace.id}`
                         ? "border-[#0891b2] bg-gradient-to-r from-[#0891b2]/8 to-[#0891b2]/4 shadow-lg shadow-[#0891b2]/20"
                         : "border-gray-200 hover:border-[#0891b2]/40 bg-white hover:bg-gradient-to-r hover:from-gray-50 hover:to-white"
                     }`}
@@ -197,7 +197,7 @@ export default function ModalManagerWorkSpace({
                     }}
                     onClick={() => {
                       // Chuyển đến workspace khi click
-                      navigate(`/dashboard/work-tables/${workspace._id}`);
+                      navigate(`/dashboard/work-tables/${workspace.id}`);
                       setIsTabletWorkspaceModalOpen(false);
                     }}
                   >
@@ -223,7 +223,7 @@ export default function ModalManagerWorkSpace({
 
                       {/* Active indicator overlay */}
                       {pathname ===
-                        `/dashboard/work-tables/${workspace._id}` && (
+                        `/dashboard/work-tables/${workspace.id}` && (
                         <div className="absolute top-2 right-2 w-3 h-3 rounded-full bg-[#0891b2] border-2 border-white shadow-sm"></div>
                       )}
                     </div>
@@ -234,7 +234,7 @@ export default function ModalManagerWorkSpace({
                         <Text
                           className={`font-bold text-lg block truncate transition-colors duration-300 ${
                             pathname ===
-                            `/dashboard/work-tables/${workspace._id}`
+                            `/dashboard/work-tables/${workspace.id}`
                               ? "text-[#0891b2]"
                               : "text-gray-900 group-hover:text-[#0891b2]"
                           }`}
@@ -242,7 +242,7 @@ export default function ModalManagerWorkSpace({
                           {workspace.name}
                         </Text>
                         {/* {pathname ===
-                          `/dashboard/work-tables/${workspace._id}` && (
+                          `/dashboard/work-tables/${workspace.id}` && (
                           <div className="px-2 py-1 bg-[#0891b2] text-white text-xs font-semibold rounded-full">
                             Đang hoạt động
                           </div>
@@ -297,7 +297,7 @@ export default function ModalManagerWorkSpace({
                     {/* Enhanced Arrow indicator */}
                     <div
                       className={`transition-all duration-300 ${
-                        pathname === `/dashboard/work-tables/${workspace._id}`
+                        pathname === `/dashboard/work-tables/${workspace.id}`
                           ? "text-[#0891b2] opacity-100"
                           : "text-gray-400 opacity-0 group-hover:opacity-100 group-hover:translate-x-1"
                       }`}
@@ -333,7 +333,7 @@ export default function ModalManagerWorkSpace({
                   <div className="w-2 h-2 rounded-full bg-green-500"></div>
                   <Text className="text-gray-600 text-sm font-medium">
                     Đã tải {/* @ts-ignore */}
-                    {workSpaces?.data?.length || 0} bảng công việc
+                    {workSpaces?.length || 0} bảng công việc
                   </Text>
                 </div>
               </div>
@@ -355,7 +355,7 @@ export default function ModalManagerWorkSpace({
         editModalVisible={editModalVisible}
         closeEditModal={closeEditModal}
         editForm={editForm}
-        workspaceId={editingWorkspace?._id || ""}
+        workspaceId={editingWorkspace?.id || ""}
         onSuccess={onRefresh}
       />
 

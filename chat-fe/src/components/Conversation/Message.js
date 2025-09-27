@@ -1,7 +1,6 @@
 import { Box, Stack, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import React, {useRef, useEffect} from 'react';
-// import {Chat_History} from '../../data'
 import { DocMsg, LinkMsg, MediaMsg, ReplyMsg, TextMsg, TimeLine } from './MsgTypes';
 
 

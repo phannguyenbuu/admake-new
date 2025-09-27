@@ -2,7 +2,6 @@ import { Avatar, Box, Divider, IconButton, Link, Stack, Typography, Menu, MenuIt
 import { useTheme } from '@mui/material/styles';
 import { DotsThreeVertical, DownloadSimple, Image } from 'phosphor-react';
 import React, { useEffect, useState } from 'react';
-import {Message_options} from '../../data'
 import { useUser } from '../../UserContext';
 import StarIcon from '@mui/icons-material/Star';
 import DeleteIcon from '@mui/icons-material/Delete';

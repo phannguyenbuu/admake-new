@@ -7,6 +7,8 @@ import { useGetNotification } from "../../hooks/notification.hook";
 import { useSocket } from "../../../socket/SocketContext";
 import { useEffect, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
+import { useWorkSpaceQueryAll } from "../../hooks/work-space.hook";
+import type { WorkSpace } from "../../../@types/work-space.type";
 
 const { Header } = Layout;
 
@@ -18,6 +20,9 @@ export default function AppHeader() {
   // call hook useInfo
   const { data: info, refetch: refetchInfo } = useInfo();
   const { isConnected, on } = useSocket();
+
+
+  const { data: workSpaces, refetch: refetchWorkSpaces } = useWorkSpaceQueryAll();
 
   const { data: notificationsData, refetch } = useGetNotification({
     page: 1,
@@ -53,6 +58,9 @@ export default function AppHeader() {
     navigate("/");
   };
 
+  console.log('WSA',workSpaces);
+
+
   return (
     <>
       <Header className="flex items-center justify-between !px-4 md:!px-8 !bg-white shadow-sm h-14 md:h-16 sticky top-0 z-30 border-b border-gray-200">
@@ -67,6 +75,40 @@ export default function AppHeader() {
             <img src="/ADMAKE.svg" alt="ADMAKE" className="h-8" />
           </div>
         </div>
+
+        <div className="flex items-center">
+            {/* <Dropdown
+              menu={{
+                items: 
+                
+                [
+                  // @ts-ignore
+                  ...(workSpaces || []).map((workspace: WorkSpace) => (
+                  {
+                    key: workspace.id,
+                    label: workspace.name,
+                    icon: <UserOutlined />,
+                    onClick: () => {
+                      navigate("/dashboard/infor");
+                    },
+                  }))
+                ]> */}
+                
+                
+              <Avatar
+                size={32}
+                className="md:!size-10 hover:scale-105 transition-transform duration-200 cursor-pointer shadow-md"
+                style={{
+                  background:
+                    "linear-gradient(135deg, #06b6d4 0%, #0891b2 100%)",
+                  color: "#fff",
+                  border: "2px solid #e5e7eb",
+                }}
+                icon={<UserOutlined />}
+              />
+            {/* </Dropdown> */}
+          </div>
+
 
         <div className="flex items-center gap-4 md:gap-6">
           {/* Center - Notification */}

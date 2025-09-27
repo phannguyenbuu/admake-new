@@ -154,10 +154,11 @@ const Footer = () => {
       sx={{
         position: "relative",
         backgroundColor: "transparent !important",
+        ml:{xs:2,sm:2}
       }}
     >
       <Box
-        p={isMobile ? 1 : 2}
+        p={{xs:0,sm:2}}
         width={"100%"}
         sx={{
           backgroundColor:

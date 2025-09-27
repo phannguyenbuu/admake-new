@@ -32,7 +32,7 @@ export interface SelectedUser {
 }
 
 export interface WorkSpace {
-  _id: string;
+  id: string;
   name: string;
   cover?: string;
 }

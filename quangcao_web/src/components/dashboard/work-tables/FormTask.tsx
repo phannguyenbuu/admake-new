@@ -96,6 +96,9 @@ export default function FormTask({
     };
   }, [taskDetail]);
 
+
+  console.log('mappedTask', mappedTask);
+
   const [customer, setCustomer] = useState({
     searchValue: "", // tạo search value
     selectedId: mappedTask?.customerId || null, // tạo selected id
@@ -258,6 +261,7 @@ export default function FormTask({
   };
 
   const resetStates = useCallback(() => {
+    console.log('FORM', form);
     form.resetFields();
     setTime({ startTime: null, endTime: null });
     setMaterial({ selectedMaterials: [], materialQuantities: {} });

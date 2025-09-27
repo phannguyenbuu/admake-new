@@ -1,13 +1,52 @@
 import React ,{ useState } from 'react';
 import { Avatar, Box, Divider, IconButton, Menu, MenuItem, Stack, Switch } from '@mui/material';
 import { useTheme } from "@mui/material/styles";
-import { Gear } from "phosphor-react";
-import { Nav_Buttons, Profile_Menu } from '../../data'
+import {
+  ChatCircleDots,
+  Gear,
+  GearSix,
+  Phone,
+  SignOut,
+  User,
+  Users,Calendar, CalendarBlank, CalendarCheck,
+} from "phosphor-react";
+
+
 import useSettings from '../../hooks/useSettings';
 import { faker } from '@faker-js/faker';
 import AntSwitch from '../../components/AntSwitch';
 import Logo from '../../assets/Images/logo.ico';
 import { useNavigate } from 'react-router-dom';
+
+const Profile_Menu = [
+  {
+    title: "Profile",
+    icon: <User />,
+  },
+  {
+    title: "Settings",
+    icon: <Gear />,
+  },
+  {
+    title: "Logout",
+    icon: <SignOut />,
+  },
+];
+
+const Nav_Buttons = [
+  {
+    index: 0,
+    icon: <Calendar />,
+  },
+  {
+    index: 1,
+    icon: <Users />,
+  },
+  // {
+  //   index: 2,
+  //   icon: <Phone />,
+  // },
+];
 
 const getPath = (index) =>{
   switch (index) {
@@ -67,9 +106,11 @@ const SideBar = () => {
     //switch themes
     const {onToggleMode} = useSettings();
   return (
-    <Box p={2} key="gear-box" sx={{ backgroundColor: theme.palette.background.paper, 
+    <Box p={2} key="gear-box" sx={{ 
+        backgroundColor: '#00B4B6',
+        // backgroundColor: theme.palette.background.paper, 
         boxShadow: "0px 0px 2px rgba(0,0,0,0.25)", height: "100vh",
-        width:  {xs:50, sm:100} , display:"flex", scale: {xs:0.6, sm:1} }}>
+        width:  {xs:50, sm:100} , display:"flex" }}>
         <Stack direction="column" alignItems={"center"} justifyContent="space-between" 
         sx={{ width: "100%" , height: "100%"}} spacing={3}>
           <Stack alignItems={"center"} spacing={4}>
@@ -79,7 +120,12 @@ const SideBar = () => {
             width: 64,
             borderRadius: 1.5
           }}>
-            <img src="/images/logo.png" alt={'Logo icon'} />
+            <Box 
+              component="img" 
+              src="/images/logo.png" 
+              alt="Logo icon" 
+              sx={{ ml: {xs:1.5, sm:3} ,width: {xs:40, sm:100} , height: {xs:40, sm:100}  }} // thêm style nếu muốn
+            />
           </Box>
           <Stack sx={{ width: "max-content" }} direction="column" alignItems="center" spacing={3}>
             {Nav_Buttons.map((el) => (

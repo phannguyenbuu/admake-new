@@ -12,9 +12,9 @@ export const WorkSpaceService = {
     return axiosClient.get(`/workspace/${id}`);
   },
   create: (dto: WorkSpace) => {
-    return axiosClient.post("/workspace", dto);
+    return axiosClient.post("/workspace/", dto);
   },
-  update: (id: string, dto: Omit<WorkSpace, "_id" | "cover">) => {
+  update: (id: string, dto: Omit<WorkSpace, "id" | "cover">) => {
     return axiosClient.put(`/workspace/${id}`, dto);
   },
   delete: (id: string) => {

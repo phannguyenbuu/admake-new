@@ -5,6 +5,8 @@ export default defineConfig({
   plugins: [react(), tailwindcss()],
   define: { global: "window" },
   server: {
+    allowedHosts: ['localhost', 'archbox.pw','dashboard.archbox.pw'],
+    host: '0.0.0.0',
     watch: {
       usePolling: true,
     },

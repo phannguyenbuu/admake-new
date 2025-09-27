@@ -206,7 +206,7 @@ export default function RenderMenuBar({}) {
             children: [
               // @ts-ignore
               ...(workSpaces || []).map((workspace: WorkSpace) => ({
-                key: `/dashboard/work-tables/${workspace._id}`,
+                key: `/dashboard/work-tables/${workspace.id}`,
                 label: (
                   <div className="flex items-center gap-3 py-1 px-2 rounded-lg hover:bg-white/10 transition-all duration-200">
                     <div className="w-10 h-6 rounded-lg bg-white/90 overflow-hidden flex-shrink-0 border border-white/40 shadow-md">

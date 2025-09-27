@@ -121,8 +121,7 @@ const Settings = () => {
 
   return (
     <>
-    <Stack direction='column' sx={{width:'100%', p:2
-    }}>
+    <Stack direction='column' sx={{width:'100%', p:2, background:'url("/backGround.png")'}}>
         {/* Left panel */}
         <Box className='scrollbar' sx={{overflow:'scroll', width:'100%'}}>
           
@@ -130,10 +129,10 @@ const Settings = () => {
                 <Typography variant='h6'>{username}</Typography>
                 
                 <Box p ={2} sx={{width:'100%', border:'1px solid #ccc', borderRadius:1 }}>
-                  <Stack direction='column' spacing={3}>
-                    <Avatar sx={{height:150, width:150}} src={'/images/avatar.png'} alt={faker.name.fullName()}/>
+                  <Stack direction='column' spacing={3} sx={{justifyContent:"center", alignItems:"center"}}>
+                    <Avatar sx={{height:150, width:150}} src={'/images/avatar.png'}/>
                     <CurrentDateTime />
-                    <Button sx={{background:"#ccc", borderRadius:5}}>Về Sớm</Button>
+                    <Button sx={{background:"#ccc", borderRadius:5}}>Ra Về</Button>
                   </Stack>
                 </Box>
                     
@@ -180,7 +179,7 @@ const GridButtons = ({ list }) => {
             sx={{ cursor: 'pointer', borderRadius:2, 
               minWidth: 72, maxWidth: 72, 
               minHeight: 80, maxHeight: 80, p:1,
-              background:color, alignItems: 'center' }}
+              background: '#ccc', alignItems: 'center' }}
           >
             {/* Icon nằm trên */}
             <div>{icon}</div>

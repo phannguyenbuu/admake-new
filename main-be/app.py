@@ -36,4 +36,4 @@ if __name__ == "__main__":
         # customers = Customer.query.all()
         # load_customers()
 
-    app.run(host="0.0.0.0", port=5006, debug=True)
+    app.run(host="0.0.0.0", port=5273, debug=True)

@@ -6,7 +6,7 @@ import { Tooltip } from '@mui/material';
 import cssStyles from '../../../utils/cssStyles';
 //
 import Iconify from '../../Iconify';
-import { IconButtonAnimate } from '../../animate';
+// import { IconButtonAnimate } from '../../animate';
 
 // ----------------------------------------------------------------------
 
@@ -49,20 +49,9 @@ export default function ToggleButton({ notDefault, open, onToggle }) {
       {notDefault && !open && <DotStyle />}
 
       <Tooltip title="Settings" placement="left">
-        <IconButtonAnimate
-          color="inherit"
-          onClick={onToggle}
-          sx={{
-            p: 1.25,
-            transition: (theme) => theme.transitions.create('all'),
-            '&:hover': {
-              color: 'primary.main',
-              bgcolor: (theme) => alpha(theme.palette.primary.main, theme.palette.action.hoverOpacity),
-            },
-          }}
-        >
+        
           <Iconify icon="eva:options-2-fill" width={20} height={20} />
-        </IconButtonAnimate>
+        
       </Tooltip>
     </RootStyle>
   );

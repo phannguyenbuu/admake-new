@@ -1,17 +1,24 @@
 import type { IPage } from "../../../@types/common.type";
 import { useParams } from "react-router-dom";
+import { useEffect } from "react";
 import ManagermentBoard from "../../../components/dashboard/work-tables/Managerment";
 import { useWorkSpaceQueryTaskById } from "../../../common/hooks/work-space.hook";
 
 export const WorkTableDetailPage: IPage["Component"] = () => {
   const { boardId } = useParams();
 
+ 
+  
   // Sử dụng hook để lấy task data theo ID
   const {
     data: response,
     isLoading,
     error,
   } = useWorkSpaceQueryTaskById(boardId || "");
+
+  useEffect(() => {
+    console.log('W_TABLE', boardId, response);
+  },[response]);
 
   // Loading state
   if (isLoading) {

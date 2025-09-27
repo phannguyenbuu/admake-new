@@ -1,7 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter } from 'react-router-dom';
-import { HelmetProvider } from "react-helmet-async";
+// import { HelmetProvider } from "react-helmet-async";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 
@@ -14,7 +14,7 @@ const root = ReactDOM.createRoot(document.getElementById("root"));
 
 root.render(
   <React.StrictMode>
-    <HelmetProvider>
+    {/* <HelmetProvider> */}
       <ReduxProvider store={store}>
       {/* <SettingsProvider> */}
         <BrowserRouter>
@@ -22,7 +22,7 @@ root.render(
         </BrowserRouter>
       {/* </SettingsProvider> */}
       </ReduxProvider>
-    </HelmetProvider>
+    {/* </HelmetProvider> */}
   </React.StrictMode>
 );
 
