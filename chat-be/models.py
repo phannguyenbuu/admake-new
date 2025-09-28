@@ -25,7 +25,6 @@ from sqlalchemy.dialects.postgresql import UUID
 app = Flask(__name__)
 
 from dotenv import load_dotenv
-
 load_dotenv()
 
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')

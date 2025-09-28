@@ -10,6 +10,8 @@ def get_customers():
     limit = request.args.get("limit", 10, type=int)
     search = request.args.get("search", "", type=str)
 
+    # print('customer', Customer.query.all())
+
     query = Customer.query
     if search:
         query = query.filter(Customer.fullName.ilike(f"%{search}%"))

@@ -44,7 +44,8 @@ def upload_multiple_dirs(sftp, local_dirs, remote_base_dir):
 def upload_to_vps(host, port, username, password, local_path, remote_path):
     ssh = paramiko.SSHClient()
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-    ssh.connect(hostname=host, port=port, username=username, password=password)
+    ssh.connect(hostname=host, port=port, username=username, password=password, timeout=60)
+
     sftp = ssh.open_sftp()
 
     print("Connected")
@@ -63,7 +64,7 @@ def upload_to_vps(host, port, username, password, local_path, remote_path):
 def upload_to_vps_multiple(host, port, username, password, local_dirs, remote_base_dir):
     ssh = paramiko.SSHClient()
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-    ssh.connect(hostname=host, port=port, username=username, password=password)
+    ssh.connect(hostname=host, port=port, username=username, password=password, timeout=60)
     sftp = ssh.open_sftp()
 
     upload_multiple_dirs(sftp, local_dirs, remote_base_dir)
@@ -97,7 +98,10 @@ local_dirs = [
     # "scripts",
 
     # "chat-be/app.py",
-    "main-be/instance/customers.db"
+    # "main-be/instance/customers.db",
+    "main-be/models.py",
+    "main-be/app.py",
+    "main-be/.env",
 ]
 
 upload_to_vps_multiple(
