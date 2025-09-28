@@ -34,9 +34,9 @@ class BaseModel(db.Model):
 
     
 
-    delete_at = db.Column(db.DateTime, nullable=True)
-    createAt = db.Column(db.DateTime)
-    updateAt = db.Column(db.DateTime)
+    deletedAt = db.Column(db.DateTime, nullable=True)
+    createdAt = db.Column(db.DateTime)
+    updatedAt = db.Column(db.DateTime)
     version = db.Column(db.Integer)
 
 
@@ -58,9 +58,9 @@ class Material(BaseModel):
     supplier = db.Column(db.String(255))
     # version = db.Column(db.Integer)
 
-    # delete_at = db.Column(db.DateTime, nullable=True)
-    # createAt = db.Column(db.DateTime, default=datetime.datetime.utcnow)
-    # updateAt = db.Column(db.DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
+    # deletedAt = db.Column(db.DateTime, nullable=True)
+    # createdAt = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+    # updatedAt = db.Column(db.DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
 
     def to_dict(self):
         result = {}
@@ -82,11 +82,11 @@ def generate_datetime_id():
 class User(BaseModel):
     __tablename__ = 'user'
 
-    id = db.Column(db.String(24), primary_key=True)    
+    id = db.Column(db.String(50), primary_key=True)    
     username = db.Column(db.String(255), nullable=False)
     password = db.Column(db.String(255), nullable=False)
     status = db.Column(db.String(50))
-    role_id = db.Column(db.String(24))  # lấy từ role.$oid
+    role_id = db.Column(db.String(50))  # lấy từ role.$oid
     type = db.Column(db.String(50))
     hashKey = db.Column(db.String(255))
     fullName = db.Column(db.String(255))
@@ -98,7 +98,7 @@ class User(BaseModel):
     is_active = db.Column(db.Boolean, default=False)
     is_anonymous = db.Column(db.Boolean, default=False)
     balanceAmount = db.Column(db.String(80), nullable=True)
-    accountId = db.Column(db.String(24), nullable=True)
+    accountId = db.Column(db.String(50), nullable=True)
     firstName = db.Column(db.String(80), nullable=True)
     lastName = db.Column(db.String(80), nullable=True)
     icon = db.Column(db.String)
@@ -111,9 +111,9 @@ class User(BaseModel):
     selectedProvider = db.Column(db.JSON)
     selectedServices = db.Column(db.JSON)
 
-    # delete_at = db.Column(db.DateTime, nullable=True)
-    # createAt = db.Column(db.DateTime, default=datetime.datetime.utcnow)
-    # updateAt = db.Column(db.DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
+    # deletedAt = db.Column(db.DateTime, nullable=True)
+    # createdAt = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+    # updatedAt = db.Column(db.DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
     # version = db.Column(db.Integer)
 
     def update_role(self):
@@ -155,9 +155,9 @@ class User(BaseModel):
             level_salary=data.get("level_salary"),
             phone=data.get("phone"),
             avatar=data.get("avatar"),
-            delete_at=parse_date(data.get("delete_at")),
-            createAt=parse_date(data.get("createAt")),
-            updateAt=parse_date(data.get("updateAt")),
+            deletedAt=parse_date(data.get("deletedAt")),
+            createdAt=parse_date(data.get("createdAt")),
+            updatedAt=parse_date(data.get("updatedAt")),
             version=data.get("__v"),
         )
     
@@ -173,9 +173,9 @@ class Role(BaseModel):
     
     permissions = db.Column(JSON)  # lưu list permissions
     name = db.Column(db.String(255))
-    # delete_at = db.Column(db.DateTime, nullable=True)
-    # createAt = db.Column(db.DateTime, default=datetime.datetime.utcnow)
-    # updateAt = db.Column(db.DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
+    # deletedAt = db.Column(db.DateTime, nullable=True)
+    # createdAt = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+    # updatedAt = db.Column(db.DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
     # version = db.Column(db.Integer)
 
     def to_dict(self):
@@ -193,9 +193,9 @@ class Role(BaseModel):
         return Role(
             permissions=data.get("permissions"),
             name=data.get("name"),
-            delete_at=data.get("delete_at"),
-            createAt=parse_date(data.get("createAt")),
-            updateAt=parse_date(data.get("updateAt")),
+            deletedAt=data.get("deletedAt"),
+            createdAt=parse_date(data.get("createdAt")),
+            updatedAt=parse_date(data.get("updatedAt")),
             version=data.get("__v"),
         )
     
@@ -203,10 +203,10 @@ class Workspace(BaseModel):
     __tablename__ = "workspace"
     __table_args__ = {'extend_existing': True}
 
-    id = db.Column(db.String(24), primary_key=True)  # _id.$oid
+    id = db.Column(db.String(50), primary_key=True)  # _id.$oid
     
     name = db.Column(db.String(255))
-    owner_id = db.Column(db.String(24))
+    owner_id = db.Column(db.String(50))
 
     
 
@@ -254,30 +254,26 @@ class Workspace(BaseModel):
             
             name=data.get("name"),
             owner_id=data.get("ownerId", {}).get("$oid"),
-            created_at=parse_date(data.get("createAt")),
-            updated_at=parse_date(data.get("updateAt")),
-            deleted_at=parse_date(data.get("deletedAt")),
+            createdAt=parse_date(data.get("createdAt")),
+            updatedAt=parse_date(data.get("updatedAt")),
+            deletedAt=parse_date(data.get("deletedAt")),
             version=data.get("__v"),
         )
     
 class Task(BaseModel):
     __tablename__ = "task"
 
-    id = db.Column(db.String(24), primary_key=True)  # _id.$oid
-    # delete_at = db.Column(db.DateTime, nullable=True)
+    id = db.Column(db.String(50), primary_key=True)  # _id.$oid
     title = db.Column(db.String(255))
     description = db.Column(db.Text)
     status = db.Column(db.String(50))
     type = db.Column(db.String(50))
     reward = db.Column(db.Integer)
     assign_ids = db.Column(db.JSON)  # lưu JSON string của list ObjectId
-    workspace_id = db.Column(db.String(24))
-    customer_id = db.Column(db.String(24))
+    workspace_id = db.Column(db.String(50))
+    customer_id = db.Column(db.String(50))
     materials = db.Column(db.JSON)  # lưu JSON string của list dict {materialId, quantity}
-    create_by_id = db.Column(db.String(24))
-    # created_at = db.Column(db.DateTime)
-    # updated_at = db.Column(db.DateTime)
-    # version = db.Column(db.Integer)
+    create_by_id = db.Column(db.String(50))
     end_time = db.Column(db.DateTime)
     start_time = db.Column(db.DateTime)
 
@@ -327,9 +323,9 @@ class Task(BaseModel):
             end_time=parse_date(data.get("endTime")),
             start_time=parse_date(data.get("startTime")),
 
-            delete_at=parse_date(data.get("delete_at")),
-            created_at=parse_date(data.get("createAt")),
-            updated_at=parse_date(data.get("updateAt")),
+            deletedAt=parse_date(data.get("deletedAt")),
+            createdAt=parse_date(data.get("createdAt")),
+            updatedAt=parse_date(data.get("updatedAt")),
         )
 
 def parse_date(d):

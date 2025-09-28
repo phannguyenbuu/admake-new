@@ -204,7 +204,7 @@ def get_group(group_id):
                 'username': user.username,
                 'icon': user.icon,
                 'text': m.text,
-                'time': m.createAt.isoformat() if m.createAt else None,
+                'time': m.createdAt.isoformat() if m.createdAt else None,
                 'is_unread': m.is_unread,
                 'type':m.type,
                 'file_url':m.file_url,
@@ -350,7 +350,7 @@ def create_message(group_id):
 @app.route('/api/messages/<group_id>')
 @login_required
 def get_messages(group_id):
-    messages = db.session.filter_by(group_id=group_id).order_by(Message.createAt.asc()).all()
+    messages = db.session.filter_by(group_id=group_id).order_by(Message.createdAt.asc()).all()
     return jsonify([m.to_dict() for m in messages])
 
 
@@ -492,7 +492,7 @@ def handle_message(data):
     # Lưu message mới
     msg = Message(group_id=group_id,type=type, user_id=user_id, text=text, 
                   message_id = message_id,
-                  file_url=file_url, updateAt=time)
+                  file_url=file_url, updatedAt=time)
     db.session.add(msg)
     db.session.commit()
     
@@ -603,8 +603,8 @@ class MessageView(ModelView):
     column_searchable_list = ['text']
     column_filters = [
         GroupInFilter(Message.group_id, 'Nhóm'),
-        DateBetweenFilter(Message.createAt, 'Ngày tạo'),
-        DateBetweenFilter(Message.updateAt, 'Ngày cập nhật')
+        DateBetweenFilter(Message.createdAt, 'Ngày tạo'),
+        DateBetweenFilter(Message.updatedAt, 'Ngày cập nhật')
     ]
 
     def get_filters(self):

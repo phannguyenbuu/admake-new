@@ -28,9 +28,9 @@ def load_customers():
                 workAddress=item.get("workAddress"),
                 workPrice=item.get("workPrice"),
                 status=item.get("status"),
-                delete_at=parse_date(item.get("delete_at")),
-                createAt=parse_date(item.get("createAt")),
-                updateAt=parse_date(item.get("updateAt")),
+                deletedAt=parse_date(item.get("deletedAt")),
+                createdAt=parse_date(item.get("createdAt")),
+                updatedAt=parse_date(item.get("updatedAt")),
             )
             db.session.add(customer)
         db.session.commit()
@@ -50,9 +50,9 @@ def load_materials():
                 description=data.get('description'),
                 supplier=data.get('supplier'),
                 version=data.get('__v'),
-                delete_at=parse_date(data.get("delete_at")),
-                createAt=parse_date(data.get("createAt")),
-                updateAt=parse_date(data.get("updateAt")),
+                deletedAt=parse_date(data.get("deletedAt")),
+                createdAt=parse_date(data.get("createdAt")),
+                updatedAt=parse_date(data.get("updatedAt")),
             )
             db.session.add(mtl)
         db.session.commit()
@@ -291,8 +291,8 @@ def transfer_data_to_postgres():
                 'cryptoAddressList': Json(row_dict.get('cryptoAddressList')) if row_dict.get('cryptoAddressList') else None,
                 'selectedProvider': Json(row_dict.get('selectedProvider')) if row_dict.get('selectedProvider') else None,
                 'selectedServices': Json(row_dict.get('selectedServices')) if row_dict.get('selectedServices') else None,
-                'createAt': row_dict.get('createAt') or datetime.datetime.utcnow(),
-                'updateAt': row_dict.get('updateAt') or datetime.datetime.utcnow(),
+                'createdAt': row_dict.get('createdAt') or datetime.datetime.utcnow(),
+                'updatedAt': row_dict.get('updatedAt') or datetime.datetime.utcnow(),
                 'role': row_dict.get('role') or 'user',
                 'is_authenticated': row_dict.get('is_authenticated', False),
                 'is_active': row_dict.get('is_active', False),
@@ -317,6 +317,7 @@ def transfer_material_to_postgres():
 
     with sqlite_engine.connect() as conn:
         row_dict = conn.execute(materials_sqlite.select())
+        print(row_dict)
         for row in row_dict:
             
             id_value = row[0]  # thường là cột đầu tiên
@@ -337,6 +338,91 @@ def transfer_material_to_postgres():
             )
 
             db.session.add(new_material)
+    db.session.commit()
+
+
+def transfer_workspace_to_postgres():
+    # Kết nối SQLite
+    sqlite_engine = create_engine('sqlite:///main-be/instance/customers.db')
+    metadata_sqlite = MetaData()
+    metadata_sqlite.reflect(bind=sqlite_engine)
+    workspaces_sqlite = Table('workspaces', metadata_sqlite, autoload_with=sqlite_engine)
+
+    with sqlite_engine.connect() as conn:
+        row_dict = conn.execute(workspaces_sqlite.select())
+        for row in row_dict:
+            
+            id_value = row[0]  # thường là cột đầu tiên
+            name_value = row[1]  # cột thứ hai, tùy thứ tự cột DB
+            # hoặc chuyển row thành dict:
+            row_dict = dict(row._mapping)
+            id_value = row_dict['id']
+            name_value = row_dict['name']
+
+            print(row_dict)
+
+            new_workspace = Workspace(
+                id=id_value,
+                name=name_value,
+                description=row_dict['description'],
+                documents=row_dict['documents'],
+                images=row_dict['images'],
+                chats=row_dict['chats'],
+                rating_sum=row_dict['rating_sum'],
+                rating_count=row_dict['rating_count'],
+                state=row_dict['state'],
+            )
+
+
+
+
+
+
+
+            db.session.add(new_workspace)
+    db.session.commit()
+
+
+
+def transfer_task_to_postgres():
+    # Kết nối SQLite
+    sqlite_engine = create_engine('sqlite:///main-be/instance/customers.db')
+    metadata_sqlite = MetaData()
+    metadata_sqlite.reflect(bind=sqlite_engine)
+    tasks_sqlite = Table('tasks', metadata_sqlite, autoload_with=sqlite_engine)
+
+    with sqlite_engine.connect() as conn:
+        row_dict = conn.execute(tasks_sqlite.select())
+        for row in row_dict:
+            
+            id_value = row[0]  # thường là cột đầu tiên
+            name_value = row[1]  # cột thứ hai, tùy thứ tự cột DB
+            # hoặc chuyển row thành dict:
+            row_dict = dict(row._mapping)
+            id_value = row_dict['id']
+            # name_value = row_dict['name']
+
+            print(row_dict)
+
+            new_task = Task(
+                id=id_value,
+                # name=name_value,
+                title=row_dict['title'],
+                description=row_dict['description'],
+                status=row_dict['status'],
+                type=row_dict['type'],
+                reward=row_dict['reward'],
+                assign_ids=row_dict['assign_ids'],
+                workspace_id=row_dict['workspace_id'],
+                customer_id=row_dict['customer_id'],
+                materials=row_dict['materials'],
+                create_by_id=row_dict['create_by_id'],
+                end_time=row_dict['end_time'],
+                start_time=row_dict['start_time'],
+            )
+
+
+            db.session.add(new_task)
     db.session.commit()
 
 
@@ -362,11 +448,11 @@ def add_new_columns():
     # db.session.execute(text('ALTER TABLE "user" ADD COLUMN version INTEGER;'))
     # db.session.execute(text('ALTER TABLE "user" ADD COLUMN phone VARCHAR(20);'))
     # db.session.execute(text('ALTER TABLE "user" ADD COLUMN avatar VARCHAR(255);'))
-    # db.session.execute(text('ALTER TABLE "user" ADD COLUMN delete_at TIMESTAMP;'))
-    # delete_at = db.Column(db.DateTime, nullable=True)
+    # db.session.execute(text('ALTER TABLE "user" ADD COLUMN deletedAt TIMESTAMP;'))
+    # deletedAt = db.Column(db.DateTime, nullable=True)
 
-    # db.session.execute(text('ALTER TABLE "role" RENAME COLUMN "createdAt" TO "createAt";'))
-    # db.session.execute(text('ALTER TABLE "role" RENAME COLUMN "updatedAt" TO "updateAt";'))
+    # db.session.execute(text('ALTER TABLE "role" RENAME COLUMN "createdAt" TO "createdAt";'))
+    # db.session.execute(text('ALTER TABLE "role" RENAME COLUMN "updatedAt" TO "updatedAt";'))
 
     db.session.execute(text('UPDATE "user" SET "fullName" = concat("firstName", \' \', "lastName");'))
     
@@ -431,15 +517,62 @@ def update_users_with_accountId(json_file):
     print("Đã gán accountId từ JSON làm id trong PostgreSQL theo thứ tự")
 
 
-def renameColumn(table,fieldName,newName):
-    db.session.execute(text(f'ALTER TABLE {table} RENAME COLUMN "{fieldName}" TO "{newName}";'))
+def change_value_type(table, keys):
+    for key in keys:
+        db.session.execute(text(f'ALTER TABLE "{table}" ALTER COLUMN "{key}" TYPE VARCHAR(50);'))
+    db.session.commit()
+
+def renameColumn(table, fieldName = None, newName = None):
+    from sqlalchemy.exc import ProgrammingError
+
+    inspector = inspect(db.engine)
+    
+    
+    columns = inspector.get_columns(table)
+    for col in columns:
+        print(f"Tên cột: {col['name']}, Kiểu: {col['type']}")
+
+    columns = [col['name'] for col in inspector.get_columns(table)]
+    print(','.join(columns))
+
+    if fieldName and fieldName not in columns:
+        print(f"Cột '{fieldName}' không tồn tại trong bảng '{table}'.")
+        return
+    try:
+        db.session.execute(text(f'ALTER TABLE "{table}" RENAME COLUMN "{fieldName}" TO "{newName}";'))
+        db.session.commit()
+        print(f"Đã đổi tên cột '{fieldName}' thành '{newName}' trong bảng '{table}'.")
+    except ProgrammingError as e:
+        db.session.rollback()
+        print(f"Lỗi khi đổi tên cột: {e}")
 
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()
         # update_users_with_accountId('user.json')
         # transfer_material_to_postgres()
+        # transfer_workspace_to_postgres()
+        transfer_task_to_postgres()
         # show_collections_and_schema()
+        # change_value_type()
 
-        db.session.execute(text('ALTER TABLE material RENAME COLUMN "updatedAt" TO "updateAt";'))
+    
+        # change_value_type('task', ['id','workspace_id','customer_id','create_by_id'])
+        # renameColumn('task')
+
+        # for table in [ 'task']:
+        #     renameColumn(table, "createAt", "createdAt")
+        #     renameColumn(table, "create_at", "createdAt")
+        #     renameColumn(table, "created_at", "createdAt")
+        #     renameColumn(table, "updateAt", "updatedAt")
+        #     renameColumn(table, "update_at", "updatedAt")
+        #     renameColumn(table, "updated_at", "updatedAt")
+        #     renameColumn(table, "deleted_at", "deletedAt")
+        #     renameColumn(table, "delete_at", "deletedAt")
+
+        all_records = Task.query.all()
+        print(len(all_records))
+        for record in all_records:
+            print(record)
+        
         

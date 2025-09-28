@@ -66,7 +66,7 @@ toggle.addEventListener('change', () => {
         const firstName = row.querySelector('.col-firstName')?.textContent.trim();
         const lastName = row.querySelector('.col-lastName')?.textContent.trim();
         const role = row.querySelector('.col-role')?.textContent.trim();
-        const createAt = row.querySelector('.col-createAt')?.textContent.trim();
+        const createdAt = row.querySelector('.col-createdAt')?.textContent.trim();
         const balanceAmount = row.querySelector('.col-balanceAmount')?.textContent.trim();
         const companyName = row.querySelector('.col-companyName')?.textContent.trim();
 
@@ -74,8 +74,8 @@ toggle.addEventListener('change', () => {
         const balanceInVND = Math.round(parseFloat(balanceAmount.replace(/\./g, '')));
         const formattedBalance = balanceInVND.toLocaleString('vi-VN') + ' ₫';
 
-        const createAtStr = `${createAt}`;  // chuỗi ngày giờ từ server render
-        const date = new Date(createAtStr);
+        const createdAtStr = `${createdAt}`;  // chuỗi ngày giờ từ server render
+        const date = new Date(createdAtStr);
 
         const day = date.getDate().toString().padStart(2, '0');      // ngày 2 số
         const month = (date.getMonth() + 1).toString().padStart(2, '0'); // tháng 2 số (0-based nên +1)

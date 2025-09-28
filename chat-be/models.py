@@ -53,10 +53,10 @@ def load_json(params, key):
 
 def to_date(date_str):
     try:
-        createAt = datetime.strptime(date_str, '%Y-%m-%d %H:%M:%S')
+        createdAt = datetime.strptime(date_str, '%Y-%m-%d %H:%M:%S')
     except ValueError:
-        createAt = None
-    return createAt
+        createdAt = None
+    return createdAt
 # Models
 class User(db.Model):
     __tablename__ = 'user'
@@ -81,8 +81,8 @@ class User(db.Model):
     cryptoAddressList = db.Column(db.JSON)
     selectedProvider = db.Column(db.JSON)
     selectedServices = db.Column(db.JSON)
-    createAt = db.Column(db.DateTime(timezone=True), server_default=func.now())
-    updateAt = db.Column(db.DateTime(timezone=True), server_default=func.now())
+    createdAt = db.Column(db.DateTime(timezone=True), server_default=func.now())
+    updatedAt = db.Column(db.DateTime(timezone=True), server_default=func.now())
     role = db.Column(db.String(20), default='user')
 
     def get_id(self):
@@ -119,8 +119,8 @@ class User(db.Model):
             selectedProvider=load_json(params,'selectedProvider'),
             selectedServices=load_json(params,'selectedServices'),
 
-            createAt=to_date(params.get('createAt','')),
-            updateAt=to_date(params.get('updateAt','')),
+            createdAt=to_date(params.get('createdAt','')),
+            updatedAt=to_date(params.get('updatedAt','')),
         )
 
         try:
@@ -151,8 +151,8 @@ class Group(db.Model):
     chats = db.Column(db.JSON, default=[])      # Lưu danh sách message ID lưu lại
     rating_sum = db.Column(db.Integer, default=0)
     rating_count = db.Column(db.Integer, default=0)
-    createAt = db.Column(db.DateTime(timezone=True), server_default=func.now())
-    updateAt = db.Column(db.DateTime(timezone=True), server_default=func.now())
+    createdAt = db.Column(db.DateTime(timezone=True), server_default=func.now())
+    updatedAt = db.Column(db.DateTime(timezone=True), server_default=func.now())
 
     @staticmethod
     def create_item(params):
@@ -167,8 +167,8 @@ class Group(db.Model):
 
             rating_sum=params.get('rating_sum', 0),
             
-            createAt=to_date(params.get('createAt','')),
-            updateAt=to_date(params.get('updateAt','')),
+            createdAt=to_date(params.get('createdAt','')),
+            updatedAt=to_date(params.get('updatedAt','')),
         )
 
         db.session.add(group)
@@ -191,7 +191,7 @@ class Group(db.Model):
     
     @property
     def all_messages(self):
-        return Message.query.filter_by(group_id=self.id).order_by(Message.createAt).all()
+        return Message.query.filter_by(group_id=self.id).order_by(Message.createdAt).all()
 
     @property
     def total_unread_messages(self):
@@ -202,10 +202,10 @@ class Group(db.Model):
         msgs = Message.query.filter_by(group_id=self.id)
 
         if msgs.count() > 0:
-            last_msg = msgs.order_by(Message.createAt.desc()).first()
+            last_msg = msgs.order_by(Message.createdAt.desc()).first()
             if last_msg:
                 # Trả lại đoạn text hoặc thông tin bạn muốn hiển thị
-                return f"{last_msg.createAt}|{last_msg.text[:50]}"  # cắt ngắn 50 ký tự
+                return f"{last_msg.createdAt}|{last_msg.text[:50]}"  # cắt ngắn 50 ký tự
         return ''
 
 class GroupMember(db.Model):
@@ -263,8 +263,8 @@ class Message(db.Model):
 
     text = db.Column(db.String(500))
     file_url = db.Column(db.String(255), nullable=True)
-    createAt = db.Column(db.DateTime(timezone=True), server_default=func.now())
-    updateAt = db.Column(db.DateTime(timezone=True), server_default=func.now())
+    createdAt = db.Column(db.DateTime(timezone=True), server_default=func.now())
+    updatedAt = db.Column(db.DateTime(timezone=True), server_default=func.now())
     
     is_unread = db.Column(db.Boolean, default=False)
     # is_link = db.Column(db.Boolean, default=False)
@@ -298,8 +298,8 @@ class Message(db.Model):
                     # username=params.get('username', ''),
                     is_unread=params.get('is_unread', '') != 'SUCCESS',
                     
-                    createAt=to_date(params.get('createAt','')),
-                    updateAt=to_date(params.get('updateAt','')),
+                    createdAt=to_date(params.get('createdAt','')),
+                    updatedAt=to_date(params.get('updatedAt','')),
                 )
                 
                 db.session.add(msg)
