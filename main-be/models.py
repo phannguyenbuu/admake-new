@@ -12,6 +12,7 @@ from sqlalchemy import inspect
 from sqlalchemy import create_engine, MetaData, Table, select, insert
 from sqlalchemy.sql import func, text
 from psycopg2.extras import Json
+from flask_socketio import SocketIO, join_room, leave_room, emit
 
 app = Flask(__name__)
 # base_dir = os.path.abspath(os.path.dirname(__file__))
@@ -25,6 +26,9 @@ load_dotenv()
 
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
 db = SQLAlchemy(app)
+
+socketio = SocketIO(app, cors_allowed_origins='*')
+
 
 CORS(app)
 
@@ -364,7 +368,7 @@ class Task(BaseModel):
 class Group(BaseModel):
     __tablename__ = 'group'
     __table_args__ = {'quote': True}
-    
+
     id = db.Column(db.Integer, primary_key=True)
     groupId = db.Column(db.Integer, unique=True)
     name = db.Column(db.String(120), nullable=True)

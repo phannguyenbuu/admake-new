@@ -33,22 +33,6 @@ def get_customers():
         }
     })
 
-# @customer_bp.route("/", methods=["POST"])
-# def create_customer():
-#     data = request.get_json()
-#     new_customer = Customer(
-#         fullName=data.get('fullName'),
-#         phone=data.get('phone'),
-#         workInfo=data.get('workInfo'),
-#         workAddress=data.get('workAddress'),
-#         workPrice=data.get('workPrice'),
-#         status=data.get('status'),
-#         workStart=dateStr(data.get('workStart')),
-#         workEnd=dateStr(data.get('workEnd'))
-#     )
-#     db.session.add(new_customer)
-#     db.session.commit()
-#     return jsonify(new_customer.to_dict()), 201
 
 @customer_bp.route("/", methods=["POST"])
 def create_customer():
@@ -95,20 +79,6 @@ def get_customer_detail(id):
     if not customer:
         abort(404, description="Customer not found")
     return jsonify(customer.to_dict())
-
-# @customer_bp.route("/<int:id>", methods=["PUT"])
-# def update_customer(id):
-#     data = request.get_json()
-#     customer = db.session.get(Customer, id)
-#     if not customer:
-#         return jsonify({"error": "Customer not found"}), 404
-#     for key, value in data.items():
-#         if hasattr(customer, key):
-#             if key in ['workStart', 'workEnd'] and isinstance(value, str):
-#                 value = dateStr(value)
-#             setattr(customer, key, value)
-#     db.session.commit()
-#     return jsonify(customer.to_dict()), 200
 
 
 

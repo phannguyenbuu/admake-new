@@ -9,6 +9,7 @@ import { useEffect, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useWorkSpaceQueryAll } from "../../hooks/work-space.hook";
 import type { WorkSpace } from "../../../@types/work-space.type";
+import ChatGroupList from "./ChatGroupList";
 
 const { Header } = Layout;
 
@@ -76,39 +77,8 @@ export default function AppHeader() {
           </div>
         </div>
 
-        <div className="flex items-center">
-            {/* <Dropdown
-              menu={{
-                items: 
-                
-                [
-                  // @ts-ignore
-                  ...(workSpaces || []).map((workspace: WorkSpace) => (
-                  {
-                    key: workspace.id,
-                    label: workspace.name,
-                    icon: <UserOutlined />,
-                    onClick: () => {
-                      navigate("/dashboard/infor");
-                    },
-                  }))
-                ]> */}
-                
-                
-              <Avatar
-                size={32}
-                className="md:!size-10 hover:scale-105 transition-transform duration-200 cursor-pointer shadow-md"
-                style={{
-                  background:
-                    "linear-gradient(135deg, #06b6d4 0%, #0891b2 100%)",
-                  color: "#fff",
-                  border: "2px solid #e5e7eb",
-                }}
-                icon={<UserOutlined />}
-              />
-            {/* </Dropdown> */}
-          </div>
-
+        {/* Menu Chat Group List */}
+        <ChatGroupList/>
 
         <div className="flex items-center gap-4 md:gap-6">
           {/* Center - Notification */}

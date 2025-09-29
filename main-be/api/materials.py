@@ -69,3 +69,5 @@ def update_material(id):
             setattr(material, key, value)
     db.session.commit()
     return jsonify(material.to_dict()), 200
+
+

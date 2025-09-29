@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify, abort
-from models import db, Group, dateStr, GroupMember, generate_datetime_id
+from models import db, app, socketio, Group, Message,User, dateStr, GroupMember, generate_datetime_id
 
-group_bp = Blueprint('group', __name__, url_prefix='/group')
+group_bp = Blueprint('group', __name__, url_prefix='/api/group')
 
 @group_bp.route("/", methods=["GET"])
 def get_groups():
@@ -45,3 +45,46 @@ def update_group(id):
     db.session.commit()
     return jsonify(role.to_dict()), 200
 
+
+
+
+
+
+
+
+# Tạo Message
+@app.route('/api/groups/<int:group_id>/messages', methods=['POST'])
+def create_message(group_id):
+    data = request.json
+    user_id = data.get('user_id')
+    text = data.get('text')
+    file_url = data.get('file_url')  # URL lưu file đã upload
+    link = data.get('link')          # Link gửi kèm
+    
+    # Kiểm tra user có trong nhóm không
+    member = GroupMember.query.filter_by(user_id=user_id, group_id=group_id).first()
+    if not member:
+        return jsonify({'error': 'User not a member of the group'}), 403
+
+    msg = Message(
+        group_id=group_id,
+        user_id=user_id,
+        username=User.query.get(user_id).username,
+        text=text,
+        file_url=file_url,
+        link=link,
+    )
+    db.session.add(msg)
+    db.session.commit()
+    
+    # Phát message qua socket
+    socketio.emit('message', {
+        'id': msg.id,
+        'group_id': group_id,
+        'username': msg.username,
+        'text': text,
+        'file_url': file_url,
+        'link': link,
+    }, room=str(group_id))
+    
+    return jsonify({'message': 'Message sent'})

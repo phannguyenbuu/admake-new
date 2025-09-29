@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify, abort
-from models import db, dateStr, Message
+from models import db, socketio, app, dateStr, Message
 
 message_bp = Blueprint('message', __name__, url_prefix='/message')
 
@@ -58,4 +58,54 @@ def update_message(id):
             setattr(role, key, value)
     db.session.commit()
     return jsonify(role.to_dict()), 200
+
+
+
+
+
+@message_bp.route("/<int:id>", methods=['DELETE'])
+def delete_message(message_id):
+    message = Message.query.filter_by(message_id=message_id).first()
+
+    if not message:
+        return jsonify({"error": "Message not found"}), 404
+
+    try:
+        db.session.delete(message)
+        db.session.commit()
+
+        # Phát sự kiện xóa message realtime tới client qua socket
+        socketio.emit('message_deleted', {'message_id': message_id})
+
+        return jsonify({"message": "Message deleted successfully"})
+    except Exception as e:
+        db.session.rollback()
+        app.logger.error(f"Delete message failed: {e}", exc_info=True)
+        return jsonify({"error": "Delete message failed", "details": str(e)}), 500
+    
+
+
+
+
+@message_bp.route('/api/upload', methods=['POST'])
+def upload_file():
+    if 'file' not in request.files:
+        return jsonify({'error': 'No file provided'}), 400
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({'error': 'Empty filename'}), 400
+
+    original_filename = file.filename
+    name, ext = os.path.splitext(original_filename)  # tách phần tên và phần mở rộng
+    filename = original_filename
+    filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+
+    if os.path.exists(filepath):
+        # Tạo tên file mới dạng filename_{uuid}.ext
+        filename = f"{name}_{uuid.uuid4().hex}{ext}"
+        filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        print('New file name because an exist file', filename)
+
+    file.save(filepath)
+    return jsonify({'message': 'File uploaded successfully', 'filename': filename})
 

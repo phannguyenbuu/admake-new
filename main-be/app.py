@@ -4,7 +4,7 @@ import json
 import datetime
 import os
 import sys
-from models import app, db
+from models import app, db, socketio
 from dotenv import load_dotenv
 
 base_dir = os.path.abspath(os.path.dirname(__file__))
@@ -39,4 +39,5 @@ if __name__ == "__main__":
         # customers = Customer.query.all()
         # load_customers()
 
-    app.run(host="0.0.0.0", port=5273, debug=True)
+    # app.run(host="0.0.0.0", port=5273, debug=True)
+    socketio.run(app, host='0.0.0.0', port=5007, debug=True)
