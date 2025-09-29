@@ -10,9 +10,14 @@ def get_users():
     limit = request.args.get("limit", 10, type=int)
     search = request.args.get("search", "", type=str)
 
-    query = User.query
+    query = User.query.filter(User.role_id != "CUSTOMER")
+
     if search:
-        query = query.filter(User.name.ilike(f"%{search}%"))
+        query = query.filter(
+            (User.username.ilike(f"%{search}%")) | 
+            (User.fullName.ilike(f"%{search}%"))
+        )
+
 
     pagination = query.paginate(page=page, per_page=limit, error_out=False)
     users = [c.to_dict() for c in pagination.items]

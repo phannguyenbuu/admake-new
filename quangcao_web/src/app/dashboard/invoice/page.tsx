@@ -54,13 +54,13 @@ export const InvoiceDashboard: IPage["Component"] = () => {
   // Thêm/xóa vật liệu
   const handleCheck = useCallback((checked: boolean, material: Material) => {
     setSelected((prev) =>
-      checked ? [...prev, material] : prev.filter((v) => v._id !== material._id)
+      checked ? [...prev, material] : prev.filter((v) => v.id !== material.id)
     );
   }, []);
 
   // Xóa vật liệu khỏi danh sách đã chọn
   const handleRemove = useCallback((material: string) => {
-    setSelected((prev) => prev.filter((v) => v._id !== material));
+    setSelected((prev) => prev.filter((v) => v.id !== material));
   }, []);
 
   // Đổi số lượng
@@ -134,8 +134,8 @@ export const InvoiceDashboard: IPage["Component"] = () => {
       const payload = {
         staff_ids: selectedUsers,
         materials: selected.map((material) => ({
-          id: material._id,
-          quantity: quantities[material._id] || 1,
+          id: material.id,
+          quantity: quantities[material.id] || 1,
         })),
         totalDay: totalDays,
         coefficient: coefficient,
@@ -159,7 +159,7 @@ export const InvoiceDashboard: IPage["Component"] = () => {
       // 2) Sau khi quote thành công → cập nhật tồn kho
       const updatePromises = selected.map((material) => {
         const materialData = materials?.data?.find(
-          (m: Material) => m._id === material._id
+          (m: Material) => m.id === material.id
         );
         if (!materialData) return Promise.resolve();
 
@@ -211,9 +211,9 @@ export const InvoiceDashboard: IPage["Component"] = () => {
   const totalMaterialsCost = useMemo(() => {
     return selected.reduce((sum, material) => {
       const materialData = materials?.data?.find(
-        (m: Material) => m._id === material._id
+        (m: Material) => m.id === material.id
       );
-      const selectedQuantity = quantities[material._id] || 1;
+      const selectedQuantity = quantities[material.id] || 1;
       const availableQuantity = materialData?.quantity || 0;
       const actualQuantity = Math.min(selectedQuantity, availableQuantity);
       return sum + (materialData?.price || 0) * actualQuantity;

@@ -1,5 +1,5 @@
 import json
-from models import db, app, User, Customer, Material, parse_date, Role, Task, Workspace
+from models import db, app, User, Customer, Material, parse_date, Role, Task, Workspace, generate_datetime_id
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 import json
@@ -426,6 +426,56 @@ def transfer_task_to_postgres():
     db.session.commit()
 
 
+def transfer_customer_to_postgres():
+    # Kết nối SQLite
+    sqlite_engine = create_engine('sqlite:///main-be/instance/customers.db')
+    metadata_sqlite = MetaData()
+    metadata_sqlite.reflect(bind=sqlite_engine)
+    customers_sqlite = Table('customer', metadata_sqlite, autoload_with=sqlite_engine)
+
+    with sqlite_engine.connect() as conn:
+        row_dict = conn.execute(customers_sqlite.select())
+        for row in row_dict:
+            
+            id_value = row[0]  # thường là cột đầu tiên
+            name_value = row[1]  # cột thứ hai, tùy thứ tự cột DB
+            # hoặc chuyển row thành dict:
+            row_dict = dict(row._mapping)
+            id_value = row_dict['id']
+            # name_value = row_dict['name']
+
+            print(row_dict)
+
+            # Tạo user mới
+            new_user = User(
+                id=generate_datetime_id(),
+                username=row_dict.get("username"),
+                password=row_dict.get("password"),
+                fullName=row_dict.get("fullName"),
+                phone=row_dict.get("phone"),
+                status="active",
+                role_id="CUSTOMER",   # giả sử bạn đặt role CUSTOMER
+            )
+
+            db.session.add(new_user)
+            db.session.flush()  # để có id ngay mà không cần commit
+
+            new_customer = Customer(
+                id=generate_datetime_id(),
+                user_id=new_user.id,   # gắn FK
+                taxCode=row_dict.get("taxCode"),
+                workInfo=row_dict.get("workInfo"),
+                workStart=row_dict.get("workStart"),
+                workEnd=row_dict.get("workEnd"),
+                workAddress=row_dict.get("workAddress"),
+                workPrice=row_dict.get("workPrice"),
+            )
+
+            db.session.add(new_customer)
+    db.session.commit()
+
+
+
 def alter_column_id_type():
     
 
@@ -437,27 +487,23 @@ def alter_column_id_type():
 
 
 
-
-def add_new_columns():
-
-    # db.session.execute(text('ALTER TABLE "user" ADD COLUMN status VARCHAR(50);'))
-    # db.session.execute(text('ALTER TABLE "user" ADD COLUMN role_id VARCHAR(24);'))
-    # db.session.execute(text('ALTER TABLE "user" ADD COLUMN type VARCHAR(50);'))
-    # db.session.execute(text('ALTER TABLE "user" ADD COLUMN hashKey VARCHAR(255);'))
-    # db.session.execute(text('ALTER TABLE "user" ADD COLUMN fullName VARCHAR(255);'))
-    # db.session.execute(text('ALTER TABLE "user" ADD COLUMN version INTEGER;'))
-    # db.session.execute(text('ALTER TABLE "user" ADD COLUMN phone VARCHAR(20);'))
-    # db.session.execute(text('ALTER TABLE "user" ADD COLUMN avatar VARCHAR(255);'))
-    # db.session.execute(text('ALTER TABLE "user" ADD COLUMN deletedAt TIMESTAMP;'))
-    # deletedAt = db.Column(db.DateTime, nullable=True)
-
-    # db.session.execute(text('ALTER TABLE "role" RENAME COLUMN "createdAt" TO "createdAt";'))
-    # db.session.execute(text('ALTER TABLE "role" RENAME COLUMN "updatedAt" TO "updatedAt";'))
-
-    db.session.execute(text('UPDATE "user" SET "fullName" = concat("firstName", \' \', "lastName");'))
-    
+def create_table(table):
+    db.session.execute(text('''CREATE TABLE customer (
+        id SERIAL PRIMARY KEY,
+        user_id INT UNIQUE NOT NULL REFERENCES "user"(id) ON DELETE CASCADE,
+        address TEXT,
+        phone VARCHAR(20),
+        loyalty_points INT DEFAULT 0
+    );'''))
     db.session.commit()
-    print("Đã thêm các cột mới vào bảng role")
+
+
+def add_new_columns(table,cols,type):
+    for col in cols:
+      db.session.execute(text(f'ALTER TABLE "{table}" ADD COLUMN "{col}" {type};'))  
+
+    db.session.commit()
+    print(f"Đã thêm các cột mới vào bảng {table}")
 
 
 
@@ -517,10 +563,24 @@ def update_users_with_accountId(json_file):
     print("Đã gán accountId từ JSON làm id trong PostgreSQL theo thứ tự")
 
 
-def change_value_type(table, keys):
+def change_value_type(table, keys, type='VARCHAR(50)'):
     for key in keys:
-        db.session.execute(text(f'ALTER TABLE "{table}" ALTER COLUMN "{key}" TYPE VARCHAR(50);'))
+        db.session.execute(text(f'ALTER TABLE "{table}" ALTER COLUMN "{key}" TYPE {type};'))
     db.session.commit()
+
+
+def show_table():
+    result = db.session.execute(text(f'''SELECT conname, confrelid::regclass AS referenced_table
+        FROM pg_constraint
+        WHERE conrelid = 'customer'::regclass;'''))
+    # db.session.commit()
+    for row in result:
+        print(f"Constraint: {row.conname}, References: {row.referenced_table}")
+
+    # sql = text('ALTER TABLE customer DROP CONSTRAINT IF EXISTS customer_user_id_fkey;')
+    # db.session.execute(sql)
+    # db.session.commit()
+    # print("Đã xóa constraint thừa.")
 
 def renameColumn(table, fieldName = None, newName = None):
     from sqlalchemy.exc import ProgrammingError
@@ -552,12 +612,12 @@ if __name__ == "__main__":
         # update_users_with_accountId('user.json')
         # transfer_material_to_postgres()
         # transfer_workspace_to_postgres()
-        transfer_task_to_postgres()
+        # transfer_task_to_postgres()
         # show_collections_and_schema()
-        # change_value_type()
+        # change_value_type('user', ['id'])
 
     
-        # change_value_type('task', ['id','workspace_id','customer_id','create_by_id'])
+        # change_value_type('customer', ['workPrice'], 'INTEGER')
         # renameColumn('task')
 
         # for table in [ 'task']:
@@ -570,9 +630,16 @@ if __name__ == "__main__":
         #     renameColumn(table, "deleted_at", "deletedAt")
         #     renameColumn(table, "delete_at", "deletedAt")
 
-        all_records = Task.query.all()
-        print(len(all_records))
-        for record in all_records:
-            print(record)
+        # all_records = Task.query.all()
+        # print(len(all_records))
+        # for record in all_records:
+        #     print(record)
+
+        # create_table('customer')
+        # renameColumn('user')
+
+        # show_table()
+
+        # add_new_columns('customer',['workAddress'],'VARCHAR(255)')
         
-        
+        transfer_customer_to_postgres()

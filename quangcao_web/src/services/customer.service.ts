@@ -6,7 +6,7 @@ export const CustomerService = {
   getCustomers: (dto: Partial<PaginationDto> = {}) => {
     return axiosClient.get("/customer", { params: dto });
   },
-  getCustomerDetail: (id: number) => {
+  getCustomerDetail: (id: string) => {
     console.log('HY useCustomerDetail', id);
     return axiosClient.get(`/customer/${id}`);
   },
@@ -16,12 +16,12 @@ export const CustomerService = {
     return axiosClient.post("/customer/", dto);
   },
   updateCustomer: (
-    id: number,
+    id: string,
     dto: Omit<Customer, "createdAt" | "updatedAt" | "deletedAt">
   ) => {
     return axiosClient.put(`/customer/${id}`, dto);
   },
-  deleteCustomer: (id: number) => {
+  deleteCustomer: (id: string) => {
     return axiosClient.delete(`/customer/${id}`);
   },
 } as const;

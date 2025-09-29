@@ -44,8 +44,8 @@ export const MaterialSection: React.FC<MaterialSectionProps> = ({
       const payload: any = (p as any)?.data;
       const items: Material[] = payload?.data ?? payload ?? [];
       for (const m of items) {
-        if (!seen.has(m._id)) {
-          seen.add(m._id);
+        if (!seen.has(m.id)) {
+          seen.add(m.id);
           merged.push(m);
         }
       }
@@ -56,8 +56,8 @@ export const MaterialSection: React.FC<MaterialSectionProps> = ({
   // ----- Bảo đảm vật liệu đã chọn xuất hiện
   useEffect(() => {
     if (!selected?.length) return;
-    const currentIds = new Set(allMaterials.map((m) => m._id));
-    const missing = selected.filter((m) => !currentIds.has(m._id));
+    const currentIds = new Set(allMaterials.map((m) => m.id));
+    const missing = selected.filter((m) => !currentIds.has(m.id));
     if (missing.length > 0 && hasNextPage && !isFetchingNextPage) {
       fetchNextPage();
     }
@@ -65,10 +65,10 @@ export const MaterialSection: React.FC<MaterialSectionProps> = ({
 
   // ----- Ưu tiên vật liệu đã chọn lên trước
   const displayMaterials = useMemo(() => {
-    const selectedSet = new Set(selected.map((m) => m._id));
+    const selectedSet = new Set(selected.map((m) => m.id));
     return [...allMaterials].sort((a, b) => {
-      const aSel = selectedSet.has(a._id) ? 1 : 0;
-      const bSel = selectedSet.has(b._id) ? 1 : 0;
+      const aSel = selectedSet.has(a.id) ? 1 : 0;
+      const bSel = selectedSet.has(b.id) ? 1 : 0;
       if (aSel !== bSel) return bSel - aSel;
       return (a.name || "").localeCompare(b.name || "");
     });
@@ -156,10 +156,10 @@ export const MaterialSection: React.FC<MaterialSectionProps> = ({
                 )}
 
                 {displayMaterials.map((m) => {
-                  const checked = selected.some((s) => s._id === m._id);
+                  const checked = selected.some((s) => s.id === m.id);
                   return (
                     <button
-                      key={m._id}
+                      key={m.id}
                       type="button"
                       onClick={() => toggleRow(!checked, m)}
                       className="w-full text-left px-3 py-3 border-b last:border-b-0 hover:bg-slate-50 active:bg-slate-100 transition select-none"

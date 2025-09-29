@@ -91,8 +91,8 @@ local_dirs = [
     # "chat-fe/public",
     # "chat-fe/src",
     # "chat-be",
-
-
+    # "quangcao_web/src/components/dashboard/work-tables/job",
+    # "quangcao_web/src/components/dashboard/work-tables",
     # "quangcao_web/src/common/layouts/base"
 
     # "scripts",
@@ -102,6 +102,9 @@ local_dirs = [
     "main-be/models.py",
     "main-be/app.py",
     "main-be/.env",
+
+    # "main-be/api/users.py",
+    "main-be/api/customers.py",
 ]
 
 upload_to_vps_multiple(

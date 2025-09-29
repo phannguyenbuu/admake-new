@@ -87,3 +87,20 @@ export interface FormTaskProps {
   workspaceId: string;
   onSuccess?: () => void;
 }
+
+export interface AdminPermissions {
+  adminMode: boolean,
+  adminMaterial: boolean,
+  adminInvoice: boolean,
+  adminCustomer: boolean,
+  adminRole: boolean,
+  adminSetting: boolean,
+  adminUser: boolean,
+  adminAccounting: boolean,
+  adminStatistics: boolean,
+};
+
+export interface Mode {
+  adminMode: AdminPermissions;
+  userMode: boolean;
+}

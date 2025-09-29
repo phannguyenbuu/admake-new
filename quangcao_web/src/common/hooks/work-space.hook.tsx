@@ -67,7 +67,7 @@ export function useGetTaskById(id: string) {
   return useQuery({
     // cần refectch mỗi khi mở lại form task
     queryKey: [TASK_QUERY_KEY, id],
-    queryFn: () => TaskService.getById(id),
+    queryFn: () => TaskService.getById(id).then(response => response.data),
     enabled: !!id,
     staleTime: 0,
     refetchOnMount: true,

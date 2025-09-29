@@ -29,7 +29,7 @@ export interface UserSectionProps {
 }
 
 export interface MaterialSectionProps {
-  selected: any[]; // Thay đổi từ string[] sang any[] để lưu toàn bộ material object
+  selected: Material[]; // Thay đổi từ string[] sang any[] để lưu toàn bộ material object
   quantities: { [key: string]: number };
   onCheck: (checked: boolean, material: any) => void; // Thay đổi từ materialId: string sang material: any
   onRemove: (material: string) => void;

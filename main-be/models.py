@@ -66,7 +66,7 @@ class Material(BaseModel):
         result = {}
         for column in self.__table__.columns:
             value = getattr(self, column.name)
-            print(f"DEBUG: Column {column.name} value type: {type(value)}")
+            # print(f"DEBUG: Column {column.name} value type: {type(value)}")
             if isinstance(value, (datetime.datetime, datetime.date)):
                 value = value.isoformat()
             result[column.name] = value
@@ -111,6 +111,8 @@ class User(BaseModel):
     selectedProvider = db.Column(db.JSON)
     selectedServices = db.Column(db.JSON)
 
+    # customer = db.relationship("Customer", back_populates="user", uselist=False)
+
     # deletedAt = db.Column(db.DateTime, nullable=True)
     # createdAt = db.Column(db.DateTime, default=datetime.datetime.utcnow)
     # updatedAt = db.Column(db.DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
@@ -131,7 +133,7 @@ class User(BaseModel):
         result = {}
         for column in self.__table__.columns:
             value = getattr(self, column.name)
-            print(f"DEBUG: Column {column.name} value type: {type(value)}")
+            # print(f"DEBUG: Column {column.name} value type: {type(value)}")
             if isinstance(value, (datetime.datetime, datetime.date)):
                 value = value.isoformat()
             result[column.name] = value
@@ -161,9 +163,40 @@ class User(BaseModel):
             version=data.get("__v"),
         )
     
-class Customer(User):
-    __tablename__ = 'user'
-    __table_args__ = {'extend_existing': True}
+class Customer(db.Model):
+    __tablename__ = "customer"
+
+    id = db.Column(db.String(50), primary_key=True)
+    user_id = db.Column(db.String(50), db.ForeignKey("user.id"), unique=True, nullable=False)
+
+    taxCode = db.Column(db.String(50))
+    
+    workInfo  = db.Column(db.String(255))
+    workStart = db.Column(db.DateTime, nullable=True)
+    workEnd = db.Column(db.DateTime, nullable=True)
+    workAddress = db.Column(db.String(255))
+    workPrice = db.Column(db.Integer)
+   
+    user = db.relationship("User", backref="customer", uselist=False)
+
+    def to_dict(self):
+        result = {}
+        for column in self.__table__.columns:
+            value = getattr(self, column.name)
+            # print(f"DEBUG: Column {column.name} value type: {type(value)}")
+            if isinstance(value, (datetime.datetime, datetime.date)):
+                value = value.isoformat()
+            result[column.name] = value
+
+        result["role"] = "Khách hàng"
+
+        if self.user:
+            user_data = self.user.to_dict()
+            result.update(user_data) 
+
+        return result
+
+
 
 class Role(BaseModel):
     __tablename__ = 'role'
@@ -182,7 +215,7 @@ class Role(BaseModel):
         result = {}
         for column in self.__table__.columns:
             value = getattr(self, column.name)
-            print(f"DEBUG: Column {column.name} value type: {type(value)}")
+            # print(f"DEBUG: Column {column.name} value type: {type(value)}")
             if isinstance(value, (datetime.datetime, datetime.date)):
                 value = value.isoformat()
             result[column.name] = value
@@ -241,7 +274,7 @@ class Workspace(BaseModel):
         result = {}
         for column in self.__table__.columns:
             value = getattr(self, column.name)
-            print(f"DEBUG: Column {column.name} value type: {type(value)}")
+            # print(f"DEBUG: Column {column.name} value type: {type(value)}")
             if isinstance(value, (datetime.datetime, datetime.date)):
                 value = value.isoformat()
             result[column.name] = value
@@ -281,7 +314,7 @@ class Task(BaseModel):
         result = {}
         for column in self.__table__.columns:
             value = getattr(self, column.name)
-            print(f"DEBUG: Column {column.name} value type: {type(value)}")
+            # print(f"DEBUG: Column {column.name} value type: {type(value)}")
             if isinstance(value, (datetime.datetime, datetime.date)):
                 value = value.isoformat()
             result[column.name] = value

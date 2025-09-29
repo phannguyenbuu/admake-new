@@ -23,7 +23,7 @@ import dayjs from "dayjs";
 import "./css/css.css";
 import type { Task } from "../../../@types/work-space.type";
 import type { Customer } from "../../../@types/customer.type";
-import { MaterialSection } from "../invoice/MaterialSection";
+// import { MaterialSection } from "../invoice/MaterialSection";
 import { UserSection } from "../invoice/UserSection";
 import CommentSection from "./CommentSection";
 import {
@@ -40,7 +40,15 @@ import FormCustomer from "../customer-managerment/FormCustomer";
 import { useInfo } from "../../../common/hooks/info.hook";
 import CheckInOut from "./CheckInOut";
 import { useCheckPermission } from "../../../common/hooks/checkPermission.hook";
-import type { User } from "../../../@types/user.type";
+// import type { User } from "../../../@types/user.type";
+import JobInfoCard from "./job/JobInfoCard";
+import EnhanceHeader from "./job/EnhanceHeader";
+import JobCustomerInfo from "./job/JobCustomerInfo";
+import JobDescription from "./job/JobDescription";
+import JobTimeAndProcess from "./job/JobTimeAndProcess ";
+import MobileDatePickerModal from "./job/MobileDatePickerModal";
+import MaterialInfo from "./job/MaterialInfo";
+import AgentInfo from "./job/AgentInfo";
 
 const { TextArea } = Input;
 const { Title, Text } = Typography;
@@ -97,7 +105,7 @@ export default function FormTask({
   }, [taskDetail]);
 
 
-  console.log('mappedTask', mappedTask);
+  console.log('Mapped-Task', mappedTask, taskDetail, users, taskId, workspaceId, material);
 
   const [customer, setCustomer] = useState({
     searchValue: "", // tạo search value
@@ -113,6 +121,9 @@ export default function FormTask({
   const { data: customerDetail } = useCustomerDetail(customer.selectedId || "");
 
   useEffect(() => {
+
+    console.log("mappedTask changed:", mappedTask);
+
     setMode({
       adminMode: adminMode,
       // @ts-ignore
@@ -140,15 +151,15 @@ export default function FormTask({
       : 0;
   }, [time]);
 
-  const getStatusMeta = (status: string) => {
-    const statusMap: Record<string, any> = {
-      OPEN: { color: "blue", label: "Phân việc", icon: "📋" },
-      IN_PROGRESS: { color: "orange", label: "Sản xuất", icon: "⚡" },
-      DONE: { color: "green", label: "Hoàn thiện", icon: "✅" },
-      REWARD: { color: "purple", label: "Đã Nghiệm Thu", icon: "🏆" },
-    };
-    return statusMap[status] || statusMap.OPEN;
-  };
+  // const getStatusMeta = (status: string) => {
+  //   const statusMap: Record<string, any> = {
+  //     OPEN: { color: "blue", label: "Phân việc", icon: "📋" },
+  //     IN_PROGRESS: { color: "orange", label: "Sản xuất", icon: "⚡" },
+  //     DONE: { color: "green", label: "Hoàn thiện", icon: "✅" },
+  //     REWARD: { color: "purple", label: "Đã Nghiệm Thu", icon: "🏆" },
+  //   };
+  //   return statusMap[status] || statusMap.OPEN;
+  // };
 
   // Handlers và các useEffect giữ nguyên như code gốc...
   const handlers = {
@@ -531,649 +542,46 @@ export default function FormTask({
     >
       <div className="bg-white h-full flex flex-col">
         {/* Enhanced Header */}
-        <div className="px-4 sm:px-6 py-3 sm:py-4 bg-gradient-to-r from-cyan-500/10 via-white to-cyan-600/10 border-b border-cyan-500/20 flex-shrink-0">
-          <div className="flex items-center gap-2 sm:gap-3">
-            <div className="flex items-center gap-1.5 sm:gap-2">
-              <div className="w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full bg-cyan-500 animate-pulse"></div>
-              <Text className="text-cyan-600 text-xs sm:text-sm font-medium">
-                Thông tin công việc
-              </Text>
-            </div>
-            {duration > 0 && (
-              <Tag
-                color="cyan"
-                className="!px-1.5 sm:!px-2 !py-0.5 !rounded-full !border-none !font-medium !text-xs !shadow-sm !ml-auto"
-              >
-                Thời gian: {duration} ngày
-              </Tag>
-            )}
-          </div>
-        </div>
+        <EnhanceHeader duration={duration}/>
 
         {/* Enhanced Content Area - Scrollable */}
         <div className="flex-1 overflow-y-auto p-4 sm:p-6 custom-scrollbar">
           <Form form={form} layout="vertical" requiredMark={false}>
             {/* Tên công việc & Trạng thái */}
-            <div className="bg-gray-50 rounded-lg border border-gray-200 shadow-sm p-3 sm:p-4 mb-3 sm:mb-4 hover:shadow-md transition-all duration-300">
-              <div className="flex items-center gap-2 mb-2 sm:mb-3">
-                <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-md bg-gradient-to-r from-cyan-500/10 to-cyan-600/10 flex items-center justify-center">
-                  <ProjectOutlined className="!text-cyan-600 !text-xs sm:!text-sm" />
-                </div>
-                <Text strong className="!text-gray-800 !text-sm sm:!text-base">
-                  Thông tin cơ bản
-                </Text>
-              </div>
-
-              <div className="grid grid-cols-1 gap-3 sm:gap-4">
-                <Form.Item
-                  name="title"
-                  label={
-                    <div className="flex items-center gap-1.5 sm:gap-2">
-                      <div className="w-1 h-1 bg-cyan-500 rounded-full"></div>
-                      <span className="text-gray-800 font-medium text-xs sm:text-sm">
-                        Tên công việc
-                      </span>
-                      <span className="text-red-500">*</span>
-                    </div>
-                  }
-                  rules={[
-                    { required: true, message: "Vui lòng nhập tên công việc" },
-                    { min: 3, message: "Ít nhất 3 ký tự" },
-                  ]}
-                  className="!mb-0"
-                >
-                  <Input
-                    placeholder="Nhập tên công việc..."
-                    className="!h-9 sm:!h-10 !text-xs sm:!text-sm !rounded-lg !border !border-gray-300 focus:!border-cyan-500 focus:!shadow-lg hover:!border-cyan-500 !transition-all !duration-200 !shadow-sm"
-                    size="middle"
-                    disabled={!mode.adminMode}
-                  />
-                </Form.Item>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="flex flex-col">
-                    <span className="text-xs text-gray-600 mb-2 font-medium">
-                      Danh sách
-                    </span>
-                    <Tag
-                      color={getStatusMeta(currentStatus).color}
-                      className="!px-3 !py-1.5 !rounded-lg !border-none !font-medium !text-xs !shadow-md !w-fit"
-                    >
-                      {getStatusMeta(currentStatus).icon}{" "}
-                      {getStatusMeta(currentStatus).label}
-                    </Tag>
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="text-xs text-gray-600 mb-2 font-medium">
-                      Trạng thái
-                    </span>
-                    <Tag
-                      color={getStatusMeta(currentStatus).color}
-                      className="!px-3 !py-1.5 !rounded-lg !border-none !font-medium !text-xs !shadow-md !w-fit"
-                    >
-                      {currentStatus === "OPEN"
-                        ? "⏳ Chưa nhận việc"
-                        : currentStatus === "IN_PROGRESS"
-                        ? "🚀 Đang thực hiện"
-                        : currentStatus === "DONE"
-                        ? "✅ Đã hoàn thành"
-                        : currentStatus === "REWARD"
-                        ? "🏆 Đã Nghiệm Thu"
-                        : "⏳ Chưa nhận việc"}
-                    </Tag>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <JobInfoCard currentStatus={currentStatus} mode = {mode}/>
 
             {/* Thông tin khách hàng */}
-            <div className="bg-gray-50 rounded-lg border border-gray-200 shadow-sm p-3 sm:p-4 mb-3 sm:mb-4 hover:shadow-md transition-all duration-300">
-              <div className="flex items-center justify-between mb-2 sm:mb-3">
-                <div className="flex items-center gap-2">
-                  <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-md bg-gradient-to-r from-blue-100 to-blue-200 flex items-center justify-center">
-                    <UserOutlined className="!text-blue-600 !text-xs sm:!text-sm" />
-                  </div>
-                  <Text
-                    strong
-                    className="!text-gray-800 !text-sm sm:!text-base"
-                  >
-                    Thông tin khách hàng
-                  </Text>
-                </div>
-                {mode.adminMode && !isEditMode && (
-                  <Button
-                    type="link"
-                    size="small"
-                    className="!text-cyan-600 hover:!text-cyan-700 !text-xs !font-medium hover:!underline"
-                    onClick={() => setShowCustomerModal(true)}
-                  >
-                    + Tạo mới
-                  </Button>
-                )}
-              </div>
-
-              {mode.adminMode && !isEditMode && (
-                <Form.Item
-                  name="customer"
-                  label={
-                    <div className="flex items-center gap-1.5 sm:gap-2">
-                      <div className="w-1 h-1 bg-blue-500 rounded-full"></div>
-                      <span className="text-gray-800 font-medium text-xs sm:text-sm">
-                        Tìm kiếm khách hàng
-                      </span>
-                    </div>
-                  }
-                  className="!mb-3"
-                >
-                  <AutoComplete
-                    value={customer.searchValue}
-                    onChange={handlers.customerSearch}
-                    onSelect={handlers.customerSelect}
-                    placeholder="Nhập tên, số điện thoại hoặc địa chỉ..."
-                    className="!h-9 sm:!h-10 !rounded-lg !border !border-gray-300 focus:!border-cyan-500 focus:!shadow-lg hover:!border-cyan-500 !transition-all !duration-200 !text-xs sm:!text-sm !shadow-sm"
-                    options={filteredCustomers.map((c: Customer) => ({
-                      key: c.id,
-                      value: c.fullName,
-                      label: (
-                        <div className="flex flex-col py-1">
-                          <div className="font-medium text-sm">
-                            {c.fullName}
-                          </div>
-                          <div className="text-xs text-gray-500">
-                            📞 {c.phone}{" "}
-                            {c.workAddress ? `• 📍 ${c.workAddress}` : ""}
-                          </div>
-                        </div>
-                      ),
-                    }))}
-                    filterOption={false}
-                    showSearch
-                    allowClear
-                    notFoundContent={
-                      loadingCustomers ? (
-                        <div className="text-center py-2 text-gray-500 text-xs">
-                          ⏳ Đang tìm kiếm...
-                        </div>
-                      ) : customer.searchValue ? (
-                        <div className="text-center py-2 text-gray-500 text-xs">
-                          Không tìm thấy "{customer.searchValue}"
-                        </div>
-                      ) : (
-                        <div className="text-center py-2 text-gray-500 text-xs">
-                          Nhập từ khóa để tìm kiếm
-                        </div>
-                      )
-                    }
-                    onClear={() =>
-                      setCustomer({
-                        searchValue: "",
-                        selectedId: null,
-                        selectedCustomer: null,
-                        isTyping: false,
-                      })
-                    }
-                  />
-                </Form.Item>
-              )}
-
-              {customer.selectedCustomer && (
-                <div className="bg-white rounded-lg p-3 border border-gray-200 shadow-sm">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {/* Cột trái: Tên + Địa điểm */}
-                    <div className="space-y-4">
-                      {/* Tên khách hàng */}
-                      <div className="flex items-start gap-2">
-                        <div className="w-7 h-7 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
-                          <span className="text-blue-600 text-xs">👤</span>
-                        </div>
-                        <div className="min-w-0">
-                          <div className="text-xs text-gray-600 mb-1">
-                            Tên khách hàng
-                          </div>
-                          <div className="text-sm font-semibold text-gray-800 break-words">
-                            {customer.selectedCustomer.fullName || "-"}
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Địa điểm */}
-                      {customer.selectedCustomer.workAddress && (
-                        <div className="flex items-start gap-2">
-                          <div className="w-7 h-7 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
-                            <span className="text-blue-600 text-xs">📍</span>
-                          </div>
-                          <div className="min-w-0">
-                            <div className="text-xs text-gray-600 mb-1">
-                              Địa điểm
-                            </div>
-                            <div className="text-sm font-medium text-cyan-700 break-words whitespace-pre-wrap">
-                              {customer.selectedCustomer.workAddress}
-                            </div>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Cột phải: SĐT + Thông tin công việc */}
-                    <div className="space-y-4">
-                      {/* Số điện thoại */}
-                      <div className="flex items-start gap-2">
-                        <div className="w-7 h-7 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
-                          <span className="text-blue-600 text-xs">📞</span>
-                        </div>
-                        <div className="min-w-0">
-                          <div className="text-xs text-gray-600 mb-1">
-                            Số điện thoại
-                          </div>
-                          <div className="text-sm font-semibold text-gray-800">
-                            {customer.selectedCustomer.phone ? (
-                              <a
-                                href={`tel:${customer.selectedCustomer.phone.replace(
-                                  /\s/g,
-                                  ""
-                                )}`}
-                                className="text-cyan-700 hover:underline"
-                              >
-                                {customer.selectedCustomer.phone}
-                              </a>
-                            ) : (
-                              "-"
-                            )}
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Thông tin công việc */}
-                      {customer.selectedCustomer.workInfo && (
-                        <div className="flex items-start gap-2">
-                          <div className="w-7 h-7 rounded-full bg-purple-100 flex items-center justify-center flex-shrink-0">
-                            <span className="text-purple-600 text-xs">💼</span>
-                          </div>
-                          <div className="min-w-0">
-                            <div className="text-xs text-gray-600 mb-1">
-                              Thông tin công việc
-                            </div>
-                            <div className="text-sm font-medium text-purple-700 break-words leading-relaxed">
-                              {customer.selectedCustomer.workInfo}
-                            </div>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
+            <JobCustomerInfo mode={mode} isEditMode={isEditMode}
+              customer={customer} handlers={handlers}
+              filteredCustomers={filteredCustomers} 
+              loadingCustomers={loadingCustomers}
+              setShowCustomerModal={setShowCustomerModal}
+              setCustomer={setCustomer}
+              form={form}/>
 
             {/* Mô tả */}
-            <div className="bg-gray-50 rounded-lg border border-gray-200 shadow-sm p-3 sm:p-4 mb-3 sm:mb-4 hover:shadow-md transition-all duration-300">
-              <div className="flex items-center gap-2 mb-2 sm:mb-3">
-                <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-md bg-gradient-to-r from-green-100 to-green-200 flex items-center justify-center">
-                  <span className="text-green-600 text-xs sm:text-sm">📝</span>
-                </div>
-                <Text strong className="!text-gray-800 !text-sm sm:!text-base">
-                  Mô tả công việc
-                </Text>
-              </div>
-
-              {mode.adminMode ? (
-                <Form.Item
-                  name="description"
-                  label={
-                    <div className="flex items-center gap-1.5 sm:gap-2">
-                      <div className="w-1 h-1 bg-green-500 rounded-full"></div>
-                      <span className="text-gray-800 font-medium text-xs sm:text-sm">
-                        Chi tiết công việc
-                      </span>
-                    </div>
-                  }
-                  className="!mb-0"
-                >
-                  <TextArea
-                    rows={3}
-                    showCount
-                    maxLength={1000}
-                    placeholder="Mô tả chi tiết về công việc cần thực hiện..."
-                    className="!rounded-lg !border !border-gray-300 focus:!border-cyan-500 focus:!shadow-lg hover:!border-cyan-500 !transition-all !duration-200 !shadow-sm !resize-none !text-xs sm:!text-sm"
-                  />
-                </Form.Item>
-              ) : (
-                <div className="bg-white rounded-lg p-3 border border-gray-200 shadow-sm">
-                  <div className="text-sm text-gray-700 leading-relaxed">
-                    {/* @ts-ignore */}
-                    {taskDetail?.description || "Không có mô tả"}
-                  </div>
-                </div>
-              )}
-            </div>
+            <JobDescription mode={mode} taskDetail={taskDetail}/>
 
             {/* Thời gian và quy trình */}
-            <div className="bg-gray-50 rounded-lg border border-gray-200 shadow-sm p-3 sm:p-4 mb-3 sm:mb-4 hover:shadow-md transition-all duration-300">
-              <div className="flex items-center gap-2 mb-2 sm:mb-3">
-                <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-md bg-gradient-to-r from-orange-100 to-orange-200 flex items-center justify-center">
-                  <CalendarOutlined className="!text-orange-600 !text-xs sm:!text-sm" />
-                </div>
-                <Text strong className="!text-gray-800 !text-sm sm:!text-base">
-                  Thời gian & quy trình
-                </Text>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-4 mb-4">
-                <Form.Item
-                  name="startTime"
-                  label={
-                    <div className="flex items-center gap-1.5 sm:gap-2">
-                      <div className="w-1 h-1 bg-orange-500 rounded-full"></div>
-                      <span className="text-gray-800 font-medium text-xs sm:text-sm">
-                        Ngày bắt đầu
-                      </span>
-                      <span className="text-red-500">*</span>
-                    </div>
-                  }
-                  rules={[{ required: true, message: "Chọn ngày bắt đầu" }]}
-                  className="!mb-0"
-                >
-                  <div className="flex gap-2">
-                    <DatePicker
-                      className="!flex-1 !h-9 sm:!h-10 !text-xs sm:!text-sm !rounded-lg !border !border-gray-300 focus:!border-cyan-500 focus:!shadow-lg hover:!border-cyan-500 !transition-all !duration-200 !shadow-sm"
-                      format="DD/MM/YYYY"
-                      placeholder="Chọn ngày"
-                      onChange={(date) => {
-                        console.log("startTime DatePicker onChange:", date);
-                        handlers.startTimeChange(date);
-                        form.setFieldsValue({ startTime: date });
-                      }}
-                      disabledDate={(current) =>
-                        current && current < dayjs().startOf("day")
-                      }
-                      value={time.startTime}
-                      disabled={!mode.adminMode}
-                      size="middle"
-                      onOpenChange={(open) => {
-                        // Trên mobile, mở modal thay vì datepicker
-                        if (open && window.innerWidth <= 768) {
-                          setCurrentDatePicker({
-                            type: "startTime",
-                            value: time.startTime,
-                          });
-                          setShowDatePickerModal(true);
-                          return false; // Ngăn datepicker mở
-                        }
-                      }}
-                    />
-                    {/* <Button
-                      type="default"
-                      size="middle"
-                      className="!h-9 sm:!h-10 !px-3 !rounded-lg !border !border-gray-300 hover:!border-cyan-500 !text-gray-600 hover:!text-cyan-600 !transition-all !duration-200"
-                      onClick={() => {
-                        setCurrentDatePicker({
-                          type: "startTime",
-                          value: time.startTime,
-                        });
-                        setShowDatePickerModal(true);
-                      }}
-                      disabled={!mode.adminMode}
-                    >
-                      📅
-                    </Button> */}
-                  </div>
-                </Form.Item>
-
-                <Form.Item
-                  name="endTime"
-                  label={
-                    <div className="flex items-center gap-1.5 sm:gap-2">
-                      <div className="w-1 h-1 bg-orange-500 rounded-full"></div>
-                      <span className="text-gray-800 font-medium text-xs sm:text-sm">
-                        Ngày kết thúc
-                      </span>
-                      <span className="text-red-500">*</span>
-                    </div>
-                  }
-                  rules={[
-                    { required: true, message: "Chọn ngày kết thúc" },
-                    ({ getFieldValue }) => ({
-                      validator(_, value) {
-                        const startTime = getFieldValue("startTime");
-                        if (
-                          !startTime ||
-                          (value && dayjs(value).isBefore(dayjs(startTime)))
-                        ) {
-                          return Promise.reject(
-                            new Error(
-                              "Ngày kết thúc không được bé hơn ngày bắt đầu"
-                            )
-                          );
-                        }
-                        return Promise.resolve();
-                      },
-                    }),
-                  ]}
-                  className="!mb-0"
-                >
-                  <div className="flex gap-2">
-                    <DatePicker
-                      className="!flex-1 !h-9 sm:!h-10 !text-xs sm:!text-sm !rounded-lg !border !border-gray-300 focus:!border-cyan-500 focus:!shadow-lg hover:!border-cyan-500 !transition-all !duration-200 !shadow-sm"
-                      format="DD/MM/YYYY"
-                      placeholder="Chọn ngày"
-                      onChange={(date) => {
-                        console.log("endTime DatePicker onChange:", date);
-                        handlers.endTimeChange(date);
-                        form.setFieldsValue({ endTime: date });
-                      }}
-                      disabled={!mode.adminMode || !time.startTime}
-                      disabledDate={(current) =>
-                        !time.startTime ||
-                        (current && current < dayjs(time.startTime))
-                      }
-                      value={time.endTime}
-                      size="middle"
-                      onOpenChange={(open) => {
-                        // Trên mobile, mở modal thay vì datepicker
-                        if (open && window.innerWidth <= 768) {
-                          setCurrentDatePicker({
-                            type: "endTime",
-                            value: time.endTime,
-                          });
-                          setShowDatePickerModal(true);
-                          return false; // Ngăn datepicker mở
-                        }
-                      }}
-                    />
-                    {/* <Button
-                      type="default"
-                      size="middle"
-                      className="!h-9 sm:!h-10 !px-3 !rounded-lg !border !border-gray-300 hover:!border-cyan-500 !text-gray-600 hover:!text-cyan-600 !transition-all !duration-200"
-                      onClick={() => {
-                        setCurrentDatePicker({
-                          type: "endTime",
-                          value: time.endTime,
-                        });
-                        setShowDatePickerModal(true);
-                      }}
-                      disabled={!mode.adminMode || !time.startTime}
-                    >
-                      📅
-                    </Button> */}
-                  </div>
-                </Form.Item>
-
-                <div className="flex flex-col">
-                  <div className="flex items-center gap-1.5 sm:gap-2 mb-1.5">
-                    <div className="w-1 h-1 bg-orange-500 rounded-full"></div>
-                    <span className="text-gray-800 font-medium text-xs sm:text-sm">
-                      Tổng thời gian
-                    </span>
-                  </div>
-                  <div className="bg-cyan-600 text-white px-3 py-2 rounded-lg text-xs sm:text-sm font-bold text-center shadow-md h-9 sm:h-10 flex items-center justify-center">
-                    ⏱️ {duration} ngày
-                  </div>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
-                <Form.Item
-                  name="type"
-                  label={
-                    <div className="flex items-center gap-1.5 sm:gap-2">
-                      <div className="w-1 h-1 bg-orange-500 rounded-full"></div>
-                      <span className="text-gray-800 font-medium text-xs sm:text-sm">
-                        Hình thức làm việc
-                      </span>
-                      <span className="text-red-500">*</span>
-                    </div>
-                  }
-                  rules={[
-                    { required: true, message: "Chọn hình thức làm việc" },
-                  ]}
-                  className="!mb-0"
-                >
-                  <Select
-                    placeholder="Chọn hình thức"
-                    className="!h-9 sm:!h-10 !rounded-lg  focus:!border-cyan-500 focus:!shadow-lg hover:!border-cyan-500 !transition-all !duration-200 !text-xs sm:!text-sm !shadow-sm"
-                    size="middle"
-                    disabled={!mode.adminMode}
-                  >
-                    <Select.Option value="REWARD">💼 Công khoán</Select.Option>
-                    <Select.Option value="MONTHLY">📅 Công tháng</Select.Option>
-                  </Select>
-                </Form.Item>
-
-                <Form.Item
-                  name="reward"
-                  label={
-                    <div className="flex items-center gap-1.5 sm:gap-2">
-                      <div className="w-1 h-1 bg-orange-500 rounded-full"></div>
-                      <span className="text-gray-800 font-medium text-xs sm:text-sm">
-                        Mức lương
-                      </span>
-                      <span className="text-red-500">*</span>
-                    </div>
-                  }
-                  rules={[{ required: true, message: "Nhập mức lương" }]}
-                  className="!mb-0"
-                >
-                  <InputNumber
-                    size="large"
-                    controls={false}
-                    placeholder="Nhập mức lương"
-                    className={`!w-full !rounded-lg !border !transition-all !duration-200 !text-xs sm:!text-sm !shadow-sm`}
-                    min={0}
-                    step={1000}
-                    disabled={!mode.adminMode}
-                    formatter={(value) =>
-                      `${value ?? 0}`.replace(/\B(?=(\d{3})+(?!\d))/g, ".")
-                    }
-                    parser={(value) => {
-                      if (!value) return 0;
-                      const numValue = value.replace(/\./g, "");
-                      return (numValue ? Number(numValue) : 0) as 0;
-                    }}
-                  />
-                </Form.Item>
-              </div>
-            </div>
+            <JobTimeAndProcess  mode = {mode} time={time} 
+              handlers={handlers} duration={duration} form = {form} 
+              setCurrentDatePicker={setCurrentDatePicker}
+              setShowDatePickerModal={setShowDatePickerModal}
+              />
 
             {/* Vật liệu */}
-            <div className="bg-gray-50 rounded-lg border border-gray-200 shadow-sm p-3 sm:p-4 mb-3 sm:mb-4 hover:shadow-md transition-all duration-300">
-              <div className="flex items-center gap-2 mb-2 sm:mb-3">
-                <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-md bg-gradient-to-r from-purple-100 to-purple-200 flex items-center justify-center">
-                  <span className="text-purple-600 text-xs sm:text-sm">🔧</span>
-                </div>
-                <Text strong className="!text-gray-800 !text-sm sm:!text-base">
-                  Vật liệu cần thiết
-                </Text>
-              </div>
-              {currentStatus === "OPEN" && !isEditMode ? (
-                <MaterialSection
-                  selected={material.selectedMaterials}
-                  quantities={material.materialQuantities}
-                  onCheck={handlers.materialCheck}
-                  onRemove={handlers.materialRemove}
-                  onQuantityChange={handlers.materialQuantityChange}
-                  disabled={mode.adminMode && currentStatus !== "OPEN"}
-                />
-              ) : (
-                <div
-                  className="px-3 sm:px-4 pb-4 max-h-60 overflow-y-auto space-y-2"
-                  style={{ maxHeight: 240 }}
-                >
-                  {/* @ts-ignore */}
-                  {mappedTask?.materials?.map((m: any) => {
-                    const material = m.material;
-                    const qty = material.quantity || 1;
-                    return (
-                      <div key={material.id} className="p-2 md:p-0">
-                        {/* Row responsive */}
-                        <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-3">
-                          {/* Tên */}
-                          <div className="flex-1 min-w-0">
-                            <span className="text-cyan-600 font-semibold cursor-pointer hover:underline block truncate">
-                              {material?.name || "Unknown Material"}
-                            </span>
-                          </div>
-
-                          {/* Số lượng + Thành tiền */}
-                          <div className="flex flex-wrap items-center gap-2 md:gap-3">
-                            <span className="text-gray-600">Số lượng</span>
-                            <span className="text-green-600 font-semibold text-sm">
-                              {qty} x {material?.price.toLocaleString("vi-VN")}đ
-                            </span>
-                            <span className="text-green-600 font-semibold text-sm">
-                              ={" "}
-                              {(
-                                ((material?.price || 0) * qty) as number
-                              ).toLocaleString("vi-VN")}
-                              đ
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
+            <MaterialInfo currentStatus={currentStatus} isEditMode={isEditMode} 
+              mode={mode} material={material} 
+              handlers={handlers}
+              mappedTask={mappedTask}
+              />
 
             {/* Nhân sự */}
-            <div className="bg-gray-50 rounded-lg border border-gray-200 shadow-sm p-3 sm:p-4 mb-3 sm:mb-4 hover:shadow-md transition-all duration-300">
-              <div className="flex items-center gap-2 mb-2 sm:mb-3">
-                <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-md bg-gradient-to-r from-indigo-100 to-indigo-200 flex items-center justify-center">
-                  <UserOutlined className="!text-indigo-600 !text-xs sm:!text-sm" />
-                </div>
-                <Text strong className="!text-gray-800 !text-sm sm:!text-base">
-                  Nhân sự thực hiện
-                </Text>
-              </div>
-              {/* chỉ hiện thị ở phân việc có status là OPEN */}
-              {currentStatus !== "DONE" && currentStatus !== "REWARD" ? (
-                <UserSection
-                  selectedUsers={users.selectedUsers}
-                  onUserCheck={handlers.userCheck}
-                  onRemoveUser={handlers.userRemove}
-                />
-              ) : (
-                <div
-                  className="px-4 pb-4 max-h-60 overflow-y-auto"
-                  style={{ maxHeight: "240px" }}
-                >
-                  {/* @ts-ignore */}
-                  {mappedTask?.assigns?.map((user: User) => {
-                    return (
-                      <div
-                        key={user.id}
-                        className="flex items-center border-b last:border-b-0 py-2"
-                      >
-                        <span className="text-cyan-600 font-semibold flex-1 cursor-pointer hover:underline">
-                          {user?.fullName || user?.username || "Unknown User"}
-                        </span>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-
+            <AgentInfo currentStatus={currentStatus} isEditMode={isEditMode}
+              mode={mode} users={users} handlers={handlers} mappedTask={mappedTask}
+            />
+            
+            
             {/* Điểm danh - chỉ hiển thị cho user mode */}
             {taskId && mode.userMode && (
               <div className="bg-gray-50 rounded-lg border border-gray-200 shadow-sm p-3 sm:p-4 mb-3 sm:mb-4 hover:shadow-md transition-all duration-300">
@@ -1320,204 +728,50 @@ export default function FormTask({
   );
 }
 
-// Mobile Date Picker Modal Component
-interface MobileDatePickerModalProps {
-  open: boolean;
-  onCancel: () => void;
-  onConfirm: (date: dayjs.Dayjs | null) => void;
-  value: dayjs.Dayjs | null;
-  disabledDate?: (current: dayjs.Dayjs) => boolean;
-}
 
-function MobileDatePickerModal({
-  open,
-  onCancel,
-  onConfirm,
-  value,
-  disabledDate,
-}: MobileDatePickerModalProps) {
-  const [selectedDate, setSelectedDate] = useState<dayjs.Dayjs | null>(value);
-  const [currentMonth, setCurrentMonth] = useState(dayjs());
 
-  useEffect(() => {
-    setSelectedDate(value);
-    if (value) {
-      setCurrentMonth(value);
-    }
-  }, [value]);
+{/*Giao diện form được chia nhiều phần component con như:
+EnhanceHeader: header phần thông tin nâng cao.
+JobInfoCard: phần tên công việc, trạng thái.
+JobCustomerInfo: thông tin khách hàng với autocomplete.
+JobDescription: mô tả công việc.
+JobTimeAndProcess: phần chọn ngày và hình thức làm việc.
+MaterialInfo: phần vật liệu cần thiết.
+AgentInfo: thông tin nhân sự thực hiện.
+CheckInOut: phần điểm danh thực hiện công việc.
+CommentSection: phần bình luận và hoạt động.
+Khung Modal do Ant Design cung cấp với nhiều chỉnh sửa giao diện, hỗ trợ responsive. */}
 
-  const handleMonthChange = (direction: "prev" | "next") => {
-    if (direction === "prev") {
-      setCurrentMonth((prev) => prev.subtract(1, "month"));
-    } else {
-      setCurrentMonth((prev) => prev.add(1, "month"));
-    }
-  };
 
-  const handleDateSelect = (date: dayjs.Dayjs) => {
-    if (disabledDate && disabledDate(date)) return;
-    setSelectedDate(date);
-  };
+{/*Các biến điều khiển và vai trò chính trong code:
+open: boolean, điều khiển hiển thị modal form.
+onCancel: hàm gọi khi đóng modal, dùng để reset form và trạng thái.
+taskId: nếu có, chỉ ra form đang ở chế độ chỉnh sửa (edit mode), nếu không là tạo mới.
+workspaceId: ID của workspace chứa task.
+onSuccess: callback gọi khi tạo hoặc cập nhật thành công task.
+Các trạng thái nội bộ:
+form: instance form của Ant Design để thao tác với form.
+isEditMode: true khi chỉnh sửa task.
+adminMode: nhận quyền admin từ hook useCheckPermission.
+taskDetail: dữ liệu task lấy từ hook useGetTaskById.
+createTask, updateTask, updateTaskStatus: hook để gọi API tạo, sửa, hoặc đổi trạng thái task.
+time: trạng thái quản lý ngày bắt đầu và ngày kết thúc (startTime, endTime).
+material: quản lý vật liệu chọn và số lượng.
+users: quản lý người dùng được chỉ định (assign).
+customer: quản lý thông tin khách hàng, autocomplete tìm kiếm và chọn khách.
+duration: tự tính dựa trên ngày bắt đầu, ngày kết thúc.
+currentStatus: trạng thái hiện tại của task (OPEN, DONE, v.v).
+mappedTask: thông tin task đã map thêm customerId để tiện dùng.
 
-  const handleConfirm = () => {
-    onConfirm(selectedDate);
-  };
-
-  const handleReset = () => {
-    setSelectedDate(null);
-  };
-
-  const getDaysInMonth = () => {
-    const start = currentMonth.startOf("month");
-    const end = currentMonth.endOf("month");
-    const startDay = start.day(); // 0 = Chủ nhật, 1 = Thứ 2, ...
-    const daysInMonth = end.date();
-
-    const days = [];
-
-    // Thêm các ngày trống ở đầu
-    for (let i = 0; i < startDay; i++) {
-      days.push(null);
-    }
-
-    // Thêm các ngày trong tháng
-    for (let i = 1; i <= daysInMonth; i++) {
-      days.push(start.date(i));
-    }
-
-    return days;
-  };
-
-  const weekDays = ["CN", "Th2", "Th3", "Th4", "Th5", "Th6", "Th7"];
-  const days = getDaysInMonth();
-
-  return (
-    <Modal
-      open={open}
-      onCancel={onCancel}
-      footer={null}
-      width="90vw"
-      style={{ maxWidth: "400px" }}
-      centered
-      destroyOnHidden
-      maskClosable={false}
-      className="mobile-date-picker-modal"
-      styles={{
-        content: {
-          borderRadius: "16px",
-          overflow: "hidden",
-          padding: 0,
-        },
-        body: {
-          padding: 0,
-        },
-        mask: {
-          backdropFilter: "blur(8px)",
-          backgroundColor: "rgba(0, 0, 0, 0.5)",
-        },
-      }}
-    >
-      <div className="bg-white">
-        {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-800">Chọn ngày</h3>
-          {/* <button
-            onClick={onCancel}
-            className="w-8 h-8 rounded-full hover:bg-gray-100 flex items-center justify-center transition-colors"
-          >
-            <span className="text-gray-500 text-xl">×</span>
-          </button> */}
-        </div>
-
-        {/* Month Navigation */}
-        <div className="flex items-center justify-center p-4 bg-gray-50">
-          <button
-            onClick={() => handleMonthChange("prev")}
-            className="w-8 h-8 rounded-full hover:bg-gray-200 flex items-center justify-center transition-colors mr-4"
-          >
-            <LeftOutlined className="text-gray-600" />
-          </button>
-
-          <h4 className="text-lg font-medium text-gray-800">
-            Tháng {currentMonth.format("MM YYYY")}
-          </h4>
-
-          <button
-            onClick={() => handleMonthChange("next")}
-            className="w-8 h-8 rounded-full hover:bg-gray-200 flex items-center justify-center transition-colors ml-4"
-          >
-            <RightOutlined className="text-gray-600" />
-          </button>
-        </div>
-
-        {/* Calendar Grid */}
-        <div className="p-4">
-          {/* Week Days Header */}
-          <div className="grid grid-cols-7 gap-1 mb-3">
-            {weekDays.map((day, index) => (
-              <div
-                key={index}
-                className="text-center text-sm font-medium text-gray-600 py-2"
-              >
-                {day}
-              </div>
-            ))}
-          </div>
-
-          {/* Calendar Days */}
-          <div className="grid grid-cols-7 gap-1">
-            {days.map((day, index) => {
-              if (!day) {
-                return <div key={index} className="h-10" />;
-              }
-
-              const isDisabled = disabledDate ? disabledDate(day) : false;
-              const isSelected =
-                selectedDate && day.isSame(selectedDate, "day");
-              const isToday = day.isSame(dayjs(), "day");
-
-              return (
-                <button
-                  key={index}
-                  onClick={() => handleDateSelect(day)}
-                  disabled={isDisabled}
-                  className={`
-                    h-10 rounded-lg text-sm font-medium transition-all duration-200
-                    ${
-                      isDisabled
-                        ? "text-gray-300 bg-gray-50 cursor-not-allowed"
-                        : isSelected
-                        ? "text-white bg-orange-500 shadow-lg scale-105"
-                        : isToday
-                        ? "text-orange-600 bg-orange-50 border border-orange-200"
-                        : "text-gray-700 hover:bg-gray-100 hover:scale-105"
-                    }
-                  `}
-                >
-                  {day.date()}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Footer Buttons */}
-        <div className="flex gap-3 p-4 border-t border-gray-200">
-          <Button
-            onClick={handleReset}
-            className="flex-1 h-12 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 font-medium"
-          >
-            Đặt lại
-          </Button>
-          <Button
-            type="primary"
-            onClick={handleConfirm}
-            className="flex-1 h-12 rounded-lg bg-green-600 border-green-600 text-white hover:bg-green-700 font-medium"
-          >
-            Áp dụng
-          </Button>
-        </div>
-      </div>
-    </Modal>
-  );
-}
+Các handler chính gồm:
+materialCheck, materialRemove, materialQuantityChange: xử lý chọn, bỏ chọn, thay số lượng vật liệu.
+userCheck, userRemove: quản lý danh sách người dùng được phân công.
+startTimeChange, endTimeChange: cập nhật ngày bắt đầu và kết thúc, đồng thời validate ngày.
+customerSearch, customerSelect: tìm kiếm và chọn khách hàng trong autocomplete.
+updateTaskStatus: gọi API cập nhật trạng thái task (ví dụ nghiệm thu).
+resetStates: reset toàn bộ trạng thái về mặc định (dùng khi đóng form hoặc tạo mới).
+handleCancel: gọi reset trạng thái và đóng modal.
+handleFinish: xử lý lưu tạo mới hoặc sửa task, gọi API tương ứng với validate dữ liệu trước.
+Nhìn chung, component này quản lý cả trạng thái UI, dữ liệu form, tìm kiếm khách hàng, 
+chọn vật liệu, người dùng phân công, thời gian, trạng thái task..., 
+đồng thời tương tác nhiều hook API để lấy và cập nhật dữ liệu.*/}

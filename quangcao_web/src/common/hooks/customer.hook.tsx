@@ -13,11 +13,11 @@ export function useCustomerQuery(dto: Partial<PaginationDto> = {}) {
   });
 }
 
-export function useCustomerDetail(id?: number) {
+export function useCustomerDetail(id?: string) {
   
   return useQuery({
     queryKey: [CUSTOMER_DETAIL_QUERY_KEY, id],
-    queryFn: () => CustomerService.getCustomerDetail(id || 0),
+    queryFn: () => CustomerService.getCustomerDetail(id || ''),
     enabled: !!id,
   });
 }
@@ -37,7 +37,7 @@ export function useUpdateCustomer() {
       id,
     }: {
       dto: Omit<Customer, "createdAt" | "updatedAt" | "deletedAt">;
-      id: number;
+      id: string;
     }) => CustomerService.updateCustomer(id, dto),
   });
 }
