@@ -516,6 +516,21 @@ def handle_message(data):
         'message_id': message_id
     }, room=request.sid)
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+
 def seed_database_user():
     with app.app_context():
         inspector = inspect(db.engine)

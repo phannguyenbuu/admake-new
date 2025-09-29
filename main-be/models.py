@@ -361,6 +361,213 @@ class Task(BaseModel):
             updatedAt=parse_date(data.get("updatedAt")),
         )
 
+class Group(BaseModel):
+    __tablename__ = 'group'
+    __table_args__ = {'quote': True}
+    
+    id = db.Column(db.Integer, primary_key=True)
+    groupId = db.Column(db.Integer, unique=True)
+    name = db.Column(db.String(120), nullable=True)
+    description = db.Column(db.String(255))
+    documents = db.Column(db.JSON, default=[])  # Lưu danh sách đường dẫn tài liệu
+    images = db.Column(db.JSON, default=[])     # Lưu danh sách đường dẫn hình ảnh
+    chats = db.Column(db.JSON, default=[])      # Lưu danh sách message ID lưu lại
+    rating_sum = db.Column(db.Integer, default=0)
+    rating_count = db.Column(db.Integer, default=0)
+    # createdAt = db.Column(db.DateTime(timezone=True), server_default=func.now())
+    # updatedAt = db.Column(db.DateTime(timezone=True), server_default=func.now())
+
+    def to_dict(self):
+        result = {}
+        for column in self.__table__.columns:
+            value = getattr(self, column.name)
+            # print(f"DEBUG: Column {column.name} value type: {type(value)}")
+            if isinstance(value, (datetime.datetime, datetime.date)):
+                value = value.isoformat()
+            result[column.name] = value
+        return result
+    
+    @staticmethod
+    def create_item(params):
+        group = Group(
+            groupId=params.get('id', 0),
+            name=params.get('name', 0),
+            description=params.get('description', ''),
+
+            documents=[],
+            images=[],
+            chats=[],
+
+            rating_sum=params.get('rating_sum', 0),
+            
+            # createdAt=to_date(params.get('createdAt','')),
+            # updatedAt=to_date(params.get('updatedAt','')),
+        )
+
+        db.session.add(group)
+        db.session.commit()
+        return group
+    
+    @property
+    def rating(self):
+        if self.rating_count == 0:
+            return 0
+        return round(self.rating_sum / self.rating_count, 2)
+    
+    @property
+    def total_members(self):
+        return GroupMember.query.filter_by(group_id=self.id).count()
+
+    @property
+    def total_messages(self):
+        return Message.query.filter_by(group_id=self.id).count()
+    
+    @property
+    def all_messages(self):
+        return Message.query.filter_by(group_id=self.id).order_by(Message.createdAt).all()
+
+    @property
+    def total_unread_messages(self):
+        return Message.query.filter_by(group_id=self.id, is_unread=True).count()
+
+    @property
+    def last_message(self):
+        msgs = Message.query.filter_by(group_id=self.id)
+
+        if msgs.count() > 0:
+            last_msg = msgs.order_by(Message.createdAt.desc()).first()
+            if last_msg:
+                # Trả lại đoạn text hoặc thông tin bạn muốn hiển thị
+                return f"{last_msg.createdAt}|{last_msg.text[:50]}"  # cắt ngắn 50 ký tự
+        return ''
+
+class GroupMember(db.Model):
+    __tablename__ = 'group_member'
+
+    id = db.Column(db.Integer, primary_key=True)
+    
+    group_id = db.Column(db.Integer, db.ForeignKey('group.groupId'), nullable=True)
+    user_id = db.Column(db.String(80), db.ForeignKey('user.accountId'), nullable=True)
+
+    role = db.Column(db.String(20), default='member')
+
+    user = db.relationship('User', backref='group_members')
+    group = db.relationship('Group', backref='group_members')
+
+    def to_dict(self):
+        result = {}
+        for column in self.__table__.columns:
+            value = getattr(self, column.name)
+            # print(f"DEBUG: Column {column.name} value type: {type(value)}")
+            if isinstance(value, (datetime.datetime, datetime.date)):
+                value = value.isoformat()
+            result[column.name] = value
+        return result
+
+    @staticmethod
+    def create_item(params):
+        try:
+            user_id = str(params.get('user_id',0))
+            user_exists = User.query.filter_by(accountId=user_id).first()
+            
+            group_id = params.get('group_id', 0)
+            group_exists = Group.query.filter_by(id=group_id).first()
+
+            if user_exists and group_exists:
+                gr = GroupMember(
+                    user_id=user_id,
+                    group_id=group_id,
+                    role=params.get('role', ''),
+                )
+        
+                db.session.add(gr)  # hoặc bulk insert
+                db.session.commit()
+                return gr
+            else:
+                print('No exist',user_id,group_id)
+        except IntegrityError as e:
+            db.session.rollback()
+            # Kiểm tra có phải lỗi unique constraint vi phạm không
+            if 'user_accountId_key' in str(e.orig):
+                print("Duplicate accountId, bỏ qua bản ghi này")
+                # Hoặc xử lý theo ý bạn, ví dụ bỏ qua, log lại,...
+            else:
+                raise  # lỗi khác thì raise tiếp
+
+from sqlalchemy.exc import IntegrityError
+class Message(BaseModel):
+    __tablename__ = 'message'
+
+    id = db.Column(db.Integer, primary_key=True)
+    message_id = db.Column(db.String(80))
+    group_id = db.Column(db.Integer, db.ForeignKey('group.groupId'), nullable=True)
+    user_id = db.Column(db.String(80), db.ForeignKey('user.accountId'), nullable=True)
+    
+    text = db.Column(db.String(500))
+    file_url = db.Column(db.String(255), nullable=True)
+    # createdAt = db.Column(db.DateTime(timezone=True), server_default=func.now())
+    # updatedAt = db.Column(db.DateTime(timezone=True), server_default=func.now())
+    
+    is_unread = db.Column(db.Boolean, default=False)
+    is_favourite = db.Column(db.Boolean, default=False)
+
+    react = db.Column(db.JSON)
+    type = db.Column(db.String(10), nullable=True)
+    
+    user = db.relationship('User', foreign_keys=[user_id])
+    group = db.relationship('Group', foreign_keys=[group_id])
+
+    def to_dict(self):
+        result = {}
+        for column in self.__table__.columns:
+            value = getattr(self, column.name)
+            # print(f"DEBUG: Column {column.name} value type: {type(value)}")
+            if isinstance(value, (datetime.datetime, datetime.date)):
+                value = value.isoformat()
+            result[column.name] = value
+        return result
+
+    @staticmethod
+    def create_item(params):
+        try:
+            user_id = str(params.get('user_id',''))
+            user_exists = User.query.filter_by(accountId=user_id).first()
+            group_id = params.get('group_id', 0)
+            group_exists = Group.query.filter_by(id=group_id).first()
+            
+            if user_exists and group_exists:
+                # print(accountId, group.id)
+                msg = Message(
+                    group_id=group_id,
+                    user_id=user_id,
+                    text=params.get('text', ''),
+                    # username=params.get('username', ''),
+                    is_unread=params.get('is_unread', '') != 'SUCCESS',
+                    
+                )
+                
+                db.session.add(msg)
+                db.session.commit()
+                return msg
+            else:
+                print('No exist',user_id,group_id)
+        except IntegrityError as e:
+            db.session.rollback()
+            # Kiểm tra có phải lỗi unique constraint vi phạm không
+            if 'user_accountId_key' in str(e.orig):
+                print("Duplicate accountId, bỏ qua bản ghi này")
+                # Hoặc xử lý theo ý bạn, ví dụ bỏ qua, log lại,...
+            else:
+                raise  # lỗi khác thì raise tiếp
+
+class Location(db.Model):
+    __tablename__ = 'locations'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(255), nullable=False)
+    gps_lat = db.Column(db.Float, nullable=False)
+    gps_lng = db.Column(db.Float, nullable=False)
+    type = db.Column(db.Enum('chi_nhanh', 'cong_trinh', name='location_type'), nullable=False)
+
 def parse_date(d):
     # d có dạng {"$date": "2025-07-21T01:03:22.362Z"}
     if isinstance(d, dict) and "$date" in d:

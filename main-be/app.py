@@ -18,6 +18,8 @@ from api.roles import role_bp
 from api.settings import setting_bp
 from api.tasks import task_bp
 from api.works import workspace_bp
+from api.groups import group_bp
+from api.messages import message_bp
 
 app.register_blueprint(customer_bp)
 app.register_blueprint(material_bp)
@@ -26,7 +28,8 @@ app.register_blueprint(role_bp)
 app.register_blueprint(setting_bp)
 app.register_blueprint(task_bp)
 app.register_blueprint(workspace_bp)
-
+app.register_blueprint(group_bp)
+app.register_blueprint(message_bp)
 
 load_dotenv()  # load biến môi trường trong file .env vào process.env
 VITE_API_HOST = os.getenv("VITE_API_HOST")

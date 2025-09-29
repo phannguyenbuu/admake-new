@@ -103,8 +103,8 @@ local_dirs = [
     "main-be/app.py",
     "main-be/.env",
 
-    # "main-be/api/users.py",
-    "main-be/api/customers.py",
+    "main-be/api/messages.py",
+    "main-be/api/groups.py",
 ]
 
 upload_to_vps_multiple(

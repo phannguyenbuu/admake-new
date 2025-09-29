@@ -618,17 +618,19 @@ if __name__ == "__main__":
 
     
         # change_value_type('customer', ['workPrice'], 'INTEGER')
-        # renameColumn('task')
+        # renameColumn('group',"updateAt", "updatedAt")
 
-        # for table in [ 'task']:
-        #     renameColumn(table, "createAt", "createdAt")
-        #     renameColumn(table, "create_at", "createdAt")
-        #     renameColumn(table, "created_at", "createdAt")
-        #     renameColumn(table, "updateAt", "updatedAt")
-        #     renameColumn(table, "update_at", "updatedAt")
-        #     renameColumn(table, "updated_at", "updatedAt")
-        #     renameColumn(table, "deleted_at", "deletedAt")
-        #     renameColumn(table, "delete_at", "deletedAt")
+        for table in [ 'group_member','message']:
+            renameColumn(table, "createAt", "createdAt")
+            # renameColumn(table, "create_at", "createdAt")
+            # renameColumn(table, "created_at", "createdAt")
+            renameColumn(table, "updateAt", "updatedAt")
+            # renameColumn(table, "update_at", "updatedAt")
+            # renameColumn(table, "updated_at", "updatedAt")
+            renameColumn(table, "deleted_at", "deletedAt")
+            renameColumn(table, "delete_at", "deletedAt")
+            add_new_columns(table,['deletedAt'],'TIMESTAMP')
+            add_new_columns(table,['version'],'INTEGER')
 
         # all_records = Task.query.all()
         # print(len(all_records))
@@ -640,6 +642,6 @@ if __name__ == "__main__":
 
         # show_table()
 
-        # add_new_columns('customer',['workAddress'],'VARCHAR(255)')
+        # add_new_columns('group',['version'],'INTEGER')
         
-        transfer_customer_to_postgres()
+        # transfer_customer_to_postgres()

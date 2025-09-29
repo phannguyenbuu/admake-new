@@ -44,6 +44,6 @@ export function useUpdateCustomer() {
 
 export function useDeleteCustomer() {
   return useMutation({
-    mutationFn: (id: number) => CustomerService.deleteCustomer(id),
+    mutationFn: (id: string) => CustomerService.deleteCustomer(id),
   });
 }

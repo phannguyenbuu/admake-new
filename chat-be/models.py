@@ -21,6 +21,7 @@ import string
 from sqlalchemy.exc import IntegrityError
 import uuid
 from sqlalchemy.dialects.postgresql import UUID
+from flask_socketio import SocketIO, join_room, leave_room, emit
 
 app = Flask(__name__)
 
@@ -30,6 +31,7 @@ load_dotenv()
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
 
 db = SQLAlchemy(app)
+socketio = SocketIO(app, cors_allowed_origins='*')
 
 def generate_random_md5_password(length=10):
     # Tạo chuỗi ngẫu nhiên gồm chữ và số
