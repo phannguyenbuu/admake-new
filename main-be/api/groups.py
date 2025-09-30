@@ -24,7 +24,7 @@ def create_group():
 
 @group_bp.route("/<int:id>", methods=["GET"])
 def get_group_detail(id):
-    group = db.session.get(group, id)
+    group = db.session.get(Group, id)
     if not group:
         abort(404, description="group not found")
     return jsonify(group.to_dict())
@@ -53,7 +53,7 @@ def update_group(id):
 
 
 # Tạo Message
-@app.route('/api/groups/<int:group_id>/messages', methods=['POST'])
+@group_bp.route('/<int:group_id>/messages', methods=['POST'])
 def create_message(group_id):
     data = request.json
     user_id = data.get('user_id')
@@ -88,3 +88,16 @@ def create_message(group_id):
     }, room=str(group_id))
     
     return jsonify({'message': 'Message sent'})
+
+@group_bp.route('/<int:group_id>/messages', methods=['GET'])
+def get_messages(group_id):
+    group = db.session.get(Group, group_id)
+
+    if not group:
+        return jsonify({"error": "group not found"}), 404
+    
+    messages = [m.to_dict() for m in group.all_messages]
+    
+    print('GET',group_id, len(messages))
+
+    return jsonify({'messages': messages})

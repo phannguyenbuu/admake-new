@@ -4,23 +4,23 @@ import { UserOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import { useApiHost } from "../../hooks/useApiHost";
 import type { MenuProps } from "antd/lib";
-
-interface ChatGroupItem {
-  id: number;
-  name: string;
-  description: string;
-}
+import Group from '../../../components/chat/pages/dashboard/Group.tsx';
+import type { GroupProps } from "../../../@types/chat.type.ts";
+import type { MenuInfo } from 'rc-menu/lib/interface';
 
 const ChatGroupList: React.FC = ({}) => {
   const navigate = useNavigate();
-  const [ChatGroupList, setChatGroupList] = useState<ChatGroupItem[]>([]);
+  const [chatGroupList, setChatGroupList] = useState<GroupProps[]>([]);
   const [modalVisible, setModalVisible] = useState(false);
-  const [selectedId, setSelectedId] = useState<string | null>(null);
-
+  const [selectedId, setSelectedId] = useState<GroupProps | null>(null);
+  const API_HOST = useApiHost();
+  
   useEffect(() => {
-    fetch(`${useApiHost()}/group/`)
+    console.log('!!!API', API_HOST);
+
+    fetch(`${API_HOST}/group/`)
       .then((res) => res.json())
-      .then((data: ChatGroupItem[]) => 
+      .then((data: GroupProps[]) => 
         {
           console.log('GroupData', data);
           setChatGroupList(data);
@@ -28,17 +28,20 @@ const ChatGroupList: React.FC = ({}) => {
       .catch((error) => console.error("Failed to load group data", error));
   }, []);
 
-  const items: MenuProps["items"] = (ChatGroupList || []).map((group) => ({
+  const items: MenuProps["items"] = (chatGroupList || []).map((group) => ({
     key: group.id,
     label: group.name,
     icon: <UserOutlined />,
   }));
 
-  const onMenuClick: MenuProps["onClick"] = (info: { key: string }) => {
-    // info.key là workspace.id bạn bấm chọn
-    // navigate("/dashboard/infor");
-    setSelectedId(info.key);
-    setModalVisible(true);
+  const onMenuClick: MenuProps["onClick"] = (info: MenuInfo) => {
+    // console.log('chatGroupList',chatGroupList, info);
+    const group = chatGroupList.find(g => g.id.toString() === info.key);
+    if (group) {
+      console.log('Selected Group:', group);
+      setSelectedId(group);
+      setModalVisible(true);
+    }
   };
 
   const handleOk = () => {
@@ -59,9 +62,12 @@ const ChatGroupList: React.FC = ({}) => {
       </Dropdown>
 
       {/* Model popup */}
-      <Modal visible={modalVisible} onOk={handleOk} onCancel={handleOk} 
-        title="Workspace Selected" okText="OK" cancelButtonProps={{ style: { display: "none" } }}>
-        <p>ID của workspace là: {selectedId}</p>
+      <Modal visible={modalVisible} onOk={handleOk} onCancel={handleOk} footer={null}
+        title={`ID của group là: ${selectedId?.id} - ${selectedId?.name}`}
+        okText="OK" cancelButtonProps={{ style: { display: "none" } }}
+        style={{ padding:0, minWidth: '96vw'}}
+        >
+        <Group/>
       </Modal>
 
     </div>

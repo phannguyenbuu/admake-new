@@ -102,7 +102,7 @@ class User(BaseModel):
     is_active = db.Column(db.Boolean, default=False)
     is_anonymous = db.Column(db.Boolean, default=False)
     balanceAmount = db.Column(db.String(80), nullable=True)
-    accountId = db.Column(db.String(50), nullable=True)
+    # accountId = db.Column(db.String(50), nullable=True)
     firstName = db.Column(db.String(80), nullable=True)
     lastName = db.Column(db.String(80), nullable=True)
     icon = db.Column(db.String)
@@ -370,7 +370,7 @@ class Group(BaseModel):
     __table_args__ = {'quote': True}
 
     id = db.Column(db.Integer, primary_key=True)
-    groupId = db.Column(db.Integer, unique=True)
+    # groupId = db.Column(db.Integer, unique=True)
     name = db.Column(db.String(120), nullable=True)
     description = db.Column(db.String(255))
     documents = db.Column(db.JSON, default=[])  # Lưu danh sách đường dẫn tài liệu
@@ -389,6 +389,9 @@ class Group(BaseModel):
             if isinstance(value, (datetime.datetime, datetime.date)):
                 value = value.isoformat()
             result[column.name] = value
+
+        result['members'] = self.total_members
+        
         return result
     
     @staticmethod
@@ -450,8 +453,8 @@ class GroupMember(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     
-    group_id = db.Column(db.Integer, db.ForeignKey('group.groupId'), nullable=True)
-    user_id = db.Column(db.String(80), db.ForeignKey('user.accountId'), nullable=True)
+    group_id = db.Column(db.Integer, db.ForeignKey('group.id'), nullable=True)
+    user_id = db.Column(db.String(80), db.ForeignKey('user.id'), nullable=True)
 
     role = db.Column(db.String(20), default='member')
 
@@ -502,10 +505,10 @@ from sqlalchemy.exc import IntegrityError
 class Message(BaseModel):
     __tablename__ = 'message'
 
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.String(50), primary_key=True)
     message_id = db.Column(db.String(80))
-    group_id = db.Column(db.Integer, db.ForeignKey('group.groupId'), nullable=True)
-    user_id = db.Column(db.String(80), db.ForeignKey('user.accountId'), nullable=True)
+    group_id = db.Column(db.Integer, db.ForeignKey('group.id'), nullable=True)
+    user_id = db.Column(db.String(80), db.ForeignKey('user.id'), nullable=True)
     
     text = db.Column(db.String(500))
     file_url = db.Column(db.String(255), nullable=True)
@@ -529,6 +532,8 @@ class Message(BaseModel):
             if isinstance(value, (datetime.datetime, datetime.date)):
                 value = value.isoformat()
             result[column.name] = value
+        
+        result["username"] = result["user_id"]
         return result
 
     @staticmethod

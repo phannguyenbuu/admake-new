@@ -3,7 +3,7 @@ from models import db, User, dateStr, app
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 import datetime
 
-user_bp = Blueprint('user', __name__, url_prefix='/user')
+user_bp = Blueprint('user', __name__, url_prefix='/api/user')
 
 @user_bp.route("/", methods=["GET"])
 def get_users():
@@ -69,17 +69,6 @@ def update_user(id):
         
     db.session.commit()
     return jsonify(user.to_dict()), 
-
-
-
-
-
-
-
-
-
-
-
 
 login_manager = LoginManager()
 login_manager.init_app(app)

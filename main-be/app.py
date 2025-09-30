@@ -32,7 +32,7 @@ app.register_blueprint(group_bp)
 app.register_blueprint(message_bp)
 
 load_dotenv()  # load biến môi trường trong file .env vào process.env
-VITE_API_HOST = os.getenv("VITE_API_HOST")
+# VITE_API_HOST = os.getenv("VITE_API_HOST")
 
 if __name__ == "__main__":
     # with app.app_context():

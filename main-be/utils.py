@@ -1,5 +1,5 @@
 import json
-from models import db, app, User, Customer, Material, parse_date, Role, Task, Workspace, generate_datetime_id
+from models import db, app, User, Customer, Material, parse_date, Role, Message, Task, Workspace, generate_datetime_id
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 import json
@@ -189,7 +189,7 @@ def alter_columns():
     from sqlalchemy import create_engine, text
 
     # Khởi tạo engine kết nối SQLite file customer.db
-    engine = create_engine('sqlite:///instance/customers.db')
+    engine = create_engine('sqlite:///main-be/instance/customers.db')
 
     # Danh sách các lệnh ALTER TABLE để thêm các cột mới
     # alter_commands = [
@@ -241,76 +241,124 @@ def alter_columns():
 
 
 
-def transfer_data_to_postgres():
+def transfer_user_to_postgres():
     # Kết nối SQLite
-    sqlite_engine = create_engine('sqlite:///instance/customers.db')
+    sqlite_engine = create_engine('sqlite:///main-be/instance/customers.db')
+    
     metadata_sqlite = MetaData()
     metadata_sqlite.reflect(bind=sqlite_engine)
     users_sqlite = Table('users', metadata_sqlite, autoload_with=sqlite_engine)
 
-    # Kết nối Postgres
-    pg_engine = create_engine('postgresql+psycopg2://postgres@localhost/admake_chat')
-    metadata_pg = MetaData()
-    metadata_pg.reflect(bind=pg_engine)
-    users_pg = Table('user', metadata_pg, autoload_with=pg_engine)
+    
 
-    with sqlite_engine.connect() as sqlite_conn, pg_engine.connect() as pg_conn:
-        pg_conn.execute(text("""
-            ALTER TABLE "user"
-            ALTER COLUMN id TYPE VARCHAR USING id::text,
-            ALTER COLUMN "accountId" TYPE VARCHAR(80) USING "accountId"::text;
-        """))
+    
+    with sqlite_engine.connect() as sqlite_conn:
+        cmd_1 = """
+CREATE TABLE "user" (
+                -id VARCHAR(50) PRIMARY KEY,
+                -username VARCHAR(255) NOT NULL,
+                -password VARCHAR(255) NOT NULL,
+                status VARCHAR(50),
+                role_id VARCHAR(50),
+                type VARCHAR(50),
+                hashKey VARCHAR(255),
+                fullName VARCHAR(255),
+                level_salary INTEGER,
+                phone VARCHAR(20),
+                avatar VARCHAR(255),
+                ---createdAt TIMESTAMP,
+                ---updatedAt TIMESTAMP,
+                deletedAt TIMESTAMP,
+                version INTEGER
+                -is_authenticated BOOLEAN DEFAULT FALSE,
+                -is_active BOOLEAN DEFAULT FALSE,
+                -is_anonymous BOOLEAN DEFAULT FALSE,
+                -balanceAmount VARCHAR(80),
+                -accountId VARCHAR(50),
+                -firstName VARCHAR(80),
+                -lastName VARCHAR(80),
+                -icon VARCHAR,
+                -companyName VARCHAR(80),
+                -localeCode VARCHAR(80),
+                -languageCode VARCHAR(80),
+                -socialInfor JSON,
+                -orderWebhook VARCHAR(255),
+                -cryptoAddressList JSON,
+                -selectedProvider JSON,
+                -selectedServices JSON,
+                
+            );
+    """
+
+        cmd_2 = """
+            
+            CREATE TABLE customer (
+                id VARCHAR(50) PRIMARY KEY,
+                user_id VARCHAR(50) UNIQUE NOT NULL,
+                taxCode VARCHAR(50),
+                workInfo VARCHAR(255),
+                workStart TIMESTAMP,
+                workEnd TIMESTAMP,
+                workAddress VARCHAR(255),
+                workPrice INTEGER,
+                CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES "user"(id)
+            );
+        """
         
-        pg_conn.execute(text("DELETE FROM message;"))
-        pg_conn.execute(text("DELETE FROM group_member;"))
-
-        # Đọc tất cả records từ SQLite
         rows = sqlite_conn.execute(select(users_sqlite)).fetchall()
         print(f"Read {len(rows)} records from SQLite users")
 
-        # Xóa trắng bảng user trong Postgres
-        pg_conn.execute(users_pg.delete())
-        print("Deleted all records from PostgreSQL user table")
+        with sqlite_engine.connect() as conn:
+            row_dict = conn.execute(users_sqlite.select())
+            print(row_dict)
+            for row in row_dict:
+                id_value = row[0]  # thường là cột đầu tiên
+                # name_value = row[1]  # cột thứ hai, tùy thứ tự cột DB
+                # hoặc chuyển row thành dict:
+                row_dict = dict(row._mapping)
+                id_value = row_dict['id']
+                # name_value = row_dict['name']
 
-        # Chuẩn bị dữ liệu insert với mapping trường
-        insert_values = []
-        for row in rows:
-            row_dict = dict(row._mapping)
-            print(row_dict['id'])
+                new_user = User(
+    id = id_value,
+    username = row_dict.get('username'),
+    password = row_dict.get('password'),
+    status = row_dict.get('status'),
+    role_id = row_dict.get('role_id'),
+    type = row_dict.get('type'),
+    hashKey = row_dict.get('hashKey'),
+    fullName = row_dict.get('fullName'),
+    level_salary = row_dict.get('level_salary'),
+    phone = row_dict.get('phone'),
+    avatar = row_dict.get('avatar'),
+    is_authenticated = row_dict.get('is_authenticated'),
+    is_active = row_dict.get('is_active'),
+    is_anonymous = row_dict.get('is_anonymous'),
+    balanceAmount = row_dict.get('balanceAmount'),
+    accountId = row_dict.get('accountId'),
+    firstName = row_dict.get('firstName'),
+    lastName = row_dict.get('lastName'),
+    icon = row_dict.get('icon'),
+    companyName = row_dict.get('companyName'),
+    localeCode = row_dict.get('localeCode'),
+    languageCode = row_dict.get('languageCode'),
+    socialInfor = row_dict.get('socialInfor'),
+    orderWebhook = row_dict.get('orderWebhook'),
+    cryptoAddressList = row_dict.get('cryptoAddressList'),
+    selectedProvider = row_dict.get('selectedProvider'),
+    selectedServices = row_dict.get('selectedServices'),
+)
 
-            insert_values.append({
-                'id': row_dict['id'],
-                'accountId': row_dict.get('accountId'),
-                'balanceAmount': row_dict.get('balanceAmount'),
-                'icon': row_dict.get('icon'),
-                'companyName': row_dict.get('companyName'),
-                'localeCode': row_dict.get('localeCode'),
-                'languageCode': row_dict.get('languageCode'),
-                'socialInfor': Json(row_dict.get('socialInfor')) if row_dict.get('socialInfor') else None,
-                'orderWebhook': row_dict.get('orderWebhook'),
-                'cryptoAddressList': Json(row_dict.get('cryptoAddressList')) if row_dict.get('cryptoAddressList') else None,
-                'selectedProvider': Json(row_dict.get('selectedProvider')) if row_dict.get('selectedProvider') else None,
-                'selectedServices': Json(row_dict.get('selectedServices')) if row_dict.get('selectedServices') else None,
-                'createdAt': row_dict.get('createdAt') or datetime.datetime.utcnow(),
-                'updatedAt': row_dict.get('updatedAt') or datetime.datetime.utcnow(),
-                'role': row_dict.get('role') or 'user',
-                'is_authenticated': row_dict.get('is_authenticated', False),
-                'is_active': row_dict.get('is_active', False),
-                'is_anonymous': row_dict.get('is_anonymous', False),
-                'firstName': row_dict.get('firstName'),
-                'lastName': row_dict.get('lastName'),
-                'username': row_dict.get('username'),
-            })
 
-        # Thực hiện insert batch vào Postgres
-        pg_conn.execute(insert(users_pg), insert_values)
-        print(f"Inserted {len(insert_values)} records into PostgreSQL user table")
+                db.session.add(new_user)
+    db.session.commit()
 
+        
 
 
 def transfer_material_to_postgres():
     # Kết nối SQLite
-    sqlite_engine = create_engine('sqlite:///instance/customers.db')
+    sqlite_engine = create_engine('sqlite:///main-be/instance/customers.db')
     metadata_sqlite = MetaData()
     metadata_sqlite.reflect(bind=sqlite_engine)
     materials_sqlite = Table('materials', metadata_sqlite, autoload_with=sqlite_engine)
@@ -426,6 +474,47 @@ def transfer_task_to_postgres():
     db.session.commit()
 
 
+def transfer_message_to_postgres():
+    # Kết nối SQLite
+    sqlite_engine = create_engine('sqlite:///main-be/instance/customers.db')
+    metadata_sqlite = MetaData()
+    metadata_sqlite.reflect(bind=sqlite_engine)
+    tasks_sqlite = Table('message', metadata_sqlite, autoload_with=sqlite_engine)
+
+    with sqlite_engine.connect() as conn:
+        row_dict = conn.execute(tasks_sqlite.select())
+        for row in row_dict:
+            
+            id_value = row[0]  # thường là cột đầu tiên
+            name_value = row[1]  # cột thứ hai, tùy thứ tự cột DB
+            # hoặc chuyển row thành dict:
+            row_dict = dict(row._mapping)
+            id_value = row_dict['id']
+            # name_value = row_dict['name']
+
+            print(row_dict)
+
+            new_message = Message(
+                id=id_value,
+                # name=name_value,
+                message_id=row_dict['message_id'],
+                group_id=row_dict['group_id'],
+                user_id=row_dict['user_id'],
+                text=row_dict['text'],
+                file_url=row_dict['file_url'],
+                is_unread=row_dict['is_unread'],
+                is_favourite=row_dict['is_favourite'],
+                react=row_dict['react'],
+                type=row_dict['type'],
+            )
+
+
+            db.session.add(new_message)
+    db.session.commit()
+
+
+
+
 def transfer_customer_to_postgres():
     # Kết nối SQLite
     sqlite_engine = create_engine('sqlite:///main-be/instance/customers.db')
@@ -498,12 +587,27 @@ def create_table(table):
     db.session.commit()
 
 
-def add_new_columns(table,cols,type):
+def add_new_columns(table, cols, col_type):
     for col in cols:
-      db.session.execute(text(f'ALTER TABLE "{table}" ADD COLUMN "{col}" {type};'))  
+        # Kiểm tra xem cột đã tồn tại chưa
+        check_sql = text(f"""
+            SELECT 1 
+            FROM information_schema.columns 
+            WHERE table_name = :table AND column_name = :col
+        """)
+        exists = db.session.execute(check_sql, {"table": table, "col": col}).scalar()
+        
+        if not exists:
+            # Nếu chưa tồn tại thì thêm cột
+            alter_sql = text(f'ALTER TABLE "{table}" ADD COLUMN "{col}" {col_type};')
+            db.session.execute(alter_sql)
+            print(f"Added column '{col}' to table '{table}'")
+        else:
+            print(f"Column '{col}' already exists in table '{table}', skipping.")
 
     db.session.commit()
-    print(f"Đã thêm các cột mới vào bảng {table}")
+    print(f"Done altering table {table}")
+
 
 
 
@@ -564,8 +668,14 @@ def update_users_with_accountId(json_file):
 
 
 def change_value_type(table, keys, type='VARCHAR(50)'):
-    for key in keys:
-        db.session.execute(text(f'ALTER TABLE "{table}" ALTER COLUMN "{key}" TYPE {type};'))
+    # for key in keys:
+    #     db.session.execute(text(f'ALTER TABLE "{table}" ALTER COLUMN "{key}" TYPE {type};'))
+    db.session.execute(text(f'''UPDATE "user"
+    SET role_id = -1
+    WHERE role_id = 'CUSTOMER';'''))
+
+    db.session.execute(text(f'ALTER TABLE "user" ALTER COLUMN "role_id" TYPE INTEGER USING role_id::integer;'))
+
     db.session.commit()
 
 
@@ -606,32 +716,92 @@ def renameColumn(table, fieldName = None, newName = None):
         db.session.rollback()
         print(f"Lỗi khi đổi tên cột: {e}")
 
+def transfer_data_to_postgres():
+    # transfer_user_to_postgres()
+    # transfer_customer_to_postgres()
+    # transfer_material_to_postgres()
+    # transfer_workspace_to_postgres()
+    # transfer_task_to_postgres()
+
+    transfer_message_to_postgres()
+
+import random
+
+def fix_invalid_foreign_keys():
+    # Lấy tất cả user_id hợp lệ
+    valid_user_ids = [row[0] for row in db.session.execute(text('SELECT id FROM "user"')).fetchall()]
+    # Lấy tất cả group_id hợp lệ
+    valid_group_ids = [row[0] for row in db.session.execute(text('SELECT id FROM "group"')).fetchall()]
+
+    # Cập nhật user_id không hợp lệ
+    invalid_user_ids = db.session.execute(text('''
+        SELECT DISTINCT user_id FROM message
+        WHERE user_id NOT IN (SELECT id FROM "user")
+    ''')).fetchall()
+
+    for (invalid_user_id,) in invalid_user_ids:
+        if valid_user_ids:
+            new_user_id = random.choice(valid_user_ids)
+            db.session.execute(text('''
+                UPDATE message SET user_id = :new_user_id WHERE user_id = :invalid_user_id
+            '''), {'new_user_id': new_user_id, 'invalid_user_id': invalid_user_id})
+
+    # Cập nhật group_id không hợp lệ
+    invalid_group_ids = db.session.execute(text('''
+        SELECT DISTINCT group_id FROM message
+        WHERE group_id NOT IN (SELECT id FROM "group")
+    ''')).fetchall()
+    
+    for (invalid_group_id,) in invalid_group_ids:
+        if valid_group_ids:
+            new_group_id = random.choice(valid_group_ids)
+            db.session.execute(text('''
+                UPDATE message SET group_id = :new_group_id WHERE group_id = :invalid_group_id
+            '''), {'new_group_id': new_group_id, 'invalid_group_id': invalid_group_id})
+
+    db.session.commit()
+
+
+
+def change_foreign_key():
+    db.session.execute(text('''
+    ALTER TABLE message ADD CONSTRAINT fk_message_user_id FOREIGN KEY (user_id) REFERENCES "user"(id);
+    ALTER TABLE message ADD CONSTRAINT fk_message_group_id FOREIGN KEY (group_id) REFERENCES "group"(id);
+
+    '''))
+    db.session.commit()
+
+
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()
         # update_users_with_accountId('user.json')
-        # transfer_material_to_postgres()
-        # transfer_workspace_to_postgres()
-        # transfer_task_to_postgres()
+        
         # show_collections_and_schema()
         # change_value_type('user', ['id'])
 
     
-        # change_value_type('customer', ['workPrice'], 'INTEGER')
+        change_value_type('user', ['role_id'], 'INTEGER')
         # renameColumn('group',"updateAt", "updatedAt")
 
-        for table in [ 'group_member','message']:
-            renameColumn(table, "createAt", "createdAt")
-            # renameColumn(table, "create_at", "createdAt")
-            # renameColumn(table, "created_at", "createdAt")
-            renameColumn(table, "updateAt", "updatedAt")
-            # renameColumn(table, "update_at", "updatedAt")
-            # renameColumn(table, "updated_at", "updatedAt")
-            renameColumn(table, "deleted_at", "deletedAt")
-            renameColumn(table, "delete_at", "deletedAt")
-            add_new_columns(table,['deletedAt'],'TIMESTAMP')
-            add_new_columns(table,['version'],'INTEGER')
+        # for table in ['message','group_member']:
+        #     renameColumn(table, "createAt", "createdAt")
+        #     renameColumn(table, "create_at", "createdAt")
+        #     renameColumn(table, "created_at", "createdAt")
+        #     renameColumn(table, "updateAt", "updatedAt")
+        #     renameColumn(table, "update_at", "updatedAt")
+        #     renameColumn(table, "updated_at", "updatedAt")
+        #     renameColumn(table, "deleted_at", "deletedAt")
+        #     renameColumn(table, "delete_at", "deletedAt")
+        #     add_new_columns(table,['deletedAt'],'TIMESTAMP')
+        #     add_new_columns(table,['version'],'INTEGER')
 
+        # add_new_columns('user',['status','role_id','type','phone'],'VARCHAR(50)')
+        # add_new_columns('user',['hashKey','fullName','avatar'],'VARCHAR(255)')
+        # add_new_columns('user',['level_salary','version'],'INTEGER')
+        # add_new_columns('user',['deletedAt'],'TIMESTAMP')
+        # renameColumn('user', "createAt", "createdAt")
+        # renameColumn('user', "updateAt", "updatedAt")
         # all_records = Task.query.all()
         # print(len(all_records))
         # for record in all_records:
@@ -644,4 +814,10 @@ if __name__ == "__main__":
 
         # add_new_columns('group',['version'],'INTEGER')
         
-        # transfer_customer_to_postgres()
+
+        # transfer_data_to_postgres()
+
+
+        
+        # fix_invalid_foreign_keys()
+        # change_foreign_key()

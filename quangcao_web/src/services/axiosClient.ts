@@ -1,8 +1,9 @@
 import axios from 'axios';
 import { TOKEN_LABEL } from '../common/config';
+import { useApiHost } from '../common/hooks/useApiHost';
 
 const axiosClient = axios.create({
-  baseURL: import.meta.env.VITE_API_HOST,
+  baseURL: useApiHost(),
   headers: {
     'Content-Type': 'application/json',
   },

@@ -87,7 +87,7 @@ def ensure_remote_dir(sftp, remote_directory):
 local_dirs = [
     # "main-be",
     # "quangcao_web/public",
-    "quangcao_web/src",
+    # "quangcao_web/src",
     # "chat-fe/public",
     # "chat-fe/src",
     # "chat-be",
@@ -103,10 +103,10 @@ local_dirs = [
     "main-be/models.py",
     "main-be/app.py",
     "main-be/.env",
+    # "main-be/api",
 
-    "main-be/api",
-
-    "quangcao_web/.env",
+    # "quangcao_web/.env",
+    "main-be/api/groups.py"
 ]
 
 upload_to_vps_multiple(

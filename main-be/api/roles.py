@@ -2,7 +2,7 @@ from flask import Blueprint, request, jsonify, abort
 from models import db, Role, dateStr
 import datetime
 
-role_bp = Blueprint('role', __name__, url_prefix='/role')
+role_bp = Blueprint('role', __name__, url_prefix='/api/role')
 
 @role_bp.route("/", methods=["GET"])
 def get_roles():

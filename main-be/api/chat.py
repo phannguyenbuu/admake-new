@@ -3,7 +3,7 @@ from flask import Flask, request, jsonify
 from models import Message, socketio, db, app
 import datetime
 
-@socketio.on('join_group')
+@socketio.on('admake/chat/join_group')
 def on_join_group(data):
     group_id = str(data.get('group_id'))
 
@@ -14,7 +14,7 @@ def on_join_group(data):
         print(f"Socket {request.sid} joined room {group_id}")
         socketio.emit('room_joined', {'group_id': group_id}, room=request.sid)
 
-@socketio.on('leave_group')
+@socketio.on('admake/chat/leave_group')
 def on_leave_group(data):
     group_id = str(data.get('group_id'))
     if group_id:

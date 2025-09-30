@@ -1,7 +1,8 @@
 from flask import Blueprint, request, jsonify, abort
 from models import db, socketio, app, dateStr, Message
+import os
 
-message_bp = Blueprint('message', __name__, url_prefix='/message')
+message_bp = Blueprint('message', __name__, url_prefix='/api/message')
 
 @message_bp.route("/", methods=["GET"])
 def get_messages():
@@ -59,10 +60,6 @@ def update_message(id):
     db.session.commit()
     return jsonify(role.to_dict()), 200
 
-
-
-
-
 @message_bp.route("/<int:id>", methods=['DELETE'])
 def delete_message(message_id):
     message = Message.query.filter_by(message_id=message_id).first()
@@ -82,10 +79,6 @@ def delete_message(message_id):
         db.session.rollback()
         app.logger.error(f"Delete message failed: {e}", exc_info=True)
         return jsonify({"error": "Delete message failed", "details": str(e)}), 500
-    
-
-
-
 
 @message_bp.route('/api/upload', methods=['POST'])
 def upload_file():

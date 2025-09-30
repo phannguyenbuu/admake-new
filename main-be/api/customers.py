@@ -2,7 +2,7 @@ from flask import Blueprint, request, jsonify, abort
 from models import db, Customer, dateStr, User, generate_datetime_id
 import datetime
 
-customer_bp = Blueprint('customer', __name__, url_prefix='/customer')
+customer_bp = Blueprint('customer', __name__, url_prefix='/api/customer')
 def get_model_columns(model):
     """Lấy danh sách tên các cột từ 1 model"""
     return [c.name for c in model.__table__.columns]

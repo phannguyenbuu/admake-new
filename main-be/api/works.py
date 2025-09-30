@@ -3,7 +3,7 @@ from models import db, Workspace, Task, dateStr, generate_datetime_id
 import datetime
 from collections import defaultdict
 
-workspace_bp = Blueprint('workspace', __name__, url_prefix='/workspace')
+workspace_bp = Blueprint('workspace', __name__, url_prefix='/api/workspace')
 
 @workspace_bp.route("/", methods=["GET"])
 def get_workspaces():

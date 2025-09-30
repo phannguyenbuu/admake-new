@@ -2,7 +2,7 @@ from flask import Blueprint, request, jsonify, abort
 from models import db, Task, dateStr
 import datetime
 
-task_bp = Blueprint('task', __name__, url_prefix='/task')
+task_bp = Blueprint('task', __name__, url_prefix='/api/task')
 
 @task_bp.route("/", methods=["GET"])
 def get_tasks():

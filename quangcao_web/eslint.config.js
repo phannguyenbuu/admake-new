@@ -9,18 +9,32 @@ export default tseslint.config({ ignores: ["dist"] });
 module.exports = {
   parser: '@typescript-eslint/parser', // parser cho TS
   parserOptions: {
-    ecmaVersion: 'latest', // hỗ trợ ES mới nhất
-    sourceType: 'module', // hỗ trợ import/export
+    ecmaVersion: 'latest',            // hỗ trợ ES mới nhất
+    sourceType: 'module',             // hỗ trợ import/export
     ecmaFeatures: {
-      jsx: true, // nếu dùng react jsx
+      jsx: true,                     // bật JSX (lưu ý không phải `js: true`)
     },
   },
-  plugins: ['@typescript-eslint', 'react'],
+  env: {
+    browser: true,
+    es2021: true,
+    node: true,
+  },
+  plugins: ['@typescript-eslint', 'react', 'react-hooks'],
   extends: [
+    'eslint:recommended',
     'plugin:@typescript-eslint/recommended',
     'plugin:react/recommended',
+    'plugin:react-hooks/recommended',
+    'plugin:react-refresh/recommended',
   ],
   rules: {
-    // các rule khác
-  }
+    // các rule bạn muốn ghi đè thêm
+  },
+  settings: {
+    react: {
+      version: 'detect', // tự động detect version React đang dùng
+    },
+  },
+  ignorePatterns: ['dist', 'node_modules'],
 };
