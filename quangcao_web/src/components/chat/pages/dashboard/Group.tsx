@@ -43,7 +43,7 @@ const Group = () => {
     //  const { userId, username } = user;
 
     
-    const { width, height} = useWindowDimensions();
+    // const { width, height} = useWindowDimensions();
 
     const handleDeleteMessage = (el:MessageTypeProps) =>{
     //  console.log('Delete userId:', userId, el);
@@ -53,7 +53,7 @@ const Group = () => {
     //      return;
     //  }
 
-     fetch(`${urlApi}/api/message/${el.message_id}`, { method: 'DELETE' })
+     fetch(`${urlApi}/message/${el.message_id}`, { method: 'DELETE' })
          .then(res => {
          if (!res.ok) throw new Error('Delete failed');
          return res.json();

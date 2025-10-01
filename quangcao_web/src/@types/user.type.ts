@@ -22,6 +22,7 @@ export type User = BaseEntity & {
   type: string;
   hashKey: string;
   role: Role;
+  role_id: number;
   avatar?: string;
   level_salary?: number;
   total_salary?: number;

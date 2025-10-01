@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
-import { useMemo } from 'react';
+import React, { useMemo } from 'react';
+import type { ReactNode } from 'react';
 // @mui
 import { alpha, ThemeProvider, createTheme, useTheme } from '@mui/material/styles';
 // hooks
@@ -7,15 +8,30 @@ import useSettings from '../../hooks/useSettings';
 //
 import componentsOverride from '../../theme/overrides';
 
-// ----------------------------------------------------------------------
+// Mở rộng interface Theme
+declare module '@mui/material/styles' {
+  interface Theme {
+    customShadows?: {
+      primary?: string;
+    };
+  }
+  interface ThemeOptions {
+    customShadows?: {
+      primary?: string;
+    };
+  }
+}
+
+interface ThemeColorPresetsProps {
+  children?: ReactNode;
+}
 
 ThemeColorPresets.propTypes = {
   children: PropTypes.node,
 };
 
-export default function ThemeColorPresets({ children }) {
+export default function ThemeColorPresets({ children }: ThemeColorPresetsProps) {
   const defaultTheme = useTheme();
-
   const { setColor } = useSettings();
 
   const themeOptions = useMemo(

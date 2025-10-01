@@ -14,6 +14,7 @@ from sqlalchemy import inspect
 from sqlalchemy import create_engine, MetaData, Table, select, insert
 from sqlalchemy.sql import func, text
 from psycopg2.extras import Json
+from sqlalchemy import create_engine, inspect
 
 def load_customers():
     with open("json/customers.json", "r", encoding="utf-8") as f:
@@ -99,27 +100,7 @@ def load_work_spaces():
 
         db.session.commit()
 
-def apply_role_for_user():
-    role_ids = [
-        "6879cd8e865fb3ae13aab099",
-        "6879cd8e865fb3ae13aab098",
-        "688923918d99dcb8816275c6",
-        "689ded9749f0334c7af17ddd",
-        "689e142749f0334c7af18aab",
-        "68abcd4fa4e729c9cfc889c9",
-        "68abcea3a4e729c9cfc88a55",
-    ]
 
-    for user in User.query.all():
-        if user.role_id in role_ids:
-            
-            idx = role_ids.index(user.role_id)
-            print('match', idx)
-            user.role_id = str(idx)
-
-    db.session.commit()
-
-from sqlalchemy import create_engine, inspect
 
 def show_collections_and_schema():
     # Thay connection string với thông tin PostgreSQL của bạn
@@ -259,7 +240,7 @@ CREATE TABLE "user" (
                 -username VARCHAR(255) NOT NULL,
                 -password VARCHAR(255) NOT NULL,
                 status VARCHAR(50),
-                role_id VARCHAR(50),
+                role_id INTEGER,
                 type VARCHAR(50),
                 hashKey VARCHAR(255),
                 fullName VARCHAR(255),
@@ -543,7 +524,7 @@ def transfer_customer_to_postgres():
                 fullName=row_dict.get("fullName"),
                 phone=row_dict.get("phone"),
                 status="active",
-                role_id="CUSTOMER",   # giả sử bạn đặt role CUSTOMER
+                role_id=-1,   # giả sử bạn đặt role CUSTOMER
             )
 
             db.session.add(new_user)
@@ -670,14 +651,25 @@ def update_users_with_accountId(json_file):
 def change_value_type(table, keys, type='VARCHAR(50)'):
     # for key in keys:
     #     db.session.execute(text(f'ALTER TABLE "{table}" ALTER COLUMN "{key}" TYPE {type};'))
-    db.session.execute(text(f'''UPDATE "user"
-    SET role_id = -1
-    WHERE role_id = 'CUSTOMER';'''))
-
-    db.session.execute(text(f'ALTER TABLE "user" ALTER COLUMN "role_id" TYPE INTEGER USING role_id::integer;'))
+    db.session.execute(text(
+        f'''
+CREATE SEQUENCE {table}_id_seq;
+ALTER TABLE "{table}" ALTER COLUMN id SET DEFAULT nextval('{table}_id_seq');
+ALTER SEQUENCE {table}_id_seq OWNED BY "{table}".id;
+'''))
 
     db.session.commit()
 
+def create_customer_role():
+    # Kiểm tra nếu role CUSTOMER đã tồn tại chưa
+    existing_role = db.session.query(Role).filter_by(name='CUSTOMER').first()
+    if not existing_role:
+        customer_role = Role(id=-1, name='CUSTOMER', permissions=[])
+        db.session.add(customer_role)
+        db.session.commit()
+        print("Tạo role CUSTOMER thành công")
+    else:
+        print("Role CUSTOMER đã tồn tại")
 
 def show_table():
     result = db.session.execute(text(f'''SELECT conname, confrelid::regclass AS referenced_table
@@ -778,10 +770,11 @@ if __name__ == "__main__":
         # update_users_with_accountId('user.json')
         
         # show_collections_and_schema()
-        # change_value_type('user', ['id'])
+        # change_value_type('role', ['id'], 'SERIAL')
+        # change_value_type('group', ['id'], 'SERIAL')
 
-    
-        change_value_type('user', ['role_id'], 'INTEGER')
+        # create_customer_role()
+        # change_value_type('user', ['role_id'], 'INTEGER')
         # renameColumn('group',"updateAt", "updatedAt")
 
         # for table in ['message','group_member']:
@@ -821,3 +814,12 @@ if __name__ == "__main__":
         
         # fix_invalid_foreign_keys()
         # change_foreign_key()
+
+
+        db.session.execute(text(
+        f'''
+        DELETE FROM "group" WHERE name LIKE 'Alice%';
+
+'''))
+
+        db.session.commit()

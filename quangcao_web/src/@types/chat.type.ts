@@ -37,11 +37,11 @@ export interface MessageTypeProps {
   
   createdAt: Date;
   updatedAt: Date;
-  deletedAt: Date;
+  deletedAt: Date | null;
 
   preview: string;
   reply: string;
-  user_role:string;
+  role:number;
   icon:string;
   status:string;
   

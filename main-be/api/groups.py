@@ -1,11 +1,14 @@
 from flask import Blueprint, request, jsonify, abort
-from models import db, app, socketio, Group, Message,User, dateStr, GroupMember, generate_datetime_id
+from models import db, app, Group, Message,User, dateStr, GroupMember, generate_datetime_id
+from api.chat import socketio
+from sqlalchemy import desc
 
 group_bp = Blueprint('group', __name__, url_prefix='/api/group')
 
 @group_bp.route("/", methods=["GET"])
 def get_groups():
-    return jsonify([c.to_dict() for c in Group.query.all()])
+    groups = Group.query.order_by(desc(Group.createdAt)).all()
+    return jsonify([c.to_dict() for c in groups])
 
 @group_bp.route("/member/", methods=["GET"])
 def get_group_members():
@@ -67,7 +70,6 @@ def create_message(group_id):
         return jsonify({'error': 'User not a member of the group'}), 403
 
     msg = Message(
-        group_id=group_id,
         user_id=user_id,
         username=User.query.get(user_id).username,
         text=text,

@@ -2,6 +2,7 @@ from flask import Blueprint, request, jsonify, abort
 from models import db, Workspace, Task, dateStr, generate_datetime_id
 import datetime
 from collections import defaultdict
+from sqlalchemy import desc
 
 workspace_bp = Blueprint('workspace', __name__, url_prefix='/api/workspace')
 
@@ -16,11 +17,12 @@ def get_workspaces():
     #     query = query.filter(Workspace.name.ilike(f"%{search}%"))
 
     # pagination = query.paginate(page=page, per_page=limit, error_out=False)
-    workspaces = [c.to_dict() for c in Workspace.query.all()]
+    workspaces = Workspace.query.order_by(desc(Workspace.createdAt)).all()
+       
 
     # print(workspaces)
 
-    return jsonify(workspaces)
+    return jsonify([c.to_dict() for c in workspaces])
 
 
 @workspace_bp.route("/", methods=["POST"])

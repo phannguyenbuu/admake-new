@@ -36,9 +36,6 @@ export const CustomerDashboard: IPage["Component"] = () => {
     }
   }, [customers]);
 
-
-   
-
   useEffect(() => {
   if (error) {
     console.error("Error fetching customers:", error);

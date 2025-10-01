@@ -103,10 +103,15 @@ local_dirs = [
     "main-be/models.py",
     "main-be/app.py",
     "main-be/.env",
-    # "main-be/api",
+    "main-be/api",
 
     # "quangcao_web/.env",
-    "main-be/api/groups.py"
+    # "main-be/api/chat.py",
+    # "main-be/api/messages.py",
+    # "main-be/api/groups.py",
+
+
+    # "quangcao_web/vite.config.ts"
 ]
 
 upload_to_vps_multiple(

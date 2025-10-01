@@ -12,7 +12,6 @@ from sqlalchemy import inspect
 from sqlalchemy import create_engine, MetaData, Table, select, insert
 from sqlalchemy.sql import func, text
 from psycopg2.extras import Json
-from flask_socketio import SocketIO, join_room, leave_room, emit
 
 app = Flask(__name__)
 # base_dir = os.path.abspath(os.path.dirname(__file__))
@@ -27,7 +26,7 @@ load_dotenv()
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
 db = SQLAlchemy(app)
 
-socketio = SocketIO(app, cors_allowed_origins='*')
+
 
 
 CORS(app)
@@ -90,7 +89,7 @@ class User(BaseModel):
     username = db.Column(db.String(255), nullable=False)
     password = db.Column(db.String(255), nullable=False)
     status = db.Column(db.String(50))
-    role_id = db.Column(db.String(50))  # lấy từ role.$oid
+    role_id = db.Column(db.Integer)
     type = db.Column(db.String(50))
     hashKey = db.Column(db.String(255))
     fullName = db.Column(db.String(255))
@@ -102,7 +101,7 @@ class User(BaseModel):
     is_active = db.Column(db.Boolean, default=False)
     is_anonymous = db.Column(db.Boolean, default=False)
     balanceAmount = db.Column(db.String(80), nullable=True)
-    # accountId = db.Column(db.String(50), nullable=True)
+    
     firstName = db.Column(db.String(80), nullable=True)
     lastName = db.Column(db.String(80), nullable=True)
     icon = db.Column(db.String)
@@ -123,15 +122,10 @@ class User(BaseModel):
     # version = db.Column(db.Integer)
 
     def update_role(self):
-        try:
-            role_id_int = int(self.role_id)
-        except (TypeError, ValueError):
-            role_id_int = None
+        role = db.session.get(Role, self.role_id)
 
-        if role_id_int:
-            role = db.session.get(Role, role_id_int)
-            if role:
-                return role.to_dict()
+        if role:
+            return role.to_dict()
 
     def to_dict(self):
         result = {}
@@ -148,13 +142,16 @@ class User(BaseModel):
 
     @staticmethod
     def parse(data):
+        role_id_value = data.get('role_id')
+        if role_id_value in ('undefined', '', None):
+            role_id_value = None
         return User(
             id = generate_datetime_id(),
             # id=data.get("_id", {}).get("$oid"),
             username=data.get("username"),
             password=data.get("password"),
             status="active",
-            role_id=data.get("role"),
+            role_id=role_id_value,
             type=data.get("type"),
             hashKey=data.get("hashKey"),
             fullName=data.get("fullName"),
@@ -206,7 +203,7 @@ class Role(BaseModel):
     __tablename__ = 'role'
     __table_args__ = {'extend_existing': True}
 
-    id = db.Column(db.Integer, primary_key=True)  # lấy từ _id.$oid
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     
     permissions = db.Column(JSON)  # lưu list permissions
     name = db.Column(db.String(255))
@@ -369,7 +366,7 @@ class Group(BaseModel):
     __tablename__ = 'group'
     __table_args__ = {'quote': True}
 
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     # groupId = db.Column(db.Integer, unique=True)
     name = db.Column(db.String(120), nullable=True)
     description = db.Column(db.String(255))
@@ -397,7 +394,6 @@ class Group(BaseModel):
     @staticmethod
     def create_item(params):
         group = Group(
-            groupId=params.get('id', 0),
             name=params.get('name', 0),
             description=params.get('description', ''),
 
@@ -505,15 +501,14 @@ from sqlalchemy.exc import IntegrityError
 class Message(BaseModel):
     __tablename__ = 'message'
 
-    id = db.Column(db.String(50), primary_key=True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+
     message_id = db.Column(db.String(80))
     group_id = db.Column(db.Integer, db.ForeignKey('group.id'), nullable=True)
     user_id = db.Column(db.String(80), db.ForeignKey('user.id'), nullable=True)
     
     text = db.Column(db.String(500))
     file_url = db.Column(db.String(255), nullable=True)
-    # createdAt = db.Column(db.DateTime(timezone=True), server_default=func.now())
-    # updatedAt = db.Column(db.DateTime(timezone=True), server_default=func.now())
     
     is_unread = db.Column(db.Boolean, default=False)
     is_favourite = db.Column(db.Boolean, default=False)
@@ -533,7 +528,7 @@ class Message(BaseModel):
                 value = value.isoformat()
             result[column.name] = value
         
-        result["username"] = result["user_id"]
+        result["role"] = self.user.role_id
         return result
 
     @staticmethod
@@ -552,7 +547,12 @@ class Message(BaseModel):
                     text=params.get('text', ''),
                     # username=params.get('username', ''),
                     is_unread=params.get('is_unread', '') != 'SUCCESS',
-                    
+                    file_url = params.get('file_url',''),
+                    is_favourite = params.get('is_favourite', True),
+                    react = params.get('react',''),
+                    type = params.get('type',''),
+                    id = params.get('id',''),
+                    message_id = params.get('message_id',''),
                 )
                 
                 db.session.add(msg)

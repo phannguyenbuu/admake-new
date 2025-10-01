@@ -1,7 +1,13 @@
 from flask_socketio import SocketIO, join_room, leave_room, emit
 from flask import Flask, request, jsonify
-from models import Message, socketio, db, app
+from models import Message, db, app, User
 import datetime
+
+socketio = SocketIO(app, cors_allowed_origins='*')
+
+@socketio.on('connect')
+def on_connect():
+    print('------------------------------Client connected:', request.sid)
 
 @socketio.on('admake/chat/join_group')
 def on_join_group(data):
@@ -24,17 +30,23 @@ def on_leave_group(data):
 
 @socketio.on('admake/chat/message')
 def handle_message(data):
+    first_user = User.query.first()
+    if first_user is not None:
+        user_id = first_user.id  # Lấy id của user đầu tiên
+    else:
+        user_id = None  # Hoặc giá trị mặc định phù hợp
+
     
     print('Receive data', data)
     group_id = data['group_id']
     message_id = data['message_id']
-    user_id = data['user_id']
+    # user_id = User.query.first() # data['user_id']
     username = data['username']
     # icon = data['icon']
     text = data.get('text')
     file_url = data.get('file_url')
     link = data.get('link')
-    time = datetime.now()
+    time = datetime.datetime.now()
     time_str = time.isoformat()
 
     type = 'msg'
@@ -66,7 +78,7 @@ def handle_message(data):
         'username': username,
         'link': link,
         'group_id': group_id,
-        'time': time_str,
+        'createdAt': time_str,
         'incoming': False,
     }, room=str(group_id), skip_sid=request.sid)
 

@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useInfiniteQuery } from "@tanstack/react-query";
 import type { PaginationDto } from "../../@types/common.type";
 import { UserService } from "../../services/user.service";
-import type { User } from '../@types/user.type';
+import type { User } from "../../@types/user.type";
 
 export const USER_QUERY_KEY = "user/queryPagination";
 export const USER_DETAIL_QUERY_KEY = "user/queryDetail";
@@ -22,13 +22,13 @@ export function useUserDetail(id?: string) {
 
 export function useCreateUser() {
   return useMutation({
-    mutationFn: (dto: FormData) => UserService.create(dto),
+    mutationFn: (dto: User) => UserService.create(dto),
   });
 }
 
 export function useUpdateUser() {
   return useMutation({
-    mutationFn: ({ dto, id }: { dto: FormData; id: string }) =>
+    mutationFn: ({ dto, id }: { dto: User; id: string }) =>
       UserService.update(id, dto),
   });
 }

@@ -224,6 +224,7 @@ const Footer = forwardRef<HTMLDivElement, FooterProps>(
   }, [groupId]);
 
   const sendMessage = (message: string, file_url = '') => {
+    
     if (socket.connected) {
       const timestamp = Date.now();
       
@@ -231,7 +232,7 @@ const Footer = forwardRef<HTMLDivElement, FooterProps>(
         id: generateUniqueIntId(),
         preview: '',
         reply: '',
-        user_role: '',
+        role: 0,
         icon: '',
         type: getTypeName(file_url),
         incoming: false,
@@ -242,9 +243,13 @@ const Footer = forwardRef<HTMLDivElement, FooterProps>(
         file_url,
         link: '',
         message_id: `temp-${timestamp}`,
-        time: new Date(timestamp),
+        createdAt: new Date(timestamp),
+        updatedAt: new Date(timestamp),
+        deletedAt: null,
         status: 'sending'
       };
+
+      console.log('Send message', socket.io.opts.host, data);
 
       setMessages(prev => [...prev, data]);
       socket.emit('admake/chat/message', data);

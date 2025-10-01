@@ -22,6 +22,13 @@ import { Link as RouterLink } from 'react-router-dom';
 
 const baseUrl = useApiStatic();
 
+function get_role_name(role:number):string {
+  if(role === -1)
+    return "Khách hàng"
+  else
+    return "Công ty"
+}
+
 export function formatTime(datetimeStr: Date): string {
     // const datetimeStr = "2025-09-08T07:40:10.608041+07:00";
 
@@ -70,7 +77,7 @@ const DocMsg:React.FC<MsgTypeProps> = ({ el, menu, onDelete }) => {
   return (
     <Stack direction="row" justifyContent={el.incoming ? "start" : "end"}>
       <Box
-        p={1.5}
+        p={0.2}
         sx={{
           backgroundColor: el.incoming
             ? theme.palette.background.default
@@ -110,7 +117,7 @@ const LinkMsg: React.FC<MsgTypeProps> = ({el,menu,onDelete}) => {
   const theme = useTheme();
   return (
     <Stack direction='row' justifyContent={el.incoming ? 'start' : 'end'}>
-        <Box p={1.5} sx={{
+        <Box p={0.2} sx={{
                 backgroundColor: el.incoming ? theme.palette.background.default :
                     theme.palette.primary.main, borderRadius: 1.5, width: 'max-content'
             }}>
@@ -139,7 +146,7 @@ const ReplyMsg: React.FC<MsgTypeProps> = ({el, menu, onDelete}) => {
     const theme = useTheme();
   return (
     <Stack direction='row' justifyContent={el.incoming ? 'start' : 'end'}>
-        <Box p={1.5} sx={{
+        <Box p={0.2} sx={{
                 backgroundColor: el.incoming ? theme.palette.background.default :
                     theme.palette.primary.main, borderRadius: 1.5, width: 'max-content'
             }}>
@@ -169,7 +176,7 @@ const MediaMsg: React.FC<MsgTypeProps> = ({ el, menu,onDelete }) => {
   return (
     <Stack direction="row" justifyContent={el.incoming ? 'start' : 'end'}>
       <Box
-        p={1.5}
+        p={0.2}
         sx={{
           backgroundColor: el.incoming ? theme.palette.background.default : theme.palette.primary.main,
           borderRadius: 1.5,
@@ -184,8 +191,9 @@ const MediaMsg: React.FC<MsgTypeProps> = ({ el, menu,onDelete }) => {
               style={{ maxHeight: 210, borderRadius: '10px', cursor: 'pointer' }} 
             />
           </a>
-          <Typography variant='body2' color={ el.incoming ? "#000" : '#fff'}>
-            {formatTime(el.createdAt)}
+          <Typography variant='body2'  fontStyle="italic" color={ el.incoming ? "#000" : '#fff'} 
+            fontSize='0.5rem' fontWeight={300}>
+            {formatTime(el.createdAt)}-{el.user_id}
           </Typography>
         </Stack>
       </Box>
@@ -204,7 +212,7 @@ const TextMsg: React.FC<MsgTypeProps> = ({el, menu, onDelete}) => {
     // const [bkColor, setBkColor ] = useState("#fff");
     // const [textColor, setTextColor ] = useState("#000");
 
-    const isIncoming = true; //username !== el.user_role;
+    const isIncoming = el.role < 0; //username !== el.user_role;
     // console.log('TextMsg',username, el.user_role);
 
     const bkColor = isIncoming
@@ -223,19 +231,22 @@ const TextMsg: React.FC<MsgTypeProps> = ({el, menu, onDelete}) => {
                 sx={{ backgroundColor: bkColor, borderRadius: 1.5, width: 'max-content', height:'fit-content'}}>
                 {isIncoming && 
                     <Stack direction='row' alignItems="center" spacing={1}>
-                        <Avatar alt={el.username} src={el.icon || '/images/avatar.png'} sx={{ width: 24, height: 24 }} />
-                        <Typography key={`DefaultMsg-${el.message_id}-Username`} variant="subtitle2" color={textColor}>
-                        {el.username}
+                        <Avatar alt={get_role_name(el.role)} src={el.icon || '/images/avatar.png'} sx={{ width: 24, height: 24 }} />
+                        <Typography key={`DefaultMsg-${el.message_id}-Username`} 
+                          variant="subtitle2" color={textColor} fontSize='0.75rem' fontWeight={500}>
+                        {get_role_name(el.role)}
                         </Typography>
                     </Stack>
                 }
 
-                <Typography key={`DefaultMsg-${el.message_id}-Text`} variant="body2" p={5} color={textColor}>
+                <Typography key={`DefaultMsg-${el.message_id}-Text`} 
+                  variant="body2" p={1} color={textColor} fontSize='0.75rem' fontWeight={300}>
                     {el.text}
                 </Typography>
                 
-                <Typography key={`DefaultMsg-${el.message_id}-Time`} variant="body2" fontStyle="italic" fontSize={10} color={textColor}>
-                    {formatTime(el.createdAt)}
+                <Typography key={`DefaultMsg-${el.message_id}-Time`} 
+                  variant="body2" fontStyle="italic" fontSize='0.5rem' fontWeight={300} color={textColor}>
+                    {formatTime(el.createdAt)}-{el.user_id}
                 </Typography>
             </Box>
             {menu && <MessageOptions el={el} onDelete={()=>onDelete(el)}/>}
@@ -258,7 +269,7 @@ const TimeLine: React.FC<MsgTypeProps> = ({ el }) => {
 const MessageOptions: React.FC<MsgTypeProps> = ({el, onDelete }) => {
   if(!el) return null;
   // const { userId, username } = useUser();
-  const isIncoming = true; // username !== el.user_role;
+  const isIncoming = el.role < 0; // username !== el.user_role;
 
     // console.log('MessageOptions',username, el.user_role);
 

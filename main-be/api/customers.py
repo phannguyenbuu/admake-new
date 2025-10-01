@@ -1,6 +1,8 @@
 from flask import Blueprint, request, jsonify, abort
 from models import db, Customer, dateStr, User, generate_datetime_id
+from api.groups import create_group
 import datetime
+from sqlalchemy import desc
 
 customer_bp = Blueprint('customer', __name__, url_prefix='/api/customer')
 def get_model_columns(model):
@@ -18,6 +20,8 @@ def get_customers():
     query = Customer.query
     if search:
         query = query.filter(Customer.fullName.ilike(f"%{search}%"))
+
+    query = query.order_by(desc(Customer.workStart))
 
     pagination = query.paginate(page=page, per_page=limit, error_out=False)
     customers = [c.to_dict() for c in pagination.items]
@@ -54,7 +58,7 @@ def create_customer():
     new_user = User(
         id=generate_datetime_id(),   # ✅ bắt buộc gán id string
         **user_data,
-        role_id="CUSTOMER"
+        role_id=-1
     )
     db.session.add(new_user)
     db.session.flush()  # lấy id mà chưa commit
@@ -69,9 +73,6 @@ def create_customer():
     db.session.commit()
 
     return jsonify(new_customer.to_dict()), 201
-
-
-
 
 @customer_bp.route("/<string:id>", methods=["GET"])
 def get_customer_detail(id):

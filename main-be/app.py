@@ -4,7 +4,7 @@ import json
 import datetime
 import os
 import sys
-from models import app, db, socketio
+from models import app, db
 from dotenv import load_dotenv
 
 base_dir = os.path.abspath(os.path.dirname(__file__))
@@ -30,6 +30,8 @@ app.register_blueprint(task_bp)
 app.register_blueprint(workspace_bp)
 app.register_blueprint(group_bp)
 app.register_blueprint(message_bp)
+
+from api.chat import socketio
 
 load_dotenv()  # load biến môi trường trong file .env vào process.env
 # VITE_API_HOST = os.getenv("VITE_API_HOST")

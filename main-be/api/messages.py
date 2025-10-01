@@ -1,5 +1,6 @@
 from flask import Blueprint, request, jsonify, abort
-from models import db, socketio, app, dateStr, Message
+from models import db, app, dateStr, Message
+from api.chat import socketio
 import os
 
 message_bp = Blueprint('message', __name__, url_prefix='/api/message')
@@ -38,14 +39,14 @@ def create_message():
 
     return jsonify(new_message.to_dict()), 201
 
-@message_bp.route("/<int:id>", methods=["GET"])
+@message_bp.route("/<string:id>", methods=["GET"])
 def get_message_detail(id):
     message = db.session.get(message, id)
     if not message:
         abort(404, description="Message not found")
     return jsonify(message.to_dict())
 
-@message_bp.route("/<int:id>", methods=["PUT"])
+@message_bp.route("/<string:id>", methods=["PUT"])
 def update_message(id):
     data = request.get_json()
     # print(data)
@@ -60,7 +61,7 @@ def update_message(id):
     db.session.commit()
     return jsonify(role.to_dict()), 200
 
-@message_bp.route("/<int:id>", methods=['DELETE'])
+@message_bp.route("/<string:message_id>", methods=['DELETE'])
 def delete_message(message_id):
     message = Message.query.filter_by(message_id=message_id).first()
 
@@ -80,7 +81,7 @@ def delete_message(message_id):
         app.logger.error(f"Delete message failed: {e}", exc_info=True)
         return jsonify({"error": "Delete message failed", "details": str(e)}), 500
 
-@message_bp.route('/api/upload', methods=['POST'])
+@message_bp.route('/upload', methods=['POST'])
 def upload_file():
     if 'file' not in request.files:
         return jsonify({'error': 'No file provided'}), 400

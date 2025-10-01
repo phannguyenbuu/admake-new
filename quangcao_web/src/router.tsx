@@ -30,6 +30,7 @@ import { WorkPointsPage } from "./app/dashboard/work-points/page";
 import { useInfo } from "./common/hooks/info.hook";
 // import Error403 from "./app/403";
 import { Navigate } from "react-router-dom";
+import QrPage from "./components/qr/QrPage";
 
 // Route guard: chặn truy cập nếu không có quyền
 function RequireRoles({
@@ -82,6 +83,13 @@ const routes: TRoute = {
       title: "Đăng nhập",
       ignoreInMenu: true,
     },
+    
+    {
+  path: "qr/:name/:description",
+  element: <QrPage />,
+  title: "QR Code Dynamic",
+  ignoreInMenu: true,
+},
 
 
 
@@ -206,7 +214,7 @@ const routes: TRoute = {
           title: "Hồ sơ",
           icon: <UserOutlined />,
           ignoreInMenu: false,
-        },
+        }
       ],
     },
   ],
