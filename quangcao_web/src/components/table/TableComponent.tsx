@@ -4,6 +4,7 @@ import { useStyle } from "../../common/hooks/styles.hook";
 
 export default function TableComponents<T>({ ...props }: TableProps<T>) {
   const { styles } = useStyle();
+  
   return (
     <div>
       <div className="bg-white/90 rounded-xl shadow-lg overflow-x-auto">

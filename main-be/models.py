@@ -123,6 +123,8 @@ class User(BaseModel):
     selectedProvider = db.Column(db.JSON)
     selectedServices = db.Column(db.JSON)
 
+    workpoints = db.relationship('Workpoint', backref='user', lazy=True)
+
     # customer = db.relationship("Customer", back_populates="user", uselist=False)
 
     # deletedAt = db.Column(db.DateTime, nullable=True)
@@ -566,6 +568,71 @@ class Message(BaseModel):
                 return msg
             else:
                 print('No exist',user_id,group_id)
+        except IntegrityError as e:
+            db.session.rollback()
+            # Kiểm tra có phải lỗi unique constraint vi phạm không
+            if 'user_accountId_key' in str(e.orig):
+                print("Duplicate accountId, bỏ qua bản ghi này")
+                # Hoặc xử lý theo ý bạn, ví dụ bỏ qua, log lại,...
+            else:
+                raise  # lỗi khác thì raise tiếp
+
+class Workpoint(BaseModel):
+    __tablename__ = 'workpoint'
+    id = db.Column(db.String(80), primary_key=True)
+    note = db.Column(db.String(255))
+
+    checklist = db.Column(db.JSON)
+    user_id = db.Column(db.String(80), db.ForeignKey('user.id'), nullable=True)
+
+    def __repr__(self):
+        return f'<Workpoint id={self.id} user_id={self.user_id}>'
+    
+    def to_dict(self):
+        result = {}
+        for column in self.__table__.columns:
+            value = getattr(self, column.name)
+            # print(f"DEBUG: Column {column.name} value type: {type(value)}")
+            if isinstance(value, (datetime.datetime, datetime.date)):
+                value = value.isoformat()
+            result[column.name] = value
+        
+        # result["role"] = self.user.role_id
+        return result
+    
+    def check_point(self, timeIndex, checkType, imgUrl):
+        if self.checklist is None:
+            self.checklist = {}
+
+        if timeIndex not in self.checklist:
+            self.checklist[timeIndex] = {}
+
+        self.checklist[timeIndex][checkType] = {
+            "time": datetime.datetime.utcnow().time().isoformat(),
+            "img": imgUrl
+        }
+
+        db.session.add(self)  # Đánh dấu obj cần update
+        db.session.commit()   # Lưu thay đổi
+
+
+    @staticmethod
+    def create_item(params):
+        try:
+            user_id = params.get('user_id','')
+            user_exists = User.query.filter_by(accountId=user_id).first()
+            
+            if user_exists:
+                # print(accountId, group.id)
+                msg = Workpoint(
+                    user_id=user_id,
+                )
+                
+                db.session.add(msg)
+                db.session.commit()
+                return msg
+            else:
+                print('No exist',user_id)
         except IntegrityError as e:
             db.session.rollback()
             # Kiểm tra có phải lỗi unique constraint vi phạm không

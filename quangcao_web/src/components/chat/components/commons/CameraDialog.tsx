@@ -1,69 +1,65 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Box,
   Stack,
   Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  Typography,
   Select,
   MenuItem,
-  FormControl,
-  InputLabel
-} from '@mui/material';
-import { ArrowClockwise } from "phosphor-react";
-import { useUser } from "../../../../common/hooks/useUser";
+  InputLabel,
+  Typography
+} from "@mui/material";
 
+import { useApiHost } from "../../../../common/hooks/useApiHost";
+import type { User } from "../../../../@types/user.type";
 
+interface CameraSelectorProps {
+  onDeviceChange?: (deviceId: string) => void;
+}
 
-
-
-const CameraSelector = () => {
-  const videoRef = useRef(null);
-  const [devices, setDevices] = useState([]);
-  const [selectedDeviceId, setSelectedDeviceId] = useState(null);
-  const [stream, setStream] = useState(null);
-  const [error, setError] = useState("");
-  const [isFrontCamera, setIsFrontCamera] = useState(true);
-
-
-
+const CameraSelector: React.FC<CameraSelectorProps> = ({ onDeviceChange }) => {
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const [devices, setDevices] = useState<MediaDeviceInfo[]>([]);
+  const [selectedDeviceId, setSelectedDeviceId] = useState<string | null>(null);
+  const [stream, setStream] = useState<MediaStream | null>(null);
+  const [error, setError] = useState<string>("");
+  const [isFrontCamera, setIsFrontCamera] = useState(true); // currently unused
 
   useEffect(() => {
     const getDevices = async () => {
       try {
         const devices = await navigator.mediaDevices.enumerateDevices();
-        const videoDevices = devices.filter(device => device.kind === "videoinput");
+        const videoDevices = devices.filter(
+          (device) => device.kind === "videoinput"
+        );
         setDevices(videoDevices);
         if (videoDevices.length > 0) {
           setSelectedDeviceId(videoDevices[0].deviceId);
+          if (onDeviceChange) onDeviceChange(videoDevices[0].deviceId);
         }
-      } catch (err) {
+      } catch (err: any) {
         setError("Không thể lấy danh sách camera: " + err.message);
       }
     };
 
     getDevices();
-  }, []);
+  }, [onDeviceChange]);
 
   useEffect(() => {
     const startStream = async () => {
       if (stream) {
-        stream.getTracks().forEach(track => track.stop());
+        stream.getTracks().forEach((track) => track.stop());
       }
       if (!selectedDeviceId) return;
       try {
         const newStream = await navigator.mediaDevices.getUserMedia({
-          video: { deviceId: { exact: selectedDeviceId } }
+          video: { deviceId: { exact: selectedDeviceId } },
         });
         setStream(newStream);
         if (videoRef.current) {
           videoRef.current.srcObject = newStream;
         }
         setError("");
-      } catch (err) {
+      } catch (err: any) {
         setError("Lỗi truy cập camera: " + err.message);
       }
     };
@@ -72,28 +68,28 @@ const CameraSelector = () => {
 
     return () => {
       if (stream) {
-        stream.getTracks().forEach(track => track.stop());
+        stream.getTracks().forEach((track) => track.stop());
       }
     };
-  }, [selectedDeviceId]);
-  
+  }, [selectedDeviceId, stream]);
+
+  const handleChange = (e: React.ChangeEvent<{ value: unknown }>) => {
+    const deviceId = e.target.value as string;
+    setSelectedDeviceId(deviceId);
+    if (onDeviceChange) onDeviceChange(deviceId);
+  };
 
   return (
     <div>
       <h3>Chọn Camera:</h3>
-      <select
-        value={selectedDeviceId || ""}
-        onChange={(e) => setSelectedDeviceId(e.target.value)}
-      >
-        {devices.map(device => (
+      <select value={selectedDeviceId ?? ""} onChange={handleChange}>
+        {devices.map((device) => (
           <option key={device.deviceId} value={device.deviceId}>
             {device.label || device.deviceId}
           </option>
         ))}
       </select>
-
       {error && <p style={{ color: "red" }}>{error}</p>}
-
       <div>
         <video
           ref={videoRef}
@@ -110,52 +106,70 @@ const CameraSelector = () => {
 
 
 
+async function postWorkpointCheck(user_id: string, imgUrl: string) {
+  const url = `${useApiHost()}/workpoint/check/${user_id}/${imgUrl}/`;
 
-const CameraDialog = ({ open, setOpen, dialogTitle }) => {
-  const videoRef = useRef(null);
-  const canvasRef = useRef(null);
-  const {userId} = useUser();
+  try {
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        // Nếu không gửi body thì Content-Type có thể không cần
+        "Content-Type": "application/json",
+      },
+      // Nếu bạn có muốn gửi một body JSON kèm theo thì có thể thêm:
+      // body: JSON.stringify({ someData: 'value' }),
+    });
 
-  const [error, setError] = useState(null);
-  const [position, setPosition] = useState({ latitude: null, longitude: null });
-  const [stream, setStream] = useState(null);
-  const [receiver, setReceiver] = useState('environment');
-  const [imageData, setImageData] = useState(null);
-  const [imageURL, setImageURL] = useState(null);
-  const [statusMsg, setStatusMsg] = useState('');
-  const [sendSuccessMsg, setSendSuccessMsg] = useState('');
-  const [step, setStep] = useState(1); // 1: Chụp, 2: Xem
-  const [captured, setCaptured] = useState(false);
-
-  const getVideoDevices = async () => {
-    const devices = await navigator.mediaDevices.enumerateDevices();
-    return devices.filter(device => device.kind === 'videoinput');
-  }
-
-  const checkCameraAccess = async () => {
-    const videoDevices = await getVideoDevices();
-
-    for (const device of videoDevices) {
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({
-          video: { deviceId: { exact: device.deviceId } }
-        });
-        console.log(`Có quyền truy cập camera: ${device.label}`);
-        stream.getTracks().forEach(track => track.stop());
-      } catch (err) {
-        console.log(`Không thể truy cập camera ${device.label}:`, err.message);
-      }
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
     }
-  };
 
-checkCameraAccess();
+    const data = await response.json();
+    console.log("Response data:", data);
+    return data;
+  } catch (error) {
+    console.error("Fetch error:", error);
+    throw error;
+  }
+}
 
+
+
+
+interface CameraDialogProps {
+  open: boolean;
+  setOpen: (open: boolean) => void;
+  dialogTitle: string;
+  userEl: User | null;
+}
+
+const CameraDialog: React.FC<CameraDialogProps> = ({
+  open,
+  setOpen,
+  dialogTitle,
+  userEl,
+}) => {
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  
+  const [error, setError] = useState<string | null>(null);
+  const [position, setPosition] = useState<{ latitude: number | null; longitude: number | null }>({
+    latitude: null,
+    longitude: null,
+  });
+  const [stream, setStream] = useState<MediaStream | null>(null);
+  const [receiver, setReceiver] = useState<string>("environment");
+  const [imageData, setImageData] = useState<Blob | null>(null);
+  const [imageURL, setImageURL] = useState<string | null>(null);
+  const [statusMsg, setStatusMsg] = useState<string>("");
+  const [sendSuccessMsg, setSendSuccessMsg] = useState<string>("");
+  const [step, setStep] = useState<number>(1); // 1: Chụp, 2: Xem
+  const [captured, setCaptured] = useState<boolean>(false);
 
   useEffect(() => {
     if (!open) {
-      
       if (stream) {
-        stream.getTracks().forEach(t => t.stop());
+        stream.getTracks().forEach((t) => t.stop());
       }
       setStep(1);
       setCaptured(false);
@@ -163,35 +177,22 @@ checkCameraAccess();
       setImageData(null);
       setPosition({ latitude: null, longitude: null });
       setError(null);
-      setSendSuccessMsg('');
+      setSendSuccessMsg("");
       return;
     }
-
     const getCameraStream = async () => {
-      
       if (stream) {
-        stream.getTracks().forEach(t => t.stop());
+        stream.getTracks().forEach((t) => t.stop());
       }
-
-      // checkCameraAccess();
-      
-      // navigator.permissions.query({ name: 'camera' })
-      // .then(permissionStatus => {
-      //   console.log('Trạng thái quyền camera:', permissionStatus.state); // granted, denied, prompt
-
-      //   permissionStatus.onchange = () => {
-      //     console.log('Quyền camera thay đổi:', permissionStatus.state);
-      //   };
-      // });
-
-
       try {
         const devices = await navigator.mediaDevices.enumerateDevices();
-        const videoDevices = devices.filter(device => device.kind === 'videoinput');
-        console.log('Danh sách camera:', videoDevices);
+        const videoDevices = devices.filter(
+          (device) => device.kind === "videoinput"
+        );
+        console.log("Danh sách camera:", videoDevices);
 
         const newStream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: receiver }
+          video: { facingMode: receiver },
         });
 
         setStream(newStream);
@@ -199,7 +200,7 @@ checkCameraAccess();
           videoRef.current.srcObject = newStream;
         }
         setError(null);
-      } catch (err) {
+      } catch (err: any) {
         setError("Lỗi truy cập camera: " + err.message);
       }
     };
@@ -208,11 +209,10 @@ checkCameraAccess();
 
     return () => {
       if (stream) {
-        stream.getTracks().forEach(t => t.stop());
+        stream.getTracks().forEach((t) => t.stop());
       }
     };
   }, [open, receiver]);
-
 
   const getLocation = () => {
     if (!navigator.geolocation) {
@@ -220,15 +220,17 @@ checkCameraAccess();
       return;
     }
     navigator.geolocation.getCurrentPosition(
-      pos => {
+      (pos) => {
         setPosition({
           latitude: pos.coords.latitude,
           longitude: pos.coords.longitude,
         });
-        setStatusMsg(`Vị trí: ${pos.coords.latitude.toFixed(6)}, ${pos.coords.longitude.toFixed(6)}`);
+        setStatusMsg(
+          `Vị trí: ${pos.coords.latitude.toFixed(6)}, ${pos.coords.longitude.toFixed(6)}`
+        );
         setError(null);
       },
-      err => setError("Lỗi lấy vị trí: " + err.message),
+      (err) => setError("Lỗi lấy vị trí: " + err.message),
       { enableHighAccuracy: true }
     );
   };
@@ -239,12 +241,19 @@ checkCameraAccess();
     const canvas = canvasRef.current;
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-    canvas.toBlob(blob => {
-      setImageData(blob);
-      setImageURL(URL.createObjectURL(blob));
-    }, 'image/jpeg', 0.95);
+    canvas.toBlob(
+      (blob) => {
+        setImageData(blob);
+        if (blob) {
+          setImageURL(URL.createObjectURL(blob));
+        }
+      },
+      "image/jpeg",
+      0.95
+    );
     setCaptured(true);
     getLocation();
     setStep(2);
@@ -255,66 +264,86 @@ checkCameraAccess();
     setCaptured(false);
     setImageURL(null);
     setImageData(null);
-    setSendSuccessMsg('');
+    setSendSuccessMsg("");
   };
 
   const handleSend = async () => {
-    if (!imageData) {
-      setError("Vui lòng chụp hình trước khi gửi");
-      return;
-    }
-    if (!position.latitude || !position.longitude) {
-      setError("Vui lòng lấy vị trí GPS trước khi gửi");
-      return;
-    }
-    const formatDate = date => {
-      const pad = n => (n < 10 ? '0' + n : n);
-      return date.getFullYear().toString() 
-        + pad(date.getMonth() + 1) 
-        + pad(date.getDate()) 
-        + "_" 
-        + pad(date.getHours()) 
-        + pad(date.getMinutes()) 
-        + pad(date.getSeconds());
+    // if (!imageData) {
+    //   setError("Vui lòng chụp hình trước khi gửi");
+    //   return;
+    // }
+    // if (!position.latitude || !position.longitude) {
+    //   setError("Vui lòng lấy vị trí GPS trước khi gửi");
+    //   return;
+    // }
+
+    const formatDate = (date: Date): string => {
+      const pad = (n: number) => (n < 10 ? "0" + n : n);
+      return (
+        date.getFullYear().toString() +
+        pad(date.getMonth() + 1) +
+        pad(date.getDate()) +
+        "_" +
+        pad(date.getHours()) +
+        pad(date.getMinutes()) +
+        pad(date.getSeconds())
+      );
     };
     const now = new Date();
     const dateTimeStr = formatDate(now);
     const lat = position.latitude ? position.latitude.toFixed(6) : "null";
     const long = position.longitude ? position.longitude.toFixed(6) : "null";
-    const filename = `att_${dateTimeStr}_${lat}_${long}_${userId}.jpg`;
+    const filename = `workpoint_${userEl?.id}_${dateTimeStr}_${lat}_${long}.jpg`;
+
     const formData = new FormData();
-    formData.append("file", imageData, filename);
-    formData.append("latitude", position.latitude);
-    formData.append("longitude", position.longitude);
-    formData.append("receiver", receiver);
-    try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/upload`, {
+    formData.append("latitude", position.latitude?.toString() ?? "");
+    formData.append("longitude", position.longitude?.toString() ?? "");
+    formData.append("time", dateTimeStr);
+
+    if(imageData)
+    {
+      formData.append("file", imageData, filename);
+
+      fetch(`${useApiHost()}/api/message/upload`, {
         method: "POST",
-        body: formData,
+        body: formData
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then(result => {
+        postWorkpointCheck(userEl?.id ?? '', filename);
+
+        setSendSuccessMsg(`Đã gửi thành công! Link: ${filename}`);
+        setTimeout(() => {
+          setOpen(false);
+          setStep(1);
+          setCaptured(false);
+          setImageURL(null);
+          setImageData(null);
+          setPosition({ latitude: null, longitude: null });
+          setError(null);
+          setSendSuccessMsg("");
+        }, 2000);
+      })
+      .catch((err) => {
+        setError("Lỗi upload ảnh: " + err.message);
       });
-      const result = await response.json();
-      setSendSuccessMsg(`Đã gửi thành công! Link: ${filename}`);
-      setTimeout(() => {
-        setOpen(false);
-        setStep(1);
-        setCaptured(false);
-        setImageURL(null);
-        setImageData(null);
-        setPosition({ latitude: null, longitude: null });
-        setError(null);
-        setSendSuccessMsg('');
-      }, 2000);
-    } catch (err) {
-      setError("Lỗi upload ảnh: " + err.message);
+
+    }else{
+      postWorkpointCheck(userEl?.id ?? '', filename);
+      console.log('Form Data',filename, formData);
     }
   };
 
   return (
-    <Dialog open={open} onClose={() => setOpen(false)} maxWidth="sm" fullWidth>
-      <DialogTitle>{dialogTitle}</DialogTitle>
-      <DialogContent>
-        
-        <FormControl fullWidth sx={{ mb: 2 }}>
+    <Stack>
+      
+      <Stack>
+        <Stack>
           <InputLabel id="receiver-label">Camera</InputLabel>
           <Select
             labelId="receiver-label"
@@ -325,7 +354,7 @@ checkCameraAccess();
             <MenuItem value="user">Trước</MenuItem>
             <MenuItem value="environment">Sau</MenuItem>
           </Select>
-        </FormControl>
+        </Stack>
 
         {step === 1 && (
           <>
@@ -335,7 +364,7 @@ checkCameraAccess();
               height="auto"
               autoPlay
               playsInline
-              style={{ borderRadius: 8, backgroundColor: '#000' }}
+              style={{ borderRadius: 8, backgroundColor: "#000" }}
             />
             <Button variant="contained" fullWidth sx={{ mt: 2 }} onClick={capturePhoto}>
               Chụp hình kèm GPS
@@ -345,38 +374,53 @@ checkCameraAccess();
 
         {step === 2 && (
           <>
-            <Box sx={{ textAlign: 'center', mt: 2 }}>
-              {imageURL && <img src={imageURL} alt="Ảnh đã chụp" style={{ maxWidth: '100%', borderRadius: 8 }} />}
+            <Box sx={{ textAlign: "center", mt: 2 }}>
+              {imageURL && (
+                <img
+                  src={imageURL}
+                  alt="Ảnh đã chụp"
+                  style={{ maxWidth: "100%", borderRadius: 8 }}
+                />
+              )}
               {position.latitude && position.longitude && (
                 <Typography sx={{ mt: 1 }}>
                   {statusMsg}
                 </Typography>
               )}
             </Box>
-            {error && <Typography color="error" sx={{ mt: 1 }}>{error}</Typography>}
+            {error && (
+              <Typography color="error" sx={{ mt: 1 }}>
+                {error}
+              </Typography>
+            )}
           </>
         )}
-        <CameraSelector/>
 
-      </DialogContent>
-      <DialogActions>
-        <Button mr={20} onClick={() => setOpen(false)}>Hủy</Button>
-        {step === 2 && (
-          <Button onClick={handleBack}>Chụp lại</Button>
-        )}
-        {step === 2 && (
-          <Button onClick={handleSend} variant="contained">Gửi</Button>
-        )}
-      </DialogActions>
+        <CameraSelector />
+      </Stack>
 
-      <canvas ref={canvasRef} style={{ display: 'none' }} />
+      <Stack>
+        <Button onClick={() => setOpen(false)}>
+          Hủy
+        </Button>
+        {step === 2 && <Button onClick={handleBack}>Chụp lại</Button>}
+        {step === 2 && (
+          <Button onClick={handleSend} variant="contained">
+            Gửi
+          </Button>
+        )}
+      </Stack>
+
+      <canvas ref={canvasRef} style={{ display: "none" }} />
 
       {sendSuccessMsg && (
-        <Typography sx={{ mt: 2, mx: 2, fontSize: 10, color: 'green', wordBreak: 'break-word' }}>
+        <Typography
+          sx={{ mt: 2, mx: 2, fontSize: 10, color: "green", wordBreak: "break-word" }}
+        >
           {sendSuccessMsg}
         </Typography>
       )}
-    </Dialog>
+    </Stack>
   );
 };
 

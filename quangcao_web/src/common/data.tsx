@@ -7,6 +7,7 @@ import HolidayButton from "../components/dashboard/user/HolidayButton";
 import dayjs from "dayjs";
 import { formatPrice } from "../utils/fomatPrice.util";
 import { getDayOfWeek } from "../utils/convert.util";
+import React, { useState, useEffect } from 'react';
 
 export const columnsMaterial = [
   {
@@ -169,20 +170,14 @@ export const columnsUser = [
     dataIndex: "fullName",
     key: "fullName",
     width: 200,
-    render: (text: string) => (
-      <span className="!font-medium !line-clamp-2 !w-[180px] !text-base">
-        {text}
-      </span>
+    render: (text: string, record: User) => (
+      <div>
+        <div>{text}</div>
+        <span className="!text-base" style={{fontSize:8,fontStyle:'italic'}}>{record.role?.name}</span>
+      </div>
     ),
   },
-  {
-    title: "Chức vụ",
-    dataIndex: "role",
-    key: "role",
-    width: 150,
-    render: (role: Role) => <span className="!text-base">{role?.name}</span>,
-    // render: (text: string) => <span className="!text-base">{text}</span>,
-  },
+  
   {
     title: "Tài khoản",
     dataIndex: "username",
@@ -509,3 +504,91 @@ export const columnsAttendance = (
     })),
   },
 ];
+
+const today = new Date();
+const month = today.getMonth();
+
+export const columnsWorkPoint = [
+  {
+    title: "Họ và tên",
+    dataIndex: "fullName",
+    key: "fullName",
+    width: 200,
+    render: (text: string, record: User) => (
+      <div>
+        <div>{text}</div>
+        <span className="!text-base" style={{fontSize:8,fontStyle:'italic'}}>{record.role?.name}</span>
+      </div>
+    ),
+  },
+  
+  {
+    title: `Ngày công tác trong tháng ${month + 1}`,
+    dataIndex: "role",
+    key: "role",
+    width: 800,
+    render: () => (
+      <div>
+        <WorkDays />
+      </div>
+    )
+  },
+];
+
+
+function WorkDays() {
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = today.getMonth();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+  const colors = ['#fff', 'red', 'green'];
+  const todayDate = new Date().getDate();
+
+  return (
+    <div style={{ display: 'flex', overflowX: 'auto' }}>
+      {Array.from({ length: daysInMonth }).map((_, dayIndex) => {
+        const date = new Date(year, month, dayIndex + 1);
+        const isSunday = date.getDay() === 0;
+
+        return (
+          <div
+            key={dayIndex}
+            style={{
+              borderRight: date.getDate() === todayDate ? '3px solid blue' : 'none',
+              textAlign: 'center',
+              borderRadius: 1,
+              maxWidth: 18,
+              marginRight: 1,
+            }}
+          >
+            <div style={{ fontSize: 10, marginBottom: 4,
+                color: isSunday ? 'red' : 'black',
+
+             }}>{date.getDate()}</div>
+            {[0, 1, 2].map((btnIndex) => (
+              <div
+                key={btnIndex}
+                style={{
+                  display: 'block',
+                  width: 16,
+                  height: 16,
+                  borderRadius: 8,
+                  // backgroundColor: colors[statuses[dayIndex][btnIndex]],
+                  border: isSunday ? '1px solid red' : '1px solid #999',
+                  marginBottom: 1,
+                }}
+                
+              />
+            ))}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+// Sử dụng ở component khác
+export default function SomeComponent() {
+  
+}

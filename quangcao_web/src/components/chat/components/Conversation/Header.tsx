@@ -85,6 +85,7 @@ const Header: React.FC<HeaderProps>
                   {status}
               </Typography>
             </Stack>
+            {!full && <LogoAdmake/>}
         </Stack>
 
         {full && 
@@ -149,3 +150,14 @@ const Header: React.FC<HeaderProps>
 }
 
 export default Header
+
+const LogoAdmake = () => {
+  return <div className="flex items-center justify-center pb-5" style={{scale: 0.75}}>
+        <div className="flex items-center justify-center">
+          <img src="/logo.jpg" alt="logo" className="w-13 h-13" />
+        </div>
+        <div className="flex items-center justify-center">
+          <img src="/ADMAKE.svg" alt="ADMAKE" className="h-8" />
+        </div>
+      </div>
+}

@@ -88,7 +88,10 @@ def upload_file():
 
     user_id = request.form.get('userId')
     group_id = int(request.form.get('groupId'))
-    role = int(request.form.get('role'))
+    role = request.form.get('role')
+    latitude = request.form.get('latitude')
+    longitude = request.form.get('longitude')
+    time = request.form.get('time')
 
 
     if 'file' not in request.files:
@@ -118,6 +121,9 @@ def upload_file():
         'file_url': filename,
         'link': filepath,
         'role': role,
+        'latitude': latitude,
+        'longitude': longitude,
+        'time': time,
     }
 
     print(data)
@@ -126,5 +132,5 @@ def upload_file():
     
     # socketio.emit('admake/chat/message', data, room=str(group_id))
     
-    return jsonify({'message': 'File uploaded successfully', 'filename': filename})
+    return jsonify({'message': 'File uploaded successfully', 'filename': filename, 'data': data})
 

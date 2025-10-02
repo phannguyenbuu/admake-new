@@ -67,12 +67,12 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const logout = async () => {
     if(window.location.href.endsWith('/login') 
-      || window.location.href.includes('/chat/'))
+      || window.location.href.includes('/chat/')
+      || window.location.href.includes('/point/'))
     {
       sessionStorage.removeItem('accessToken');
       setUserId(null);
       setUsername(null);
-
 
       let roleId = -1;
       const href = window.location.href;

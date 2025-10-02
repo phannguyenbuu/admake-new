@@ -100,7 +100,7 @@ export default function RenderMenuBar({}) {
   const createMobileMenuItems = () => {
     // Lọc các menu items phù hợp cho mobile (không quá nhiều)
     const mobileMenuKeys = [
-      "/dashboard/work-points",
+      "/dashboard/workpoints",
       "/dashboard/work-tables",
       "/dashboard/infor",
     ];
@@ -114,10 +114,10 @@ export default function RenderMenuBar({}) {
     if (mobileItems.length < 3) {
       const fallbackItems = [
         {
-          key: "/dashboard/work-points",
+          key: "/dashboard/workpoints",
           label: "Chấm công",
           icon: <CheckOutlined />,
-          path: "/dashboard/work-points",
+          path: "/dashboard/workpoints",
         },
         {
           key: "/dashboard/work-tables",

@@ -26,14 +26,14 @@ import { CustomerDashboard } from "./app/dashboard/customer/page";
 import { SettingDashboard } from "./app/dashboard/setting/page";
 import { AccountingDashboard } from "./app/dashboard/accounting/page";
 import { InforDashboard } from "./app/infor/page";
-import { WorkPointsPage } from "./app/dashboard/work-points/page";
+import { WorkPointPage } from "./app/dashboard/workpoints/page";
 import { useInfo } from "./common/hooks/info.hook";
 // import Error403 from "./app/403";
 import { Navigate } from "react-router-dom";
 import QrPage from "./components/qr/QrPage";
 import RequireAuth from "./services/RequireAuth";
 import GroupQRPage from "./components/chat/components/GroupQRPage";
-
+import Workpoint from "./components/chat/components/Workpoint";
 
 // Route guard: chặn truy cập nếu không có quyền
 function RequireRoles({
@@ -80,20 +80,19 @@ const routes: TRoute = {
     },
     
     {
-      path: "/qr/:name/:description",
-      element: <QrPage />,
-      title: "QR Code Dynamic",
-      ignoreInMenu: true,
-    },
-
-    
-    {
       path: "/chat/:id/:token",
       element: <GroupQRPage/>,
       title: "Chat Group",
       ignoreInMenu: true,
     },
 
+
+    {
+      path: "/point/:id/",
+      element: <Workpoint/>,
+      title: "Workpoint",
+      ignoreInMenu: true,
+    },
 
     {
       path: "/dashboard",
@@ -115,8 +114,8 @@ const routes: TRoute = {
           ignoreInMenu: true,
         },
         {
-          path: "/dashboard/work-points",
-          element: <WorkPointsPage />,
+          path: "/dashboard/workpoints",
+          element: <WorkPointPage />,
           title: "Chấm công",
           icon: <CheckOutlined />,
         },

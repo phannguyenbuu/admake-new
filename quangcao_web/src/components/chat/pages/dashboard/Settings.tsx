@@ -2,7 +2,6 @@ import { Avatar, Box, Divider, IconButton,Button, Stack, Typography, Grid } from
 import React, {useState, useEffect} from 'react';
 import { useTheme } from "@mui/material/styles";
 import { Camera, Bell, CaretLeft, Image, Info, Key, Airplane, Keyboard, Lock, Note, PencilCircle } from 'phosphor-react';
-import { faker } from '@faker-js/faker';
 import Shortcuts from '../../sections/settings/Shortcuts';
 // import Conversation from '../../components/Conversation';
 

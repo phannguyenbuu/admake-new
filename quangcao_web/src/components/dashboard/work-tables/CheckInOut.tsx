@@ -3,8 +3,8 @@ import { useQueryClient } from "@tanstack/react-query";
 import { message, Spin, Typography } from "antd";
 import { LoadingOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
-import { ClockInSection } from "../work-points/ClockInSection";
-import { ClockOutSection } from "../work-points/ClockOutSection";
+import { ClockInSection } from "../workpoints/ClockInSection";
+import { ClockOutSection } from "../workpoints/ClockOutSection";
 import { useCheckTask } from "../../../common/hooks/work-space.hook";
 import { useGetAttendance } from "../../../common/hooks/attendance.hook";
 import {

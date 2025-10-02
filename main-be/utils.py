@@ -784,7 +784,24 @@ def fix_invalid_foreign_keys():
 
     db.session.commit()
 
+def create_table_workpoint():
+    db.session.execute(text('''
+    DROP TABLE IF EXISTS workpoint;
 
+    CREATE TABLE workpoint (
+        id VARCHAR(80) PRIMARY KEY,
+        note VARCHAR(255),
+        
+        checklist JSON,
+
+        "createdAt" TIMESTAMP,
+        "updatedAt" TIMESTAMP,
+        "deletedAt" TIMESTAMP,
+        version INTEGER,
+        user_id VARCHAR(80) REFERENCES "user"(id)
+        );
+    '''))
+    db.session.commit()
 
 def change_foreign_key():
     db.session.execute(text('''
@@ -875,5 +892,6 @@ if __name__ == "__main__":
 # '''))
 
 #         db.session.commit()
-
-        renameColumn('group','rate','status')
+        # add_group_work_point()
+        # renameColumn('group','rate','status')
+        create_table_workpoint()
