@@ -7,6 +7,7 @@ import type { MenuProps } from "antd/lib";
 import Group from '../../../components/chat/pages/dashboard/Group.tsx';
 import type { GroupProps } from "../../../@types/chat.type.ts";
 import type { MenuInfo } from 'rc-menu/lib/interface';
+import { useUser } from "../../hooks/useUser.tsx";
 
 const ChatGroupList: React.FC = ({}) => {
   const navigate = useNavigate();
@@ -14,6 +15,7 @@ const ChatGroupList: React.FC = ({}) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedId, setSelectedId] = useState<GroupProps | null>(null);
   const API_HOST = useApiHost();
+  const {userId, userRoleId} = useUser();
   
   useEffect(() => {
     console.log('!!!API', API_HOST);
@@ -22,7 +24,7 @@ const ChatGroupList: React.FC = ({}) => {
       .then((res) => res.json())
       .then((data: GroupProps[]) => 
         {
-          console.log('GroupData', data);
+          // console.log('GroupData', data);
           setChatGroupList(data);
         })
       .catch((error) => console.error("Failed to load group data", error));
@@ -67,7 +69,7 @@ const ChatGroupList: React.FC = ({}) => {
         okText="OK" cancelButtonProps={{ style: { display: "none" } }}
         style={{ padding:0, minWidth: '96vw'}}
         >
-        <Group/>
+        <Group selected={selectedId} setSelected={setSelectedId}/>
       </Modal>
 
     </div>

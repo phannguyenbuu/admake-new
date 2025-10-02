@@ -9,6 +9,7 @@ export interface GroupProps {
   time:string,
   msg:string,
   unread:number,
+  status?:string,
   pinned:boolean
 }
 

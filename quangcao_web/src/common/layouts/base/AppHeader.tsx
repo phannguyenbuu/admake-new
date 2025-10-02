@@ -10,6 +10,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useWorkSpaceQueryAll } from "../../hooks/work-space.hook";
 import type { WorkSpace } from "../../../@types/work-space.type";
 import ChatGroupList from "./ChatGroupList";
+import { useUser } from "../../hooks/useUser";
 
 const { Header } = Layout;
 
@@ -17,7 +18,10 @@ export default function AppHeader() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [notificationOpen, setNotificationOpen] = useState(false);
+  const {username, userId, userRole, userRoleId} = useUser();
 
+  // console.log('USER_NAME', useUser(), username);
+  
   // call hook useInfo
   const { data: info, refetch: refetchInfo } = useInfo();
   const { isConnected, on } = useSocket();
@@ -59,7 +63,7 @@ export default function AppHeader() {
     navigate("/");
   };
 
-  console.log('WSA',workSpaces);
+  // console.log('WSA',workSpaces);
 
 
   return (
@@ -140,7 +144,7 @@ export default function AppHeader() {
           {/* Admin role text */}
           <div className="hidden md:flex items-center">
             <span className="text-gray-700 font-semibold text-sm px-3 py-1.5 bg-gray-100 rounded-full">
-              {info?.role?.name || "Admin"}
+              {username || "Admin"} / {userRole?.name}
             </span>
           </div>
 

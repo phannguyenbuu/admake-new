@@ -4,7 +4,7 @@ import type { User } from '../@types/user.type';
 
 export const UserService = {
   getAll: (dto: Partial<PaginationDto> = {}) => {
-    return axiosClient.get("/user", { params: dto });
+    return axiosClient.get("/user/", { params: dto });
   },
   getDetail: (id: string) => {
     return axiosClient.get(`/user/${id}`);

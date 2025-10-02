@@ -4,12 +4,13 @@ import React, { forwardRef, useRef, useState, useEffect } from 'react';
 import type { Ref } from 'react';
 import { styled, useTheme } from "@mui/material/styles";
 import { LinkSimple, PaperPlaneTilt, Smiley, Camera, File, Image, Sticker } from 'phosphor-react';
-import { useUser } from "../../UserContext.jsx";
+import { useUser } from "../../../../common/hooks/useUser.js";
 import FileUpload from './FileUpload.js';
 import { useWindowDimensions } from '../../hooks/useResponsive';
 import type { MessageTypeProps } from '../../../../@types/chat.type.js';
 import { generateUniqueIntId } from '../../../../@types/chat.type.js';
 import { useApiHost } from '../../../../common/hooks/useApiHost.js';
+import type { GroupProps } from '../../../../@types/chat.type.js';
 
 const StyledInput = styled(TextField)(({ theme }) => ({
   "& .MuiInputBase-input": {
@@ -20,21 +21,9 @@ const StyledInput = styled(TextField)(({ theme }) => ({
 
 const Actions = [
   {
-    color:'#4da5fe',
-    icon: <Image size={24}/>,
-    y:102,
-    title:'Photo/Video'
-  },
-  {
-    color:'#1b8cfe',
-    icon: <Sticker size={24}/>,
-    y:172,
-    title:'Stickers'
-  },
-  {
     color:'#0172e4',
     icon: <Camera size={24}/>,
-    y:242,
+    y:50,
     title:'Image'
   },
 ];
@@ -69,17 +58,17 @@ interface ChatInputProps {
   inputValue: string;
   setInputValue: React.Dispatch<React.SetStateAction<string>>;
   setOpenPicker: React.Dispatch<React.SetStateAction<boolean>>;
-  groupId: number;
+  groupEl: GroupProps | null;
   handleSendMessage: (message: string, url: string) => void;
 }
 
 const ChatInput = forwardRef<HTMLDivElement, ChatInputProps>(
-  ({ inputValue, setInputValue, setOpenPicker, groupId, 
+  ({ inputValue, setInputValue, setOpenPicker, groupEl, 
     handleSendMessage 
   }, ref: Ref<HTMLDivElement>) => {
 
   const [openAction, setOpenAction] = useState(false);
-  // const {userId, username, userRole, userIcon } = useUser();
+  const {userId, username, userRoleId, userIcon } = useUser();
    
   
   const handleUploadDocument = async () => {
@@ -93,15 +82,25 @@ const ChatInput = forwardRef<HTMLDivElement, ChatInputProps>(
       if (!target.files) return;
       const file = target.files[0];
       if (!file) return;
+
+      const fileSizeMB = file.size / (1024 * 1024);
+      if (fileSizeMB > 1) {
+        alert("Kích thước file vượt quá 1MB, vui lòng chọn file nhỏ hơn.");
+        return;
+      }
       
-      // Upload file lên server /upload
+            
       const formData = new FormData();
       formData.append("file", file);
+      formData.append("groupId", groupEl?.id.toString() || '');
+      formData.append("role", userRoleId.toString());
+      formData.append("userId", userId?.toString() || '');
 
-      const uploadResponse = await fetch(`${useApiHost()}/upload`, {
+      const uploadResponse = await fetch(`${useApiHost()}/message/upload`, {
         method: "POST",
         body: formData,
       });
+
 
       if (!uploadResponse.ok) {
         const errorText = await uploadResponse.text();
@@ -153,7 +152,7 @@ const ChatInput = forwardRef<HTMLDivElement, ChatInputProps>(
                 </Tooltip>
               ))}
               <Tooltip placement='right' title='Document'>
-                <Fab  onClick={() => handleUploadDocument()} sx={{position:'absolute', top: -312, backgroundColor: '#0159b2'}}>
+                <Fab  onClick={() => handleUploadDocument()} sx={{position:'absolute', top: -120, backgroundColor: '#0159b2'}}>
                   <File size={24}/>
                 </Fab>
               </Tooltip>
@@ -175,28 +174,26 @@ const ChatInput = forwardRef<HTMLDivElement, ChatInputProps>(
   )
 });
 
-
-
 interface FooterProps {
   setMessages: React.Dispatch<React.SetStateAction<MessageTypeProps[]>>;
-  groupId: number;
+  groupEl: GroupProps | null;
 }
 
-
 const Footer = forwardRef<HTMLDivElement, FooterProps>(
-  ({ groupId, setMessages }, ref: Ref<HTMLDivElement>) => {
+  ({ groupEl, setMessages }, ref: Ref<HTMLDivElement>) => {
   // const [showFileUpload, setShowFileUpload] = useState(false);
+  const {userId, username, userRoleId} = useUser();
   const [openPicker, setOpenPicker] = useState(false);
   const [inputValue, setInputValue] = useState('');
-  // const {width, height} = useWindowDimensions();
-
+  const full = userRoleId > 0;
+  
   useEffect(() => {
     socket.connect();
     console.log("WebSocket URL:", (socket.io.engine.transport as any).uri);
 
     socket.on('connect', () => {
       console.log('Connected to server', socket.id);
-      socket.emit('join', { group_id: groupId });
+      socket.emit('join', { group_id: groupEl?.id });
     });
 
     socket.on('admake/chat/message', (msg) => {
@@ -207,7 +204,7 @@ const Footer = forwardRef<HTMLDivElement, FooterProps>(
       console.log('Disconnected from server');
     });
 
-    socket.on('message_ack', data => {
+    socket.on('admake/chat/message_ack', data => {
       setMessages(prev =>
         prev.map(m => 
           m.message_id === data.message_id ? { ...m, status: 'success', message_id: data.message_id } : m
@@ -221,7 +218,7 @@ const Footer = forwardRef<HTMLDivElement, FooterProps>(
       socket.off('disconnect');
       socket.disconnect();
     };
-  }, [groupId]);
+  }, [groupEl?.id]);
 
   const sendMessage = (message: string, file_url = '') => {
     
@@ -232,11 +229,11 @@ const Footer = forwardRef<HTMLDivElement, FooterProps>(
         id: generateUniqueIntId(),
         preview: '',
         reply: '',
-        role: 0,
+        role: userRoleId,
         icon: '',
         type: getTypeName(file_url),
         incoming: false,
-        group_id: groupId,
+        group_id: groupEl?.id || 0,
         user_id: '',
         username: '',
         text: message,
@@ -260,34 +257,28 @@ const Footer = forwardRef<HTMLDivElement, FooterProps>(
     setInputValue('');
   };
 
-  // const handleSendMessage = (txt: string) => {
-  //   if (!txt.trim()) return;
-  //   sendMessage(txt, file_url = '');
-  //   setInputValue('');
-  // };
-
   return (
     <>
       {/* {showFileUpload && <FileUpload onUploadComplete={handleUploadComplete} />} */}
       <Box p={1} sx={{
         position: 'fixed',
-        width: {xs:320, sm: '50vw'},
+        width: full ? '50vw':'100vw',
         bottom: 40,
         backgroundColor: '#fff8f8ff',
         boxShadow: '0px 0px 2px rgba(0,0,0,0.25)'
       }}>
         <Stack direction='row' alignItems='center' spacing={3}>
-          <Stack sx={{ width: '100%' }}>
+          
             <ChatInput
               onEnterKey={() => sendMessage(inputValue)}
               ref={ref}
               inputValue={inputValue}
               setInputValue={setInputValue}
               setOpenPicker={setOpenPicker}
-              groupId={groupId}
+              groupEl={groupEl}
               handleSendMessage={sendMessage}
             />
-          </Stack>
+          
           <Box sx={{ height: 48, width: 48, backgroundColor: '#4da5fe', borderRadius: 1.5 }} 
             onClick={() => sendMessage(inputValue)}
             >

@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify, abort
-from models import db, Workspace, Task, dateStr, generate_datetime_id
+from models import db, Workspace, Task, dateStr, generate_datetime_id, Group
 import datetime
 from collections import defaultdict
 from sqlalchemy import desc
@@ -28,9 +28,30 @@ def get_workspaces():
 @workspace_bp.route("/", methods=["POST"])
 def create_workspace():
     data = request.get_json()
+
+    group_id = data.get('group_id')
+
+    if group_id:
+        group = db.session.get(Group, group_id)
+
+        if group:
+            name = group.name
+            
+
+    if not name:    
+        name = data.get('name')
+
+    if not name:
+        return jsonify({"error": "Empty Workspace name"}), 405
+
+    existing = Workspace.query.filter_by(name=name).first()
+    if existing:
+        return jsonify({"error": "Workspace name already exists"}), 400
+
+
     new_workspace = Workspace(
         id=generate_datetime_id(),
-        name=data.get('name')
+        name=name
     )
     db.session.add(new_workspace)
     db.session.commit()
@@ -85,3 +106,5 @@ def get_workspace_detail(id):
     # print('TASK', tasks)
     
     return jsonify(work.to_dict())
+
+__all__ = ['customer_bp']

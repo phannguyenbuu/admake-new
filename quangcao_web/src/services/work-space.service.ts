@@ -3,7 +3,7 @@ import axiosClient from "./axiosClient";
 
 export const WorkSpaceService = {
   getAll: () => {
-    return axiosClient.get("/workspace");
+    return axiosClient.get("/workspace/");
   },
   getTaskById: (id: string) => {
     return axiosClient.get(`/workspace/${id}/tasks`);

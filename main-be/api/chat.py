@@ -3,7 +3,7 @@ from flask import Flask, request, jsonify
 from models import Message, db, app, User
 import datetime
 
-socketio = SocketIO(app, cors_allowed_origins='*')
+socketio = SocketIO(app, cors_allowed_origins=["http://localhost:5173", "https://archbox.pw"])
 
 @socketio.on('connect')
 def on_connect():
@@ -42,6 +42,7 @@ def handle_message(data):
     message_id = data['message_id']
     # user_id = User.query.first() # data['user_id']
     username = data['username']
+    role = data['role']
     # icon = data['icon']
     text = data.get('text')
     file_url = data.get('file_url')
@@ -62,13 +63,14 @@ def handle_message(data):
 
 
     # Lưu message mới
+    print('Saving role', role)
     msg = Message(group_id=group_id,type=type, user_id=user_id, text=text, 
-                  message_id = message_id,
+                  message_id = message_id,role=role,
                   file_url=file_url, updatedAt=time)
     db.session.add(msg)
     db.session.commit()
     
-    emit('message', {
+    emit('admake/chat/message', {
         'type':type,
         'message_id': message_id,
         # 'icon': icon,
@@ -80,9 +82,10 @@ def handle_message(data):
         'group_id': group_id,
         'createdAt': time_str,
         'incoming': False,
+        'role':role,
     }, room=str(group_id), skip_sid=request.sid)
 
-    emit('message_ack', {
+    emit('admake/chat/message_ack', {
         'status': 'success',
         'message': 'Message received and stored successfully',
         'message_id': message_id

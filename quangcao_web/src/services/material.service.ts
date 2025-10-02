@@ -4,7 +4,7 @@ import axiosClient from "./axiosClient";
 
 export const MaterialService = {
   getMaterials: (dto: Partial<PaginationDto> = {}) => {
-    return axiosClient.get("/material", { params: dto });
+    return axiosClient.get("/material/", { params: dto });
   },
   getMaterialDetail: (id: number) => {
     return axiosClient.get(`/material/${id}`);

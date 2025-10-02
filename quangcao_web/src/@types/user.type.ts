@@ -30,6 +30,9 @@ export type User = BaseEntity & {
 export type JwtResponse = {
   access_token: string;
   roles: UserRole[];
+  userId: string;
+  username: string;
+  icon?: string;
 };
 export type UserPartial = {
   key: number;

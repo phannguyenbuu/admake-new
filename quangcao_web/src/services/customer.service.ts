@@ -4,7 +4,7 @@ import axiosClient from "./axiosClient";
 
 export const CustomerService = {
   getCustomers: (dto: Partial<PaginationDto> = {}) => {
-    return axiosClient.get("/customer", { params: dto });
+    return axiosClient.get("/customer/", { params: dto });
   },
   getCustomerDetail: (id: string) => {
     console.log('HY useCustomerDetail', id);

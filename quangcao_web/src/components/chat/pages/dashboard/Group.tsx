@@ -10,49 +10,43 @@ import ChatElement from '../../components/ChatElement';
 import CreateGroup from '../../sections/main/CreateGroup';
 import useApiFlaskReceive from "../../api/ApiFlaskReceive";
 import Conversation from "../../components/Conversation";
-import { useUser } from '../../UserContext';
 import { socket } from '../../components/Conversation/socket';
 import Contact from '../../components/Contact';
 import StarredMessages from '../../components/StarredMessages';
 import SharedMessages from '../../components/SharedMessages';
 import { useWindowDimensions } from '../../hooks/useResponsive';
 import type { GroupProps, MessageTypeProps } from '../../../../@types/chat.type';
+import { useUser } from '../../../../common/hooks/useUser';
 
 import { useApiHost, useApiSocket } from '../../../../common/hooks/useApiHost';
+interface GroupComponentProps {
+  selected: GroupProps | null;
+  setSelected: React.Dispatch<React.SetStateAction<GroupProps | null>> | null;
+}
 
-const Group = () => {
+const Group: React.FC<GroupComponentProps> = ({ selected, setSelected }) => {
     const [showLeft, setShowLeft] = useState(false);
     const [showRight, setShowRight] = useState(false);
     const [messageList, setMessages] = useState<MessageTypeProps[]>([]);
     const [title, setTitle] = useState('');
-    const [currentGroupId, setCurrentGroupId] = useState(0);
-    const [status, setStatus] = useState('');
+    const [currentGroup, setcurrentGroup] = useState<GroupProps | null>(null);
+    const [status, setStatus] = useState<string | undefined>('');
     const [_loading, setLoading] = useState(false);
     const [_error, setError] = useState(null);
-   const urlApi = useApiHost();
+    const urlApi = useApiHost();
+    const {userRoleId} = useUser();
+    const [showFooter, setShowFooter] = useState<boolean>(false);
+    const full = userRoleId > 0;
 
-    //  const user = useUser();
-    //  setTimeout(() => {console.log('<User>', user)},1000);
-
-    //  if (!user) {
-        
-    //      return <div>Null user!</div>;
-        
-    //  }
-    
-    //  const { userId, username } = user;
-
-    
-    // const { width, height} = useWindowDimensions();
+    useEffect(() => {
+    if (selected !== null && selected !== undefined) {
+      console.log("SLEED", selected);
+      handleClick(selected); // Có thể truyền tên trống hoặc lấy từ data thực tế
+      setShowFooter(selected?.status === "talk" || selected?.status === "pass");
+    }
+  }, [selected]);
 
     const handleDeleteMessage = (el:MessageTypeProps) =>{
-    //  console.log('Delete userId:', userId, el);
-    //  if(userId !== el.user_id)
-    //  {
-    //      alert("Cannot erase message of other member in group!")
-    //      return;
-    //  }
-
      fetch(`${urlApi}/message/${el.message_id}`, { method: 'DELETE' })
          .then(res => {
          if (!res.ok) throw new Error('Delete failed');
@@ -71,51 +65,48 @@ const Group = () => {
 
     //   Xử lý khi click vào group
     const handleClick = (el:GroupProps) => {
-    //  if (!userId) {
-    //      alert('Vui lòng đăng nhập để xem tin nhắn');
-    //      return;
-    //  }
+        if(setSelected)
+        {
+            setSelected(el);
+        }
+        setLoading(true);
 
-     setLoading(true);
-        
-    //  console.log(currentGroupId, `Start ${urlApi}/api/group/${el.id}?userId=${userId}`);
-    //   Gửi userId khi gọi API để chỉ lấy message liên quan user
-     fetch(`${urlApi}/group/${el.id}/messages`)
-         .then((res) => res.json())
-         .then((data) => {
-             if (data && data.messages) {
-                //  console.log('Data_Message', data.messages);
-                 setMessages(data.messages);
-                //  console.log('OK1');
-                 setTitle(el.name);
-                //  console.log('OK2');
-                 setStatus(`${el.members} member(s)`);
-                 setCurrentGroupId(el.id);
-                //  console.log('OK3');
-             }
-             setLoading(false);
-            //  console.log('OK4');
-         })
-         .catch((err) => {
-             console.error('Error khi lấy dữ liệu:', err);
-             setError(err);
-             setLoading(false);
-         });
-     setShowLeft(false);
- };
+        fetch(`${urlApi}/group/${el.id}/messages`)
+            .then((res) => res.json())
+            .then((data) => {
+                if (data && data.messages) {
+                    console.log('Data_Message', data.messages);
+                    setMessages(data.messages);
+                    //  console.log('OK1');
+                    setTitle(el.name);
+                    //  console.log('OK2');
+                    setStatus(el.status);
+                    setcurrentGroup(el);
+                    //  console.log('OK3');
+                }
+                setLoading(false);
+                //  console.log('OK4');
+            })
+            .catch((err) => {
+                console.error('Error khi lấy dữ liệu:', err);
+                setError(err);
+                setLoading(false);
+            });
+        setShowLeft(false);
+    };
 
 
 const [groupList, setGroupList] = useState<GroupProps[]>([]);
   const API_HOST = useApiHost();
   
   useEffect(() => {
-    console.log('!!!API', API_HOST);
+    // console.log('!!!API', API_HOST);
 
     fetch(`${API_HOST}/group/`)
       .then((res) => res.json())
       .then((data: GroupProps[]) => 
         {
-          console.log('GroupData', data);
+        //   console.log('GroupData', data);
           setGroupList(data);
         })
       .catch((error) => console.error("Failed to load group data", error));
@@ -124,47 +115,40 @@ const [groupList, setGroupList] = useState<GroupProps[]>([]);
 
   
  useEffect(() => {
-     if (!currentGroupId) return;
+    if (!currentGroup) return;
 
-     socket.on('message_deleted', ({ message_id }) => {
-         setMessages(prev => prev.filter(m => m.message_id !== message_id));
-     });
+    socket.on('admake/chat/message_deleted', ({ message_id }) => {
+        setMessages(prev => prev.filter(m => m.message_id !== message_id));
+    });
 
     //   Join vào room group hiện tại
-     socket.emit('join_group', { group_id: currentGroupId });
+    socket.emit('admake/chat/join_group', { group_id: currentGroup.id });
 
     //   Lắng nghe tin nhắn mới realtime
-     socket.on('message', (msg) => {
-         console.log('Current Group ID', currentGroupId, msg);
-         if (msg.group_id === currentGroupId) {  // chỉ thêm tin nhắn cùng group
-             setMessages(prev => [...prev, msg]);  // thêm tin nhắn mới vào cuối
-         }
-     });
+    socket.on('admake/chat/message', (msg) => {
+        console.log('Current Group ID', currentGroup, msg);
+        if (msg.group_id === currentGroup.id) {  // chỉ thêm tin nhắn cùng group
+            setMessages(prev => [...prev, msg]);  // thêm tin nhắn mới vào cuối
+        }
+    });
 
-    //   Cleanup khi unmount hoặc khi currentGroupId thay đổi
-     return () => {
-         socket.off('message');
-         socket.emit('leave_group', { group_id: currentGroupId }); // tùy backend có xử lý leave room không
-     };
- }, [currentGroupId]);
+    //   Cleanup khi unmount hoặc khi currentGroup thay đổi
+    return () => {
+        socket.off('admake/chat/message');
+        socket.off('admake/chat/message_deleted');
+        socket.emit('admake/chat/leave_group', { group_id: currentGroup.id }); // tùy backend có xử lý leave room không
+    };
+ }, [currentGroup]);
 
 
 
  const theme = useTheme();
- const [openDialog, setOpenDialog] = useState(false);
-
- const handleCloseDialog = () => setOpenDialog(false);
-
-//   const { sidebar } = useSelector((store) => store.app);
-
-
-
-// return <div>Group Component EFS {width} x {height}</div>;
-//     {/*
+//  const [openDialog, setOpenDialog] = useState(false);
 
  return (
      <>
          <Stack direction={'row'}>
+            { full &&
              <Box sx={{
                 backgroundColor: theme.palette.mode === 'light' ? '#F8FAFF' : "#fff",
                 minWidth: '20vw',
@@ -216,21 +200,22 @@ const [groupList, setGroupList] = useState<GroupProps[]>([]);
                     
                      </Stack>
                  </Stack>
-             </Box>
+             </Box>}
 
              
             <Conversation
                 setMessages={setMessages}
                 messages={messageList}
                 title={title}
-                status={status}
-                groupId={currentGroupId}
+                status={status || null}
+                groupEl={currentGroup}
                 userId=''
                 username=''
                 onDelete={handleDeleteMessage}
+                showFooter={showFooter}
             />
         
-
+            {full &&
              <Box sx={{ height: '100%',
                   backgroundColor: theme.palette.mode === 'light' ? '#F8FAFF' : "#fff",
                  width: 320,
@@ -239,10 +224,8 @@ const [groupList, setGroupList] = useState<GroupProps[]>([]);
                      sm: "block",
                  },
                  boxShadow: '0px 0px 2px rgba(0,0,0,0.25)'}}>
-                    <Contact messages={messageList} />
-                    {/* <StarredMessages messages={messageList}/> */}
-                    {/* <SharedMessages messages={messageList}/> */}
-             </Box>
+                    <Contact messages={messageList} groupEl={selected ?? null} setShowFooter={setShowFooter}/>
+             </Box>}
          </Stack>
 
          <Stack
@@ -255,7 +238,7 @@ const [groupList, setGroupList] = useState<GroupProps[]>([]);
                  top: 400,
                  left: -8,
                  justifyContent: "center",
-                 display: { xs: "flex", sm: "none" },
+                 display: { xs: "none", sm: "none" },
                  zIndex: 999,
              }}
             
@@ -268,7 +251,7 @@ const [groupList, setGroupList] = useState<GroupProps[]>([]);
                  right: 50,
                 
                  justifyContent: "center",
-                 display: { xs: "flex", sm: "none" },
+                 display: { xs: "none", sm: "none" },
                  zIndex: 999,
              }} onClick={() => setShowRight(!showRight)}>
                  {!showRight ? <Box sx={{position:'relative', left:20}}>

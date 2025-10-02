@@ -1,3 +1,4 @@
+import { notification } from 'antd/lib';
 import { Avatar,Tabs, Tab, ToggleButton, ToggleButtonGroup, Grid, Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Divider, IconButton, Slide, Stack, Typography} from '@mui/material'
 import React, { useState, useEffect } from 'react';
 import {useTheme } from "@mui/material/styles";
@@ -6,12 +7,18 @@ import { useDispatch } from 'react-redux';
 import { ToggleSidebar, UpdateSidebarType } from '../redux/slices/app';
 import AntSwitch from './AntSwitch';
 import '../css/global.css';
-import { useUser } from '../UserContext';
+import { useUser } from '../../../common/hooks/useUser';
+import { SvgIcon } from '@mui/material';
 import { useApiStatic } from '../../../common/hooks/useApiHost';
-import type { MessageTypeProps } from '../../../@types/chat.type';
+import type { GroupProps, MessageTypeProps } from '../../../@types/chat.type';
 import type { SlideProps } from '@mui/material';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import StarIcon from '@mui/icons-material/Star';
+import { WorkSpaceService } from '../../../services/work-space.service';
+import { useApiHost } from '../../../common/hooks/useApiHost';
+import RatingButtons from './RatingButtons';
+
+import QRCode from './QRCode';
 
 const Transition = React.forwardRef(function Transition(
   props: SlideProps & { children: React.ReactElement<any, any> },
@@ -20,70 +27,10 @@ const Transition = React.forwardRef(function Transition(
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
-
-function RatingButtons() {
-  const [value, setValue] = React.useState<string | null>(null);
-
-  const handleChange = (event: React.MouseEvent<HTMLElement>, 
-    newValue: string | null) => {
-    if (newValue !== null) {
-      setValue(newValue);
-    }
-  };
-
-
-  const toggleSize = { width: 80, height: 40, fontSize: 12, borderRadius: 30 };
-
-
-  return (
-    <ToggleButtonGroup
-      value={value}
-      exclusive
-      onChange={handleChange}
-      aria-label="rating"
-      size="small"
-      sx={{ gap: 0, width: 300 }}
-    >
-      <ToggleButton value="not_pass" 
-          sx={{ ...toggleSize,
-            '&.Mui-selected': {
-            backgroundColor: '#ff2a3cff', // Cam
-            color: '#fff',
-            '&:hover': {
-              backgroundColor: '#ff2a3cff',
-            },
-          } }} aria-label="not pass">
-        TẠO QR
-      </ToggleButton>
-      <ToggleButton value="late"  sx={{ ...toggleSize,
-            '&.Mui-selected': {
-            backgroundColor: '#ffaf24ff', // Cam
-            color: '#fff',
-            '&:hover': {
-              backgroundColor: '#ffaf24ff',
-            },
-          } }} aria-label="late">
-        TIẾP XÚC
-      </ToggleButton>
-      <ToggleButton value="normal"  sx={{ ...toggleSize,
-            '&.Mui-selected': {
-            backgroundColor: '#b7ff00ff', // Cam
-            color: '#333',
-            '&:hover': {
-              backgroundColor: '#00ff04ff',
-            },
-          } }} aria-label="normal">
-        HỢP ĐỒNG
-      </ToggleButton>
-    </ToggleButtonGroup>
-  );
-}
-
 interface BlockDialogProps {
   open: boolean;
   handleClose: () => void;
 }
-
 
 const BlockDialog: React.FC<BlockDialogProps> = ({ open, handleClose }) => {
   return (
@@ -132,10 +79,12 @@ const DeleteDialog: React.FC<BlockDialogProps> = ({ open, handleClose }) => {
 }
 
 interface ContactProps {
+  groupEl: GroupProps | null;
   messages: MessageTypeProps[];
+  setShowFooter: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const Contact: React.FC<ContactProps> = ({ messages }) => {
+const Contact: React.FC<ContactProps> = ( { groupEl, messages, setShowFooter }) => {
  
   const theme = useTheme();
   // const dispatch = useDispatch();
@@ -143,13 +92,16 @@ const Contact: React.FC<ContactProps> = ({ messages }) => {
   const [openBlock, setOpenBlock] = useState(false);
   const [openDelete, setOpenDelete] = useState(false);
   const [photos, setPhotos] = useState<MessageTypeProps[]>([]);
-
+  const [groupId,setGroupId] = useState<number>(0);
   // const {userId, username, userRole, userIcon } = useUser();
 
   useEffect(()=>{
-    if(messages)
-      setPhotos(messages.filter((el)=>el.type === 'img' || el.type === 'doc'));
-  },[messages]);
+    if(messages && messages.length > 0)
+    {
+      setGroupId(messages[0].group_id);
+      setPhotos(messages.filter((groupEl)=>groupEl.type === 'img' || groupEl.type === 'doc'));
+    }
+  },[messages, groupEl]);
 
   const handleCloseBlock = () =>{
     setOpenBlock(false);
@@ -173,12 +125,14 @@ const Contact: React.FC<ContactProps> = ({ messages }) => {
     // Mở file bằng trình duyệt mặc định (mở tab mới)
     window.open(`${useApiStatic()}/${fileUrl}`, '_blank');
   }
+
+  const tabStyle = {fontSize:10, padding: '4px 8px', minWidth: '5vw',  marginRight: 0.2,borderRadius:'5px', background:"#ccc" };
  
   return (
     <Box sx={{width:'20vw', p:1, ml:0, height:'80vh', boxSizing: 'border-box'}}>
         <Typography ml={0} fontWeight={300} fontSize={12}>Trạng thái dự án</Typography>
           <Stack direction="row" sx={{ maxWidth:300 }}>
-              <RatingButtons/>
+              <RatingButtons groupEl={groupEl} setShowFooter={setShowFooter}/>
           </Stack>
         
         <Stack className='scrollbar' sx={{position:'relative', flexGrow:1}} p={1}
@@ -186,36 +140,53 @@ const Contact: React.FC<ContactProps> = ({ messages }) => {
           
           <Tabs value={tabValue} onChange={handleChange} aria-label="nav tabs">
             <Tab 
-              icon={<NotificationsIcon />} 
+              iconPosition="start" 
+              label="QR"
+              id="tab-0" 
+              aria-controls="tabpanel-0" 
+              sx={tabStyle}
+            />
+            <Tab 
+              
               iconPosition="start" 
               label="Tài liệu" 
               id="tab-0" 
               aria-controls="tabpanel-0" 
-              sx={{fontSize:10, padding:0}}
+              sx={tabStyle}
             />
             <Tab 
               icon={<StarIcon />} 
               iconPosition="start" 
-              label="Tin lưu" 
+              label="" 
               id="tab-1" 
               aria-controls="tabpanel-1" 
-              sx={{fontSize:10, padding:0}}
+              sx={tabStyle}
             />
           </Tabs>
-           {tabValue === 0 && (
-              <Box sx={{ p: 0.5, height:'60vh', overflowY:'scroll' }}>
-                {photos.map((el, idx) => (
+          {tabValue === 0 && (
+            <Stack direction="column" spacing={0} sx={{width: '20vw', height:'68vh',overflowY:'auto', overflowX:'hidden'}}>
+              <QRCode title="Mã QR cho khách hàng" filename='qrcode-admake-khachhang.png'
+                url={`${window.location.origin}/chat/${groupEl?.id}/${groupEl?.description}`}/>
+              <QRCode title="Mã QR cho nhân viên" filename='qrcode-admake-nhanvien.png'
+                url={`${window.location.origin}/chat/${groupEl?.id}/a${groupEl?.description}`}/>
+             </Stack>
+            )}
+           {tabValue === 1 && (
+              <Box sx={{ p: 0.5,width: '20vw', height:'68vh', overflowY:'scroll' }}>
+                {photos.length > 0 ? photos.map((groupEl, idx) => (
                   <img 
                     key={idx}
-                    src={`${useApiStatic()}/${el.file_url}`} 
-                    alt={el.file_url.split('_')[0]} 
+                    src={`${useApiStatic()}/${groupEl.file_url}`} 
+                    alt={groupEl.file_url.split('_')[0]} 
                     style={{ width: '100%', height: 'auto', marginBottom: 8, cursor: 'pointer' }}
-                    onClick={() => handlePhotoClick(el.file_url)}
+                    onClick={() => handlePhotoClick(groupEl.file_url)}
                   />
-                ))}
+                )) : 
+              <Typography variant="body1">Chưa có tài liệu</Typography>
+              }
               </Box>
             )}
-            {tabValue === 1 && (
+            {tabValue === 2 && (
               <Box sx={{ p: 0.5, height:'60vh', overflowY:'scroll' }}>
                 <Typography variant="body1">Chưa có tin nhắn lưu</Typography>
                 {/* Hiển thị danh sách message hoặc nội dung khác */}

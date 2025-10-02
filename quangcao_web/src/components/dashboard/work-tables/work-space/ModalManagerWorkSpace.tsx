@@ -33,9 +33,9 @@ export default function ModalManagerWorkSpace({
   const { pathname } = useLocation();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    console.log('workSpaces',workSpaces);
-  }, [workSpaces]);
+  // useEffect(() => {
+  //   console.log('workSpaces',workSpaces);
+  // }, [workSpaces]);
 
   // State cho edit modal
   const [editModalVisible, setEditModalVisible] = useState(false);

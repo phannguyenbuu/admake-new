@@ -50,9 +50,19 @@ def update_group(id):
 
 
 
+@group_bp.route('/<int:group_id>/status', methods=['POST'])
+def change_group_status(group_id):
+    data = request.json
+    status = data.get('status')
+    group = db.session.get(Group, group_id)
 
+    if not group:
+        abort(404, description="group not found")
 
+    group.status = status
+    db.session.commit()
 
+    return jsonify(group.to_dict()), 201
 
 
 # Tạo Message
@@ -60,33 +70,37 @@ def update_group(id):
 def create_message(group_id):
     data = request.json
     user_id = data.get('user_id')
+    role = data.get('role')
     text = data.get('text')
     file_url = data.get('file_url')  # URL lưu file đã upload
     link = data.get('link')          # Link gửi kèm
-    
+    username=User.query.get(user_id).username
+
     # Kiểm tra user có trong nhóm không
     member = GroupMember.query.filter_by(user_id=user_id, group_id=group_id).first()
     if not member:
         return jsonify({'error': 'User not a member of the group'}), 403
 
-    msg = Message(
-        user_id=user_id,
-        username=User.query.get(user_id).username,
-        text=text,
-        file_url=file_url,
-        link=link,
-    )
-    db.session.add(msg)
-    db.session.commit()
+    # msg = Message(
+    #     user_id=user_id,
+    #     username=User.query.get(user_id).username,
+    #     text=text,
+    #     file_url=file_url,
+    #     link=link,
+    #     role=role
+    # )
+    # db.session.add(msg)
+    # db.session.commit()
     
     # Phát message qua socket
-    socketio.emit('message', {
-        'id': msg.id,
+    socketio.emit('admake/chat/message', {
+        # 'id': msg.id,
         'group_id': group_id,
-        'username': msg.username,
+        'username': username,
         'text': text,
         'file_url': file_url,
         'link': link,
+        'role': role,
     }, room=str(group_id))
     
     return jsonify({'message': 'Message sent'})
@@ -103,3 +117,25 @@ def get_messages(group_id):
     print('GET',group_id, len(messages))
 
     return jsonify({'messages': messages})
+
+@group_bp.route('/check-access/<int:group_id>/<string:desc>/', methods=['GET'])
+def get_check_access(group_id, desc):
+    group = db.session.get(Group, group_id)
+
+    if not group:
+        return jsonify({"error": "group not found"}), 404
+    
+    roleId = -1
+
+    if desc[0].lower() == 'a':
+        desc = desc[1:]
+        roleId = 1
+
+    if group.description != desc:
+        return jsonify({"error": "group secription not match"}), 403
+    
+    result = group.to_dict()
+    result["role"] = roleId
+
+    return jsonify({"valid":True,"data":result})
+

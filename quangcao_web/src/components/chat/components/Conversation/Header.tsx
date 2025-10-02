@@ -9,12 +9,12 @@ import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 // import { faker } from '@faker-js/faker';
 import StyledBadge from '../StyledBadge';
 import { ToggleSidebar } from '../../redux/slices/app';
-import { useUser } from '../../UserContext';
+import { useUser } from '../../../../common/hooks/useUser';
 import { useAppDispatch } from '../../../../common/hooks/useAppDispatch';
 
 interface HeaderProps {
   title: string;
-  status: string;
+  status: string | null;
   onDeleteGroup?: () => void;
   onAddMember?: () => void;
   onLeaveGroup?: () => void;
@@ -22,6 +22,9 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> 
   = ({ title, status, onDeleteGroup, onAddMember, onLeaveGroup }) => {
+
+  const {userRoleId} = useUser();
+  const full = userRoleId > 0;
   // const {userId, username, userRole, userIcon } = useUser();
   // console.log("User_Info", userId, username, userRole );
   // const dispatch = useAppDispatch();
@@ -58,8 +61,7 @@ const Header: React.FC<HeaderProps>
 
 
   return (
-    <Box p={0.2} sx={{ width:'50vw', 
-      scale: {xs: 0.6, sm: 1},
+    <Box p={0.2} sx={{ width: full ? '50vw':'100vw', 
       backgroundColor: theme.palette.mode === 'light' ? '#F8FAFF' : "#fff", 
       boxShadow:'0px 0px 2px rgba(0,0,0,0.25)'}}>
     <Stack alignItems={'center'} direction='row' justifyContent={'space-between'}
@@ -84,6 +86,8 @@ const Header: React.FC<HeaderProps>
               </Typography>
             </Stack>
         </Stack>
+
+        {full && 
         <Stack direction='row' alignItems='center' spacing={3}>
             <IconButton>
                 <MagnifyingGlass/>
@@ -138,7 +142,7 @@ const Header: React.FC<HeaderProps>
                 <ExitToAppIcon fontSize="small" />
               </ListItemIcon>Leave this group</MenuItem> */}
           </Menu>
-        </Stack>
+        </Stack>}
     </Stack>
 </Box>
   )

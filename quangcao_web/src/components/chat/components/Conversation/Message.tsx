@@ -9,14 +9,14 @@ const Message: React.FC<MsgListTypeProps> = ({ menu, messages, onDelete }) => {
   const bottomRef = useRef<HTMLDivElement | null>(null);
 
  useEffect(() => {
-  console.log('NEWMES',messages.length > 0 ? messages[0] : '');
-
   if (bottomRef.current) {
     setTimeout(() => {
-      bottomRef.current!.scrollIntoView({ behavior: 'smooth', block: 'end'  });
-    }, 100);  // trì hoãn 100ms, điều chỉnh tuỳ ý
+      const el = bottomRef.current!;
+      el.parentElement!.scrollTop = el.parentElement!.scrollHeight;
+    }, 200);
   }
 }, [messages]);
+
   
   return (
     <Box p={3} ref={bottomRef}>

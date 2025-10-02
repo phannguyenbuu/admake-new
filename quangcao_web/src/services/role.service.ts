@@ -3,13 +3,13 @@ import axiosClient from "./axiosClient";
 
 export const RoleService = {
   getAll: () => {
-    return axiosClient.get("/role");
+    return axiosClient.get("/role/");
   },
   getId: (id: number) => {
     return axiosClient.get(`/role/${id}`);
   },
   getPermission: () => {
-    return axiosClient.get("/role/list/permission");
+    return axiosClient.get("/role/list/permission/");
   },
   create: (dto: Role) => {
     return axiosClient.post("/role/", dto);

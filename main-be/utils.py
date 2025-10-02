@@ -1,5 +1,5 @@
 import json
-from models import db, app, User, Customer, Material, parse_date, Role, Message, Task, Workspace, generate_datetime_id
+from models import db, app, User, Group, Customer, Material, parse_date, Role, Message, Task, Workspace, generate_datetime_id
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 import json
@@ -483,7 +483,7 @@ def transfer_message_to_postgres():
                 user_id=row_dict['user_id'],
                 text=row_dict['text'],
                 file_url=row_dict['file_url'],
-                is_unread=row_dict['is_unread'],
+                
                 is_favourite=row_dict['is_favourite'],
                 react=row_dict['react'],
                 type=row_dict['type'],
@@ -493,6 +493,36 @@ def transfer_message_to_postgres():
             db.session.add(new_message)
     db.session.commit()
 
+
+def transfer_role_to_postgres():
+    # Kết nối SQLite
+    sqlite_engine = create_engine('sqlite:///main-be/instance/customers.db')
+    metadata_sqlite = MetaData()
+    metadata_sqlite.reflect(bind=sqlite_engine)
+    roles_sqlite = Table('roles', metadata_sqlite, autoload_with=sqlite_engine)
+
+    with sqlite_engine.connect() as conn:
+        row_dict = conn.execute(roles_sqlite.select())
+        for row in row_dict:
+            
+            id_value = row[0]  # thường là cột đầu tiên
+            name_value = row[1]  # cột thứ hai, tùy thứ tự cột DB
+            # hoặc chuyển row thành dict:
+            row_dict = dict(row._mapping)
+            id_value = row_dict['id']
+            # name_value = row_dict['name']
+
+            print(row_dict)
+
+            new_role = Role(
+                id=id_value,
+                # name=name_value,
+                permissions=row_dict['permissions'],
+                name=row_dict['name'],
+            )
+
+            db.session.add(new_role)
+    db.session.commit()
 
 
 
@@ -649,14 +679,14 @@ def update_users_with_accountId(json_file):
 
 
 def change_value_type(table, keys, type='VARCHAR(50)'):
-    # for key in keys:
-    #     db.session.execute(text(f'ALTER TABLE "{table}" ALTER COLUMN "{key}" TYPE {type};'))
-    db.session.execute(text(
-        f'''
-CREATE SEQUENCE {table}_id_seq;
-ALTER TABLE "{table}" ALTER COLUMN id SET DEFAULT nextval('{table}_id_seq');
-ALTER SEQUENCE {table}_id_seq OWNED BY "{table}".id;
-'''))
+    for key in keys:
+        db.session.execute(text(f'ALTER TABLE "{table}" ALTER COLUMN "{key}" TYPE {type} USING {key}::integer;'))
+#     db.session.execute(text(
+#         f'''
+# CREATE SEQUENCE {table}_id_seq;
+# ALTER TABLE "{table}" ALTER COLUMN id SET DEFAULT nextval('{table}_id_seq');
+# ALTER SEQUENCE {table}_id_seq OWNED BY "{table}".id;
+# '''))
 
     db.session.commit()
 
@@ -715,7 +745,8 @@ def transfer_data_to_postgres():
     # transfer_workspace_to_postgres()
     # transfer_task_to_postgres()
 
-    transfer_message_to_postgres()
+    # transfer_message_to_postgres()
+    transfer_role_to_postgres()
 
 import random
 
@@ -764,6 +795,26 @@ def change_foreign_key():
     db.session.commit()
 
 
+def set_group_generate_token():
+    for i, group in enumerate(Group.query.all()):
+        s = generate_datetime_id()
+        # s = s[:5] + str(i) + group.name[::-1].lower() + s[5:]
+        group.description = s
+    db.session.commit()
+
+
+def add_group_work_point():
+    group = Group(
+        description = generate_datetime_id(),
+        id = 0,
+        name = "WORKPOINT",
+        status = "start")
+    
+    db.session.add(group)
+    db.session.commit()
+    
+  
+
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()
@@ -774,7 +825,7 @@ if __name__ == "__main__":
         # change_value_type('group', ['id'], 'SERIAL')
 
         # create_customer_role()
-        # change_value_type('user', ['role_id'], 'INTEGER')
+        # change_value_type('group', ['rate'], 'VARCHAR(10)')
         # renameColumn('group',"updateAt", "updatedAt")
 
         # for table in ['message','group_member']:
@@ -809,6 +860,7 @@ if __name__ == "__main__":
         
 
         # transfer_data_to_postgres()
+        # set_group_generate_token()
 
 
         
@@ -816,10 +868,12 @@ if __name__ == "__main__":
         # change_foreign_key()
 
 
-        db.session.execute(text(
-        f'''
-        DELETE FROM "group" WHERE name LIKE 'Alice%';
+#         db.session.execute(text(
+#         f'''
+#         DELETE FROM "group" WHERE name LIKE 'Alice%';
 
-'''))
+# '''))
 
-        db.session.commit()
+#         db.session.commit()
+
+        renameColumn('group','rate','status')

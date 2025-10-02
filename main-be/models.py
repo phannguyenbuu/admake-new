@@ -12,13 +12,21 @@ from sqlalchemy import inspect
 from sqlalchemy import create_engine, MetaData, Table, select, insert
 from sqlalchemy.sql import func, text
 from psycopg2.extras import Json
+from datetime import timedelta
+from flask import Flask, jsonify, request
+from flask_jwt_extended import (
+    JWTManager, create_access_token,
+    jwt_required, get_jwt_identity
+)
+import logging
 
 app = Flask(__name__)
-# base_dir = os.path.abspath(os.path.dirname(__file__))
-# db_path = os.path.join(base_dir, "instance", "customers.db")
-
-# app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{db_path}"
-# app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+app.logger.setLevel(logging.DEBUG)
+app.secret_key = 'admake-secret-token'
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=15)
+app.config['JWT_SECRET_KEY'] = 'admake-jwt-secret-key'
+app.config['UPLOAD_FOLDER'] = os.path.join(os.getcwd(), 'static')
+os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -26,10 +34,15 @@ load_dotenv()
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
 db = SQLAlchemy(app)
 
+jwt = JWTManager(app)
 
 
 
-CORS(app)
+CORS(app, supports_credentials=True, resources={
+    r"/api/*": {
+        "origins": ["http://localhost:5173", "https://archbox.pw"]
+    }
+})
 
 
 class BaseModel(db.Model):
@@ -38,13 +51,9 @@ class BaseModel(db.Model):
     
 
     deletedAt = db.Column(db.DateTime, nullable=True)
-    createdAt = db.Column(db.DateTime)
-    updatedAt = db.Column(db.DateTime)
+    createdAt = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+    updatedAt = db.Column(db.DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
     version = db.Column(db.Integer)
-
-
-
- 
 
 
 class Material(BaseModel):
@@ -223,7 +232,7 @@ class Role(BaseModel):
         return result
 
     @staticmethod
-    def parse(data):
+    def create_item(data):
         return Role(
             permissions=data.get("permissions"),
             name=data.get("name"),
@@ -374,7 +383,7 @@ class Group(BaseModel):
     images = db.Column(db.JSON, default=[])     # Lưu danh sách đường dẫn hình ảnh
     chats = db.Column(db.JSON, default=[])      # Lưu danh sách message ID lưu lại
     rating_sum = db.Column(db.Integer, default=0)
-    rating_count = db.Column(db.Integer, default=0)
+    status = db.Column(db.String(10), default=0)
     # createdAt = db.Column(db.DateTime(timezone=True), server_default=func.now())
     # updatedAt = db.Column(db.DateTime(timezone=True), server_default=func.now())
 
@@ -388,7 +397,7 @@ class Group(BaseModel):
             result[column.name] = value
 
         result['members'] = self.total_members
-        
+                
         return result
     
     @staticmethod
@@ -429,9 +438,7 @@ class Group(BaseModel):
     def all_messages(self):
         return Message.query.filter_by(group_id=self.id).order_by(Message.createdAt).all()
 
-    @property
-    def total_unread_messages(self):
-        return Message.query.filter_by(group_id=self.id, is_unread=True).count()
+   
 
     @property
     def last_message(self):
@@ -510,7 +517,7 @@ class Message(BaseModel):
     text = db.Column(db.String(500))
     file_url = db.Column(db.String(255), nullable=True)
     
-    is_unread = db.Column(db.Boolean, default=False)
+    role = db.Column(db.Integer, default=0)
     is_favourite = db.Column(db.Boolean, default=False)
 
     react = db.Column(db.JSON)
@@ -528,7 +535,7 @@ class Message(BaseModel):
                 value = value.isoformat()
             result[column.name] = value
         
-        result["role"] = self.user.role_id
+        # result["role"] = self.user.role_id
         return result
 
     @staticmethod
@@ -546,7 +553,6 @@ class Message(BaseModel):
                     user_id=user_id,
                     text=params.get('text', ''),
                     # username=params.get('username', ''),
-                    is_unread=params.get('is_unread', '') != 'SUCCESS',
                     file_url = params.get('file_url',''),
                     is_favourite = params.get('is_favourite', True),
                     react = params.get('react',''),

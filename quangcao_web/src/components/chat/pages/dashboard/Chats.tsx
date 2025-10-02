@@ -9,7 +9,7 @@ import { Search, SearchIconWrapper, StyledInputBase } from '../../components/Sea
 import ChatElement, {WorkElement} from '../../components/ChatElement';
 import infors from '../../json/works.json';
 import useApiFlaskReceive from "../../api/ApiFlaskReceive";
-import { useUser } from '../../UserContext';
+import { useUser } from '../../../../common/hooks/useUser';
 import { useWindowDimensions} from '../../hooks/useResponsive';
 
 const Chats = () => {

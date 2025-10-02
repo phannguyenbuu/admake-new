@@ -1,1 +1,1 @@
-export const TOKEN_LABEL = 'ACCESS_TOKEN';
+export const TOKEN_LABEL = 'admake-secret-token';

@@ -31,6 +31,9 @@ import { useInfo } from "./common/hooks/info.hook";
 // import Error403 from "./app/403";
 import { Navigate } from "react-router-dom";
 import QrPage from "./components/qr/QrPage";
+import RequireAuth from "./services/RequireAuth";
+import GroupQRPage from "./components/chat/components/GroupQRPage";
+
 
 // Route guard: chặn truy cập nếu không có quyền
 function RequireRoles({
@@ -60,37 +63,36 @@ interface TRoute extends Omit<NonIndexRouteObject, "index" | "children"> {
   isMainMenu?: boolean;
   index?: boolean;
 }
+
+
 const routes: TRoute = {
   path: "/",
   element: <BaseLayout />,
   errorElement: <Error404 />,
   children: [
-    // {
-    //   path: "/",
-    //   index: true,
-    //   lazy: () => import("./app/login/page"),
-    //   title: "Đăng nhập",
-    //   ignoreInMenu: true,
-    // },
-
+    
     {
+      path: "/login", // chuyển trang login thành path 'login' tách biệt
       index: true,
-      element: <Navigate to="/dashboard" replace />,
-    },
-    {
-      path: "login", // chuyển trang login thành path 'login' tách biệt
       lazy: () => import("./app/login/page"),
       title: "Đăng nhập",
       ignoreInMenu: true,
     },
     
     {
-  path: "qr/:name/:description",
-  element: <QrPage />,
-  title: "QR Code Dynamic",
-  ignoreInMenu: true,
-},
+      path: "/qr/:name/:description",
+      element: <QrPage />,
+      title: "QR Code Dynamic",
+      ignoreInMenu: true,
+    },
 
+    
+    {
+      path: "/chat/:id/:token",
+      element: <GroupQRPage/>,
+      title: "Chat Group",
+      ignoreInMenu: true,
+    },
 
 
     {
@@ -229,6 +231,7 @@ type MenuItem = {
 };
 export function getMainMenuItems(pathname?: string): MenuItem[] {
   const { data: user } = useInfo();
+  // console.log('Parm', user);
   // const { setAdminMode } = useAdminMode();
   if (!pathname) {
     pathname = window.location.pathname;

@@ -8,7 +8,7 @@ import Shortcuts from '../../sections/settings/Shortcuts';
 
 import { CenterBox } from '../../components/commons/TitlePanel';
 import infor from '../../json/attendance.json';
-import { useUser } from '../../UserContext';
+import { useUser } from '../../../../common/hooks/useUser';
 import CommentDialog from '../../components/CommentDialog';
 import CameraDialog from '../../components/commons/CameraDialog';
 // import ReportDialog from '../../components/ReportDialog';

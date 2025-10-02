@@ -12,6 +12,18 @@ def get_roles():
 
     return jsonify(roles)
 
+@role_bp.route("/role/list/permission/", methods=["GET"])
+def get_role_list_permission():
+    result = set()
+    roles = Role.query.all()
+    for c in roles:
+        # Giả sử c.permissions là list hoặc iterable các permission string
+        # Nếu là dict, cần lấy keys hoặc values tùy ý
+        result.update(c.permissions)  # thêm nhiều phần tử vào set
+
+    return jsonify(list(result))  # convert set thành list để jsonify
+
+
 @role_bp.route("/", methods=["POST"])
 def create_role():
     data = request.get_json()

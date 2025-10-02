@@ -4,42 +4,51 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useLoading } from "../../common/hooks/useLoading";
 import type { User } from "../../@types/user.type";
 import { AuthService } from "../../services/auth.service";
+// import { useNavigate } from "react-router-dom";
+import { useUser } from "../../common/hooks/useUser";
 import { TOKEN_LABEL } from "../../common/config";
-import { useNavigate } from "react-router-dom";
 
 const LoginForm = () => {
   const { loading, toggle } = useLoading();
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { login } = useUser();  // lấy hàm login từ context
 
   const { mutate } = useMutation({
     mutationFn: async (values: Pick<User, "username" | "password">) => {
-      // Chuyển đổi username thành lowercase trước khi gửi
       const normalizedValues = {
         ...values,
-        username: values.username.toLowerCase(),
+        username: values.username,
       };
-      return AuthService.login(normalizedValues);
+      return AuthService.login(normalizedValues); // gọi API login backend
     },
     onError: (error) => {
       notification.error({
         message: "Đăng nhập thất bại",
         description:
-          error instanceof Error
-            ? error.message
-            : "Đã xảy ra lỗi khi đăng nhập",
+          error instanceof Error ? error.message : "Đã xảy ra lỗi khi đăng nhập",
       });
     },
-    onSuccess: (data) => {
-      // Clear tất cả cache cũ trước khi login
+    onSuccess: async (data) => {
       queryClient.clear();
+      // localStorage.setItem(TOKEN_LABEL, data.access_token);
 
-      localStorage.setItem(TOKEN_LABEL, data.access_token);
+      // Sau khi login backend trả về, gọi login context truyền credentials để cập nhật trạng thái
+      try {
+        await login({
+          username: data.username,
+          password: "" // hoặc để "" nếu backend không yêu cầu password ở đây
+        });
+      } catch (e) {
+        notification.error({ message: "Lỗi cập nhật trạng thái người dùng" });
+      }
+
       notification.success({
         message: "Đăng nhập thành công",
         description: `Chào mừng bạn quay trở lại!`,
       });
-      navigate("/dashboard");
+
+      // navigate("/dashboard", { replace: true });
     },
     onMutate: toggle,
     onSettled: toggle,
@@ -59,7 +68,6 @@ const LoginForm = () => {
       >
         <Input prefix={<UserOutlined />} placeholder="Nhập tên đăng nhập" />
       </Form.Item>
-
       <Form.Item
         label="Mật khẩu"
         name="password"

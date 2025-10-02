@@ -52,11 +52,11 @@ export default function RenderMenuBar({}) {
   const { data: workSpaces, refetch: refetchWorkSpaces } =
     useWorkSpaceQueryAll();
 
-  console.log("Init works", workSpaces);
+  // console.log("Init works", workSpaces);
 
   const { mutate: createWorkSpace } = useCreateWorkSpace();
 
-  const adminMode = useCheckPermission();
+  const adminMode = true; //useCheckPermission();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isTabletWorkspaceModalOpen, setIsTabletWorkspaceModalOpen] =

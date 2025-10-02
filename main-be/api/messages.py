@@ -3,6 +3,7 @@ from models import db, app, dateStr, Message
 from api.chat import socketio
 import os
 
+
 message_bp = Blueprint('message', __name__, url_prefix='/api/message')
 
 @message_bp.route("/", methods=["GET"])
@@ -83,6 +84,13 @@ def delete_message(message_id):
 
 @message_bp.route('/upload', methods=['POST'])
 def upload_file():
+    import uuid
+
+    user_id = request.form.get('userId')
+    group_id = int(request.form.get('groupId'))
+    role = int(request.form.get('role'))
+
+
     if 'file' not in request.files:
         return jsonify({'error': 'No file provided'}), 400
     file = request.files['file']
@@ -100,6 +108,23 @@ def upload_file():
         filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
         print('New file name because an exist file', filename)
 
+
+    data = {
+        # 'id': msg.id,
+        'user_id': user_id,
+        'group_id': group_id,
+        'username': '',
+        # 'text': text,
+        'file_url': filename,
+        'link': filepath,
+        'role': role,
+    }
+
+    print(data)
+
     file.save(filepath)
+    
+    # socketio.emit('admake/chat/message', data, room=str(group_id))
+    
     return jsonify({'message': 'File uploaded successfully', 'filename': filename})
 
