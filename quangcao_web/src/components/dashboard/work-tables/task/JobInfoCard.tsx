@@ -1,33 +1,42 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Form, Input, Tag, Typography } from "antd";
 import { ProjectOutlined } from "@ant-design/icons";
-import type { Mode } from "../../../../@types/work-space.type";
 
 const { Text } = Typography;
 
-// Kiểu các trạng thái công việc
-type StatusType = "OPEN" | "IN_PROGRESS" | "DONE" | "REWARD" | string;
+export type StatusType = "OPEN" | "IN_PROGRESS" | "DONE" | "REWARD" | string;
 
+interface Task {
+  title?: string;
+  // các trường khác...
+}
 
-
-// Kiểu props của component
-// interface JobInfoCardProps {
-//   currentStatus: StatusType;
-//   mode: Mode;
-// }
+interface JobInfoCardProps {
+  currentStatus: StatusType;
+  taskDetail: Task | null;
+  form: any; // form instance từ Form.useForm()
+}
 
 const getStatusMeta = (status: string) => {
-    const statusMap: Record<string, any> = {
-      OPEN: { color: "blue", label: "Phân việc", icon: "📋" },
-      IN_PROGRESS: { color: "orange", label: "Sản xuất", icon: "⚡" },
-      DONE: { color: "green", label: "Hoàn thiện", icon: "✅" },
-      REWARD: { color: "purple", label: "Đã Nghiệm Thu", icon: "🏆" },
-    };
-    return statusMap[status] || statusMap.OPEN;
+  const statusMap: Record<string, any> = {
+    OPEN: { color: "blue", label: "Phân việc", icon: "📋" },
+    IN_PROGRESS: { color: "orange", label: "Sản xuất", icon: "⚡" },
+    DONE: { color: "green", label: "Hoàn thiện", icon: "✅" },
+    REWARD: { color: "purple", label: "Đã Nghiệm Thu", icon: "🏆" },
   };
+  return statusMap[status] || statusMap.OPEN;
+};
 
-const JobInfoCard: React.FC<{currentStatus: StatusType, mode: Mode}> 
-  = ({ currentStatus, mode }) => {
+const JobInfoCard: React.FC<JobInfoCardProps> = ({ currentStatus, taskDetail, form }) => {
+  useEffect(() => {
+    if (taskDetail) {
+      form.setFieldsValue({
+        title: taskDetail.title || "",
+        // có thể set thêm các trường khác
+      });
+    }
+  }, [taskDetail, form]);
+
   return (
     <div className="bg-gray-50 rounded-lg border border-gray-200 shadow-sm p-3 sm:p-4 mb-3 sm:mb-4 hover:shadow-md transition-all duration-300">
       <div className="flex items-center gap-2 mb-2 sm:mb-3">
@@ -44,10 +53,8 @@ const JobInfoCard: React.FC<{currentStatus: StatusType, mode: Mode}>
           name="title"
           label={
             <div className="flex items-center gap-1.5 sm:gap-2">
-              <div className="w-1 h-1 bg-cyan-500 rounded-full"></div>
-              <span className="text-gray-800 font-medium text-xs sm:text-sm">
-                Tên công việc
-              </span>
+              <div className="w-1 h-1 bg-cyan-500 rounded-full" />
+              <span className="text-gray-800 font-medium text-xs sm:text-sm">Tên công việc</span>
               <span className="text-red-500">*</span>
             </div>
           }
@@ -61,7 +68,6 @@ const JobInfoCard: React.FC<{currentStatus: StatusType, mode: Mode}>
             placeholder="Nhập tên công việc..."
             className="!h-9 sm:!h-10 !text-xs sm:!text-sm !rounded-lg !border !border-gray-300 focus:!border-cyan-500 focus:!shadow-lg hover:!border-cyan-500 !transition-all !duration-200 !shadow-sm"
             size="middle"
-            disabled={!mode.adminMode}
           />
         </Form.Item>
 

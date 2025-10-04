@@ -16,7 +16,7 @@ def get_task_by_id(id):
 
     if task is None:
         abort(404, description="Task not found")
-    return jsonify(task.to_dict())
+    return jsonify({"data":task.to_dict(),"message":"Success"}),200
 
 @task_bp.route("/<string:id>", methods=["PUT"])
 def update_task(id):

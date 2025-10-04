@@ -37,7 +37,7 @@ export interface WorkSpace {
   cover?: string;
 }
 
-export interface Material {
+export interface MaterialTask {
   materialId: string;
   material: {
     name: string;
@@ -52,12 +52,14 @@ export interface Task extends BaseEntity {
   status: string; // có thể thu hẹp thành "OPEN" | "DONE" | ...
   type: string; // có thể thu hẹp thành "REWARD" | ...
   reward: number; // số tiền thưởng
+  amount: number;
+  salary_type: "monthly" | "task" | string;
   assignIds: string[]; // id của user
   workspaceId: string; // id của workspace
   customerId: string; // id của customer
-  materials: Material[]; // danh sách vật tư
-  startTime?: string | Date; // Thời gian bắt đầu
-  endTime?: string | Date; // Thời gian kết thúc
+  materials: MaterialTask[]; // danh sách vật tư
+  start_time?: string | Date; // Thời gian bắt đầu
+  end_time?: string | Date; // Thời gian kết thúc
 }
 
 export interface TaskGroup {
@@ -79,7 +81,15 @@ export interface ManagermentBoardProps {
   workspaceId: string;
 }
 
+export interface FormTaskDetailProps {
+  taskDetail: Task | null;
+  workspaceId: string;
+  form: any;
+}
+
+
 export interface FormTaskProps {
+  form: any;
   open: boolean;
   onCancel: () => void;
   taskId?: string;

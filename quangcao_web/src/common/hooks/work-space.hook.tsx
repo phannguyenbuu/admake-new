@@ -70,7 +70,7 @@ export function useGetTaskById(id: string) {
     queryFn: async () => {
       try {
         const response = await TaskService.getById(id);
-        return response; // trả về data đúng
+        return response.data; // trả về data đúng
       } catch (error) {
         throw error; // ném lỗi để React Query nhận biết và set isError=true
       }

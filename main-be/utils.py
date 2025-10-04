@@ -832,6 +832,61 @@ def change_foreign_key():
     db.session.commit()
 
 
+def check_foreign_key():
+    result = db.session.execute(text('''
+SELECT
+    tc.constraint_name, 
+    tc.table_name, 
+    kcu.column_name, 
+    ccu.table_name AS foreign_table_name,
+    ccu.column_name AS foreign_column_name 
+FROM 
+    information_schema.table_constraints AS tc 
+    JOIN information_schema.key_column_usage AS kcu
+      ON tc.constraint_name = kcu.constraint_name
+     AND tc.table_schema = kcu.table_schema
+    JOIN information_schema.constraint_column_usage AS ccu
+      ON ccu.constraint_name = tc.constraint_name
+     AND ccu.table_schema = tc.table_schema
+WHERE 
+    tc.constraint_type = 'FOREIGN KEY' 
+    AND tc.table_schema = 'admake_chat'
+    AND (tc.table_name = 'customer' OR ccu.table_name = 'user');
+'''))
+    
+    print(result.all())
+    db.session.commit()
+
+def set_user_customer_foreign():
+    db.session.execute(text('''
+    ALTER TABLE customer
+ADD CONSTRAINT fk_customer_user
+FOREIGN KEY (user_id) REFERENCES "user"(id);
+'''))
+    
+    
+    db.session.commit()
+
+
+def delete_customer_user():
+    db.session.execute(text('''
+    DELETE FROM customer WHERE user_id IN (
+    SELECT id FROM "user"
+    WHERE "fullName" = 'Alice'
+);
+DELETE FROM "user"
+WHERE "fullName" = 'Alice';
+'''))
+        
+    db.session.commit()
+
+def delete_null_task():
+    db.session.execute(text('''
+DELETE FROM task
+WHERE start_time IS NULL;
+                            '''))
+    db.session.commit()
+
 def set_group_generate_token():
     for i, group in enumerate(Group.query.all()):
         s = generate_datetime_id()
@@ -877,8 +932,8 @@ if __name__ == "__main__":
         #     add_new_columns(table,['deletedAt'],'TIMESTAMP')
         #     add_new_columns(table,['version'],'INTEGER')
 
-        # add_new_columns('user',['status','role_id','type','phone'],'VARCHAR(50)')
-        # add_new_columns('user',['hashKey','fullName','avatar'],'VARCHAR(255)')
+        add_new_columns('task',['salary_type'],'VARCHAR(10)')
+        add_new_columns('task',['amount'],'INTEGER')
         # add_new_columns('user',['level_salary','version'],'INTEGER')
         # add_new_columns('user',['deletedAt'],'TIMESTAMP')
         # renameColumn('user', "createAt", "createdAt")
@@ -917,3 +972,7 @@ if __name__ == "__main__":
         # create_table_workpoint()
         # erase_table(Workpoint)
         # modify_workpoint()
+        # set_user_customer_foreign()
+        # check_foreign_key()
+        # delete_customer_user()
+        # delete_null_task()

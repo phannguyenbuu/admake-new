@@ -773,8 +773,8 @@ export default function ManagermentBoard({
         open={showFormTask}
         onCancel={() => {
           setShowFormTask(false);
-          setEditingTaskId(null);
-          setSelectedTask(null);
+          // setEditingTaskId(null);
+          // setSelectedTask(null);
         }}
         taskId={editingTaskId || undefined}
         workspaceId={workspaceId}

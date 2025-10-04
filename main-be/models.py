@@ -332,6 +332,8 @@ class Task(BaseModel):
     status = db.Column(db.String(50))
     type = db.Column(db.String(50))
     reward = db.Column(db.Integer)
+    amount = db.Column(db.Integer)
+    salary_type = db.Column(db.String(10))
     assign_ids = db.Column(db.JSON)  # lưu JSON string của list ObjectId
     workspace_id = db.Column(db.String(50))
     customer_id = db.Column(db.String(50))

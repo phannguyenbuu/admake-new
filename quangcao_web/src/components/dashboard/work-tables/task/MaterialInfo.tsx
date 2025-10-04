@@ -2,8 +2,9 @@ import React from "react";
 import { Typography } from "antd";
 import { MaterialSection } from "../../invoice/MaterialSection";
 import type { Mode } from "../../../../@types/work-space.type";
-import type { Material } from "../../../../@types/material.type";
-
+import type { MaterialTask } from "../../../../@types/work-space.type";
+import type { FormTaskDetailProps } from "../../../../@types/work-space.type";
+import type { Task } from "../../../../@types/work-space.type";
 
 const { Text } = Typography;
 
@@ -14,38 +15,31 @@ const { Text } = Typography;
 //   quantity?: number;
 // }
 
-interface MaterialData {
-  selectedMaterials: Material[];
-  materialQuantities: Record<string, number>;
-}
+// interface MaterialData {
+//   selectedMaterials: Material[];
+//   materialQuantities: Record<string, number>;
+// }
 
-interface MaterialHandlers {
-  materialCheck: (checked: boolean, material: any) => void;
-  materialRemove: (materialId: string) => void;
-  materialQuantityChange: (materialId: string, value: number | null) => void;
-}
+// interface MaterialHandlers {
+//   materialCheck: (checked: boolean, material: any) => void;
+//   materialRemove: (materialId: string) => void;
+//   materialQuantityChange: (materialId: string, value: number | null) => void;
+// }
 
-interface MaterialInfoProps {
-  currentStatus: string;
-  isEditMode: boolean;
-  mode: Mode;
-  material: MaterialData;
-  handlers: MaterialHandlers;
-  mappedTask?: {
-    materials?: {
-      material: Material & { quantity?: number };
-    }[];
-  };
-}
+// interface MaterialInfoProps {
+//   currentStatus: string;
+//   isEditMode: boolean;
+//   mode: Mode;
+//   material: MaterialData;
+//   handlers: MaterialHandlers;
+//   mappedTask?: {
+//     materials?: {
+//       material: Material & { quantity?: number };
+//     }[];
+//   };
+// }
 
-const MaterialInfo: React.FC<MaterialInfoProps> = ({
-  currentStatus,
-  isEditMode,
-  mode,
-  material,
-  handlers,
-  mappedTask,
-}) => {
+const MaterialInfo = ({taskDetail}:{taskDetail:Task | null}) => {
   return (
     <div className="bg-gray-50 rounded-lg border border-gray-200 shadow-sm p-3 sm:p-4 mb-3 sm:mb-4 hover:shadow-md transition-all duration-300">
       <div className="flex items-center gap-2 mb-2 sm:mb-3">
@@ -56,7 +50,7 @@ const MaterialInfo: React.FC<MaterialInfoProps> = ({
           Vật liệu cần thiết
         </Text>
       </div>
-      {currentStatus === "OPEN" && !isEditMode ? (
+      {/* {currentStatus === "OPEN"  ? (
         <MaterialSection
           selected={material.selectedMaterials}
           quantities={material.materialQuantities}
@@ -65,29 +59,29 @@ const MaterialInfo: React.FC<MaterialInfoProps> = ({
           onQuantityChange={handlers.materialQuantityChange}
           disabled={mode.adminMode && currentStatus !== "OPEN"}
         />
-      ) : (
+      ) : ( */}
         <div
           className="px-3 sm:px-4 pb-4 max-h-60 overflow-y-auto space-y-2"
           style={{ maxHeight: 240 }}
         >
           {/* @ts-ignore */}
-          {mappedTask?.materials?.map(({ material: mat }) => {
+          {taskDetail?.materials?.map((mat) => {
             const qty = mat.quantity || 1;
             return (
-              <div key={mat.id} className="p-2 md:p-0">
+              <div key={mat.materialId} className="p-2 md:p-0">
                 <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-3">
                   <div className="flex-1 min-w-0">
                     <span className="text-cyan-600 font-semibold cursor-pointer hover:underline block truncate">
-                      {mat?.name || "Unknown Material"}
+                      {mat?.material?.name || "Unknown Material"}
                     </span>
                   </div>
                   <div className="flex flex-wrap items-center gap-2 md:gap-3">
                     <span className="text-gray-600">Số lượng</span>
                     <span className="text-green-600 font-semibold text-sm">
-                      {qty} x {mat?.price.toLocaleString("vi-VN")}đ
+                      {qty} x {mat?.material?.price.toLocaleString("vi-VN")}đ
                     </span>
                     <span className="text-green-600 font-semibold text-sm">
-                      = {(mat?.price * qty).toLocaleString("vi-VN")}đ
+                      = {(mat?.material?.price * qty).toLocaleString("vi-VN")}đ
                     </span>
                   </div>
                 </div>
@@ -95,7 +89,7 @@ const MaterialInfo: React.FC<MaterialInfoProps> = ({
             );
           })}
         </div>
-      )}
+      {/* )} */}
     </div>
   );
 };
