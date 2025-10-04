@@ -81,7 +81,7 @@ function TaskDetails({ taskDetail, workspaceId }: FormTaskDetailProps) {
   },[taskDetail]);
 
   return (
-    <Form form={form}>
+    <Form form={form} style={{maxHeight:'80vh', overflowY:'auto'}}>
       <Stack spacing={1}>
         <JobInfoCard taskDetail={taskDetail} currentStatus={currentStatus} form={form} />
         

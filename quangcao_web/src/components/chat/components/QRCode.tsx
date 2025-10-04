@@ -20,6 +20,13 @@ const QRCode: React.FC<RatingButtonsProps> = ({ title, url, filename }) => {
   // const [open, setOpen] = useState(false);
   const svgRef = useRef<SVGSVGElement>(null);
 
+  const handleCopy = () => {
+    if (!url) return;
+    navigator.clipboard.writeText(url)
+      .then(() => alert("Đã sao chép URL vào clipboard!"))
+      .catch(() => alert("Sao chép thất bại."));
+  };
+
   const handleDownloadPNG = () => {
     if (!svgRef.current) return;
 
@@ -71,15 +78,30 @@ const QRCode: React.FC<RatingButtonsProps> = ({ title, url, filename }) => {
   const w = 180;
 
   return (
-      <Stack direction="column" spacing={0} style={{ padding:20, flexDirection:'column'}}>
+      <Stack direction="column" spacing={1} style={{ padding:20, flexDirection:'column'}}>
         <Stack direction="row" sx={{overflowX:'visible'}}>
           <DownloadIcon onClick={handleDownloadPNG} style={{width:40,height:40, color:'#0084a5ff', cursor:'pointer'}}/>  
           <p style={{whiteSpace:'normal',wordBreak: 'break-word',textAlign:'left',fontSize:10}}>{title}</p>
         </Stack>
         
         <QRCodeSVG value={url ?? ''} size={w} ref={svgRef} />
-        <p style={{width:w, whiteSpace:'normal',wordBreak: 'break-word',textAlign:'left',fontSize:10}}>{url}</p>
-                  
+        {/* <p style={{width:w, whiteSpace:'normal',wordBreak: 'break-word',textAlign:'left',fontSize:10}}>{url}</p> */}
+        <button
+      onClick={handleCopy}
+      style={{
+        padding: "5px 10px",
+        fontSize: 12,
+        cursor: "pointer",
+        marginLeft: 10,
+        borderRadius: 4,
+        width:160,
+        border: "1px solid #0084a5ff",
+        backgroundColor: "white",
+        color: "#0084a5ff"
+      }}
+    >
+      Copy
+    </button>
       </Stack>
       
   );

@@ -37,7 +37,7 @@ const Group: React.FC<GroupComponentProps> = ({ selected, setSelected }) => {
 
     useEffect(() => {
     if (selected !== null && selected !== undefined) {
-      console.log("SLEED", selected);
+    //   console.log("SLEED", selected);
       handleClick(selected); // Có thể truyền tên trống hoặc lấy từ data thực tế
       setShowFooter(selected?.status === "talk" || selected?.status === "pass");
     }
@@ -138,6 +138,38 @@ const [groupList, setGroupList] = useState<GroupProps[]>([]);
  }, [currentGroup]);
 
 
+ const handleDeleteGroup = () => {
+  if (!selected) return;
+
+  fetch(`${useApiHost()}/group/${selected.id}`, {
+    method: "DELETE",
+    headers: { "Content-Type": "application/json" },
+  })
+    .then((response) => {
+      if (!response.ok) throw new Error("Xóa nhóm thất bại");
+      return response.json();
+    })
+    .then(() => {
+      alert("Xóa nhóm chat thành công");
+
+      // Cập nhật lại groupList loại bỏ nhóm đã xóa
+      setGroupList((prevGroupList) =>
+        prevGroupList.filter((group) => group.id !== selected.id)
+      );
+
+      
+    })
+    .catch((err) => {
+      console.error(err);
+      alert("Lỗi khi xóa nhóm chat");
+    });
+};
+
+
+useEffect(()=>{
+    // setSelected && setSelected(groupList && groupList.length > 0 ? groupList[0] : null);
+},[groupList]);
+
 
  const theme = useTheme();
 //  const [openDialog, setOpenDialog] = useState(false);
@@ -210,6 +242,7 @@ const [groupList, setGroupList] = useState<GroupProps[]>([]);
                 username=''
                 onDelete={handleDeleteMessage}
                 showFooter={showFooter}
+                onGroupDelete={handleDeleteGroup}
             />
         
             {full &&

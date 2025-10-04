@@ -1,7 +1,7 @@
 import type { BaseEntity } from "./common.type";
 
 export type Material = BaseEntity & {
-  id: string;
+  id: number;
   name: string;
   quantity: number;
   unit: string;

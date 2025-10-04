@@ -25,6 +25,19 @@ def create_group():
 
     return jsonify(new_group.to_dict()), 201
 
+
+
+@group_bp.route("/<int:group_id>", methods=["DELETE"])
+def delete_group(group_id):
+    group = Group.query.get(group_id)
+    if not group:
+        return jsonify({"error": "Group not found"}), 404
+
+    db.session.delete(group)
+    db.session.commit()
+    return jsonify({"message": "Group deleted successfully"}), 200
+
+
 @group_bp.route("/<int:id>", methods=["GET"])
 def get_group_detail(id):
     group = db.session.get(Group, id)

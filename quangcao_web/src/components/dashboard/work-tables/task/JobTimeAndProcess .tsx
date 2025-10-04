@@ -48,7 +48,7 @@ const JobTimeAndProcess: React.FC<JobTimeAndProcessProps> = ({taskDetail, form})
   }, [taskDetail?.start_time, taskDetail?.end_time]);
 
   return (
-    <Stack spacing={2} sx={{maxWidth:400, overflowX:'hidden'}}>
+    <Stack spacing={0.2} sx={{maxWidth:400, overflowX:'hidden'}}>
       <div className="flex items-center gap-2 mb-2 sm:mb-3">
         <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-md bg-gradient-to-r from-orange-100 to-orange-200 flex items-center justify-center">
           <CalendarOutlined className="!text-orange-600 !text-xs sm:!text-sm" />
@@ -93,7 +93,7 @@ const JobTimeAndProcess: React.FC<JobTimeAndProcessProps> = ({taskDetail, form})
             label={
               <div className="flex items-center gap-1.5 sm:gap-2">
                 <div className="w-1 h-1 bg-orange-500 rounded-full"></div>
-                <span className="text-gray-800 font-medium text-xs sm:text-sm">Hình thức làm việc</span>
+                <span className="text-gray-800 font-medium text-xs sm:text-sm">Trả lương</span>
                 <span className="text-red-500">*</span>
               </div>
             }

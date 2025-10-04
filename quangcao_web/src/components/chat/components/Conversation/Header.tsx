@@ -6,17 +6,18 @@ import StyledBadge from '../StyledBadge';
 import { useUser } from '../../../../common/hooks/useUser';
 import SearchIcon from '@mui/icons-material/Search';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import type { GroupProps } from '../../../../@types/chat.type';
 
 interface HeaderProps {
   title: string;
   status: string | null;
-  onDeleteGroup?: () => void;
+  onGroupDelete?: () => void;
   onAddMember?: () => void;
   onLeaveGroup?: () => void;
 }
 
 const Header: React.FC<HeaderProps> 
-  = ({ title, status, onDeleteGroup, onAddMember, onLeaveGroup }) => {
+  = ({ title, status, onGroupDelete, onAddMember, onLeaveGroup }) => {
 
   const {userRoleId} = useUser();
   const full = userRoleId > 0;
@@ -40,7 +41,7 @@ const Header: React.FC<HeaderProps>
   // // Xử lý các sự kiện menu
   const handleDeleteGroup = () => {
     handleMenuClose();
-    if (onDeleteGroup) onDeleteGroup();
+    if (onGroupDelete) onGroupDelete();
   };
 
   // const handleAddMember = () => {

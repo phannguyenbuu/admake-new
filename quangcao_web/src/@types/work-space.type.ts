@@ -38,11 +38,7 @@ export interface WorkSpace {
 }
 
 export interface MaterialTask {
-  materialId: string;
-  material: {
-    name: string;
-    price: number;
-  };
+  materialId: number;
   quantity: number;
 }
 

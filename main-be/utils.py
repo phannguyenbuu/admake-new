@@ -15,6 +15,7 @@ from sqlalchemy import create_engine, MetaData, Table, select, insert
 from sqlalchemy.sql import func, text
 from psycopg2.extras import Json
 from sqlalchemy import create_engine, inspect
+from sqlalchemy.orm.attributes import flag_modified
 
 def load_customers():
     with open("json/customers.json", "r", encoding="utf-8") as f:
@@ -804,6 +805,13 @@ def modify_workpoint():
     db.session.commit()
 
 
+def modify_material_id_type():
+    db.session.execute(text('''
+ALTER TABLE material
+ALTER COLUMN id TYPE INTEGER USING id::integer;
+                            '''))
+    db.session.commit()
+
 def create_table_workpoint():
     db.session.execute(text('''
     DROP TABLE IF EXISTS workpoint;
@@ -904,7 +912,33 @@ def add_group_work_point():
     
     db.session.add(group)
     db.session.commit()
-    
+
+def modify_task_material():
+    # Bước 1: Lấy tất cả bản ghi Task
+    tasks = db.session.query(Task).all()
+
+    # Bước 2: Lấy tất cả materialId dưới dạng set
+    material_ids = set()
+    for task in tasks:
+        if task.materials:
+            for mat in task.materials:
+                material_ids.add(mat.get("materialId"))
+
+    # Chuyển set sang list để có thể lấy index
+    material_ids_list = list(material_ids)
+
+    # Bước 3: Gán lại materialId thành index tương ứng
+    for task in tasks:
+        if task.materials:
+            for mat in task.materials:
+                if mat.get("materialId") in material_ids_list:
+                    mat["materialId"] = material_ids_list.index(mat["materialId"])
+            
+            flag_modified(task, "materials")
+
+    # Cuối cùng, thay đổi trong db nếu cần:
+    # session.commit() nếu muốn lưu thay đổi
+    db.session.commit()
   
 
 if __name__ == "__main__":
@@ -932,8 +966,8 @@ if __name__ == "__main__":
         #     add_new_columns(table,['deletedAt'],'TIMESTAMP')
         #     add_new_columns(table,['version'],'INTEGER')
 
-        add_new_columns('task',['salary_type'],'VARCHAR(10)')
-        add_new_columns('task',['amount'],'INTEGER')
+        # add_new_columns('task',['salary_type'],'VARCHAR(10)')
+        # add_new_columns('task',['amount'],'INTEGER')
         # add_new_columns('user',['level_salary','version'],'INTEGER')
         # add_new_columns('user',['deletedAt'],'TIMESTAMP')
         # renameColumn('user', "createAt", "createdAt")
@@ -948,7 +982,7 @@ if __name__ == "__main__":
 
         # show_table()
 
-        # add_new_columns('group',['version'],'INTEGER')
+        add_new_columns('group',['address'],'VARCHAR(255)')
         
 
         # transfer_data_to_postgres()
@@ -976,3 +1010,6 @@ if __name__ == "__main__":
         # check_foreign_key()
         # delete_customer_user()
         # delete_null_task()
+
+        # modify_task_material()
+        # modify_material_id_type()

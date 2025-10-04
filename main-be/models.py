@@ -401,6 +401,7 @@ class Group(BaseModel):
     # groupId = db.Column(db.Integer, unique=True)
     name = db.Column(db.String(120), nullable=True)
     description = db.Column(db.String(255))
+    address = db.Column(db.String(255))
     documents = db.Column(db.JSON, default=[])  # Lưu danh sách đường dẫn tài liệu
     images = db.Column(db.JSON, default=[])     # Lưu danh sách đường dẫn hình ảnh
     chats = db.Column(db.JSON, default=[])      # Lưu danh sách message ID lưu lại
@@ -424,9 +425,11 @@ class Group(BaseModel):
     
     @staticmethod
     def create_item(params):
+        description_value = params.get('description') or generate_datetime_id()
+
         group = Group(
             name=params.get('name', 0),
-            description=params.get('description', ''),
+            description=description_value,
 
             documents=[],
             images=[],
