@@ -48,7 +48,7 @@ const LoginForm = () => {
         description: `Chào mừng bạn quay trở lại!`,
       });
 
-      // navigate("/dashboard", { replace: true });
+      window.location.href = "/dashboard";
     },
     onMutate: toggle,
     onSettled: toggle,

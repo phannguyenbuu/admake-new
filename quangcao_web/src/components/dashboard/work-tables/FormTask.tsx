@@ -72,7 +72,7 @@ export default function FormTask({
   const [form] = Form.useForm();
   const isEditMode = !!taskId; // TODO: check if task is edit mode
   const adminMode = useCheckPermission();
-  const { data: taskDetail } = useGetTaskById(taskId || "");
+  const { data: taskDetail, isLoading, isError, error } = useGetTaskById(taskId || "");
   const createTask = useCreateTask();
   const updateTask = useUpdateTask();
   const { data: info } = useInfo();
@@ -96,6 +96,7 @@ export default function FormTask({
   const [currentStatus, setCurrentStatus] = useState<string>("OPEN");
 
   const mappedTask = useMemo(() => {
+    console.log('Task detail', taskDetail);
     if (!taskDetail) return null;
     return {
       ...taskDetail,
@@ -104,8 +105,26 @@ export default function FormTask({
     };
   }, [taskDetail]);
 
+  useEffect(() => {
+    if (taskDetail) {
+      console.log('taskDetail:', taskDetail);
+    } else {
+      console.log('Chưa có dữ liệu taskDetail hoặc đang loading');
+    }
+  }, [taskDetail]);
 
-  console.log('Mapped-Task', mappedTask, taskDetail, users, taskId, workspaceId, material);
+
+  // console.log('taskDetail:',taskId, taskDetail);
+  useEffect(() => {
+    console.log('--->taskDetail:', taskDetail);
+  }, [taskDetail]);
+
+  if (isLoading) return <div>Đang tải...</div>;
+  if (isError) {
+  // Hiển thị lỗi cụ thể
+  return <div>Lỗi tải dữ liệu: {error?.message || 'Có lỗi xảy ra'}</div>;
+}
+  if (!taskDetail) return <div>Không có dữ liệu</div>;
 
   const [customer, setCustomer] = useState({
     searchValue: "", // tạo search value
@@ -122,7 +141,7 @@ export default function FormTask({
 
   useEffect(() => {
 
-    console.log("mappedTask changed:", mappedTask);
+    console.log('Mapped-Task', mappedTask, taskDetail, users, taskId, workspaceId, material);
 
     setMode({
       adminMode: adminMode,

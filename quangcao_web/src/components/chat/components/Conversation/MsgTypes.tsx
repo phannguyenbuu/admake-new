@@ -1,6 +1,5 @@
 import { Avatar, Box, Divider, IconButton, Link, Stack, Typography, Menu, MenuItem, ListItemIcon } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { DotsThreeVertical, DownloadSimple, Image } from 'phosphor-react';
 import React, { useEffect, useState } from 'react';
 import { useUser } from '../../../../common/hooks/useUser';
 import StarIcon from '@mui/icons-material/Star';
@@ -19,6 +18,9 @@ import PanToolIcon from '@mui/icons-material/PanTool';
 import type { MsgTypeProps } from '../../../../@types/chat.type';
 import { useApiHost, useApiStatic } from '../../../../common/hooks/useApiHost';
 import { Link as RouterLink } from 'react-router-dom';
+import ImageIcon from '@mui/icons-material/Image';
+import DownloadIcon from '@mui/icons-material/Download';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
 
 const baseUrl = useApiStatic();
 
@@ -95,10 +97,10 @@ const DocMsg:React.FC<MsgTypeProps> = ({ el, menu, onDelete }) => {
             alignItems="center"
             sx={{ backgroundColor: theme.palette.background.paper, borderRadius: 1 }}
           >
-            <Image size={48} />
+            <ImageIcon fontSize="large" />
             <Typography variant="caption">{el.file_url}</Typography>
             <IconButton onClick={handleDownload}>
-              <DownloadSimple />
+              <DownloadIcon fontSize="large" />
             </IconButton>
           </Stack>
           <Typography variant="body2" sx={{ color: el.incoming ? "#000" : "#fff" }}>
@@ -295,13 +297,14 @@ const MessageOptions: React.FC<MsgTypeProps> = ({el, onDelete }) => {
 
   return (
     <>
-    <DotsThreeVertical 
+    <MoreVertIcon  
     id="basic-button"
-    aria-controls={open ? 'basic-menu' : undefined}
-    aria-haspopup="true"
-    aria-expanded={open ? 'true' : undefined}
+    // aria-controls={open ? 'basic-menu' : undefined}
+    // aria-haspopup="true"
+    // aria-expanded={open ? 'true' : undefined}
     onClick={handleClick}
-    size={20}
+    // size={20}
+    fontSize='small'
     />
 
     <Menu

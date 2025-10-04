@@ -18,7 +18,7 @@ const ChatGroupList: React.FC = ({}) => {
   const {userId, userRoleId} = useUser();
   
   useEffect(() => {
-    console.log('!!!API', API_HOST);
+    // console.log('!!!API', API_HOST);
 
     fetch(`${API_HOST}/group/`)
       .then((res) => res.json())
@@ -64,7 +64,7 @@ const ChatGroupList: React.FC = ({}) => {
       </Dropdown>
 
       {/* Model popup */}
-      <Modal visible={modalVisible} onOk={handleOk} onCancel={handleOk} footer={null}
+      <Modal open={modalVisible} onOk={handleOk} onCancel={handleOk} footer={null}
         title={`ID của group là: ${selectedId?.id} - ${selectedId?.name}`}
         okText="OK" cancelButtonProps={{ style: { display: "none" } }}
         style={{ padding:0, minWidth: '96vw'}}

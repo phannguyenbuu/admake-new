@@ -87,7 +87,10 @@ def upload_file():
     import uuid
 
     user_id = request.form.get('userId')
-    group_id = int(request.form.get('groupId'))
+    try:
+        group_id = int(request.form.get('groupId', '0'))
+    except ValueError:
+        group_id = 0  # hoặc xử lý lỗi phù hợp
     role = request.form.get('role')
     latitude = request.form.get('latitude')
     longitude = request.form.get('longitude')
@@ -99,18 +102,21 @@ def upload_file():
     file = request.files['file']
     if file.filename == '':
         return jsonify({'error': 'Empty filename'}), 400
-
+    
+    
     original_filename = file.filename
     name, ext = os.path.splitext(original_filename)  # tách phần tên và phần mở rộng
     filename = original_filename
     filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
 
+    
     if os.path.exists(filepath):
         # Tạo tên file mới dạng filename_{uuid}.ext
         filename = f"{name}_{uuid.uuid4().hex}{ext}"
         filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
         print('New file name because an exist file', filename)
 
+    
 
     data = {
         # 'id': msg.id,
@@ -126,8 +132,8 @@ def upload_file():
         'time': time,
     }
 
-    print(data)
-
+    
+    
     file.save(filepath)
     
     # socketio.emit('admake/chat/message', data, room=str(group_id))

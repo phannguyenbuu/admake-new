@@ -67,7 +67,15 @@ export function useGetTaskById(id: string) {
   return useQuery({
     // cần refectch mỗi khi mở lại form task
     queryKey: [TASK_QUERY_KEY, id],
-    queryFn: () => TaskService.getById(id).then(response => response.data),
+    queryFn: async () => {
+      try {
+        const response = await TaskService.getById(id);
+        return response; // trả về data đúng
+      } catch (error) {
+        throw error; // ném lỗi để React Query nhận biết và set isError=true
+      }
+    },
+
     enabled: !!id,
     staleTime: 0,
     refetchOnMount: true,

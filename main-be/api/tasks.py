@@ -12,11 +12,11 @@ def get_tasks():
 
 @task_bp.route("/<string:id>", methods=["GET"])
 def get_task_by_id(id):
-    task = Task.query.filter_by(id=id).first()
+    task = db.session.get(Task,id)
 
     if task is None:
         abort(404, description="Task not found")
-    return jsonify(task)
+    return jsonify(task.to_dict())
 
 @task_bp.route("/<string:id>", methods=["PUT"])
 def update_task(id):

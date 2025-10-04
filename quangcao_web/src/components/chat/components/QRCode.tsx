@@ -68,6 +68,8 @@ const QRCode: React.FC<RatingButtonsProps> = ({ title, url, filename }) => {
   //   setQRContent();
   // }, [groupEl]);
 
+  const w = 180;
+
   return (
       <Stack direction="column" spacing={0} style={{ padding:20, flexDirection:'column'}}>
         <Stack direction="row" sx={{overflowX:'visible'}}>
@@ -75,8 +77,8 @@ const QRCode: React.FC<RatingButtonsProps> = ({ title, url, filename }) => {
           <p style={{whiteSpace:'normal',wordBreak: 'break-word',textAlign:'left',fontSize:10}}>{title}</p>
         </Stack>
         
-        <QRCodeSVG value={url ?? ''} size={200} ref={svgRef} />
-        <p style={{width:200, whiteSpace:'normal',wordBreak: 'break-word',textAlign:'left',fontSize:10}}>{url}</p>
+        <QRCodeSVG value={url ?? ''} size={w} ref={svgRef} />
+        <p style={{width:w, whiteSpace:'normal',wordBreak: 'break-word',textAlign:'left',fontSize:10}}>{url}</p>
                   
       </Stack>
       

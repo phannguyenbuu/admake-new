@@ -3,14 +3,16 @@ import { Box, Fab, IconButton, InputAdornment, Stack, TextField, Tooltip } from 
 import React, { forwardRef, useRef, useState, useEffect } from 'react';
 import type { Ref } from 'react';
 import { styled, useTheme } from "@mui/material/styles";
-import { LinkSimple, PaperPlaneTilt, Smiley, Camera, File, Image, Sticker } from 'phosphor-react';
 import { useUser } from "../../../../common/hooks/useUser.js";
-import FileUpload from './FileUpload.js';
-import { useWindowDimensions } from '../../hooks/useResponsive';
 import type { MessageTypeProps } from '../../../../@types/chat.type.js';
 import { generateUniqueIntId } from '../../../../@types/chat.type.js';
 import { useApiHost } from '../../../../common/hooks/useApiHost.js';
 import type { GroupProps } from '../../../../@types/chat.type.js';
+import CameraIcon from '@mui/icons-material/Camera';
+import SendIcon from '@mui/icons-material/Send';
+import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
+import LinkIcon from '@mui/icons-material/Link';
+import SentimentSatisfiedIcon from '@mui/icons-material/SentimentSatisfied';
 
 const StyledInput = styled(TextField)(({ theme }) => ({
   "& .MuiInputBase-input": {
@@ -22,7 +24,7 @@ const StyledInput = styled(TextField)(({ theme }) => ({
 const Actions = [
   {
     color:'#0172e4',
-    icon: <Camera size={24}/>,
+    icon: <CameraIcon fontSize="large"/>,
     y:50,
     title:'Image'
   },
@@ -153,20 +155,20 @@ const ChatInput = forwardRef<HTMLDivElement, ChatInputProps>(
               ))}
               <Tooltip placement='right' title='Document'>
                 <Fab  onClick={() => handleUploadDocument()} sx={{position:'absolute', top: -120, backgroundColor: '#0159b2'}}>
-                  <File size={24}/>
+                  <InsertDriveFileIcon fontSize="large"/>
                 </Fab>
               </Tooltip>
             </Stack>
             <InputAdornment position="start">
               <IconButton onClick={() => setOpenAction(prev => !prev)}>
-                <LinkSimple/>
+                <LinkIcon/>
               </IconButton>
             </InputAdornment>
           </Stack>,
         endAdornment: 
           <InputAdornment position="end">
             <IconButton onClick={() => setOpenPicker(prev => !prev)}>
-              <Smiley/>
+              <SentimentSatisfiedIcon />
             </IconButton>
           </InputAdornment>
       }}
@@ -283,7 +285,7 @@ const Footer = forwardRef<HTMLDivElement, FooterProps>(
             onClick={() => sendMessage(inputValue)}
             >
             <Stack sx={{ height: '100%', width: '100%', alignItems: 'center', justifyContent: 'center' }}>
-              <IconButton><PaperPlaneTilt color='#fff' /></IconButton>
+              <IconButton><SendIcon/></IconButton>
             </Stack>
           </Box>
         </Stack>

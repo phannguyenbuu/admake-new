@@ -1,22 +1,19 @@
  import { Box, Button, Stack, Typography, Link, IconButton, Divider } from '@mui/material'
 import React, { useState, useEffect } from 'react';
 import { Search, SearchIconWrapper, StyledInputBase } from '../../components/Search'
-import { MagnifyingGlass, Plus, WindowsLogo, CaretLeft, CaretRight, X } from 'phosphor-react';
 import { useTheme } from "@mui/material/styles";
-
+import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
+import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import '../../css/global.css';
-import { useSelector } from "react-redux";
+
 import ChatElement from '../../components/ChatElement';
-import CreateGroup from '../../sections/main/CreateGroup';
-import useApiFlaskReceive from "../../api/ApiFlaskReceive";
+
 import Conversation from "../../components/Conversation";
 import { socket } from '../../components/Conversation/socket';
 import Contact from '../../components/Contact';
-import StarredMessages from '../../components/StarredMessages';
-import SharedMessages from '../../components/SharedMessages';
-import { useWindowDimensions } from '../../hooks/useResponsive';
 import type { GroupProps, MessageTypeProps } from '../../../../@types/chat.type';
 import { useUser } from '../../../../common/hooks/useUser';
+import SearchIcon from "@mui/icons-material/Search";
 
 import { useApiHost, useApiSocket } from '../../../../common/hooks/useApiHost';
 interface GroupComponentProps {
@@ -158,7 +155,7 @@ const [groupList, setGroupList] = useState<GroupProps[]>([]);
                  <Stack p={0} spacing={2}>
                      <Search>
                          <SearchIconWrapper>
-                             <MagnifyingGlass color="#709CE6" />
+                             <SearchIcon color="primary" />
                          </SearchIconWrapper>
                          
                      </Search>
@@ -243,7 +240,7 @@ const [groupList, setGroupList] = useState<GroupProps[]>([]);
              }}
             
              onClick={() => setShowLeft(!showLeft)}>
-                 {!showLeft ? <Box sx={{ml:0}}><CaretRight size={24} weight="bold" /></Box> : <X size={24} weight="bold" />}
+                 {!showLeft && <Box sx={{ml:0}}><KeyboardArrowRightIcon fontSize="large"/></Box>}
              </Button>
              <Button sx={{
                  position: "fixed",
@@ -254,9 +251,9 @@ const [groupList, setGroupList] = useState<GroupProps[]>([]);
                  display: { xs: "none", sm: "none" },
                  zIndex: 999,
              }} onClick={() => setShowRight(!showRight)}>
-                 {!showRight ? <Box sx={{position:'relative', left:20}}>
-                     <CaretLeft size={24} weight="bold" />
-                 </Box> : <X size={24} weight="bold" />}
+                 {!showRight && <Box sx={{position:'relative', left:20}}>
+                     <KeyboardArrowLeftIcon fontSize="large" />
+                 </Box>}
              </Button>
          </Stack>
 

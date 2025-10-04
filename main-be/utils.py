@@ -1,5 +1,5 @@
 import json
-from models import db, app, User, Group, Customer, Material, parse_date, Role, Message, Task, Workspace, generate_datetime_id
+from models import db, app, User, Group,Workpoint, Customer, Material, parse_date, Role, Message, Task, Workspace, generate_datetime_id
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 import json
@@ -784,6 +784,26 @@ def fix_invalid_foreign_keys():
 
     db.session.commit()
 
+def erase_table(table):
+    db.session.query(table).delete()
+
+    # Commit thay đổi vào DB
+    db.session.commit()
+
+
+def modify_workpoint():
+    # Cách mới với Session.get()
+    workpoint = db.session.get(Workpoint, "20251003004356040983f1f591")
+
+    if "morning" in workpoint.checklist and "out" in workpoint.checklist["morning"]:
+        del workpoint.checklist["morning"]["out"]
+
+    from sqlalchemy.orm.attributes import flag_modified
+    flag_modified(workpoint, "checklist")
+
+    db.session.commit()
+
+
 def create_table_workpoint():
     db.session.execute(text('''
     DROP TABLE IF EXISTS workpoint;
@@ -894,4 +914,6 @@ if __name__ == "__main__":
 #         db.session.commit()
         # add_group_work_point()
         # renameColumn('group','rate','status')
-        create_table_workpoint()
+        # create_table_workpoint()
+        # erase_table(Workpoint)
+        # modify_workpoint()

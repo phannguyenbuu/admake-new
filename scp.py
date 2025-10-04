@@ -67,7 +67,11 @@ def upload_to_vps_multiple(host, port, username, password, local_dirs, remote_ba
     ssh.connect(hostname=host, port=port, username=username, password=password, timeout=60)
     sftp = ssh.open_sftp()
 
-    upload_multiple_dirs(sftp, local_dirs, remote_base_dir)
+
+    fixed_dirs = [dir_path.replace("\\", "/") for dir_path in local_dirs]
+
+
+    upload_multiple_dirs(sftp, fixed_dirs, remote_base_dir)
 
     sftp.close()
     ssh.close()
@@ -88,6 +92,7 @@ local_dirs = [
     # "main-be",
     # "quangcao_web/public",
     # "quangcao_web/src",
+    # "quangcao_web/package.json",
     # "chat-fe/public",
     # "chat-fe/src",
     # "chat-be",
@@ -105,6 +110,12 @@ local_dirs = [
     "main-be/.env",
     "main-be/api",
 
+    # r"quangcao_web\src\common\data.tsx",
+    # "quangcao_web/src/components/chat/components/Camera",
+    # r"quangcao_web\src\common\layouts\base\AppHeader.tsx",
+    # "quangcao_web/src/components/chat/components/commons/TitlePanel.tsx",
+    # r"quangcao_web\src\common\data.tsx",
+    # "quangcao_web/src/common/hooks",
     # "quangcao_web/.env",
     # "main-be/api/chat.py",
     # "main-be/api/messages.py",

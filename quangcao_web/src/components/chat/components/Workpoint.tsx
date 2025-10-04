@@ -3,9 +3,11 @@ import React,  { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import type { User } from "../../../@types/user.type";
 import { useApiHost } from "../../../common/hooks/useApiHost";
-import CameraDialog from "./commons/CameraDialog";
+import CameraDialog from "./Camera/CameraDialog";
+import { useLocation } from "react-router-dom";
 
 const Workpoint = () => {
+    
   const { id } = useParams<{ id: string }>();
 
   // Gọi API backend check với id và token

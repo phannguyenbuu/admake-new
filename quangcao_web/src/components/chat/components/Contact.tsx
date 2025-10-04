@@ -1,21 +1,11 @@
-import { notification } from 'antd/lib';
 import { Avatar,Tabs, Tab, ToggleButton, ToggleButtonGroup, Grid, Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Divider, IconButton, Slide, Stack, Typography} from '@mui/material'
 import React, { useState, useEffect } from 'react';
 import {useTheme } from "@mui/material/styles";
-import { Bell, CaretRight, Phone, Prohibit, Star, Trash, VideoCamera, X } from 'phosphor-react';
-import { useDispatch } from 'react-redux';
-import { ToggleSidebar, UpdateSidebarType } from '../redux/slices/app';
-import AntSwitch from './AntSwitch';
 import '../css/global.css';
-import { useUser } from '../../../common/hooks/useUser';
-import { SvgIcon } from '@mui/material';
 import { useApiStatic } from '../../../common/hooks/useApiHost';
 import type { GroupProps, MessageTypeProps } from '../../../@types/chat.type';
 import type { SlideProps } from '@mui/material';
-import NotificationsIcon from '@mui/icons-material/Notifications';
 import StarIcon from '@mui/icons-material/Star';
-import { WorkSpaceService } from '../../../services/work-space.service';
-import { useApiHost } from '../../../common/hooks/useApiHost';
 import RatingButtons from './RatingButtons';
 
 import QRCode from './QRCode';

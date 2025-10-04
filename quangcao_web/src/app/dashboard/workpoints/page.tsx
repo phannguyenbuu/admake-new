@@ -51,22 +51,7 @@ export const WorkPointPage: IPage["Component"] = () => {
         columns={columnsWorkPoint}
         dataSource={users?.data}
         loading={isLoadingUsers}
-        rowSelection={{
-          type: "radio",
-          columnWidth: 100,
-          renderCell: (_, record) => {
-            return (
-              <EditOutlined
-                className="!text-cyan-600 !cursor-pointer !text-xl"
-                onClick={() => {
-                  setUser(record);
-                  toggle("openUpdate")();
-                }}
-              />
-            );
-          },
-        }}
-
+        
         pagination={{
           pageSize: query.limit,
           current: query.page,

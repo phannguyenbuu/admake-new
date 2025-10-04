@@ -1,16 +1,11 @@
 import { Avatar, Box, Typography, IconButton, Divider, Stack, Menu, MenuItem, ListItemIcon } from '@mui/material';
-import { CaretDown, MagnifyingGlass, Phone,VideoCamera } from 'phosphor-react'
 import React, { useState } from 'react';
 import { useTheme } from "@mui/material/styles";
-import StarIcon from '@mui/icons-material/Star';
 import DeleteIcon from '@mui/icons-material/Delete';
-import PersonAddIcon from '@mui/icons-material/PersonAdd';
-import ExitToAppIcon from '@mui/icons-material/ExitToApp';
-// import { faker } from '@faker-js/faker';
 import StyledBadge from '../StyledBadge';
-import { ToggleSidebar } from '../../redux/slices/app';
 import { useUser } from '../../../../common/hooks/useUser';
-import { useAppDispatch } from '../../../../common/hooks/useAppDispatch';
+import SearchIcon from '@mui/icons-material/Search';
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 
 interface HeaderProps {
   title: string;
@@ -91,14 +86,14 @@ const Header: React.FC<HeaderProps>
         {full && 
         <Stack direction='row' alignItems='center' spacing={3}>
             <IconButton>
-                <MagnifyingGlass/>
+                <SearchIcon/>
             </IconButton>
             <Divider orientation='vertical' flexItem/>
 
             <IconButton onClick={handleMenuOpen} 
                 aria-controls={open ? 'group-menu' : undefined} 
                 aria-haspopup="true" aria-expanded={open ? 'true' : undefined}>
-                <CaretDown/>
+                <ArrowDropDownIcon/>
             </IconButton>
 
             <Menu
@@ -151,7 +146,7 @@ const Header: React.FC<HeaderProps>
 
 export default Header
 
-const LogoAdmake = () => {
+export const LogoAdmake = () => {
   return <div className="flex items-center justify-center pb-5" style={{scale: 0.75}}>
         <div className="flex items-center justify-center">
           <img src="/logo.jpg" alt="logo" className="w-13 h-13" />
@@ -161,3 +156,4 @@ const LogoAdmake = () => {
         </div>
       </div>
 }
+

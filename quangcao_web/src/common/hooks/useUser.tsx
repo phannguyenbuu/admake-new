@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { useApiHost } from './useApiHost';
 import type { Role } from '../../@types/role.type';
+import WebFont from 'webfontloader';
 
 interface UserContextProps {
   userId: string | null;
@@ -16,6 +17,14 @@ interface UserContextProps {
 const UserContext = createContext<UserContextProps | undefined>(undefined);
 
 export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  useEffect(() => {
+    WebFont.load({
+      google: {
+        families: ['Oswald','Poppins']
+      }
+    });
+  }, []);
+  
   const [userId, setUserId] = useState<string | null>(null);
   const [username, setUsername] = useState<string | null>(null);
   const [userRoleId, setUserRoleId] = useState<number>(0);
