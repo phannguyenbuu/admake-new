@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Form, AutoComplete, Typography } from "antd";
 import type { Customer } from "../../../../@types/customer.type";
 import { useApiHost } from "../../../../common/hooks/useApiHost";
+import type { User } from "../../../../@types/user.type";
 
 const { Text } = Typography;
 
@@ -10,8 +11,8 @@ interface JobCustomerInfoProps {
   form: any; // Form instance AntD
   searchValue: string;
   setSearchValue: React.Dispatch<React.SetStateAction<string>>;
-  selectedCustomer: Customer | null;
-  setSelectedCustomer: React.Dispatch<React.SetStateAction<Customer | null>>;
+  selectedCustomer: Customer | User| null;
+  setSelectedCustomer: React.Dispatch<React.SetStateAction<Customer | User | null>>;
 }
 
 const JobCustomerInfo: React.FC<JobCustomerInfoProps> = ({ 

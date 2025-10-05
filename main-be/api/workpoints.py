@@ -37,21 +37,23 @@ def get_workpoint_detail(user_id):
 
     return jsonify([c.to_dict() for c in workpoints])
 
-# @workpoint_bp.route("/<string:id>", methods=["PUT"])
-# def update_workpoint(id):
-#     # print(request)
-#     data = request.get_json()
-#     # print(data)
-#     role = db.session.get(Workpoint, id)
-#     if not role:
-#         return jsonify({"error": "role not found"}), 404
-#     for key, value in data.items():
-#         if hasattr(role, key):
-#             if key in ['workStart', 'workEnd'] and isinstance(value, str):
-#                 value = dateStr(value)
-#             setattr(role, key, value)
-#     db.session.commit()
-#     return jsonify(role.to_dict()), 200
+
+from flask import request
+
+@workpoint_bp.route("/batch", methods=["GET"])
+def get_batch_workpoint_detail():
+    user_ids = request.args.get("user_ids")  # "1,2,3,4,5"
+    if not user_ids:
+        abort(400, description="Missing user_ids")
+    user_id_list = user_ids.split(",")
+    
+    # Lấy tất cả workpoints có user_id trong danh sách
+    workpoints = Workpoint.query.filter(Workpoint.user_id.in_(user_id_list)).all()
+
+    if not workpoints:
+        abort(404, description="workpoints not found")
+    return jsonify([c.to_dict() for c in workpoints])
+
 
 from datetime import datetime, time, date
 

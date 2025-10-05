@@ -72,9 +72,14 @@ export default function WorkDays({ userId, username }: WorkDaysProps) {
   useEffect(() => {
     let isMounted = true;
 
-    const fetchData = () => {
-      fetch(`${useApiHost()}/workpoint/${userId}`)
-        .then((response) => response.json())
+    fetch(`/batch?user_ids=${userIds}`)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok ' + response.statusText);
+        }
+        return response.json(); // Lấy dữ liệu JSON từ response
+      })
+  
         .then((dataList: WorkListProps[]) => {
           if (!isMounted) return;
           console.log('main', dataList);

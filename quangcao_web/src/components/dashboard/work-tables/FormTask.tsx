@@ -21,6 +21,7 @@ import type { FormTaskDetailProps } from "../../../@types/work-space.type";
 import {Stack, Box} from "@mui/material";
 import type { UserList, User } from "../../../@types/user.type";
 import type { Customer, CustomerList } from "../../../@types/customer.type";
+import type { Id } from "@hello-pangea/dnd";
 
 const { Title, Text } = Typography;
 
@@ -37,10 +38,11 @@ interface TaskHeaderProps {
   // mode: { adminMode: boolean; userMode: boolean };
   taskDetail: Task;
   isLoading: boolean;
+  onUpdate: () => void;
 }
 
 // TaskHeader.tsx
-function TaskHeader({ taskDetail, isLoading }: TaskHeaderProps) {
+function TaskHeader({ taskDetail, isLoading, onUpdate  }: TaskHeaderProps) {
   return (
     <Stack direction="row" spacing={5}>
       <div className="flex items-center gap-2 px-4 py-3">
@@ -54,7 +56,7 @@ function TaskHeader({ taskDetail, isLoading }: TaskHeaderProps) {
 
       <Stack direction="row" spacing={1}>
         {taskDetail?.status !== "DONE" && taskDetail?.status !== "REWARD" && (
-          <Button type="primary" loading={isLoading}>
+          <Button type="primary" loading={isLoading} onClick={onUpdate}>
             ✅ Cập nhật
           </Button>
         )}
@@ -75,6 +77,7 @@ function TaskHeader({ taskDetail, isLoading }: TaskHeaderProps) {
 function TaskComments({ taskId, disabled }: { taskId?: string; disabled: boolean }) {
   return <CommentSection taskId={taskId || ""} disabled={disabled} />;
 }
+
 
 export default function FormTask({ open, onCancel, taskId, workspaceId }: FormTaskProps) {
   const { data:taskDetail, isLoading, isError, error } = useGetTaskById(taskId || "");
@@ -98,47 +101,76 @@ export default function FormTask({ open, onCancel, taskId, workspaceId }: FormTa
 
   const [customerSearch, setCustomerSearch] = useState('');
   const [userSearch, setUserSearch] = useState('');
-  const [customerSelected, setCustomerSelected] = useState<Customer | null>(null);
-  const [userSelected, setUserSelected] = useState<Customer | null>(null);
+  const [customerSelected, setCustomerSelected] = useState<Customer | User | null>(null);
+  const [userSelected, setUserSelected] = useState<Customer | User | null>(null);
 
-  const [userList, setUserList] = useState<User[]>([]);
-  const [customerList, setCustomerList] = useState<User[]>([]);
+  const [userList, setUserList] = useState<UserItemProps[]>([]);
+  const [customerObj, setCustomerObj] = useState<UserItemProps | null>(null);
 
-    useEffect(() => {
-      // console.log('!!!API', API_HOST);
-  
-      fetch(`${useApiHost()}/user/?limit=1000`)
-        .then((res) => res.json())
-        .then((data: UserList) => 
-          {
-            console.log('UserData', data.data);
-            setUserList(data.data);
-          })
-        .catch((error) => console.error("Failed to load group data", error));
-
-
-      fetch(`${useApiHost()}/customer/?limit=1000`)
-        .then((res) => res.json())
-        .then((data: UserList) => 
-          {
-            console.log('UserData', data.data);
-            setCustomerList(data.data);
-          })
-        .catch((error) => console.error("Failed to load group data", error));
-    }, []);
-
-// Tương tự với options nếu cần
-
-  // Các useEffect, handlers, filteredCustomers, duration tính toán tại đây...
   useEffect(()=>{
+    if(!taskDetail || !taskDetail?.assign_ids)
+      return;
     setCurrentStatus(taskDetail?.status ?? '');
-    console.log('task_selected', taskDetail?.assign_ids);
+    setCustomerObj(taskDetail?.customer_id);
+    setUserList(taskDetail?.assign_ids);
   },[taskDetail]);
+
+  const onUserDelete = (idToDelete: string | null) => {
+    const newList = userList.filter(user => user.id !== idToDelete);
+    setUserList(newList);
+  };
+
+  useEffect(()=>{
+    setCustomerObj({id: customerSelected?.id ?? null, name:customerSelected?.fullName ?? null});
+  },[customerSelected]);
+
+  useEffect(() => {
+    if (!userSelected)
+      return;
+
+    const user = userSelected;
+    const newUsers = [...userList];
+
+    
+    const exists = userList.some(user => user.id === user.name);
+    !exists && user && newUsers.push({id:user?.id, name:user?.fullName ?? null});
+      
+    setUserList(newUsers);
+  }, [userSelected]);
+
+  const [isUpdating, setIsUpdating] = useState(false);
+
+  const handleUpdate = async () => {
+    try {
+      setIsUpdating(true);
+      // Lấy dữ liệu hiện tại từ form
+      const values = await form.validateFields();
+
+      console.log("new_task_values", values);
+
+      // Gọi API PUT gửi dữ liệu cập nhật
+      const response = await fetch(`${useApiHost()}/task/${taskId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(values),
+      });
+
+      if (!response.ok) throw new Error("Cập nhật thất bại");
+
+      // Xử lý thành công, có thể gọi onSuccess hoặc đóng modal
+      onCancel();
+    } catch (error) {
+      console.error("Update error:", error);
+      // Hiện thông báo lỗi nếu cần
+    } finally {
+      setIsUpdating(false);
+    }
+  };
 
   return (
     <Modal open={open} onCancel={onCancel} footer={null} centered width={900}>
       <Stack direction="row" spacing = {2}>
-        <TaskHeader taskDetail={taskDetail} isLoading={isLoading}/>
+        <TaskHeader taskDetail={taskDetail} isLoading={isLoading} onUpdate={handleUpdate}/>
       </Stack>
         <Form form={form} style={{maxHeight:'80vh', overflowY:'auto'}}>
           <Stack spacing={1}>
@@ -151,15 +183,20 @@ export default function FormTask({ open, onCancel, taskId, workspaceId }: FormTa
                 <JobCustomerInfo form={form} mode="customer" 
                   setSearchValue={setCustomerSearch} searchValue={customerSearch} 
                   setSelectedCustomer={setCustomerSelected} selectedCustomer={customerSelected}/>  
-                  {taskDetail?.assign_ids && taskDetail?.assign_ids.map((el:string)=> {
-                    const user = userList.find(user => user.id === el);
-                    return <Typography>{user?.fullName}</Typography>
-                  })}
+                 {customerObj && <UserItem user={customerObj} onDelete={()=> setCustomerObj(null)}/>}
               </Stack>
-              <JobCustomerInfo form={form} mode="user"
-                searchValue={userSearch} setSearchValue={setUserSearch}
-                selectedCustomer={userSelected} setSelectedCustomer={setUserSelected}
-              />
+
+              <Stack>
+                <JobCustomerInfo 
+                  form={form} 
+                  mode="user"
+                  searchValue={userSearch} setSearchValue={setUserSearch}
+                  selectedCustomer={userSelected} setSelectedCustomer={setUserSelected} 
+                />
+                 
+                 {userList && userList.map((el)=> 
+                    <UserItem user={el} onDelete={onUserDelete}/>)}
+              </Stack>
             </Stack>
 
             <Stack direction="row" spacing = {2}>
@@ -178,3 +215,29 @@ export default function FormTask({ open, onCancel, taskId, workspaceId }: FormTa
     </Modal>
   );
 }
+
+interface UserItemProps {
+  name: string | null;
+  id: string | null;
+}
+
+interface UserItemSubProps {
+  user: UserItemProps;
+  onDelete: (id: string | null) => void;
+}
+
+const UserItem: React.FC<UserItemSubProps> = ({user,onDelete}) => {
+  return (
+    <Stack direction="row" spacing={1} alignItems="center">
+      <Typography>{user.name}</Typography>
+      <button
+        onClick={() => onDelete && onDelete(user.id)}
+        style={{ color: 'red', cursor: "pointer", background: "transparent", border: "none", fontSize: "16px" }}
+        aria-label={`Xóa ${user.name}`}
+        type="button"
+      >
+        ❌
+      </button>
+    </Stack>
+  );
+};

@@ -25,11 +25,7 @@ export const WorkPointPage: IPage["Component"] = () => {
   // Debounce search value
   const debouncedSearch = useDebounce(query.search, 500);
 
-  const {
-    data: users,
-    isLoading: isLoadingUsers,
-    refetch,
-  } = useUserQuery({ ...query, search: debouncedSearch });
+  const {data: users, isLoading: isLoadingUsers, refetch} = useUserQuery({ ...query, search: debouncedSearch });
 
   const [user, setUser] = useState<User | null>(null);
 

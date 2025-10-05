@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify, abort
-from models import db, Task, dateStr
+from models import db, Task, dateStr, User, Customer
 import datetime
 
 task_bp = Blueprint('task', __name__, url_prefix='/api/task')
@@ -16,7 +16,26 @@ def get_task_by_id(id):
 
     if task is None:
         abort(404, description="Task not found")
-    return jsonify({"data":task.to_dict(),"message":"Success"}),200
+
+    result = task.to_dict()
+
+    if task.assign_ids:
+        ls = []
+        for id in task.assign_ids:
+            user = db.session.get(User, id)
+            if user:
+                ls.append({"id":id,"name": user.fullName})
+
+        result["assign_ids"] = ls
+
+    if task.customer_id:
+        customer = db.session.get(Customer, task.customer_id)
+        if customer:
+            result["customer_id"] = {"id":id,"name": customer.fullName}
+        else:
+            result["customer_id"] = None
+
+    return jsonify({"data": result,"message":"Success"}),200
 
 @task_bp.route("/<string:id>", methods=["PUT"])
 def update_task(id):
@@ -29,15 +48,20 @@ def update_task(id):
     # Cập nhật các trường trong Task từ dữ liệu gửi lên
     task.title = data.get("title", task.title)
     task.description = data.get("description", task.description)
-    task.status = data.get("status", task.status)
-    task.type = data.get("type", task.type)
-    task.reward = data.get("reward", task.reward)
-    task.assign_ids = data.get("assignIds", task.assign_ids)
-    task.workspace_id = data.get("workspaceId", task.workspace_id)
-    task.customer_id = data.get("customerId", task.customer_id)
+    # task.status = data.get("status", task.status)
+    # task.type = data.get("type", task.type)
+    # task.reward = data.get("reward", task.reward)
+    # task.workspace_id = data.get("workspaceId", task.workspace_id)
+
+    task.assign_ids = data.get("assign_ids", task.assign_ids)
+    
+    task.customer_id = data.get("customer_id", task.customer_id)
+
+
+
     task.materials = data.get("materials", task.materials)
-    task.start_time = data.get("startTime", task.start_time)
-    task.end_time = data.get("endTime", task.end_time)
+    task.start_time = data.get("start_time", task.start_time)
+    task.end_time = data.get("end_time", task.end_time)
 
     db.session.commit()
 

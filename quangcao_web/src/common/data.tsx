@@ -12,7 +12,7 @@ import { useApiHost, useApiStatic } from "./hooks/useApiHost";
 import { Stack, Box, Typography } from "@mui/material";
 import QRCode from "../components/chat/components/QRCode";
 import { useLocation } from "react-router-dom";
-import WorkDays, {QRColumn} from "../app/dashboard/workpoints/WorDays";
+import WorkDays, {QRColumn} from "../app/dashboard/workpoints/WorkDays";
 
 export const columnsMaterial = [
   {
@@ -544,7 +544,7 @@ export const columnsWorkPoint = [
     width: 800,
     render:  (text: string, record: User)  => (
       <div>
-        <WorkDays userId={record.id} username={record.fullName ?? null}/>
+        <WorkDays userIds={dataSource.map(record => record.id)}/>
       </div>
     )
   },
