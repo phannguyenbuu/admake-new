@@ -50,3 +50,7 @@ export interface FormUserProps {
   user?: User;
   buttonText?: string;
 }
+
+export interface UserList {
+  data: User[];
+}

@@ -10,3 +10,7 @@ export type Customer = BaseEntity & {
   workPrice: string;
   status: string;
 };
+
+export interface CustomerList {
+  data: Customer[];
+}

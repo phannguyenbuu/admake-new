@@ -8,13 +8,21 @@ const { Text } = Typography;
 interface JobCustomerInfoProps {
   mode: "customer"|"user"|string;
   form: any; // Form instance AntD
+  searchValue: string;
+  setSearchValue: React.Dispatch<React.SetStateAction<string>>;
+  selectedCustomer: Customer | null;
+  setSelectedCustomer: React.Dispatch<React.SetStateAction<Customer | null>>;
 }
 
-const JobCustomerInfo: React.FC<JobCustomerInfoProps> = ({ form, mode }) => {
+const JobCustomerInfo: React.FC<JobCustomerInfoProps> = ({ 
+  form,
+  mode,
+  searchValue,
+  setSearchValue,
+  selectedCustomer,
+  setSelectedCustomer, }) => {
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [options, setOptions] = useState<{ value: string; label: React.ReactNode }[]>([]);
-  const [searchValue, setSearchValue] = useState("");
-  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
 
   const rolename = mode === "customer" ? "khách hàng" : "nhân viên";
 
@@ -63,7 +71,7 @@ const JobCustomerInfo: React.FC<JobCustomerInfoProps> = ({ form, mode }) => {
     const customer = customers.find((c) => c.fullName === value) || null;
     setSelectedCustomer(customer);
     // Cập nhật form field nếu form có quản lý
-    form.setFieldsValue({ customer: value });
+    form.setFieldsValue({ [mode]: value });
   };
 
   return (
@@ -74,6 +82,7 @@ const JobCustomerInfo: React.FC<JobCustomerInfoProps> = ({ form, mode }) => {
         className="mb-3"
       >
         <AutoComplete
+          style={{ minWidth: 280 }}
           options={options}
           value={searchValue}
           onSearch={handleSearch}

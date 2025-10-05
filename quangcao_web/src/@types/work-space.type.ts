@@ -50,7 +50,7 @@ export interface Task extends BaseEntity {
   reward: number; // số tiền thưởng
   amount: number;
   salary_type: "monthly" | "task" | string;
-  assignIds: string[]; // id của user
+  assign_ids: string[]; // id của user
   workspaceId: string; // id của workspace
   customerId: string; // id của customer
   materials: MaterialTask[]; // danh sách vật tư

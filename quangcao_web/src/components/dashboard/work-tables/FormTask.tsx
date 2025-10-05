@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { Modal, Typography, Button } from "antd";
 import type { Task } from "../../../@types/work-space.type";
-import type { Customer } from "../../../@types/customer.type";
 import { useCheckPermission } from "../../../common/hooks/checkPermission.hook";
 import { useInfo } from "../../../common/hooks/info.hook";
 import { useCustomerQuery, useCustomerDetail } from "../../../common/hooks/customer.hook";
@@ -11,6 +10,7 @@ import JobCustomerInfo from "./task/JobCustomerInfo";
 import JobDescription from "./task/JobDescription";
 import JobTimeAndProcess from "./task/JobTimeAndProcess ";
 import MaterialInfo from "./task/MaterialInfo";
+import { useApiHost } from "../../../common/hooks/useApiHost";
 import CheckInOut from "./CheckInOut";
 import CommentSection from "./CommentSection";
 import dayjs from "dayjs";
@@ -19,6 +19,8 @@ import { Form } from "antd";
 import type { StatusType } from "./task/JobInfoCard";
 import type { FormTaskDetailProps } from "../../../@types/work-space.type";
 import {Stack, Box} from "@mui/material";
+import type { UserList, User } from "../../../@types/user.type";
+import type { Customer, CustomerList } from "../../../@types/customer.type";
 
 const { Title, Text } = Typography;
 
@@ -93,9 +95,44 @@ export default function FormTask({ open, onCancel, taskId, workspaceId }: FormTa
   const { data: customers } = useCustomerQuery({ limit: 50, search: customer.searchValue });
   const { data: customerDetail } = useCustomerDetail(customer.selectedId || "");
   const [form] = Form.useForm();
+
+  const [customerSearch, setCustomerSearch] = useState('');
+  const [userSearch, setUserSearch] = useState('');
+  const [customerSelected, setCustomerSelected] = useState<Customer | null>(null);
+  const [userSelected, setUserSelected] = useState<Customer | null>(null);
+
+  const [userList, setUserList] = useState<User[]>([]);
+  const [customerList, setCustomerList] = useState<User[]>([]);
+
+    useEffect(() => {
+      // console.log('!!!API', API_HOST);
+  
+      fetch(`${useApiHost()}/user/?limit=1000`)
+        .then((res) => res.json())
+        .then((data: UserList) => 
+          {
+            console.log('UserData', data.data);
+            setUserList(data.data);
+          })
+        .catch((error) => console.error("Failed to load group data", error));
+
+
+      fetch(`${useApiHost()}/customer/?limit=1000`)
+        .then((res) => res.json())
+        .then((data: UserList) => 
+          {
+            console.log('UserData', data.data);
+            setCustomerList(data.data);
+          })
+        .catch((error) => console.error("Failed to load group data", error));
+    }, []);
+
+// Tương tự với options nếu cần
+
   // Các useEffect, handlers, filteredCustomers, duration tính toán tại đây...
   useEffect(()=>{
     setCurrentStatus(taskDetail?.status ?? '');
+    console.log('task_selected', taskDetail?.assign_ids);
   },[taskDetail]);
 
   return (
@@ -110,8 +147,19 @@ export default function FormTask({ open, onCancel, taskId, workspaceId }: FormTa
             {/* Thông tin khách hàng */}
             
             <Stack direction="row" spacing = {2}>
-              <JobCustomerInfo form={form} mode="customer"/>  
-              <JobCustomerInfo form={form} mode="user"/>
+              <Stack>
+                <JobCustomerInfo form={form} mode="customer" 
+                  setSearchValue={setCustomerSearch} searchValue={customerSearch} 
+                  setSelectedCustomer={setCustomerSelected} selectedCustomer={customerSelected}/>  
+                  {taskDetail?.assign_ids && taskDetail?.assign_ids.map((el:string)=> {
+                    const user = userList.find(user => user.id === el);
+                    return <Typography>{user?.fullName}</Typography>
+                  })}
+              </Stack>
+              <JobCustomerInfo form={form} mode="user"
+                searchValue={userSearch} setSearchValue={setUserSearch}
+                selectedCustomer={userSelected} setSelectedCustomer={setUserSelected}
+              />
             </Stack>
 
             <Stack direction="row" spacing = {2}>

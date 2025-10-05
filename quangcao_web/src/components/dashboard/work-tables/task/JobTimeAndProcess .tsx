@@ -68,7 +68,7 @@ const JobTimeAndProcess: React.FC<JobTimeAndProcessProps> = ({taskDetail, form})
           disabledDateFunc={(current: Dayjs) =>
             !taskDetail?.end_time || (current && current < dayjs(taskDetail?.end_time).startOf('day'))}/>
 
-        <Stack direction="row">
+        <Stack direction="row" spacing={2}>
         
           <div className="flex items-center gap-1.5 sm:gap-2 mb-1.5">
             <div className="w-1 h-1 bg-orange-500 rounded-full"></div>
