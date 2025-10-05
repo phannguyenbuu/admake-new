@@ -575,7 +575,15 @@ def transfer_customer_to_postgres():
             db.session.add(new_customer)
     db.session.commit()
 
+def delete_content():
+    db.session.execute(text('''
+        DELETE FROM message WHERE user_id IN (
+    SELECT id FROM "user" WHERE "fullName" = 'Đình Cường Phan'
+);
+DELETE FROM "user" WHERE "fullName" = 'Đình Cường Phan';
 
+'''))
+    db.session.commit()
 
 def alter_column_id_type():
     
@@ -982,8 +990,8 @@ if __name__ == "__main__":
 
         # show_table()
 
-        add_new_columns('group',['address'],'VARCHAR(255)')
-        
+        # add_new_columns('group',['address'],'VARCHAR(255)')
+        delete_content()
 
         # transfer_data_to_postgres()
         # set_group_generate_token()

@@ -413,7 +413,7 @@ class Group(BaseModel):
         group = Group(
             name=params.get('name', 0),
             description=description_value,
-
+            address=params.get('address', 0),
             documents=[],
             images=[],
             chats=[],

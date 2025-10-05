@@ -7,6 +7,7 @@ import QRCode from "../../../components/chat/components/QRCode";
 import { useLocation } from "react-router-dom";
 import type { WorkListPeriod, PeriodData, PeriodHour } from "../../../@types/CheckListType";
 import DownloadIcon from '@mui/icons-material/Download';
+import { CenterBox } from "../../../components/chat/components/commons/TitlePanel";
 
 interface QRColumnProps {
   record: User;
@@ -239,66 +240,73 @@ return (
     </div>
   </Stack>
 
-
-
   <Modal
       open={modalVisible}
       onOk={handleOk}
       onCancel={handleOk}
       footer={null}
-      title={`${username}`}
+      title=""
       okText="OK"
       cancelButtonProps={{ style: { display: 'none' } }}
-      style={{ padding: 20, maxHeight:'60vh', minWidth:'90vw' }}
+      style={{ padding: 20, minWidth:'90vw' }}
     >
-      {modalImg?.out?.img && 
-        <Typography>Số giờ làm trong buổi: {modalImg.workhour?.toFixed(2)}</Typography>
-      }
-      <Typography fontSize={10}>Nhấp vào hình để xem vị trí trên googlemap</Typography>
-      <Stack direction="row" spacing={2} style={{ padding: 20, minHeight: '80vh', width:'fit-content' }}>
-      {modalImg?.in?.img && 
-      <Stack>
-        <img
-          src={`${useApiStatic()}/${modalImg.in.img}`}
-          alt="Check-in"
-          style={{ maxHeight: '50vh', minWidth:300, borderRadius: 8, marginBottom: 8, cursor:'pointer' }}
-          onClick={(e) => {
-            e.stopPropagation();
-            if (modalImg?.in?.lat && modalImg?.in?.long && modalImg?.in?.lat !== '-' && modalImg?.in?.long !== '-') {
-              const url = `https://www.google.com/maps?q=${modalImg?.in?.lat},${modalImg?.in?.long}`;
-              window.open(url, '_blank');
-            } else {
-              alert('Không có tọa độ để mở bản đồ');
-            }
-          }}
-        />
-         <Typography>Check in</Typography>
+      <CenterBox>
+        <Box sx={{borderRadius:10, backgroundColor:"#00B4B6", px:5, py:1}}>
+          <Typography sx={{textTransform:"uppercase",color:"#fff",fontWeight:500,textAlign:"center"}}>{username}</Typography>
+          {modalImg?.out?.img && 
+            <Typography sx={{color:"#fff",textAlign:"center",fontSize:10}}>Số giờ làm trong buổi: {modalImg.workhour?.toFixed(2)}</Typography>
+          }
+        </Box>
+        <Typography fontSize={10} color="#00B4B6" fontStyle="italic">Nhấp vào hình để xem vị trí trên googlemap</Typography>
+            
+        <Stack direction="row" spacing={2} style={{ padding: 20, minHeight: '80vh', width:'fit-content' }}>
+          {modalImg?.in?.img && 
+            <Stack>
+              <Typography textAlign="center">Check in</Typography>
+              <img
+                src={`${useApiStatic()}/${modalImg.in.img}`}
+                alt="Check-in"
+                style={{ maxHeight: '80vh', minWidth:300, borderRadius: 8, marginBottom: 8, cursor:'pointer' }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (modalImg?.in?.lat && modalImg?.in?.long && modalImg?.in?.lat !== '-' && modalImg?.in?.long !== '-') {
+                    const url = `https://www.google.com/maps?q=${modalImg?.in?.lat},${modalImg?.in?.long}`;
+                    window.open(url, '_blank');
+                  } else {
+                    alert('Không có tọa độ để mở bản đồ');
+                  }
+                }}
+              />
+            
+            </Stack>
+          }
+
+          {modalImg?.out?.img && 
+            <Stack>
+              <Typography textAlign="center">Check out</Typography>
+              <img
+                src={`${useApiStatic()}/${modalImg.out.img}`}
+                alt="Check-out"
+                style={{ maxHeight: '80vh',   minWidth:300, borderRadius: 8, marginBottom: 8, cursor:'pointer' }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (modalImg?.out?.lat && modalImg?.out?.long && modalImg?.out?.lat !== '-' && modalImg?.out?.long !== '-') {
+                    const url = `https://www.google.com/maps?q=${modalImg?.out?.lat},${modalImg?.out?.long}`;
+                    window.open(url, '_blank');
+                  } else {
+                    alert('Không có tọa độ để mở bản đồ');
+                  }
+                }}
+              />
+
+            
+            </Stack>
+            
+          }
+
+      
         </Stack>
-      }
-
-      {modalImg?.out?.img && 
-      <Stack>
-        <img
-          src={`${useApiStatic()}/${modalImg.out.img}`}
-          alt="Check-out"
-          style={{ maxHeight: '60vh',   minWidth:300, borderRadius: 8, marginBottom: 8, cursor:'pointer' }}
-          onClick={(e) => {
-            e.stopPropagation();
-            if (modalImg?.out?.lat && modalImg?.out?.long && modalImg?.out?.lat !== '-' && modalImg?.out?.long !== '-') {
-              const url = `https://www.google.com/maps?q=${modalImg?.out?.lat},${modalImg?.out?.long}`;
-              window.open(url, '_blank');
-            } else {
-              alert('Không có tọa độ để mở bản đồ');
-            }
-          }}
-        />
-
-        <Typography>Check out</Typography>
-        </Stack>
-        
-      }
-      </Stack>
-
+      </CenterBox>
       
     </Modal>
   </>

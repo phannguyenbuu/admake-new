@@ -98,7 +98,6 @@ const ChatGroupList: React.FC = ({}) => {
 
 export default ChatGroupList;
 
-
 interface AddGroupModalProps {
   visible: boolean;
   onOk: (groupName: string) => void;

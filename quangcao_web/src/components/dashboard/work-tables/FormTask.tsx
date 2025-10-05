@@ -99,41 +99,67 @@ export default function FormTask({ open, onCancel, taskId, workspaceId }: FormTa
   const [customerSearch, setCustomerSearch] = useState('');
   const [userSearch, setUserSearch] = useState('');
   const [customerSelected, setCustomerSelected] = useState<Customer | null>(null);
-  const [userSelected, setUserSelected] = useState<Customer | null>(null);
+  const [userSelected, setUserSelected] = useState<User | null>(null);
 
-  const [userList, setUserList] = useState<User[]>([]);
-  const [customerList, setCustomerList] = useState<User[]>([]);
+  const [userList, setUserList] = useState<string[]>([]);
+  const [customerObj, setCustomerObj] = useState<string | null>(null);
 
-    useEffect(() => {
-      // console.log('!!!API', API_HOST);
+  useEffect(()=>{
+    if(!taskDetail || !taskDetail?.assign_ids)
+      return;
+    setCurrentStatus(taskDetail?.status ?? '');
+    setCustomerObj(taskDetail?.customer_id);
+    setUserList(taskDetail?.assign_ids);
+  },[taskDetail]);
+  //   useEffect(() => {
+  //     // console.log('!!!API', API_HOST);
   
-      fetch(`${useApiHost()}/user/?limit=1000`)
-        .then((res) => res.json())
-        .then((data: UserList) => 
-          {
-            console.log('UserData', data.data);
-            setUserList(data.data);
-          })
-        .catch((error) => console.error("Failed to load group data", error));
+  //     fetch(`${useApiHost()}/user/?limit=1000`)
+  //       .then((res) => res.json())
+  //       .then((data: UserList) => 
+  //         {
+  //           console.log('UserData', data.data);
+  //           setUserList(data.data);
+  //         })
+  //       .catch((error) => console.error("Failed to load group data", error));
 
 
-      fetch(`${useApiHost()}/customer/?limit=1000`)
-        .then((res) => res.json())
-        .then((data: UserList) => 
-          {
-            console.log('UserData', data.data);
-            setCustomerList(data.data);
-          })
-        .catch((error) => console.error("Failed to load group data", error));
-    }, []);
+  //     fetch(`${useApiHost()}/customer/?limit=1000`)
+  //       .then((res) => res.json())
+  //       .then((data: CustomerList) => 
+  //         {
+  //           console.log('CustomerData', data.data);
+  //           setCustomerList(data.data);
+  //         })
+  //       .catch((error) => console.error("Failed to load group data", error));
+  //   }, []);
 
 // Tương tự với options nếu cần
 
   // Các useEffect, handlers, filteredCustomers, duration tính toán tại đây...
+
+  const onUserDelete = (txtToDelete: string) => {
+    const newList = userList.filter(txt => txt !== txtToDelete);
+    setUserList(newList);
+  };
+
   useEffect(()=>{
-    setCurrentStatus(taskDetail?.status ?? '');
-    console.log('task_selected', taskDetail?.assign_ids);
-  },[taskDetail]);
+    setCustomerObj(customerSelected?.fullName ?? null);
+  },[customerSelected]);
+
+  useEffect(() => {
+    if (!userSelected)
+      return;
+
+    const user_name = userSelected?.fullName;
+    const newUsers = [...userList];
+
+    
+    const exists = userList.some(user => user === user_name);
+    !exists && user_name && newUsers.push(user_name);
+      
+    setUserList(newUsers);
+  }, [userSelected]);
 
   return (
     <Modal open={open} onCancel={onCancel} footer={null} centered width={900}>
@@ -151,15 +177,20 @@ export default function FormTask({ open, onCancel, taskId, workspaceId }: FormTa
                 <JobCustomerInfo form={form} mode="customer" 
                   setSearchValue={setCustomerSearch} searchValue={customerSearch} 
                   setSelectedCustomer={setCustomerSelected} selectedCustomer={customerSelected}/>  
-                  {taskDetail?.assign_ids && taskDetail?.assign_ids.map((el:string)=> {
-                    const user = userList.find(user => user.id === el);
-                    return <Typography>{user?.fullName}</Typography>
-                  })}
+                 {customerObj && <UserItem txt={customerObj} onDelete={()=> setCustomerObj(null)}/>}
               </Stack>
-              <JobCustomerInfo form={form} mode="user"
-                searchValue={userSearch} setSearchValue={setUserSearch}
-                selectedCustomer={userSelected} setSelectedCustomer={setUserSelected}
-              />
+
+              <Stack>
+                <JobCustomerInfo 
+                  form={form} 
+                  mode="user"
+                  searchValue={userSearch} setSearchValue={setUserSearch}
+                  selectedCustomer={userSelected} setSelectedCustomer={setUserSelected} 
+                />
+                 
+                 {userList && userList.map((el:string)=> 
+                    <UserItem txt={el} onDelete={onUserDelete}/>)}
+              </Stack>
             </Stack>
 
             <Stack direction="row" spacing = {2}>
@@ -178,3 +209,26 @@ export default function FormTask({ open, onCancel, taskId, workspaceId }: FormTa
     </Modal>
   );
 }
+
+
+
+interface UserItemProps {
+  txt: string;
+  onDelete: (txt: string) => void;
+}
+
+const UserItem: React.FC<UserItemProps> = ({ txt, onDelete }) => {
+  return (
+    <Stack direction="row" spacing={1} alignItems="center">
+      <Typography>{txt}</Typography>
+      <button
+        onClick={() => onDelete(txt)}
+        style={{ cursor: "pointer", background: "transparent", border: "none", fontSize: "16px" }}
+        aria-label={`Xóa ${txt}`}
+        type="button"
+      >
+        &times;
+      </button>
+    </Stack>
+  );
+};

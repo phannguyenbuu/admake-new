@@ -33,7 +33,7 @@ function StatusSelect() {
 
 
 //single chat element
-const ChatElement = ({id,name, img, msg, time, online, unread, onClick}) => {
+const ChatElement = ({id,name, img, msg, time, online, unread, onClick, note}) => {
     const theme = useTheme();
     return (
       <Box onClick={onClick} sx={{
@@ -54,8 +54,8 @@ const ChatElement = ({id,name, img, msg, time, online, unread, onClick}) => {
               <Typography variant='subtitle2'>
                 {name}
               </Typography>
-              <Typography variant='caption'>
-                {msg}
+              <Typography variant='caption' color="#333" fontStyle="italic">
+                {note}
               </Typography>
             </Stack>
             </Stack>

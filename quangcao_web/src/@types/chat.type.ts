@@ -10,7 +10,8 @@ export interface GroupProps {
   msg:string,
   unread:number,
   status?:string,
-  pinned:boolean
+  pinned:boolean,
+  address:string
 }
 
 export interface MsgListTypeProps {

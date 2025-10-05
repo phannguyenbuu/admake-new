@@ -105,10 +105,10 @@ local_dirs = [
     # "chat-be/app.py",
     # "main-be/instance/customers.db",
 
-    # "main-be/models.py",
-    # "main-be/app.py",
-    # "main-be/.env",
-    # "main-be/api",
+    "main-be/models.py",
+    "main-be/app.py",
+    "main-be/.env",
+    "main-be/api",
     r"quangcao_web\src\app\dashboard\workpoints\WorDays.tsx",
     # r"quangcao_web\src\components\chat\pages\dashboard\Group.tsx",
 

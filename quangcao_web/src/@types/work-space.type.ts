@@ -52,7 +52,7 @@ export interface Task extends BaseEntity {
   salary_type: "monthly" | "task" | string;
   assign_ids: string[]; // id của user
   workspaceId: string; // id của workspace
-  customerId: string; // id của customer
+  customer_id: string; // id của customer
   materials: MaterialTask[]; // danh sách vật tư
   start_time?: string | Date; // Thời gian bắt đầu
   end_time?: string | Date; // Thời gian kết thúc

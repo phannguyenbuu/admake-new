@@ -21,7 +21,7 @@ def get_users():
             (User.fullName.ilike(f"%{search}%"))
         )
 
-    query = query.order_by(desc(User.createdAt))
+    query = query.order_by(desc(User.createdAt), User.id)
 
     pagination = query.paginate(page=page, per_page=limit, error_out=False)
     users = [c.to_dict() for c in pagination.items]

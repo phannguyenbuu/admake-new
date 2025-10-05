@@ -185,14 +185,13 @@ useEffect(()=>{
                 boxShadow: '0px 0px 2px rgba(0,0,0,0.25)'
              }}>
                  <Stack p={0} spacing={2}>
-                     <Search>
+                     {/* <Search>
                          <SearchIconWrapper>
                              <SearchIcon color="primary" />
                          </SearchIconWrapper>
-                         
-                     </Search>
+                     </Search> */}
                     
-                     <Divider />
+                     {/* <Divider /> */}
                      <Stack spacing={0.5} className='scrollbar' sx={{ flexGrow: 1, overflowY: 'hidden'}}>
                         <Typography variant='subtitle2' sx={{ color: '#676667' }}>Pinned</Typography>
                         {groupList && groupList.filter(el => el.name === 'TELEGRAM' || el.name === 'APPLE').map((el, idx) => (
@@ -203,6 +202,7 @@ useEffect(()=>{
                                 time={el.time}
                                 name={el.name}
                                 msg={el.msg}
+                                note={el.address}
                                 unread={el.unread}
                                 onClick={() => handleClick(el)}
                                 key={`ChatElement-${idx}`}
@@ -220,6 +220,7 @@ useEffect(()=>{
                                     time={el.time}
                                     name={el.name}
                                     msg={el.msg}
+                                    note={el.address}
                                     unread={el.unread}
                                     onClick={() => handleClick(el)}
                                     key={`ChatElement-${idx}`}

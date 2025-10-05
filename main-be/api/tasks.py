@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify, abort
-from models import db, Task, dateStr
+from models import db, Task, dateStr, User, Customer
 import datetime
 
 task_bp = Blueprint('task', __name__, url_prefix='/api/task')
@@ -16,7 +16,26 @@ def get_task_by_id(id):
 
     if task is None:
         abort(404, description="Task not found")
-    return jsonify({"data":task.to_dict(),"message":"Success"}),200
+
+    result = task.to_dict()
+
+    if task.assign_ids:
+        ls = []
+        for t in task.assign_ids:
+            user = db.session.get(User, t)
+            if user:
+                ls.append(user.fullName)
+
+        result["assign_ids"] = ls
+
+    if task.customer_id:
+        customer = db.session.get(Customer, task.customer_id)
+        if customer:
+            result["customer_id"] = customer.fullName
+        else:
+            result["customer_id"] = None
+
+    return jsonify({"data": result,"message":"Success"}),200
 
 @task_bp.route("/<string:id>", methods=["PUT"])
 def update_task(id):
