@@ -69,7 +69,7 @@ const JobCustomerInfo: React.FC<JobCustomerInfoProps> = ({ form, mode }) => {
   return (
     <div className="p-3 border border-gray-200 shadow-sm rounded shadow-sm">
       <Form.Item
-        label={`Tìm kiếm  ${rolename}`}
+        label={`Tìm ${rolename}`}
         name={mode}
         className="mb-3"
       >

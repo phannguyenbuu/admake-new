@@ -14,7 +14,7 @@ export interface PeriodData {
   workhour?: number;
 }
 
-export interface CheckListPeriod {
+export interface WorkListPeriod {
   morning?: PeriodData;
   noon?: PeriodData;
   evening?: PeriodData;
@@ -27,10 +27,3 @@ export interface PeriodHour {
 }
 
 
-export interface CheckListProps {
-  checklist: CheckListPeriod;
-  createdAt: string;
-  updatedAt: string;
-  id: string;
-  user_id: string;
-}

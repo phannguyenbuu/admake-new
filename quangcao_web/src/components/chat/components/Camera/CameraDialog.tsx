@@ -17,7 +17,6 @@ import type { User } from "../../../../@types/user.type";
 import { CenterBox } from "../commons/TitlePanel";
 import { LogoAdmake } from "../Conversation/Header";
 import type { Workpoint } from "../../../../@types/workpoint";
-import CameraSelector from "./CameraSelector";
 import WorkpointGrid from "./WorkpointTable";
 import { CurrentDateTime } from "./WorkpointTable";
 
@@ -76,7 +75,7 @@ const CameraDialog: React.FC<CameraDialogProps> = ({userEl}) => {
 
 
   useEffect(() => {
-    fetch(`${useApiHost()}/workpoint/${userEl?.id}`)
+    fetch(`${useApiHost()}/workpoint/today/${userEl?.id}`)
     .then(response => {
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);

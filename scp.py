@@ -109,8 +109,8 @@ local_dirs = [
     # "main-be/app.py",
     # "main-be/.env",
     # "main-be/api",
-
-    "quangcao_web\src\components\chat\pages\dashboard\Group.tsx",
+    r"quangcao_web\src\app\dashboard\workpoints\WorDays.tsx",
+    # r"quangcao_web\src\components\chat\pages\dashboard\Group.tsx",
 
     # r"quangcao_web\src\common\data.tsx",
     # "quangcao_web/src/components/chat/components/Camera",

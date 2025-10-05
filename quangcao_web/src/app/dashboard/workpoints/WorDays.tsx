@@ -1,0 +1,306 @@
+import { Tag, Modal } from "antd";
+import type { User } from "../../../@types/user.type";
+import React, { useState, useEffect } from 'react';
+import { useApiHost, useApiStatic } from "../../../common/hooks/useApiHost";
+import { Stack, Box, Typography } from "@mui/material";
+import QRCode from "../../../components/chat/components/QRCode";
+import { useLocation } from "react-router-dom";
+import type { WorkListPeriod, PeriodData, PeriodHour } from "../../../@types/CheckListType";
+import DownloadIcon from '@mui/icons-material/Download';
+
+interface QRColumnProps {
+  record: User;
+}
+
+export const QRColumn: React.FC<QRColumnProps> = ({ record }) => {
+  const [showModal, setShowModal] = useState(false);
+  const [selectedRecord, setSelectedRecord] = useState<User | null>(null);
+
+  const handleOpenModal = () => {
+    setSelectedRecord(record);
+    setShowModal(true);
+  };
+
+  return (
+    <>
+      <DownloadIcon sx={{width:40, height:40,cursor:'pointer'}} onClick={handleOpenModal}/>
+      
+      <Modal
+        open={showModal}
+        onCancel={() => setShowModal(false)}
+        footer={null}
+        width={300}
+        title={`Mã QR của ${record.fullName}`}
+      >
+        {selectedRecord && (
+          <Box display="flex" justifyContent="center">
+            <QRCode title="Download và gửi cho nhân sự" filename={`qrcode-admake-${record.id}.png`} 
+              url={`${window.location.origin}/point/${selectedRecord.id}/`} />
+          </Box>
+        )}
+      </Modal>
+    </>
+  );
+};
+
+interface WorkDaysProps {
+  userId: string | null;
+  username: string | null;
+}
+
+interface WorkListProps {
+  checklist: WorkListPeriod;
+  createdAt: string;
+  updatedAt: string;
+  id: string;
+  user_id: string;
+}
+
+const periodMap: Record<keyof WorkListPeriod, number> = {morning: 0,noon: 1,evening: 2,};
+
+export default function WorkDays({ userId, username }: WorkDaysProps) {
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = today.getMonth();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  
+  const [totalHour, setTotalHour] = useState<PeriodHour | null>(null);
+  const [mainData, setData] = useState<WorkListProps[]>([]);
+  const [modalImg, setModalImg] = useState<PeriodData | null>(null);
+  const todayDate = new Date().getDate();
+  
+  useEffect(() => {
+    let isMounted = true;
+
+    const fetchData = () => {
+      fetch(`${useApiHost()}/workpoint/${userId}`)
+        .then((response) => response.json())
+        .then((dataList: WorkListProps[]) => {
+          if (!isMounted) return;
+          console.log('main', dataList);
+          setData(dataList);
+
+          const newStatuses = Array(daysInMonth).fill(null).map(() => Array(3).fill(null));
+          const total:PeriodHour | null = {morning: 0,noon: 0,evening: 0,};
+
+          dataList && dataList.forEach((data) => {
+            const dateObj = new Date(data.createdAt);
+            const localTime = new Date(dateObj.getTime() + 7 * 60 * 60 * 1000);
+
+            // if(userId === "68864f6163e2975c3a8ebef9")
+            //   console.log(dateObj, localTime);
+
+            if (localTime.getFullYear() === year && localTime.getMonth() === month) {
+              const dayIndex = localTime.getDate() - 1;
+              (Object.keys(data.checklist) as (keyof WorkListPeriod)[]).forEach(
+                (period) => {
+                  const periodData = data.checklist[period];
+                  if (periodData) {
+                    if (periodData.out) {
+                      total[period] += periodData.workhour || 0;
+                      newStatuses[dayIndex][periodMap[period]] = 'out';
+                    } else if (periodData.in) {
+                      newStatuses[dayIndex][periodMap[period]] = 'in';
+                    } else {
+                      newStatuses[dayIndex][periodMap[period]] = null;
+                    }
+                  }
+                }
+              );
+            }
+          });
+
+          setTotalHour(total);
+          setStatuses(newStatuses);
+        });
+    };
+
+    fetchData(); // Lần chạy đầu tiên ngay khi mount
+
+    const intervalId = setInterval(fetchData, 3 * 60 * 1000); // 5 phút
+
+    return () => {
+      isMounted = false;
+      clearInterval(intervalId);
+    };
+  }, [userId, year, month, daysInMonth]);
+
+  type StatusKey = 'in' | 'out' | 'null';
+
+  const colors: Record<StatusKey, string> = {
+    in: 'red',
+    out: 'green',
+    null: 'white',
+  };
+
+  const [statuses, setStatuses] = useState(
+    Array(daysInMonth)
+      .fill(null)
+      .map(() => Array(3).fill(null))
+  );
+
+  const [modalVisible, setModalVisible] = useState(false);
+  const handleOk = () => {
+    setModalVisible(false);
+    setModalImg(null);
+  };
+
+return (
+  <>
+  <Stack direction="row" spacing={1}>
+    <Stack sx={{background:"#999",borderRadius:8, width: 30,pt:2 }}>
+      <Typography color="#fff" textAlign="center" fontSize={10} fontWeight={300}>
+        {( (totalHour?.morning || 0) + (totalHour?.noon || 0) ).toFixed(2)}
+      </Typography>
+      <Typography color="#fff" textAlign="center" fontSize={10} fontWeight={300}>
+        {(totalHour?.evening || 0).toFixed(2)}
+      </Typography>
+
+    </Stack>
+
+    <div style={{ display: 'flex', overflowX: 'auto' }}>
+      {Array.from({ length: daysInMonth }).map((_, dayIndex) => {
+        const date = new Date(year, month, dayIndex + 1);
+        const isSunday = date.getDay() === 0;
+
+        return (
+          <div
+            key={dayIndex}
+            style={{
+              borderRight: date.getDate() === todayDate ? '3px solid blue' : 'none',
+              textAlign: 'center',
+              borderRadius: 1,
+              maxWidth: 18,
+              marginRight: 1,
+            }}
+          >
+            <div
+              style={{
+                fontSize: 10,
+                marginBottom: 4,
+                color: isSunday ? 'red' : 'black',
+              }}
+            >
+              {date.getDate()}
+            </div>
+            {[0, 1, 2].map((btnIndex) => {
+              const status: any = statuses[dayIndex][btnIndex];
+
+              let imgUrl: PeriodData | null = null;
+
+              if (status && mainData?.length) {
+                const periodKey = ['morning', 'noon', 'evening'][btnIndex] as keyof WorkListPeriod;
+
+                for (const item of mainData) {
+
+                  const itemCreateDate = new Date(item.createdAt);
+                  const itemDate = new Date(itemCreateDate.getTime() + 7 * 60 * 60 * 1000);
+
+                  if (
+                    itemDate.getDate() === date.getDate() &&
+                    itemDate.getMonth() === date.getMonth() &&
+                    itemDate.getFullYear() === date.getFullYear()
+                  ) {
+                    const periodData = item.checklist[periodKey];
+                    if (periodData) {
+                      imgUrl = periodData;
+                      break; // nếu chỉ cần lấy giá trị đầu tiên thỏa điều kiện
+                    }
+                  }
+                }
+              }
+
+
+              return (
+                <div
+                  key={btnIndex}
+                  style={{
+                    display: 'block',
+                    width: 16,
+                    height: 16,
+                    borderRadius: 8,
+                    backgroundColor: colors[(statuses[dayIndex][btnIndex] ?? 'null') as StatusKey],
+                    border: isSunday ? '1px solid red' : '1px solid #999',
+                    marginBottom: 1,
+                    cursor: imgUrl ? 'pointer' : 'default',
+                  }}
+                  onClick={() => {
+                    if (imgUrl) {
+                      setModalImg(imgUrl);
+                      setModalVisible(true);
+                    }
+                  }}
+                />
+              );
+            })}
+          </div>
+        );
+      })}
+    </div>
+  </Stack>
+
+
+
+  <Modal
+      open={modalVisible}
+      onOk={handleOk}
+      onCancel={handleOk}
+      footer={null}
+      title={`${username}`}
+      okText="OK"
+      cancelButtonProps={{ style: { display: 'none' } }}
+      style={{ padding: 20, maxHeight:'60vh', minWidth:'90vw' }}
+    >
+      {modalImg?.out?.img && 
+        <Typography>Số giờ làm trong buổi: {modalImg.workhour?.toFixed(2)}</Typography>
+      }
+      <Typography fontSize={10}>Nhấp vào hình để xem vị trí trên googlemap</Typography>
+      <Stack direction="row" spacing={2} style={{ padding: 20, minHeight: '80vh', width:'fit-content' }}>
+      {modalImg?.in?.img && 
+      <Stack>
+        <img
+          src={`${useApiStatic()}/${modalImg.in.img}`}
+          alt="Check-in"
+          style={{ maxHeight: '50vh', minWidth:300, borderRadius: 8, marginBottom: 8, cursor:'pointer' }}
+          onClick={(e) => {
+            e.stopPropagation();
+            if (modalImg?.in?.lat && modalImg?.in?.long && modalImg?.in?.lat !== '-' && modalImg?.in?.long !== '-') {
+              const url = `https://www.google.com/maps?q=${modalImg?.in?.lat},${modalImg?.in?.long}`;
+              window.open(url, '_blank');
+            } else {
+              alert('Không có tọa độ để mở bản đồ');
+            }
+          }}
+        />
+         <Typography>Check in</Typography>
+        </Stack>
+      }
+
+      {modalImg?.out?.img && 
+      <Stack>
+        <img
+          src={`${useApiStatic()}/${modalImg.out.img}`}
+          alt="Check-out"
+          style={{ maxHeight: '60vh',   minWidth:300, borderRadius: 8, marginBottom: 8, cursor:'pointer' }}
+          onClick={(e) => {
+            e.stopPropagation();
+            if (modalImg?.out?.lat && modalImg?.out?.long && modalImg?.out?.lat !== '-' && modalImg?.out?.long !== '-') {
+              const url = `https://www.google.com/maps?q=${modalImg?.out?.lat},${modalImg?.out?.long}`;
+              window.open(url, '_blank');
+            } else {
+              alert('Không có tọa độ để mở bản đồ');
+            }
+          }}
+        />
+
+        <Typography>Check out</Typography>
+        </Stack>
+        
+      }
+      </Stack>
+
+      
+    </Modal>
+  </>
+  );
+}

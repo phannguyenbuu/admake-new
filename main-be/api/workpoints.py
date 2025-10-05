@@ -22,12 +22,20 @@ def get_workpoints():
 
 #     return jsonify(new_workpoint.to_dict()), 201
 
-@workpoint_bp.route("/<string:user_id>", methods=["GET"])
-def get_workpoint_detail(user_id):
+@workpoint_bp.route("/today/<string:user_id>", methods=["GET"])
+def get_workpoint_today_detail(user_id):
     workpoint, _, _ = get_workpoint_today(user_id)
     if not workpoint:
         abort(404, description="workpoint not found")
     return jsonify(workpoint.to_dict())
+
+@workpoint_bp.route("/<string:user_id>", methods=["GET"])
+def get_workpoint_detail(user_id):
+    workpoints = get_all_workpoints(user_id)
+    if not workpoints:
+        abort(404, description="workpoints not found")
+
+    return jsonify([c.to_dict() for c in workpoints])
 
 # @workpoint_bp.route("/<string:id>", methods=["PUT"])
 # def update_workpoint(id):
@@ -71,18 +79,21 @@ def filter_by_date(query, model_field, date_to_compare):
     """
     return query.filter(cast(model_field, Date) == date_to_compare)
 
+
+def get_all_workpoints(user_id):
+    workpoints = Workpoint.query.filter(Workpoint.user_id == user_id).all()
+    return workpoints
+
 def get_workpoint_today(user_id):
     tz = pytz.timezone("Asia/Ho_Chi_Minh")  # múi giờ GMT+7
     now = datetime.utcnow().replace(tzinfo=pytz.utc).astimezone(tz)
     
     today = now.date()
-    workpoints = Workpoint.query.filter(Workpoint.user_id == user_id).all()
+    workpoints = get_all_workpoints(user_id)
 
-    workpoints_same_date = [
-        wp for wp in workpoints if wp.createdAt.replace(tzinfo=pytz.utc).astimezone(tz).date() == today
-    ]
-
+    workpoints_same_date = [wp for wp in workpoints if wp.get_date() == today]
     workpoint = workpoints_same_date[0] if workpoints_same_date else None
+
     return workpoint, now, tz
 
 @workpoint_bp.route('/check/<string:user_id>/', methods=['POST'])
@@ -94,9 +105,10 @@ def post_workpoint_by_user_and_date(user_id):
 
     workpoint, now, tz = get_workpoint_today(user_id)
     
-    print('work_point', workpoint)
+    print('work_point', workpoint, now)
 
     if not workpoint:
+        
         workpoint = Workpoint(
             id=generate_datetime_id(),
             user_id=user_id,

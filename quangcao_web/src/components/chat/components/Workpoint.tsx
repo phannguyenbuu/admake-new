@@ -19,18 +19,9 @@ const Workpoint = () => {
   const [loading, setLoading] = React.useState(true);
   
   React.useEffect(() => {
-    console.log("Param", id );
     if (!id) return;
     
-    // const accessToken = sessionStorage.getItem('accessToken');
-    fetch(`${useApiHost()}/workpoint/check-access/${id}` 
-    // , {
-    //     method: 'GET',
-    //     headers: {
-    //     Authorization: `Bearer ${accessToken || ''}`,
-    //     },
-    // }
-    )
+    fetch(`${useApiHost()}/workpoint/check-access/${id}`)
     .then((res) => {
         if (res.status === 401 || res.status === 403) {
         // Nếu không hợp lệ thì chuyển hướng về login

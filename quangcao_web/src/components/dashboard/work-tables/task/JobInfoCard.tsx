@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { Form, Input, Tag, Typography } from "antd";
 import { ProjectOutlined } from "@ant-design/icons";
+import {Stack, Box} from "@mui/material";
 
 const { Text } = Typography;
 
@@ -48,31 +49,25 @@ const JobInfoCard: React.FC<JobInfoCardProps> = ({ currentStatus, taskDetail, fo
         </Text>
       </div>
 
-      <div className="grid grid-cols-1 gap-3 sm:gap-4">
+      <Stack direction="row" spacing={1}>
         <Form.Item
           name="title"
-          label={
-            <div className="flex items-center gap-1.5 sm:gap-2">
-              <div className="w-1 h-1 bg-cyan-500 rounded-full" />
-              <span className="text-gray-800 font-medium text-xs sm:text-sm">Tên công việc</span>
-              <span className="text-red-500">*</span>
-            </div>
-          }
+          
           rules={[
             { required: true, message: "Vui lòng nhập tên công việc" },
             { min: 3, message: "Ít nhất 3 ký tự" },
           ]}
-          className="!mb-0"
+          className="!mb-0 w-150"
         >
           <Input
             placeholder="Nhập tên công việc..."
-            className="!h-9 sm:!h-10 !text-xs sm:!text-sm !rounded-lg !border !border-gray-300 focus:!border-cyan-500 focus:!shadow-lg hover:!border-cyan-500 !transition-all !duration-200 !shadow-sm"
+            className="w-full !h-9 sm:!h-10 !text-xs sm:!text-sm !rounded-lg !border !border-gray-300 focus:!border-cyan-500 focus:!shadow-lg hover:!border-cyan-500 !transition-all !duration-200 !shadow-sm"
             size="middle"
           />
         </Form.Item>
 
-        <div className="grid grid-cols-2 gap-4">
-          <div className="flex flex-col">
+        <Stack spacing={1}>
+          <Stack direction="row" spacing={1}>
             <span className="text-xs text-gray-600 mb-2 font-medium">Danh sách</span>
             <Tag
               color={getStatusMeta(currentStatus).color}
@@ -80,8 +75,8 @@ const JobInfoCard: React.FC<JobInfoCardProps> = ({ currentStatus, taskDetail, fo
             >
               {getStatusMeta(currentStatus).icon} {getStatusMeta(currentStatus).label}
             </Tag>
-          </div>
-          <div className="flex flex-col">
+          </Stack>
+          <Stack direction="row" spacing={1}>
             <span className="text-xs text-gray-600 mb-2 font-medium">Trạng thái</span>
             <Tag
               color={getStatusMeta(currentStatus).color}
@@ -97,10 +92,11 @@ const JobInfoCard: React.FC<JobInfoCardProps> = ({ currentStatus, taskDetail, fo
                 ? "🏆 Đã Nghiệm Thu"
                 : "⏳ Chưa nhận việc"}
             </Tag>
-          </div>
-        </div>
-      </div>
+          </Stack>
+        </Stack>
+      </Stack>
     </div>
+    
   );
 };
 

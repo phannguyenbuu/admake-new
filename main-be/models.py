@@ -8,7 +8,7 @@ from flask_cors import CORS
 import random
 from sqlalchemy.types import JSON
 from sqlalchemy import inspect
-
+import pytz
 from sqlalchemy import create_engine, MetaData, Table, select, insert
 from sqlalchemy.sql import func, text
 from psycopg2.extras import Json
@@ -66,12 +66,15 @@ CORS(app)
 class BaseModel(db.Model):
     __abstract__ = True
 
-    
-
     deletedAt = db.Column(db.DateTime, nullable=True)
     createdAt = db.Column(db.DateTime, default=datetime.datetime.utcnow)
     updatedAt = db.Column(db.DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
     version = db.Column(db.Integer)
+
+    def get_date(self):
+        tz = pytz.timezone("Asia/Ho_Chi_Minh")  # múi giờ GMT+7
+        # now = datetime.utcnow().replace(tzinfo=pytz.utc).astimezone(tz)
+        return self.createdAt.replace(tzinfo=pytz.utc).astimezone(tz).date()
 
 
 class Material(BaseModel):
@@ -267,17 +270,8 @@ class Workspace(BaseModel):
     __table_args__ = {'extend_existing': True}
 
     id = db.Column(db.String(50), primary_key=True)  # _id.$oid
-    
     name = db.Column(db.String(255))
     owner_id = db.Column(db.String(50))
-
-    
-
-
-
-    id = db.Column(db.Integer, primary_key=True)
-    # groupId = db.Column(db.Integer, unique=True)
-    # name = db.Column(db.String(120), nullable=True)
     description = db.Column(db.String(255))
     documents = db.Column(db.JSON, default=[])  # Lưu danh sách đường dẫn tài liệu
     images = db.Column(db.JSON, default=[])     # Lưu danh sách đường dẫn hình ảnh
@@ -285,20 +279,9 @@ class Workspace(BaseModel):
     rating_sum = db.Column(db.Integer, default=0)
     rating_count = db.Column(db.Integer, default=0)
 
-
-
     state = db.Column(db.String(50))
     
-
-
-
-    # deleted_at = db.Column(db.DateTime, nullable=True)
-    # created_at = db.Column(db.DateTime)
-    # updated_at = db.Column(db.DateTime)
-    # version = db.Column(db.Integer)
-
-
-
+    
 
     def to_dict(self):
         result = {}

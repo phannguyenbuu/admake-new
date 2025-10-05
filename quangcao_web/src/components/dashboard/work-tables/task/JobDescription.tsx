@@ -2,6 +2,7 @@ import React from "react";
 import { Form, Input, Typography } from "antd";
 import type { Mode } from "../../../../@types/work-space.type";
 import type { FormTaskDetailProps } from "../../../../@types/work-space.type";
+import {Stack, Box} from "@mui/material";
 
 const { Text } = Typography;
 const { TextArea } = Input;
