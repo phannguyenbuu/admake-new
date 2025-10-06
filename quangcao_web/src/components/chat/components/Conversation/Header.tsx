@@ -117,7 +117,7 @@ const Header: React.FC<HeaderProps>
                   <MenuItem>
                     <ListItemIcon>
                       <DeleteIcon fontSize="small" />
-                    </ListItemIcon>Chọn Thành Viên Nhóm
+                    </ListItemIcon>Thay đổi thông tin
                   </MenuItem>
                   
                 </> 

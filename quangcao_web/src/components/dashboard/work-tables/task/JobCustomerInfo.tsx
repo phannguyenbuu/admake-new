@@ -11,8 +11,13 @@ interface JobCustomerInfoProps {
   form: any; // Form instance AntD
   searchValue: string;
   setSearchValue: React.Dispatch<React.SetStateAction<string>>;
+<<<<<<< HEAD
   selectedCustomer: Customer | User| null;
   setSelectedCustomer: React.Dispatch<React.SetStateAction<Customer | User | null>>;
+=======
+  selectedCustomer: Customer | User | null;
+  setSelectedCustomer: React.Dispatch<React.SetStateAction<Customer | User |  null>>;
+>>>>>>> origin/main
 }
 
 const JobCustomerInfo: React.FC<JobCustomerInfoProps> = ({ 
@@ -83,7 +88,7 @@ const JobCustomerInfo: React.FC<JobCustomerInfoProps> = ({
         className="mb-3"
       >
         <AutoComplete
-          style={{ minWidth: 280 }}
+          style={{ minWidth: 200, maxWidth:300 }}
           options={options}
           value={searchValue}
           onSearch={handleSearch}

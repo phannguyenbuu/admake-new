@@ -25,8 +25,6 @@ def create_group():
 
     return jsonify(new_group.to_dict()), 201
 
-
-
 @group_bp.route("/<int:group_id>", methods=["DELETE"])
 def delete_group(group_id):
     group = Group.query.get(group_id)
@@ -45,21 +43,19 @@ def get_group_detail(id):
         abort(404, description="group not found")
     return jsonify(group.to_dict())
 
-@group_bp.route("/<int:id>", methods=["PUT"])
-def update_group(id):
-    # print(request)
+@group_bp.route("/<int:group_id>", methods=["PUT"])
+def update_group(group_id):
     data = request.get_json()
-    # print(data)
-    role = db.session.get(Group, id)
-    if not role:
-        return jsonify({"error": "role not found"}), 404
+    
+    group = Group.query.get(group_id)
+    if not group:
+        return jsonify({"error": "Group not found"}), 404
+    
     for key, value in data.items():
-        if hasattr(role, key):
-            if key in ['workStart', 'workEnd'] and isinstance(value, str):
-                value = dateStr(value)
-            setattr(role, key, value)
+        group[key] = value
+
     db.session.commit()
-    return jsonify(role.to_dict()), 200
+    return jsonify(group.to_dict()), 200
 
 
 

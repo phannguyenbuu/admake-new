@@ -1,5 +1,5 @@
 import type { IPage } from "../../../@types/common.type";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { PaginationDto } from "../../../@types/common.type";
 import { useUserQuery } from "../../../common/hooks/user.hook";
 import type { User } from "../../../@types/user.type";
@@ -25,11 +25,12 @@ export const UserDashboard: IPage["Component"] = () => {
   // Debounce search value
   const debouncedSearch = useDebounce(query.search, 500);
 
-  const {
-    data: users,
-    isLoading: isLoadingUsers,
-    refetch,
+  const {data: users,isLoading: isLoadingUsers,refetch,
   } = useUserQuery({ ...query, search: debouncedSearch });
+
+  // useEffect(()=>{
+  //   console.log('users', users);
+  // },[users]);
 
   const handleRefetch = async () => {
     setIsRefetching(true);
