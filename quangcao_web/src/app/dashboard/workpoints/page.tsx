@@ -1,5 +1,4 @@
 import type { IPage } from "../../../@types/common.type";
-import { useState } from "react";
 import type { PaginationDto } from "../../../@types/common.type";
 import { useUserQuery } from "../../../common/hooks/user.hook";
 import type { User } from "../../../@types/user.type";
@@ -9,55 +8,63 @@ import TableComponent from "../../../components/table/TableComponent";
 import { EditOutlined } from "@ant-design/icons";
 import { columnsWorkPoint } from "../../../common/data";
 import { useDebounce } from "../../../common/hooks/useDebounce";
+import { useState, useEffect } from "react";
+import { useApiHost } from "../../../common/hooks/useApiHost";
+import type { Workpoint } from "../../../@types/workpoint";
 
 export const WorkPointPage: IPage["Component"] = () => {
-  const [config, setConfig] = useState({
-    openCreate: false,
-    openUpdate: false,
-  });
-  const [query, setQuery] = useState<Partial<PaginationDto>>({
+  const [query, setQuery] = useState({
     page: 1,
     limit: 10,
     search: "",
   });
-  const [isRefetching, setIsRefetching] = useState(false);
 
-  // Debounce search value
-  const debouncedSearch = useDebounce(query.search, 500);
+  const [workpoints, setWorkpoints] = useState<{ data: Workpoint[]; total: number } | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const {data: users, isLoading: isLoadingUsers, refetch} = useUserQuery({ ...query, search: debouncedSearch });
-
-  const [user, setUser] = useState<User | null>(null);
-
-  const toggle = (key: keyof typeof config) => {
-    return () => {
-      setConfig({ ...config, [key]: !config[key] });
-    };
+  // Fetch data dùng fetch API với params paging và search
+  const fetchUsers = async ({ page, limit, search }: typeof query) => {
+    setIsLoading(true);
+    try {
+      const response = await fetch(
+        `${useApiHost}/workpoint/page?` +
+          new URLSearchParams({
+            page: String(page),
+            limit: String(limit),
+            search,
+          })
+      );
+      
+      const result = await response.json();
+      console.log(result);
+      setWorkpoints(result);
+    } catch (error) {
+      console.error("Failed to fetch users", error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  // Handle search
-  const handleSearch = (searchValue: string) => {
-    setQuery({ ...query, search: searchValue, page: 1 });
-  };
+  // Gọi fetch khi query thay đổi
+  useEffect(() => {
+    fetchUsers(query);
+  }, [query]);
 
   return (
     <div className="min-h-screen p-2 w-full">
-      
-      <TableComponent<User>
+      <TableComponent<Workpoint>
         columns={columnsWorkPoint}
-        dataSource={users?.data}
-        loading={isLoadingUsers}
-        
+        dataSource={workpoints?.data}
+        loading={isLoading}
         pagination={{
           pageSize: query.limit,
           current: query.page,
-          total: (users as any)?.total || 0,
+          total: workpoints?.total || 0,
           onChange: (page, pageSize) => {
             setQuery({ ...query, page, limit: pageSize });
           },
           showSizeChanger: true,
-          showTotal: (total, range) =>
-            `${range[0]}-${range[1]} của ${total} nhân sự`,
+          showTotal: (total, range) => `${range[0]}-${range[1]} của ${total} nhân sự`,
           style: {
             paddingRight: "15px",
           },
@@ -66,10 +73,4 @@ export const WorkPointPage: IPage["Component"] = () => {
       />
     </div>
   );
-};
-
-export const loader = async () => {
-  // Simulate loading delay
-  await new Promise((resolve) => setTimeout(resolve, 100));
-  return { userId: 1, name: "John Doe" };
 };

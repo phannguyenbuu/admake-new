@@ -44,8 +44,7 @@ export const QRColumn: React.FC<QRColumnProps> = ({ record }) => {
 };
 
 interface WorkDaysProps {
-  userId: string | null;
-  username: string | null;
+  dataList: WorkListProps[]
 }
 
 interface WorkListProps {
@@ -58,7 +57,7 @@ interface WorkListProps {
 
 const periodMap: Record<keyof WorkListPeriod, number> = {morning: 0,noon: 1,evening: 2,};
 
-export default function WorkDays({ userId, username }: WorkDaysProps) {
+export default function WorkDays({ dataList }: WorkDaysProps) {
   const today = new Date();
   const year = today.getFullYear();
   const month = today.getMonth();
@@ -70,65 +69,36 @@ export default function WorkDays({ userId, username }: WorkDaysProps) {
   const todayDate = new Date().getDate();
   
   useEffect(() => {
-    let isMounted = true;
+    const newStatuses = Array(daysInMonth).fill(null).map(() => Array(3).fill(null));
+    const total:PeriodHour | null = {morning: 0,noon: 0,evening: 0,};
 
-    fetch(`/batch?user_ids=${userIds}`)
-      .then(response => {
-        if (!response.ok) {
-          throw new Error('Network response was not ok ' + response.statusText);
-        }
-        return response.json(); // Lấy dữ liệu JSON từ response
-      })
-  
-        .then((dataList: WorkListProps[]) => {
-          if (!isMounted) return;
-          console.log('main', dataList);
-          setData(dataList);
+    dataList && dataList.forEach((data) => {
+      const dateObj = new Date(data.createdAt);
+      const localTime = new Date(dateObj.getTime() + 7 * 60 * 60 * 1000);
 
-          const newStatuses = Array(daysInMonth).fill(null).map(() => Array(3).fill(null));
-          const total:PeriodHour | null = {morning: 0,noon: 0,evening: 0,};
-
-          dataList && dataList.forEach((data) => {
-            const dateObj = new Date(data.createdAt);
-            const localTime = new Date(dateObj.getTime() + 7 * 60 * 60 * 1000);
-
-            // if(userId === "68864f6163e2975c3a8ebef9")
-            //   console.log(dateObj, localTime);
-
-            if (localTime.getFullYear() === year && localTime.getMonth() === month) {
-              const dayIndex = localTime.getDate() - 1;
-              (Object.keys(data.checklist) as (keyof WorkListPeriod)[]).forEach(
-                (period) => {
-                  const periodData = data.checklist[period];
-                  if (periodData) {
-                    if (periodData.out) {
-                      total[period] += periodData.workhour || 0;
-                      newStatuses[dayIndex][periodMap[period]] = 'out';
-                    } else if (periodData.in) {
-                      newStatuses[dayIndex][periodMap[period]] = 'in';
-                    } else {
-                      newStatuses[dayIndex][periodMap[period]] = null;
-                    }
-                  }
-                }
-              );
+      if (localTime.getFullYear() === year && localTime.getMonth() === month) {
+        const dayIndex = localTime.getDate() - 1;
+        (Object.keys(data.checklist) as (keyof WorkListPeriod)[]).forEach(
+          (period) => {
+            const periodData = data.checklist[period];
+            if (periodData) {
+              if (periodData.out) {
+                total[period] += periodData.workhour || 0;
+                newStatuses[dayIndex][periodMap[period]] = 'out';
+              } else if (periodData.in) {
+                newStatuses[dayIndex][periodMap[period]] = 'in';
+              } else {
+                newStatuses[dayIndex][periodMap[period]] = null;
+              }
             }
-          });
+          }
+        );
+      }
+    });
 
-          setTotalHour(total);
-          setStatuses(newStatuses);
-        });
-    };
-
-    fetchData(); // Lần chạy đầu tiên ngay khi mount
-
-    const intervalId = setInterval(fetchData, 3 * 60 * 1000); // 5 phút
-
-    return () => {
-      isMounted = false;
-      clearInterval(intervalId);
-    };
-  }, [userId, year, month, daysInMonth]);
+    setTotalHour(total);
+    setStatuses(newStatuses);
+  }, [dataList, year, month, daysInMonth]);
 
   type StatusKey = 'in' | 'out' | 'null';
 

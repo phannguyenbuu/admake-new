@@ -13,6 +13,20 @@ def get_users():
     limit = request.args.get("limit", 10, type=int)
     search = request.args.get("search", "", type=str)
 
+    users, pagination = get_query_page_users(page,limit,search)
+
+    return jsonify({
+        "data": users,
+        "total": pagination.total,
+        "pagination": {
+            "total": pagination.total,
+            "page": page,
+            "per_page": limit,
+            "pages": pagination.pages,
+        }
+    })
+
+def get_query_page_users(page,limit,search):
     query = User.query.filter(User.role_id != -1)
 
     if search:
@@ -26,16 +40,7 @@ def get_users():
     pagination = query.paginate(page=page, per_page=limit, error_out=False)
     users = [c.to_dict() for c in pagination.items]
 
-    return jsonify({
-        "data": users,
-        "total": pagination.total,
-        "pagination": {
-            "total": pagination.total,
-            "page": page,
-            "per_page": limit,
-            "pages": pagination.pages,
-        }
-    })
+    return users, pagination
 
 @user_bp.route("/", methods=["POST"])
 def create_user():

@@ -4,6 +4,7 @@ from api.chat import socketio
 from sqlalchemy import desc
 from datetime import datetime, time
 from sqlalchemy.orm.attributes import flag_modified
+from api.users import get_query_page_users
 
 workpoint_bp = Blueprint('workpoint', __name__, url_prefix='/api/workpoint')
 
@@ -40,19 +41,28 @@ def get_workpoint_detail(user_id):
 
 from flask import request
 
-@workpoint_bp.route("/batch", methods=["GET"])
+@workpoint_bp.route("/page", methods=["GET"])
 def get_batch_workpoint_detail():
-    user_ids = request.args.get("user_ids")  # "1,2,3,4,5"
-    if not user_ids:
-        abort(400, description="Missing user_ids")
-    user_id_list = user_ids.split(",")
+    page = request.args.get("page", 1, type=int)
+    limit = request.args.get("limit", 10, type=int)
+    search = request.args.get("search", "", type=str)
+
+    users, pagination = get_query_page_users(page, limit, search)
+    user_id_list = [user.id for user in users]
     
     # Lấy tất cả workpoints có user_id trong danh sách
     workpoints = Workpoint.query.filter(Workpoint.user_id.in_(user_id_list)).all()
 
-    if not workpoints:
-        abort(404, description="workpoints not found")
-    return jsonify([c.to_dict() for c in workpoints])
+    return jsonify({
+        "data": workpoints,
+        "total": pagination.total,
+        "pagination": {
+            "total": pagination.total,
+            "page": page,
+            "per_page": limit,
+            "pages": pagination.pages,
+        }
+    })
 
 
 from datetime import datetime, time, date

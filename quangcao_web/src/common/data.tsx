@@ -13,6 +13,7 @@ import { Stack, Box, Typography } from "@mui/material";
 import QRCode from "../components/chat/components/QRCode";
 import { useLocation } from "react-router-dom";
 import WorkDays, {QRColumn} from "../app/dashboard/workpoints/WorkDays";
+import Workpoint from "../components/chat/components/Workpoint";
 
 export const columnsMaterial = [
   {
@@ -513,7 +514,7 @@ export const columnsAttendance = (
 const today = new Date();
 const month = today.getMonth();
 
-export const columnsWorkPoint = [
+export const columnsWorkPoint: ColumnsType<Workpoint> = [
   {
     title: `QR`,
     dataIndex: "role",
@@ -544,7 +545,7 @@ export const columnsWorkPoint = [
     width: 800,
     render:  (text: string, record: User)  => (
       <div>
-        <WorkDays userIds={dataSource.map(record => record.id)}/>
+        <WorkDays userId={record.id} username={record.fullName ?? null}/>
       </div>
     )
   },
