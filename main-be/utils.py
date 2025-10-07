@@ -990,8 +990,8 @@ if __name__ == "__main__":
 
         # show_table()
 
-        # add_new_columns('group',['address'],'VARCHAR(255)')
-        delete_content()
+        add_new_columns('group',['address'],'VARCHAR(255)')
+        # delete_content()
 
         # transfer_data_to_postgres()
         # set_group_generate_token()
