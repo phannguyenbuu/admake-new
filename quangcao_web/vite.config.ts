@@ -22,7 +22,7 @@ export default defineConfig({
 
   define: { global: "window" },
   server: {
-    allowedHosts: ['localhost', 'archbox.pw','dashboard.archbox.pw'],
+    allowedHosts: ['localhost', 'archbox.pw','dashboard.archbox.pw','quanly.admake.vn'],
     host: '0.0.0.0',
     watch: {
       usePolling: true,
