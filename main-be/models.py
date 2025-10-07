@@ -22,26 +22,26 @@ import logging
 import re
 from flask_cors import CORS
 
-def cors_origin_regex(origin):
-    if origin is None:
-        return False
+# def cors_origin_regex(origin):
+#     if origin is None:
+#         return False
 
-    # Kiểm tra origin có phải https và kết thúc với .archbox.pw
-    allowed_pattern_archbox = re.compile(r"^https:\/\/([a-z0-9\-]+\.)*archbox\.pw$")
-    allowed_pattern_admake = re.compile(r"^https:\/\/([a-z0-9\-]+\.)*admake\.vn$")
-    localhost_pattern = re.compile(r"^http:\/\/localhost(:\d+)?$")
+#     # Kiểm tra origin có phải https và kết thúc với .archbox.pw
+#     allowed_pattern_archbox = re.compile(r"^https:\/\/([a-z0-9\-]+\.)*archbox\.pw$")
+#     allowed_pattern_admake = re.compile(r"^https:\/\/([a-z0-9\-]+\.)*admake\.vn$")
+#     localhost_pattern = re.compile(r"^http:\/\/localhost(:\d+)?$")
 
-    return bool(
-        allowed_pattern_archbox.match(origin) or
-        allowed_pattern_admake.match(origin) or
-        localhost_pattern.match(origin)
-    )
+#     return bool(
+#         allowed_pattern_archbox.match(origin) or
+#         allowed_pattern_admake.match(origin) or
+#         localhost_pattern.match(origin)
+#     )
 
-def custom_cors_origin():
-    origin = request.headers.get('Origin')
-    if cors_origin_regex(origin):
-        return origin
-    return None
+# def custom_cors_origin():
+#     origin = request.headers.get('Origin')
+#     if cors_origin_regex(origin):
+#         return origin
+#     return None
 
 app = Flask(__name__)
 app.logger.setLevel(logging.DEBUG)
