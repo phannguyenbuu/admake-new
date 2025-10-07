@@ -2,7 +2,7 @@ from flask import Blueprint, request, jsonify, abort
 from models import db, app, Workpoint, Message,User, dateStr, generate_datetime_id
 from api.chat import socketio
 from sqlalchemy import desc
-from datetime import datetime, time
+from datetime import datetime, time, date
 from sqlalchemy.orm.attributes import flag_modified
 from api.users import get_query_page_users
 
@@ -39,7 +39,6 @@ def get_workpoint_detail(user_id):
     return jsonify([c.to_dict() for c in workpoints])
 
 
-from flask import request
 
 @workpoint_bp.route("/page", methods=["GET"])
 def get_batch_workpoint_detail():
@@ -48,7 +47,7 @@ def get_batch_workpoint_detail():
     search = request.args.get("search", "", type=str)
 
     users, pagination = get_query_page_users(page, limit, search)
-    user_id_list = [user.id for user in users]
+    user_id_list = [user['id'] for user in users]
     
     # Lấy tất cả workpoints có user_id trong danh sách
     workpoints = Workpoint.query.filter(Workpoint.user_id.in_(user_id_list)).all()
@@ -63,9 +62,6 @@ def get_batch_workpoint_detail():
             "pages": pagination.pages,
         }
     })
-
-
-from datetime import datetime, time, date
 
 @workpoint_bp.route('/check-access/<string:user_id>', methods=['GET'])
 def get_workpoint_checkpoint(user_id):

@@ -27,7 +27,7 @@ export const WorkPointPage: IPage["Component"] = () => {
     setIsLoading(true);
     try {
       const response = await fetch(
-        `${useApiHost}/workpoint/page?` +
+        `${useApiHost()}/workpoint/page?` +
           new URLSearchParams({
             page: String(page),
             limit: String(limit),
