@@ -10,7 +10,7 @@ import { columnsWorkPoint } from "../../../common/data";
 // import { useDebounce } from "../../../common/hooks/useDebounce";
 import { useState, useEffect } from "react";
 import { useApiHost } from "../../../common/hooks/useApiHost";
-import type { Workpoint } from "../../../@types/workpoint";
+import type { Workpoint, WorkDaysProps } from "../../../@types/workpoint";
 
 export const WorkPointPage: IPage["Component"] = () => {
   const [query, setQuery] = useState({
@@ -19,7 +19,7 @@ export const WorkPointPage: IPage["Component"] = () => {
     search: "",
   });
 
-  const [workpoints, setWorkpoints] = useState<{ data: Workpoint[]; total: number } | null>(null);
+  const [workpoints, setWorkpoints] = useState<{ data: WorkDaysProps[]; total: number } | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   // Fetch data dùng fetch API với params paging và search
@@ -36,7 +36,7 @@ export const WorkPointPage: IPage["Component"] = () => {
       );
       
       const result = await response.json();
-      // console.log(result);
+      console.log(result);
       setWorkpoints(result);
     } catch (error) {
       console.error("Failed to fetch users", error);
@@ -52,7 +52,7 @@ export const WorkPointPage: IPage["Component"] = () => {
 
   return (
     <div className="min-h-screen p-2 w-full">
-      <TableComponent<Workpoint>
+      <TableComponent<WorkDaysProps>
         columns={columnsWorkPoint}
         dataSource={workpoints?.data}
         loading={isLoading}

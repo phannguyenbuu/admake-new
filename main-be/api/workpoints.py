@@ -5,6 +5,7 @@ from sqlalchemy import desc
 from datetime import datetime, time, date
 from sqlalchemy.orm.attributes import flag_modified
 from api.users import get_query_page_users
+from collections import defaultdict
 
 workpoint_bp = Blueprint('workpoint', __name__, url_prefix='/api/workpoint')
 
@@ -43,6 +44,8 @@ def get_workpoint_detail(user_id):
 @workpoint_bp.route("/page", methods=["GET"])
 def get_batch_workpoint_detail():
     page = request.args.get("page", 1, type=int)
+    print(f"Requested page: {page}")
+
     limit = request.args.get("limit", 10, type=int)
     search = request.args.get("search", "", type=str)
 
@@ -58,14 +61,17 @@ def get_batch_workpoint_detail():
 
     for user in users:
         user_id = user["id"]
-        user_fullName = user["fullName"]
+        username = user["fullName"]
+        user_role = user.get("role") and user["role"].get("name")
+        # user_role = user.get("role", {}).get("name")  # Trả về None nếu `role` hoặc `name` không tồn tại
 
         if user_id in workpoint_dict:
             wp = workpoint_dict[user_id]
             
             # Chuyển đổi wp thành dict JSON serializable (giả sử đã có to_dict hoặc tương tự)
             wp_data = wp.to_dict()  # bạn cần implement to_dict trong model Workpoint
-            wp_data["username"] = user_fullName 
+            wp_data["username"] = username 
+            wp_data["userrole"] = user_role 
         else:
             wp_data = {
                 "checklist": {},
@@ -75,14 +81,32 @@ def get_batch_workpoint_detail():
                 "id": "",
                 "note": "",
                 "user_id": user_id,
-                "username": user_fullName,
+                "username": username,
+                "userrole": user_role,
                 "version": None
             }
         result.append(wp_data)
 
+    grouped_result = {}
+
+    for wp_data in result:
+        user_id = wp_data.get("user_id")
+        username = wp_data.get("username")
+        userrole = wp_data.get("userrole")
+
+        if user_id not in grouped_result:
+            # Tạo nhóm mới với 'user_id', 'username' và danh sách chứa wp_data
+            grouped_result[user_id] = {
+                "user_id": user_id,
+                "username": username,
+                "userrole": userrole,
+                "items": []
+            }
+        # Thêm wp_data vào danh sách items của user
+        grouped_result[user_id]["items"].append(wp_data)
 
     return jsonify({
-        "data": result,
+        "data": list(grouped_result.values()),
         "total": pagination.total,
         "pagination": {
             "total": pagination.total,

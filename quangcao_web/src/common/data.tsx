@@ -13,7 +13,7 @@ import { Stack, Box, Typography } from "@mui/material";
 import QRCode from "../components/chat/components/QRCode";
 import { useLocation } from "react-router-dom";
 import WorkDays, {QRColumn} from "../app/dashboard/workpoints/WorkDays";
-import type { Workpoint } from "../@types/workpoint";
+import type { Workpoint, WorkDaysProps } from "../@types/workpoint";
 import type { ColumnsType } from "antd/es/table";
 
 export const columnsMaterial = [
@@ -515,37 +515,37 @@ export const columnsAttendance = (
 const today = new Date();
 const month = today.getMonth();
 
-export const columnsWorkPoint: ColumnsType<Workpoint> = [
+export const columnsWorkPoint: ColumnsType<WorkDaysProps> = [
   {
     title: `QR`,
-    dataIndex: "role",
-    key: "role",
+    dataIndex: "userrole",
+    key: "userrole",
     width: 40,
-    render:  (text: string, record: Workpoint)  => (
+    render:  (text: string, record: WorkDaysProps)  => (
      <QRColumn record = {record}/>
     )
   },
   {
     title: "Họ Và Tên",
-    dataIndex: "fullName",
-    key: "fullName",
+    dataIndex: "username",
+    key: "username",
     width: 200,
-    render: (text: string, record: Workpoint) => (
+    render: (text: string, record: WorkDaysProps) => (
       <div>
         <div>{text}</div>
-        <span className="!text-base" style={{fontSize:8,fontStyle:'italic'}}>{record.role}</span>
+        <span className="!text-base" style={{fontSize:8,fontStyle:'italic'}}>{record.userrole}</span>
       </div>
     ),
   },
 
   {
     title: `Ngày công tác trong tháng ${month + 1}`,
-    dataIndex: "role",
-    key: "role",
+    dataIndex: "workpoint",
+    key: "workpoint",
     width: 800,
-    render:  (text: string, record: Workpoint)  => (
+    render:  (text: string, record: WorkDaysProps)  => (
       <div>
-        <WorkDays user_id={record.id} username={record.fullName ?? null}/>
+        <WorkDays record = {record}/>
       </div>
     )
   },

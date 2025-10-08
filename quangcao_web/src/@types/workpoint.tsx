@@ -29,3 +29,11 @@ export interface Workpoint {
   version?: string | null;
   role: string;
 }
+
+
+export interface WorkDaysProps {
+  items: Workpoint[];
+  user_id: string;
+  username: string;
+  userrole: string;
+}

@@ -8,15 +8,15 @@ import { useLocation } from "react-router-dom";
 // import type { Checklist, PeriodData, Checklist } from "../../../@types/CheckListType";
 import DownloadIcon from '@mui/icons-material/Download';
 import { CenterBox } from "../../../components/chat/components/commons/TitlePanel";
-import type { Workpoint, PeriodData, Checklist } from "../../../@types/workpoint";
+import type { Workpoint, WorkDaysProps, PeriodData, Checklist } from "../../../@types/workpoint";
 
 interface QRColumnProps {
-  record: Workpoint;
+  record: WorkDaysProps;
 }
 
 export const QRColumn: React.FC<QRColumnProps> = ({ record }) => {
   const [showModal, setShowModal] = useState(false);
-  const [selectedRecord, setSelectedRecord] = useState<Workpoint | null>(null);
+  const [selectedRecord, setSelectedRecord] = useState<WorkDaysProps | null>(null);
 
   const handleOpenModal = () => {
     setSelectedRecord(record);
@@ -36,8 +36,8 @@ export const QRColumn: React.FC<QRColumnProps> = ({ record }) => {
       >
         {selectedRecord && (
           <Box display="flex" justifyContent="center">
-            <QRCode title="Download và gửi cho nhân sự" filename={`qrcode-admake-${record.id}.png`} 
-              url={`${window.location.origin}/point/${selectedRecord.id}/`} />
+            <QRCode title="Download và gửi cho nhân sự" filename={`qrcode-admake-${record.user_id}.png`} 
+              url={`${window.location.origin}/point/${selectedRecord.user_id}/`} />
           </Box>
         )}
       </Modal>
@@ -45,9 +45,6 @@ export const QRColumn: React.FC<QRColumnProps> = ({ record }) => {
   );
 };
 
-interface WorkDaysProps {
-  dataList: Workpoint[]
-}
 
 // interface WorkListProps {
 //   checklist: Checklist;
@@ -60,7 +57,9 @@ interface WorkDaysProps {
 
 const periodMap: Record<keyof Checklist, number> = {morning: 0,noon: 1,evening: 2,};
 
-export default function WorkDays({ dataList }: WorkDaysProps) {
+export default function WorkDays({record}: {record:WorkDaysProps}) {
+  const {items,user_id,username} = record;
+
   const today = new Date();
   const year = today.getFullYear();
   const month = today.getMonth();
@@ -70,12 +69,16 @@ export default function WorkDays({ dataList }: WorkDaysProps) {
   const [mainData, setData] = useState<Workpoint[]>([]);
   const [modalImg, setModalImg] = useState<PeriodData | null>(null);
   const todayDate = new Date().getDate();
+
+  useEffect(() => {
+    setData(record.items);
+  },[record]);
   
   useEffect(() => {
     const newStatuses = Array(daysInMonth).fill(null).map(() => Array(3).fill(null));
     const total = {morning: 0,noon: 0,evening: 0};
 
-    dataList && dataList.forEach((data) => {
+    items && items.forEach((data) => {
       const dateObj = new Date(data.createdAt);
       const localTime = new Date(dateObj.getTime() + 7 * 60 * 60 * 1000);
 
@@ -100,8 +103,11 @@ export default function WorkDays({ dataList }: WorkDaysProps) {
     });
 
     setTotalHour(total);
+
+    if(username === "Thanh Hiếu Trần")
+      console.log('MMMstatus',username, newStatuses);
     setStatuses(newStatuses);
-  }, [dataList, year, month, daysInMonth]);
+  }, [items, year, month, daysInMonth]);
 
   type StatusKey = 'in' | 'out' | 'null';
 
@@ -163,16 +169,18 @@ return (
             </div>
             {[0, 1, 2].map((btnIndex) => {
               const status: any = statuses[dayIndex][btnIndex];
-
+              
               let imgUrl: PeriodData | null = null;
 
               if (status && mainData?.length) {
+                console.log('mainData', status);
                 const periodKey = ['morning', 'noon', 'evening'][btnIndex] as keyof Checklist;
 
                 for (const item of mainData) {
 
                   const itemCreateDate = new Date(item.createdAt);
                   const itemDate = new Date(itemCreateDate.getTime() + 7 * 60 * 60 * 1000);
+                  console.log('itemDate', itemDate);
 
                   if (
                     itemDate.getDate() === date.getDate() &&
@@ -180,6 +188,7 @@ return (
                     itemDate.getFullYear() === date.getFullYear()
                   ) {
                     const periodData = item.checklist[periodKey];
+                    console.log('periodData', periodData);
                     if (periodData) {
                       imgUrl = periodData;
                       break; // nếu chỉ cần lấy giá trị đầu tiên thỏa điều kiện
@@ -203,6 +212,7 @@ return (
                     cursor: imgUrl ? 'pointer' : 'default',
                   }}
                   onClick={() => {
+                    console.log('IMG', imgUrl);
                     if (imgUrl) {
                       setModalImg(imgUrl);
                       setModalVisible(true);
@@ -229,7 +239,7 @@ return (
     >
       <CenterBox>
         <Box sx={{borderRadius:10, backgroundColor:"#00B4B6", px:5, py:1}}>
-          {/* <Typography sx={{textTransform:"uppercase",color:"#fff",fontWeight:500,textAlign:"center"}}>{username}</Typography> */}
+          <Typography sx={{textTransform:"uppercase",color:"#fff",fontWeight:500,textAlign:"center"}}>{username}</Typography>
           {modalImg?.out?.img && 
             <Typography sx={{color:"#fff",textAlign:"center",fontSize:10}}>Số giờ làm trong buổi: {modalImg.workhour?.toFixed(2)}</Typography>
           }
