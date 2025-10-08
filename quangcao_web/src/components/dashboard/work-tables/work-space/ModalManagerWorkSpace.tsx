@@ -355,7 +355,7 @@ export default function ModalManagerWorkSpace({
         editModalVisible={editModalVisible}
         closeEditModal={closeEditModal}
         editForm={editForm}
-        workspaceId={editingWorkspace?.id || ""}
+        taskId={editingWorkspace?.id || ""}
         onSuccess={onRefresh}
       />
 

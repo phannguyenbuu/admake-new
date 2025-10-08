@@ -33,7 +33,7 @@ const Conversation: React.FC<ConversationProps>
   },[groupEl?.status]);
 
   return (
-    <Stack ref={boxRef} sx={{ width: full ? '50vw' : '100vw', background:"#ddd"}}>
+    <Stack ref={boxRef} sx={{ width: full ? '50vw' : '100vw', backgroundImage: "url(/backGround.png)"}}>
         <Header title={title} status={status} onGroupDelete={onGroupDelete}/>
         
         <Box className='scrollbar'

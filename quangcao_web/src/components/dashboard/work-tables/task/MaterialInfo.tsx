@@ -22,7 +22,7 @@ const MaterialInfo = ({taskDetail}:{taskDetail:Task | null}) => {
     fetch(`${useApiHost()}/material/`)
         .then((response) => response.json())
         .then((data: MaterialProps) => {
-          console.log("materials", data);
+          // console.log("materials", data);
           setMeterialList(data.data);
         });
   },[]);

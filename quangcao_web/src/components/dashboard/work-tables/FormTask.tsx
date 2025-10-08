@@ -146,7 +146,7 @@ export default function FormTask({ open, onCancel, taskId, workspaceId }: FormTa
       // Lấy dữ liệu hiện tại từ form
       const values = await form.validateFields();
 
-      console.log("new_task_values", values);
+      // console.log("new_task_values", values);
 
       // Gọi API PUT gửi dữ liệu cập nhật
       const response = await fetch(`${useApiHost()}/task/${taskId}`, {

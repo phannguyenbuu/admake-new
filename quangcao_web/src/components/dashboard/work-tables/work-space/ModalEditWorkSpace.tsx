@@ -10,6 +10,7 @@ import {
 import { EditOutlined } from "@ant-design/icons";
 import { useUpdateWorkSpace } from "../../../../common/hooks/work-space.hook";
 import { useCallback } from "react";
+import { useApiHost } from "../../../../common/hooks/useApiHost";
 
 const { Title, Text } = Typography;
 
@@ -17,7 +18,7 @@ interface ModalEditWorkSpaceProps {
   editModalVisible: boolean;
   closeEditModal: () => void;
   editForm: FormInstance;
-  workspaceId: string; // Thêm workspaceId để biết workspace nào đang edit
+  taskId: string; // Thêm taskId để biết workspace nào đang edit
   onSuccess?: () => void; // Callback khi update thành công
 }
 
@@ -25,41 +26,35 @@ export default function ModalEditWorkSpace({
   editModalVisible,
   closeEditModal,
   editForm,
-  workspaceId,
+  taskId,
   onSuccess,
 }: ModalEditWorkSpaceProps) {
   const { mutate: updateWorkSpace, isPending: isUpdating } =
     useUpdateWorkSpace();
 
   // Hàm xử lý update workspace
-  const handleUpdate = useCallback(
-    async (values: any) => {
-      try {
-        updateWorkSpace(
-          {
-            id: workspaceId,
-            dto: {
-              name: values.name,
-            },
-          },
-          {
-            onSuccess: () => {
-              message.success("Cập nhật workspace thành công!");
-              closeEditModal();
-              editForm.resetFields();
-              onSuccess?.(); // Gọi callback success
-            },
-            onError: () => {
-              message.error("Có lỗi xảy ra khi cập nhật workspace!");
-            },
-          }
-        );
-      } catch (error) {
+  const handleUpdate = (values: any) => {
+    console.log('TaskID', taskId);
+    fetch(`${useApiHost()}/task/${taskId}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name: values.name }),
+    })
+      .then((response) => {
+        if (!response.ok) throw new Error("Network response was not ok");
+        return response.json();
+      })
+      .then(() => {
+        message.success("Cập nhật workspace thành công!");
+        closeEditModal();
+        editForm.resetFields();
+        onSuccess?.();
+      })
+      .catch(() => {
         message.error("Có lỗi xảy ra khi cập nhật workspace!");
-      }
-    },
-    [workspaceId, updateWorkSpace, closeEditModal, editForm, onSuccess]
-  );
+      });
+  };
+
 
   return (
     <Modal
@@ -160,6 +155,7 @@ export default function ModalEditWorkSpace({
               >
                 ❌ Hủy bỏ
               </Button>
+
               <Button
                 type="primary"
                 htmlType="submit"

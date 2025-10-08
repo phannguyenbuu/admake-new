@@ -266,7 +266,7 @@ const Footer = forwardRef<HTMLDivElement, FooterProps>(
         position: 'fixed',
         width: full ? '50vw':'100vw',
         bottom: 40,
-        backgroundColor: '#fff8f8ff',
+        backgroundColor: '#00B4B6',
         boxShadow: '0px 0px 2px rgba(0,0,0,0.25)'
       }}>
         <Stack direction='row' alignItems='center' spacing={3}>

@@ -22,6 +22,7 @@ import {
   useWorkSpaceQueryById,
 } from "../../../common/hooks/work-space.hook";
 import { useCheckPermission } from "../../../common/hooks/checkPermission.hook";
+import DragableTaskCard from "./work-space/DragableTaskCard";
 
 export default function ManagermentBoard({
   workspaceId,
@@ -37,12 +38,12 @@ export default function ManagermentBoard({
   // API hooks
   const { data: workspaceData } = useWorkSpaceQueryById(workspaceId);
 
-  console.log('MAN_WSPACE', workspaceData);
+  // console.log('MAN_WSPACE', workspaceData);
 
   const { data: tasksData, refetch: refetchTasks } = useWorkSpaceQueryTaskById(workspaceId);
 
 
-  console.log('MAN_TASK', tasksData);
+  // console.log('MAN_TASK', tasksData);
 
   const updateTaskStatusMutation = useUpdateTaskStatusById();
   const deleteTaskMutation = useDeleteTask();
@@ -410,47 +411,11 @@ export default function ManagermentBoard({
             </div>
           </div>
         </div>
-        {/* Stats Cards
-        <div className="flex justify-center sm:justify-end gap-2 sm:gap-3">
-          <div className="bg-white/90 backdrop-blur-md rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 shadow-md border border-white/20 min-w-[60px] sm:min-w-[70px] text-center">
-            <div className="text-xs text-gray-500 font-medium mb-0.5">Tổng</div>
-            <div className="text-sm sm:text-base font-bold text-gray-800">
-              {columns.reduce((acc, col) => acc + col.tasks.length, 0)}
-            </div>
-          </div>
-          <div className="bg-white/90 backdrop-blur-md rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 shadow-md border border-white/20 min-w-[60px] sm:min-w-[70px] text-center">
-            <div className="text-xs text-green-600 font-medium mb-0.5">
-              Hoàn thành
-            </div>
-            <div className="text-sm sm:text-base font-bold text-green-600">
-              {columns[2]?.tasks.length || 0}
-            </div>
-          </div>
-          <div className="bg-white/90 backdrop-blur-md rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 shadow-md border border-white/20 min-w-[60px] sm:min-w-[70px] text-center">
-            <div className="text-xs text-blue-600 font-medium mb-0.5">
-              Đang làm
-            </div>
-            <div className="text-sm sm:text-base font-bold text-blue-600">
-              {columns[1]?.tasks.length || 0}
-            </div>
-          </div>
-        </div> */}
+        
       </div>
 
       {/* Board */}
       <div className="relative z-10 px-4 sm:px-6 pt-3">
-        {/* Thông báo về cột khoán thưởng */}
-        {/* <div className="mb-4 p-3 bg-purple-50 border border-purple-200 rounded-lg">
-          <div className="flex items-center gap-2 text-purple-800">
-            <span className="text-lg">💡</span>
-            <div className="text-sm">
-              <strong>Lưu ý:</strong> Các task trong cột "Khoán thưởng" đã hoàn
-              thành và không thể di chuyển. Chỉ có thể kéo task từ cột "Hoàn
-              thiện" vào cột này khi đã xác nhận hoàn thành.
-            </div>
-          </div>
-        </div> */}
-
         <DragDropContext
           onDragStart={onDragStart}
           onDragUpdate={onDragUpdate}
@@ -554,188 +519,15 @@ export default function ManagermentBoard({
                           >
                             {/* @ts-ignore */}
                             {col.tasks.map((task, idx) => {
-                              // Kiểm tra xem task có đang ở cột "Khoán thưởng" không
-                              const isRewardColumn = col.type === "REWARD";
-
-                              return (
-                                <Draggable
-                                  key={task.id}
-                                  draggableId={task.id}
-                                  index={idx}
-                                  isDragDisabled={isRewardColumn} // Vô hiệu hóa drag cho task trong cột khoán thưởng
-                                >
-                                  {(provided, snapshot) => (
-                                    <div
-                                      ref={provided.innerRef}
-                                      {...provided.draggableProps}
-                                      {...provided.dragHandleProps}
-                                      className={`task-card group/task relative mb-3 transition-all duration-200 ${
-                                        isRewardColumn
-                                          ? "cursor-not-allowed opacity-90" // Style cho task không thể kéo
-                                          : "cursor-pointer"
-                                      } ${
-                                        snapshot.isDragging
-                                          ? "shadow-xl scale-105 ring-2 ring-[#00B4B6]/30 z-50 border-2 border-[#00B4B6]/50 rotate-1"
-                                          : "shadow-md hover:shadow-lg hover:scale-[1.01] hover:-translate-y-0.5"
-                                      } ${
-                                        !snapshot.isDragging
-                                          ? "drag-item-reset"
-                                          : ""
-                                      }`}
-                                      style={{
-                                        ...provided.draggableProps.style,
-                                        ...(snapshot.isDragging && {
-                                          // Đảm bảo phần tử theo sát con trỏ chuột
-                                          transition: "none",
-                                          zIndex: 99999,
-                                          cursor: "grabbing",
-                                          position: "fixed",
-                                          top: 0,
-                                          left: 0,
-                                          margin: 0,
-                                          // Sử dụng transform từ drag library để theo sát con trỏ
-                                          transform:
-                                            provided.draggableProps.style
-                                              ?.transform || "none",
-                                        }),
-                                      }}
-                                      onClick={() => {
-                                        // Chỉ cho phép click khi không đang drag và không trong quá trình transition
-                                        if (
-                                          !snapshot.isDragging &&
-                                          !isDragging
-                                        ) {
-                                          setSelectedTask(task);
-                                          setEditingTaskId(task.id);
-                                          setShowFormTask(true);
-                                        }
-                                      }}
-                                    >
-                                      {/* Task glow effect */}
-                                      <div
-                                        className="absolute inset-0 rounded-xl blur opacity-0 group-hover/task:opacity-20 transition-opacity duration-200"
-                                        style={{
-                                          background: `linear-gradient(135deg, ${theme.color}40, ${theme.color}20)`,
-                                        }}
-                                      ></div>
-
-                                      {/* Task card content */}
-                                      <div
-                                        className={`relative bg-white rounded-xl p-2 sm:p-3 border transition-all duration-300 ${
-                                          isRewardColumn
-                                            ? "border-purple-200 bg-purple-50/30" // Style đặc biệt cho cột khoán thưởng
-                                            : ""
-                                        } ${
-                                          snapshot.isDragging
-                                            ? "shadow-xl border-[#00B4B6]/50 bg-white/95 backdrop-blur-sm"
-                                            : "shadow-md border-gray-100/50 group-hover/task:shadow-lg group-hover/task:border-gray-200/70"
-                                        }`}
-                                      >
-                                        {/* Badge cho task đã hoàn thành khoán thưởng */}
-                                        {isRewardColumn && (
-                                          <div className="absolute -top-2 -right-2 bg-purple-500 text-white text-xs px-2 py-1 rounded-full font-bold shadow-lg">
-                                            🏆
-                                          </div>
-                                        )}
-
-                                        <div className="space-y-1 sm:space-y-1.5">
-                                          <div className="flex items-start justify-between gap-2">
-                                            <h3
-                                              className={`font-bold text-xs sm:text-sm line-clamp-2 transition-colors duration-150 flex-1 min-w-0 ${
-                                                isRewardColumn
-                                                  ? "text-purple-800"
-                                                  : "text-gray-800 group-hover/task:text-gray-900"
-                                              }`}
-                                            >
-                                              {task.title}
-                                            </h3>
-                                            {/* <button
-                                              onClick={(e) => {
-                                                e.stopPropagation(); // Ngăn không cho trigger onClick của task card
-                                                setDeleteConfirmModal({
-                                                  visible: true,
-                                                  taskId: task.id,
-                                                  taskTitle: task.title,
-                                                });
-                                              }}
-                                              disabled={
-                                                deleteTaskMutation.isPending
-                                              }
-                                              className="group-hover/task:opacity-100 p-1 hover:bg-red-50 rounded-md text-red-500 hover:text-red-600 hover:scale-110 transform transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed opacity-100 flex-shrink-0"
-                                              title="Xóa task"
-                                            >
-                                              {deleteTaskMutation.isPending ? (
-                                                <svg
-                                                  className="w-3 h-3 animate-spin"
-                                                  fill="none"
-                                                  viewBox="0 0 24 24"
-                                                >
-                                                  <circle
-                                                    className="opacity-25"
-                                                    cx="12"
-                                                    cy="12"
-                                                    r="10"
-                                                    stroke="currentColor"
-                                                    strokeWidth="4"
-                                                  ></circle>
-                                                  <path
-                                                    className="opacity-75"
-                                                    fill="currentColor"
-                                                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                                                  ></path>
-                                                </svg>
-                                              ) : (
-                                                <svg
-                                                  className="w-3 h-3"
-                                                  fill="currentColor"
-                                                  viewBox="0 0 20 20"
-                                                >
-                                                  <path
-                                                    fillRule="evenodd"
-                                                    d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
-                                                    clipRule="evenodd"
-                                                  />
-                                                </svg>
-                                              )}
-                                            </button> */}
-                                          </div>
-                                          {task.description && (
-                                            <p className="text-gray-500 text-xs line-clamp-2 leading-relaxed">
-                                              {task.description}
-                                            </p>
-                                          )}
-                                          {task.reward && (
-                                            <div className="flex items-center gap-1 text-xs text-green-600 font-semibold">
-                                              <span>💰</span>
-                                              <span className="truncate">
-                                                {task.reward.toLocaleString()}{" "}
-                                                VNĐ
-                                              </span>
-                                            </div>
-                                          )}
-                                        </div>
-
-                                        {/* Task footer */}
-                                        <div className="flex items-center justify-between mt-2 pt-2 border-t border-gray-100/50">
-                                          <div className="flex gap-1">
-                                            <div
-                                              className="w-1.5 h-1.5 rounded-full"
-                                              style={{
-                                                backgroundColor: theme.color,
-                                              }}
-                                            ></div>
-                                            <div className="w-1.5 h-1.5 bg-gray-200 rounded-full"></div>
-                                            <div className="w-1.5 h-1.5 bg-gray-200 rounded-full"></div>
-                                          </div>
-                                          <div className="text-xs text-gray-400 font-mono flex-shrink-0">
-                                            #{task.id?.slice(-4)}
-                                          </div>
-                                        </div>
-                                      </div>
-                                    </div>
-                                  )}
-                                </Draggable>
-                              );
+                              <DragableTaskCard task={task}
+                                                col = {col}
+                                                idx = {idx}
+                                                theme = {theme}
+                                                isDragging = {isDragging}
+                                                setSelectedTask= {setSelectedTask}
+                                                setEditingTaskId={setEditingTaskId}
+                                                setShowFormTask={setShowFormTask}
+                              />
                             })}
                             {provided.placeholder}
 

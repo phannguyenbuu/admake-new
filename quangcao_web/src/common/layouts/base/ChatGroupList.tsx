@@ -78,7 +78,7 @@ const ChatGroupList: React.FC = ({}) => {
 
       {/* Model popup */}
       <Modal open={modalVisible} onOk={handleOk} onCancel={handleOk} footer={null}
-        title={`ID của group là: ${selectedId?.id} - ${selectedId?.name}`}
+        title={`ID: ${selectedId?.id} - ${selectedId?.name}`}
         okText="OK" cancelButtonProps={{ style: { display: "none" } }}
         style={{ padding:0, minWidth: '96vw'}}
         >

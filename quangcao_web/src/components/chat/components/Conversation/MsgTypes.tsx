@@ -221,7 +221,7 @@ const TextMsg: React.FC<MsgTypeProps> = ({el, menu, onDelete}) => {
     ? '#fff'
     : el.status === 'sending'
     ? '#b0b0b0'
-    : theme.palette.primary.main;
+    : "#00B4B6";
 
     const textColor = isIncoming ? '#000' : '#fff';
 
