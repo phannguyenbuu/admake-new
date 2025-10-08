@@ -13,7 +13,8 @@ import { Stack, Box, Typography } from "@mui/material";
 import QRCode from "../components/chat/components/QRCode";
 import { useLocation } from "react-router-dom";
 import WorkDays, {QRColumn} from "../app/dashboard/workpoints/WorkDays";
-import Workpoint from "../components/chat/components/Workpoint";
+import type { Workpoint } from "../@types/workpoint";
+import type { ColumnsType } from "antd/es/table";
 
 export const columnsMaterial = [
   {
@@ -520,8 +521,7 @@ export const columnsWorkPoint: ColumnsType<Workpoint> = [
     dataIndex: "role",
     key: "role",
     width: 40,
-    height: 40,
-    render:  (text: string, record: User)  => (
+    render:  (text: string, record: Workpoint)  => (
      <QRColumn record = {record}/>
     )
   },
@@ -530,10 +530,10 @@ export const columnsWorkPoint: ColumnsType<Workpoint> = [
     dataIndex: "fullName",
     key: "fullName",
     width: 200,
-    render: (text: string, record: User) => (
+    render: (text: string, record: Workpoint) => (
       <div>
         <div>{text}</div>
-        <span className="!text-base" style={{fontSize:8,fontStyle:'italic'}}>{record.role?.name}</span>
+        <span className="!text-base" style={{fontSize:8,fontStyle:'italic'}}>{record.role}</span>
       </div>
     ),
   },
@@ -543,9 +543,9 @@ export const columnsWorkPoint: ColumnsType<Workpoint> = [
     dataIndex: "role",
     key: "role",
     width: 800,
-    render:  (text: string, record: User)  => (
+    render:  (text: string, record: Workpoint)  => (
       <div>
-        <WorkDays userId={record.id} username={record.fullName ?? null}/>
+        <WorkDays user_id={record.id} username={record.fullName ?? null}/>
       </div>
     )
   },

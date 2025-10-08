@@ -47,13 +47,42 @@ def get_batch_workpoint_detail():
     search = request.args.get("search", "", type=str)
 
     users, pagination = get_query_page_users(page, limit, search)
-    user_id_list = [user['id'] for user in users]
-    
-    # Lấy tất cả workpoints có user_id trong danh sách
+    user_id_list = [user["id"] for user in users]
+
     workpoints = Workpoint.query.filter(Workpoint.user_id.in_(user_id_list)).all()
 
+    # Tạo dict để lookup nhanh workpoint theo user_id
+    workpoint_dict = {wp.user_id: wp for wp in workpoints}
+
+    result = []
+
+    for user in users:
+        user_id = user["id"]
+        user_fullName = user["fullName"]
+
+        if user_id in workpoint_dict:
+            wp = workpoint_dict[user_id]
+            
+            # Chuyển đổi wp thành dict JSON serializable (giả sử đã có to_dict hoặc tương tự)
+            wp_data = wp.to_dict()  # bạn cần implement to_dict trong model Workpoint
+            wp_data["username"] = user_fullName 
+        else:
+            wp_data = {
+                "checklist": {},
+                "createdAt": None,
+                "deletedAt": None,
+                "updatedAt": None,
+                "id": "",
+                "note": "",
+                "user_id": user_id,
+                "username": user_fullName,
+                "version": None
+            }
+        result.append(wp_data)
+
+
     return jsonify({
-        "data": workpoints,
+        "data": result,
         "total": pagination.total,
         "pagination": {
             "total": pagination.total,
@@ -189,3 +218,4 @@ def post_workpoint_by_user_and_date(user_id):
     result = workpoint.to_dict()
     
     return jsonify(result), 201
+

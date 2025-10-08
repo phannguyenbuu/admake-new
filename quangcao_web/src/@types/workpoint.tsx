@@ -1,19 +1,17 @@
-
-
-interface Check {
+export interface Check {
   img: string;
-  lat: number | null;
-  long: number | null;
+  lat: string | null;
+  long: string | null;
   time: string;
 }
 
-interface PeriodData {
+export interface PeriodData {
   in?: Check;
   out?: Check;
   workhour?: number;
 }
 
-interface Checklist {
+export interface Checklist {
   morning?: PeriodData;
   noon?: PeriodData;
   evening?: PeriodData;
@@ -27,5 +25,7 @@ export interface Workpoint {
   note?: string | null;
   deletedAt?: string | null;
   user_id: string;
+  username: string;
   version?: string | null;
+  role: string;
 }

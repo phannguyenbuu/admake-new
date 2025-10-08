@@ -1,13 +1,13 @@
 import type { IPage } from "../../../@types/common.type";
-import type { PaginationDto } from "../../../@types/common.type";
-import { useUserQuery } from "../../../common/hooks/user.hook";
-import type { User } from "../../../@types/user.type";
-import FormUser from "../../../components/dashboard/user/FormUser";
-import ButtonComponent from "../../../components/Button";
+// import type { PaginationDto } from "../../../@types/common.type";
+// import { useUserQuery } from "../../../common/hooks/user.hook";
+// import type { User } from "../../../@types/user.type";
+// import FormUser from "../../../components/dashboard/user/FormUser";
+// import ButtonComponent from "../../../components/Button";
 import TableComponent from "../../../components/table/TableComponent";
-import { EditOutlined } from "@ant-design/icons";
+// import { EditOutlined } from "@ant-design/icons";
 import { columnsWorkPoint } from "../../../common/data";
-import { useDebounce } from "../../../common/hooks/useDebounce";
+// import { useDebounce } from "../../../common/hooks/useDebounce";
 import { useState, useEffect } from "react";
 import { useApiHost } from "../../../common/hooks/useApiHost";
 import type { Workpoint } from "../../../@types/workpoint";
@@ -36,7 +36,7 @@ export const WorkPointPage: IPage["Component"] = () => {
       );
       
       const result = await response.json();
-      console.log(result);
+      // console.log(result);
       setWorkpoints(result);
     } catch (error) {
       console.error("Failed to fetch users", error);

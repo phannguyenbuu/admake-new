@@ -5,17 +5,18 @@ import { useApiHost, useApiStatic } from "../../../common/hooks/useApiHost";
 import { Stack, Box, Typography } from "@mui/material";
 import QRCode from "../../../components/chat/components/QRCode";
 import { useLocation } from "react-router-dom";
-import type { WorkListPeriod, PeriodData, PeriodHour } from "../../../@types/CheckListType";
+// import type { Checklist, PeriodData, Checklist } from "../../../@types/CheckListType";
 import DownloadIcon from '@mui/icons-material/Download';
 import { CenterBox } from "../../../components/chat/components/commons/TitlePanel";
+import type { Workpoint, PeriodData, Checklist } from "../../../@types/workpoint";
 
 interface QRColumnProps {
-  record: User;
+  record: Workpoint;
 }
 
 export const QRColumn: React.FC<QRColumnProps> = ({ record }) => {
   const [showModal, setShowModal] = useState(false);
-  const [selectedRecord, setSelectedRecord] = useState<User | null>(null);
+  const [selectedRecord, setSelectedRecord] = useState<Workpoint | null>(null);
 
   const handleOpenModal = () => {
     setSelectedRecord(record);
@@ -31,7 +32,7 @@ export const QRColumn: React.FC<QRColumnProps> = ({ record }) => {
         onCancel={() => setShowModal(false)}
         footer={null}
         width={300}
-        title={`Mã QR của ${record.fullName}`}
+        title={`Mã QR của ${record.username}`}
       >
         {selectedRecord && (
           <Box display="flex" justifyContent="center">
@@ -45,18 +46,19 @@ export const QRColumn: React.FC<QRColumnProps> = ({ record }) => {
 };
 
 interface WorkDaysProps {
-  dataList: WorkListProps[]
+  dataList: Workpoint[]
 }
 
-interface WorkListProps {
-  checklist: WorkListPeriod;
-  createdAt: string;
-  updatedAt: string;
-  id: string;
-  user_id: string;
-}
+// interface WorkListProps {
+//   checklist: Checklist;
+//   createdAt: string;
+//   updatedAt: string;
+//   id: string;
+//   user_id: string;
+//   username: string;
+// }
 
-const periodMap: Record<keyof WorkListPeriod, number> = {morning: 0,noon: 1,evening: 2,};
+const periodMap: Record<keyof Checklist, number> = {morning: 0,noon: 1,evening: 2,};
 
 export default function WorkDays({ dataList }: WorkDaysProps) {
   const today = new Date();
@@ -64,14 +66,14 @@ export default function WorkDays({ dataList }: WorkDaysProps) {
   const month = today.getMonth();
   const daysInMonth = new Date(year, month + 1, 0).getDate();
   
-  const [totalHour, setTotalHour] = useState<PeriodHour | null>(null);
-  const [mainData, setData] = useState<WorkListProps[]>([]);
+  const [totalHour, setTotalHour] = useState<{morning: number,noon: number,evening: number} | null>(null);
+  const [mainData, setData] = useState<Workpoint[]>([]);
   const [modalImg, setModalImg] = useState<PeriodData | null>(null);
   const todayDate = new Date().getDate();
   
   useEffect(() => {
     const newStatuses = Array(daysInMonth).fill(null).map(() => Array(3).fill(null));
-    const total:PeriodHour | null = {morning: 0,noon: 0,evening: 0,};
+    const total = {morning: 0,noon: 0,evening: 0};
 
     dataList && dataList.forEach((data) => {
       const dateObj = new Date(data.createdAt);
@@ -79,7 +81,7 @@ export default function WorkDays({ dataList }: WorkDaysProps) {
 
       if (localTime.getFullYear() === year && localTime.getMonth() === month) {
         const dayIndex = localTime.getDate() - 1;
-        (Object.keys(data.checklist) as (keyof WorkListPeriod)[]).forEach(
+        (Object.keys(data.checklist) as (keyof Checklist)[]).forEach(
           (period) => {
             const periodData = data.checklist[period];
             if (periodData) {
@@ -165,7 +167,7 @@ return (
               let imgUrl: PeriodData | null = null;
 
               if (status && mainData?.length) {
-                const periodKey = ['morning', 'noon', 'evening'][btnIndex] as keyof WorkListPeriod;
+                const periodKey = ['morning', 'noon', 'evening'][btnIndex] as keyof Checklist;
 
                 for (const item of mainData) {
 
@@ -227,7 +229,7 @@ return (
     >
       <CenterBox>
         <Box sx={{borderRadius:10, backgroundColor:"#00B4B6", px:5, py:1}}>
-          <Typography sx={{textTransform:"uppercase",color:"#fff",fontWeight:500,textAlign:"center"}}>{username}</Typography>
+          {/* <Typography sx={{textTransform:"uppercase",color:"#fff",fontWeight:500,textAlign:"center"}}>{username}</Typography> */}
           {modalImg?.out?.img && 
             <Typography sx={{color:"#fff",textAlign:"center",fontSize:10}}>Số giờ làm trong buổi: {modalImg.workhour?.toFixed(2)}</Typography>
           }

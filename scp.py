@@ -109,11 +109,7 @@ local_dirs = [
     "main-be/app.py",
     "main-be/.env",
     "main-be/api",
-<<<<<<< HEAD
     # r"quangcao_web\src\app\dashboard\workpoints\WorDays.tsx",
-=======
-    r"quangcao_web\src\app\dashboard\workpoints\WorDays.tsx",
->>>>>>> origin/main
     # r"quangcao_web\src\components\chat\pages\dashboard\Group.tsx",
 
     # r"quangcao_web\src\common\data.tsx",
