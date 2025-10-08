@@ -3,7 +3,11 @@ from flask import Flask, request, jsonify
 from models import Message, db, app, User
 import datetime
 
-socketio = SocketIO(app, cors_allowed_origins=["http://localhost:5173", "https://archbox.pw", "https://dashboard.archbox.pw"])
+socketio = SocketIO(app, cors_allowed_origins=["http://localhost:5173",
+                                                "https://admake.vn",
+                                                "https://quanly.admake.vn",
+                                                "https://archbox.pw", 
+                                                "https://dashboard.archbox.pw"])
 
 @socketio.on('connect')
 def on_connect():

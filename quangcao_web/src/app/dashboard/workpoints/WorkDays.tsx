@@ -104,8 +104,8 @@ export default function WorkDays({record}: {record:WorkDaysProps}) {
 
     setTotalHour(total);
 
-    if(username === "Thanh Hiếu Trần")
-      console.log('MMMstatus',username, newStatuses);
+    // if(username === "Thanh Hiếu Trần")
+      // console.log('MMMstatus',username, newStatuses);
     setStatuses(newStatuses);
   }, [items, year, month, daysInMonth]);
 
@@ -173,14 +173,14 @@ return (
               let imgUrl: PeriodData | null = null;
 
               if (status && mainData?.length) {
-                console.log('mainData', status);
+                // console.log('mainData', status);
                 const periodKey = ['morning', 'noon', 'evening'][btnIndex] as keyof Checklist;
 
                 for (const item of mainData) {
 
                   const itemCreateDate = new Date(item.createdAt);
                   const itemDate = new Date(itemCreateDate.getTime() + 7 * 60 * 60 * 1000);
-                  console.log('itemDate', itemDate);
+                  // console.log('itemDate', itemDate);
 
                   if (
                     itemDate.getDate() === date.getDate() &&
@@ -188,7 +188,7 @@ return (
                     itemDate.getFullYear() === date.getFullYear()
                   ) {
                     const periodData = item.checklist[periodKey];
-                    console.log('periodData', periodData);
+                    // console.log('periodData', periodData);
                     if (periodData) {
                       imgUrl = periodData;
                       break; // nếu chỉ cần lấy giá trị đầu tiên thỏa điều kiện
@@ -212,7 +212,7 @@ return (
                     cursor: imgUrl ? 'pointer' : 'default',
                   }}
                   onClick={() => {
-                    console.log('IMG', imgUrl);
+                    // console.log('IMG', imgUrl);
                     if (imgUrl) {
                       setModalImg(imgUrl);
                       setModalVisible(true);
