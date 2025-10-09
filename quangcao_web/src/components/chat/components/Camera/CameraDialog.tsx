@@ -73,6 +73,11 @@ const CameraDialog: React.FC<CameraDialogProps> = ({userEl}) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem('Admake-User-Access') || '{}');
+    console.log(user.user_id, user.username);
+  },[]);
+
 
   useEffect(() => {
     fetch(`${useApiHost()}/workpoint/today/${userEl?.id}`)

@@ -511,6 +511,7 @@ class Message(BaseModel):
     message_id = db.Column(db.String(80))
     group_id = db.Column(db.Integer, db.ForeignKey('group.id'), nullable=True)
     user_id = db.Column(db.String(80), db.ForeignKey('user.id'), nullable=True)
+    username =  db.Column(db.String(255))
     
     text = db.Column(db.String(500))
     file_url = db.Column(db.String(255), nullable=True)

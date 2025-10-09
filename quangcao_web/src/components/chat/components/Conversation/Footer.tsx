@@ -222,10 +222,16 @@ const Footer = forwardRef<HTMLDivElement, FooterProps>(
     };
   }, [groupEl?.id]);
 
+  function get_user_name():string {
+    const user = JSON.parse(localStorage.getItem('Admake-User-Access') || '{}');
+    return user?.username || '';
+  }
+
   const sendMessage = (message: string, file_url = '') => {
     
     if (socket.connected) {
       const timestamp = Date.now();
+      console.log("Username",  get_user_name());
       
       const data: MessageTypeProps = {
         id: generateUniqueIntId(),
@@ -237,7 +243,7 @@ const Footer = forwardRef<HTMLDivElement, FooterProps>(
         incoming: false,
         group_id: groupEl?.id || 0,
         user_id: '',
-        username: '',
+        username: get_user_name(),
         text: message,
         file_url,
         link: '',

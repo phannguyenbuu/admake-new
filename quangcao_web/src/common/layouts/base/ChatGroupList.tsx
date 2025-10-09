@@ -9,6 +9,7 @@ import type { GroupProps } from "../../../@types/chat.type.ts";
 import type { MenuInfo } from 'rc-menu/lib/interface';
 import { useUser } from "../../hooks/useUser.tsx";
 import {Button, Input} from "@mui/material";
+import {Box, Stack} from "@mui/material";
 
 const ChatGroupList: React.FC = ({}) => {
   const navigate = useNavigate();
@@ -63,18 +64,43 @@ const ChatGroupList: React.FC = ({}) => {
     // navigate("/dashboard/infor");
   };
 
+  const [isHover, setIsHover] = useState(false);
+
+  const spanStyle = {
+    cursor: "pointer",
+    position: "relative",
+    top:-20,
+    left: 20,
+    marginTop: 15,
+    height: 25,
+    width: 80,
+    fontWeight: 700,
+    color: "#777",
+    padding: "0px 20px",
+    borderRadius: 10,
+    transition: "background-color 0.3s",
+  };
+
   return (
     <div className="flex items-center">
-      
-      <Dropdown menu={{ items, onClick: onMenuClick }}>
-        <div className="hidden md:flex items-center">
-          <span style={{cursor:"pointer"}} className="text-gray-700 font-semibold text-sm px-3 py-1.5 bg-gray-100 rounded-full">
-            Chat Group
-          </span>
-        </div>
-      </Dropdown>
+      <Stack direction="row" spacing={2} px={0.5}
+        sx={{backgroundColor:"#00B4B6", maxHeight:30, borderRadius: 5}}>
+        <Dropdown menu={{ items, onClick: onMenuClick }}>
+          <Box sx = {{width: 120,height: 25, top: 2,position: "relative",borderRadius: 10,
+              backgroundColor: isHover ? 'rgba(255,255,255,0.5)' : 'rgba(255,255,255,0.25)',
+              transition: "background-color 1s ease"}}>
+            <span style={spanStyle}
+              onMouseEnter={() => setIsHover(true)}
+              onMouseLeave={() => setIsHover(false)}
+            >
+              CHAT
+            </span>
+          </Box>
+        </Dropdown>
 
-      <Button onClick={() => setAddGroupModalVisible(true)}>+ Group</Button>
+        <Button sx={{color:"#fff"}}
+          onClick={() => setAddGroupModalVisible(true)}>+ Group</Button>
+       </Stack>
 
       {/* Model popup */}
       <Modal open={modalVisible} onOk={handleOk} onCancel={handleOk} footer={null}

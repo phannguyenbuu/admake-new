@@ -68,7 +68,9 @@ def handle_message(data):
 
     # Lưu message mới
     print('Saving role', role)
-    msg = Message(group_id=group_id,type=type, user_id=user_id, text=text, 
+    msg = Message(group_id=group_id,type=type, 
+                  user_id=user_id, username=username,
+                  text=text, 
                   message_id = message_id,role=role,
                   file_url=file_url, updatedAt=time)
     db.session.add(msg)

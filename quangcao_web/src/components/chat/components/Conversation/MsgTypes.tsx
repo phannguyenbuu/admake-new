@@ -28,7 +28,10 @@ function get_role_name(role:number):string {
   if(role === -1)
     return "Khách hàng"
   else
-    return "Công ty"
+  {
+    const user = JSON.parse(localStorage.getItem('Admake-User-Access') || '{}');
+    return user?.username || '';
+  }
 }
 
 export function formatTime(datetimeStr: Date): string {
@@ -209,6 +212,9 @@ const MediaMsg: React.FC<MsgTypeProps> = ({ el, menu,onDelete }) => {
 const TextMsg: React.FC<MsgTypeProps> = ({el, menu, onDelete}) => {
     if(!el) return null;
     const theme = useTheme();
+    const {userRoleId} = useUser();
+    const full = userRoleId > 0;
+
     // const { userId, username } = useUser();
     // const [incoming, setIncoming ] = useState(true);
     // const [bkColor, setBkColor ] = useState("#fff");
@@ -231,13 +237,17 @@ const TextMsg: React.FC<MsgTypeProps> = ({el, menu, onDelete}) => {
         <Stack key={`DefaultMsg-${el.message_id}-Wrapper`} direction='row' justifyContent={isIncoming ? 'start' : 'end'}>
             <Box key={`DefaultMsg-${el.message_id}-Conatiner`} p={0.5} 
                 sx={{ backgroundColor: bkColor, borderRadius: 1.5, width: 'max-content', height:'fit-content'}}>
-                {isIncoming && 
+                {!isIncoming && 
                     <Stack direction='row' alignItems="center" spacing={1}>
-                        <Avatar alt={get_role_name(el.role)} src={el.icon || '/images/avatar.png'} sx={{ width: 24, height: 24 }} />
-                        <Typography key={`DefaultMsg-${el.message_id}-Username`} 
-                          variant="subtitle2" color={textColor} fontSize='0.75rem' fontWeight={500}>
-                        {get_role_name(el.role)}
-                        </Typography>
+                        {full && 
+                          <>
+                            <Avatar alt={el.username} src={'/images/avatar.png'} sx={{ width: 24, height: 24 }} />
+                            <Typography key={`DefaultMsg-${el.message_id}-Username`} 
+                              variant="subtitle2" color={textColor} fontSize='0.75rem' fontWeight={500}>
+                            {el.username}
+                            </Typography>
+                          </>
+                        }
                     </Stack>
                 }
 

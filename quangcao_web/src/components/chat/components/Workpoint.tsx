@@ -33,9 +33,16 @@ const Workpoint = () => {
     })
     .then(response => {
         console.log(response);
+        
+
         if (response.valid) {
             setVerified(true);
             setSelected(response.data);
+
+            localStorage.setItem('Admake-User-Access', 
+                JSON.stringify({ user_id: response.data.id, username: response.data.fullName }));
+
+            
         } else {
         setVerified(false);
             window.location.href = "/login";
