@@ -13,6 +13,7 @@ import SendIcon from '@mui/icons-material/Send';
 import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
 import LinkIcon from '@mui/icons-material/Link';
 import SentimentSatisfiedIcon from '@mui/icons-material/SentimentSatisfied';
+import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 
 const StyledInput = styled(TextField)(({ theme }) => ({
   "& .MuiInputBase-input": {
@@ -23,7 +24,7 @@ const StyledInput = styled(TextField)(({ theme }) => ({
 
 const Actions = [
   {
-    color:'#0172e4',
+    color:'#ddd',
     icon: <CameraIcon fontSize="large"/>,
     y:50,
     title:'Image'
@@ -144,7 +145,7 @@ const ChatInput = forwardRef<HTMLDivElement, ChatInputProps>(
       InputProps={{
         disableUnderline: true,
         startAdornment: 
-          <Stack sx={{width:'max-content'}}>
+          <Stack sx={{width:'max-content', mt:-2}}>
             <Stack sx={{position:'relative', display: openAction ? 'inline-block' : 'none'}}>
               {Actions.map((el,idx)=>(
                 <Tooltip key={`ActionItem-${idx}`}  placement='right' title={el.title}>
@@ -265,37 +266,76 @@ const Footer = forwardRef<HTMLDivElement, FooterProps>(
     setInputValue('');
   };
 
+
+  const sendRewardMessage = () => {
+    if (socket.connected) {
+      const timestamp = Date.now();
+      // console.log("Username",  get_user_name());
+      
+      const data: MessageTypeProps = {
+        id: generateUniqueIntId(),
+        preview: '',
+        reply: '',
+        role: userRoleId,
+        icon: '',
+        type: 'timeline',
+        incoming: false,
+        group_id: groupEl?.id || 0,
+        user_id: '',
+        username: get_user_name(),
+        text: 'Quý khách hàng muốn nghiệm thu dự án này?',
+        file_url: '',
+        link: '',
+        message_id: `temp-${timestamp}`,
+        createdAt: new Date(timestamp),
+        updatedAt: new Date(timestamp),
+        deletedAt: null,
+        status: 'sending'
+      };
+
+      console.log('Send REWARD message', socket.io.opts.host, data);
+
+      setMessages(prev => [...prev, data]);
+      socket.emit('admake/chat/message', data);
+    } else {
+      console.warn('Socket.IO not connected.');
+    }
+
+    setInputValue('');
+  };
+
   return (
     <>
       {/* {showFileUpload && <FileUpload onUploadComplete={handleUploadComplete} />} */}
-      <Box p={1} sx={{
-        position: 'fixed',
-        width: full ? '50vw':'100vw',
-        bottom: 40,
-        backgroundColor: '#00B4B6',
-        boxShadow: '0px 0px 2px rgba(0,0,0,0.25)'
-      }}>
-        <Stack direction='row' alignItems='center' spacing={3}>
+
+        <Stack direction='row' alignItems='center' spacing={0.5} p={0.5} sx={{backgroundColor:"#00B4B6"}}>
+          <ChatInput
+            onEnterKey={() => sendMessage(inputValue)}
+            ref={ref}
+            inputValue={inputValue}
+            setInputValue={setInputValue}
+            setOpenPicker={setOpenPicker}
+            groupEl={groupEl}
+            handleSendMessage={sendMessage}
+          />
           
-            <ChatInput
-              onEnterKey={() => sendMessage(inputValue)}
-              ref={ref}
-              inputValue={inputValue}
-              setInputValue={setInputValue}
-              setOpenPicker={setOpenPicker}
-              groupEl={groupEl}
-              handleSendMessage={sendMessage}
-            />
-          
-          <Box sx={{ height: 48, width: 48, backgroundColor: '#4da5fe', borderRadius: 1.5 }} 
+          <Box sx={{ height: 48, width: 48, backgroundColor: '#ccc', borderRadius: 1.5 }} 
             onClick={() => sendMessage(inputValue)}
             >
             <Stack sx={{ height: '100%', width: '100%', alignItems: 'center', justifyContent: 'center' }}>
               <IconButton><SendIcon/></IconButton>
             </Stack>
           </Box>
+
+          {full && <Box sx={{ height: 48, width: 48, backgroundColor: '#ccc', borderRadius: 1.5 }} 
+            onClick={() => sendRewardMessage()}
+            >
+            <Stack sx={{ height: '100%', width: '100%', alignItems: 'center', justifyContent: 'center' }}>
+              <IconButton><ThumbUpIcon sx={{color:'orange'}}/></IconButton>
+            </Stack>
+          </Box>}
         </Stack>
-      </Box>
+      
     </>
   );
 });

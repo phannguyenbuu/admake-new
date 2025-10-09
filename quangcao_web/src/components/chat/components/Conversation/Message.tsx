@@ -24,9 +24,8 @@ const Message: React.FC<MsgListTypeProps> = ({ menu, messages, onDelete }) => {
             {messages && messages.map((el)=>
             { 
                 switch (el.type) {
-                    case 'divider':
+                    case 'timeline':
                       return <TimeLine el={el}/>
-                    
                     case 'img':
                       return <MediaMsg el={el} menu={menu}  key={`MediaMsg-${el.id}`} onDelete={onDelete}/>
                     case 'doc':

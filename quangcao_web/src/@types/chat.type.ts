@@ -46,6 +46,7 @@ export interface MessageTypeProps {
   role:number;
   icon:string;
   status:string;
+  is_favourite:boolean;
   
   username:string;
   link:string;

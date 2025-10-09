@@ -40,14 +40,28 @@ def create_message():
 
     return jsonify(new_message.to_dict()), 201
 
-@message_bp.route("/<string:id>", methods=["GET"])
+@message_bp.route("/<int:id>", methods=["GET"])
 def get_message_detail(id):
-    message = db.session.get(message, id)
+    message = db.session.get(Message, id)
     if not message:
         abort(404, description="Message not found")
     return jsonify(message.to_dict())
 
-@message_bp.route("/<string:id>", methods=["PUT"])
+@message_bp.route("/<int:id>/favourite", methods=["PUT"])
+def put_message_favourite(id):
+    message = db.session.get(Message, id)
+    if not message:
+        abort(404, description="Message not found")
+
+    print('match', message, message.is_favourite)
+    # db.session.refresh(message)
+    message.is_favourite = True
+    # db.session.add(message)
+    db.session.commit()
+    
+    return jsonify({"message":"OK"}), 200
+
+@message_bp.route("/<int:id>", methods=["PUT"])
 def update_message(id):
     data = request.get_json()
     # print(data)
@@ -62,7 +76,7 @@ def update_message(id):
     db.session.commit()
     return jsonify(role.to_dict()), 200
 
-@message_bp.route("/<string:message_id>", methods=['DELETE'])
+@message_bp.route("/<int:message_id>", methods=['DELETE'])
 def delete_message(message_id):
     message = Message.query.filter_by(message_id=message_id).first()
 

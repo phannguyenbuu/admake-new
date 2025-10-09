@@ -982,7 +982,7 @@ if __name__ == "__main__":
         #     add_new_columns(table,['deletedAt'],'TIMESTAMP')
         #     add_new_columns(table,['version'],'INTEGER')
 
-        # add_new_columns('message',['username'],'VARCHAR(255)')
+        add_new_columns('message',['username'],'VARCHAR(255)')
         # add_new_columns('task',['amount'],'INTEGER')
         # add_new_columns('user',['level_salary','version'],'INTEGER')
         # add_new_columns('user',['deletedAt'],'TIMESTAMP')
@@ -1030,4 +1030,4 @@ if __name__ == "__main__":
         # modify_task_material()
         # modify_material_id_type()
 
-        modify_role_name()
+        # modify_role_name()

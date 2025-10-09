@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify, abort
-from models import db, Workspace, Task, dateStr, generate_datetime_id, Group, User, Customer
+from models import db, Workspace, Task, dateStr,Message, generate_datetime_id, Group, User, Customer
 import datetime
 from collections import defaultdict
 from sqlalchemy import desc
@@ -120,6 +120,42 @@ def get_workspace_task(id):
     tasks_response = dict(grouped)
     
     return jsonify(tasks_response)
+
+@workspace_bp.route("/<string:id>/reward", methods=["PUT"])
+def post_workspace_reward_task(id):
+
+    group = db.session.get(Group, id)
+    if not group:
+        print("Group not found", id)
+        abort(404, description="Group not found")
+
+    work = Workspace.query.filter(Workspace.name.ilike(group.name)).first()
+        
+    if not work:
+        print("Workspace not found", group.name)
+        abort(404, description="Workspace not found")
+
+    tasks = Task.query.filter_by(workspace_id=work.id).all()
+    print('tasks',work, len(tasks))
+
+    for task in tasks:
+        print('task', task.title)
+        task.status = "REWARD"
+
+    data = request.get_json()
+
+    message_id = data.get('message_id')
+    if message_id:
+        message = db.session.get(Message, message_id)
+        if message:
+            print("Find message", message_id)
+            # message.is_favourite = True
+        else:
+            print("Cannot find message", message_id)
+    
+    db.session.commit()
+    
+    return jsonify({"message":"OK"}), 200
 
 @workspace_bp.route("/<string:id>", methods=["GET"])
 def get_workspace_detail(id):

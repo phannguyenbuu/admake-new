@@ -136,6 +136,7 @@ const RatingButtons: React.FC<RatingButtonsProps> = ({setShowFooter, groupEl }) 
           } }} aria-label="talk">
         THẢO LUẬN
       </ToggleButton>
+
       <ToggleButton value="pass"  
       
       sx={{ ...toggleSize,
@@ -148,6 +149,7 @@ const RatingButtons: React.FC<RatingButtonsProps> = ({setShowFooter, groupEl }) 
           } }} aria-label="pass">
         HỢP ĐỒNG
       </ToggleButton>
+
     </ToggleButtonGroup>
   );
 }

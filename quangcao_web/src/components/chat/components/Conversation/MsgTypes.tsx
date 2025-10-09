@@ -1,4 +1,4 @@
-import { Avatar, Box, Divider, IconButton, Link, Stack, Typography, Menu, MenuItem, ListItemIcon } from '@mui/material';
+import { Avatar, Box, Divider, IconButton, Link, Button, Stack, Typography, Menu, MenuItem, ListItemIcon } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import React, { useEffect, useState } from 'react';
 import { useUser } from '../../../../common/hooks/useUser';
@@ -266,16 +266,49 @@ const TextMsg: React.FC<MsgTypeProps> = ({el, menu, onDelete}) => {
     )
 }
 
+
 const TimeLine: React.FC<MsgTypeProps> = ({ el }) => {
   if(!el) return null;
+  const {userRoleId} = useUser();
+  const full = userRoleId > 0;
+
+  const handleReward = async () => {
+    const response = await fetch(`${useApiHost()}/workspace/${el.group_id}/reward`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({"message_id":el.id})
+    });
+  
+    if (!response.ok) 
+      throw new Error("Nghiệm thu công việc thất bại");
+    else
+    {
+      console.log("Nghiệm thu công việc thành công!");
+    }
+  }
+
+  console.log('Timeline',el.text, userRoleId);
   const theme = useTheme();
-  return <Stack direction='row' alignItems='center' justifyContent='space-between'>
-      <Divider />
-      <Typography variant='caption' sx={{ color: "#000" }}>
+  return (
+    <Stack alignItems='center' justifyContent='space-between' 
+      spacing={2} py={5} sx={{backgroundColor:"rgba(0,255,255,0.25)", borderRadius: 5}}>
+        <Typography variant='caption' sx={{ color: "#000" }}>
           {el.text}
       </Typography>
-      <Divider />
+      {(userRoleId < 0 || full) && !el.is_favourite &&
+      <Stack direction="row" spacing={2}>
+        <Button sx= {{backgroundColor:"#999",color:"white",p:1, borderRadius:10}}>
+          Chưa đồng ý
+        </Button>
+        <Button 
+          onClick={handleReward}
+          sx= {{backgroundColor:"#00B4B6",color:"white",p:1, borderRadius:10}}>
+          OK
+        </Button>
+      </Stack>}
   </Stack>
+  )
+  
 }
 
 const MessageOptions: React.FC<MsgTypeProps> = ({el, onDelete }) => {

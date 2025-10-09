@@ -39,7 +39,6 @@ def handle_message(data):
         user_id = first_user.id  # Lấy id của user đầu tiên
     else:
         user_id = None  # Hoặc giá trị mặc định phù hợp
-
     
     print('Receive data', data)
     group_id = data['group_id']
@@ -54,7 +53,7 @@ def handle_message(data):
     time = datetime.datetime.now()
     time_str = time.isoformat()
 
-    type = 'msg'
+    type = data.get('type')
 
     if file_url != '':
         type = 'doc'

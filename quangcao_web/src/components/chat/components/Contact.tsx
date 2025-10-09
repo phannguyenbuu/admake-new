@@ -152,6 +152,7 @@ const Contact: React.FC<ContactProps> = ( { groupEl, messages, setShowFooter }) 
               aria-controls="tabpanel-1" 
               sx={tabStyle}
             />
+            
           </Tabs>
           {tabValue === 0 && (
             <Stack direction="column" spacing={0} sx={{width: '20vw', height:'68vh',overflowY:'auto', overflowX:'hidden'}}>
