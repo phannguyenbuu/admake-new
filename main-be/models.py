@@ -550,8 +550,9 @@ class Message(BaseModel):
                 msg = Message(
                     group_id=group_id,
                     user_id=user_id,
+                    
                     text=params.get('text', ''),
-                    # username=params.get('username', ''),
+                    username=params.get('username', ''),
                     file_url = params.get('file_url',''),
                     is_favourite = params.get('is_favourite', True),
                     react = params.get('react',''),

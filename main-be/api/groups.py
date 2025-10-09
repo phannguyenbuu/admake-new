@@ -83,7 +83,7 @@ def create_message(group_id):
     text = data.get('text')
     file_url = data.get('file_url')  # URL lưu file đã upload
     link = data.get('link')          # Link gửi kèm
-    username=User.query.get(user_id).username
+    username=data.get('username')
 
     # Kiểm tra user có trong nhóm không
     member = GroupMember.query.filter_by(user_id=user_id, group_id=group_id).first()
