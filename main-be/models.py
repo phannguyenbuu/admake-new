@@ -229,8 +229,6 @@ class Customer(db.Model):
 
         return result
 
-
-
 class Role(BaseModel):
     __tablename__ = 'role'
     __table_args__ = {'extend_existing': True}
@@ -322,8 +320,8 @@ class Task(BaseModel):
     customer_id = db.Column(db.String(50))
     materials = db.Column(db.JSON)  # lưu JSON string của list dict {materialId, quantity}
     create_by_id = db.Column(db.String(50))
-    end_time = db.Column(db.DateTime)
-    start_time = db.Column(db.DateTime)
+    end_time = db.Column(db.Date)
+    start_time = db.Column(db.Date)
 
     def to_dict(self):
         result = {}
@@ -337,43 +335,35 @@ class Task(BaseModel):
 
     @staticmethod
     def parse(data):
-        def parse_oid_list(lst):
-            # lst = list dict chứa {"$oid": "..."}
-            if not lst:
-                return []
-            return [item.get("$oid") for item in lst]
+        # title = data.get("title", '')
+        # description = data.get("description", '')
+        
+        # assign_ids = data.get("assign_ids", '')
+        # customer_id = data.get("customer_id", '')
 
-        def parse_materials(lst):
-            if not lst:
-                return []
-            # chuyển mỗi element giữ materialId và quantity, materialId lấy $oid
-            out = []
-            for item in lst:
-                material_id = item.get("materialId", {}).get("$oid")
-                quantity = item.get("quantity", 0)
-                out.append({"materialId": material_id, "quantity": quantity})
-            return out
+        
+        # start_time = data.get("start_time", None)
+        # end_time = data.get("end_time", None)
+
+        # type = data.get("type", '')
+        # reward = data.get("reward", 0)
+        # amount = data.get("amount", '')
+        # salary_type = data.get("salary_type", '')
 
         return Task(
             id=generate_datetime_id(),
-            title=data.get("title"),
-            description=data.get("description"),
-            status=data.get("status"),
+            workspace_id = data.get("workspace_id", ''),
+            title= data.get("title", ''),
+            description=data.get("description", ''),
+            status=data.get("status", ''),
             type=data.get("type"),
             reward=data.get("reward"),
-            assign_ids=data.get("assignIds"),
-            workspace_id=data.get("workspaceId"),
-            customer_id=data.get("customerId"),
-            materials=data.get("materials"),
-            create_by_id=data.get("createById"),
-            
-            version=data.get("__v"),
-            end_time=parse_date(data.get("endTime")),
-            start_time=parse_date(data.get("startTime")),
-
-            deletedAt=parse_date(data.get("deletedAt")),
-            createdAt=parse_date(data.get("createdAt")),
-            updatedAt=parse_date(data.get("updatedAt")),
+            assign_ids=data.get("assign_ids"),
+            customer_id=data.get("customer_id", ''),
+            end_time=data.get("end_time", None),
+            start_time=data.get("start_time", None),
+            amount = data.get("amount"),
+            salary_type = data.get("salary_type", '')
         )
 
 class Group(BaseModel):

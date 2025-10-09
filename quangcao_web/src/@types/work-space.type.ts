@@ -1,4 +1,5 @@
 import type { BaseEntity } from "./common.type";
+import dayjs, { Dayjs } from "dayjs";
 
 export interface CreateWorkData {
   name: string; // Tên công việc
@@ -35,11 +36,22 @@ export interface WorkSpace {
   id: string;
   name: string;
   cover?: string;
+  
+  users: UserSearchProps[],
+  customers: UserSearchProps[]
 }
 
 export interface MaterialTask {
   materialId: number;
   quantity: number;
+}
+
+export interface UserSearchProps {
+  "fullName": string,
+  "user_id":  string,
+  "role":  string,
+  "phone":  string,
+  "workAddress": string,
 }
 
 export interface Task extends BaseEntity {
@@ -54,8 +66,8 @@ export interface Task extends BaseEntity {
   workspaceId: string; // id của workspace
   customer_id: string; // id của customer
   materials: MaterialTask[]; // danh sách vật tư
-  start_time?: string | Date; // Thời gian bắt đầu
-  end_time?: string | Date; // Thời gian kết thúc
+  start_time?: Dayjs | null; // Thời gian bắt đầu
+  end_time?: Dayjs | null; // Thời gian kết thúc
 }
 
 export interface TaskGroup {

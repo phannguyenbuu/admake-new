@@ -23,10 +23,19 @@ import {
 } from "../../../common/hooks/work-space.hook";
 import { useCheckPermission } from "../../../common/hooks/checkPermission.hook";
 import DragableTaskCard from "./work-space/DragableTaskCard";
+import columnThemes from "./theme.json";
+import WorkspaceHeader from "./work-space/WorkspaceHeader";
+import WorkspaceBoard from "./work-space/WorkspaceBoard";
+import WorkspaceModal from "./work-space/WorkspaceModal";
+import "./work-space/workspace.css";
 
-export default function ManagermentBoard({
-  workspaceId,
-}: ManagermentBoardProps) {
+export interface DeleteConfirmProps {
+    visible: boolean;
+    taskId: string | null;
+    taskTitle: string;
+}
+
+export default function ManagermentBoard({workspaceId,}: ManagermentBoardProps) {
   const adminMode = useCheckPermission();
   const fixedColumns = [
     { id: "col-0", title: "Phân việc", type: "OPEN" },
@@ -38,12 +47,11 @@ export default function ManagermentBoard({
   // API hooks
   const { data: workspaceData } = useWorkSpaceQueryById(workspaceId);
 
-  // console.log('MAN_WSPACE', workspaceData);
+  console.log('MAN_WSPACE', workspaceData);
 
   const { data: tasksData, refetch: refetchTasks } = useWorkSpaceQueryTaskById(workspaceId);
-
-
-  // console.log('MAN_TASK', tasksData);
+  
+  console.log('WORKSPACE_DATA', tasksData);
 
   const updateTaskStatusMutation = useUpdateTaskStatusById();
   const deleteTaskMutation = useDeleteTask();
@@ -51,6 +59,7 @@ export default function ManagermentBoard({
   // Chuyển đổi board data thành columns structure
   const convertBoardToColumns = useCallback(
     (boardData: TasksResponse): ColumnType[] => {
+      // console.log('OK1', boardData);
       return fixedColumns.map((col) => ({
         ...col,
         tasks: boardData[col.type]?.tasks || [],
@@ -72,11 +81,7 @@ export default function ManagermentBoard({
 
   const [isDragging, setIsDragging] = useState(false);
   const [draggedTaskId, setDraggedTaskId] = useState<string | null>(null);
-  const [deleteConfirmModal, setDeleteConfirmModal] = useState<{
-    visible: boolean;
-    taskId: string | null;
-    taskTitle: string;
-  }>({
+  const [deleteConfirmModal, setDeleteConfirmModal] = useState<DeleteConfirmProps>({
     visible: false,
     taskId: null,
     taskTitle: "",
@@ -386,334 +391,40 @@ export default function ManagermentBoard({
 
   return (
     <div className="relative min-h-screen overflow-hidden">
-      {/* Background Decorative Elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-cyan-400/10 to-blue-600/10 rounded-full blur-3xl"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-tr from-indigo-400/10 to-purple-600/10 rounded-full blur-3xl"></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-br from-teal-400/5 to-cyan-600/5 rounded-full blur-3xl"></div>
-      </div>
-
-      {/* Header */}
-      <div className="relative z-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 px-4 sm:px-6 pt-4 pb-3">
-        <div className="flex items-center justify-center sm:justify-start gap-3">
-          <div className="group relative">
-            {/* Glow effect */}
-            <div className="absolute inset-0 bg-gradient-to-r from-[#00B4B6] to-teal-500 rounded-xl blur-md opacity-50 group-hover:opacity-70 transition-opacity duration-300"></div>
-
-            {/* Main header */}
-            <div className="relative bg-gradient-to-r from-[#00B4B6] to-teal-500 rounded-xl shadow-lg px-4 sm:px-6 py-2 sm:py-3 flex items-center gap-2 text-white font-bold text-base sm:text-lg border border-white/10 backdrop-blur-sm">
-              <div className="w-1.5 h-1.5 bg-white rounded-full"></div>
-              <span className="truncate max-w-[200px] sm:max-w-none">
-                {/* @ts-ignore */}
-                {workspaceData?.name}
-              </span>
-              <StarOutlined className="ml-1 text-white text-base transform group-hover:scale-110 transition-transform duration-200 flex-shrink-0" />
-            </div>
-          </div>
-        </div>
-        
-      </div>
-
+      <WorkspaceHeader workspaceData={workspaceData}/>
+      
       {/* Board */}
-      <div className="relative z-10 px-4 sm:px-6 pt-3">
-        <DragDropContext
-          onDragStart={onDragStart}
-          onDragUpdate={onDragUpdate}
-          onDragEnd={onDragEnd}
-          sensors={adminMode ? undefined : []}
-        >
-          <Row gutter={[12, 12]} wrap={false} className="pb-6 overflow-x-auto">
-            {columns.map((col, colIdx) => {
-              // Column color themes
-              const columnThemes = [
-                {
-                  gradient: "from-red-500 to-pink-500",
-                  bg: "bg-gradient-to-br from-red-50 to-pink-50",
-                  color: "#ef4444",
-                  lightColor: "rgba(239, 68, 68, 0.1)",
-                },
-                {
-                  gradient: "from-yellow-500 to-orange-500",
-                  bg: "bg-gradient-to-br from-yellow-50 to-orange-50",
-                  color: "#f59e0b",
-                  lightColor: "rgba(245, 158, 11, 0.1)",
-                },
-                {
-                  gradient: "from-green-500 to-teal-500",
-                  bg: "bg-gradient-to-br from-green-50 to-teal-50",
-                  color: "#10b981",
-                  lightColor: "rgba(16, 185, 129, 0.1)",
-                },
-                {
-                  gradient: "from-purple-500 to-indigo-500",
-                  bg: "bg-gradient-to-br from-purple-50 to-indigo-50",
-                  color: "#8b5cf6",
-                  lightColor: "rgba(139, 92, 246, 0.1)",
-                },
-              ];
-
-              const theme = columnThemes[colIdx];
-
-              return (
-                <Col
-                  key={col.id}
-                  className="flex-shrink-0 min-w-[380px] sm:min-w-[260px] max-w-[420px] sm:max-w-[280px]"
-                >
-                  <Droppable droppableId={col.id}>
-                    {(provided, snapshot) => (
-                      <div className="group relative">
-                        {/* Enhanced Column Card */}
-                        <Card
-                          title={
-                            <div className="flex items-center justify-between !text-white !text-sm font-semibold">
-                              <div className="flex items-center gap-2 min-w-0">
-                                <div
-                                  className="w-2 h-2 bg-white/30 rounded-full flex-shrink-0"
-                                  style={{
-                                    backgroundColor: "rgba(255,255,255,0.3)",
-                                  }}
-                                ></div>
-                                <span className="truncate">{col.title}</span>
-                                <div className="bg-white/20 rounded-full px-2 py-0.5 text-xs font-bold border border-white/5 flex-shrink-0">
-                                  {/* @ts-ignore */}
-                                  {col.tasks.length}
-                                </div>
-                              </div>
-                              <MoreOutlined className="cursor-pointer hover:bg-white/20 rounded-md p-1.5 transition-all duration-200 flex-shrink-0" />
-                            </div>
-                          }
-                          className={`relative w-full transition-all duration-300 ease-out !border-none shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 ${
-                            snapshot.isDraggingOver
-                              ? "scale-102 shadow-xl"
-                              : "scale-100"
-                          } ${col.type === "REWARD" ? "reward-column" : ""}`}
-                          style={{
-                            background: `linear-gradient(135deg, ${theme.color} 0%, ${theme.color}dd 100%)`,
-                            borderRadius: "20px",
-                            overflow: "hidden",
-                          }}
-                          styles={{
-                            body: {
-                              background: `linear-gradient(135deg, ${theme.color} 0%, ${theme.color}dd 100%)`,
-                              padding: "12px",
-                              minHeight: "120px",
-                              border: "none",
-                            },
-                            header: {
-                              background: `linear-gradient(135deg, ${theme.color} 0%, ${theme.color}dd 100%)`,
-                              borderRadius: "20px 20px 0 0",
-                              border: "none",
-                              boxShadow: "0 3px 8px rgba(0,0,0,0.05)",
-                            },
-                          }}
-                        >
-                          {/* Tasks Container */}
-                          <div
-                            ref={provided.innerRef}
-                            {...provided.droppableProps}
-                            className={`!outline-transparent min-h-[120px] transition-all duration-200 ease-in-out rounded-xl ${
-                              snapshot.isDraggingOver
-                                ? `${theme.bg} border-2 border-dashed border-gray-200/50 p-2 transform scale-[1.01] backdrop-blur-sm`
-                                : "transform scale-100"
-                            }`}
-                          >
-                            {/* @ts-ignore */}
-                            {col.tasks.map((task, idx) => {
-                              <DragableTaskCard task={task}
-                                                col = {col}
-                                                idx = {idx}
-                                                theme = {theme}
-                                                isDragging = {isDragging}
-                                                setSelectedTask= {setSelectedTask}
-                                                setEditingTaskId={setEditingTaskId}
-                                                setShowFormTask={setShowFormTask}
-                              />
-                            })}
-                            {provided.placeholder}
-
-                            {/* Add Task Button */}
-                            {colIdx === 0 && (
-                              <Button
-                                block
-                                icon={<PlusOutlined />}
-                                className="group/btn relative h-8 sm:h-10 !border-2 !border-dashed !border-white/40 hover:!border-white/70 !bg-transparent hover:!bg-white/20 !text-white hover:!text-white !font-semibold !rounded-xl !mt-3 transition-all duration-200 transform hover:scale-[1.01] backdrop-blur-sm"
-                                onClick={() => {
-                                  setSelectedTask(null);
-                                  setEditingTaskId(null);
-                                  setShowFormTask(true);
-                                }}
-                              >
-                                <span className="relative z-10 flex items-center gap-2 text-xs sm:text-sm">
-                                  Thêm thẻ mới
-                                </span>
-                                <div className="absolute inset-0 bg-white/10 rounded-xl opacity-0 group-hover/btn:opacity-100 transition-opacity duration-200"></div>
-                              </Button>
-                            )}
-                          </div>
-                        </Card>
-                      </div>
-                    )}
-                  </Droppable>
-                </Col>
-              );
-            })}
-          </Row>
-        </DragDropContext>
-      </div>
+      <WorkspaceBoard onDragStart = {onDragStart} 
+                      onDragUpdate = {onDragUpdate}
+                      // adminMode = {adminMode}
+                      onDragEnd = {onDragEnd}
+                      isDragging = {isDragging}
+                      columns = {columns}
+                      setSelectedTask = {setSelectedTask} 
+                      setEditingTaskId = {setEditingTaskId}
+                      setShowFormTask = {setShowFormTask}
+      />
 
       <FormTask
         open={showFormTask}
-        onCancel={() => {
-          setShowFormTask(false);
-          // setEditingTaskId(null);
-          // setSelectedTask(null);
-        }}
+        onCancel={() => { setShowFormTask(false); }}
         taskId={editingTaskId || undefined}
         workspaceId={workspaceId}
         initialValues={selectedTask}
         onSuccess={handleFormSuccess}
+
+        // @ts-ignore
+        users = {workspaceData?.users}
+        // @ts-ignore
+        customers = {workspaceData?.customers}
+        updateTaskStatus={updateTaskStatus}
       />
 
-      {/* Delete Confirmation Modal */}
-      <Modal
-        open={deleteConfirmModal.visible}
-        onCancel={handleDeleteCancel}
-        footer={null}
-        title={null}
-        width="400px"
-        centered
-        className="custom-modal"
-      >
-        <div className="text-center p-6">
-          {/* Warning Icon */}
-          <div className="mx-auto w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-4">
-            <svg
-              className="w-8 h-8 text-red-500"
-              fill="currentColor"
-              viewBox="0 0 20 20"
-            >
-              <path
-                fillRule="evenodd"
-                d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
-                clipRule="evenodd"
-              />
-            </svg>
-          </div>
-
-          {/* Title */}
-          <h3 className="text-lg font-bold text-gray-900 mb-2">
-            Xác nhận xóa task
-          </h3>
-
-          {/* Message */}
-          <p className="text-gray-600 mb-6">
-            Bạn có chắc chắn muốn xóa task{" "}
-            <span className="font-semibold text-gray-900">
-              "{deleteConfirmModal.taskTitle}"
-            </span>
-            ? Hành động này không thể hoàn tác.
-          </p>
-
-          {/* Buttons */}
-          <div className="flex gap-3 justify-center">
-            <Button
-              onClick={handleDeleteCancel}
-              className="px-6 py-2 h-10 rounded-lg border-2 border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400 font-semibold transition-all duration-200"
-            >
-              Hủy bỏ
-            </Button>
-            <Button
-              onClick={handleDeleteConfirm}
-              loading={deleteTaskMutation.isPending}
-              danger
-              className="px-6 py-2 h-10 rounded-lg bg-red-500 hover:bg-red-600 border-red-500 hover:border-red-600 text-white font-semibold transition-all duration-200"
-            >
-              Xóa task
-            </Button>
-          </div>
-        </div>
-      </Modal>
-
-      <style>{`
-        .line-clamp-2 {
-          display: -webkit-box;
-          -webkit-line-clamp: 2;
-          -webkit-box-orient: vertical;
-          overflow: hidden;
-        }
-        
-        @keyframes pulse {
-          0%, 100% { opacity: 1; }
-          50% { opacity: 0.7; }
-        }
-        
-        .animate-pulse {
-          animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-        }
-
-        /* Style cho task không thể kéo thả */
-        .task-card[data-rbd-draggable-id] {
-          transition: all 0.2s ease;
-        }
-        
-        .task-card[data-rbd-draggable-id]:hover {
-          transform: none !important;
-        }
-        
-        /* Style đặc biệt cho cột khoán thưởng */
-        .reward-column .task-card {
-          position: relative;
-        }
-        
-        .reward-column .task-card::before {
-          content: "🔒";
-          position: absolute;
-          top: -8px;
-          left: -8px;
-          background: #8b5cf6;
-          color: white;
-          border-radius: 50%;
-          width: 20px;
-          height: 20px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: 10px;
-          z-index: 10;
-        }
-
-        /* Mobile responsive improvements */
-        @media (max-width: 640px) {
-          .ant-row {
-            margin-left: -6px !important;
-            margin-right: -6px !important;
-          }
-          
-          .ant-col {
-            padding-left: 6px !important;
-            padding-right: 6px !important;
-          }
-          
-          .ant-card {
-            margin-bottom: 8px;
-          }
-          
-          .task-card {
-            margin-bottom: 8px !important;
-          }
-        }
-
-        /* Ensure proper scrolling on mobile */
-        .overflow-x-auto {
-          -webkit-overflow-scrolling: touch;
-          scrollbar-width: none;
-          -ms-overflow-style: none;
-        }
-        
-        .overflow-x-auto::-webkit-scrollbar {
-          display: none;
-        }
-      `}</style>
+      <WorkspaceModal deleteConfirmModal={deleteConfirmModal}      
+                      handleDeleteCancel={handleDeleteCancel}
+                      handleDeleteConfirm={handleDeleteConfirm}
+                      deleteTaskMutation={deleteConfirmModal}
+                      />
     </div>
   );
 }

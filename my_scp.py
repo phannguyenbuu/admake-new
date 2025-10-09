@@ -62,14 +62,14 @@ def upload_to_vps(host, port, username, password, local_path, remote_path):
 
 
 def upload_to_vps_multiple(host, port, username, password, local_dirs, remote_base_dir):
+    save_dump()
+
     ssh = paramiko.SSHClient()
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     ssh.connect(hostname=host, port=port, username=username, password=password, timeout=60)
     sftp = ssh.open_sftp()
 
-
     fixed_dirs = [dir_path.replace("\\", "/") for dir_path in local_dirs]
-
 
     upload_multiple_dirs(sftp, fixed_dirs, remote_base_dir)
 
@@ -87,6 +87,49 @@ def ensure_remote_dir(sftp, remote_directory):
                 sftp.stat(path)
             except FileNotFoundError:
                 sftp.mkdir(path)
+
+import datetime
+import os
+from paramiko import SSHClient, AutoAddPolicy
+from scp import SCPClient
+
+def save_dump():
+    # Kết nối SSH tới server Linux
+    ssh = SSHClient()
+    ssh.set_missing_host_key_policy(AutoAddPolicy())
+    ssh.connect('31.97.76.62', username='root', password='@baoLong0511')
+
+    now = datetime.datetime.now()
+    timestamp = now.strftime("%y_%m_%d_%H_%M")
+
+    remote_dump_path = f"/root/admake_chat_{timestamp}.dump"
+    print("Dump file remote:", remote_dump_path)
+
+    # Thực thi lệnh pg_dump trên server Linux
+    pg_dump_cmd = f"pg_dump -U postgres -d admake_chat -F c -f {remote_dump_path}"
+    stdin, stdout, stderr = ssh.exec_command(pg_dump_cmd)
+
+    # Đợi lệnh hoàn thành
+    exit_status = stdout.channel.recv_exit_status()
+    if exit_status == 0:
+        print("Dump database thành công trên server.")
+    else:
+        error = stderr.read().decode()
+        print("Lỗi khi dump database:", error)
+        ssh.close()
+        return
+
+    # Tải file dump về local Windows
+    local_folder = "./backup"
+    os.makedirs(local_folder, exist_ok=True)
+    local_dump_path = os.path.join(local_folder, f"admake_chat_{timestamp}.dump")
+
+    scp = SCPClient(ssh.get_transport())
+    scp.get(remote_dump_path, local_dump_path)
+    print(f"Đã tải file dump về: {local_dump_path}")
+
+    scp.close()
+    ssh.close()
 
 local_dirs = [
     # "main-be",

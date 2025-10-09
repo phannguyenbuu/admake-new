@@ -14,6 +14,7 @@ export type UserRole =
   | "warehouse:management";
 
 export type User = BaseEntity & {
+  user_id: string;
   username: string;
   password: string;
   fullName?: string;

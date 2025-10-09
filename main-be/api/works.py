@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify, abort
-from models import db, Workspace, Task, dateStr, generate_datetime_id, Group
+from models import db, Workspace, Task, dateStr, generate_datetime_id, Group, User, Customer
 import datetime
 from collections import defaultdict
 from sqlalchemy import desc
@@ -53,10 +53,36 @@ def create_workspace():
         id=generate_datetime_id(),
         name=name
     )
+    
     db.session.add(new_workspace)
     db.session.commit()
     return jsonify(new_workspace.to_dict()), 201
 
+
+def get_role(user):
+    s = user.update_role()
+    if s:
+        return s.get("name")
+    else:
+        return ""
+
+def get_all_users_and_customers():
+    users = [{
+        "fullName": user.fullName,
+        "user_id": user.id,
+        "role": get_role(user),
+        "phone": user.phone
+        } for user in User.query.all() if not user.role_id or user.role_id > 0]
+
+    customers = [{
+        "fullName": customer.user.fullName,
+        "user_id": customer.user.id,
+        # "role": "customer",
+        "phone": customer.user.phone,
+        "workAddress": customer.workAddress,
+        } for customer in Customer.query.all()]
+    
+    return users, customers
 
 @workspace_bp.route("/<string:id>", methods=["PUT"])
 def update_workspace(id):
@@ -69,6 +95,8 @@ def update_workspace(id):
     # Cập nhật các trường
     workspace.name = data.get("name", workspace.name)
     # Nếu có thêm trường khác, cập nhật tương tự
+    
+
 
     db.session.commit()
 
@@ -105,6 +133,11 @@ def get_workspace_detail(id):
     # tasks = Task.query.filter_by(workspace_id=id).all()
     # print('TASK', tasks)
     
-    return jsonify(work.to_dict())
+    result = work.to_dict()
+    users, customers = get_all_users_and_customers()
+    result["users"] = users
+    result["customers"] = customers
+
+    return jsonify(result)
 
 __all__ = ['customer_bp']

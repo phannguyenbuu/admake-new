@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify, abort
-from models import db, Task, dateStr, User, Customer
+from models import db, Task, dateStr, User, Customer, Role
 import datetime
+from sqlalchemy.orm.attributes import flag_modified
 
 task_bp = Blueprint('task', __name__, url_prefix='/api/task')
 
@@ -28,13 +29,19 @@ def get_task_by_id(id):
 
         result["assign_ids"] = ls
 
+    # print('CUS_ID', task.customer_id, db.session.get(Customer, task.customer_id))
+    # print('CUS_USER_ID', task.customer_id, db.session.get(User, task.customer_id))
+
     if task.customer_id:
-        customer = db.session.get(Customer, task.customer_id)
+        customer = db.session.get(User, task.customer_id)
         if customer:
-            result["customer_id"] = {"id":id,"name": customer.fullName}
+            result["customer_id"] = {"id":task.customer_id,"name": customer.fullName}
         else:
             result["customer_id"] = None
+    
 
+    # print(result)
+    
     return jsonify({"data": result,"message":"Success"}),200
 
 @task_bp.route("/<string:id>", methods=["PUT"])
@@ -44,26 +51,32 @@ def update_task(id):
         abort(404, description="Task not found")
 
     data = request.get_json()
+    print('PUT task', id, data.get("customer_id"))
 
-    # Cập nhật các trường trong Task từ dữ liệu gửi lên
     task.title = data.get("title", task.title)
     task.description = data.get("description", task.description)
-    # task.status = data.get("status", task.status)
-    # task.type = data.get("type", task.type)
-    # task.reward = data.get("reward", task.reward)
-    # task.workspace_id = data.get("workspaceId", task.workspace_id)
-
+    
     task.assign_ids = data.get("assign_ids", task.assign_ids)
     task.customer_id = data.get("customer_id", task.customer_id)
 
     task.materials = data.get("materials", task.materials)
     task.start_time = data.get("start_time", task.start_time)
+    
     task.end_time = data.get("end_time", task.end_time)
 
+    task.type = data.get("type", task.type)
+    task.reward = data.get("reward", task.reward)
+    task.amount = data.get("amount", task.amount)
+    task.salary_type = data.get("salary_type", task.salary_type)
+
+    flag_modified(task, "assign_ids")
+    
+    db.session.add(task)
     db.session.commit()
 
+    task = Task.query.get(id)
+    print('F', task.to_dict())
     return jsonify(task.to_dict())
-
 
 @task_bp.route("/<string:id>/status", methods=["PUT"])
 def update_task_status(id):

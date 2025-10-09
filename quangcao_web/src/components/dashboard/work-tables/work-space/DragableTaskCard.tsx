@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { Row, Col, Card, Button, message, Modal } from "antd";
 import { StarOutlined, PlusOutlined, MoreOutlined } from "@ant-design/icons";
-import FormTask from "./FormTask";
+import FormTask from "../FormTask";
 import {
   DragDropContext,
   Droppable,
@@ -21,7 +21,7 @@ import {
   useDeleteTask,
   useWorkSpaceQueryById,
 } from "../../../../common/hooks/work-space.hook";
-import { useCheckPermission } from "../../../common/hooks/checkPermission.hook";
+import { useCheckPermission } from "../../../../common/hooks/checkPermission.hook";
 
 interface DragableTaskCardProps {
   task: any;

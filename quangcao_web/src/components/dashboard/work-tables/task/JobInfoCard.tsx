@@ -35,6 +35,11 @@ const JobInfoCard: React.FC<JobInfoCardProps> = ({ currentStatus, taskDetail, fo
         title: taskDetail.title || "",
         // có thể set thêm các trường khác
       });
+    }else{
+      form.setFieldsValue({
+        title: "",
+        // có thể set thêm các trường khác
+      });
     }
   }, [taskDetail, form]);
 
@@ -45,7 +50,7 @@ const JobInfoCard: React.FC<JobInfoCardProps> = ({ currentStatus, taskDetail, fo
           <ProjectOutlined className="!text-cyan-600 !text-xs sm:!text-sm" />
         </div>
         <Text strong className="!text-gray-800 !text-sm sm:!text-base">
-          Thông tin cơ bản
+          Thông tin
         </Text>
       </div>
 

@@ -18,7 +18,7 @@ interface ModalEditWorkSpaceProps {
   editModalVisible: boolean;
   closeEditModal: () => void;
   editForm: FormInstance;
-  taskId: string; // Thêm taskId để biết workspace nào đang edit
+  workspaceId: string; // Thêm workspaceId để biết workspace nào đang edit
   onSuccess?: () => void; // Callback khi update thành công
 }
 
@@ -26,7 +26,7 @@ export default function ModalEditWorkSpace({
   editModalVisible,
   closeEditModal,
   editForm,
-  taskId,
+  workspaceId,
   onSuccess,
 }: ModalEditWorkSpaceProps) {
   const { mutate: updateWorkSpace, isPending: isUpdating } =
@@ -34,8 +34,8 @@ export default function ModalEditWorkSpace({
 
   // Hàm xử lý update workspace
   const handleUpdate = (values: any) => {
-    console.log('TaskID', taskId);
-    fetch(`${useApiHost()}/task/${taskId}`, {
+    // console.log('TaskID', workspaceId);
+    fetch(`${useApiHost()}/workspace/${workspaceId}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name: values.name }),

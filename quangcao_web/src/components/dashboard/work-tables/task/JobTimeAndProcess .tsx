@@ -3,7 +3,11 @@ import {Stack, Box} from "@mui/material";
 import { Form, DatePicker, Select, InputNumber, Typography } from "antd";
 import { CalendarOutlined, ConsoleSqlOutlined } from "@ant-design/icons";
 import dayjs, { Dayjs } from "dayjs";
-import type { Mode } from "../../../../@types/work-space.type";
+import utc from 'dayjs/plugin/utc';
+import timezone from "dayjs/plugin/timezone";
+dayjs.extend(utc);
+dayjs.extend(timezone);
+import type { Mode, UserSearchProps } from "../../../../@types/work-space.type";
 import type { Task } from "../../../../@types/work-space.type";
 
 const { Text } = Typography;
@@ -49,12 +53,15 @@ const JobTimeAndProcess: React.FC<JobTimeAndProcessProps> = ({taskDetail, form})
   }, [taskDetail?.start_time, taskDetail?.end_time]);
 
   useEffect(() => {
-    if (form && taskDetail) {
+    if (taskDetail) {
       form.setFieldsValue({
-        start_time: taskDetail.start_time ? dayjs(taskDetail.start_time) : null,
-        end_time: taskDetail.end_time ? dayjs(taskDetail.end_time) : null,
         type: taskDetail.type,
         reward: taskDetail.reward
+      });
+    }else{
+      form.setFieldsValue({
+        type: "",
+        reward: 0
       });
     }
   }, [form, taskDetail]);
@@ -70,16 +77,17 @@ const JobTimeAndProcess: React.FC<JobTimeAndProcessProps> = ({taskDetail, form})
           Thời gian & quy trình
         </Text>
       </div>
-
       
         <DateFormPicker form={form} mode="start_time" title="Bắt đầu"
+          taskDetail={taskDetail}
           timeValue={taskDetail?.start_time ? dayjs(taskDetail?.start_time) : null}
           disabledDateFunc={(current: Dayjs) => current && current < dayjs().startOf("day")}/>
 
         <DateFormPicker form={form} mode="end_time" title="Kết thúc"
+          taskDetail={taskDetail}
           timeValue={taskDetail?.end_time ? dayjs(taskDetail?.end_time) : null}
           disabledDateFunc={(current: Dayjs) =>
-            !taskDetail?.end_time || (current && current < dayjs(taskDetail?.end_time).startOf('day'))}/>
+            (current && current < dayjs(taskDetail?.start_time).startOf('day'))}/>
 
         <Stack direction="row" spacing={2}>
         
@@ -121,7 +129,7 @@ const JobTimeAndProcess: React.FC<JobTimeAndProcessProps> = ({taskDetail, form})
               // disabled={!mode.adminMode}
             >
               <Select.Option value="REWARD">💼 Công khoán</Select.Option>
-              <Select.Option value="MONTHLY">📅 Công tháng</Select.Option>
+              <Select.Option value="MONTHLY">📅 Lương tháng</Select.Option>
             </Select>
           </Form.Item>
 
@@ -165,60 +173,75 @@ const JobTimeAndProcess: React.FC<JobTimeAndProcessProps> = ({taskDetail, form})
 
 export default JobTimeAndProcess;
 
-function DateFormPicker({mode, title, timeValue,disabledDateFunc, form}:
-  {mode: string, title:string, timeValue: Dayjs | null, disabledDateFunc:any, form: any}) {
-  // type TaskDateKeys = "start_time" | "end_time";
-  const [showDatePickerModal, setShowDatePickerModal] = useState(false);
-  const [value, setValue] = useState<Dayjs | null>(null);
-
-  useEffect(()=>{
-    setValue(timeValue);
-  },[timeValue]);
-
+function DateFormPicker({
+  taskDetail,
+  mode,
+  title,
+  timeValue,
+  disabledDateFunc,
+  form,
+}: {
+  taskDetail:Task | null,
+  mode: string;
+  title: string;
+  timeValue: Dayjs | null;
+  disabledDateFunc?: (date: Dayjs) => boolean;
+  form: any; // Tốt hơn là bạn định nghĩa đúng type của form tùy lib bạn dùng
+}) {
   useEffect(() => {
-    if (form) {
-      console.log({ [mode]: value })
-      form.setFieldsValue({ [mode]: value });
-    }
-  }, [form, mode, value]);
+    form.setFieldsValue({ [mode]: timeValue });
+  }, [timeValue]);
 
-  
+  const handleChange = (date: Dayjs | null) => {
+    if (date) {
+      // Đặt giờ = 0, phút = 0, giây = 0, mili giây = 0 để chỉ lấy ngày
+      const dateOnly = date.hour(0).minute(0).second(0).millisecond(0);
+      form.setFieldsValue({ [mode]: dateOnly });
+
+      if (taskDetail) {
+        if (mode === "end_time") {
+          taskDetail.end_time = dateOnly;
+        } else {
+          taskDetail.start_time = dateOnly;
+        }
+      }
+    } else {
+      form.setFieldsValue({ [mode]: null });
+      if (taskDetail) {
+        if (mode === "end_time") {
+          taskDetail.end_time = null;
+        } else {
+          taskDetail.start_time = null;
+        }
+      }
+    }
+  };
+
+
+  const value = form.getFieldValue(mode);
+
   return (
     <Form.Item
       name={mode}
       label={
         <div className="flex items-center gap-1.5 sm:gap-2">
           <div className="w-1 h-1 bg-orange-500 rounded-full"></div>
-          <span className="text-gray-800 font-medium text-xs sm:text-sm">
-            {title}
-          </span>
+          <span className="text-gray-800 font-medium text-xs sm:text-sm">{title}</span>
           <span className="text-red-500">*</span>
         </div>
       }
       rules={[{ required: true, message: "Chọn ngày" }]}
       className="!mb-0"
     >
-      <div className="flex gap-2">
-        <DatePicker
-          className="!flex-1 !h-9 sm:!h-10 !text-xs sm:!text-sm !rounded-lg !border !border-gray-300 focus:!border-cyan-500 focus:!shadow-lg hover:!border-cyan-500 !transition-all !duration-200 !shadow-sm"
-          format="DD/MM/YYYY"
-          placeholder="Chọn ngày"
-          onChange={(date) => {
-            // handlers.startTimeChange(date);
-            // console.log({ [mode]: date })
-            // form.setFieldsValue({ [mode]: date });
-            setValue(date);
-          }}
-          disabledDate={disabledDateFunc}
-          value={value}
-          size="middle"
-          onOpenChange={(open) => {
-            // setCurrentDatePicker({ type: key, value: dayjs(taskDetail?[key]) });
-            setShowDatePickerModal(true);
-            return false;
-          }}
-        />
-      </div>
+      <DatePicker
+        className="!flex-1 !h-9 sm:!h-10 !text-xs sm:!text-sm !rounded-lg !border !border-gray-300 focus:!border-cyan-500 focus:!shadow-lg hover:!border-cyan-500 !transition-all !duration-200 !shadow-sm"
+        format="DD/MM/YYYY"
+        placeholder="Chọn ngày"
+        onChange={handleChange}
+        value={value}
+        size="middle"
+        disabledDate={disabledDateFunc}
+      />
     </Form.Item>
-  )
+  );
 }

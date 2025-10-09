@@ -687,7 +687,7 @@ def update_users_with_accountId(json_file):
 
 def change_value_type(table, keys, type='VARCHAR(50)'):
     for key in keys:
-        db.session.execute(text(f'ALTER TABLE "{table}" ALTER COLUMN "{key}" TYPE {type} USING {key}::integer;'))
+        db.session.execute(text(f'ALTER TABLE "{table}" ALTER COLUMN "{key}" TYPE {type};'))
 #     db.session.execute(text(
 #         f'''
 # CREATE SEQUENCE {table}_id_seq;
@@ -957,7 +957,8 @@ if __name__ == "__main__":
         # change_value_type('group', ['id'], 'SERIAL')
 
         # create_customer_role()
-        # change_value_type('group', ['rate'], 'VARCHAR(10)')
+        change_value_type('task', ['end_time'], 'DATE')
+        change_value_type('task', ['start_time'], 'DATE')
         # renameColumn('group',"updateAt", "updatedAt")
 
         # for table in ['message','group_member']:
@@ -972,8 +973,8 @@ if __name__ == "__main__":
         #     add_new_columns(table,['deletedAt'],'TIMESTAMP')
         #     add_new_columns(table,['version'],'INTEGER')
 
-        add_new_columns('task',['salary_type'],'VARCHAR(10)')
-        add_new_columns('task',['amount'],'INTEGER')
+        # add_new_columns('task',['salary_type'],'VARCHAR(10)')
+        # add_new_columns('task',['amount'],'INTEGER')
         # add_new_columns('user',['level_salary','version'],'INTEGER')
         # add_new_columns('user',['deletedAt'],'TIMESTAMP')
         # renameColumn('user', "createAt", "createdAt")
