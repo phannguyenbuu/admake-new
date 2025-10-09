@@ -20,6 +20,7 @@ import {
 } from "@ant-design/icons";
 import { WorkTableDetailPage } from "./app/dashboard/work-tables/page";
 import { UserDashboard } from "./app/dashboard/user/page";
+import { SupplierDashboard } from "./app/dashboard/supplier/page";
 import { MaterialDashboard } from "./app/dashboard/material/page";
 import { InvoiceDashboard } from "./app/dashboard/invoice/page";
 import { CustomerDashboard } from "./app/dashboard/customer/page";
@@ -128,6 +129,17 @@ const routes: TRoute = {
           ),
           roles: ["user:management"],
           title: "Quản lý nhân sự",
+          icon: <FormOutlined />,
+        },
+        {
+          path: "/dashboard/supplier",
+          element: (
+            <RequireRoles roles={["user:management"]}>
+              <SupplierDashboard />
+            </RequireRoles>
+          ),
+          roles: ["user:management"],
+          title: "Quản lý thầu phụ",
           icon: <FormOutlined />,
         },
         {

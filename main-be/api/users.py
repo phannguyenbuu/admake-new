@@ -3,7 +3,7 @@ from models import db, User, dateStr, app
 from flask import Flask, request, jsonify, session
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 import datetime
-from sqlalchemy import desc
+from sqlalchemy import desc, and_
 
 user_bp = Blueprint('user', __name__, url_prefix='/api/user')
 
@@ -27,7 +27,12 @@ def get_users():
     })
 
 def get_query_page_users(page,limit,search):
-    query = User.query.filter(User.role_id != -1)
+    query = User.query.filter(
+        and_(
+            User.role_id != -1,
+            User.role_id != 3
+        )
+    )
 
     if search:
         query = query.filter(

@@ -81,10 +81,7 @@ def get_customer_detail(id):
         abort(404, description="Customer not found")
     return jsonify(customer.to_dict())
 
-
-
-
-@customer_bp.route("/<int:id>", methods=["PUT"])
+@customer_bp.route("/<string:id>", methods=["PUT"])
 def update_customer(id):
     data = request.get_json()
     customer = db.session.get(Customer, id)

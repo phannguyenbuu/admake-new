@@ -22,6 +22,7 @@ from api.groups import group_bp
 from api.messages import message_bp
 from api.auth import auth_bp
 from api.workpoints import workpoint_bp
+from api.supplier import supplier_bp
 
 app.register_blueprint(customer_bp)
 app.register_blueprint(material_bp)
@@ -34,6 +35,7 @@ app.register_blueprint(group_bp)
 app.register_blueprint(message_bp)
 app.register_blueprint(auth_bp)
 app.register_blueprint(workpoint_bp)
+app.register_blueprint(supplier_bp)
 
 from api.chat import socketio
 

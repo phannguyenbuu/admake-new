@@ -945,7 +945,16 @@ def modify_task_material():
     # Cuối cùng, thay đổi trong db nếu cần:
     # session.commit() nếu muốn lưu thay đổi
     db.session.commit()
-  
+
+def modify_role_name():
+    # Lấy role có id = 3
+    role = db.session.get(Role, 3)
+
+    if role:
+        role.name = "Thi công"  # Thay đổi tên
+        db.session.commit()      # Lưu vào database
+    else:
+        print("Role id = 3 không tồn tại")
 
 if __name__ == "__main__":
     with app.app_context():
@@ -973,7 +982,7 @@ if __name__ == "__main__":
         #     add_new_columns(table,['deletedAt'],'TIMESTAMP')
         #     add_new_columns(table,['version'],'INTEGER')
 
-        add_new_columns('message',['username'],'VARCHAR(255)')
+        # add_new_columns('message',['username'],'VARCHAR(255)')
         # add_new_columns('task',['amount'],'INTEGER')
         # add_new_columns('user',['level_salary','version'],'INTEGER')
         # add_new_columns('user',['deletedAt'],'TIMESTAMP')
@@ -1020,3 +1029,5 @@ if __name__ == "__main__":
 
         # modify_task_material()
         # modify_material_id_type()
+
+        modify_role_name()
