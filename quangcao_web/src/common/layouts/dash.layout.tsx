@@ -8,7 +8,6 @@ const { Sider, Content } = Layout;
 export default function DashLayout() {
   const [collapsed, setCollapsed] = React.useState(false);
   const [isMobile, setIsMobile] = React.useState(false);
-
   // Responsive: Collapse sidebar trên mobile
   React.useEffect(() => {
     const resize = () => {
@@ -28,7 +27,10 @@ export default function DashLayout() {
         backgroundImage: "url(/backGround.png)",
         backgroundSize: "cover",
         backgroundPosition: "center",
+        cursor: 'pointer',
       }}
+
+      
     >
       <AppHeader />
       <Layout hasSider className="">

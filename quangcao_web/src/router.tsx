@@ -17,6 +17,12 @@ import {
   SettingOutlined,
   TeamOutlined,
   UserOutlined,
+  PieChartOutlined,
+  BarChartOutlined,
+
+LineChartOutlined,
+
+DotChartOutlined,
 } from "@ant-design/icons";
 import { WorkTableDetailPage } from "./app/dashboard/work-tables/page";
 import { UserDashboard } from "./app/dashboard/user/page";
@@ -35,7 +41,7 @@ import QrPage from "./components/qr/QrPage";
 import RequireAuth from "./services/RequireAuth";
 import GroupQRPage from "./components/chat/components/GroupQRPage";
 import Workpoint from "./components/chat/components/Workpoint";
-
+import { StatisticDashboard } from "./app/dashboard/statistic/page";
 // Route guard: chặn truy cập nếu không có quyền
 function RequireRoles({
   roles,
@@ -102,18 +108,26 @@ const routes: TRoute = {
       isMainMenu: true,
       children: [
         {
+          path: "/dashboard/statistics",
+          element: <StatisticDashboard />,
+          title: "Phân tích",
+          icon: <PieChartOutlined  />,
+        },
+        {
           path: "/dashboard",
           index: true,
-          element: (
-            <div className="p-6">
-              <h1 className="text-2xl font-bold mb-4">Bảng điều khiển</h1>
-              <p>Chào mừng bạn đến với hệ thống quản lý!</p>
-            </div>
-          ),
+          // element: (
+          //   <div className="p-6">
+          //     <h1 className="text-2xl font-bold mb-4">Bảng điều khiển</h1>
+          //     <p>Chào mừng bạn đến với hệ thống quản lý!</p>
+          //   </div>
+          // ),
+          element: <Navigate to="/dashboard/statistics" replace />,
           title: "Home",
           icon: <HomeOutlined />,
           ignoreInMenu: true,
         },
+        
         {
           path: "/dashboard/workpoints",
           element: <WorkPointPage />,
@@ -129,7 +143,7 @@ const routes: TRoute = {
           ),
           roles: ["user:management"],
           title: "Quản lý nhân sự",
-          icon: <FormOutlined />,
+          icon: <LineChartOutlined />,
         },
         {
           path: "/dashboard/supplier",
@@ -168,7 +182,7 @@ const routes: TRoute = {
           path: "/dashboard/work-tables",
           element: <WorkTableDetailPage />,
           title: "Bảng công việc",
-          icon: <TeamOutlined />,
+          icon: <BarChartOutlined />,
           children: [
             {
               path: "/dashboard/work-tables/:boardId",
