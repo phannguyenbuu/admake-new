@@ -20,6 +20,21 @@ export default defineConfig({
     
     react(), tailwindcss()],
 
+  build: {
+    rollupOptions: {
+      external: ['react', 'react-dom'],
+      output: {
+        globals: {
+          react: 'React',
+          'react-dom': 'ReactDOM'
+        }
+      }
+    }
+  },
+  optimizeDeps: {
+    exclude: ['react', 'react-dom']
+  },
+
   define: { global: "window" },
   server: {
     allowedHosts: ['localhost', 'archbox.pw','dashboard.archbox.pw','quanly.admake.vn'],
