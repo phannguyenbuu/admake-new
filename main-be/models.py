@@ -648,7 +648,7 @@ class UsingHistoryData(db.Model):
     end_time = db.Column(db.Date)
     balance_amount = db.Column(db.Float)
 
-class LeadPayload(db.Model):
+class LeadPayload(BaseModel):
     __tablename__ = 'lead'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(120), nullable=False)

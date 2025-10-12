@@ -982,7 +982,7 @@ if __name__ == "__main__":
         #     add_new_columns(table,['deletedAt'],'TIMESTAMP')
         #     add_new_columns(table,['version'],'INTEGER')
 
-        # add_new_columns('message',['username'],'VARCHAR(255)')
+        add_new_columns('lead',['createdAt','deletedAt','updatedAt'],'TIMESTAMP')
         # add_new_columns('task',['amount'],'INTEGER')
         # add_new_columns('user',['level_salary','version'],'INTEGER')
         # add_new_columns('user',['deletedAt'],'TIMESTAMP')
