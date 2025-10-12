@@ -23,6 +23,7 @@ from api.messages import message_bp
 from api.auth import auth_bp
 from api.workpoints import workpoint_bp
 from api.supplier import supplier_bp
+from api.leads import lead_bp
 
 app.register_blueprint(customer_bp)
 app.register_blueprint(material_bp)
@@ -36,6 +37,7 @@ app.register_blueprint(message_bp)
 app.register_blueprint(auth_bp)
 app.register_blueprint(workpoint_bp)
 app.register_blueprint(supplier_bp)
+app.register_blueprint(lead_bp)
 
 from api.chat import socketio
 
@@ -49,3 +51,4 @@ if __name__ == "__main__":
 
     # app.run(host="0.0.0.0", port=5273, debug=True)
     socketio.run(app, host='0.0.0.0', port=5007, debug=True, allow_unsafe_werkzeug=True)
+
