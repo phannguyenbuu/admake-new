@@ -66,7 +66,7 @@ export default function LeadForm() {
       setStatus("success")
       setMessage("Đã gửi thông tin. Chúng tôi sẽ liên hệ trong 24h.")
       try {
-        e.currentTarget.reset()
+        (e.target as HTMLFormElement).reset()
       } catch (err) {
         console.error(err)
       }
