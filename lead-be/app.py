@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 
 from flask import render_template
 
-@app.route('/admin/leads')
+@app.route('/admin/leads/')
 def admin_leads():
     leads = LeadPayload.query.all()  # Lấy toàn bộ lead từ db
     leads_data = [lead.to_dict() for lead in leads]  # Chuyển đối tượng thành dict để render dễ dàng
