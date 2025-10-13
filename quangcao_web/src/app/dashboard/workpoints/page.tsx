@@ -11,6 +11,7 @@ import { columnsWorkPoint } from "../../../common/data";
 import { useState, useEffect } from "react";
 import { useApiHost } from "../../../common/hooks/useApiHost";
 import type { Workpoint, WorkDaysProps } from "../../../@types/workpoint";
+import type { Leave } from "../../../@types/leave.type";
 
 export const WorkPointPage: IPage["Component"] = () => {
   const [query, setQuery] = useState({
@@ -19,8 +20,9 @@ export const WorkPointPage: IPage["Component"] = () => {
     search: "",
   });
 
-  const [workpoints, setWorkpoints] = useState<{ data: WorkDaysProps[]; total: number } | null>(null);
+  const [workpoints, setWorkpoints] = useState<WorkDaysProps[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [total, setTotal] = useState(0);
 
   // Fetch data dùng fetch API với params paging và search
   const fetchUsers = async ({ page, limit, search }: typeof query) => {
@@ -36,8 +38,21 @@ export const WorkPointPage: IPage["Component"] = () => {
       );
       
       const result = await response.json();
-      console.log(result);
-      setWorkpoints(result);
+      const ls: WorkDaysProps[] = [];
+      
+      result.data.forEach((el:any) => {
+        el.status = 'work';
+        ls.push(el);
+      });
+
+      result.leave.forEach((el:any) => {
+        el.status = 'off';
+        ls.push(el);
+      });
+
+      console.log(ls);
+      setWorkpoints(ls);
+      setTotal(result.pagination.total);
     } catch (error) {
       console.error("Failed to fetch users", error);
     } finally {
@@ -54,12 +69,12 @@ export const WorkPointPage: IPage["Component"] = () => {
     <div className="min-h-screen p-2 w-full">
       <TableComponent<WorkDaysProps>
         columns={columnsWorkPoint}
-        dataSource={workpoints?.data}
+        dataSource={workpoints}
         loading={isLoading}
         pagination={{
           pageSize: query.limit,
           current: query.page,
-          total: workpoints?.total || 0,
+          total: total,
           onChange: (page, pageSize) => {
             setQuery({ ...query, page, limit: pageSize });
           },

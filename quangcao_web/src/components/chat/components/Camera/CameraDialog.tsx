@@ -20,7 +20,7 @@ import type { Workpoint } from "../../../../@types/workpoint";
 import WorkpointGrid from "./WorkpointTable";
 import { CurrentDateTime } from "./WorkpointTable";
 import TaskBoard from "./TaskBoard";
-import HolidayBoard from "./LeaveBoard";
+import LeaveBoard from "./LeaveBoard";
 
 interface CameraDialogProps {
   userEl: User | null;
@@ -469,7 +469,7 @@ async function postWorkpointCheck(imgUrl: string, lat:string, long:string) {
       
       
       <TaskBoard open={openWork} userId={userEl?.id} onCancel={handleWorkBoardCancel}/>
-      <HolidayBoard open={openHoliday} userId={userEl?.id} onCancel={handleHolidayBoardCancel}/>
+      <LeaveBoard open={openHoliday} userId={userEl?.id} onCancel={handleHolidayBoardCancel}/>
       
     </Stack>
   );

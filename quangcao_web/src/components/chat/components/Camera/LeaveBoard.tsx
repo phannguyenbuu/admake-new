@@ -13,12 +13,12 @@ import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import TextField from "@mui/material/TextField";
 
-
-
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 
 import dayjs, { Dayjs } from "dayjs";
+
+import type { Leave } from "../../../../@types/leave.type";
 
 
 import "antd/dist/reset.css"; // hoặc `antd/dist/antd.css` tùy version
@@ -39,19 +39,13 @@ const useTaskByUserMutation = () => {
 interface LeaveBoardProps {
   // mode: { adminMode: boolean; userMode: boolean };
   
-  userId: string | undefined;
+  userId: string | null;
   open: boolean;
   onCancel: () => void;
 }
 
 
-const { TabPane } = Tabs;
-
-interface LeaveBoardProps {
-  userId: string;
-  open: boolean;
-  onCancel: () => void;
-}
+// const { TabPane } = Tabs;
 
 function LeaveDatePickerOneDay({
   value,
@@ -68,26 +62,30 @@ function LeaveDatePickerOneDay({
   onCheckMorning: (checked: boolean) => void;
   onCheckAfternoon: (checked: boolean) => void;
 }) {
+  const [open, setOpen] = useState(false);
+
+  const handleChange = (newValue: Dayjs | null) => {
+    onChange(newValue);
+    setOpen(false); // tự động đóng sau khi chọn ngày
+  };
+
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <DatePicker
-        label="Chọn ngày nghỉ"
+        label="Ngày bắt đầu"
+        open={open}
+        onOpen={() => setOpen(true)}
+        onClose={() => setOpen(false)}
         value={value}
-        onChange={onChange}
+        onChange={handleChange}
         renderInput={(params) => <TextField {...params} />}
         disablePast
       />
       <Stack direction="row" spacing={2} mt={1}>
-        <Checkbox
-          checked={checkedMorning}
-          onChange={(e) => onCheckMorning(e.target.checked)}
-        />
-        <span>Sáng</span>
-        <Checkbox
-          checked={checkedAfternoon}
-          onChange={(e) => onCheckAfternoon(e.target.checked)}
-        />
-        <span>Chiều</span>
+        <Checkbox checked={checkedMorning} onChange={(e) => onCheckMorning(e.target.checked)} />
+        <span style={{marginTop: 10}}>Sáng</span>
+        <Checkbox checked={checkedAfternoon} onChange={(e) => onCheckAfternoon(e.target.checked)} />
+        <span style={{marginTop: 10}}>Chiều</span>
       </Stack>
     </LocalizationProvider>
   );
@@ -109,21 +107,39 @@ function LeaveDatePickerMultipleDays({
       ? endValue.startOf("day").diff(startValue.startOf("day"), "day") + 1
       : 0;
 
+  const [openStart, setOpenStart] = useState(false);
+  const [openEnd, setOpenEnd] = useState(false);
+
+  const handleStartChange = (newValue: Dayjs | null) => {
+    onStartChange(newValue);
+    setOpenStart(false); // đóng popup ngày bắt đầu
+  };
+
+  const handleEndChange = (newValue: Dayjs | null) => {
+    onEndChange(newValue);
+    setOpenEnd(false); // đóng popup ngày kết thúc
+  };
+
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
-      <Stack direction="row" spacing={2}>
+      <Stack direction="column" spacing={2}>
         <DatePicker
           label="Ngày bắt đầu"
+          open={openStart}
+          onOpen={() => setOpenStart(true)}
+          onClose={() => setOpenStart(false)}
           value={startValue}
-          onChange={onStartChange}
+          onChange={handleStartChange}
           renderInput={(params) => <TextField {...params} />}
           disablePast
-          maxDate={endValue ?? undefined}
         />
         <DatePicker
           label="Ngày kết thúc"
+          open={openEnd}
+          onOpen={() => setOpenEnd(true)}
+          onClose={() => setOpenEnd(false)}
           value={endValue}
-          onChange={onEndChange}
+          onChange={handleEndChange}
           renderInput={(params) => <TextField {...params} />}
           disablePast
           minDate={startValue ?? undefined}
@@ -136,6 +152,19 @@ function LeaveDatePickerMultipleDays({
   );
 }
 
+
+const postLeaveRequest = async (payload: Leave): Promise<any> => {
+  const res = await fetch(`${useApiHost()}/leave/`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) {
+    throw new Error('Failed to create leave request');
+  }
+  return res.json();
+};
+
 export const LeaveBoard = ({ userId, open, onCancel }: LeaveBoardProps) => {
   const [tab, setTab] = useState<"oneDay" | "multiDays">("oneDay");
 
@@ -143,43 +172,84 @@ export const LeaveBoard = ({ userId, open, onCancel }: LeaveBoardProps) => {
   const [oneDayDate, setOneDayDate] = useState<Dayjs | null>(null);
   const [morningChecked, setMorningChecked] = useState(true);
   const [afternoonChecked, setAfternoonChecked] = useState(true);
-
+  const [reason, setReason] = useState<string>('');
   // State ngày cho nghỉ nhiều ngày
   const [multiStartDate, setMultiStartDate] = useState<Dayjs | null>(null);
   const [multiEndDate, setMultiEndDate] = useState<Dayjs | null>(null);
 
-  const handleAddLeaveClick = () => {
-    if (tab === "oneDay") {
-      console.log("Xin nghỉ 1 ngày:", {
-        date: oneDayDate?.format("DD/MM/YYYY"),
-        morning: morningChecked,
-        afternoon: afternoonChecked,
-      });
-    } else {
-      const days =
-        multiStartDate && multiEndDate
-          ? multiEndDate.startOf("day").diff(multiStartDate.startOf("day"), "day") + 1
-          : 0;
-      console.log("Xin nghỉ nhiều ngày:", {
-        startDate: multiStartDate?.format("DD/MM/YYYY"),
-        endDate: multiEndDate?.format("DD/MM/YYYY"),
-        daysOff: days > 0 ? days : 0,
-      });
+  // const handleAddLeaveClick = () => {
+  //   if (tab === "oneDay") {
+  //     console.log("Xin nghỉ 1 ngày:", {
+  //       date: oneDayDate?.format("DD/MM/YYYY"),
+  //       morning: morningChecked,
+  //       afternoon: afternoonChecked,
+  //     });
+  //   } else {
+  //     const days =
+  //       multiStartDate && multiEndDate
+  //         ? multiEndDate.startOf("day").diff(multiStartDate.startOf("day"), "day") + 1
+  //         : 0;
+  //     console.log("Xin nghỉ nhiều ngày:", {
+  //       startDate: multiStartDate?.format("DD/MM/YYYY"),
+  //       endDate: multiEndDate?.format("DD/MM/YYYY"),
+  //       daysOff: days > 0 ? days : 0,
+  //     });
+  //   }
+  //   onCancel();
+  // };
+
+  const mutation = useMutation<any, Error, Leave>({
+    mutationFn: postLeaveRequest,
+    onSuccess: () => {
+      onCancel();
+    },
+    onError: (error: Error) => {
+      console.error('Lỗi khi tạo yêu cầu nghỉ phép:', error.message);
     }
-    onCancel();
+  });
+
+
+  const handleAddLeaveClick = () => {
+    if (!userId) return;
+
+    let start_time: string | null = null;
+    let end_time: string | null = null;
+    
+    if (tab === 'oneDay') {
+      if (!oneDayDate) return;
+      const isoDate = oneDayDate.toISOString();
+      start_time = isoDate;
+      end_time = isoDate;
+    } else {
+      if (!multiStartDate || !multiEndDate) return;
+      start_time = multiStartDate.toISOString();
+      end_time = multiEndDate.toISOString();
+    }
+
+    mutation.mutate({
+      user_id: userId,
+      start_time: start_time!,
+      end_time: end_time!,
+      morning: morningChecked,
+      noon: afternoonChecked,
+      reason,
+    });
   };
 
   return (
-    <Modal open={open} onClose={onCancel} style={{ padding: 20 }}>
-      <div style={{ width: 500, margin: "auto", backgroundColor: "#fff", padding: 24 }}>
+    <Modal open={open} onClose={onCancel} style={{ padding: 20 }}
+      okButtonProps={{ style: { display: 'none' } }}
+      cancelButtonProps={{ style: { display: 'none' } }}
+    >
+      <Stack>
         <Tabs
           value={tab}
           onChange={(e, val) => setTab(val)}
           aria-label="Chọn loại nghỉ phép"
           centered
         >
-          <Tab label="Xin nghỉ 1 ngày" value="oneDay" />
-          <Tab label="Xin nghỉ nhiều ngày" value="multiDays" />
+          <Tab label="1 ngày" value="oneDay" />
+          <Tab label="nhiều ngày" value="multiDays" />
         </Tabs>
 
         <div style={{ marginTop: 20 }}>
@@ -203,6 +273,18 @@ export const LeaveBoard = ({ userId, open, onCancel }: LeaveBoardProps) => {
           )}
         </div>
 
+        <TextField
+          label="Lý do xin nghỉ"
+          value={reason}
+          onChange={(e) => setReason(e.target.value)}
+          multiline
+          rows={3} // số dòng nhập liệu multiline
+          variant="outlined"
+          fullWidth
+          margin="normal"
+          placeholder="Nhập lý do xin nghỉ..."
+      />
+
         <Button
           fullWidth
           style={{ marginTop: 20, borderRadius: 10, backgroundColor: "#00B4B6", color: "#fff" }}
@@ -212,38 +294,12 @@ export const LeaveBoard = ({ userId, open, onCancel }: LeaveBoardProps) => {
             (tab === "multiDays" && (!multiStartDate || !multiEndDate))
           }
         >
-          Thêm ngày nghỉ phép
+          Tạo yêu cầu nghỉ phép
         </Button>
-      </div>
+      </Stack>
     </Modal>
   );
 };
 
 export default LeaveBoard;
 
-interface DatePickerProps {
-  timeValue?: Dayjs | null;
-  disabledDateFunc?: (date: Dayjs) => boolean;
-  onChange?: (date: Dayjs | null) => void;
-  title?: string;
-}
-
-function LeaveDatePicker({
-
-  title = "Chọn ngày phép",
-}: DatePickerProps) {
-  const [value, setValue] = React.useState(null);
-
-  return (
-    <LocalizationProvider dateAdapter={AdapterDayjs}>
-      <DatePicker
-        label="Chọn ngày"
-        value={value}
-        //@ts-ignore
-        onChange={(newValue) => setValue(newValue)}
-        //@ts-ignore
-        renderInput={(params) => <TextField {...params} />}
-      />
-    </LocalizationProvider>
-  );
-}

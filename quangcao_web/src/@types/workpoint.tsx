@@ -1,3 +1,5 @@
+import type { Leave } from "./leave.type";
+
 export interface Check {
   img: string;
   lat: string | null;
@@ -28,6 +30,14 @@ export interface Workpoint {
   username: string;
   version?: string | null;
   role: string;
+  status: string;
+
+
+  start_time: string; // ISO string
+  end_time: string;   // ISO string
+  reason: string;
+  morning: boolean;
+  noon: boolean;
 }
 
 

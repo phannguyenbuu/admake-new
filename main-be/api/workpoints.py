@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify, abort
-from models import db, app, Workpoint, Message,User, dateStr, generate_datetime_id
+from models import db, app, Workpoint, Message,User, dateStr, generate_datetime_id, Leave
 from api.chat import socketio
 from sqlalchemy import desc
 from datetime import datetime, time, date
@@ -57,7 +57,12 @@ def get_batch_workpoint_detail():
     # Tạo dict để lookup nhanh workpoint theo user_id
     workpoint_dict = {wp.user_id: wp for wp in workpoints}
 
+
+    leavepoints = Leave.query.filter(Leave.user_id.in_(user_id_list)).all()
+    leavepoint_dict = {lp.user_id: lp for lp in leavepoints}
+
     result = []
+    leave_result = []
 
     for user in users:
         user_id = user["id"]
@@ -85,7 +90,31 @@ def get_batch_workpoint_detail():
                 "userrole": user_role,
                 "version": None
             }
+
         result.append(wp_data)
+
+        if user_id in leavepoint_dict:
+            wp = leavepoint_dict[user_id]
+            
+            # Chuyển đổi wp thành dict JSON serializable (giả sử đã có to_dict hoặc tương tự)
+            wp_data = wp.to_dict()  # bạn cần implement to_dict trong model Workpoint
+            wp_data["username"] = username 
+            wp_data["userrole"] = user_role 
+        else:
+            wp_data = {
+                "createdAt": None,
+                "deletedAt": None,
+                "updatedAt": None,
+                "id": "",
+                "note": "",
+                "user_id": user_id,
+                "start_time": username,
+                "end_time": user_role,
+                "noon": True,
+                "morning": True,
+                "version": None
+            }
+        leave_result.append(wp_data)
 
     grouped_result = {}
 
@@ -105,8 +134,27 @@ def get_batch_workpoint_detail():
         # Thêm wp_data vào danh sách items của user
         grouped_result[user_id]["items"].append(wp_data)
 
+    leave_grouped_result = {}
+
+    for wp_data in leave_result:
+        user_id = wp_data.get("user_id")
+        # username = wp_data.get("username")
+        # userrole = wp_data.get("userrole")
+
+        if user_id not in leave_grouped_result:
+            # Tạo nhóm mới với 'user_id', 'username' và danh sách chứa wp_data
+            leave_grouped_result[user_id] = {
+                "user_id": user_id,
+                # "username": username,
+                # "userrole": userrole,
+                "items": []
+            }
+        # Thêm wp_data vào danh sách items của user
+        leave_grouped_result[user_id]["items"].append(wp_data)
+
     return jsonify({
         "data": list(grouped_result.values()),
+        "leave": list(leave_grouped_result.values()),
         "total": pagination.total,
         "pagination": {
             "total": pagination.total,

@@ -645,31 +645,18 @@ class Workpoint(BaseModel):
             else:
                 raise  # lỗi khác thì raise tiếp
 
-class UsingHistoryData(db.Model):
-    __tablename__ = 'using'
+class Leave(BaseModel):
+    __tablename__ = 'leave'
     id = db.Column(db.Integer, primary_key=True)
-    lead_id = db.Column(db.Integer, db.ForeignKey('lead.id'), nullable=False)
-    start_time = db.Column(db.Date)
+    reason = db.Column(db.String(255), nullable=False)
     end_time = db.Column(db.Date)
-    balance_amount = db.Column(db.Float)
-
-class LeadPayload(BaseModel):
-    __tablename__ = 'lead'
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(120), nullable=False)
-    company = db.Column(db.String(120), nullable=False)
-    email = db.Column(db.String(120), nullable=False)
-    phone = db.Column(db.String(50), nullable=False)
-    nhuCau = db.Column(db.Text)
-    industry = db.Column(db.String(100), nullable=False)
-    companySize = db.Column(db.String(50), nullable=False)
-    balance_amount = db.Column(db.Float)
-
-    # Quan hệ 1-n: một Lead có nhiều historyUsing
-    history_using = db.relationship('UsingHistoryData', backref='lead', cascade='all, delete-orphan')
+    start_time = db.Column(db.Date)
+    morning = db.Column(db.Boolean, default = False)
+    noon = db.Column(db.Boolean, default = False)
+    user_id = db.Column(db.String(50))
 
     def __repr__(self):
-        return f'<Lead {self.name}>'
+        return f'<Leave {self.reason}>'
     
     def to_dict(self):
         result = {}
@@ -683,10 +670,11 @@ class LeadPayload(BaseModel):
 
     @staticmethod
     def create_item(params):
-        item = LeadPayload(**params)
+        item = Leave(**params)
         db.session.add(item)
         db.session.commit()
         return item
+    
 
 class Location(db.Model):
     __tablename__ = 'locations'
