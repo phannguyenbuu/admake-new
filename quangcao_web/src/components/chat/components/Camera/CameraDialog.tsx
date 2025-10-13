@@ -20,7 +20,7 @@ import type { Workpoint } from "../../../../@types/workpoint";
 import WorkpointGrid from "./WorkpointTable";
 import { CurrentDateTime } from "./WorkpointTable";
 import TaskBoard from "./TaskBoard";
-import HolidayBoard from "./HolidayBoard";
+import HolidayBoard from "./LeaveBoard";
 
 interface CameraDialogProps {
   userEl: User | null;
@@ -74,7 +74,7 @@ const CameraDialog: React.FC<CameraDialogProps> = ({userEl}) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [openWork, setOpenWork] = useState(false);
-  const [openHoliday, setOpenHoliday] = useState(false);
+  const [openHoliday, setOpenHoliday] = useState(true);
   const [hasCamera, setHasCamera] = useState(false);
 
   useEffect(() => {
