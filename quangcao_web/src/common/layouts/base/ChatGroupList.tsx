@@ -17,6 +17,7 @@ const ChatGroupList: React.FC = ({}) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedId, setSelectedId] = useState<GroupProps | null>(null);
   const API_HOST = useApiHost();
+  //@ts-ignore
   const {userId, userRoleId} = useUser();
 
 

@@ -20,6 +20,7 @@ import type { Workpoint } from "../../../../@types/workpoint";
 import WorkpointGrid from "./WorkpointTable";
 import { CurrentDateTime } from "./WorkpointTable";
 import TaskBoard from "./TaskBoard";
+import HolidayBoard from "./HolidayBoard";
 
 interface CameraDialogProps {
   userEl: User | null;
@@ -72,7 +73,8 @@ const CameraDialog: React.FC<CameraDialogProps> = ({userEl}) => {
   const [workpoint, setWorkpoint] = useState<Workpoint | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [openWork, setOpenWork] = useState(true);
+  const [openWork, setOpenWork] = useState(false);
+  const [openHoliday, setOpenHoliday] = useState(false);
   const [hasCamera, setHasCamera] = useState(false);
 
   useEffect(() => {
@@ -340,7 +342,8 @@ async function postWorkpointCheck(imgUrl: string, lat:string, long:string) {
 
       setSendSuccessMsg(`Đã gửi thành công!`);
       setTimeout(() => {
-        setStep(3);
+        setStep(1);
+        setOpenWork(true);
       }, 1000);
     })
     .catch((err) => {
@@ -351,7 +354,21 @@ async function postWorkpointCheck(imgUrl: string, lat:string, long:string) {
   }
 
   const handleWorkBoardCancel = () => {
+    setOpenWork(false);
     setStep(1);
+  }
+
+  const handleHolidayBoardCancel = () => {
+    setOpenHoliday(false);
+    setStep(1);
+  }
+
+  const handleTaskClick = () => {
+    setOpenWork(true);
+  }
+
+  const handleHolidayClick = () => {
+    setOpenHoliday(true);
   }
 
   return (
@@ -379,13 +396,13 @@ async function postWorkpointCheck(imgUrl: string, lat:string, long:string) {
           <Button variant="contained"  
               sx={{
                 backgroundColor:"#00B4B6",
-                  mt: 1, height: 50,maxWidth:300, mb:1 }} onClick={capturePhoto}>
+                  mt: 1, height: 50,maxWidth:300, mb:1 }} onClick={handleTaskClick}>
             Nhiệm vụ
           </Button>
           <Button variant="contained"  
               sx={{
                 backgroundColor:"#00B4B6",
-                  mt: 1, height: 50,maxWidth:300, mb:1 }} onClick={capturePhoto}>
+                  mt: 1, height: 50,maxWidth:300, mb:1 }} onClick={handleHolidayClick}>
             Nghỉ phép
           </Button>
           
@@ -451,7 +468,8 @@ async function postWorkpointCheck(imgUrl: string, lat:string, long:string) {
         )}
       
       
-      <TaskBoard open={step === 3} userId={userEl?.id} onCancel={handleWorkBoardCancel}/>
+      <TaskBoard open={openWork} userId={userEl?.id} onCancel={handleWorkBoardCancel}/>
+      <HolidayBoard open={openHoliday} userId={userEl?.id} onCancel={handleHolidayBoardCancel}/>
       
     </Stack>
   );

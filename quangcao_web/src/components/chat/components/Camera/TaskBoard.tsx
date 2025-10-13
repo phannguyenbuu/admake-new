@@ -74,28 +74,3 @@ const TaskBoard = ({ userId, open, onCancel }: TaskBoardProps) => {
 }
 
 export default TaskBoard;
-
-const CheckboxComponent = ({text}:{text : string}) => {
-  const [checked, setChecked] = useState(false);
-
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setChecked(event.target.checked);
-  };
-
-  return (
-    <FormControlLabel
-      control={
-        <Checkbox className="bg-cyan-600"
-          checked={checked}
-          onChange={handleChange}
-          style={{color:"#0092b8"}}
-        />
-      }
-      label={
-        <Typography sx={{ fontSize: 15, color: "#0092b8" }}>
-        {text}
-        </Typography>
-    }
-    />
-  );
-};

@@ -195,7 +195,7 @@ const JobTimeAndProcess: React.FC<JobTimeAndProcessProps> = ({taskDetail, form})
 
 export default JobTimeAndProcess;
 
-function DateFormPicker({
+export function DateFormPicker({
   taskDetail,
   mode,
   title,
