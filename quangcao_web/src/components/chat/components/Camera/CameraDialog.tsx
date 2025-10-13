@@ -19,6 +19,7 @@ import { LogoAdmake } from "../Conversation/Header";
 import type { Workpoint } from "../../../../@types/workpoint";
 import WorkpointGrid from "./WorkpointTable";
 import { CurrentDateTime } from "./WorkpointTable";
+import TaskBoard from "./TaskBoard";
 
 interface CameraDialogProps {
   userEl: User | null;
@@ -55,8 +56,7 @@ function drawTextOnCanvas(
 const CameraDialog: React.FC<CameraDialogProps> = ({userEl}) => {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  
-  
+    
   const [position, setPosition] = useState<{ latitude: number | null; longitude: number | null }>({
     latitude: null,
     longitude: null,
@@ -72,14 +72,21 @@ const CameraDialog: React.FC<CameraDialogProps> = ({userEl}) => {
   const [workpoint, setWorkpoint] = useState<Workpoint | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [openWork, setOpenWork] = useState(true);
+  const [hasCamera, setHasCamera] = useState(false);
 
   useEffect(() => {
+    navigator.mediaDevices.enumerateDevices()
+      .then(devices => {
+        const videoInputDevices = devices.filter(device => device.kind === 'videoinput');
+        setHasCamera(videoInputDevices.length > 0);
+      })
+      .catch(() => setHasCamera(false));
+  
     const user = JSON.parse(localStorage.getItem('Admake-User-Access') || '{}');
     console.log(user.user_id, user.username);
-  },[]);
+  
 
-
-  useEffect(() => {
     fetch(`${useApiHost()}/workpoint/today/${userEl?.id}`)
     .then(response => {
       if (!response.ok) {
@@ -168,27 +175,36 @@ const CameraDialog: React.FC<CameraDialogProps> = ({userEl}) => {
 
 
   const capturePhoto = () => {
-    if (!videoRef.current || !canvasRef.current) {
-      console.log("Khi không có camera, tạo canvas đen với kích thước cố định hoặc mặc định");
+    // Nếu có camera, chụp ảnh từ video
+    console.log("Có camera, chụp ảnh từ video");
+    const video = videoRef.current;
+    const canvas = canvasRef.current;
+      
+    if (!hasCamera || !canvas || !video) {
+      console.log("Không có camera, tạo canvas đen 480x640");
 
       const canvas = canvasRef.current!;
-      const width = 1080;
-      const height = 1920;
+      const width = 480;
+      const height = 640;
       canvas.width = width;
       canvas.height = height;
 
       const ctx = canvas.getContext("2d");
       if (!ctx) return;
 
+      // Vẽ nền đen
       ctx.fillStyle = "black";
       ctx.fillRect(0, 0, width, height);
 
+      // Vẽ chữ hoặc nội dung nếu có
       drawTextOnCanvas(canvas, textLines());
 
+      // Tạo blob ảnh JPEG độ nén 95%
       canvas.toBlob(
         (blob) => {
           setImageData(blob);
           if (blob) {
+            console.log("Tạo url từ blob để hiển thị hoặc gửi đi!");
             setImageURL(URL.createObjectURL(blob));
           }
         },
@@ -202,9 +218,10 @@ const CameraDialog: React.FC<CameraDialogProps> = ({userEl}) => {
       return;
     }
 
-    console.log("Nếu có camera, chụp ảnh từ video");
-    const video = videoRef.current;
-    const canvas = canvasRef.current;
+    
+
+    if (!canvas) return;
+
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
     const ctx = canvas.getContext("2d");
@@ -222,10 +239,12 @@ const CameraDialog: React.FC<CameraDialogProps> = ({userEl}) => {
       "image/jpeg",
       0.95
     );
+
     setCaptured(true);
     getLocation();
     setStep(2);
   };
+
 
 
 async function postWorkpointCheck(imgUrl: string, lat:string, long:string) {
@@ -270,7 +289,7 @@ async function postWorkpointCheck(imgUrl: string, lat:string, long:string) {
   };
 
   const handleSend = async () => {
-    console.log('handleSend',imageData);
+    console.log('handleSend', imageData);
     
     if(!imageData) return;
 
@@ -321,7 +340,7 @@ async function postWorkpointCheck(imgUrl: string, lat:string, long:string) {
 
       setSendSuccessMsg(`Đã gửi thành công!`);
       setTimeout(() => {
-        window.location.reload();
+        setStep(3);
       }, 1000);
     })
     .catch((err) => {
@@ -329,84 +348,115 @@ async function postWorkpointCheck(imgUrl: string, lat:string, long:string) {
     });
 
     setImageData(null);
-    
+  }
+
+  const handleWorkBoardCancel = () => {
+    setStep(1);
   }
 
   return (
     <Stack p={1} height='100vh' spacing={1}>
-      <LogoAdmake/>
-      <CenterBox sx={{border:'1px solid #ccc', borderRadius: 8}}>
-        {userEl?.fullName}
-      </CenterBox>
-        {step === 1 && (
-          <>
-          <CenterBox>
-            <CurrentDateTime />
-            <WorkpointGrid workpoint={workpoint}/>
-            <Button variant="contained" fullWidth sx={{ mt: 2, height: 50,maxWidth:300, mb:1 }} onClick={capturePhoto}>
-              Chụp hình kèm GPS
-            </Button>
-            
-            <video
-              ref={videoRef}
-              width="100%"
-              height="auto"
-              autoPlay
-              playsInline
-              style={{ borderRadius: 8, backgroundColor: "#000", width:'100%', maxWidth:400 }}
-            />
-            </CenterBox>
-          </>
-        )}
+      <Stack direction="row" spacing={0} style={{width:'90vw', marginLeft:10}}>
+        <LogoAdmake/>
+        <Box style={{width:'50vw', marginTop: 20, marginLeft: -140}}>
+          {userEl?.fullName}
+        </Box>
+      </Stack>
+      
+      {step === 1 && (
+        <>
+        <CenterBox>
+          <CurrentDateTime />
+          <WorkpointGrid workpoint={workpoint}/>
 
-        {step === 2 && (
-          <CenterBox>
-            <Box sx={{ textAlign: "center", mt: 2 }}>
-              {imageURL && (
-                <img
-                  src={imageURL}
-                  alt="Ảnh đã chụp"
-                  style={{ maxWidth: "100%", borderRadius: 8 }}
-                />
-              )}
-              {position.latitude && position.longitude && (
-                <Typography sx={{ mt: 1 }}>
-                  {statusMsg}
-                </Typography>
-              )}
-            </Box>
-            {error && (
-              <Typography color="error" sx={{ mt: 1 }}>
-                {error}
+          <Stack direction="row" spacing={1} p={1}>
+          <Button variant="contained"  
+              sx={{
+                backgroundColor:"#00B4B6",
+                  mt: 1, height: 50,maxWidth:300, mb:1 }} onClick={capturePhoto}>
+            Điểm danh
+          </Button>
+          <Button variant="contained"  
+              sx={{
+                backgroundColor:"#00B4B6",
+                  mt: 1, height: 50,maxWidth:300, mb:1 }} onClick={capturePhoto}>
+            Nhiệm vụ
+          </Button>
+          <Button variant="contained"  
+              sx={{
+                backgroundColor:"#00B4B6",
+                  mt: 1, height: 50,maxWidth:300, mb:1 }} onClick={capturePhoto}>
+            Nghỉ phép
+          </Button>
+          
+          </Stack>
+          
+          <video
+            ref={videoRef}
+            width="100%"
+            height="auto"
+            autoPlay
+            playsInline
+            style={{ borderRadius: 8, backgroundColor: "#000", width:'100%', maxWidth:400 }}
+          />
+          </CenterBox>
+        </>
+      )}
+
+      {step === 2 && (
+        <CenterBox>
+          <Box sx={{ textAlign: "center", mt: 1 }}>
+            {imageURL && (
+              <img
+                src={imageURL}
+                alt="Ảnh đã chụp"
+                style={{ maxWidth: "100%", borderRadius: 8, height:'60vh' }}
+              />
+            )}
+            {position.latitude && position.longitude && (
+              <Typography sx={{ mt: 1 }}>
+                {statusMsg}
               </Typography>
             )}
-          </CenterBox>
-        )}
+          </Box>
+          {error && (
+            <Typography color="error" sx={{ mt: 1 }}>
+              {error}
+            </Typography>
+          )}
+        </CenterBox>
+      )}
 
       {/* <CameraSelector /> */}
       
-
-      <Stack sx={{position:'fixed', top:'80vh', left: '50%',
+      {step === 2 && 
+      <Stack spacing={2} direction="row" sx={{position:'fixed', bottom:50, left: '50%',
         transform: 'translateX(-50%)',}}>
-        {step === 2 && <Button onClick={handleBack}>Chụp lại</Button>}
-        {step === 2 && (
-          <Button onClick={handleSend} variant="contained" sx={{ bottom: 100 }}>
+          <Button onClick={handleSend} variant="contained" 
+            sx={{ backgroundColor:"#00B4B6" }}>
             Gửi
           </Button>
-        )}
-      </Stack>
+
+          <Button onClick={handleBack}>Chụp lại</Button>
+      </Stack>}
 
       <canvas ref={canvasRef} style={{ display: "none" }} />
 
-      {sendSuccessMsg && (
-        <Typography
-          sx={{ position:'fixed',mt: 2, mx: 2, top: 80, fontSize: 10, color: "green", wordBreak: "break-word" }}
-        >
-          {sendSuccessMsg}
-        </Typography>
-      )}
+        {sendSuccessMsg && (
+          <Typography
+            sx={{ position:'fixed',mt: 2, mx: 2, top: 80, fontSize: 10, color: "green", wordBreak: "break-word" }}
+          >
+            {sendSuccessMsg}
+          </Typography>
+        )}
+      
+      
+      <TaskBoard open={step === 3} userId={userEl?.id} onCancel={handleWorkBoardCancel}/>
+      
     </Stack>
   );
 };
 
 export default CameraDialog;
+
+

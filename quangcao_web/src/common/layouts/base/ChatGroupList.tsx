@@ -1,5 +1,5 @@
 import React,  { useEffect, useState, useRef } from "react";
-import { Dropdown, Avatar, Modal } from "antd";
+import { Dropdown, Avatar, Modal, notification } from "antd";
 import { UserOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import { useApiHost } from "../../hooks/useApiHost";
@@ -66,7 +66,7 @@ const ChatGroupList: React.FC = ({}) => {
 
   const [isHover, setIsHover] = useState(false);
 
-  const spanStyle = {
+  const spanStyle: React.CSSProperties = {
     cursor: "pointer",
     position: "relative",
     top:-20,
@@ -148,7 +148,9 @@ const AddGroupModal: React.FC<AddGroupModalProps> = ({ visible, onOk, onCancel }
       })
       .then((response) => response.json())
       .then((data) => {
-        alert("Tạo nhóm chat mới thành công");
+        notification.success({message: "Tạo nhóm chat mới thành công",
+          description: `Bắt đầu thảo luận công việc và hợp đồng`,
+        });
 
         setTimeout(()=>{
           window.location.reload();

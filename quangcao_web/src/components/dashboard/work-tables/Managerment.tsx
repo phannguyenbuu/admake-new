@@ -35,14 +35,21 @@ export interface DeleteConfirmProps {
     taskTitle: string;
 }
 
-export default function ManagermentBoard({workspaceId,}: ManagermentBoardProps) {
-  const adminMode = useCheckPermission();
-  const fixedColumns = [
+export const fixedColumns = [
     { id: "col-0", title: "Phân việc", type: "OPEN" },
     { id: "col-1", title: "Sản xuất", type: "IN_PROGRESS" },
     { id: "col-2", title: "Hoàn thiện", type: "DONE" },
     { id: "col-3", title: "Khoán thưởng", type: "REWARD" },
   ];
+
+export function getTitleByStatus(type: string): string | undefined {
+    const col = fixedColumns.find(col => col.type === type);
+    return col ? col.title : undefined;
+}
+
+export default function ManagermentBoard({workspaceId,}: ManagermentBoardProps) {
+  const adminMode = useCheckPermission();
+
 
   // API hooks
   const { data: workspaceData } = useWorkSpaceQueryById(workspaceId);

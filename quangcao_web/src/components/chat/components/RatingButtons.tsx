@@ -4,6 +4,7 @@ import type { GroupProps } from '../../../@types/chat.type';
 import { useApiHost } from '../../../common/hooks/useApiHost';
 import { ToggleButton, ToggleButtonGroup } from '@mui/material';
 import LockIcon from '@mui/icons-material/Lock';
+import { notification } from 'antd';
 
 interface RatingButtonsProps {
   groupEl: GroupProps | null;
@@ -74,7 +75,8 @@ const RatingButtons: React.FC<RatingButtonsProps> = ({setShowFooter, groupEl }) 
           if (!response.ok) {
             if (response.status === 400) {
               return response.json().then(err => {
-                alert('Dự án đã tồn tại !');
+                
+                notification.error({message: 'Dự án đã tồn tại !'})
 
                 // notification.error({
                 //   message: "Trùng tên dự án - không thể thêm dự án!",
@@ -88,7 +90,9 @@ const RatingButtons: React.FC<RatingButtonsProps> = ({setShowFooter, groupEl }) 
           return response.json();
         })
         .then(json => {
-          alert("Đã tạo thành công dự án");
+          notification.success({message:"Đã tạo thành công dự án",
+            description:"Bắt đầu tạo công việc",
+          });
           // notification.success({
           //   message: "Đã tạo thành công dự án",
           //   description: `Xem trong bảng công việc: ${json.name}, trang sẽ reload để cập nhật`,

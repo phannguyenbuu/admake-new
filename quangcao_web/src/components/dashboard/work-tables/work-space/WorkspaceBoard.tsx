@@ -86,6 +86,7 @@ const WorkspaceBoard: React.FC<WorkspaceBoardProps> =
                                 minHeight: "120px",
                                 border: "none",
                                 },
+                                // @ts-ignore
                                 Board: {
                                     background: `linear-gradient(135deg, ${theme.color} 0%, ${theme.color}dd 100%)`,
                                     borderRadius: "20px 20px 0 0",
@@ -110,9 +111,13 @@ const WorkspaceBoard: React.FC<WorkspaceBoardProps> =
                                                     col = {col}
                                                     idx = {idx}
                                                     theme = {theme}
+                                                    // @ts-ignore
                                                     isDragging = {isDragging}
+                                                    // @ts-ignore
                                                     setSelectedTask= {setSelectedTask}
+                                                    // @ts-ignore
                                                     setEditingTaskId={setEditingTaskId}
+                                                    // @ts-ignore
                                                     setShowFormTask={setShowFormTask}
                                 />
                                 )}

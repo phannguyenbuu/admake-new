@@ -6,16 +6,12 @@ export const Component = () => {
   const navigate = useNavigate();
   
   const accessToken = sessionStorage.getItem("accessToken");
-  // console.log(accessToken);
-  // alert('T1');
   if (accessToken) {
     // Nếu token tồn tại trong sessionStorage thì redirect dashboard tránh nhấp nháy
     navigate("/dashboard", { replace: true });
-    // alert('ToDashboard');
   } else {
     sessionStorage.removeItem("accessToken"); // xóa nếu không thì có thể còn sót
   }
-
 
   return (
     <div className="flex items-center justify-center min-h-screen">
@@ -38,7 +34,6 @@ export const Component = () => {
 // Loader vẫn có thể dùng để redirect nếu cần
 export const loader = async () => {
   if (sessionStorage.getItem("accessToken")) {
-    // alert('Loader....2');
     return redirect("/dashboard");
   }
   return null;

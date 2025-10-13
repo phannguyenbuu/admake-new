@@ -14,6 +14,7 @@ import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
 import LinkIcon from '@mui/icons-material/Link';
 import SentimentSatisfiedIcon from '@mui/icons-material/SentimentSatisfied';
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
+import { notification } from 'antd';
 
 const StyledInput = styled(TextField)(({ theme }) => ({
   "& .MuiInputBase-input": {
@@ -122,10 +123,11 @@ const ChatInput = forwardRef<HTMLDivElement, ChatInputProps>(
   } catch (error: unknown) {
     if (error instanceof Error) {
       console.error(error.message);
-      alert("Upload document failed: " + error.message);
+      notification.error({message: "Upload document failed",
+        description:error.message});
     } else {
       console.error("Unknown error", error);
-      alert("Upload document failed");
+      notification.error({message: "Upload document failed"});
     }
   }
 };
@@ -249,6 +251,7 @@ const Footer = forwardRef<HTMLDivElement, FooterProps>(
         file_url,
         link: '',
         message_id: `temp-${timestamp}`,
+        is_favourite: false,
         createdAt: new Date(timestamp),
         updatedAt: new Date(timestamp),
         deletedAt: null,
@@ -287,6 +290,7 @@ const Footer = forwardRef<HTMLDivElement, FooterProps>(
         file_url: '',
         link: '',
         message_id: `temp-${timestamp}`,
+        is_favourite: false,
         createdAt: new Date(timestamp),
         updatedAt: new Date(timestamp),
         deletedAt: null,

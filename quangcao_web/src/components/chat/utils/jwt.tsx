@@ -3,6 +3,7 @@ import jwtDecode from 'jwt-decode';
 import { PATH_AUTH } from '../routes/paths';
 //
 import axios from './axios';
+import { notification } from 'antd';
 
 // ----------------------------------------------------------------------
 
@@ -30,7 +31,7 @@ const handleTokenExpired = (exp) => {
 
   expiredTimer = setTimeout(() => {
     // eslint-disable-next-line no-alert
-    alert('Token expired');
+    notification.error({message:'Token expired'});
 
     localStorage.removeItem('accessToken');
 

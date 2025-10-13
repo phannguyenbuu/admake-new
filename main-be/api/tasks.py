@@ -78,6 +78,18 @@ def update_task(id):
     print('F', task.to_dict())
     return jsonify(task.to_dict())
 
+@task_bp.route("/by_user/<string:user_id>", methods=["GET"])
+def get_task_by_user_id(user_id):
+    from sqlalchemy import cast, Text
+
+    tasks = Task.query.filter(
+        cast(Task.assign_ids, Text).like(f'%"{user_id}"%')
+    ).order_by(Task.start_time).all()
+
+    if not tasks:
+        abort(404, description="Task not found")
+    return jsonify([task.to_dict() for task in tasks])
+
 @task_bp.route("/<string:id>/status", methods=["PUT"])
 def update_task_status(id):
     task = Task.query.get(id)
@@ -88,11 +100,9 @@ def update_task_status(id):
 
     # Cập nhật các trường trong Task từ dữ liệu gửi lên
     task.status = data.get("status", task.status)
-    
     db.session.commit()
 
     return jsonify(task.to_dict())
-
 
 @task_bp.route("/", methods=["POST"])
 def create_task():

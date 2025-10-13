@@ -13,6 +13,8 @@ import {
   InputAdornment,
 } from '@mui/material';
 
+import { notification } from 'antd';
+
 function RegisterForm() {
   const [formData, setFormData] = useState({
     username: '',
@@ -33,7 +35,7 @@ function RegisterForm() {
     bankTransferNote: '',
   });
 
-  const handleChange = (e) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
     setFormData((prev) => ({
       ...prev,
@@ -41,10 +43,10 @@ function RegisterForm() {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (formData.password !== formData.rewritePassword) {
-      alert("Passwords do not match!");
+      notification.error({message:"Passwords do not match!"});
       return;
     }
     console.log('Registration Form:', formData);

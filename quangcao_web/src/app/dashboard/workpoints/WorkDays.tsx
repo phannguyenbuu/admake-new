@@ -1,4 +1,4 @@
-import { Tag, Modal } from "antd";
+import { Tag, Modal, notification } from "antd";
 import type { User } from "../../../@types/user.type";
 import React, { useState, useEffect } from 'react';
 import { useApiHost, useApiStatic } from "../../../common/hooks/useApiHost";
@@ -260,7 +260,7 @@ return (
                     const url = `https://www.google.com/maps?q=${modalImg?.in?.lat},${modalImg?.in?.long}`;
                     window.open(url, '_blank');
                   } else {
-                    alert('Không có tọa độ để mở bản đồ');
+                    notification.error({ message:'Không có tọa độ để mở bản đồ'});
                   }
                 }}
               />
@@ -281,7 +281,7 @@ return (
                     const url = `https://www.google.com/maps?q=${modalImg?.out?.lat},${modalImg?.out?.long}`;
                     window.open(url, '_blank');
                   } else {
-                    alert('Không có tọa độ để mở bản đồ');
+                    notification.error({message: 'Không có tọa độ để mở bản đồ'});
                   }
                 }}
               />

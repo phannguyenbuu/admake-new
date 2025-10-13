@@ -16,6 +16,7 @@ import { useUser } from '../../../../common/hooks/useUser';
 import SearchIcon from "@mui/icons-material/Search";
 
 import { useApiHost, useApiSocket } from '../../../../common/hooks/useApiHost';
+import { notification } from 'antd';
 interface GroupComponentProps {
   selected: GroupProps | null;
   setSelected: React.Dispatch<React.SetStateAction<GroupProps | null>> | null;
@@ -150,7 +151,7 @@ const [groupList, setGroupList] = useState<GroupProps[]>([]);
       return response.json();
     })
     .then(() => {
-      alert("Xóa nhóm chat thành công");
+      notification.success({message:"Xóa nhóm chat thành công"});
 
       // Cập nhật lại groupList loại bỏ nhóm đã xóa
       setGroupList((prevGroupList) =>
@@ -161,7 +162,7 @@ const [groupList, setGroupList] = useState<GroupProps[]>([]);
     })
     .catch((err) => {
       console.error(err);
-      alert("Lỗi khi xóa nhóm chat");
+      notification.error({message:"Lỗi khi xóa nhóm chat"});
     });
 };
 

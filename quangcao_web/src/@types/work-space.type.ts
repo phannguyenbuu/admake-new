@@ -63,7 +63,8 @@ export interface Task extends BaseEntity {
   amount: number;
   type: "MONTHLY" | "REWARD" | string;
   assign_ids: string[]; // id của user
-  workspaceId: string; // id của workspace
+  workspace_id: string; // id của workspace
+  workspace: string;
   customer_id: string; // id của customer
   materials: MaterialTask[]; // danh sách vật tư
   start_time?: Dayjs | null; // Thời gian bắt đầu

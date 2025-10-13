@@ -33,7 +33,7 @@ const JobTimeAndProcess: React.FC<JobTimeAndProcessProps> = ({taskDetail, form})
       value: dayjs.Dayjs | null;
     }>({ type: "start_time", value: null });
   const [showDatePickerModal, setShowDatePickerModal] = useState(false);
-  const selectedType = Form.useWatch("type", form); // Lấy giá trị current của field "type"
+  const selectedType = form ? Form.useWatch("type", form) : null; // Lấy giá trị current của field "type"
 
   useEffect(() => {
     if (taskDetail?.start_time && taskDetail?.end_time) {
@@ -53,6 +53,8 @@ const JobTimeAndProcess: React.FC<JobTimeAndProcessProps> = ({taskDetail, form})
   }, [taskDetail?.start_time, taskDetail?.end_time]);
 
   useEffect(() => {
+    if (!form) return;
+
     if (taskDetail) {
       form.setFieldsValue({
         type: taskDetail.type,
@@ -69,15 +71,20 @@ const JobTimeAndProcess: React.FC<JobTimeAndProcessProps> = ({taskDetail, form})
 
   return (
     <Stack spacing={0.2} sx={{maxWidth:400, overflowX:'hidden'}}>
-      <div className="flex items-center gap-2 mb-2 sm:mb-3">
-        <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-md bg-gradient-to-r from-orange-100 to-orange-200 flex items-center justify-center">
-          <CalendarOutlined className="!text-orange-600 !text-xs sm:!text-sm" />
-        </div>
-        <Text strong className="!text-gray-800 !text-sm sm:!text-base">
-          Thời gian & quy trình
-        </Text>
-      </div>
       
+      
+      
+        <div className="flex items-center gap-2 mb-2 sm:mb-3">
+          <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-md bg-gradient-to-r from-orange-100 to-orange-200 flex items-center justify-center">
+            <CalendarOutlined className="!text-orange-600 !text-xs sm:!text-sm" />
+          </div>
+          <Text strong className="!text-gray-800 !text-sm sm:!text-base">
+            { form ? "Thời gian & quy trình": taskDetail?.title ?? '' }
+          </Text>
+        </div>
+
+      {form ?
+      <>
         <DateFormPicker form={form} mode="start_time" title="Bắt đầu"
           taskDetail={taskDetail}
           timeValue={taskDetail?.start_time ? dayjs(taskDetail?.start_time) : null}
@@ -88,6 +95,13 @@ const JobTimeAndProcess: React.FC<JobTimeAndProcessProps> = ({taskDetail, form})
           timeValue={taskDetail?.end_time ? dayjs(taskDetail?.end_time) : null}
           disabledDateFunc={(current: Dayjs) =>
             (current && current < dayjs(taskDetail?.start_time).startOf('day'))}/>
+      </>
+      :
+      <>
+        {/* @ts-ignore */}
+        <Typography>Từ ngày <span style={{color:"#0092b8"}}>{taskDetail?.start_time ?? ''}</span> đến <span style={{color:"#0092b8"}}>{taskDetail?.end_time ?? ''}</span></Typography>
+      </>
+    }
 
         <Stack direction="row" spacing={2}>
         
@@ -109,6 +123,8 @@ const JobTimeAndProcess: React.FC<JobTimeAndProcessProps> = ({taskDetail, form})
 
           </Stack>
         
+        {form ? 
+        <>
           <Form.Item
             name="type"
             label={
@@ -166,6 +182,12 @@ const JobTimeAndProcess: React.FC<JobTimeAndProcessProps> = ({taskDetail, form})
               }}
             />
           </Form.Item>
+          </>
+          : <>
+            <Typography style={{fontWeight:700, color:'#0092b8'}}>
+              Tiền công: {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND', maximumFractionDigits: 0 }).format(taskDetail?.reward || 0)} ({taskDetail?.type === 'MONTHLY' ?'Lương tháng':'Công khoán' })
+            </Typography>
+          </>}
         
       </Stack>
   );
@@ -189,6 +211,8 @@ function DateFormPicker({
   form: any; // Tốt hơn là bạn định nghĩa đúng type của form tùy lib bạn dùng
 }) {
   useEffect(() => {
+    if(!form) return;
+
     form.setFieldsValue({ [mode]: timeValue });
   }, [timeValue]);
 
@@ -196,7 +220,9 @@ function DateFormPicker({
     if (date) {
       // Đặt giờ = 0, phút = 0, giây = 0, mili giây = 0 để chỉ lấy ngày
       const dateOnly = date.hour(0).minute(0).second(0).millisecond(0);
-      form.setFieldsValue({ [mode]: dateOnly });
+
+      if(form)
+        form.setFieldsValue({ [mode]: dateOnly });
 
       if (taskDetail) {
         if (mode === "end_time") {
@@ -206,7 +232,9 @@ function DateFormPicker({
         }
       }
     } else {
-      form.setFieldsValue({ [mode]: null });
+      if(form)
+        form.setFieldsValue({ [mode]: null });
+
       if (taskDetail) {
         if (mode === "end_time") {
           taskDetail.end_time = null;
@@ -218,7 +246,7 @@ function DateFormPicker({
   };
 
 
-  const value = form.getFieldValue(mode);
+  const value = form ? form.getFieldValue(mode) : null;
 
   return (
     <Form.Item

@@ -6,7 +6,7 @@ import { Dropdown, Avatar, Modal } from "antd";
 import { ToggleButton, ToggleButtonGroup, Stack } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import DownloadIcon from '@mui/icons-material/Download';
-import { Flex } from 'antd';
+import { Flex, notification } from 'antd';
 
 interface RatingButtonsProps {
   // groupEl: GroupProps | null;
@@ -21,11 +21,18 @@ const QRCode: React.FC<RatingButtonsProps> = ({ title, url, filename }) => {
   const svgRef = useRef<SVGSVGElement>(null);
 
   const handleCopy = () => {
-    if (!url) return;
-    navigator.clipboard.writeText(url)
-      .then(() => alert("Đã sao chép URL vào clipboard!"))
-      .catch(() => alert("Sao chép thất bại."));
+    if (!url) notification.error({ message: "Null url" });
+
+    navigator.clipboard.writeText(url ?? '') 
+      .then(() =>
+        notification.success({
+          message: "Đã chép vào clipboard!",
+          description: `URL quản lý chấm công và nhiệm vụ, ngày phép`,
+        })
+      )
+      .catch(() =>  notification.error({ message: "Sao chép thất bại."}));
   };
+
 
   const handleDownloadPNG = () => {
     if (!svgRef.current) return;

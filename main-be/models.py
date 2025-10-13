@@ -331,6 +331,11 @@ class Task(BaseModel):
             if isinstance(value, (datetime.datetime, datetime.date)):
                 value = value.isoformat()
             result[column.name] = value
+
+        workspace = db.session.get(Workspace, self.workspace_id)
+        if workspace:
+            result['workspace'] = workspace.name
+
         return result
 
     @staticmethod
