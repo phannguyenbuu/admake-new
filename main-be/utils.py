@@ -243,7 +243,7 @@ CREATE TABLE "user" (
                 type VARCHAR(50),
                 hashKey VARCHAR(255),
                 fullName VARCHAR(255),
-                level_salary INTEGER,
+                salary INTEGER,
                 phone VARCHAR(20),
                 avatar VARCHAR(255),
                 ---createdAt TIMESTAMP,
@@ -308,7 +308,7 @@ CREATE TABLE "user" (
     type = row_dict.get('type'),
     hashKey = row_dict.get('hashKey'),
     fullName = row_dict.get('fullName'),
-    level_salary = row_dict.get('level_salary'),
+    salary = row_dict.get('salary'),
     phone = row_dict.get('phone'),
     avatar = row_dict.get('avatar'),
     is_authenticated = row_dict.get('is_authenticated'),
@@ -967,6 +967,37 @@ def modify_leaves():
         le.end_time = date(2025,11,14)
         db.session.commit()      # Lưu vào database
 
+
+import unicodedata
+import random
+
+def remove_vietnamese_tones(text: str) -> str:
+    if not text:
+        return ""
+    normalized = unicodedata.normalize('NFD', text)
+    no_tone = ''.join(
+        c for c in normalized
+        if unicodedata.category(c) != 'Mn'
+    )
+    no_tone = no_tone.replace('đ', 'd').replace('Đ', 'D')
+    return no_tone
+
+def generate_zalo_account(full_name: str) -> str:
+    if not full_name:
+        return ""
+    no_tone = remove_vietnamese_tones(full_name)
+    base = no_tone.lower().replace(" ", "")
+    rand1 = random.randint(0, 99)
+    rand2 = random.randint(0, 99)
+    zalo_account = f"{base}{rand1:02d}{rand2:02d}"
+    return zalo_account
+
+def generate_salary(min_value=10_000_000, max_value=50_000_000, round_to=100_000):
+    raw_salary = random.randint(min_value, max_value)
+    # Làm tròn số lương xuống bội số round_to
+    rounded_salary = raw_salary - (raw_salary % round_to)
+    return rounded_salary
+
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()
@@ -994,53 +1025,20 @@ if __name__ == "__main__":
         #     add_new_columns(table,['deletedAt'],'TIMESTAMP')
         #     add_new_columns(table,['version'],'INTEGER')
 
-        # add_new_columns('lead',['createdAt','deletedAt','updatedAt'],'TIMESTAMP')
+        # add_new_columns('user',['citizenId','email','facebookAccount','zaloAccount','referrer'],'VARCHAR(80)')
+        # add_new_columns('user',['address'],'VARCHAR(255)')
+        # add_new_columns('user',['gender'],'INTEGER')
         # add_new_columns('lead',['version'],'INTEGER')
         # add_new_columns('task',['amount'],'INTEGER')
-        # add_new_columns('user',['level_salary','version'],'INTEGER')
+        # add_new_columns('user',['salary','version'],'INTEGER')
         # add_new_columns('user',['deletedAt'],'TIMESTAMP')
-        # renameColumn('user', "createAt", "createdAt")
-        # renameColumn('user', "updateAt", "updatedAt")
-        # all_records = Task.query.all()
-        # print(len(all_records))
-        # for record in all_records:
-        #     print(record)
-
-        # create_table('customer')
-        # renameColumn('user')
-
-        # show_table()
-
-        # add_new_columns('group',['address'],'VARCHAR(255)')
-        # delete_content()
-
-        # transfer_data_to_postgres()
-        # set_group_generate_token()
-
-
+        # renameColumn('user', "level_salary", "salary")
         
-        # fix_invalid_foreign_keys()
-        # change_foreign_key()
+        for user in User.query.all():
+            # user.zaloAccount = generate_zalo_account(user.fullName)
+            # user.facebookAccount = generate_zalo_account(user.fullName)
+            user.email = generate_zalo_account(user.fullName) + '@' + random.choice(['@gmail.com','hotmail.com','icloud.com'])
+            # user.salary = generate_salary()
 
-
-#         db.session.execute(text(
-#         f'''
-#         DELETE FROM "group" WHERE name LIKE 'Alice%';
-
-# '''))
-
-#         db.session.commit()
-        # add_group_work_point()
-        # renameColumn('group','rate','status')
-        # create_table_workpoint()
-        # erase_table(Workpoint)
-        # modify_workpoint()
-        # set_user_customer_foreign()
-        # check_foreign_key()
-        # delete_customer_user()
-        # delete_null_task()
-
-        # modify_task_material()
-        # modify_material_id_type()
-
-        # modify_role_name()
+            db.session.add(user)
+        db.session.commit()

@@ -25,9 +25,18 @@ export type User = BaseEntity & {
   role: Role;
   role_id: number;
   avatar?: string;
-  level_salary?: number;
+  salary?: number;
   total_salary?: number;
+
+  gender: number,
+  address: string,
+  citizenId: string,
+  email: string,
+  facebookAccount: string,
+  zaloAccount: string,
+  referrer: string,
 };
+
 export type JwtResponse = {
   access_token: string;
   roles: UserRole[];

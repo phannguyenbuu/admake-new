@@ -269,7 +269,7 @@ return (
       title=""
       okText="OK"
       cancelButtonProps={{ style: { display: 'none' } }}
-      style={{ padding: 20, minWidth:'90vw' }}
+      style={{ padding: 20, minWidth: modalImg?.status !== 'off' ?'90vw':250 }}
     >
       <CenterBox>
         <Box sx={{borderRadius:10, backgroundColor:"#00B4B6", px:5, py:1}}>

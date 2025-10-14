@@ -171,6 +171,12 @@ export const columnsCustomer = [
   },
 ];
 
+const formattedSalary = (salary:number) => new Intl.NumberFormat('vi-VN', {
+  style: 'currency',
+  currency: 'VND',
+  minimumFractionDigits: 0,
+}).format(salary);
+
 export const columnsUser = [
   {
     title: "Họ và tên",
@@ -180,21 +186,19 @@ export const columnsUser = [
     render: (text: string, record: User) => (
       <div>
         <div>{text}</div>
-        <span className="!text-base" style={{fontSize:8,fontStyle:'italic'}}>{record.role?.name}</span>
+        <span className="!text-cyan-700" style={{fontSize:12,fontStyle:'italic'}}>{record.role?.name}</span>
       </div>
     ),
   },
   
   {
-    title: "Tài khoản",
-    dataIndex: "username",
-    key: "username",
+    title: "Lương",
+    dataIndex: "salary",
+    key: "salary",
     width: 150,
-    render: (username: string) => (
-      <span>
-        <span className="!text-cyan-700 !line-clamp-2 !text-base">
-          {username}
-        </span>
+    render: (salary: number) => (
+      <span className="!text-cyan-700 !line-clamp-2 !text-base">
+        {formattedSalary(salary)}
       </span>
     ),
   },
@@ -203,31 +207,33 @@ export const columnsUser = [
     dataIndex: "phone",
     key: "phone",
     width: 150,
-    render: (phone: string) => <span className="!text-base">{phone}</span>,
-  },
-  {
-    title: "Trạng thái",
-    dataIndex: "status",
-    key: "status",
-    width: 150,
-    render: (status: string) => (
-      <Tag
-        color={
-          status === "inactive" ? "red" : status === "active" ? "green" : "cyan"
-        }
-        className="font-semibold !text-base"
-      >
-        {status === "active" ? "Đang hoạt động" : "Nghỉ phép"}
-      </Tag>
+    render: (phone: string, record: User) => (
+      <div>
+        <span className="!text-700 !line-clamp-2 !text-base">
+          {record.phone}
+        </span>
+        <span className="custom-font-size">
+          {record.email}
+        </span>
+      </div>
     ),
   },
   {
-    title: "Nghỉ phép",
-    dataIndex: "leave",
-    key: "leave",
+    title: "Mạng XH",
+    dataIndex: "zaloAccount",
+    key: "zaloAccount",
     width: 150,
-    render: (_: string, record: User) => <HolidayButton user={record} />,
-  },
+    render: (zaloAccount: string, record: User) => (
+      <div>
+        <span className="!text-cyan-700 !line-clamp-2 !text-base custom-font-size">
+          Zalo: {record.zaloAccount}
+        </span>
+        <span className="!text-cyan-700 !line-clamp-2 !text-base custom-font-size">
+          FB: {record.facebookAccount}
+        </span>
+      </div>
+    ),
+  }
 ];
 
 export const holidayTypes = [
@@ -325,8 +331,8 @@ export const columnsPayRoll = (month: number, year: number) => [
             Bậc lương
           </span>
         ),
-        dataIndex: "level_salary",
-        key: "level_salary",
+        dataIndex: "salary",
+        key: "salary",
         align: "center" as const,
         className: "!text-base !bg-white !border-[#00b4b6]",
       },

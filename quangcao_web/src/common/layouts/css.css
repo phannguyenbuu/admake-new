@@ -5,3 +5,8 @@
   background-position: center;
   background: none;
 }
+
+.custom-font-size {
+  font-size: 12px !important;
+  color: #999;
+}

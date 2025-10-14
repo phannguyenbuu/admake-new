@@ -13,7 +13,7 @@ export interface FormValues {
   fullName: string;
   phone: string;
   role: string;
-  level_salary: number;
+  salary: number;
   username: string;
   password?: string;
   total_salary: string;

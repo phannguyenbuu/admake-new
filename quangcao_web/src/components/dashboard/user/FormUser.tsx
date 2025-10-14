@@ -18,6 +18,7 @@ import { useSettingQuery } from "../../../common/hooks/setting.hook";
 import { useRoleQuery } from "../../../common/hooks/role.hook";
 import type { Role } from "../../../@types/role.type";
 import type { User } from '../../../@types/user.type';
+import { InputNumber } from "antd";
 
 export default function FormUser({
   onCancel,
@@ -67,58 +68,69 @@ export default function FormUser({
         phone: user.phone,
         username: user.username,
         password: user.password,
-        role: role ? role?.id : user.role?.id,
-        level_salary: user.level_salary,
+        role: role ? role.id : user.role?.id,
+        salary: user.salary,
+
+        gender: user.gender,
+        address: user.address,
+        citizenId: user.citizenId,
+        email: user.email,
+        facebookAccount: user.facebookAccount,
+        zaloAccount: user.zaloAccount,
+        referrer: user.referrer,
+
+        // Thêm các field khác nếu có trong form
       });
     } else {
       form.resetFields();
     }
-  }, [user, form, roles]);
+  }, [user, form, role]);
+
 
   const handleSubmit = async (values: any) => {
-    try {
-      const formData = new FormData();
-      formData.append("fullName", values.fullName);
-      formData.append("phone", values.phone);
-      formData.append("username", values.username);
+  try {
+    const formData = new FormData();
 
-      if (values.password && values.password.trim() !== "") {
-        formData.append("password", values.password);
+    // Lấy tất cả key của values để append vào formData
+    Object.entries(values).forEach(([key, value]) => {
+      // Nếu là file, xử lý riêng
+      if (key === 'avatar' && file) {
+        formData.append(key, file);
+      } else if (value !== undefined && value !== null) {
+        formData.append(key, value.toString());
       }
+    });
 
-      formData.append("type", "employee");
-      formData.append("role", values.role);
-      formData.append("level_salary", values.level_salary?.toString() || "1");
-
-      if (file) formData.append("avatar", file);
-
-      if (isEditing && user) {
-        updateUser(
-          { dto: formData, id: user.id },
-          {
-            onSuccess: () => {
-              message.success("Cập nhật người dùng thành công!");
-              onCancel();
-              onRefresh?.();
-            },
-            onError: () =>
-              message.error("Có lỗi xảy ra khi cập nhật người dùng!"),
-          }
-        );
-      } else {
-        createUser(formData, {
-          onSuccess: () => {
-            message.success("Tạo người dùng thành công!");
-            onCancel();
-            onRefresh?.();
-          },
-          onError: () => message.error("Có lỗi xảy ra khi tạo người dùng!"),
-        });
-      }
-    } catch {
-      message.error("Có lỗi xảy ra!");
+    // Các xử lý riêng biệt nếu cần, ví dụ password
+    if (values.password && values.password.trim() !== "") {
+      formData.append("password", values.password);
     }
-  };
+
+    // Các thao tác gọi API create/update
+    if (isEditing && user) {
+      updateUser({ dto: formData, id: user.id }, {
+        onSuccess: () => {
+          message.success("Cập nhật người dùng thành công!");
+          onCancel();
+          onRefresh?.();
+        },
+        onError: () => message.error("Có lỗi xảy ra khi cập nhật người dùng!")
+      });
+    } else {
+      createUser(formData, {
+        onSuccess: () => {
+          message.success("Tạo người dùng thành công!");
+          onCancel();
+          onRefresh?.();
+        },
+        onError: () => message.error("Có lỗi xảy ra khi tạo người dùng!")
+      });
+    }
+  } catch {
+    message.error("Có lỗi xảy ra!");
+  }
+};
+
 
   return (
     <div
@@ -243,91 +255,6 @@ export default function FormUser({
 
             <Col xs={24} sm={24} lg={12}>
               <Form.Item
-                name="username"
-                label={
-                  <span className="text-sm sm:text-base font-semibold text-gray-700">
-                    Tài khoản:
-                    {isEditing && (
-                      <span className="text-gray-400 text-xs ml-2">
-                        (Không cho đổi tài khoản)
-                      </span>
-                    )}
-                  </span>
-                }
-                rules={[{ required: true, message: "Nhập tên đăng nhập" }]}
-                className="!mb-0"
-              >
-                <Input
-                  placeholder="Nhập tên đăng nhập"
-                  disabled={isEditing}
-                  className={`!text-sm sm:!text-base !h-9 sm:!h-10 !rounded-lg !border-gray-300 focus:!border-cyan-500 !shadow-lg hover:!shadow-xl !transition-all !duration-300 ${
-                    isEditing ? "!bg-gray-50" : ""
-                  }`}
-                />
-              </Form.Item>
-            </Col>
-          </Row>
-
-          <Row gutter={[16, 16]}>
-            <Col xs={24} sm={24} lg={12}>
-              <Form.Item
-                name="password"
-                label={
-                  <span className="text-sm sm:text-base font-semibold text-gray-700 flex flex-row sm:items-center gap-1 sm:gap-2">
-                    <span>Mật khẩu:</span>
-                    <span className="text-gray-400 text-xs">
-                      (Nếu không thay đổi không cần nhập)
-                    </span>
-                    <span>
-                      <Tooltip
-                        title={
-                          <div className="text-xs">
-                            <div className="font-semibold mb-2">
-                              Yêu cầu mật khẩu:
-                            </div>
-                            <div>• Ít nhất 8 ký tự</div>
-                            <div>• Có chữ hoa (A-Z)</div>
-                            <div>• Có chữ thường (a-z)</div>
-                            <div>• Có số (0-9)</div>
-                            <div>• Có ký tự đặc biệt (@$!%*?&)</div>
-                          </div>
-                        }
-                        placement="top"
-                        color="#00B4B6"
-                        getPopupContainer={() => document.body}
-                      >
-                        <InfoCircleOutlined className="!text-cyan-500 !text-sm cursor-help hover:!text-cyan-600 !transition-colors" />
-                      </Tooltip>
-                    </span>
-                  </span>
-                }
-                rules={[
-                  {
-                    validator: (_, value) => {
-                      if (!value || value.trim() === "")
-                        return Promise.resolve();
-                      const passwordRegex =
-                        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-                      if (!passwordRegex.test(value)) {
-                        return Promise.reject(
-                          "Mật khẩu phải có ít nhất 8 ký tự, bao gồm: chữ hoa, chữ thường, số và ký tự đặc biệt (@$!%*?&)"
-                        );
-                      }
-                      return Promise.resolve();
-                    },
-                  },
-                ]}
-                className="!mb-0"
-              >
-                <Input.Password
-                  placeholder="Nhập mật khẩu"
-                  className="!text-sm sm:!text-base !h-9 sm:!h-10 !rounded-lg !border-gray-300 focus:!border-cyan-500 !shadow-lg hover:!shadow-xl !transition-all !duration-300"
-                />
-              </Form.Item>
-            </Col>
-
-            <Col xs={24} sm={24} lg={12}>
-              <Form.Item
                 name="phone"
                 label={
                   <span className="text-sm sm:text-base font-semibold text-gray-700">
@@ -372,28 +299,146 @@ export default function FormUser({
 
             <Col xs={24} sm={12} lg={12}>
               <Form.Item
-                name="level_salary"
+                name="salary"
                 label={
                   <span className="text-sm sm:text-base font-semibold text-gray-700">
-                    Bậc lương:
+                    Lương:
                   </span>
                 }
-                rules={[{ required: false, message: "Chọn bậc lương" }]}
+                // rules={[{ required: false, message: "Chọn bậc lương" }]}
                 className="!mb-0"
               >
-                <Select
-                  placeholder="Chọn bậc lương"
-                  options={salaryOptions}
-                  showSearch
-                  allowClear
-                  optionFilterProp="label"
-                  getPopupContainer={() => document.body}
-                  dropdownStyle={{ zIndex: 10000 }}
-                  className="!text-sm sm:!text-base !h-9 sm:!h-10 !rounded-lg !border-gray-300 focus:!border-cyan-500 !shadow-lg hover:!shadow-xl !transition-all !duration-300"
+               <InputNumber
+                  style={{ width: "100%" }}
+                  placeholder="Nhập số tiền lương"
+                  formatter={(value) =>
+                    value
+                      ? value
+                          .toString()
+                          .replace(/\B(?=(\d{3})+(?!\d))/g, ".") // thêm dấu chấm hàng nghìn
+                          .replace(",", ",") // dấu phẩy làm phân cách thập phân nếu cần
+                      : ""
+                  }
+                  parser={(value) =>
+                    value ? value.replace(/\./g, "").replace(",", ".") : ""
+                  }
                 />
               </Form.Item>
             </Col>
           </Row>
+
+
+
+          <Row gutter={[16, 16]}>
+  <Col xs={24} sm={12} lg={12}>
+    <Form.Item
+      name="gender"
+      label={<span className="text-sm sm:text-base font-semibold text-gray-700">Giới tính:</span>}
+      className="!mb-0"
+    >
+      <Select
+        placeholder="Chọn giới tính"
+        options={[
+          { label: 'Nam', value: 'male' },
+          { label: 'Nữ', value: 'female' },
+          { label: 'Khác', value: 'other' },
+        ]}
+        allowClear
+        getPopupContainer={() => document.body}
+        className="!text-sm sm:!text-base !h-9 sm:!h-10 !rounded-lg !border-gray-300 focus:!border-cyan-500 !shadow-lg hover:!shadow-xl !transition-all !duration-300"
+      />
+    </Form.Item>
+  </Col>
+
+  <Col xs={24} sm={12} lg={12}>
+    <Form.Item
+      name="address"
+      label={<span className="text-sm sm:text-base font-semibold text-gray-700">Địa chỉ:</span>}
+      className="!mb-0"
+    >
+      <Input
+        placeholder="Nhập địa chỉ"
+        className="!text-sm sm:!text-base !h-9 sm:!h-10 !rounded-lg !border-gray-300 focus:!border-cyan-500 !shadow-lg hover:!shadow-xl !transition-all !duration-300"
+      />
+    </Form.Item>
+  </Col>
+</Row>
+
+<Row gutter={[16, 16]}>
+  <Col xs={24} sm={12} lg={12}>
+    <Form.Item
+      name="citizenId"
+      label={<span className="text-sm sm:text-base font-semibold text-gray-700">Căn cước công dân:</span>}
+      className="!mb-0"
+    >
+      <Input
+        placeholder="Nhập số căn cước"
+        className="!text-sm sm:!text-base !h-9 sm:!h-10 !rounded-lg !border-gray-300 focus:!border-cyan-500 !shadow-lg hover:!shadow-xl !transition-all !duration-300"
+      />
+    </Form.Item>
+  </Col>
+
+  <Col xs={24} sm={12} lg={12}>
+    <Form.Item
+      name="email"
+      label={<span className="text-sm sm:text-base font-semibold text-gray-700">Email:</span>}
+      className="!mb-0"
+      rules={[
+        {
+          type: 'email',
+          message: 'Email không hợp lệ',
+        },
+      ]}
+    >
+      <Input
+        placeholder="Nhập email"
+        className="!text-sm sm:!text-base !h-9 sm:!h-10 !rounded-lg !border-gray-300 focus:!border-cyan-500 !shadow-lg hover:!shadow-xl !transition-all !duration-300"
+      />
+    </Form.Item>
+  </Col>
+</Row>
+
+<Row gutter={[16, 16]}>
+  <Col xs={24} sm={12} lg={8}>
+    <Form.Item
+      name="facebookAccount"
+      label={<span className="text-sm sm:text-base font-semibold text-gray-700">Tài khoản facebook:</span>}
+      className="!mb-0"
+    >
+      <Input
+        placeholder="Nhập tài khoản facebook"
+        className="!text-sm sm:!text-base !h-9 sm:!h-10 !rounded-lg !border-gray-300 focus:!border-cyan-500 !shadow-lg hover:!shadow-xl !transition-all !duration-300"
+      />
+    </Form.Item>
+  </Col>
+
+  <Col xs={24} sm={12} lg={8}>
+    <Form.Item
+      name="zaloAccount"
+      label={<span className="text-sm sm:text-base font-semibold text-gray-700">Tài khoản zalo:</span>}
+      className="!mb-0"
+    >
+      <Input
+        placeholder="Nhập tài khoản zalo"
+        className="!text-sm sm:!text-base !h-9 sm:!h-10 !rounded-lg !border-gray-300 focus:!border-cyan-500 !shadow-lg hover:!shadow-xl !transition-all !duration-300"
+      />
+    </Form.Item>
+  </Col>
+
+  <Col xs={24} sm={12} lg={8}>
+    <Form.Item
+      name="referrer"
+      label={<span className="text-sm sm:text-base font-semibold text-gray-700">Người giới thiệu:</span>}
+      className="!mb-0"
+    >
+      <Input
+        placeholder="Nhập tên người giới thiệu"
+        className="!text-sm sm:!text-base !h-9 sm:!h-10 !rounded-lg !border-gray-300 focus:!border-cyan-500 !shadow-lg hover:!shadow-xl !transition-all !duration-300"
+      />
+    </Form.Item>
+  </Col>
+</Row>
+
         </div>
 
         {/* Footer buttons */}

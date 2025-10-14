@@ -52,7 +52,7 @@ def get_batch_workpoint_detail():
     users, pagination = get_query_page_users(page, limit, search)
     user_id_list = [user["id"] for user in users]
 
-    print(f"Requested page: {page}", user_id_list)
+    # print(f"Requested page: {page}", user_id_list)
 
     workpoints = Workpoint.query.filter(Workpoint.user_id.in_(user_id_list)).all()
 

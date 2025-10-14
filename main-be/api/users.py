@@ -50,11 +50,19 @@ def get_query_page_users(page,limit,search):
 @user_bp.route("/", methods=["POST"])
 def create_user():
     data = request.get_json()
-    print('USER', data)
-    new_user = User.parse(data)
+    # print('USER', data)
+    new_user = User.create_item(data)
         
     db.session.add(new_user)
-    db.session.commit()
+    try:
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        print(f"Commit error: {e}")
+        raise
+
+    db.session.refresh(new_user)
+    
     return jsonify(new_user.to_dict()), 201
 
 @user_bp.route("/<string:id>", methods=["GET"])
@@ -67,7 +75,7 @@ def get_user_detail(id):
 @user_bp.route("/<string:id>", methods=["PUT"])
 def update_user(id):
     data = request.get_json()
-    print(data)
+    print('PUT user', data)
     user = db.session.get(User, id)
     if not user:
         return jsonify({"error": "user not found"}), 404
@@ -79,8 +87,13 @@ def update_user(id):
 
             setattr(user, key, value)
         
-    db.session.commit()
-    return jsonify(user.to_dict()), 
+    try:
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": str(e)}), 500
+    
+    return jsonify(user.to_dict()), 200
 
 
 

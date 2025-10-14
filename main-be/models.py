@@ -123,7 +123,7 @@ class User(BaseModel):
     type = db.Column(db.String(50))
     hashKey = db.Column(db.String(255))
     fullName = db.Column(db.String(255))
-    level_salary = db.Column(db.Integer)
+    salary = db.Column(db.Integer)
     phone = db.Column(db.String(20))
     avatar = db.Column(db.String(255))
 
@@ -143,6 +143,14 @@ class User(BaseModel):
     cryptoAddressList = db.Column(db.JSON)
     selectedProvider = db.Column(db.JSON)
     selectedServices = db.Column(db.JSON)
+
+    gender = db.Column(db.Integer)
+    address = db.Column(db.String(255))
+    citizenId = db.Column(db.String(80))
+    email = db.Column(db.String(80))
+    facebookAccount = db.Column(db.String(80))
+    zaloAccount = db.Column(db.String(80))
+    referrer = db.Column(db.String(80))
 
     workpoints = db.relationship('Workpoint', backref='user', lazy=True)
 
@@ -173,28 +181,22 @@ class User(BaseModel):
         return result
 
     @staticmethod
-    def parse(data):
-        role_id_value = data.get('role_id')
-        if role_id_value in ('undefined', '', None):
-            role_id_value = None
-        return User(
-            id = generate_datetime_id(),
-            # id=data.get("_id", {}).get("$oid"),
-            username=data.get("username"),
-            password=data.get("password"),
-            status="active",
-            role_id=role_id_value,
-            type=data.get("type"),
-            hashKey=data.get("hashKey"),
-            fullName=data.get("fullName"),
-            level_salary=data.get("level_salary"),
-            phone=data.get("phone"),
-            avatar=data.get("avatar"),
-            deletedAt=parse_date(data.get("deletedAt")),
-            createdAt=parse_date(data.get("createdAt")),
-            updatedAt=parse_date(data.get("updatedAt")),
-            version=data.get("__v"),
-        )
+    def create_item(params):
+        allowed_keys = set(c.name for c in User.__table__.columns)
+        filtered_params = {k: v for k, v in params.items() if k in allowed_keys}
+
+        if params.get("role"):
+            role = Role.query.filter_by(name=params.get("role")).first()
+            if role:
+                filtered_params["role_id"] = role.id
+
+        if not "role_id" in filtered_params:
+            filtered_params["role_id"] = 0
+
+        filtered_params["id"] = generate_datetime_id()
+        
+        return User(**filtered_params)
+
     
 class Customer(db.Model):
     __tablename__ = "customer"

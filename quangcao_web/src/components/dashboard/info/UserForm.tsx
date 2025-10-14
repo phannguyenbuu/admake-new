@@ -45,12 +45,12 @@ export const UserForm: React.FC<UserFormProps> = ({
   // Reset form values when info changes
   useEffect(() => {
     if (info && salaryLevelsData.length > 0) {
-      // Tìm salary level tương ứng với info.level_salary
+      // Tìm salary level tương ứng với info.salary
       const salaryLevel = salaryLevelsData.find(
-        (level) => level.index === info.level_salary
+        (level) => level.index === info.salary
       );
 
-      const core: Omit<FormValues, "level_salary"> = {
+      const core: Omit<FormValues, "salary"> = {
         fullName: info.fullName || "",
         phone: info.phone || "",
         role: info.role?.name || "",
@@ -60,9 +60,9 @@ export const UserForm: React.FC<UserFormProps> = ({
 
       const formValues = {
         ...core,
-        level_salary: salaryLevel
+        salary: salaryLevel
           ? `Bậc ${salaryLevel.index}: ${formatCurrency(salaryLevel.salary)}đ`
-          : `Bậc ${info.level_salary || "N/A"}`,
+          : `Bậc ${info.salary || "N/A"}`,
       };
 
       // Chỉ set password nếu API trả về (thường thì API không trả về password vì bảo mật)
@@ -110,12 +110,12 @@ export const UserForm: React.FC<UserFormProps> = ({
     // Xóa tất cả errors khi cancel
     form.resetFields();
     if (info && salaryLevelsData.length > 0) {
-      // Tìm salary level tương ứng với info.level_salary
+      // Tìm salary level tương ứng với info.salary
       const salaryLevel = salaryLevelsData.find(
-        (level) => level.index === info.level_salary
+        (level) => level.index === info.salary
       );
 
-      const core: Omit<FormValues, "level_salary"> = {
+      const core: Omit<FormValues, "salary"> = {
         fullName: info.fullName || "",
         phone: info.phone || "",
         role: info.role?.name || "",
@@ -124,9 +124,9 @@ export const UserForm: React.FC<UserFormProps> = ({
       };
       const formValues = {
         ...core,
-        level_salary: salaryLevel
+        salary: salaryLevel
           ? `Bậc ${salaryLevel.index}: ${formatCurrency(salaryLevel.salary)}đ`
-          : `Bậc ${info.level_salary || "N/A"}`,
+          : `Bậc ${info.salary || "N/A"}`,
         username: info.username,
       };
 
@@ -149,12 +149,12 @@ export const UserForm: React.FC<UserFormProps> = ({
       form.resetFields();
       // Reset form values khi tắt edit
       if (info && salaryLevelsData.length > 0) {
-        // Tìm salary level tương ứng với info.level_salary
+        // Tìm salary level tương ứng với info.salary
         const salaryLevel = salaryLevelsData.find(
-          (level) => level.index === info.level_salary
+          (level) => level.index === info.salary
         );
 
-        const core: Omit<FormValues, "level_salary"> = {
+        const core: Omit<FormValues, "salary"> = {
           fullName: info.fullName || "",
           phone: info.phone || "",
           role: info.role?.name || "",
@@ -165,9 +165,9 @@ export const UserForm: React.FC<UserFormProps> = ({
           ...core,
           phone: info.phone || "",
           role: info.role?.name || "",
-          level_salary: salaryLevel
+          salary: salaryLevel
             ? `Bậc ${salaryLevel.index}: ${formatCurrency(salaryLevel.salary)}đ`
-            : `Bậc ${info.level_salary || "N/A"}`,
+            : `Bậc ${info.salary || "N/A"}`,
           username: info.username,
         };
 
@@ -352,7 +352,7 @@ export const UserForm: React.FC<UserFormProps> = ({
                   </span>
                 </span>
               }
-              name="level_salary"
+              name="salary"
             >
               <Input
                 placeholder="Bậc lương"
