@@ -244,6 +244,11 @@ export default function AppHeader() {
                 <Box sx={{width:20,height:20,borderRadius:10,background:'green'}}/>
                 <Typography>Đã check-out</Typography>
               </Stack>
+
+              <Stack direction="row" spacing={1}>
+                <Box sx={{width:20,height:20,borderRadius:10,background:'grey'}}/>
+                <Typography>Nghỉ phép</Typography>
+              </Stack>
             </Stack>
 
             <Stack spacing={2} p={2} sx={{ borderRadius:4, border:'1px solid #000'}}>
