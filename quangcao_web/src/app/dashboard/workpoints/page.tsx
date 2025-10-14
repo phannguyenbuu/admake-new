@@ -11,7 +11,7 @@ import { columnsWorkPoint } from "../../../common/data";
 import { useState, useEffect } from "react";
 import { useApiHost } from "../../../common/hooks/useApiHost";
 import type { Workpoint, WorkDaysProps } from "../../../@types/workpoint";
-import type { Leave } from "../../../@types/leave.type";
+// import type { Leave } from "../../../@types/leave.type";
 
 export const WorkPointPage: IPage["Component"] = () => {
   const [query, setQuery] = useState({
@@ -38,20 +38,20 @@ export const WorkPointPage: IPage["Component"] = () => {
       );
       
       const result = await response.json();
-      const ls: WorkDaysProps[] = [];
+      // const ls: WorkDaysProps[] = [];
       
-      result.data.forEach((el:any) => {
-        el.status = 'work';
-        ls.push(el);
-      });
+      // result.data.forEach((el:any) => {
+      //   el.status = 'work';
+      //   ls.push(el);
+      // });
 
-      result.leave.forEach((el:any) => {
-        el.status = 'off';
-        ls.push(el);
-      });
+      // result.leave.forEach((el:any) => {
+      //   el.status = 'off';
+      //   ls.push(el);
+      // });
 
-      console.log(ls);
-      setWorkpoints(ls);
+      
+      setWorkpoints(result.data);
       setTotal(result.pagination.total);
     } catch (error) {
       console.error("Failed to fetch users", error);
@@ -64,6 +64,10 @@ export const WorkPointPage: IPage["Component"] = () => {
   useEffect(() => {
     fetchUsers(query);
   }, [query]);
+
+  useEffect(() => {
+    console.log('Workpoints', workpoints);
+  },[workpoints]);
 
   return (
     <div className="min-h-screen p-2 w-full">

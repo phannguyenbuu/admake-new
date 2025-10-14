@@ -30,11 +30,11 @@ const fetchTaskByUser = async (userId: string): Promise<Task[]> => {
   return response.json();
 };
 
-const useTaskByUserMutation = () => {
-  return useMutation<Task[], Error, string>({
-    mutationFn: fetchTaskByUser,
-  });
-};
+// const useTaskByUserMutation = () => {
+//   return useMutation<Task[], Error, string>({
+//     mutationFn: fetchTaskByUser,
+//   });
+// };
 
 interface LeaveBoardProps {
   // mode: { adminMode: boolean; userMode: boolean };
@@ -72,7 +72,7 @@ function LeaveDatePickerOneDay({
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <DatePicker
-        label="Ngày bắt đầu"
+        label="Ngày xin nghỉ"
         open={open}
         onOpen={() => setOpen(true)}
         onClose={() => setOpen(false)}
@@ -177,27 +177,6 @@ export const LeaveBoard = ({ userId, open, onCancel }: LeaveBoardProps) => {
   const [multiStartDate, setMultiStartDate] = useState<Dayjs | null>(null);
   const [multiEndDate, setMultiEndDate] = useState<Dayjs | null>(null);
 
-  // const handleAddLeaveClick = () => {
-  //   if (tab === "oneDay") {
-  //     console.log("Xin nghỉ 1 ngày:", {
-  //       date: oneDayDate?.format("DD/MM/YYYY"),
-  //       morning: morningChecked,
-  //       afternoon: afternoonChecked,
-  //     });
-  //   } else {
-  //     const days =
-  //       multiStartDate && multiEndDate
-  //         ? multiEndDate.startOf("day").diff(multiStartDate.startOf("day"), "day") + 1
-  //         : 0;
-  //     console.log("Xin nghỉ nhiều ngày:", {
-  //       startDate: multiStartDate?.format("DD/MM/YYYY"),
-  //       endDate: multiEndDate?.format("DD/MM/YYYY"),
-  //       daysOff: days > 0 ? days : 0,
-  //     });
-  //   }
-  //   onCancel();
-  // };
-
   const mutation = useMutation<any, Error, Leave>({
     mutationFn: postLeaveRequest,
     onSuccess: () => {
@@ -217,13 +196,13 @@ export const LeaveBoard = ({ userId, open, onCancel }: LeaveBoardProps) => {
     
     if (tab === 'oneDay') {
       if (!oneDayDate) return;
-      const isoDate = oneDayDate.toISOString();
-      start_time = isoDate;
-      end_time = isoDate;
+      const formattedDate = oneDayDate.format('YYYY-MM-DD');
+      start_time = formattedDate;
+      end_time = formattedDate;
     } else {
       if (!multiStartDate || !multiEndDate) return;
-      start_time = multiStartDate.toISOString();
-      end_time = multiEndDate.toISOString();
+      start_time = multiStartDate.format('YYYY-MM-DD');
+      end_time = multiEndDate.format('YYYY-MM-DD');
     }
 
     mutation.mutate({
@@ -237,7 +216,7 @@ export const LeaveBoard = ({ userId, open, onCancel }: LeaveBoardProps) => {
   };
 
   return (
-    <Modal open={open} onClose={onCancel} style={{ padding: 20 }}
+    <Modal open={open} onCancel={onCancel} style={{ padding: 20 }}
       okButtonProps={{ style: { display: 'none' } }}
       cancelButtonProps={{ style: { display: 'none' } }}
     >

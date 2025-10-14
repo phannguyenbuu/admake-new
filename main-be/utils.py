@@ -1,5 +1,5 @@
 import json
-from models import db, app, User, Group,Workpoint, Customer, Material, parse_date, Role, Message, Task, Workspace, generate_datetime_id
+from models import db, app, User, Group,Workpoint,Leave, Customer, Material, parse_date, Role, Message, Task, Workspace, generate_datetime_id
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 import json
@@ -956,9 +956,21 @@ def modify_role_name():
     else:
         print("Role id = 3 không tồn tại")
 
+from datetime import date
+
+def modify_leaves():
+    # Lấy role có id = 3
+    le = db.session.get(Leave, 7)
+
+    if le:
+        le.start_time = date(2025,11,12)
+        le.end_time = date(2025,11,14)
+        db.session.commit()      # Lưu vào database
+
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()
+        # modify_leaves()
         # update_users_with_accountId('user.json')
         
         # show_collections_and_schema()

@@ -8,6 +8,7 @@ import { useApiHost } from "../../../../common/hooks/useApiHost";
 import Divider from '@mui/material/Divider';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import CommentIcon from '@mui/icons-material/Comment';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { getTitleByStatus } from "../../../dashboard/work-tables/Managerment";
 
 const fetchTaskByUser = async (userId: string): Promise<Task[]> => {
@@ -46,6 +47,8 @@ const TaskBoard = ({ userId, open, onCancel }: TaskBoardProps) => {
         console.log('Working tasks', data);
     },[data]);
 
+    const btnStyle = {color:"#999", whiteSpace:'nowrap', borderRadius:20};
+
     return (
     <Modal open={open} onCancel={onCancel} footer={null} width={900} style={{marginTop:0}}>
       <Stack spacing = {2} py={2} alignItems="flex-start" justifyContent="flex-start">
@@ -58,11 +61,10 @@ const TaskBoard = ({ userId, open, onCancel }: TaskBoardProps) => {
 
             <JobTimeAndProcess key={el.id} form={null} taskDetail={el ?? null}/>
             
-            <Stack direction="row" spacing={5}>
-                <Button style={{color:"#ccc"}}><CommentIcon/></Button>
-                <Typography style={{color:"#999", marginTop:5, textTransform:'uppercase', fontSize: 12}}>
-                    TRẠNG THÁI: {getTitleByStatus(el.status)}
-                </Typography>
+            <Stack direction="row" spacing={0}>
+                <Button style={{color:"#999"}}><CommentIcon/></Button>
+                <Button style={{...btnStyle, border:'1px solid #999'}}>ỨNG LƯƠNG</Button>
+                <Button style={btnStyle}><ArrowForwardIcon/>{getTitleByStatus(el.status)}</Button>
             </Stack>
 
             <Divider color = "#0092b8" style={{width:300}}/>

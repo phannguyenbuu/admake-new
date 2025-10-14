@@ -11,6 +11,10 @@ export interface PeriodData {
   in?: Check;
   out?: Check;
   workhour?: number;
+  status: string;
+  period: number;
+  day: Date;
+  text: string;
 }
 
 export interface Checklist {
@@ -43,6 +47,7 @@ export interface Workpoint {
 
 export interface WorkDaysProps {
   items: Workpoint[];
+  leaves: Leave[];
   user_id: string;
   username: string;
   userrole: string;

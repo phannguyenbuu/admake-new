@@ -74,7 +74,7 @@ const CameraDialog: React.FC<CameraDialogProps> = ({userEl}) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [openWork, setOpenWork] = useState(false);
-  const [openHoliday, setOpenHoliday] = useState(true);
+  const [openHoliday, setOpenHoliday] = useState(false);
   const [hasCamera, setHasCamera] = useState(false);
 
   useEffect(() => {
