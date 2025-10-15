@@ -26,6 +26,10 @@ export interface MsgTypeProps {
   onDelete?: any;
 }
 
+interface ReactProps {
+  rate: number;
+}
+
 export interface MessageTypeProps {
   id: number;
   group_id: number;
@@ -50,7 +54,8 @@ export interface MessageTypeProps {
   
   username:string;
   link:string;
-  // các trường khác...
+  
+  react: ReactProps;
 }
 
 export function generateUniqueIntId(): number {

@@ -513,9 +513,9 @@ from sqlalchemy.exc import IntegrityError
 class Message(BaseModel):
     __tablename__ = 'message'
 
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    id = db.Column(db.Integer, autoincrement=True)
 
-    message_id = db.Column(db.String(80))
+    message_id = db.Column(db.String(80), primary_key=True)
     group_id = db.Column(db.Integer, db.ForeignKey('group.id'), nullable=True)
     user_id = db.Column(db.String(80), db.ForeignKey('user.id'), nullable=True)
     username =  db.Column(db.String(255))

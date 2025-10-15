@@ -1034,12 +1034,13 @@ if __name__ == "__main__":
         # add_new_columns('user',['deletedAt'],'TIMESTAMP')
         # renameColumn('user', "level_salary", "salary")
         
-        for user in User.query.all():
-            if user.role_id == 3:
-                print(user.fullName)
-                user.role_id = 101
-                db.session.add(user)
+        # msgs = db.session.query(Message).filter(Message.message_id == "temp-1760491441221").all()
+        # print(len(msgs))
 
+        from sqlalchemy import func, and_
 
+        Message.query.filter(Message.id == 150).delete(synchronize_session=False)
         db.session.commit()
+
+
         

@@ -12,21 +12,28 @@ def get_messages():
     limit = request.args.get("limit", 10, type=int)
     search = request.args.get("search", "", type=str)
 
-    query = Message.query
-    if search:
-        query = query.filter(Message.text.ilike(f"%{search}%"))
+    if limit == 0:
+        messages = [c.to_dict() for c in Message.query.all()]
+        total = len(messages)
+        pages = 1
+    else:
+        query = Message.query
+        if search:
+            query = query.filter(Message.text.ilike(f"%{search}%"))
 
-    pagination = query.paginate(page=page, per_page=limit, error_out=False)
-    messages = [c.to_dict() for c in pagination.items]
+        pagination = query.paginate(page=page, per_page=limit, error_out=False)
+        messages = [c.to_dict() for c in pagination.items]
+        total = pagination.total
+        pages = pagination.pages
 
     return jsonify({
         "data": messages,
-        "total": pagination.total,
+        "total": total,
         "pagination": {
-            "total": pagination.total,
+            "total": total,
             "page": page,
             "per_page": limit,
-            "pages": pagination.pages,
+            "pages": pages,
         }
     })
 

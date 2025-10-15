@@ -3,6 +3,7 @@ from models import db, Workspace, Task, dateStr,Message, generate_datetime_id, G
 import datetime
 from collections import defaultdict
 from sqlalchemy import desc
+from sqlalchemy.orm.attributes import flag_modified
 
 workspace_bp = Blueprint('workspace', __name__, url_prefix='/api/workspace')
 
@@ -121,9 +122,10 @@ def get_workspace_task(id):
     
     return jsonify(tasks_response)
 
-@workspace_bp.route("/<string:id>/reward", methods=["PUT"])
+@workspace_bp.route("/<int:id>/reward", methods=["PUT"])
 def post_workspace_reward_task(id):
     data = request.get_json()
+    message_id = data.get('message_id')
     rate = data.get('rate')
 
     group = db.session.get(Group, id)
@@ -131,29 +133,40 @@ def post_workspace_reward_task(id):
         print("Group not found", id)
         abort(404, description="Group not found")
 
+    print("Group", group.name)
     work = Workspace.query.filter(Workspace.name.ilike(group.name)).first()
         
     if not work:
         print("Workspace not found", group.name)
         abort(404, description="Workspace not found")
 
+    msgs = Message.query.filter(Message.message_id == message_id).all()
+    print('msgs', len(msgs))
+
+    if len(msgs) == 0:
+        print("Message not found", message_id)
+        abort(404, description="Message not found")
+    
+    msg = msgs[0]
+
+    print('-message', msg, rate, msg.react)
+    if not msg.react:
+        msg.react = {}
+
+    if rate:
+        msg.react["rate"] = rate
+        flag_modified(msg, "react")
+    # db.session.commit()
+    
     tasks = Task.query.filter_by(workspace_id=work.id).all()
+    # tasks = Task.query.execution_options(autoflush=False).filter_by(workspace_id=work.id).all()
+
     print('tasks',work, len(tasks))
 
     for task in tasks:
         print('task', task.title)
         task.status = "REWARD"
 
-    data = request.get_json()
-
-    message_id = data.get('message_id')
-    if message_id:
-        message = db.session.get(Message, message_id)
-        if message:
-            print("Find message", message_id)
-            # message.is_favourite = True
-        else:
-            print("Cannot find message", message_id)
     
     db.session.commit()
     

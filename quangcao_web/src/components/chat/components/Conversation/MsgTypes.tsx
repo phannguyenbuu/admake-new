@@ -268,18 +268,17 @@ const TextMsg: React.FC<MsgTypeProps> = ({el, menu, onDelete}) => {
 }
 
 
-const TimeLine: React.FC<MsgTypeProps> = ({ el,menu, onDelete }) => {
+const TimeLine: React.FC<MsgTypeProps> = ({ el, menu, onDelete }) => {
+  const [value, setValue] = useState<number | null>(el?.react?.rate ?? 0);
   if(!el) return null;
   const {userRoleId} = useUser();
   const full = userRoleId > 0;
 
-  
-
-  const handleReward = async (rate: number) => {
+  const handleReward = async (rate: number | null) => {
     const response = await fetch(`${useApiHost()}/workspace/${el.group_id}/reward`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({"message_id":el.id,"rate":rate})
+      body: JSON.stringify({"message_id":el.message_id, "rate":rate})
     });
   
     if (!response.ok) 
@@ -293,11 +292,20 @@ const TimeLine: React.FC<MsgTypeProps> = ({ el,menu, onDelete }) => {
   console.log('Timeline',el.text, userRoleId);
   const theme = useTheme();
 
-  const handleRatingChange = (event, newValue: number) => {
-    console.log("Rating value:", newValue, "cho group", el.group_id, " message id", el.message_id);
-    // Gọi hàm handleReward tương tự ở đây nếu cần
+  const handleRatingChange = (event: React.SyntheticEvent<Element, Event>, newValue: number | null) => {
+    console.log("Rating value:", newValue, "cho group", el.group_id, " message_id", el.message_id);
+    setValue(newValue);
     handleReward(newValue);
   };
+
+  const labels: {[index in 1 | 2 | 3 | 4 | 5]: string} = {
+  1: 'Quá kém',
+  2: 'Kém',
+  3: 'Trung bình',
+  4: 'Đạt',
+  5: 'Rất tốt',
+};
+
 
   return (
     <Stack alignItems='center' justifyContent='space-between' 
@@ -306,26 +314,26 @@ const TimeLine: React.FC<MsgTypeProps> = ({ el,menu, onDelete }) => {
           {el.text}
       </Typography>
       {(userRoleId < 0 || full) && !el.is_favourite &&
-      <Stack direction="row" spacing={2}>
-        {/* <Button sx= {{backgroundColor:"#999",color:"white",p:1, borderRadius:10}}>
-          Chưa đồng ý
-        </Button>
-        <Button 
-          onClick={handleReward}
-          sx= {{backgroundColor:"#00B4B6",color:"white",p:1, borderRadius:10}}>
-          OK
-        </Button> */}
-
+      
         <Rating
           name="simple-controlled"
-          defaultValue={0}
+          value={value}
+          // defaultValue={el?.react?.rate ?? 0}
           max={5}
           onChange={handleRatingChange}
           sx={{ color: "#ffff00ff" }}
         />
-      </Stack>
+      
       }
+      <Stack direction="row" spacing={2}>
+      {value !== null && (
+        <Typography sx={{ mt: 1, color: "#333" }}>
+          {labels[value as 1 | 2 | 3 | 4 | 5]}
+        </Typography>
+      )}
+
       {menu && <MessageOptions el={el} onDelete={()=>onDelete(el)}/>}
+        </Stack>
   </Stack>
   )
   
