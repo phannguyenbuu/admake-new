@@ -98,9 +98,11 @@ def update_task_status(id):
 
     data = request.get_json()
 
-    # Cập nhật các trường trong Task từ dữ liệu gửi lên
-    task.status = data.get("status", task.status)
-    db.session.commit()
+    if task.status != data.get("status"):
+        # Cập nhật các trường trong Task từ dữ liệu gửi lên
+        task.status = data.get("status", task.status)
+        task.check_reward = False
+        db.session.commit()
 
     return jsonify(task.to_dict())
 

@@ -1026,21 +1026,21 @@ if __name__ == "__main__":
         #     add_new_columns(table,['version'],'INTEGER')
 
         # add_new_columns('user',['citizenId','email','facebookAccount','zaloAccount','referrer'],'VARCHAR(80)')
-        # add_new_columns('message',['username'],'VARCHAR(255)')
+        # add_new_columns('task',['check_reward'],'BOOLEAN')
         # add_new_columns('user',['gender'],'INTEGER')
         # add_new_columns('lead',['version'],'INTEGER')
         # add_new_columns('task',['amount'],'INTEGER')
         # add_new_columns('user',['salary','version'],'INTEGER')
         # add_new_columns('user',['deletedAt'],'TIMESTAMP')
-        # renameColumn('user', "level_salary", "salary")
+        # renameColumn('message', "id", "salary")
         
         # msgs = db.session.query(Message).filter(Message.message_id == "temp-1760491441221").all()
         # print(len(msgs))
 
-        from sqlalchemy import func, and_
+        # from sqlalchemy import func, and_
 
-        Message.query.filter(Message.id == 150).delete(synchronize_session=False)
-        db.session.commit()
+        # Message.query.filter(Message.id == 150).delete(synchronize_session=False)
+        # db.session.commit()
 
 
         

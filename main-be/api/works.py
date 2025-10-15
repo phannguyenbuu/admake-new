@@ -122,23 +122,18 @@ def get_workspace_task(id):
     
     return jsonify(tasks_response)
 
-@workspace_bp.route("/<int:id>/reward", methods=["PUT"])
-def post_workspace_reward_task(id):
+@workspace_bp.route("/<int:group_id>/reward", methods=["PUT"])
+def post_workspace_reward_task(group_id):
     data = request.get_json()
     message_id = data.get('message_id')
     rate = data.get('rate')
 
-    group = db.session.get(Group, id)
+    group = db.session.get(Group, group_id)
     if not group:
-        print("Group not found", id)
+        print("Group not found", group_id)
         abort(404, description="Group not found")
 
-    print("Group", group.name)
-    work = Workspace.query.filter(Workspace.name.ilike(group.name)).first()
-        
-    if not work:
-        print("Workspace not found", group.name)
-        abort(404, description="Workspace not found")
+    
 
     msgs = Message.query.filter(Message.message_id == message_id).all()
     print('msgs', len(msgs))
@@ -157,15 +152,25 @@ def post_workspace_reward_task(id):
         msg.react["rate"] = rate
         flag_modified(msg, "react")
     # db.session.commit()
+
+
+    print("Group", group.name)
+    work = Workspace.query.filter(Workspace.name.ilike(group.name)).first()
+        
+    if not work:
+        print("Workspace not found", group.name)
+        abort(404, description="Workspace not found")
     
     tasks = Task.query.filter_by(workspace_id=work.id).all()
-    # tasks = Task.query.execution_options(autoflush=False).filter_by(workspace_id=work.id).all()
-
     print('tasks',work, len(tasks))
 
     for task in tasks:
         print('task', task.title)
-        task.status = "REWARD"
+        if task.status != "REWARD":
+            task.status = "DONE"
+            task.check_reward = True
+
+    # "OPEN" | "IN_PROGRESS" | "DONE" | "CHECK_REWARD" | "REWARD"
 
     
     db.session.commit()

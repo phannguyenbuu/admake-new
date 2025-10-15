@@ -49,6 +49,7 @@ export function getTitleByStatus(type: string): string | undefined {
 
 export default function ManagermentBoard({workspaceId,}: ManagermentBoardProps) {
   const adminMode = useCheckPermission();
+  const [refreshFormTask, setRefreshFormTask] = useState<boolean>(false);
 
 
   // API hooks
@@ -220,6 +221,8 @@ export default function ManagermentBoard({workspaceId,}: ManagermentBoardProps) 
     [adminMode, columns]
   );
 
+  
+
   // Hàm cập nhật trạng thái task qua API
   const updateTaskStatus = useCallback(
     async (taskId: string, newStatus: string) => {
@@ -228,7 +231,9 @@ export default function ManagermentBoard({workspaceId,}: ManagermentBoardProps) 
           id: taskId,
           dto: { status: newStatus },
         });
-        message.success("Cập nhật trạng thái thành công!");
+        message.success("Cập nhật trạng thái thành công! " + newStatus);
+
+
         refetchTasks();
       } catch (error) {
         message.error("Có lỗi xảy ra khi cập nhật trạng thái!");
@@ -425,6 +430,7 @@ export default function ManagermentBoard({workspaceId,}: ManagermentBoardProps) 
         // @ts-ignore
         customers = {workspaceData?.customers}
         updateTaskStatus={updateTaskStatus}
+        
       />
 
       <WorkspaceModal deleteConfirmModal={deleteConfirmModal}      

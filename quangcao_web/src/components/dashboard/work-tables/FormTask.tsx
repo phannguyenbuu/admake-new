@@ -32,32 +32,19 @@ interface TaskHeaderProps {
   isLoading: boolean;
   onSuccess: () => void;
   onUpdate: () => void;
-  onCancel: () => void;
   updateTaskStatus: (taskId: string, newStatus: string) => Promise<void>;
+  showUpdateButtonMode: number;
+  
 }
 
 // TaskHeader.tsx
-function TaskHeader({ taskDetail, onSuccess, updateTaskStatus, isLoading, onUpdate, onCancel }: TaskHeaderProps) {
-  // const handleInspection = () => {
-  //   if (!taskDetail) return;
-
+function TaskHeader({ taskDetail, onSuccess, updateTaskStatus, 
+  isLoading, onUpdate,  showUpdateButtonMode }: TaskHeaderProps) {
   
-    // const response = await fetch(`${useApiHost()}/task/${taskDetail.id}/status`, {
-    //       method: "PUT",
-    //       headers: { "Content-Type": "application/json" },
-    //       body: JSON.stringify({"status":"REWARD"}),
-    //     });
-      
-    //     if (!response.ok) 
-    //       throw new Error("Nghiệm thu thất bại");
-    //     else
-    //       console.log("Nghiệm thu thành công!");
+  console.log('Task:', taskDetail);
 
-    // onCancel();
-  // }
-
-  const handleInspection = async () => {
-    console.log("A_Task", taskDetail,updateTaskStatus);
+  const handleReward = async () => {
+    // console.log("A_Task", taskDetail,updateTaskStatus);
     if (!taskDetail) return;
     if (!updateTaskStatus) return;
 
@@ -85,19 +72,18 @@ function TaskHeader({ taskDetail, onSuccess, updateTaskStatus, isLoading, onUpda
       </div>
 
       <Stack direction="row" spacing={1}>
-        {taskDetail?.status !== "DONE" && taskDetail?.status !== "REWARD" && (
+        {showUpdateButtonMode === 0 && 
           <Button type="primary" loading={isLoading} onClick={onUpdate}>
             ✅ Cập nhật
           </Button>
-        )}
-        {taskDetail?.status === "DONE" && (
-          <Button type="primary" loading={isLoading} onClick={handleInspection}>
+        }
+
+        {showUpdateButtonMode === 1 && 
+          <Button type="primary" loading={isLoading} onClick={handleReward}>
             🏆 Nghiệm Thu
           </Button>
-        )}
-        <Button disabled={!isLoading}>
-          ❌ Đóng
-        </Button>
+        }
+        
       </Stack>
     </Stack>
   );
@@ -118,13 +104,12 @@ interface FormTaskProps {
   users: UserSearchProps[];
   customers: UserSearchProps[];
   updateTaskStatus: (taskId: string, newStatus: string) => Promise<void>;
-
 }
 
 export default function FormTask({ 
   updateTaskStatus, open, onCancel, taskId, onSuccess,
   workspaceId, users, customers }: FormTaskProps) {
-
+  const [showUpdateButtonMode, setShowUpdateButtonMode] = useState<number>(0);
   const { data:taskDetail, isLoading, isError, error } = useGetTaskById(taskId || "");
   // const [material, setMaterial] = useState<{ selectedMaterials: any[], materialQuantities: { [key: string]: number } }>({
   //   selectedMaterials: [],
@@ -160,6 +145,14 @@ export default function FormTask({
     setUserList(taskDetail?.assign_ids);
 
     console.log('taskDetail', taskDetail.id);
+
+    if(taskDetail?.status === "DONE" && taskDetail?.check_reward)
+      setShowUpdateButtonMode(1);
+    else if(taskDetail?.status === "REWARD")
+      setShowUpdateButtonMode(2);
+    else
+      setShowUpdateButtonMode(0);
+
   },[taskDetail]);
 
   const onUserDelete = (idToDelete: string | null) => {
@@ -285,7 +278,9 @@ export default function FormTask({
                 isLoading={isLoading}
                 onUpdate={handleUpdate}  
                 onSuccess={onSuccess}
-                onCancel={onCancel}/>
+                
+                showUpdateButtonMode={showUpdateButtonMode}
+                />
       </Stack>
       
         <Form form={form} style={{maxHeight:'80vh', overflowY:'auto'}}>

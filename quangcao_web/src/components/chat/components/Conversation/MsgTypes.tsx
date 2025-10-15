@@ -299,13 +299,15 @@ const TimeLine: React.FC<MsgTypeProps> = ({ el, menu, onDelete }) => {
   };
 
   const labels: {[index in 1 | 2 | 3 | 4 | 5]: string} = {
-  1: 'Quá kém',
-  2: 'Kém',
-  3: 'Trung bình',
-  4: 'Đạt',
-  5: 'Rất tốt',
-};
+    1: 'Quá kém',
+    2: 'Kém',
+    3: 'Trung bình',
+    4: 'Đạt',
+    5: 'Rất tốt',
+  };
 
+  const disable = el && el.react && el?.react?.rate != 0;
+  console.log(el?.react?.rate != 0, el);
 
   return (
     <Stack alignItems='center' justifyContent='space-between' 
@@ -322,6 +324,8 @@ const TimeLine: React.FC<MsgTypeProps> = ({ el, menu, onDelete }) => {
           max={5}
           onChange={handleRatingChange}
           sx={{ color: "#ffff00ff" }}
+
+          disabled = {disable}
         />
       
       }

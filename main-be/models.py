@@ -325,6 +325,8 @@ class Task(BaseModel):
     end_time = db.Column(db.Date)
     start_time = db.Column(db.Date)
 
+    check_reward = db.Column(db.Boolean, default = False)
+
     def to_dict(self):
         result = {}
         for column in self.__table__.columns:
@@ -513,7 +515,7 @@ from sqlalchemy.exc import IntegrityError
 class Message(BaseModel):
     __tablename__ = 'message'
 
-    id = db.Column(db.Integer, autoincrement=True)
+    
 
     message_id = db.Column(db.String(80), primary_key=True)
     group_id = db.Column(db.Integer, db.ForeignKey('group.id'), nullable=True)
