@@ -16,7 +16,7 @@ def get_suppliers():
     search = request.args.get("search", "", type=str)
 
     # Lọc user có role_id = 2 (nhà cung cấp)
-    query = User.query.filter(User.role_id == 3)
+    query = User.query.filter(User.role_id > 100)
 
     if search:
         # Lọc theo tên (user.fullName), cách này dùng ilike để không phân biệt hoa thường

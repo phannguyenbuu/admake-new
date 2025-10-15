@@ -286,7 +286,7 @@ const Footer = forwardRef<HTMLDivElement, FooterProps>(
         group_id: groupEl?.id || 0,
         user_id: '',
         username: get_user_name(),
-        text: 'Quý khách hàng muốn nghiệm thu dự án này?',
+        text: 'Quý khách hàng vui lòng đánh giá dự án này?',
         file_url: '',
         link: '',
         message_id: `temp-${timestamp}`,

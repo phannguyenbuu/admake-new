@@ -1026,7 +1026,7 @@ if __name__ == "__main__":
         #     add_new_columns(table,['version'],'INTEGER')
 
         # add_new_columns('user',['citizenId','email','facebookAccount','zaloAccount','referrer'],'VARCHAR(80)')
-        # add_new_columns('user',['address'],'VARCHAR(255)')
+        # add_new_columns('message',['username'],'VARCHAR(255)')
         # add_new_columns('user',['gender'],'INTEGER')
         # add_new_columns('lead',['version'],'INTEGER')
         # add_new_columns('task',['amount'],'INTEGER')
@@ -1035,10 +1035,11 @@ if __name__ == "__main__":
         # renameColumn('user', "level_salary", "salary")
         
         for user in User.query.all():
-            # user.zaloAccount = generate_zalo_account(user.fullName)
-            # user.facebookAccount = generate_zalo_account(user.fullName)
-            user.email = generate_zalo_account(user.fullName) + '@' + random.choice(['@gmail.com','hotmail.com','icloud.com'])
-            # user.salary = generate_salary()
+            if user.role_id == 3:
+                print(user.fullName)
+                user.role_id = 101
+                db.session.add(user)
 
-            db.session.add(user)
+
         db.session.commit()
+        

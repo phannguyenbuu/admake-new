@@ -68,7 +68,7 @@ export default function FormUser({
         phone: user.phone,
         username: user.username,
         password: user.password,
-        role: role ? role.id : user.role?.id,
+        role_id: role ? role.id : user.role?.id,
         salary: user.salary,
 
         gender: user.gender,
@@ -275,7 +275,7 @@ export default function FormUser({
           <Row gutter={[16, 16]}>
             <Col xs={24} sm={12} lg={12}>
               <Form.Item
-                name="role"
+                name="role_id"
                 label={
                   <span className="text-sm sm:text-base font-semibold text-gray-700">
                     Chức vụ:

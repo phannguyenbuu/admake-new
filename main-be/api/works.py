@@ -123,6 +123,8 @@ def get_workspace_task(id):
 
 @workspace_bp.route("/<string:id>/reward", methods=["PUT"])
 def post_workspace_reward_task(id):
+    data = request.get_json()
+    rate = data.get('rate')
 
     group = db.session.get(Group, id)
     if not group:

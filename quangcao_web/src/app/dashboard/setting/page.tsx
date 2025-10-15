@@ -10,18 +10,18 @@ export const SettingDashboard: IPage["Component"] = () => {
     <div className="w-full min-h-screen p-2 sm:p-4 bg-fixed bg-center bg-cover rounded-2xl">
       <Row gutter={[16, 16]} className="w-full">
         {/* Top-Left: Lương tháng */}
-        <Col xs={24} sm={24} md={12} lg={12} xl={12} className="flex flex-col">
+        {/* <Col xs={24} sm={24} md={12} lg={12} xl={12} className="flex flex-col">
           <div className="h-full">
             <SalaryLevelCard />
           </div>
-        </Col>
+        </Col> 
 
         {/* Top-Right: Lương tăng ca */}
-        <Col xs={24} sm={24} md={12} lg={12} xl={12} className="flex flex-col">
+        {/* <Col xs={24} sm={24} md={12} lg={12} xl={12} className="flex flex-col">
           <div className="h-full">
             <OvertimeCard />
           </div>
-        </Col>
+        </Col> */}
 
         {/* Bottom-Left: Chức vụ */}
         <Col xs={24} sm={24} md={12} lg={12} xl={12} className="flex flex-col">
