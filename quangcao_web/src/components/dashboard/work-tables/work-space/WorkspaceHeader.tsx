@@ -25,8 +25,9 @@ const WorkspaceHeader: React.FC<WorkspaceHeaderProps> = ({ workspaceData }) => {
                 <div className="w-1.5 h-1.5 bg-white rounded-full"></div>
                 <span className="truncate max-w-[200px] sm:max-w-none">
                 {/* @ts-ignore */}
-                {workspaceData?.name}
+                  {workspaceData?.name} - {workspaceData?.address}
                 </span>
+
                 <StarOutlined className="ml-1 text-white text-base transform group-hover:scale-110 transition-transform duration-200 flex-shrink-0" />
             </div>
             </div>

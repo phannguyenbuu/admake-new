@@ -107,12 +107,7 @@ const routes: TRoute = {
       title: "Bảng điều khiển",
       isMainMenu: true,
       children: [
-        {
-          path: "/dashboard/statistics",
-          element: <StatisticDashboard />,
-          title: "Phân tích",
-          icon: <PieChartOutlined  />,
-        },
+        
         {
           path: "/dashboard",
           index: true,
@@ -156,17 +151,7 @@ const routes: TRoute = {
           title: "Quản lý thầu phụ",
           icon: <FormOutlined />,
         },
-        {
-          path: "/dashboard/materials",
-          element: (
-            <RequireRoles roles={["warehouse:management"]}>
-              <MaterialDashboard />
-            </RequireRoles>
-          ),
-          roles: ["warehouse:management"],
-          title: "Quản lý vật liệu",
-          icon: <InboxOutlined />,
-        },
+       
         {
           path: "/dashboard/customers",
           element: (
@@ -190,7 +175,29 @@ const routes: TRoute = {
             },
           ],
         },
-
+        {
+          path: "divider-1",
+          title: "divider",
+          isDivider: true,  // lá cờ nhận biết đây là divider
+          ignoreInMenu: false,
+        },
+        {
+          path: "/dashboard/materials",
+          element: (
+            <RequireRoles roles={["warehouse:management"]}>
+              <MaterialDashboard />
+            </RequireRoles>
+          ),
+          roles: ["warehouse:management"],
+          title: "Quản lý vật liệu",
+          icon: <InboxOutlined />,
+        },
+        {
+          path: "/dashboard/statistics",
+          element: <StatisticDashboard />,
+          title: "Phân tích",
+          icon: <PieChartOutlined  />,
+        },
         {
           path: "/dashboard/invoices",
           element: (
@@ -279,22 +286,33 @@ export function getMainMenuItems(pathname?: string): MenuItem[] {
       const hasPermission = true;
 
       if (!route.ignoreInMenu && hasPermission) {
-        const push: MenuItem = {
-          key: route.path || "",
-          icon: route.icon || <BookOutlined />,
-          label: route.title || "Menu",
-          active: pathname?.includes(route.path || ""),
-        };
-
-        if (!route.children?.length) {
-          acc.push(push);
+        if (route.isDivider) {
+          // Thêm divider như 1 item đặc biệt
+          acc.push({
+            key: route.path || Math.random().toString(),
+            icon: null,
+            label: "--------------------------------",  // Hoặc bạn muốn nhãn separator thì để text gì đó
+            // Bạn có thể dùng 1 flag mới để UI hiểu đây là divider
+            isDivider: true,
+          });
         } else {
-          const children = loop(route.children);
-          if (children.length > 0) {
-            acc.push({ ...push, children });
+          const push: MenuItem = {
+            key: route.path || "",
+            icon: route.icon || <BookOutlined />,
+            label: route.title || "Menu",
+            active: pathname?.includes(route.path || ""),
+          };
+
+          if (!route.children?.length) {
+            acc.push(push);
+          } else {
+            const children = loop(route.children);
+            if (children.length > 0) {
+              acc.push({ ...push, children });
+            }
           }
         }
-      }
+      } 
       return acc;
     }, []) as MenuItem[];
   };

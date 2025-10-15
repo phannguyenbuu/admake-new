@@ -285,7 +285,7 @@ export default function FormTask({
       
         <Form form={form} style={{maxHeight:'80vh', overflowY:'auto'}}>
           <Stack spacing={1}>
-            <JobInfoCard taskDetail={taskDetail ?? null} currentStatus={currentStatus} form={form} />
+            
             
             {/* Thông tin khách hàng */}
             <Form.Item name="workspace_id" initialValue={workspaceId} hidden>
@@ -299,7 +299,7 @@ export default function FormTask({
             </Form.Item>
             
             <Stack direction="row" spacing = {2}>
-              <Stack>
+              {/* <Stack>
                 <JobCustomerInfo form={form} mode="customer" 
                   users={customers}
                   setSearchValue={setCustomerSearch} 
@@ -308,7 +308,8 @@ export default function FormTask({
                   selectedCustomer={customerSelected}/>
 
                  {customerObj && <UserItem user={customerObj} onDelete={()=> setCustomerObj(null)}/>}
-              </Stack>
+              </Stack> */}
+              <JobInfoCard taskDetail={taskDetail ?? null} currentStatus={currentStatus} form={form} />
 
               <Stack>
                 <JobCustomerInfo 

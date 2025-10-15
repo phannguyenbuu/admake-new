@@ -71,7 +71,7 @@ const JobInfoCard: React.FC<JobInfoCardProps> = ({ currentStatus, taskDetail, fo
           />
         </Form.Item>
 
-        <Stack spacing={1}>
+        {/* <Stack spacing={1}>
           <Stack direction="row" spacing={1}>
             <span className="text-xs text-gray-600 mb-2 font-medium">Danh sách</span>
             <Tag
@@ -98,7 +98,7 @@ const JobInfoCard: React.FC<JobInfoCardProps> = ({ currentStatus, taskDetail, fo
                 : "⏳ Chưa nhận việc"}
             </Tag>
           </Stack>
-        </Stack>
+        </Stack> */}
       </Stack>
     </div>
     

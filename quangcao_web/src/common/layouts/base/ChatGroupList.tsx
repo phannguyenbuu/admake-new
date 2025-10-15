@@ -60,7 +60,7 @@ const ChatGroupList: React.FC = ({}) => {
   const handleOk = () => {
     setModalVisible(false);
     setSelectedId(null);
-    window.location.reload();
+    // window.location.reload();
     // Nếu muốn điều hướng sau khi OK
     // navigate("/dashboard/infor");
   };
@@ -86,7 +86,7 @@ const ChatGroupList: React.FC = ({}) => {
     <div className="flex items-center">
       <Stack direction="row" spacing={2} px={0.5}
         sx={{backgroundColor:"#00B4B6", maxHeight:30, borderRadius: 5}}>
-        <Dropdown menu={{ items, onClick: onMenuClick }}>
+        <Dropdown menu={{ items, onClick: onMenuClick }} style={{maxHeight:'80vh'}}>
           <Box sx = {{width: 120,height: 25, top: 2,position: "relative",borderRadius: 10,
               backgroundColor: isHover ? 'rgba(255,255,255,0.5)' : 'rgba(255,255,255,0.25)',
               transition: "background-color 1s ease"}}>

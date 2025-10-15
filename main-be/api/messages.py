@@ -3,7 +3,6 @@ from models import db, app, dateStr, Message
 from api.chat import socketio
 import os
 
-
 message_bp = Blueprint('message', __name__, url_prefix='/api/message')
 
 @message_bp.route("/", methods=["GET"])

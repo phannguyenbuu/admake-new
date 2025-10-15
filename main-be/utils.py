@@ -1018,7 +1018,7 @@ if __name__ == "__main__":
         #     renameColumn(table, "create_at", "createdAt")
         #     renameColumn(table, "created_at", "createdAt")
         #     renameColumn(table, "updateAt", "updatedAt")
-        #     renameColumn(table, "update_at", "updatedAt")
+        #     renameColumn(table, "update_at", "updatedAt"grand world ha
         #     renameColumn(table, "updated_at", "updatedAt")
         #     renameColumn(table, "deleted_at", "deletedAt")
         #     renameColumn(table, "delete_at", "deletedAt")
@@ -1029,7 +1029,10 @@ if __name__ == "__main__":
         # add_new_columns('task',['check_reward'],'BOOLEAN')
         # add_new_columns('user',['gender'],'INTEGER')
         # add_new_columns('lead',['version'],'INTEGER')
-        # add_new_columns('task',['amount'],'INTEGER')
+        # add_new_columns('workspace',['address'],'VARCHAR(255)')
+        # add_new_columns('workspace',['address'],'VARCHAR(255)')
+        # add_new_columns('group',['rating_count'],'INTEGER')
+        # add_new_columns('group',['owner_id'],'VARCHAR(50)')
         # add_new_columns('user',['salary','version'],'INTEGER')
         # add_new_columns('user',['deletedAt'],'TIMESTAMP')
         # renameColumn('message', "id", "salary")
@@ -1041,6 +1044,60 @@ if __name__ == "__main__":
 
         # Message.query.filter(Message.id == 150).delete(synchronize_session=False)
         # db.session.commit()
+
+
+        # print(Group.query.count(), Workspace.query.count(), Customer.query.count())
+
+
+        so_nha_ten_duong = [
+    "23 Nguyễn Trãi",
+    "45 Lê Lợi",
+    "12 Trần Hưng Đạo",
+    "89 Phan Đình Phùng",
+    "67 Lý Thường Kiệt",
+    "34 Hai Bà Trưng",
+    "56 Trần Phú",
+    "78 Nguyễn Văn Cừ",
+    "21 Cách Mạng Tháng Tám",
+    "9 Phan Chu Trinh",
+    "15 Tôn Đức Thắng",
+    "28 Hoàng Hoa Thám",
+    "5 Bạch Đằng",
+    "103 Trần Quang Khải",
+    "42 Lê Duẩn",
+    "88 Đinh Tiên Hoàng",
+    "51 Võ Thị Sáu",
+    "6 Hùng Vương",
+    "77 Điện Biên Phủ",
+    "13 Nguyễn Hữu Thọ",
+    "36 Huỳnh Thúc Kháng",
+    "20 Lê Thánh Tông",
+    "44 Phạm Văn Đồng",
+    "59 Võ Nguyên Giáp",
+    "8 Đỗ Quang",
+    "27 Nguyễn Văn Linh",
+    "65 Trương Định",
+    "17 Phạm Ngọc Thạch",
+    "31 Nguyễn Bình",
+    "14 Trần Cao Vân",
+    "105 Trần Phú"
+]
+
+
+
+        groups = Group.query.all()
+        works = Workspace.query.all()
+        customers = Customer.query.all()
+
+        for i, s in enumerate(so_nha_ten_duong):
+            groups[i].address = works[i].address = s
+            # db.session.delete(customers[i])  # xóa từng đối tượng khỏi session
+
+        db.session.commit()  # lưu thay đổi vào database
+
+
+
+            
 
 
         

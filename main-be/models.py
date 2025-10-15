@@ -152,6 +152,8 @@ class User(BaseModel):
     zaloAccount = db.Column(db.String(80))
     referrer = db.Column(db.String(80))
 
+    taxCode = db.Column(db.String(50))
+
     workpoints = db.relationship('Workpoint', backref='user', lazy=True)
 
     # customer = db.relationship("Customer", back_populates="user", uselist=False)
@@ -204,7 +206,7 @@ class Customer(db.Model):
     id = db.Column(db.String(50), primary_key=True)
     user_id = db.Column(db.String(50), db.ForeignKey("user.id"), unique=True, nullable=False)
 
-    taxCode = db.Column(db.String(50))
+    
     
     workInfo  = db.Column(db.String(255))
     workStart = db.Column(db.DateTime, nullable=True)
@@ -271,6 +273,7 @@ class Workspace(BaseModel):
 
     id = db.Column(db.String(50), primary_key=True)  # _id.$oid
     name = db.Column(db.String(255))
+    address = db.Column(db.String(255))
     owner_id = db.Column(db.String(50))
     description = db.Column(db.String(255))
     documents = db.Column(db.JSON, default=[])  # Lưu danh sách đường dẫn tài liệu
@@ -380,13 +383,14 @@ class Group(BaseModel):
     __table_args__ = {'quote': True}
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    # groupId = db.Column(db.Integer, unique=True)
+    owner_id = db.Column(db.String(50))
     name = db.Column(db.String(120), nullable=True)
     description = db.Column(db.String(255))
     address = db.Column(db.String(255))
     documents = db.Column(db.JSON, default=[])  # Lưu danh sách đường dẫn tài liệu
     images = db.Column(db.JSON, default=[])     # Lưu danh sách đường dẫn hình ảnh
     chats = db.Column(db.JSON, default=[])      # Lưu danh sách message ID lưu lại
+    rating_count = db.Column(db.Integer, default=0)
     rating_sum = db.Column(db.Integer, default=0)
     status = db.Column(db.String(10), default=0)
     # createdAt = db.Column(db.DateTime(timezone=True), server_default=func.now())
@@ -401,7 +405,7 @@ class Group(BaseModel):
                 value = value.isoformat()
             result[column.name] = value
 
-        result['members'] = self.total_members
+        # result['members'] = self.total_members
                 
         return result
     

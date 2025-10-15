@@ -35,6 +35,7 @@ export type User = BaseEntity & {
   facebookAccount: string,
   zaloAccount: string,
   referrer: string,
+  taxCode: string,
 };
 
 export type JwtResponse = {

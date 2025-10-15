@@ -10,3 +10,13 @@
   font-size: 12px !important;
   color: #999;
 }
+
+.ant-dropdown {
+  max-height: unset !important;
+  overflow: unset !important;
+}
+
+.rc-virtual-list {
+  max-height: 80vh !important;
+  overflow-y: auto !important;
+}
