@@ -682,6 +682,14 @@ class Location(db.Model):
     gps_lng = db.Column(db.Float, nullable=False)
     type = db.Column(db.Enum('chi_nhanh', 'cong_trinh', name='location_type'), nullable=False)
 
+class UsingHistoryData(db.Model):
+    __tablename__ = 'using'
+    id = db.Column(db.Integer, primary_key=True)
+    lead_id = db.Column(db.Integer, db.ForeignKey('lead.id'), nullable=False)
+    start_time = db.Column(db.Date)
+    end_time = db.Column(db.Date)
+    balance_amount = db.Column(db.Float)
+
 class LeadPayload(BaseModel):
     __tablename__ = 'lead'
     id = db.Column(db.Integer, primary_key=True)
