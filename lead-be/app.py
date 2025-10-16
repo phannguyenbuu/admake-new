@@ -11,7 +11,8 @@ from flask import render_template
 
 @app.route('/admin/leads/')
 def admin_leads():
-    leads = LeadPayload.query.all()  # Lấy toàn bộ lead từ db
+    leads = LeadPayload.query.order_by(LeadPayload.id).all()
+  # Lấy toàn bộ lead từ db
     leads_data = [lead.to_dict() for lead in leads]  # Chuyển đối tượng thành dict để render dễ dàng
     return render_template('admin_leads.html', leads=leads_data)
 
