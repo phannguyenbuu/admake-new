@@ -82,7 +82,7 @@ def update_message(id):
     db.session.commit()
     return jsonify(role.to_dict()), 200
 
-@message_bp.route("/<int:message_id>", methods=['DELETE'])
+@message_bp.route("/<string:message_id>", methods=['DELETE'])
 def delete_message(message_id):
     message = Message.query.filter_by(message_id=message_id).first()
 

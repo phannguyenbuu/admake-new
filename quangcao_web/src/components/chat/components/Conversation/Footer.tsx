@@ -88,8 +88,8 @@ const ChatInput = forwardRef<HTMLDivElement, ChatInputProps>(
       if (!file) return;
 
       const fileSizeMB = file.size / (1024 * 1024);
-      if (fileSizeMB > 1) {
-        alert("Kích thước file vượt quá 1MB, vui lòng chọn file nhỏ hơn.");
+      if (fileSizeMB > 100) {
+        notification.error({message:"Kích thước file vượt quá 1MB, vui lòng chọn file nhỏ hơn."});
         return;
       }
       

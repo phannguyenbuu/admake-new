@@ -2,6 +2,7 @@ from flask import Blueprint, request, jsonify, abort
 from models import db, app, Workspace, Message,User, dateStr, generate_datetime_id
 from api.chat import socketio
 from sqlalchemy import desc
+from api.works import create_workspace
 
 group_bp = Blueprint('group', __name__, url_prefix='/api/group')
 
@@ -18,12 +19,10 @@ def get_groups():
 @group_bp.route("/", methods=["POST"])
 def create_group():
     data = request.get_json()
+    new_workspace = create_workspace(data)
 
-    new_group = Workspace.create_item(data)
-    db.session.add(new_group)
-    db.session.commit()
+    return jsonify(new_workspace.to_dict()), 201
 
-    return jsonify(new_group.to_dict()), 201
 
 @group_bp.route("/<int:workspace_id>", methods=["DELETE"])
 def delete_group(workspace_id):

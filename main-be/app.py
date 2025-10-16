@@ -52,5 +52,7 @@ if __name__ == "__main__":
         # load_customers()
 
     # app.run(host="0.0.0.0", port=5273, debug=True)
+    print(app.config.get('MAX_CONTENT_LENGTH'))
+
     socketio.run(app, host='0.0.0.0', port=5007, debug=True, allow_unsafe_werkzeug=True)
 

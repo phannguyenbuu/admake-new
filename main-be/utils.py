@@ -1035,19 +1035,15 @@ if __name__ == "__main__":
 
 
 
-        leads = LeadPayload.query.all()
+       
 
         # print(len(groups), len(works))
         
-        
-        # batch_size = 100
-        # count = 0
-        from datetime import timedelta
-        
-        for i, lead in enumerate(leads):
-            print(lead.to_dict())
+        work = db.session.get(Workspace,"20251016233233791675102438")
+        work.version = 51
 
-        # db.session.commit()  # commit lần cuối nếu còn phần tử chưa commit
+        
+        db.session.commit()  # commit lần cuối nếu còn phần tử chưa commit
 
 
 

@@ -23,7 +23,9 @@ interface JobTimeAndProcessProps {
 }
 
 const JobTimeAndProcess: React.FC<JobTimeAndProcessProps> = ({taskDetail, form}) => {
-  
+  const [startDate, setStartDate] = useState<Dayjs | null>(taskDetail?.start_time ? dayjs(taskDetail.start_time) : null);
+  const [endDate, setEndDate] = useState<Dayjs | null>(taskDetail?.end_time ? dayjs(taskDetail.end_time) : null);
+
   const [endTime, setEndTime] = useState<Dayjs | null>(taskDetail?.end_time ? dayjs(taskDetail.end_time) : null);
 
   const [totalDays, setTotalDays] = useState<number | null>(null);
@@ -36,6 +38,9 @@ const JobTimeAndProcess: React.FC<JobTimeAndProcessProps> = ({taskDetail, form})
   const selectedType = form ? Form.useWatch("type", form) : null; // Lấy giá trị current của field "type"
 
   useEffect(() => {
+    setStartDate(taskDetail?.start_time ? dayjs(taskDetail.start_time) : null);
+    setEndDate(taskDetail?.end_time ? dayjs(taskDetail.end_time) : null);
+
     if (taskDetail?.start_time && taskDetail?.end_time) {
       const start =  dayjs(taskDetail?.start_time);
       const end =  dayjs(taskDetail?.end_time);
@@ -50,6 +55,9 @@ const JobTimeAndProcess: React.FC<JobTimeAndProcessProps> = ({taskDetail, form})
       setTotalDays(null);
       setRemainingDays(null);
     }
+
+
+
   }, [taskDetail?.start_time, taskDetail?.end_time]);
 
   useEffect(() => {
@@ -67,6 +75,20 @@ const JobTimeAndProcess: React.FC<JobTimeAndProcessProps> = ({taskDetail, form})
       });
     }
   }, [form, taskDetail]);
+
+  useEffect(() => {
+    if (startDate && endDate) {
+      const total = endDate.diff(startDate, "day") + 1;
+      setTotalDays(total > 0 ? total : 0);
+
+      const remaining = endDate.diff(dayjs(), "day") + 1;
+      setRemainingDays(remaining > 0 ? remaining : 0);
+    } else {
+      setTotalDays(null);
+      setRemainingDays(null);
+    }
+  }, [startDate, endDate]);
+
 
 
   return (
@@ -87,12 +109,16 @@ const JobTimeAndProcess: React.FC<JobTimeAndProcessProps> = ({taskDetail, form})
       <>
         <DateFormPicker form={form} mode="start_time" title="Bắt đầu"
           taskDetail={taskDetail}
-          timeValue={taskDetail?.start_time ? dayjs(taskDetail?.start_time) : null}
+          // timeValue={taskDetail?.start_time ? dayjs(taskDetail?.start_time) : null}
+          timeValue={startDate}
+          onChange={(date) => setStartDate(date)}
           disabledDateFunc={(current: Dayjs) => current && current < dayjs().startOf("day")}/>
 
         <DateFormPicker form={form} mode="end_time" title="Kết thúc"
           taskDetail={taskDetail}
-          timeValue={taskDetail?.end_time ? dayjs(taskDetail?.end_time) : null}
+          // timeValue={taskDetail?.end_time ? dayjs(taskDetail?.end_time) : null}
+          timeValue={endDate}
+          onChange={(date) => setEndDate(date)}
           disabledDateFunc={(current: Dayjs) =>
             (current && current < dayjs(taskDetail?.start_time).startOf('day'))}/>
       </>
@@ -202,13 +228,15 @@ export function DateFormPicker({
   timeValue,
   disabledDateFunc,
   form,
+  onChange
 }: {
   taskDetail:Task | null,
   mode: string;
   title: string;
   timeValue: Dayjs | null;
   disabledDateFunc?: (date: Dayjs) => boolean;
-  form: any; // Tốt hơn là bạn định nghĩa đúng type của form tùy lib bạn dùng
+  form: any;
+  onChange?: (date: Dayjs | null) => void
 }) {
   useEffect(() => {
     if(!form) return;
@@ -231,6 +259,8 @@ export function DateFormPicker({
           taskDetail.start_time = dateOnly;
         }
       }
+
+      if (onChange) onChange(dateOnly);
     } else {
       if(form)
         form.setFieldsValue({ [mode]: null });
@@ -242,7 +272,10 @@ export function DateFormPicker({
           taskDetail.start_time = null;
         }
       }
+      if (onChange) onChange(null);
     }
+
+    
   };
 
 

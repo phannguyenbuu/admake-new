@@ -73,7 +73,7 @@ const Header: React.FC<HeaderProps>
                   <Avatar alt={title} src={undefined}/>
               </StyledBadge>
             </Box>
-            <Stack spacing={0.2}>
+            <Stack spacing={0.2} sx={{minWidth:100}}>
               <Typography variant='subtitle2'>
                   {title}
               </Typography>

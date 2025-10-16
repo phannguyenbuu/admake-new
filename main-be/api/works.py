@@ -1,53 +1,49 @@
 from flask import Blueprint, request, jsonify, abort
-from models import db, Workspace, Task, dateStr,Message, generate_datetime_id, User, Customer
+from models import app, db, Workspace, Task, dateStr,Message, generate_datetime_id, User, Customer
 import datetime
 from collections import defaultdict
 from sqlalchemy import desc
 from sqlalchemy.orm.attributes import flag_modified
+from sqlalchemy.sql import func
+
+
 
 workspace_bp = Blueprint('workspace', __name__, url_prefix='/api/workspace')
 
 @workspace_bp.route("/", methods=["GET"])
 def get_workspaces():
+    print(app.config.get('MAX_CONTENT_LENGTH'))
     workspaces = Workspace.query.order_by(desc(Workspace.updatedAt)).all()
     return jsonify([c.to_dict() for c in workspaces])
 
 
 @workspace_bp.route("/", methods=["POST"])
-def create_workspace():
+def create_worksapce_route():
     data = request.get_json()
+    new_workspace = create_workspace(data)
 
+    return jsonify(new_workspace.to_dict()), 201
+
+def create_workspace(data):
     name = data.get('name')
     address = data.get('address')
 
-    # if group_id:
-    #     group = db.session.get(Group, group_id)
-
-    #     if group:
-    #         name = group.name
-            
-
-    # if not name:    
-    #     name = data.get('name')
-
-    # if not name:
-    #     return jsonify({"error": "Empty Workspace name"}), 405
-
-    # existing = Workspace.query.filter_by(name=name).first()
-    # if existing:
-    #     return jsonify({"error": "Workspace name already exists"}), 400
+    max_version = db.session.query(func.max(Workspace.version)).scalar()
+    if max_version is None:
+        max_version = 0
 
 
     new_workspace = Workspace(
         id=generate_datetime_id(),
         name=name,
-        address=address
+        address=address,
+        version=max_version + 1
     )
     
     db.session.add(new_workspace)
     db.session.commit()
-    return jsonify(new_workspace.to_dict()), 201
-
+    
+    return new_workspace
 
 def get_role(user):
     s = user.update_role()

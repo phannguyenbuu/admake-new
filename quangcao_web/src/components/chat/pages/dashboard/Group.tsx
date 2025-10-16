@@ -195,7 +195,7 @@ useEffect(()=>{
                     
                      {/* <Divider /> */}
                      <Stack spacing={0.5} className='scrollbar' sx={{ flexGrow: 1, overflowY: 'hidden'}}>
-                        <Typography variant='subtitle2' sx={{ color: '#676667' }}>Pinned</Typography>
+                        {/* <Typography variant='subtitle2' sx={{ color: '#676667' }}>Pinned</Typography>
                         {groupList && groupList.filter(el => el.name === 'TELEGRAM' || el.name === 'APPLE').map((el, idx) => (
                             <ChatElement
                                 id={el.id}
@@ -209,10 +209,10 @@ useEffect(()=>{
                                 onClick={() => handleClick(el)}
                                 key={`ChatElement-${idx}`}
                             />
-                        ))}
+                        ))} */}
 
-                        <Typography variant='subtitle2' sx={{ color: '#676667' }}>All Groups</Typography>
-                        <Stack spacing={0} sx={{height:'55vh', overflowY:'auto', overflowX:'hidden'}}>
+                        {/* <Typography variant='subtitle2' sx={{ color: '#676667' }}>All Groups</Typography> */}
+                        <Stack spacing={0} sx={{height:'82vh', border:'1px solid #ccc', overflowY:'auto', overflowX:'hidden'}}>
                             
                             {groupList && groupList.filter(el => !el.pinned).map((el, idx) => (
                                 <ChatElement

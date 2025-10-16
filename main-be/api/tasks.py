@@ -2,6 +2,7 @@ from flask import Blueprint, request, jsonify, abort
 from models import db, Task, dateStr, User, Customer, Role
 import datetime
 from sqlalchemy.orm.attributes import flag_modified
+from api.messages import upload_a_file_to_vps
 
 task_bp = Blueprint('task', __name__, url_prefix='/api/task')
 
@@ -106,7 +107,7 @@ def update_task_status(id):
 
     return jsonify(task.to_dict())
 
-from api.messages import upload_a_file_to_vps
+
 
 @task_bp.route("/<string:id>/upload", methods=["PUT"])
 def update_task_assets(id):
