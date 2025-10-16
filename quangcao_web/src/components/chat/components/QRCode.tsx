@@ -89,26 +89,27 @@ const QRCode: React.FC<RatingButtonsProps> = ({ title, url, filename }) => {
         <Stack direction="row" sx={{overflowX:'visible'}}>
           <DownloadIcon onClick={handleDownloadPNG} style={{width:40,height:40, color:'#0084a5ff', cursor:'pointer'}}/>  
           <p style={{whiteSpace:'normal',wordBreak: 'break-word',textAlign:'left',fontSize:10}}>{title}</p>
+           <button
+              onClick={handleCopy}
+              style={{
+                padding: "5px 5px",
+                fontSize: 12,
+                cursor: "pointer",
+                marginLeft: 10,
+                borderRadius: 20,
+                width:40,
+                border: "1px solid #0084a5ff",
+                backgroundColor: "white",
+                color: "#0084a5ff"
+              }}
+            >
+              Copy
+            </button>
         </Stack>
         
         <QRCodeSVG value={url ?? ''} size={w} ref={svgRef} />
         {/* <p style={{width:w, whiteSpace:'normal',wordBreak: 'break-word',textAlign:'left',fontSize:10}}>{url}</p> */}
-        <button
-      onClick={handleCopy}
-      style={{
-        padding: "5px 10px",
-        fontSize: 12,
-        cursor: "pointer",
-        marginLeft: 10,
-        borderRadius: 4,
-        width:160,
-        border: "1px solid #0084a5ff",
-        backgroundColor: "white",
-        color: "#0084a5ff"
-      }}
-    >
-      Copy
-    </button>
+       
       </Stack>
       
   );

@@ -2,15 +2,15 @@ import React, { useEffect } from "react";
 import { Form, Input, Tag, Typography } from "antd";
 import { ProjectOutlined } from "@ant-design/icons";
 import {Stack, Box} from "@mui/material";
-
+import type { Task } from "../../../../@types/work-space.type";
 const { Text } = Typography;
 
 export type StatusType = "OPEN" | "IN_PROGRESS" | "DONE" | "REWARD" | string;
 
-interface Task {
-  title?: string;
-  // các trường khác...
-}
+// interface Task {
+//   title?: string;
+//   // các trường khác...
+// }
 
 interface JobInfoCardProps {
   currentStatus: StatusType;
@@ -62,7 +62,7 @@ const JobInfoCard: React.FC<JobInfoCardProps> = ({ currentStatus, taskDetail, fo
             { required: true, message: "Vui lòng nhập tên công việc" },
             { min: 3, message: "Ít nhất 3 ký tự" },
           ]}
-          className="!mb-0 w-150"
+          className="!mb-0 w-110"
         >
           <Input
             placeholder="Nhập tên công việc..."

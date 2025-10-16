@@ -295,6 +295,18 @@ class Workspace(BaseModel):
                 value = value.isoformat()
             result[column.name] = value
         return result
+    
+    def all_props(self):
+        result = self.to_dict()
+        user = db.session.get(User, self.owner_id)
+
+        if user:
+            for column in user.__table__.columns:
+                value = getattr(user, column.name)
+                # print(f"DEBUG: Column {column.name} value type: {type(value)}")
+                if not isinstance(value, (datetime.datetime, datetime.date)):
+                    result["user_" + column.name] = value
+        return result
 
     @staticmethod
     def create_item(params):
@@ -302,6 +314,11 @@ class Workspace(BaseModel):
         db.session.add(item)
         db.session.commit()
         return item
+    
+
+    @staticmethod
+    def get_by_id(workspace_id):
+        return Workspace.query.filter(Workspace.version == workspace_id).first()
     
 class Task(BaseModel):
     __tablename__ = "task"
@@ -317,7 +334,7 @@ class Task(BaseModel):
     assign_ids = db.Column(db.JSON)  # lưu JSON string của list ObjectId
     workspace_id = db.Column(db.String(50))
     customer_id = db.Column(db.String(50))
-    materials = db.Column(db.JSON)  # lưu JSON string của list dict {materialId, quantity}
+    assets = db.Column(db.JSON)  # lưu JSON string của list dict {materialId, quantity}
     create_by_id = db.Column(db.String(50))
     end_time = db.Column(db.Date)
     start_time = db.Column(db.Date)
@@ -510,7 +527,7 @@ class Message(BaseModel):
     __tablename__ = 'message'
 
     
-    workspace_id = db.Column(db.String(50))
+    workspace_id = db.Column(db.Integer)
     message_id = db.Column(db.String(80), primary_key=True)
     group_id = db.Column(db.Integer, db.ForeignKey('group.id'), nullable=True)
     user_id = db.Column(db.String(80), db.ForeignKey('user.id'), nullable=True)

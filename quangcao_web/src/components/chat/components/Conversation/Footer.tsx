@@ -96,7 +96,7 @@ const ChatInput = forwardRef<HTMLDivElement, ChatInputProps>(
             
       const formData = new FormData();
       formData.append("file", file);
-      formData.append("groupId", groupEl?.id.toString() || '');
+      formData.append("groupId", groupEl?.version.toString() || '');
       formData.append("role", userRoleId.toString());
       formData.append("userId", userId?.toString() || '');
 
@@ -198,7 +198,7 @@ const Footer = forwardRef<HTMLDivElement, FooterProps>(
 
     socket.on('connect', () => {
       console.log('Connected to server', socket.id);
-      socket.emit('join', { group_id: groupEl?.id });
+      socket.emit('join', { group_id: groupEl?.version });
     });
 
     socket.on('admake/chat/message', (msg) => {
@@ -223,7 +223,7 @@ const Footer = forwardRef<HTMLDivElement, FooterProps>(
       socket.off('disconnect');
       socket.disconnect();
     };
-  }, [groupEl?.id]);
+  }, [groupEl?.version]);
 
   function get_user_name():string {
     const user = JSON.parse(localStorage.getItem('Admake-User-Access') || '{}');
@@ -264,7 +264,7 @@ const Footer = forwardRef<HTMLDivElement, FooterProps>(
       
       const data: MessageTypeProps = {
         id: generateUniqueIntId(),
-        workspace_id: groupEl?.id.toString() || '',
+        workspace_id: groupEl?.version || 0,
         react: {rate:0},
         preview: '',
         reply: '',
@@ -272,7 +272,7 @@ const Footer = forwardRef<HTMLDivElement, FooterProps>(
         icon: '',
         type: getTypeName(file_url),
         incoming: false,
-        group_id: groupEl?.id || 0,
+        group_id: groupEl?.version || 0,
         user_id: '',
         username: get_user_name(),
         text: message,
@@ -305,7 +305,7 @@ const Footer = forwardRef<HTMLDivElement, FooterProps>(
       
       const data: MessageTypeProps = {
         id: generateUniqueIntId(),
-        workspace_id: groupEl?.id.toString() || '',
+        workspace_id: groupEl?.version || 0,
         react: {rate:0},
         preview: '',
         reply: '',
@@ -313,7 +313,7 @@ const Footer = forwardRef<HTMLDivElement, FooterProps>(
         icon: '',
         type: 'timeline',
         incoming: false,
-        group_id: groupEl?.id || 0,
+        group_id: groupEl?.version || 0,
         user_id: '',
         username: get_user_name(),
         text: 'Quý khách hàng vui lòng đánh giá dự án này?',

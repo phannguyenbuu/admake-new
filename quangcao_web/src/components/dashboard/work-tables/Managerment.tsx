@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useContext } from "react";
 import { Row, Col, Card, Button, message, Modal } from "antd";
 import { StarOutlined, PlusOutlined, MoreOutlined } from "@ant-design/icons";
 import FormTask from "./FormTask";
@@ -28,6 +28,7 @@ import WorkspaceHeader from "./work-space/WorkspaceHeader";
 import WorkspaceBoard from "./work-space/WorkspaceBoard";
 import WorkspaceModal from "./work-space/WorkspaceModal";
 import "./work-space/workspace.css";
+import { UpdateButtonContext } from "../../../common/hooks/useUpdateButtonTask";
 
 export interface DeleteConfirmProps {
     visible: boolean;
@@ -51,15 +52,17 @@ export default function ManagermentBoard({workspaceId,}: ManagermentBoardProps) 
   const adminMode = useCheckPermission();
   const [refreshFormTask, setRefreshFormTask] = useState<boolean>(false);
 
-
+  const context = useContext(UpdateButtonContext);
+  if (!context) throw new Error("UpdateButtonContext not found");
+  const { showUpdateButton, setShowUpdateButtonMode } = context;
   // API hooks
   const { data: workspaceData } = useWorkSpaceQueryById(workspaceId);
 
-  console.log('MAN_WSPACE', workspaceData);
+  // console.log('MAN_WSPACE', workspaceData);
 
   const { data: tasksData, refetch: refetchTasks } = useWorkSpaceQueryTaskById(workspaceId);
   
-  console.log('WORKSPACE_DATA', tasksData);
+  // console.log('WORKSPACE_DATA', tasksData);
 
   const updateTaskStatusMutation = useUpdateTaskStatusById();
   const deleteTaskMutation = useDeleteTask();
@@ -76,6 +79,7 @@ export default function ManagermentBoard({workspaceId,}: ManagermentBoardProps) 
     []
   );
 
+
   const [columns, setColumns] = useState<ColumnType[]>(() =>
     // @ts-ignore
     convertBoardToColumns(tasksData || {})
@@ -83,9 +87,16 @@ export default function ManagermentBoard({workspaceId,}: ManagermentBoardProps) 
 
   // Reload columns when board data changes
   useEffect(() => {
+    if (showUpdateButton === 1) {
+      
+    }
+
     // @ts-ignore
     setColumns(convertBoardToColumns(tasksData || {}));
-  }, [tasksData, convertBoardToColumns]);
+
+
+
+  }, [tasksData, convertBoardToColumns, showUpdateButton]);
 
   const [isDragging, setIsDragging] = useState(false);
   const [draggedTaskId, setDraggedTaskId] = useState<string | null>(null);
@@ -233,7 +244,6 @@ export default function ManagermentBoard({workspaceId,}: ManagermentBoardProps) 
         });
         message.success("Cập nhật trạng thái thành công! " + newStatus);
 
-
         refetchTasks();
       } catch (error) {
         message.error("Có lỗi xảy ra khi cập nhật trạng thái!");
@@ -244,6 +254,7 @@ export default function ManagermentBoard({workspaceId,}: ManagermentBoardProps) 
 
   const onDragEnd = useCallback(
     (result: DropResult) => {
+      setShowUpdateButtonMode(0);
       if (!adminMode) return;
       const { source, destination } = result;
 
@@ -377,6 +388,7 @@ export default function ManagermentBoard({workspaceId,}: ManagermentBoardProps) 
 
   const handleFormSuccess = useCallback(() => {
     setShowFormTask(false);
+    setSelectedTask(null);
     setEditingTaskId(null);
     setSelectedTask(null);
     refetchTasks();
@@ -430,7 +442,6 @@ export default function ManagermentBoard({workspaceId,}: ManagermentBoardProps) 
         // @ts-ignore
         customers = {workspaceData?.customers}
         updateTaskStatus={updateTaskStatus}
-        
       />
 
       <WorkspaceModal deleteConfirmModal={deleteConfirmModal}      

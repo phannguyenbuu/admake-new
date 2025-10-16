@@ -81,36 +81,37 @@ export const columnsMaterial = [
 
 export const columnsCustomer = [
   {
-    title: "Tên khách hàng",
-    dataIndex: "fullName",
-    key: "fullName",
+    title: "Khách hàng",
+    dataIndex: "name",
+    key: "name",
     width: 200,
-    render: (text: string) => (
-      <span className="!font-medium !line-clamp-2 !w-[180px] !text-base">
-        {text}
-      </span>
+     render: (text: string, record: User) => (
+      <div>
+        <div>{text}</div>
+        <span className="!text-cyan-700" style={{fontSize:12,fontStyle:'italic'}}>{record?.user_fullName}</span>
+      </div>
     ),
   },
   {
     title: "Số điện thoại",
-    dataIndex: "phone",
-    key: "phone",
+    dataIndex: "user_phone",
+    key: "user_phone",
     width: 150,
     render: (phone: string) => (
       <span className="!line-clamp-1 !text-base">{phone}</span>
     ),
   },
   {
-    title: "Thông tin thi công",
-    dataIndex: "workInfo",
-    key: "workInfo",
+    title: "Địa chỉ",
+    dataIndex: "address",
+    key: "address",
     width: 300,
     render: (text: string) => (
       <span className="!line-clamp-2 !w-[280px] !text-base">{text}</span>
     ),
   },
   {
-    title: "Đơn giá",
+    title: "Doanh số",
     dataIndex: "workPrice",
     key: "workPrice",
     width: 150,
@@ -119,56 +120,7 @@ export const columnsCustomer = [
         {typeof price === "number" ? price.toLocaleString("vi-VN") : price}
       </span>
     ),
-  },
-  {
-    title: "Địa điểm thi công",
-    dataIndex: "workAddress",
-    key: "workAddress",
-    width: 300,
-    render: (text: string) => (
-      <span className="!line-clamp-2 !w-[280px] !text-base">{text}</span>
-    ),
-  },
-  {
-    title: "Thời gian thi công",
-    dataIndex: "workStart",
-    key: "workStart",
-    width: 200,
-    render: (_: unknown, record: { workStart: string; workEnd: string }) => (
-      <div className="!text-base">
-        <div>
-          Bắt đầu:{" "}
-          <span className="!text-cyan-600 !font-medium">
-            {converTime(record.workStart)}
-          </span>
-        </div>
-        <div>
-          Kết thúc:{" "}
-          <span className="!text-cyan-600 !font-medium">
-            {converTime(record.workEnd)}
-          </span>
-        </div>
-      </div>
-    ),
-  },
-  {
-    title: "Trạng thái",
-    dataIndex: "status",
-    key: "status",
-    width: 150,
-    render: (status: string) => {
-      let color = "";
-      if (status === Status.IN_PROGRESS) color = "text-cyan-600";
-      else if (status === Status.BOOKED) color = "text-emerald-500";
-      else if (status === Status.COMPLETED) color = "text-sky-600";
-      else if (status === Status.CANCELLED) color = "text-rose-500";
-      return (
-        <span className={`font-semibold !text-base ${color}`}>
-          {StatusLabel[status?.toUpperCase() as keyof typeof StatusLabel]}
-        </span>
-      );
-    },
-  },
+  }
 ];
 
 const formattedSalary = (salary:number) => new Intl.NumberFormat('vi-VN', {

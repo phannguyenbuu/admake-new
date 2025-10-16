@@ -1,4 +1,4 @@
-import React,  { useEffect, useState, useRef } from "react";
+import React,  { useEffect, useState, useRef, useContext } from "react";
 import { Dropdown, Avatar, Modal, notification } from "antd";
 import { UserOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
@@ -10,6 +10,7 @@ import type { MenuInfo } from 'rc-menu/lib/interface';
 import { useUser } from "../../hooks/useUser.tsx";
 import {Button, Input} from "@mui/material";
 import {Box, Stack} from "@mui/material";
+import { UpdateButtonContext } from "../../hooks/useUpdateButtonTask.tsx";
 
 const ChatGroupList: React.FC = ({}) => {
   const navigate = useNavigate();
@@ -60,9 +61,6 @@ const ChatGroupList: React.FC = ({}) => {
   const handleOk = () => {
     setModalVisible(false);
     setSelectedId(null);
-    // window.location.reload();
-    // Nếu muốn điều hướng sau khi OK
-    // navigate("/dashboard/infor");
   };
 
   const [isHover, setIsHover] = useState(false);
@@ -86,7 +84,7 @@ const ChatGroupList: React.FC = ({}) => {
     <div className="flex items-center">
       <Stack direction="row" spacing={2} px={0.5}
         sx={{backgroundColor:"#00B4B6", maxHeight:30, borderRadius: 5}}>
-        <Dropdown menu={{ items, onClick: onMenuClick }} style={{maxHeight:'80vh'}}>
+        <Dropdown menu={{ items, onClick: onMenuClick }}>
           <Box sx = {{width: 120,height: 25, top: 2,position: "relative",borderRadius: 10,
               backgroundColor: isHover ? 'rgba(255,255,255,0.5)' : 'rgba(255,255,255,0.25)',
               transition: "background-color 1s ease"}}>

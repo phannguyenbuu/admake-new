@@ -69,7 +69,9 @@ const Group: React.FC<GroupComponentProps> = ({ selected, setSelected }) => {
         }
         setLoading(true);
 
-        fetch(`${urlApi}/group/${el.id}/messages`)
+        // console.log("EL", el);
+
+        fetch(`${urlApi}/group/${el.version}/messages`)
             .then((res) => res.json())
             .then((data) => {
                 if (data && data.messages) {
@@ -120,12 +122,12 @@ const [groupList, setGroupList] = useState<GroupProps[]>([]);
     });
 
     //   Join vào room group hiện tại
-    socket.emit('admake/chat/join_group', { group_id: currentGroup.id });
+    socket.emit('admake/chat/join_group', { group_id: currentGroup.version });
 
     //   Lắng nghe tin nhắn mới realtime
     socket.on('admake/chat/message', (msg) => {
         console.log('Current Group ID', currentGroup, msg);
-        if (msg.group_id === currentGroup.id) {  // chỉ thêm tin nhắn cùng group
+        if (msg.group_id === currentGroup.version) {  // chỉ thêm tin nhắn cùng group
             setMessages(prev => [...prev, msg]);  // thêm tin nhắn mới vào cuối
         }
     });
@@ -134,7 +136,7 @@ const [groupList, setGroupList] = useState<GroupProps[]>([]);
     return () => {
         socket.off('admake/chat/message');
         socket.off('admake/chat/message_deleted');
-        socket.emit('admake/chat/leave_group', { group_id: currentGroup.id }); // tùy backend có xử lý leave room không
+        socket.emit('admake/chat/leave_group', { group_id: currentGroup.version }); // tùy backend có xử lý leave room không
     };
  }, [currentGroup]);
 

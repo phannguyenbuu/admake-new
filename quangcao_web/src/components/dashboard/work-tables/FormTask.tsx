@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useContext } from "react";
 import { Modal, Typography, Button } from "antd";
 import type { Task, UserSearchProps } from "../../../@types/work-space.type";
 import { useCheckPermission } from "../../../common/hooks/checkPermission.hook";
@@ -22,6 +22,8 @@ import {Stack, Box} from "@mui/material";
 import type { UserList, User } from "../../../@types/user.type";
 import type { Customer, CustomerList } from "../../../@types/customer.type";
 import type { Id } from "@hello-pangea/dnd";
+import { UpdateButtonContext } from "../../../common/hooks/useUpdateButtonTask";
+import JobAsset from "./task/JobAsset";
 
 const { Title, Text } = Typography;
 
@@ -33,15 +35,23 @@ interface TaskHeaderProps {
   onSuccess: () => void;
   onUpdate: () => void;
   updateTaskStatus: (taskId: string, newStatus: string) => Promise<void>;
-  showUpdateButtonMode: number;
+  // showUpdateButtonMode: number;
   
 }
 
 // TaskHeader.tsx
 function TaskHeader({ taskDetail, onSuccess, updateTaskStatus, 
-  isLoading, onUpdate,  showUpdateButtonMode }: TaskHeaderProps) {
+  isLoading, onUpdate }: TaskHeaderProps) {
+
+  const context = useContext(UpdateButtonContext);
+  if (!context) throw new Error("UpdateButtonContext not found");
+  const { showUpdateButton } = context;
   
   console.log('Task:', taskDetail);
+
+  useEffect(()=>{
+    console.log('showUpdateButton',showUpdateButton);
+  },[showUpdateButton]);
 
   const handleReward = async () => {
     // console.log("A_Task", taskDetail,updateTaskStatus);
@@ -72,13 +82,13 @@ function TaskHeader({ taskDetail, onSuccess, updateTaskStatus,
       </div>
 
       <Stack direction="row" spacing={1}>
-        {showUpdateButtonMode === 0 && 
+        {showUpdateButton === 0 && 
           <Button type="primary" loading={isLoading} onClick={onUpdate}>
             ✅ Cập nhật
           </Button>
         }
 
-        {showUpdateButtonMode === 1 && 
+        {showUpdateButton === 1 && 
           <Button type="primary" loading={isLoading} onClick={handleReward}>
             🏆 Nghiệm Thu
           </Button>
@@ -104,12 +114,19 @@ interface FormTaskProps {
   users: UserSearchProps[];
   customers: UserSearchProps[];
   updateTaskStatus: (taskId: string, newStatus: string) => Promise<void>;
+  // showUpdateButtonMode: number;
+  // setShowUpdateButtonMode: (value: number) => void;
 }
 
 export default function FormTask({ 
   updateTaskStatus, open, onCancel, taskId, onSuccess,
-  workspaceId, users, customers }: FormTaskProps) {
-  const [showUpdateButtonMode, setShowUpdateButtonMode] = useState<number>(0);
+  workspaceId, users, customers,
+  // showUpdateButtonMode, setShowUpdateButtonMode
+ }: FormTaskProps) {
+  const context = useContext(UpdateButtonContext);
+  if (!context) throw new Error("UpdateButtonContext not found");
+  const { setShowUpdateButtonMode } = context;
+
   const { data:taskDetail, isLoading, isError, error } = useGetTaskById(taskId || "");
   // const [material, setMaterial] = useState<{ selectedMaterials: any[], materialQuantities: { [key: string]: number } }>({
   //   selectedMaterials: [],
@@ -278,8 +295,6 @@ export default function FormTask({
                 isLoading={isLoading}
                 onUpdate={handleUpdate}  
                 onSuccess={onSuccess}
-                
-                showUpdateButtonMode={showUpdateButtonMode}
                 />
       </Stack>
       
@@ -336,7 +351,7 @@ export default function FormTask({
             {/* Vật liệu */}
             {/* <MaterialInfo taskDetail={taskDetail ?? null}/> */}
 
-            
+            <JobAsset taskDetail={taskDetail}/>
           </Stack>
           {/* Nhân sự */}
       </Form>

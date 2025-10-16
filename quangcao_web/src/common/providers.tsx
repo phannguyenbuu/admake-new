@@ -81,7 +81,7 @@ export default function Providers({ children }: { children: React.ReactNode }) {
             {children}
           </CommonContext.Provider>
         </ConfigProvider>
-        <ReactQueryDevtools initialIsOpen={false} />
+        {/* <ReactQueryDevtools initialIsOpen={false} /> */}
       </QueryClientProvider>
     </App>
   );

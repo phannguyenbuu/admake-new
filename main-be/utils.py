@@ -1011,7 +1011,7 @@ if __name__ == "__main__":
         # create_customer_role()
         # change_value_type('message', ['group_id'], 'VARCHAR(50)')
         # change_value_type('workspace', ['id'], 'INTEGER')
-        # renameColumn('workspace',"state", "status")
+        # renameColumn('task',"materials", "assets")
 
         # for table in ['message','group_member']:
         #     renameColumn(table, "createAt", "createdAt")
@@ -1026,7 +1026,7 @@ if __name__ == "__main__":
         #     add_new_columns(table,['version'],'INTEGER')
 
         # add_new_columns('user',['citizenId','email','facebookAccount','zaloAccount','referrer'],'VARCHAR(80)')
-        # add_new_columns('message',['workspace_id'],'VARCHAR(50)')
+        # change_value_type('message',['workspace_id'],'INTEGER')
         # add_new_columns('user',['gender'],'INTEGER')
         # add_new_columns('lead',['version'],'INTEGER')
         # add_new_columns('workspace',['address'],'VARCHAR(255)')
@@ -1035,7 +1035,7 @@ if __name__ == "__main__":
         # add_new_columns('group',['owner_id'],'VARCHAR(50)')
         # add_new_columns('user',['salary','version'],'INTEGER')
         # add_new_columns('user',['deletedAt'],'TIMESTAMP')
-        renameColumn('lead', "nhuCau", "description")
+        # renameColumn('lead', "nhuCau", "description")
         
         # msgs = db.session.query(Message).filter(Message.message_id == "temp-1760491441221").all()
         # print(len(msgs))
@@ -1050,34 +1050,35 @@ if __name__ == "__main__":
 
         # groups = Group.query.all()
         # works = Workspace.query.all()
-        # customers = Customer.query.all()
 
+        for t in Task.query.all():
+            if t.assets and not isinstance(t.assets, str):
+                t.assets = None
+                flag_modified(t, "assets")
+
+        db.session.commit()
+
+        # messages = Message.query.all()
+
+        # print(len(groups), len(works))
         
-        # for i, msg in enumerate(works):
-        #     v = groups[i].status
-        #     if v == '0': v = None
-        #     works[i].status = v
+        
+        # batch_size = 100
+        # count = 0
+
+        # for i, msg in enumerate(messages):
+            
+        #     msg.workspace_id = msg.group_id
+        #     count += 1
+
+        #     if count % batch_size == 0:
+        #         print(i, datetime.datetime.now())
+        #         db.session.commit()  # commit mỗi 100 bản ghi
 
         # db.session.commit()  # commit lần cuối nếu còn phần tử chưa commit
 
-        # Giả sử bạn có danh sách workspace list hoặc query result workspace
-        # workspaces = Workspace.query.all()
-        # # Lấy set id (string)
-        # workspace_id_set = {ws.id for ws in workspaces}
 
-        # # Chuyển sang danh sách và sort để có thứ tự cố định
-        # sorted_ids = sorted(int(wid) for wid in workspace_id_set)
 
-        # # Tạo mapping từ id gốc sang index trong sorted list
-        # id_to_index = {str(wid): idx for idx, wid in enumerate(sorted_ids)}
-
-        # # Áp dụng gán giá trị mới index cho từng workspace
-        # for ws in workspaces:
-        #     ws.version = id_to_index[ws.id]  # Giả sử bạn có trường index_id hoặc dùng để xử lý
-
-        # db.session.commit()
-
-        
             
 
 

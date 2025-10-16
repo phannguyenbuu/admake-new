@@ -12,7 +12,7 @@ type LeadPayload = {
   company: string
   email: string
   phone: string
-  nhuCau: string
+  description: string
   industry: string
   companySize: string
 }

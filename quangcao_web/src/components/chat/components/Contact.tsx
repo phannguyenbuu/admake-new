@@ -157,9 +157,9 @@ const Contact: React.FC<ContactProps> = ( { groupEl, messages, setShowFooter }) 
           {tabValue === 0 && (
             <Stack direction="column" spacing={0} sx={{width: '20vw', height:'68vh',overflowY:'auto', overflowX:'hidden'}}>
               <QRCode title="Mã QR cho khách hàng" filename='qrcode-admake-khachhang.png'
-                url={`${window.location.origin}/chat/${groupEl?.id}/${groupEl?.description}`}/>
+                url={`${window.location.origin}/chat/${groupEl?.version}/${groupEl?.id}`}/>
               <QRCode title="Mã QR cho nhân viên" filename='qrcode-admake-nhanvien.png'
-                url={`${window.location.origin}/chat/${groupEl?.id}/a${groupEl?.description}`}/>
+                url={`${window.location.origin}/chat/${groupEl?.version}/a${groupEl?.id}`}/>
              </Stack>
             )}
            {tabValue === 1 && (

@@ -69,7 +69,7 @@ export interface Task extends BaseEntity {
   materials: MaterialTask[]; // danh sách vật tư
   start_time?: Dayjs | null; // Thời gian bắt đầu
   end_time?: Dayjs | null; // Thời gian kết thúc
-
+  assets: string[];
   check_reward: Boolean | false;
 }
 

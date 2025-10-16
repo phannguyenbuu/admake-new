@@ -106,6 +106,43 @@ def update_task_status(id):
 
     return jsonify(task.to_dict())
 
+from api.messages import upload_a_file_to_vps
+
+@task_bp.route("/<string:id>/upload", methods=["PUT"])
+def update_task_assets(id):
+    task = Task.query.get(id)
+    if not task:
+        abort(404, description="Task not found")
+
+    if 'file' not in request.files:
+        return jsonify({'error': 'No file provided'}), 400
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({'error': 'Empty filename'}), 400
+    
+
+    filename, filepath = upload_a_file_to_vps(file)
+
+    ls = []
+
+    # task.assets có thể None hoặc list
+    if task.assets:
+        ls = task.assets  # trực tiếp lấy list
+
+    # thêm file mới nếu có
+    if filename:
+        ls.append(filename)
+
+    # gán lại trường assets là list Python
+    task.assets = ls
+
+    flag_modified(task, "assets")
+    db.session.commit()
+
+    return jsonify(task.to_dict())
+
+
+
 @task_bp.route("/", methods=["POST"])
 def create_task():
     data = request.get_json()

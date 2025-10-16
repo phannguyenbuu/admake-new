@@ -30,29 +30,31 @@ def get_workspaces():
 def create_workspace():
     data = request.get_json()
 
-    group_id = data.get('group_id')
+    name = data.get('name')
+    address = data.get('address')
 
-    if group_id:
-        group = db.session.get(Group, group_id)
+    # if group_id:
+    #     group = db.session.get(Group, group_id)
 
-        if group:
-            name = group.name
+    #     if group:
+    #         name = group.name
             
 
-    if not name:    
-        name = data.get('name')
+    # if not name:    
+    #     name = data.get('name')
 
-    if not name:
-        return jsonify({"error": "Empty Workspace name"}), 405
+    # if not name:
+    #     return jsonify({"error": "Empty Workspace name"}), 405
 
-    existing = Workspace.query.filter_by(name=name).first()
-    if existing:
-        return jsonify({"error": "Workspace name already exists"}), 400
+    # existing = Workspace.query.filter_by(name=name).first()
+    # if existing:
+    #     return jsonify({"error": "Workspace name already exists"}), 400
 
 
     new_workspace = Workspace(
         id=generate_datetime_id(),
-        name=name
+        name=name,
+        address=address
     )
     
     db.session.add(new_workspace)
@@ -132,8 +134,6 @@ def post_workspace_reward_task(group_id):
     if not group:
         print("Group not found", group_id)
         abort(404, description="Group not found")
-
-    
 
     msgs = Message.query.filter(Message.message_id == message_id).all()
     print('msgs', len(msgs))

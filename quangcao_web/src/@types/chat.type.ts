@@ -11,7 +11,8 @@ export interface GroupProps {
   unread:number,
   status?:string,
   pinned:boolean,
-  address:string
+  address:string,
+  version:number;
 }
 
 export interface MsgListTypeProps {
@@ -33,7 +34,7 @@ interface ReactProps {
 export interface MessageTypeProps {
   id: number;
   group_id: number;
-  workspace_id: string;
+  workspace_id: number;
 
   file_url:string;
   incoming: boolean;

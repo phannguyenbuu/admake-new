@@ -16,9 +16,9 @@ export const WorkTableDetailPage: IPage["Component"] = () => {
     error,
   } = useWorkSpaceQueryTaskById(boardId || "");
 
-  useEffect(() => {
-    console.log('W_TABLE', boardId, response);
-  },[response]);
+  // useEffect(() => {
+  //   console.log('W_TABLE', boardId, response);
+  // },[response]);
 
   // Loading state
   if (isLoading) {

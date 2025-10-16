@@ -1,6 +1,6 @@
 import { Avatar, Box, Divider, IconButton, Link, Button, Stack, Typography, Menu, MenuItem, ListItemIcon } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { useUser } from '../../../../common/hooks/useUser';
 import StarIcon from '@mui/icons-material/Star';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -22,6 +22,8 @@ import ImageIcon from '@mui/icons-material/Image';
 import DownloadIcon from '@mui/icons-material/Download';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import Rating from '@mui/material/Rating';
+import { socket } from './socket';
+import { UpdateButtonContext } from '../../../../common/hooks/useUpdateButtonTask';
 
 const baseUrl = useApiStatic();
 
@@ -274,23 +276,70 @@ const TimeLine: React.FC<MsgTypeProps> = ({ el, menu, onDelete }) => {
   const {userRoleId} = useUser();
   const full = userRoleId > 0;
 
-  const handleReward = async (rate: number | null) => {
-    const response = await fetch(`${useApiHost()}/workspace/${el.group_id}/reward`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({"message_id":el.message_id, "rate":rate})
-    });
   
-    if (!response.ok) 
-      throw new Error("Nghiệm thu công việc thất bại");
-    else
-    {
-      console.log("Nghiệm thu công việc thành công!");
+  useEffect(() => {
+    
+    
+
+      socket.on('admake/chat/rate', (msg) => {
+        console.log('Received rate:', msg);
+        setValue(msg.rate);
+
+        if(!window.location.href.includes('/chat/'))
+          window.location.reload();
+      });
+  
+      socket.on('admake/chat/rate_ack', data => {
+  
+      });
+  
+      return () => {
+        socket.off('admake/chat/rate');
+      };
+    }, [el]);
+
+  const handleReward = async (rate: number | null) => {
+    // const response = await fetch(`${useApiHost()}/workspace/${el.group_id}/reward`, {
+    //   method: "PUT",
+    //   headers: { "Content-Type": "application/json" },
+    //   body: JSON.stringify({"message_id":el.message_id, "rate":rate})
+    // });
+  
+    // if (!response.ok) 
+    //   throw new Error("Nghiệm thu công việc thất bại");
+    // else
+    // {
+    //   console.log("Nghiệm thu công việc thành công!");
+    // }
+
+    console.log("Connected rates", socket.connected, socket.io.opts.host);
+    
+    if (socket.connected) {
+      const data = {
+        message_id: el.message_id,
+        rate: rate,
+        group_id: el.workspace_id,
+      };
+
+      console.log('Send rate message', socket.io.opts.host, data);
+      socket.emit('admake/chat/rate', data);
+
+
+      const context = useContext(UpdateButtonContext);
+      if (!context) 
+        throw new Error("UpdateButtonContext not found");
+      else
+      {
+        const { setShowUpdateButtonMode } = context;
+        setShowUpdateButtonMode(1);
+      }
+    } else {
+      console.warn('Socket.IO not connected.');
     }
   }
 
-  console.log('Timeline',el.text, userRoleId);
-  const theme = useTheme();
+  // console.log('Timeline',el.text, userRoleId);
+  // const theme = useTheme();
 
   const handleRatingChange = (event: React.SyntheticEvent<Element, Event>, newValue: number | null) => {
     console.log("Rating value:", newValue, "cho group", el.group_id, " message_id", el.message_id);

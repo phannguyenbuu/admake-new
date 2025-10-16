@@ -102,10 +102,10 @@ def delete_message(message_id):
         app.logger.error(f"Delete message failed: {e}", exc_info=True)
         return jsonify({"error": "Delete message failed", "details": str(e)}), 500
 
+import uuid
+
 @message_bp.route('/upload', methods=['POST'])
 def upload_file():
-    import uuid
-
     user_id = request.form.get('userId')
     try:
         group_id = int(request.form.get('groupId', '0'))
@@ -123,21 +123,9 @@ def upload_file():
     if file.filename == '':
         return jsonify({'error': 'Empty filename'}), 400
     
-    
-    original_filename = file.filename
-    name, ext = os.path.splitext(original_filename)  # tách phần tên và phần mở rộng
-    filename = original_filename
-    filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
 
+    filename, filepath = upload_a_file_to_vps(file)
     
-    if os.path.exists(filepath):
-        # Tạo tên file mới dạng filename_{uuid}.ext
-        filename = f"{name}_{uuid.uuid4().hex}{ext}"
-        filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-        print('New file name because an exist file', filename)
-
-    
-
     data = {
         # 'id': msg.id,
         'user_id': user_id,
@@ -152,11 +140,20 @@ def upload_file():
         'time': time,
     }
 
-    
-    
-    file.save(filepath)
-    
-    # socketio.emit('admake/chat/message', data, room=str(group_id))
-    
     return jsonify({'message': 'File uploaded successfully', 'filename': filename, 'data': data})
+    
+def upload_a_file_to_vps(file):
+    name, ext = os.path.splitext(file.filename)
+    filename = file.filename
+    filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+
+    if os.path.exists(filepath):
+        filename = f"{name}_{uuid.uuid4().hex}{ext}"
+        filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        print('New file name because file exists:', filename)
+
+    file.save(filepath)
+    return filename, filepath
+
+    
 

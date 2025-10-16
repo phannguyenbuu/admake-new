@@ -1,7 +1,8 @@
 from flask_socketio import SocketIO, join_room, leave_room, emit
 from flask import Flask, request, jsonify
-from models import Message, db, app, User
+from models import Message, db, app, User, Workspace, Task
 import datetime
+from sqlalchemy.orm.attributes import flag_modified
 
 socketio = SocketIO(app, cors_allowed_origins=["http://localhost:5173",
                                                 "https://admake.vn",
@@ -68,12 +69,16 @@ def handle_message(data):
 
     # Lưu message mới
     print('Saving role', role)
-    msg = Message(group_id=group_id,type=type, 
+    msg = Message(group_id=group_id,
+                  type=type, 
                   workspace_id = workspace_id,
-                  user_id=user_id, username=username,
+                  user_id=user_id, 
+                  username=username,
                   text=text, 
-                  message_id = message_id,role=role,
-                  file_url=file_url, updatedAt=time)
+                  message_id = message_id,
+                  role=role,
+                  file_url=file_url, 
+                  updatedAt=time)
     db.session.add(msg)
     db.session.commit()
     
@@ -97,3 +102,58 @@ def handle_message(data):
         'message': 'Message received and stored successfully',
         'message_id': message_id
     }, room=request.sid)
+
+
+@socketio.on('admake/chat/rate')
+def handle_message_rate(data):
+    print('Receive rate', data)
+    message_id = data['message_id']
+    rate = data['rate']
+    group_id = data['group_id']
+
+    msg = Message.query.filter(Message.message_id == message_id).first()
+    
+    if not msg:
+        print("Message not found", message_id)
+        return
+    
+    print('-message', msg, rate, msg.react)
+    if not msg.react:
+        msg.react = {}
+
+    if rate:
+        msg.react["rate"] = rate
+        flag_modified(msg, "react")
+
+
+    work = Workspace.query.filter(Workspace.version == group_id).first()
+        
+    if not work:
+        print("Workspace not found", group_id)
+        return
+    
+    tasks = Task.query.filter_by(workspace_id=work.id).all()
+    print('tasks',work, len(tasks))
+
+    for task in tasks:
+        print('task', task.title)
+        if task.status != "REWARD":
+            task.status = "DONE"
+            task.check_reward = True
+    
+    db.session.commit()
+
+    emit('admake/chat/rate', {
+        'rate':rate,
+        'message_id': message_id,
+        'group_id': group_id,
+    }, room=str(group_id), skip_sid=request.sid)
+
+    emit('admake/chat/rate_ack', {
+        'status': 'success',
+        'message': 'Message received and stored successfully',
+        'message_id': message_id
+    }, room=request.sid)
+
+
+

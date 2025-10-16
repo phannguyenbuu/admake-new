@@ -14,6 +14,9 @@ import { useUser } from "../../hooks/useUser";
 import { QuestionOutlined } from '@ant-design/icons';
 import {Box,Stack,Typography} from '@mui/material';
 import { useLocation } from "react-router-dom";
+import { UpdateButtonProvider } from "../../hooks/useUpdateButtonTask";
+
+
 const { Header } = Layout;
 
 export default function AppHeader() {
@@ -31,7 +34,7 @@ export default function AppHeader() {
   const { data: info, refetch: refetchInfo } = useInfo();
   const { isConnected, on } = useSocket();
 
-
+  //@ts-ignore
   const { data: workSpaces, refetch: refetchWorkSpaces } = useWorkSpaceQueryAll();
 
   const handleQuestionClick = () => {

@@ -22,6 +22,8 @@ const RatingButtons: React.FC<RatingButtonsProps> = ({setShowFooter, groupEl }) 
     }
   }, [groupEl]);
 
+  
+
   const handleChange = (event: React.MouseEvent<HTMLElement>, newValue: string | null) => {
         
     if(value === newValue)
@@ -36,12 +38,12 @@ const RatingButtons: React.FC<RatingButtonsProps> = ({setShowFooter, groupEl }) 
       setValue(newValue);
       setShowFooter(newValue === "talk" || newValue === "pass");
 
-      const data = { group_id: groupEl?.id };
+      const data = { group_id: groupEl?.version };
 
       
       groupEl && (groupEl.status = newValue);
 
-      fetch(`${useApiHost()}/group/${groupEl?.id}/status`, { // hoặc đường dẫn chính xác endpoint của bạn
+      fetch(`${useApiHost()}/group/${groupEl?.version}/status`, { // hoặc đường dẫn chính xác endpoint của bạn
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

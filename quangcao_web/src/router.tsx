@@ -2,10 +2,11 @@ import {
   createBrowserRouter,
   type NonIndexRouteObject,
 } from "react-router-dom";
+
 import BaseLayout from "./common/layouts/base.layout";
 import type { UserRole } from "./@types/user.type";
 import Error404 from "./app/404";
-import type React from "react";
+import React from "react";
 import {
   AccountBookOutlined,
   BookOutlined,
@@ -24,6 +25,7 @@ LineChartOutlined,
 
 DotChartOutlined,
 } from "@ant-design/icons";
+import { Tooltip } from "@mui/material";
 import { WorkTableDetailPage } from "./app/dashboard/work-tables/page";
 import { UserDashboard } from "./app/dashboard/user/page";
 import { SupplierDashboard } from "./app/dashboard/supplier/page";
@@ -42,6 +44,8 @@ import RequireAuth from "./services/RequireAuth";
 import GroupQRPage from "./components/chat/components/GroupQRPage";
 import Workpoint from "./components/chat/components/Workpoint";
 import { StatisticDashboard } from "./app/dashboard/statistic/page";
+import { CenterBox } from "./components/chat/components/commons/TitlePanel";
+import { Typography } from "@mui/material";
 // Route guard: chặn truy cập nếu không có quyền
 function RequireRoles({
   roles,
@@ -67,8 +71,25 @@ interface TRoute extends Omit<NonIndexRouteObject, "index" | "children"> {
   title?: string;
   icon?: React.ReactNode;
   ignoreInMenu?: boolean;
+  isDevelope?: boolean;
   isMainMenu?: boolean;
   index?: boolean;
+  tooltip?: string;
+  isDivider?: boolean;
+}
+
+
+const DevelopeDashboard = () => {
+  return (
+    <CenterBox spacing={5}>
+      <Typography color="#00B4B6" fontSize={16} fontStyle="italic" mt={25} textAlign="center">
+        Cám ơn quý khách đã quan tâm. Tính năng này đang phát triển ...
+      </Typography>
+      <Typography color="#00B4B6" fontSize={16} fontStyle="italic" textAlign="center">
+        Vui lòng quay lại sau!
+      </Typography>
+    </CenterBox>
+  )
 }
 
 
@@ -162,6 +183,7 @@ const routes: TRoute = {
           roles: ["customer:management"],
           title: "Quản lý khách hàng",
           icon: <TeamOutlined />,
+          isDevelope: false,
         },
         {
           path: "/dashboard/work-tables",
@@ -174,6 +196,8 @@ const routes: TRoute = {
               element: <WorkTableDetailPage />,
             },
           ],
+
+          
         },
         {
           path: "divider-1",
@@ -185,26 +209,32 @@ const routes: TRoute = {
           path: "/dashboard/materials",
           element: (
             <RequireRoles roles={["warehouse:management"]}>
-              <MaterialDashboard />
+              {/* <MaterialDashboard /> */}
+              <DevelopeDashboard/>
             </RequireRoles>
           ),
           roles: ["warehouse:management"],
           title: "Quản lý vật liệu",
           icon: <InboxOutlined />,
+          isDevelope: true,
         },
         {
           path: "/dashboard/statistics",
-          element: <StatisticDashboard />,
+          element: (
+            <RequireRoles roles={["warehouse:management"]}>
+              {/* <MaterialDashboard /> */}
+              <DevelopeDashboard/>
+            </RequireRoles>),
           title: "Phân tích",
           icon: <PieChartOutlined  />,
         },
         {
           path: "/dashboard/invoices",
           element: (
-            <RequireRoles roles={["accounting:management"]}>
-              <InvoiceDashboard />
-            </RequireRoles>
-          ),
+            <RequireRoles roles={["warehouse:management"]}>
+              {/* <InvoiceDashboard /> */}
+              <DevelopeDashboard/>
+            </RequireRoles>),
           roles: ["accounting:management"],
           title: "Báo giá",
           icon: <FileTextOutlined />,
@@ -212,43 +242,42 @@ const routes: TRoute = {
 
         {
           path: "/dashboard/accounting",
-          element: (
-            <RequireRoles roles={["accounting:management"]}>
-              <AccountingDashboard />
-            </RequireRoles>
-          ),
+          element: 
+            (
+            <RequireRoles roles={["warehouse:management"]}>
+              {/* <AccountingDashboard /> */}
+              <DevelopeDashboard/>
+            </RequireRoles>),
+          
           roles: ["accounting:management"],
           title: "Kế toán",
           icon: <AccountBookOutlined />,
         },
-        {
-          path: "/dashboard/settings",
-          element: (
-            <RequireRoles
-              roles={[
-                "setting:management",
-                "permission:management",
-                "role:management",
-              ]}
-            >
-              <SettingDashboard />
-            </RequireRoles>
-          ),
-          roles: [
-            "setting:management",
-            "permission:management",
-            "role:management",
-          ],
-          title: "Cài đặt",
-          icon: <SettingOutlined />,
-        },
-        {
-          path: "/dashboard/infor",
-          element: <InforDashboard />,
-          title: "Hồ sơ",
-          icon: <UserOutlined />,
-          ignoreInMenu: false,
-        }
+        // {
+        //   path: "/dashboard/settings",
+        //   element: 
+        //     (
+        //     <RequireRoles roles={["warehouse:management"]}>
+        //       {/* <SettingDashboard /> */}
+        //       <DevelopeDashboard/>
+        //     </RequireRoles>),
+          
+        //   roles: [
+        //     "setting:management",
+        //     "permission:management",
+        //     "role:management",
+        //   ],
+        //   title: "Cài đặt",
+        //   icon: <SettingOutlined />,
+          
+        // },
+        // {
+        //   path: "/dashboard/infor",
+        //   element: <InforDashboard />,
+        //   title: "Hồ sơ",
+        //   icon: <UserOutlined />,
+        //   ignoreInMenu: false,
+        // }
       ],
     },
   ],
@@ -260,11 +289,13 @@ type MenuItem = {
   label: string;
   active?: boolean;
   children?: MenuItem[];
+  isDevelope: boolean,
+  tooltip: string,
+  style:any,
 };
+
 export function getMainMenuItems(pathname?: string): MenuItem[] {
   const { data: user } = useInfo();
-  // console.log('Parm', user);
-  // const { setAdminMode } = useAdminMode();
   if (!pathname) {
     pathname = window.location.pathname;
   }
@@ -272,35 +303,36 @@ export function getMainMenuItems(pathname?: string): MenuItem[] {
     pathname = pathname.slice(0, -1);
   }
 
-  const userPermissions = user?.role.permissions || []; // Lấy permissions từ user, mặc định là mảng rỗng nếu không có
+  const userPermissions = user?.role.permissions || [];
 
   const loop = (routes: Array<TRoute | undefined>): MenuItem[] => {
     return routes.reduce((acc: MenuItem[], route) => {
       if (!route) return acc;
 
-      // Kiểm tra nếu route có roles và userPermissions không chứa bất kỳ role nào trong đó
-      // const hasPermission =
-      //   !route.roles ||
-      //   route.roles.some((role) => userPermissions.includes(role));
-
-      const hasPermission = true;
+      const hasPermission = true; // Gộp check quyền nếu cần
 
       if (!route.ignoreInMenu && hasPermission) {
         if (route.isDivider) {
-          // Thêm divider như 1 item đặc biệt
           acc.push({
             key: route.path || Math.random().toString(),
             icon: null,
-            label: "--------------------------------",  // Hoặc bạn muốn nhãn separator thì để text gì đó
-            // Bạn có thể dùng 1 flag mới để UI hiểu đây là divider
+            label: "---",
+            //@ts-ignore
             isDivider: true,
           });
         } else {
+          const isDeveloping = (route as any).isDevelope || false;
+
           const push: MenuItem = {
             key: route.path || "",
             icon: route.icon || <BookOutlined />,
             label: route.title || "Menu",
-            active: pathname?.includes(route.path || ""),
+            active: !isDeveloping, //pathname?.includes(route.path || ""),
+            isDevelope: isDeveloping,
+            tooltip: isDeveloping ? "Tính năng đang phát triển" : "",
+            style: isDeveloping
+              ? { opacity: 0.5, cursor: "not-allowed" }
+              : {},
           };
 
           if (!route.children?.length) {
@@ -312,7 +344,8 @@ export function getMainMenuItems(pathname?: string): MenuItem[] {
             }
           }
         }
-      } 
+      }
+
       return acc;
     }, []) as MenuItem[];
   };
@@ -325,8 +358,11 @@ export function getMainMenuItems(pathname?: string): MenuItem[] {
 
   return loop(main) as MenuItem[];
 }
+
+
 export const router = createBrowserRouter([routes as NonIndexRouteObject], {});
 export type Router = typeof router;
 export function FallbackElement() {
   return <div>Loading...</div>;
 }
+
