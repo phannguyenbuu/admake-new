@@ -682,6 +682,41 @@ class Location(db.Model):
     gps_lng = db.Column(db.Float, nullable=False)
     type = db.Column(db.Enum('chi_nhanh', 'cong_trinh', name='location_type'), nullable=False)
 
+class LeadPayload(BaseModel):
+    __tablename__ = 'lead'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(120), nullable=False)
+    company = db.Column(db.String(120), nullable=False)
+    email = db.Column(db.String(120), nullable=False)
+    phone = db.Column(db.String(50), nullable=False)
+    description = db.Column(db.Text)
+    industry = db.Column(db.String(100), nullable=False)
+    companySize = db.Column(db.String(50), nullable=False)
+    balance_amount = db.Column(db.Float)
+
+    # Quan hệ 1-n: một Lead có nhiều historyUsing
+    history_using = db.relationship('UsingHistoryData', backref='lead', cascade='all, delete-orphan')
+
+    def __repr__(self):
+        return f'<Lead {self.name}>'
+    
+    def to_dict(self):
+        result = {}
+        for column in self.__table__.columns:
+            value = getattr(self, column.name)
+            # print(f"DEBUG: Column {column.name} value type: {type(value)}")
+            if isinstance(value, (datetime.datetime, datetime.date)):
+                value = value.isoformat()
+            result[column.name] = value
+        return result
+
+    @staticmethod
+    def create_item(params):
+        item = LeadPayload(**params)
+        db.session.add(item)
+        db.session.commit()
+        return item
+
 def parse_date(d):
     # d có dạng {"$date": "2025-07-21T01:03:22.362Z"}
     if isinstance(d, dict) and "$date" in d:
