@@ -50,7 +50,7 @@ export default function LeadForm() {
       company: String(form.get("company") || ""),
       email: String(form.get("email") || ""),
       phone: String(form.get("phone") || ""),
-      nhuCau: String(form.get("nhuCau") || ""),
+      description: String(form.get("description") || ""),
       industry: String(form.get("industry") || ""),
       companySize: String(form.get("companySize") || ""),
     }

@@ -57,7 +57,7 @@ def update_group(workspace_id):
     db.session.commit()
     return jsonify(group.to_dict()), 200
 
-@group_bp.route('/<int:workspace_id>/status', methods=['POST'])
+@group_bp.route('/<int:workspace_id>/status', methods=['PUT'])
 def change_group_status(workspace_id):
     data = request.json
     status = data.get('status')

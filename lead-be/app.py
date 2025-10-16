@@ -15,6 +15,13 @@ def admin_leads():
     leads_data = [lead.to_dict() for lead in leads]  # Chuyển đối tượng thành dict để render dễ dàng
     return render_template('admin_leads.html', leads=leads_data)
 
+@app.route('/admin/lead/', methods=['POST'])
+def create_lead_infor():
+    data = request.get_json()
+    lead = LeadPayload.create_item(data)  # Giả sử phương thức này tạo instance Lead từ data
+    db.session.add(lead)
+    db.session.commit()
+    return jsonify(lead.to_dict()), 201
 
 base_dir = os.path.abspath(os.path.dirname(__file__))
 print(base_dir)
