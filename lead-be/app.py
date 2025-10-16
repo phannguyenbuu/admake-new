@@ -17,7 +17,9 @@ def admin_leads():
 
 @app.route('/api/lead/', methods=['POST'])
 def create_lead_infor():
+    
     data = request.get_json()
+    print(data)
     lead = LeadPayload.create_item(data)  # Giả sử phương thức này tạo instance Lead từ data
     db.session.add(lead)
     db.session.commit()
