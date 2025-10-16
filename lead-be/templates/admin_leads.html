@@ -18,15 +18,15 @@
             <thead class="table-light" style="background-color: #00B4B6;">
                 <tr>
                     <th>ID</th>
-                    <th style="width:300px">Họ và tên</th>
+                    <th style="width:200px">Họ và tên</th>
                     <th>Công ty</th>
                     
                     <th>Liên hệ</th>
-                    <th>Nhu cầu</th>
+                    <th style="width:200px">Nhu cầu</th>
                     <th>Ngành</th>
-                    <th>Quy mô công ty</th>
-                    <th>Số dư</th>
-                    <th>Ngày đăng ký/ gia hạn/ hết hạn</p>
+                    <th style="width:50px">Quy mô công ty</th>
+                    <th style="width:50px">Số dư</th>
+                    <th style="width:100px">Ngày đăng ký/ gia hạn/ hết hạn</p>
                     </th>
                 </tr>
             </thead>
@@ -42,10 +42,10 @@
                         <p>{{ lead.email }}</p>
                     </td>
 
-                    <td style="width:300px">{{ lead.description }}</td>
+                    <td>{{ lead.description }}</td>
                     <td>{{ lead.industry }}</td>
-                    <td style="width:50px">{{ lead.companySize }}</td>
-                    <td style="width:50px">{{ lead.balance_amount }}</td>
+                    <td>{{ lead.companySize }}</td>
+                    <td>{{ lead.balance_amount }}</td>
                     <td>
                         <p>{{ lead.createdAt }}</p>
                         <p>{{ lead.updatedAt }}</p>
