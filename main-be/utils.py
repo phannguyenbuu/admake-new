@@ -1009,9 +1009,9 @@ if __name__ == "__main__":
         # change_value_type('group', ['id'], 'SERIAL')
 
         # create_customer_role()
-        # change_value_type('task', ['end_time'], 'DATE')
-        # change_value_type('task', ['start_time'], 'DATE')
-        # renameColumn('group',"updateAt", "updatedAt")
+        # change_value_type('message', ['group_id'], 'VARCHAR(50)')
+        # change_value_type('workspace', ['id'], 'INTEGER')
+        # renameColumn('workspace',"state", "status")
 
         # for table in ['message','group_member']:
         #     renameColumn(table, "createAt", "createdAt")
@@ -1026,7 +1026,7 @@ if __name__ == "__main__":
         #     add_new_columns(table,['version'],'INTEGER')
 
         # add_new_columns('user',['citizenId','email','facebookAccount','zaloAccount','referrer'],'VARCHAR(80)')
-        # add_new_columns('task',['check_reward'],'BOOLEAN')
+        # add_new_columns('message',['workspace_id'],'VARCHAR(50)')
         # add_new_columns('user',['gender'],'INTEGER')
         # add_new_columns('lead',['version'],'INTEGER')
         # add_new_columns('workspace',['address'],'VARCHAR(255)')
@@ -1035,7 +1035,7 @@ if __name__ == "__main__":
         # add_new_columns('group',['owner_id'],'VARCHAR(50)')
         # add_new_columns('user',['salary','version'],'INTEGER')
         # add_new_columns('user',['deletedAt'],'TIMESTAMP')
-        # renameColumn('message', "id", "salary")
+        renameColumn('lead', "nhuCau", "description")
         
         # msgs = db.session.query(Message).filter(Message.message_id == "temp-1760491441221").all()
         # print(len(msgs))
@@ -1048,52 +1048,37 @@ if __name__ == "__main__":
 
         # print(Group.query.count(), Workspace.query.count(), Customer.query.count())
 
+        # groups = Group.query.all()
+        # works = Workspace.query.all()
+        # customers = Customer.query.all()
 
-        so_nha_ten_duong = [
-    "23 Nguyễn Trãi",
-    "45 Lê Lợi",
-    "12 Trần Hưng Đạo",
-    "89 Phan Đình Phùng",
-    "67 Lý Thường Kiệt",
-    "34 Hai Bà Trưng",
-    "56 Trần Phú",
-    "78 Nguyễn Văn Cừ",
-    "21 Cách Mạng Tháng Tám",
-    "9 Phan Chu Trinh",
-    "15 Tôn Đức Thắng",
-    "28 Hoàng Hoa Thám",
-    "5 Bạch Đằng",
-    "103 Trần Quang Khải",
-    "42 Lê Duẩn",
-    "88 Đinh Tiên Hoàng",
-    "51 Võ Thị Sáu",
-    "6 Hùng Vương",
-    "77 Điện Biên Phủ",
-    "13 Nguyễn Hữu Thọ",
-    "36 Huỳnh Thúc Kháng",
-    "20 Lê Thánh Tông",
-    "44 Phạm Văn Đồng",
-    "59 Võ Nguyên Giáp",
-    "8 Đỗ Quang",
-    "27 Nguyễn Văn Linh",
-    "65 Trương Định",
-    "17 Phạm Ngọc Thạch",
-    "31 Nguyễn Bình",
-    "14 Trần Cao Vân",
-    "105 Trần Phú"
-]
+        
+        # for i, msg in enumerate(works):
+        #     v = groups[i].status
+        #     if v == '0': v = None
+        #     works[i].status = v
 
+        # db.session.commit()  # commit lần cuối nếu còn phần tử chưa commit
 
+        # Giả sử bạn có danh sách workspace list hoặc query result workspace
+        # workspaces = Workspace.query.all()
+        # # Lấy set id (string)
+        # workspace_id_set = {ws.id for ws in workspaces}
 
-        groups = Group.query.all()
-        works = Workspace.query.all()
-        customers = Customer.query.all()
+        # # Chuyển sang danh sách và sort để có thứ tự cố định
+        # sorted_ids = sorted(int(wid) for wid in workspace_id_set)
 
-        for i, s in enumerate(so_nha_ten_duong):
-            groups[i].address = works[i].address = s
-            # db.session.delete(customers[i])  # xóa từng đối tượng khỏi session
+        # # Tạo mapping từ id gốc sang index trong sorted list
+        # id_to_index = {str(wid): idx for idx, wid in enumerate(sorted_ids)}
 
-        db.session.commit()  # lưu thay đổi vào database
+        # # Áp dụng gán giá trị mới index cho từng workspace
+        # for ws in workspaces:
+        #     ws.version = id_to_index[ws.id]  # Giả sử bạn có trường index_id hoặc dùng để xử lý
+
+        # db.session.commit()
+
+        
+            
 
 
 

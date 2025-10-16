@@ -73,7 +73,7 @@ class LeadPayload(BaseModel):
     company = db.Column(db.String(120), nullable=False)
     email = db.Column(db.String(120), nullable=False)
     phone = db.Column(db.String(50), nullable=False)
-    nhuCau = db.Column(db.Text)
+    description = db.Column(db.Text)
     industry = db.Column(db.String(100), nullable=False)
     companySize = db.Column(db.String(50), nullable=False)
     balance_amount = db.Column(db.Float)

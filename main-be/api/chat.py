@@ -42,6 +42,7 @@ def handle_message(data):
     
     print('Receive data', data)
     group_id = data['group_id']
+    workspace_id = data['workspace_id']
     message_id = data['message_id']
     # user_id = User.query.first() # data['user_id']
     username = data['username']
@@ -68,6 +69,7 @@ def handle_message(data):
     # Lưu message mới
     print('Saving role', role)
     msg = Message(group_id=group_id,type=type, 
+                  workspace_id = workspace_id,
                   user_id=user_id, username=username,
                   text=text, 
                   message_id = message_id,role=role,
@@ -78,7 +80,7 @@ def handle_message(data):
     emit('admake/chat/message', {
         'type':type,
         'message_id': message_id,
-        # 'icon': icon,
+        'workspace_id': workspace_id,
         'text': text,
         'file_url': file_url,
         'user_id': user_id,

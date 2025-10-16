@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify, abort
-from models import db, app, Group, Message,User, dateStr, GroupMember, generate_datetime_id
+from models import db, app, Workspace, Message,User, dateStr, generate_datetime_id
 from api.chat import socketio
 from sqlalchemy import desc
 
@@ -7,49 +7,49 @@ group_bp = Blueprint('group', __name__, url_prefix='/api/group')
 
 @group_bp.route("/", methods=["GET"])
 def get_groups():
-    groups = Group.query.order_by(desc(Group.createdAt)).all()
+    groups = Workspace.query.order_by(desc(Workspace.createdAt)).all()
     return jsonify([c.to_dict() for c in groups])
 
-@group_bp.route("/member/", methods=["GET"])
-def get_group_members():
-    group_members = [c.to_dict() for c in GroupMember.query.all()]
-    return jsonify(group_members)
+# @group_bp.route("/member/", methods=["GET"])
+# def get_group_members():
+#     group_members = [c.to_dict() for c in WorkspaceMember.query.all()]
+#     return jsonify(group_members)
 
 @group_bp.route("/", methods=["POST"])
 def create_group():
     data = request.get_json()
 
-    new_group = Group.create_item(data)
+    new_group = Workspace.create_item(data)
     db.session.add(new_group)
     db.session.commit()
 
     return jsonify(new_group.to_dict()), 201
 
-@group_bp.route("/<int:group_id>", methods=["DELETE"])
-def delete_group(group_id):
-    group = Group.query.get(group_id)
+@group_bp.route("/<int:workspace_id>", methods=["DELETE"])
+def delete_group(workspace_id):
+    group = Workspace.query.get(workspace_id)
     if not group:
-        return jsonify({"error": "Group not found"}), 404
+        return jsonify({"error": "Workspace not found"}), 404
 
     db.session.delete(group)
     db.session.commit()
-    return jsonify({"message": "Group deleted successfully"}), 200
+    return jsonify({"message": "Workspace deleted successfully"}), 200
 
 
 @group_bp.route("/<int:id>", methods=["GET"])
 def get_group_detail(id):
-    group = db.session.get(Group, id)
+    group = db.session.get(Workspace, id)
     if not group:
         abort(404, description="group not found")
     return jsonify(group.to_dict())
 
-@group_bp.route("/<int:group_id>", methods=["PUT"])
-def update_group(group_id):
+@group_bp.route("/<int:workspace_id>", methods=["PUT"])
+def update_group(workspace_id):
     data = request.get_json()
     
-    group = Group.query.get(group_id)
+    group = Workspace.query.get(workspace_id)
     if not group:
-        return jsonify({"error": "Group not found"}), 404
+        return jsonify({"error": "Workspace not found"}), 404
     
     for key, value in data.items():
         group[key] = value
@@ -57,13 +57,11 @@ def update_group(group_id):
     db.session.commit()
     return jsonify(group.to_dict()), 200
 
-
-
-@group_bp.route('/<int:group_id>/status', methods=['POST'])
-def change_group_status(group_id):
+@group_bp.route('/<int:workspace_id>/status', methods=['POST'])
+def change_group_status(workspace_id):
     data = request.json
     status = data.get('status')
-    group = db.session.get(Group, group_id)
+    group = db.session.get(Workspace, workspace_id)
 
     if not group:
         abort(404, description="group not found")
@@ -75,8 +73,8 @@ def change_group_status(group_id):
 
 
 # Tạo Message
-@group_bp.route('/<int:group_id>/messages', methods=['POST'])
-def create_message(group_id):
+@group_bp.route('/<int:workspace_id>/messages', methods=['POST'])
+def create_message(workspace_id):
     data = request.json
     user_id = data.get('user_id')
     role = data.get('role')
@@ -86,9 +84,9 @@ def create_message(group_id):
     username=data.get('username')
 
     # Kiểm tra user có trong nhóm không
-    member = GroupMember.query.filter_by(user_id=user_id, group_id=group_id).first()
-    if not member:
-        return jsonify({'error': 'User not a member of the group'}), 403
+    # member = WorkspaceMember.query.filter_by(user_id=user_id, workspace_id=workspace_id).first()
+    # if not member:
+    #     return jsonify({'error': 'User not a member of the group'}), 403
 
     # msg = Message(
     #     user_id=user_id,
@@ -104,32 +102,33 @@ def create_message(group_id):
     # Phát message qua socket
     socketio.emit('admake/chat/message', {
         # 'id': msg.id,
-        'group_id': group_id,
+        'workspace_id': workspace_id,
         'username': username,
         'text': text,
         'file_url': file_url,
         'link': link,
         'role': role,
-    }, room=str(group_id))
+    }, room=str(workspace_id))
     
     return jsonify({'message': 'Message sent'})
 
-@group_bp.route('/<int:group_id>/messages', methods=['GET'])
-def get_messages(group_id):
-    group = db.session.get(Group, group_id)
+@group_bp.route('/<int:workspace_id>/messages', methods=['GET'])
+def get_messages(workspace_id):
+    group = db.session.get(Workspace, workspace_id)
 
     if not group:
         return jsonify({"error": "group not found"}), 404
     
-    messages = [m.to_dict() for m in group.all_messages]
+    all_messages = Message.query.filter_by(workspace_id=workspace_id).order_by(Message.createdAt).all()
+    messages = [m.to_dict() for m in all_messages]
     
-    print('GET',group_id, len(messages))
+    print('GET',workspace_id, len(messages))
 
     return jsonify({'messages': messages})
 
-@group_bp.route('/check-access/<int:group_id>/<string:desc>/', methods=['GET'])
-def get_check_access(group_id, desc):
-    group = db.session.get(Group, group_id)
+@group_bp.route('/check-access/<int:workspace_id>/<string:desc>/', methods=['GET'])
+def get_check_access(workspace_id, desc):
+    group = db.session.get(Workspace, workspace_id)
 
     if not group:
         return jsonify({"error": "group not found"}), 404

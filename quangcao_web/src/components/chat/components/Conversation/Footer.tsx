@@ -256,13 +256,15 @@ const Footer = forwardRef<HTMLDivElement, FooterProps>(
 
 
   const sendMessage = (message: string, file_url = '') => {
-    
+    if(!message || message === '') return;
+
     if (socket.connected) {
       const timestamp = Date.now();
       console.log("Username",  get_user_name());
       
       const data: MessageTypeProps = {
         id: generateUniqueIntId(),
+        workspace_id: groupEl?.id.toString() || '',
         react: {rate:0},
         preview: '',
         reply: '',
@@ -303,6 +305,7 @@ const Footer = forwardRef<HTMLDivElement, FooterProps>(
       
       const data: MessageTypeProps = {
         id: generateUniqueIntId(),
+        workspace_id: groupEl?.id.toString() || '',
         react: {rate:0},
         preview: '',
         reply: '',

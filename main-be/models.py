@@ -282,7 +282,7 @@ class Workspace(BaseModel):
     rating_sum = db.Column(db.Integer, default=0)
     rating_count = db.Column(db.Integer, default=0)
 
-    state = db.Column(db.String(50))
+    status = db.Column(db.String(50))
     
     
 
@@ -297,17 +297,11 @@ class Workspace(BaseModel):
         return result
 
     @staticmethod
-    def parse(data):
-        return Workspace(
-            id=data.get("_id", {}).get("$oid"),
-            
-            name=data.get("name"),
-            owner_id=data.get("ownerId", {}).get("$oid"),
-            createdAt=parse_date(data.get("createdAt")),
-            updatedAt=parse_date(data.get("updatedAt")),
-            deletedAt=parse_date(data.get("deletedAt")),
-            version=data.get("__v"),
-        )
+    def create_item(params):
+        item = Workspace(**params)
+        db.session.add(item)
+        db.session.commit()
+        return item
     
 class Task(BaseModel):
     __tablename__ = "task"
@@ -393,9 +387,7 @@ class Group(BaseModel):
     rating_count = db.Column(db.Integer, default=0)
     rating_sum = db.Column(db.Integer, default=0)
     status = db.Column(db.String(10), default=0)
-    # createdAt = db.Column(db.DateTime(timezone=True), server_default=func.now())
-    # updatedAt = db.Column(db.DateTime(timezone=True), server_default=func.now())
-
+    
     def to_dict(self):
         result = {}
         for column in self.__table__.columns:
@@ -448,8 +440,6 @@ class Group(BaseModel):
     @property
     def all_messages(self):
         return Message.query.filter_by(group_id=self.id).order_by(Message.createdAt).all()
-
-   
 
     @property
     def last_message(self):
@@ -520,7 +510,7 @@ class Message(BaseModel):
     __tablename__ = 'message'
 
     
-
+    workspace_id = db.Column(db.String(50))
     message_id = db.Column(db.String(80), primary_key=True)
     group_id = db.Column(db.Integer, db.ForeignKey('group.id'), nullable=True)
     user_id = db.Column(db.String(80), db.ForeignKey('user.id'), nullable=True)
