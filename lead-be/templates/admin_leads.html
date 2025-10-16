@@ -20,15 +20,14 @@
                     <th>ID</th>
                     <th style="width:300px">Họ và tên</th>
                     <th>Công ty</th>
-                    <th>Email</th>
-                    <th>Điện thoại</th>
+                    
+                    <th>Liên hệ</th>
                     <th>Nhu cầu</th>
                     <th>Ngành</th>
                     <th>Quy mô công ty</th>
                     <th>Số dư</th>
-                    <th>Ngày đăng ký</th>
-                    <th>Ngày gia hạn</th>
-                    <th>Ngày hết hạn</th>
+                    <th>Ngày đăng ký/ gia hạn/ hết hạn</p>
+                    </th>
                 </tr>
             </thead>
             <tbody>
@@ -37,15 +36,21 @@
                     <td>{{ lead.id }}</td>
                     <td>{{ lead.name }}</td>
                     <td>{{ lead.company }}</td>
-                    <td>{{ lead.email }}</td>
-                    <td>{{ lead.phone }}</td>
-                    <td>{{ lead.description }}</td>
+                    
+                    <td>
+                        <p>{{ lead.phone }}</p>
+                        <p>{{ lead.email }}</p>
+                    </td>
+
+                    <td style="width:300px">{{ lead.description }}</td>
                     <td>{{ lead.industry }}</td>
-                    <td>{{ lead.companySize }}</td>
-                    <td>{{ lead.balance_amount }}</td>
-                    <td>{{ lead.createdAt }}</td>
-                    <td>{{ lead.updatedAt }}</td>
-                    <td>{{ lead.expiredAt }}</td>
+                    <td style="width:50px">{{ lead.companySize }}</td>
+                    <td style="width:50px">{{ lead.balance_amount }}</td>
+                    <td>
+                        <p>{{ lead.createdAt }}</p>
+                        <p>{{ lead.updatedAt }}</p>
+                        <p>{{ lead.expiredAt }}</p>
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>
