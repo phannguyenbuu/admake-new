@@ -26,7 +26,7 @@
                     <th>Ngành</th>
                     <th style="width:50px">Quy mô công ty</th>
                     <th style="width:50px">Số dư</th>
-                    <th style="width:100px">Ngày đăng ký/ gia hạn/ hết hạn</p>
+                    <th style="width:150px; font-size:10px">Ngày đăng ký/gia hạn/hết hạn</p>
                     </th>
                 </tr>
             </thead>
@@ -48,8 +48,8 @@
                     <td>{{ lead.balance_amount }}</td>
                     <td>
                         <p>{{ lead.createdAt }}</p>
-                        <p>{{ lead.updatedAt }}</p>
-                        <p style="color:red">{{ lead.expiredAt }}</p>
+                        <p style="color:red">{{ lead.updatedAt }}</p>
+                        <p style="color:red; font-weight:700">{{ lead.expiredAt }}</p>
                     </td>
                 </tr>
                 {% endfor %}
