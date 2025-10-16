@@ -91,7 +91,7 @@ class LeadPayload(BaseModel):
             value = getattr(self, column.name)
             # print(f"DEBUG: Column {column.name} value type: {type(value)}")
             if isinstance(value, (datetime.datetime, datetime.date)):
-                value = value.get_date()
+                value = value.isoformat()
             result[column.name] = value
         return result
 
