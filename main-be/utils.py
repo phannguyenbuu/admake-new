@@ -1,5 +1,5 @@
 import json
-from models import db, app, User, Workpoint,Leave, Customer, Material, parse_date, Role, Message, Task, Workspace, generate_datetime_id
+from models import db, app, User, LeadPayload, Workpoint,Leave, Customer, Material, parse_date, Role, Message, Task, Workspace, generate_datetime_id
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 import json
@@ -1016,7 +1016,7 @@ if __name__ == "__main__":
         # add_new_columns('group',['rating_count'],'INTEGER')
         # add_new_columns('group',['owner_id'],'VARCHAR(50)')
         # add_new_columns('user',['salary','version'],'INTEGER')
-        # add_new_columns('user',['deletedAt'],'TIMESTAMP')
+        # add_new_columns('lead',['expiredAt'],'TIMESTAMP')
         # renameColumn('lead', "nhuCau", "description")
         
         # msgs = db.session.query(Message).filter(Message.message_id == "temp-1760491441221").all()
@@ -1033,29 +1033,19 @@ if __name__ == "__main__":
         # groups = Group.query.all()
         # works = Workspace.query.all()
 
-        for t in Task.query.all():
-            if t.assets and not isinstance(t.assets, str):
-                t.assets = None
-                flag_modified(t, "assets")
 
-        db.session.commit()
 
-        # messages = Message.query.all()
+        leads = LeadPayload.query.all()
 
         # print(len(groups), len(works))
         
         
         # batch_size = 100
         # count = 0
-
-        # for i, msg in enumerate(messages):
-            
-        #     msg.workspace_id = msg.group_id
-        #     count += 1
-
-        #     if count % batch_size == 0:
-        #         print(i, datetime.datetime.now())
-        #         db.session.commit()  # commit mỗi 100 bản ghi
+        from datetime import timedelta
+        
+        for i, lead in enumerate(leads):
+            print(lead.to_dict())
 
         # db.session.commit()  # commit lần cuối nếu còn phần tử chưa commit
 

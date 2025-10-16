@@ -18,7 +18,7 @@
             <thead class="table-light" style="background-color: #00B4B6;">
                 <tr>
                     <th>ID</th>
-                    <th>Tên</th>
+                    <th style="width:300px">Họ và tên</th>
                     <th>Công ty</th>
                     <th>Email</th>
                     <th>Điện thoại</th>
@@ -43,9 +43,9 @@
                     <td>{{ lead.industry }}</td>
                     <td>{{ lead.companySize }}</td>
                     <td>{{ lead.balance_amount }}</td>
-                    <td>{{ lead.createdAt }}</td>
-                    <td>{{ lead.updateAt }}</td>
-                    <td>{{ lead.expiredAt }}</td>
+                    <td>{{ lead.createdAt.strftime('%Y-%m-%d') }}</td>
+                    <td>{{ lead.updatedAt.strftime('%Y-%m-%d') }}</td>
+                    <td>{{ lead.expiredAt.strftime('%Y-%m-%d') }}</td>
                 </tr>
                 {% endfor %}
             </tbody>

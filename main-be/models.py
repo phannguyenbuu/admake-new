@@ -688,6 +688,7 @@ class LeadPayload(BaseModel):
     companySize = db.Column(db.String(50), nullable=False)
     balance_amount = db.Column(db.Float)
 
+    expiredAt = db.Column(db.DateTime, default=datetime.datetime.utcnow)
     # Quan hệ 1-n: một Lead có nhiều historyUsing
     history_using = db.relationship('UsingHistoryData', backref='lead', cascade='all, delete-orphan')
 
