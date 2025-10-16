@@ -35,10 +35,25 @@ export interface SelectedUser {
 export interface WorkSpace {
   id: string;
   name: string;
-  cover?: string;
+  // cover?: string;
   
   users: UserSearchProps[],
   customers: UserSearchProps[]
+
+  // id: number,
+  // members: number,
+  owner_id: string;
+  // name:string,
+  // message_id: string;
+  description: string;
+  // img:string,
+  // time:string,
+  // msg:string,
+  // unread:number,
+  // status?:string,
+  pinned:boolean,
+  address:string,
+  version:number;
 }
 
 export interface MaterialTask {

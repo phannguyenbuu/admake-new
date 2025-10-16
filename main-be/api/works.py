@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify, abort
-from models import db, Workspace, Task, dateStr,Message, generate_datetime_id, Group, User, Customer
+from models import db, Workspace, Task, dateStr,Message, generate_datetime_id, User, Customer
 import datetime
 from collections import defaultdict
 from sqlalchemy import desc
@@ -9,20 +9,7 @@ workspace_bp = Blueprint('workspace', __name__, url_prefix='/api/workspace')
 
 @workspace_bp.route("/", methods=["GET"])
 def get_workspaces():
-    # page = request.args.get("page", 1, type=int)
-    # limit = request.args.get("limit", 10, type=int)
-    # search = request.args.get("search", "", type=str)
-
-    # query = Workspace.query
-    # if search:
-    #     query = query.filter(Workspace.name.ilike(f"%{search}%"))
-
-    # pagination = query.paginate(page=page, per_page=limit, error_out=False)
-    workspaces = Workspace.query.order_by(desc(Workspace.createdAt)).all()
-       
-
-    # print(workspaces)
-
+    workspaces = Workspace.query.order_by(desc(Workspace.updatedAt)).all()
     return jsonify([c.to_dict() for c in workspaces])
 
 
@@ -130,11 +117,6 @@ def post_workspace_reward_task(group_id):
     message_id = data.get('message_id')
     rate = data.get('rate')
 
-    group = db.session.get(Group, group_id)
-    if not group:
-        print("Group not found", group_id)
-        abort(404, description="Group not found")
-
     msgs = Message.query.filter(Message.message_id == message_id).all()
     print('msgs', len(msgs))
 
@@ -152,14 +134,7 @@ def post_workspace_reward_task(group_id):
         msg.react["rate"] = rate
         flag_modified(msg, "react")
     # db.session.commit()
-
-
-    print("Group", group.name)
-    work = Workspace.query.filter(Workspace.name.ilike(group.name)).first()
-        
-    if not work:
-        print("Workspace not found", group.name)
-        abort(404, description="Workspace not found")
+    work = Workspace.query.filter(Workspace.version == group_id).first()
     
     tasks = Task.query.filter_by(workspace_id=work.id).all()
     print('tasks',work, len(tasks))

@@ -76,6 +76,7 @@ class LeadPayload(BaseModel):
     description = db.Column(db.Text)
     industry = db.Column(db.String(100), nullable=False)
     companySize = db.Column(db.String(50), nullable=False)
+    expiredAt = db.Column(db.DateTime, default=datetime.datetime.utcnow)
     balance_amount = db.Column(db.Float)
 
     # Quan hệ 1-n: một Lead có nhiều historyUsing

@@ -26,6 +26,9 @@
                     <th>Ngành</th>
                     <th>Quy mô công ty</th>
                     <th>Số dư</th>
+                    <th>Ngày đăng ký</th>
+                    <th>Ngày gia hạn</th>
+                    <th>Ngày hết hạn</th>
                 </tr>
             </thead>
             <tbody>
@@ -36,10 +39,13 @@
                     <td>{{ lead.company }}</td>
                     <td>{{ lead.email }}</td>
                     <td>{{ lead.phone }}</td>
-                    <td>{{ lead.nhuCau }}</td>
+                    <td>{{ lead.description }}</td>
                     <td>{{ lead.industry }}</td>
                     <td>{{ lead.companySize }}</td>
                     <td>{{ lead.balance_amount }}</td>
+                    <td>{{ lead.createdAt }}</td>
+                    <td>{{ lead.updateAt }}</td>
+                    <td>{{ lead.expiredAt }}</td>
                 </tr>
                 {% endfor %}
             </tbody>

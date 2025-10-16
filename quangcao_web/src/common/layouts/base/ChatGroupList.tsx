@@ -5,19 +5,23 @@ import { useNavigate } from "react-router-dom";
 import { useApiHost } from "../../hooks/useApiHost";
 import type { MenuProps } from "antd/lib";
 import Group from '../../../components/chat/pages/dashboard/Group.tsx';
-import type { GroupProps } from "../../../@types/chat.type.ts";
+// import type { WorkSpace } from "../../../@types/chat.type.ts";
 import type { MenuInfo } from 'rc-menu/lib/interface';
 import { useUser } from "../../hooks/useUser.tsx";
 import {Button, Input} from "@mui/material";
 import {Box, Stack} from "@mui/material";
 import { UpdateButtonContext } from "../../hooks/useUpdateButtonTask.tsx";
+import type { WorkSpace } from "../../../@types/work-space.type.ts";
 
-const ChatGroupList: React.FC = ({}) => {
-  const navigate = useNavigate();
-  const [chatGroupList, setChatGroupList] = useState<GroupProps[]>([]);
+interface ChatGroupListProps {
+  workSpaces?: WorkSpace[];
+}
+
+const ChatGroupList: React.FC<ChatGroupListProps> = ({workSpaces}) => {
+  const [chatGroupList, setChatGroupList] = useState<WorkSpace[]>([]);
   const [modalVisible, setModalVisible] = useState(false);
-  const [selectedId, setSelectedId] = useState<GroupProps | null>(null);
-  const API_HOST = useApiHost();
+  const [selectedId, setSelectedId] = useState<WorkSpace | null>(null);
+  
   //@ts-ignore
   const {userId, userRoleId} = useUser();
 
@@ -32,15 +36,18 @@ const ChatGroupList: React.FC = ({}) => {
   useEffect(() => {
     // console.log('!!!API', API_HOST);
 
-    fetch(`${API_HOST}/group/`)
-      .then((res) => res.json())
-      .then((data: GroupProps[]) => 
-        {
-          // console.log('GroupData', data);
-          setChatGroupList(data);
-        })
-      .catch((error) => console.error("Failed to load group data", error));
-  }, []);
+    // fetch(`${useApiHost()}/group/`)
+    //   .then((res) => res.json())
+    //   .then((data: WorkSpace[]) => 
+    //     {
+    //       // console.log('GroupData', data);
+    //       setChatGroupList(data);
+    //     })
+    //   .catch((error) => console.error("Failed to load group data", error));
+
+    setChatGroupList(workSpaces);
+  }, [workSpaces]);
+  
 
   const items: MenuProps["items"] = (chatGroupList || []).map((group) => ({
     key: group.id,

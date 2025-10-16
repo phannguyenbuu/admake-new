@@ -1,6 +1,5 @@
  import { Box, Button, Stack, Typography, Link, IconButton, Divider } from '@mui/material'
 import React, { useState, useEffect } from 'react';
-import { Search, SearchIconWrapper, StyledInputBase } from '../../components/Search'
 import { useTheme } from "@mui/material/styles";
 import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
@@ -13,10 +12,10 @@ import { socket } from '../../components/Conversation/socket';
 import Contact from '../../components/Contact';
 import type { GroupProps, MessageTypeProps } from '../../../../@types/chat.type';
 import { useUser } from '../../../../common/hooks/useUser';
-import SearchIcon from "@mui/icons-material/Search";
 
-import { useApiHost, useApiSocket } from '../../../../common/hooks/useApiHost';
+import { useApiHost } from '../../../../common/hooks/useApiHost';
 import { notification } from 'antd';
+
 interface GroupComponentProps {
   selected: GroupProps | null;
   setSelected: React.Dispatch<React.SetStateAction<GroupProps | null>> | null;

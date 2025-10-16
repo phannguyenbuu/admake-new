@@ -1,5 +1,5 @@
 import json
-from models import db, app, User, Group,Workpoint,Leave, Customer, Material, parse_date, Role, Message, Task, Workspace, generate_datetime_id
+from models import db, app, User, Workpoint,Leave, Customer, Material, parse_date, Role, Message, Task, Workspace, generate_datetime_id
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 import json
@@ -899,24 +899,6 @@ def delete_null_task():
 DELETE FROM task
 WHERE start_time IS NULL;
                             '''))
-    db.session.commit()
-
-def set_group_generate_token():
-    for i, group in enumerate(Group.query.all()):
-        s = generate_datetime_id()
-        # s = s[:5] + str(i) + group.name[::-1].lower() + s[5:]
-        group.description = s
-    db.session.commit()
-
-
-def add_group_work_point():
-    group = Group(
-        description = generate_datetime_id(),
-        id = 0,
-        name = "WORKPOINT",
-        status = "start")
-    
-    db.session.add(group)
     db.session.commit()
 
 def modify_task_material():

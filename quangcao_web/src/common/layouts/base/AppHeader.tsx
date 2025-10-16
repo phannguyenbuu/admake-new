@@ -94,7 +94,7 @@ export default function AppHeader() {
         </div>
 
         {/* Menu Chat Group List */}
-        <ChatGroupList/>
+        <ChatGroupList workSpaces={workSpaces}/>
 
         <div className="flex items-center gap-4 md:gap-6">
           {/* Center - Notification */}

@@ -6,7 +6,7 @@ import StyledBadge from '../StyledBadge';
 import { useUser } from '../../../../common/hooks/useUser';
 import SearchIcon from '@mui/icons-material/Search';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
-import type { GroupProps } from '../../../../@types/chat.type';
+// import type { GroupProps } from '../../../../@types/chat.type';
 
 interface HeaderProps {
   title: string;

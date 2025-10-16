@@ -29,8 +29,8 @@ def get_users():
 def get_query_page_users(page,limit,search):
     query = User.query.filter(
         and_(
-            User.role_id != -1,
-            User.role_id != 3
+            User.role_id > 0,
+            User.role_id < 100
         )
     )
 
@@ -40,7 +40,7 @@ def get_query_page_users(page,limit,search):
             (User.fullName.ilike(f"%{search}%"))
         )
 
-    query = query.order_by(desc(User.createdAt), User.id)
+    query = query.order_by(desc(User.updatedAt), User.id)
 
     pagination = query.paginate(page=page, per_page=limit, error_out=False)
     users = [c.to_dict() for c in pagination.items]

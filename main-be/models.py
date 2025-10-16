@@ -311,11 +311,11 @@ class Workspace(BaseModel):
     @staticmethod
     def create_item(params):
         item = Workspace(**params)
+        item.id = generate_datetime_id()
         db.session.add(item)
         db.session.commit()
         return item
     
-
     @staticmethod
     def get_by_id(workspace_id):
         return Workspace.query.filter(Workspace.version == workspace_id).first()
@@ -389,138 +389,138 @@ class Task(BaseModel):
             salary_type = data.get("salary_type", '')
         )
 
-class Group(BaseModel):
-    __tablename__ = 'group'
-    __table_args__ = {'quote': True}
+# class Group(BaseModel):
+#     __tablename__ = 'group'
+#     __table_args__ = {'quote': True}
 
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    owner_id = db.Column(db.String(50))
-    name = db.Column(db.String(120), nullable=True)
-    description = db.Column(db.String(255))
-    address = db.Column(db.String(255))
-    documents = db.Column(db.JSON, default=[])  # Lưu danh sách đường dẫn tài liệu
-    images = db.Column(db.JSON, default=[])     # Lưu danh sách đường dẫn hình ảnh
-    chats = db.Column(db.JSON, default=[])      # Lưu danh sách message ID lưu lại
-    rating_count = db.Column(db.Integer, default=0)
-    rating_sum = db.Column(db.Integer, default=0)
-    status = db.Column(db.String(10), default=0)
+#     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+#     owner_id = db.Column(db.String(50))
+#     name = db.Column(db.String(120), nullable=True)
+#     description = db.Column(db.String(255))
+#     address = db.Column(db.String(255))
+#     documents = db.Column(db.JSON, default=[])  # Lưu danh sách đường dẫn tài liệu
+#     images = db.Column(db.JSON, default=[])     # Lưu danh sách đường dẫn hình ảnh
+#     chats = db.Column(db.JSON, default=[])      # Lưu danh sách message ID lưu lại
+#     rating_count = db.Column(db.Integer, default=0)
+#     rating_sum = db.Column(db.Integer, default=0)
+#     status = db.Column(db.String(10), default=0)
     
-    def to_dict(self):
-        result = {}
-        for column in self.__table__.columns:
-            value = getattr(self, column.name)
-            # print(f"DEBUG: Column {column.name} value type: {type(value)}")
-            if isinstance(value, (datetime.datetime, datetime.date)):
-                value = value.isoformat()
-            result[column.name] = value
+#     def to_dict(self):
+#         result = {}
+#         for column in self.__table__.columns:
+#             value = getattr(self, column.name)
+#             # print(f"DEBUG: Column {column.name} value type: {type(value)}")
+#             if isinstance(value, (datetime.datetime, datetime.date)):
+#                 value = value.isoformat()
+#             result[column.name] = value
 
-        # result['members'] = self.total_members
+#         # result['members'] = self.total_members
                 
-        return result
+#         return result
     
-    @staticmethod
-    def create_item(params):
-        description_value = params.get('description') or generate_datetime_id()
+#     @staticmethod
+#     def create_item(params):
+#         description_value = params.get('description') or generate_datetime_id()
 
-        group = Group(
-            name=params.get('name', 0),
-            description=description_value,
-            address=params.get('address', 0),
-            documents=[],
-            images=[],
-            chats=[],
+#         group = Group(
+#             name=params.get('name', 0),
+#             description=description_value,
+#             address=params.get('address', 0),
+#             documents=[],
+#             images=[],
+#             chats=[],
 
-            rating_sum=params.get('rating_sum', 0),
+#             rating_sum=params.get('rating_sum', 0),
             
-            # createdAt=to_date(params.get('createdAt','')),
-            # updatedAt=to_date(params.get('updatedAt','')),
-        )
+#             # createdAt=to_date(params.get('createdAt','')),
+#             # updatedAt=to_date(params.get('updatedAt','')),
+#         )
 
-        db.session.add(group)
-        db.session.commit()
-        return group
+#         db.session.add(group)
+#         db.session.commit()
+#         return group
     
-    @property
-    def rating(self):
-        if self.rating_count == 0:
-            return 0
-        return round(self.rating_sum / self.rating_count, 2)
+#     @property
+#     def rating(self):
+#         if self.rating_count == 0:
+#             return 0
+#         return round(self.rating_sum / self.rating_count, 2)
     
-    @property
-    def total_members(self):
-        return GroupMember.query.filter_by(group_id=self.id).count()
+#     @property
+#     def total_members(self):
+#         return GroupMember.query.filter_by(group_id=self.id).count()
 
-    @property
-    def total_messages(self):
-        return Message.query.filter_by(group_id=self.id).count()
+#     @property
+#     def total_messages(self):
+#         return Message.query.filter_by(group_id=self.id).count()
     
-    @property
-    def all_messages(self):
-        return Message.query.filter_by(group_id=self.id).order_by(Message.createdAt).all()
+#     @property
+#     def all_messages(self):
+#         return Message.query.filter_by(group_id=self.id).order_by(Message.createdAt).all()
 
-    @property
-    def last_message(self):
-        msgs = Message.query.filter_by(group_id=self.id)
+#     @property
+#     def last_message(self):
+#         msgs = Message.query.filter_by(group_id=self.id)
 
-        if msgs.count() > 0:
-            last_msg = msgs.order_by(Message.createdAt.desc()).first()
-            if last_msg:
-                # Trả lại đoạn text hoặc thông tin bạn muốn hiển thị
-                return f"{last_msg.createdAt}|{last_msg.text[:50]}"  # cắt ngắn 50 ký tự
-        return ''
+#         if msgs.count() > 0:
+#             last_msg = msgs.order_by(Message.createdAt.desc()).first()
+#             if last_msg:
+#                 # Trả lại đoạn text hoặc thông tin bạn muốn hiển thị
+#                 return f"{last_msg.createdAt}|{last_msg.text[:50]}"  # cắt ngắn 50 ký tự
+#         return ''
 
-class GroupMember(db.Model):
-    __tablename__ = 'group_member'
+# class GroupMember(db.Model):
+    # __tablename__ = 'group_member'
 
-    id = db.Column(db.Integer, primary_key=True)
+    # id = db.Column(db.Integer, primary_key=True)
     
-    group_id = db.Column(db.Integer, db.ForeignKey('group.id'), nullable=True)
-    user_id = db.Column(db.String(80), db.ForeignKey('user.id'), nullable=True)
+    # group_id = db.Column(db.Integer, db.ForeignKey('group.id'), nullable=True)
+    # user_id = db.Column(db.String(80), db.ForeignKey('user.id'), nullable=True)
 
-    role = db.Column(db.String(20), default='member')
+    # role = db.Column(db.String(20), default='member')
 
-    user = db.relationship('User', backref='group_members')
-    group = db.relationship('Group', backref='group_members')
+    # user = db.relationship('User', backref='group_members')
+    # group = db.relationship('Group', backref='group_members')
 
-    def to_dict(self):
-        result = {}
-        for column in self.__table__.columns:
-            value = getattr(self, column.name)
-            # print(f"DEBUG: Column {column.name} value type: {type(value)}")
-            if isinstance(value, (datetime.datetime, datetime.date)):
-                value = value.isoformat()
-            result[column.name] = value
-        return result
+    # def to_dict(self):
+    #     result = {}
+    #     for column in self.__table__.columns:
+    #         value = getattr(self, column.name)
+    #         # print(f"DEBUG: Column {column.name} value type: {type(value)}")
+    #         if isinstance(value, (datetime.datetime, datetime.date)):
+    #             value = value.isoformat()
+    #         result[column.name] = value
+    #     return result
 
-    @staticmethod
-    def create_item(params):
-        try:
-            user_id = str(params.get('user_id',0))
-            user_exists = User.query.filter_by(accountId=user_id).first()
+    # @staticmethod
+    # def create_item(params):
+    #     try:
+    #         user_id = str(params.get('user_id',0))
+    #         user_exists = User.query.filter_by(accountId=user_id).first()
             
-            group_id = params.get('group_id', 0)
-            group_exists = Group.query.filter_by(id=group_id).first()
+    #         group_id = params.get('group_id', 0)
+    #         group_exists = Group.query.filter_by(id=group_id).first()
 
-            if user_exists and group_exists:
-                gr = GroupMember(
-                    user_id=user_id,
-                    group_id=group_id,
-                    role=params.get('role', ''),
-                )
+    #         if user_exists and group_exists:
+    #             gr = GroupMember(
+    #                 user_id=user_id,
+    #                 group_id=group_id,
+    #                 role=params.get('role', ''),
+    #             )
         
-                db.session.add(gr)  # hoặc bulk insert
-                db.session.commit()
-                return gr
-            else:
-                print('No exist',user_id,group_id)
-        except IntegrityError as e:
-            db.session.rollback()
-            # Kiểm tra có phải lỗi unique constraint vi phạm không
-            if 'user_accountId_key' in str(e.orig):
-                print("Duplicate accountId, bỏ qua bản ghi này")
-                # Hoặc xử lý theo ý bạn, ví dụ bỏ qua, log lại,...
-            else:
-                raise  # lỗi khác thì raise tiếp
+    #             db.session.add(gr)  # hoặc bulk insert
+    #             db.session.commit()
+    #             return gr
+    #         else:
+    #             print('No exist',user_id,group_id)
+    #     except IntegrityError as e:
+    #         db.session.rollback()
+    #         # Kiểm tra có phải lỗi unique constraint vi phạm không
+    #         if 'user_accountId_key' in str(e.orig):
+    #             print("Duplicate accountId, bỏ qua bản ghi này")
+    #             # Hoặc xử lý theo ý bạn, ví dụ bỏ qua, log lại,...
+    #         else:
+    #             raise  # lỗi khác thì raise tiếp
 
 from sqlalchemy.exc import IntegrityError
 class Message(BaseModel):
@@ -529,7 +529,7 @@ class Message(BaseModel):
     
     workspace_id = db.Column(db.Integer)
     message_id = db.Column(db.String(80), primary_key=True)
-    group_id = db.Column(db.Integer, db.ForeignKey('group.id'), nullable=True)
+    group_id = db.Column(db.Integer, nullable=True)
     user_id = db.Column(db.String(80), db.ForeignKey('user.id'), nullable=True)
     username =  db.Column(db.String(255))
     
@@ -543,7 +543,7 @@ class Message(BaseModel):
     type = db.Column(db.String(10), nullable=True)
     
     user = db.relationship('User', foreign_keys=[user_id])
-    group = db.relationship('Group', foreign_keys=[group_id])
+    # group = db.relationship('Group', foreign_keys=[group_id])
 
     def to_dict(self):
         result = {}
@@ -559,41 +559,10 @@ class Message(BaseModel):
 
     @staticmethod
     def create_item(params):
-        try:
-            user_id = str(params.get('user_id',''))
-            user_exists = User.query.filter_by(accountId=user_id).first()
-            group_id = params.get('group_id', 0)
-            group_exists = Group.query.filter_by(id=group_id).first()
-            
-            if user_exists and group_exists:
-                # print(accountId, group.id)
-                msg = Message(
-                    group_id=group_id,
-                    user_id=user_id,
-                    
-                    text=params.get('text', ''),
-                    username=params.get('username', ''),
-                    file_url = params.get('file_url',''),
-                    is_favourite = params.get('is_favourite', True),
-                    react = params.get('react',''),
-                    type = params.get('type',''),
-                    id = params.get('id',''),
-                    message_id = params.get('message_id',''),
-                )
-                
-                db.session.add(msg)
-                db.session.commit()
-                return msg
-            else:
-                print('No exist',user_id,group_id)
-        except IntegrityError as e:
-            db.session.rollback()
-            # Kiểm tra có phải lỗi unique constraint vi phạm không
-            if 'user_accountId_key' in str(e.orig):
-                print("Duplicate accountId, bỏ qua bản ghi này")
-                # Hoặc xử lý theo ý bạn, ví dụ bỏ qua, log lại,...
-            else:
-                raise  # lỗi khác thì raise tiếp
+        item = Message(**params)
+        db.session.add(item)
+        db.session.commit()
+        return item
 
 class Workpoint(BaseModel):
     __tablename__ = 'workpoint'
