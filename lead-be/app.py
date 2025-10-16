@@ -15,7 +15,7 @@ def admin_leads():
     leads_data = [lead.to_dict() for lead in leads]  # Chuyển đối tượng thành dict để render dễ dàng
     return render_template('admin_leads.html', leads=leads_data)
 
-@app.route('/admin/lead/', methods=['POST'])
+@app.route('/api/lead/', methods=['POST'])
 def create_lead_infor():
     data = request.get_json()
     lead = LeadPayload.create_item(data)  # Giả sử phương thức này tạo instance Lead từ data
