@@ -55,6 +55,8 @@ export default function LeadForm() {
       companySize: String(form.get("companySize") || ""),
     }
 
+    console.log(payload);
+
     try {
       const res = await fetch("/api/lead/", {
         method: "POST",
