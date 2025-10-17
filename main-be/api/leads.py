@@ -15,9 +15,7 @@ def create_lead():
     data = request.get_json()
 
     new_lead = LeadPayload.create_item(data)
-    db.session.add(new_lead)
-    db.session.commit()
-
+    
     return jsonify(new_lead.to_dict()), 201
 
 @lead_bp.route("/<int:lead_id>", methods=["DELETE"])
