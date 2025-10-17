@@ -21,8 +21,8 @@ const theme = createTheme({
 const defaultState = {
   in_morning: "07:30",
   out_morning: "11:30",
-  in_afternoon: "13:30",
-  out_afternoon: "17:30",
+  in_noon: "13:30",
+  out_noon: "17:30",
   include_saturday_afternoon: false,
   night_overtime: "1.5",
   holiday_overtime: "2.0",
@@ -48,6 +48,8 @@ const NoteWorkpointModal: React.FC<NoteWorkpointModalProps> = ({
         // Gửi formState lên backend hoặc xử lý
         console.log(formState);
       };
+
+      
     
     return (
     <Modal open={questionOpen}
@@ -114,7 +116,7 @@ const NoteWorkpointModal: React.FC<NoteWorkpointModalProps> = ({
             
           </Stack>
           
-          <Stack component="form" onSubmit={handleSubmit} spacing={2}>
+          <Stack component="form" onSubmit={handleSubmit} spacing={4}>
       <TableContainer component={Paper}>
         <Table size="small" aria-label="work times table">
           <TableHead>
@@ -125,9 +127,9 @@ const NoteWorkpointModal: React.FC<NoteWorkpointModalProps> = ({
             </TableRow>
           </TableHead>
           <TableBody>
-            {['Sáng', 'Chiều'].map(period => (
+            {['morning', 'noon'].map(period => (
               <TableRow key={period}>
-                <TableCell>{period.charAt(0).toUpperCase() + period.slice(1)}</TableCell>
+                <TableCell>{period === "morning" ? "Sáng" : "Chiều"}</TableCell>
                 <TableCell>
                   <TextField
                     type="time"
@@ -168,25 +170,25 @@ const NoteWorkpointModal: React.FC<NoteWorkpointModalProps> = ({
         />
 
             <TextField
-                label="Hệ số tăng ca đêm"
+                label="Tăng ca đêm"
                 type="number"
                 name="night_overtime"
                 value={formState.night_overtime}
                 onChange={handleChange}
                 inputProps={{ min: 0, step: 0.5 }}
                 placeholder="Hours"
-                style={{width:100}}
+                style={{width:150}}
             />
 
             <TextField
-                label="Hệ số tăng ca Chủ Nhật,Lễ,Tết"
+                label="Tăng ca Chủ Nhật,Lễ,Tết"
                 type="number"
                 name="holiday_overtime"
                 value={formState.holiday_overtime}
                 onChange={handleChange}
                 inputProps={{ min: 0, step: 0.5 }}
                 placeholder="Hours"
-                style={{width:100}}
+                style={{width:150}}
             />
             </Stack>
 
