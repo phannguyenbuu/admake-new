@@ -37,7 +37,7 @@
                 {% for lead in leads %}
                 <tr>
                     <td>
-                        <input type="checkbox" name="selected_leads" value="{{ lead.id }}" />
+                        <input type="checkbox" name="selected_leads" value="{{ lead.id }}" checked/>
                     </td>
                     <td>{{ lead.id }}</td>
                     <td>{{ lead.name }}</td>
