@@ -13,7 +13,7 @@ def get_leads():
 @lead_bp.route("/", methods=["POST"])
 def create_lead():
     data = request.get_json()
-
+    print(data)
     new_lead = LeadPayload.create_item(data)
     
     return jsonify(new_lead.to_dict()), 201
