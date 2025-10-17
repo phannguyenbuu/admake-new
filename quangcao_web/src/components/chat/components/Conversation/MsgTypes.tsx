@@ -330,8 +330,8 @@ const TimeLine: React.FC<MsgTypeProps> = ({ el, menu, onDelete }) => {
         throw new Error("UpdateButtonContext not found");
       else
       {
-        const { setShowUpdateButtonMode } = context;
-        setShowUpdateButtonMode(1);
+        const { setShowUpdateButton } = context;
+        setShowUpdateButton(1);
       }
     } else {
       console.warn('Socket.IO not connected.');

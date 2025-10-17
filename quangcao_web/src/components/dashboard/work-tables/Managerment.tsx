@@ -54,7 +54,7 @@ export default function ManagermentBoard({workspaceId,}: ManagermentBoardProps) 
 
   const context = useContext(UpdateButtonContext);
   if (!context) throw new Error("UpdateButtonContext not found");
-  const { showUpdateButton, setShowUpdateButtonMode } = context;
+  const { showUpdateButton, setShowUpdateButton } = context;
   // API hooks
   const { data: workspaceData } = useWorkSpaceQueryById(workspaceId);
 
@@ -254,7 +254,7 @@ export default function ManagermentBoard({workspaceId,}: ManagermentBoardProps) 
 
   const onDragEnd = useCallback(
     (result: DropResult) => {
-      setShowUpdateButtonMode(0);
+      setShowUpdateButton(0);
       if (!adminMode) return;
       const { source, destination } = result;
 

@@ -71,7 +71,7 @@ def handle_message(data):
 
     # Lưu message mới
     print('Saving role', role)
-    msg = Message(group_id=group_id,
+    msg = Message(
                   type=type, 
                   workspace_id = workspace_id,
                   user_id=user_id, 

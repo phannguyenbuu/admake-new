@@ -45,13 +45,19 @@ function TaskHeader({ taskDetail, onSuccess, updateTaskStatus,
 
   const context = useContext(UpdateButtonContext);
   if (!context) throw new Error("UpdateButtonContext not found");
-  const { showUpdateButton } = context;
+  const { showUpdateButton, setShowUpdateButton } = context;
   
   console.log('Task:', taskDetail);
 
   useEffect(()=>{
     console.log('showUpdateButton',showUpdateButton);
   },[showUpdateButton]);
+
+
+  useEffect(()=>{
+    if (!taskDetail) setShowUpdateButton(0);
+
+  },[taskDetail]);
 
   const handleReward = async () => {
     // console.log("A_Task", taskDetail,updateTaskStatus);
@@ -115,17 +121,17 @@ interface FormTaskProps {
   customers: UserSearchProps[];
   updateTaskStatus: (taskId: string, newStatus: string) => Promise<void>;
   // showUpdateButtonMode: number;
-  // setShowUpdateButtonMode: (value: number) => void;
+  // setShowUpdateButton: (value: number) => void;
 }
 
 export default function FormTask({ 
   updateTaskStatus, open, onCancel, taskId, onSuccess,
   workspaceId, users, customers,
-  // showUpdateButtonMode, setShowUpdateButtonMode
+  // showUpdateButtonMode, setShowUpdateButton
  }: FormTaskProps) {
   const context = useContext(UpdateButtonContext);
   if (!context) throw new Error("UpdateButtonContext not found");
-  const { setShowUpdateButtonMode } = context;
+  const { setShowUpdateButton } = context;
 
   const { data:taskDetail, isLoading, isError, error } = useGetTaskById(taskId || "");
   // const [material, setMaterial] = useState<{ selectedMaterials: any[], materialQuantities: { [key: string]: number } }>({
@@ -164,11 +170,11 @@ export default function FormTask({
     console.log('taskDetail', taskDetail.id);
 
     if(taskDetail?.status === "DONE" && taskDetail?.check_reward)
-      setShowUpdateButtonMode(1);
+      setShowUpdateButton(1);
     else if(taskDetail?.status === "REWARD")
-      setShowUpdateButtonMode(2);
+      setShowUpdateButton(2);
     else
-      setShowUpdateButtonMode(0);
+      setShowUpdateButton(0);
 
   },[taskDetail]);
 

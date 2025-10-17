@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useContext } from "react";
 import { Row, Col, Card, Button, message, Modal } from "antd";
 import { StarOutlined, PlusOutlined, MoreOutlined } from "@ant-design/icons";
 import type { ColumnType } from "../../../../@types/work-space.type";
@@ -9,8 +9,10 @@ import {
   Draggable,
   type DropResult,
 } from "@hello-pangea/dnd";
+
 import columnThemes from "../theme.json";
 import type { Task } from "../../../../@types/work-space.type";
+import { UpdateButtonContext } from "../../../../common/hooks/useUpdateButtonTask";
 
 interface WorkspaceBoardProps {
   columns: ColumnType[];
@@ -28,6 +30,12 @@ const WorkspaceBoard: React.FC<WorkspaceBoardProps> =
     ({ onDragStart, onDragUpdate, 
         onDragEnd, isDragging,columns,
         setSelectedTask, setEditingTaskId, setShowFormTask, }) => {
+
+   
+            
+    
+
+
     return (
     <div className="relative z-10 px-4 sm:px-6 pt-3">
             <DragDropContext
@@ -133,6 +141,14 @@ const WorkspaceBoard: React.FC<WorkspaceBoardProps> =
                                     setSelectedTask(null);
                                     setEditingTaskId(null);
                                     setShowFormTask(true);
+                                        const context = useContext(UpdateButtonContext);
+                                        if (!context) 
+                                            throw new Error("UpdateButtonContext not found");
+                                        else
+                                        {
+                                            const { setShowUpdateButton } = context;
+                                            setShowUpdateButton(0);
+                                        }
                                     }}
                                 >
                                     <span className="relative z-10 flex items-center gap-2 text-xs sm:text-sm">
