@@ -116,7 +116,7 @@ export default function LeadForm() {
           ))}
         </select>
       </div>
-      <Textarea name="nhuCau" placeholder="Nhu cầu / Ghi chú" />
+      <Textarea name="description" placeholder="Nhu cầu / Ghi chú" />
       <Button disabled={status === "loading"} className="w-full bg-brand-500 text-white hover:bg-brand-400">
         {status === "loading" ? "Đang gửi..." : "Đăng ký DÙNG THỬ"}
       </Button>
