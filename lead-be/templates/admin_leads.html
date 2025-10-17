@@ -26,7 +26,7 @@
                     
                     <th>Liên hệ</th>
                     <th style="width:200px">Nhu cầu</th>
-                    <th style="width:200px;">Ngành</th>
+                    
                     <th style="width:200px; font-size:10px">Quy mô công ty</th>
                     <th style="width:100px">Số dư</th>
                     <th style="width:200px; font-size:10px">Ngày đăng ký/gia hạn/hết hạn</p>
@@ -48,8 +48,11 @@
                         <p style="font-size:10px;text-transform: lowercase;">{{ lead.email }}</p>
                     </td>
 
-                    <td>{{ lead.description }}</td>
-                    <td>{{ lead.industry }}</td>
+                    
+                    <td>
+                        <p>{{ lead.industry }}</p>
+                        <p style="font-size:10px">{{ lead.description }}</p>
+                    </td>
                     <td>{{ lead.companySize }}</td>
                     <td>{{ lead.balance_amount }}</td>
                     <td>
