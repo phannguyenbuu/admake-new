@@ -15,6 +15,7 @@ import { useLocation } from "react-router-dom";
 import WorkDays, {QRColumn} from "../app/dashboard/workpoints/WorkDays";
 import type { Workpoint, WorkDaysProps } from "../@types/workpoint";
 import type { ColumnsType } from "antd/es/table";
+import StatisticsMonthDays from "../app/dashboard/workpoints/StatisticsMonthDays";
 
 export const columnsMaterial = [
   {
@@ -473,7 +474,9 @@ export const columnsAttendance = (
 const today = new Date();
 const month = today.getMonth();
 
-export const columnsWorkPoint: ColumnsType<WorkDaysProps> = [
+
+export const columnsWorkPoint = (handleOpenModal: (record: WorkDaysProps) => void): ColumnsType<WorkDaysProps> => [
+// export const columnsWorkPoint: ColumnsType<WorkDaysProps> = [
   {
     title: `QR`,
     dataIndex: "userrole",
@@ -488,12 +491,18 @@ export const columnsWorkPoint: ColumnsType<WorkDaysProps> = [
     dataIndex: "username",
     key: "username",
     width: 200,
-    render: (text: string, record: WorkDaysProps) => (
-      <div>
+    render: (text: string, record: WorkDaysProps) => {
+     
+      
+    return(
+      <div
+          style={{ cursor: 'pointer' }}
+          onClick={() => handleOpenModal(record)}
+        >
         <div>{text}</div>
         <span className="!text-base" style={{fontSize:8,fontStyle:'italic'}}>{record.userrole}</span>
       </div>
-    ),
+    )},
   },
 
   {

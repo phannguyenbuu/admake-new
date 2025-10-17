@@ -8,7 +8,9 @@ socketio = SocketIO(app, cors_allowed_origins=["http://localhost:5173",
                                                 "https://admake.vn",
                                                 "https://quanly.admake.vn",
                                                 "https://archbox.pw", 
-                                                "https://dashboard.archbox.pw"])
+                                                "https://dashboard.archbox.pw"],
+
+                        max_http_buffer_size=100 * 1024 * 1024)  # 100MB
 
 @socketio.on('connect')
 def on_connect():

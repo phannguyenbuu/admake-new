@@ -77,60 +77,60 @@ const ChatInput = forwardRef<HTMLDivElement, ChatInputProps>(
   
   const handleUploadDocument = async () => {
     setOpenAction(prev => !prev);
-  try {
-    const input = document.createElement("input");
-    input.type = "file";
+    try {
+      const input = document.createElement("input");
+      input.type = "file";
 
-    input.onchange = async (e: Event) => {
-      const target = e.target as HTMLInputElement;
-      if (!target.files) return;
-      const file = target.files[0];
-      if (!file) return;
+      input.onchange = async (e: Event) => {
+        const target = e.target as HTMLInputElement;
+        if (!target.files) return;
+        const file = target.files[0];
+        if (!file) return;
 
-      const fileSizeMB = file.size / (1024 * 1024);
-      if (fileSizeMB > 100) {
-        notification.error({message:"Kích thước file vượt quá 1MB, vui lòng chọn file nhỏ hơn."});
-        return;
+        const fileSizeMB = file.size / (1024 * 1024);
+        if (fileSizeMB > 100) {
+          notification.error({message:"Kích thước file vượt quá 100MB, vui lòng chọn file nhỏ hơn."});
+          return;
+        }
+        
+              
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("groupId", groupEl?.version.toString() || '');
+        formData.append("role", userRoleId.toString());
+        formData.append("userId", userId?.toString() || '');
+
+        const uploadResponse = await fetch(`${useApiHost()}/message/upload`, {
+          method: "POST",
+          body: formData,
+        });
+
+
+        if (!uploadResponse.ok) {
+          const errorText = await uploadResponse.text();
+          throw new Error(`File upload failed: ${uploadResponse.status} ${uploadResponse.statusText} - ${errorText}`);
+        }
+
+        const uploadResult = await uploadResponse.json();
+        // console.log('Upload', uploadResult);
+        const fileUrl = `${uploadResult.filename}`; // URL file mới trên server
+
+        handleSendMessage(`${new Date(Date.now()).toLocaleString()}-${formatBytes(file.size)}`, fileUrl);
+        console.log("Document message sent successfully");
+      };
+
+      input.click();
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.error(error.message);
+        notification.error({message: "Upload document failed",
+          description:error.message});
+      } else {
+        console.error("Unknown error", error);
+        notification.error({message: "Upload document failed"});
       }
-      
-            
-      const formData = new FormData();
-      formData.append("file", file);
-      formData.append("groupId", groupEl?.version.toString() || '');
-      formData.append("role", userRoleId.toString());
-      formData.append("userId", userId?.toString() || '');
-
-      const uploadResponse = await fetch(`${useApiHost()}/message/upload`, {
-        method: "POST",
-        body: formData,
-      });
-
-
-      if (!uploadResponse.ok) {
-        const errorText = await uploadResponse.text();
-        throw new Error(`File upload failed: ${uploadResponse.status} ${uploadResponse.statusText} - ${errorText}`);
-      }
-
-      const uploadResult = await uploadResponse.json();
-      // console.log('Upload', uploadResult);
-      const fileUrl = `${uploadResult.filename}`; // URL file mới trên server
-
-      handleSendMessage(`${new Date(Date.now()).toLocaleString()}-${formatBytes(file.size)}`, fileUrl);
-      console.log("Document message sent successfully");
-    };
-
-    input.click();
-  } catch (error: unknown) {
-    if (error instanceof Error) {
-      console.error(error.message);
-      notification.error({message: "Upload document failed",
-        description:error.message});
-    } else {
-      console.error("Unknown error", error);
-      notification.error({message: "Upload document failed"});
     }
-  }
-};
+  };
 
 
   return (

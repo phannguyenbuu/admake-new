@@ -3,7 +3,7 @@ from models import db, User, dateStr, app
 from flask import Flask, request, jsonify, session
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 import datetime
-from sqlalchemy import desc, and_
+from sqlalchemy import desc, and_, func, select
 
 user_bp = Blueprint('user', __name__, url_prefix='/api/user')
 
@@ -40,7 +40,10 @@ def get_query_page_users(page,limit,search):
             (User.fullName.ilike(f"%{search}%"))
         )
 
-    query = query.order_by(desc(User.updatedAt), User.id)
+    split_length = func.array_length(func.regexp_split_to_array(User.fullName, ' '), 1)
+    last_name = func.split_part(User.fullName, ' ', split_length)
+
+    query = query.order_by(last_name, User.id)
 
     pagination = query.paginate(page=page, per_page=limit, error_out=False)
     users = [c.to_dict() for c in pagination.items]

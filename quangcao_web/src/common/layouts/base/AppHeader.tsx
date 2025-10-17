@@ -8,14 +8,13 @@ import { useSocket } from "../../../socket/SocketContext";
 import { useEffect, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useWorkSpaceQueryAll } from "../../hooks/work-space.hook";
-import type { WorkSpace } from "../../../@types/work-space.type";
 import ChatGroupList from "./ChatGroupList";
 import { useUser } from "../../hooks/useUser";
 import { QuestionOutlined } from '@ant-design/icons';
-import {Box,Stack,Typography} from '@mui/material';
-import { useLocation } from "react-router-dom";
-import { UpdateButtonProvider } from "../../hooks/useUpdateButtonTask";
 
+import { useLocation } from "react-router-dom";
+
+import NoteWorkpointModal from "./NoteWorkpointModal";
 
 const { Header } = Layout;
 
@@ -39,6 +38,10 @@ export default function AppHeader() {
 
   const handleQuestionClick = () => {
     setQuestionOpen(true);
+  }
+
+  const handleCancel = () => {
+    setQuestionOpen(false)
   }
 
   const { data: notificationsData, refetch } = useGetNotification({
@@ -224,75 +227,8 @@ export default function AppHeader() {
         </div>
       </Header>
 
-      {location === '/dashboard/workpoints' &&
-      <Modal open={questionOpen}
-          onCancel={() => setQuestionOpen(false)}
-          footer={null}
-          width={600}
-          title={`Kí hiệu cho chấm công`}
-        >
-          <Stack direction="row" spacing={10}>
-          <Stack spacing={2} p={2}  sx={{ borderRadius:4, border:'1px solid #000'}}>
-            <Stack direction="row" spacing={1}>
-              <Box sx={{width:20,height:20,borderRadius:10,background:'none',border:'1px solid #000'}}/>
-              <Typography>Chưa check-in</Typography>
-            </Stack>
-
-              <Stack direction="row" spacing={1}>
-                <Box sx={{width:20,height:20,borderRadius:10,background:'red'}}/>
-                <Typography>Đã check-in</Typography>
-              </Stack>
-
-              <Stack direction="row" spacing={1}>
-                <Box sx={{width:20,height:20,borderRadius:10,background:'green'}}/>
-                <Typography>Đã check-out</Typography>
-              </Stack>
-
-              <Stack direction="row" spacing={1}>
-                <Box sx={{width:20,height:20,borderRadius:10,background:'grey'}}/>
-                <Typography>Nghỉ phép</Typography>
-              </Stack>
-            </Stack>
-
-            <Stack spacing={2} p={2} sx={{ borderRadius:4, border:'1px solid #000'}}>
-              <Stack direction="row" spacing={1}>
-                <Box sx={{width:20,height:20,borderRadius:10,background:'none',border:'1px solid #000'}}/>
-                <Typography>Buổi sáng tính từ 5:00AM</Typography>
-              </Stack>
-
-              <Stack direction="row" spacing={1}>
-                <Box sx={{width:20,height:20,borderRadius:10,background:'none',border:'1px solid #000'}}/>
-                <Typography>Buổi chiều tính từ 12:00AM</Typography>
-              </Stack>
-
-              <Stack direction="row" spacing={1}>
-                <Box sx={{width:20,height:20,borderRadius:10,background:'none',border:'1px solid #000'}}/>
-                <Typography>Buổi tối tính từ 18:00AM</Typography>
-              </Stack>
-            </Stack>
-          </Stack>
-
-          <Stack mt={5}>
-            <Stack direction="row" spacing={1} sx={{height:72}}>
-              <Stack sx={{background:"#999",borderRadius:8, width: 30,pt:2 }}>
-                  <Typography color="#fff" textAlign="center" fontSize={10} fontWeight={300}>
-                    0.00
-                  </Typography>
-                  <Typography color="#fff" textAlign="center" fontSize={10} fontWeight={300}>
-                    0.00
-                  </Typography>
-              </Stack>
-              <Stack sx={{ }}>
-                <Typography>Tổng giờ làm hành chính</Typography>
-                <Typography sx={{pt:3}}>Tổng giờ tăng ca</Typography>
-              </Stack>
-            </Stack>
-            
-          </Stack>
-          
-
-      </Modal>
-      }
+      {location === '/dashboard/workpoints' 
+        && <NoteWorkpointModal questionOpen={questionOpen} onCancel={handleCancel} />}
     </>
   );
 }

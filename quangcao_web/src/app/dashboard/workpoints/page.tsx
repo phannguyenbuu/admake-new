@@ -13,6 +13,8 @@ import { useApiHost } from "../../../common/hooks/useApiHost";
 import type { Workpoint, WorkDaysProps } from "../../../@types/workpoint";
 // import type { Leave } from "../../../@types/leave.type";
 
+import StatisticsMonthDays from "./StatisticsMonthDays";
+
 export const WorkPointPage: IPage["Component"] = () => {
   const [query, setQuery] = useState({
     page: 1,
@@ -23,6 +25,19 @@ export const WorkPointPage: IPage["Component"] = () => {
   const [workpoints, setWorkpoints] = useState<WorkDaysProps[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [total, setTotal] = useState(0);
+
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedRecord, setSelectedRecord] = useState<WorkDaysProps | null>(null);
+
+  const handleOpenModal = (record: WorkDaysProps) => {
+    setSelectedRecord(record);
+    setModalVisible(true);
+  };
+
+  const handleCloseModal = () => {
+    setModalVisible(false);
+    setSelectedRecord(null);
+  };
 
   // Fetch data dùng fetch API với params paging và search
   const fetchUsers = async ({ page, limit, search }: typeof query) => {
@@ -69,10 +84,13 @@ export const WorkPointPage: IPage["Component"] = () => {
     console.log('Workpoints', workpoints);
   },[workpoints]);
 
+  
+
   return (
+    <>
     <div className="min-h-screen p-2 w-full">
       <TableComponent<WorkDaysProps>
-        columns={columnsWorkPoint}
+        columns={columnsWorkPoint(handleOpenModal)}
         dataSource={workpoints}
         loading={isLoading}
         pagination={{
@@ -91,5 +109,12 @@ export const WorkPointPage: IPage["Component"] = () => {
         }}
       />
     </div>
+
+    {modalVisible && 
+            <StatisticsMonthDays 
+              selectedRecord={selectedRecord}
+              modalVisible={modalVisible} 
+              handleOk={handleCloseModal} />}
+              </>
   );
 };
