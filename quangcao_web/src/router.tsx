@@ -95,10 +95,11 @@ const DevelopeDashboard = () => {
   )
 }
 
+const adminIndex = useAdminIndex();
 
 
 const routes: TRoute = {
-  path: `${useAdminIndex()}/`,
+  path: `/`,
   element: <BaseLayout />,
   errorElement: <Error404 />,
   children: [
