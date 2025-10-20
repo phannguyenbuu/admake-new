@@ -47,12 +47,5 @@ load_dotenv()  # load biến môi trường trong file .env vào process.env
 # VITE_API_HOST = os.getenv("VITE_API_HOST")
 
 if __name__ == "__main__":
-    # with app.app_context():
-        # customers = Customer.query.all()
-        # load_customers()
-
-    # app.run(host="0.0.0.0", port=5273, debug=True)
-    print(app.config.get('MAX_CONTENT_LENGTH'))
-
-    socketio.run(app, host='0.0.0.0', port=5007, debug=True, allow_unsafe_werkzeug=True)
+    socketio.run(app, host='0.0.0.0', debug=True, allow_unsafe_werkzeug=True)
 

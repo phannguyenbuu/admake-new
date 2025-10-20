@@ -131,50 +131,221 @@ def save_dump():
     scp.close()
     ssh.close()
 
-local_dirs = [
-    # "main-be",
-    # "quangcao_web/public",
-    # "quangcao_web/src",
-    # "quangcao_web/package.json",
-    # "chat-fe/public",
-    # "chat-fe/src",
-    # "chat-be",
-    # "quangcao_web/src/components/dashboard/work-tables/job",
-    # "quangcao_web/src/components/dashboard/work-tables",
-    # "quangcao_web/src/common/layouts/base"
-
-    # "scripts",
-
-    # "chat-be/app.py",
-    # "main-be/instance/customers.db",
-
-    "main-be/models.py",
-    "main-be/app.py",
-    "main-be/.env",
-    "main-be/api",
-    # r"quangcao_web\src\app\dashboard\workpoints\WorDays.tsx",
-    # r"quangcao_web\src\components\chat\pages\dashboard\Group.tsx",
-
-    # r"quangcao_web\src\common\data.tsx",
-    # "quangcao_web/src/components/chat/components/Camera",
-    # r"quangcao_web\src\common\layouts\base\AppHeader.tsx",
-    # "quangcao_web/src/components/chat/components/commons/TitlePanel.tsx",
-    # r"quangcao_web\src\common\data.tsx",
-    # "quangcao_web/src/common/hooks",
-    # "quangcao_web/.env",
-    # "main-be/api/chat.py",
-    # "main-be/api/messages.py",
-    # "main-be/api/groups.py",
 
 
-    # "quangcao_web/vite.config.ts"
-]
+
+
+def generate_nginx_config(n):
+    # phần cấu hình cố định
+    base_config = '''
+server {
+    listen 80;
+
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
+    server_name admake.vn www.admake.vn;
+
+    client_max_body_size 100M;
+
+    ssl_certificate /etc/letsencrypt/live/admake.vn/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/admake.vn/privkey.pem;
+
+    ssl_session_timeout 1d;
+    ssl_session_cache shared:SSL:50m;
+    ssl_session_tickets off;
+
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_ciphers HIGH:!aNULL:!MD5;
+    ssl_prefer_server_ciphers on;
+
+    add_header Strict-Transport-Security "max-age=15768000" always;
+
+    # ssl_stapling on;
+    # ssl_stapling_verify on;
+    ssl_trusted_certificate /etc/letsencrypt/live/admake.vn/chain.pem;
+
+    resolver 8.8.8.8 8.8.4.4 valid=300s;
+    resolver_timeout 5s;
+
+    location /.well-known/acme-challenge/ {
+        root /var/www/admake.vn/html;
+        allow all;
+    }
+    
+    location / {
+        proxy_pass http://127.0.0.1:4999;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+    }
+
+    location /admin/leads/ {
+        proxy_pass http://127.0.0.1:6000/admin/leads/;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    location /static/ {
+        proxy_pass http://127.0.0.1:6000/static/;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+'''
+
+    # phần location thêm theo ad1 đến adN
+    dynamic_locations = ""
+    for i in range(n + 1):
+        prefix = f"/ad{i}" if i > 0 else ''
+        dynamic_locations += f'''
+
+    location {prefix}/api/ {{
+        proxy_pass http://127.0.0.1:{6000+i}/api/;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }}
+
+    location {prefix}/socket.io/ {{
+        proxy_pass http://127.0.0.1:{6000+i}/socket.io/;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "Upgrade";
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+
+        proxy_buffering off;
+        proxy_read_timeout 3600s;
+        proxy_send_timeout 3600s;
+    }}
+'''
+
+    end_config = "\n}\n"
+
+    return base_config + dynamic_locations + end_config
+
+def build_nginx_and_ecosystem(num_prefixes):
+    config_content = generate_nginx_config(num_prefixes)
+
+    with open("nginx/sites-enabled/admake.vn", "w") as f:
+        f.write(config_content)
+
+    generate_ecosystem_config(num_prefixes)
+    print(f"Đã tạo file cấu hình với các location ad1 đến ad{num_prefixes} thành công.")
+    
+
+
+
+def generate_ecosystem_config(n):
+    apps = [
+            {
+                "name": "backend-flask-landing-page",
+                "cwd": "./lead-be",
+                "args": "-m gunicorn app:app -b 0.0.0.0:6999",
+                "script": "/root/venv/bin/python",
+                "env": {
+                    "GENERATE_SOURCEMAP": "false",
+                    "HOST": "0.0.0.0",
+                    "PORT": "6999",
+                    "DATABASE_URL": "postgresql://postgres:mypassword@31.97.76.62:5432/admake_chat"
+                }
+            },
+            {
+                "name": "admake landing page",
+                "cwd": "./landingpage",
+                "script": "npm",
+                "args": "run dev -- --port 4999",
+                "env": {
+                    "PORT": "4999"
+                }
+            },
+            {
+                "name": "backend-flask-n0",
+                "cwd": "./main-be",
+                "args": "-m gunicorn app:app -b 0.0.0.0:6000",
+                "script": "/root/venv/bin/python",
+                "env": {
+                    "GENERATE_SOURCEMAP": "false",
+                    "HOST": "0.0.0.0",
+                    "PORT": "6000",
+                    "DATABASE_URL": "postgresql://postgres:mypassword@31.97.76.62:5432/admake_chat"
+                }
+            },
+            {
+                "name": "frontend-react-n0",
+                "cwd": "./quangcao_web",
+                "script": "npm",
+                "args": "run dev -- --port 4000",
+                "env": {
+                    "VITE_APP_API_HOST": "https://admake.vn/api",
+                    "VITE_APP_SOCKET": "https://admake.vn",
+                    "VITE_APP_STATIC": "https://admake.vn/static"
+                }
+            }
+    ]
+
+    # tenant n>0
+    for i in range(1, n + 1):
+        apps.append({
+            "name": f"backend-flask-n{i}",
+            "cwd": "./main-be",
+            "args": f"-m gunicorn app:app -b 0.0.0.0:{6000 + i}",
+            "script": "/root/venv/bin/python",
+            "env": {
+                "GENERATE_SOURCEMAP": "false",
+                "HOST": "0.0.0.0",
+                # "REACT_APP_API_URL": f"http://31.97.76.62:{5000 + i}",
+                "DATABASE_URL": f"postgresql://postgres:mypassword@31.97.76.62:5432/admake_{i}"
+            }
+        })
+
+        apps.append({
+            "name": f"frontend-react-n{i}",
+            "cwd": "./quangcao_web",
+            "script": "npm",
+            "args": f"run dev -- --port {4000 + i}",
+            "env": {
+                "VITE_APP_API_HOST": f"https://admake.vn/ad{i}/api",
+                "VITE_APP_SOCKET": f"https://admake.vn/ad{i}/",
+                "VITE_APP_STATIC": "https://admake.vn/static"
+            }
+        })
+
+    ecosystem = {
+        "apps": apps
+    }
+
+    import json
+    with open("ecosystem.config.js", "w") as f:
+        f.write("module.exports = ")
+        json.dump(ecosystem, f, indent=4)
+
+
 
 upload_to_vps_multiple(
     host="31.97.76.62",
     port=22,
     username="root",
     password="@baoLong0511",
-    local_dirs=local_dirs,
-    remote_base_dir="admake"
+    local_dirs=["nginx"],
+    remote_base_dir="/etc"
 )
+
+local_dirs = [
+    "main-be/models.py",
+    "main-be/app.py",
+    "main-be/.env",
+    "main-be/api",
+    "ecosystem.config.js",
+]
+
+upload_to_vps_multiple(host="31.97.76.62",port=22,username="root",password="@baoLong0511",local_dirs=local_dirs,remote_base_dir="admake")
+build_nginx_and_ecosystem(10)
+
+

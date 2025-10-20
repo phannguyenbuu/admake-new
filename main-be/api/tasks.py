@@ -60,7 +60,7 @@ def update_task(id):
     task.assign_ids = data.get("assign_ids", task.assign_ids)
     task.customer_id = data.get("customer_id", task.customer_id)
 
-    task.materials = data.get("materials", task.materials)
+    # task.materials = data.get("materials", task.materials)
     task.start_time = data.get("start_time", task.start_time)
     
     task.end_time = data.get("end_time", task.end_time)

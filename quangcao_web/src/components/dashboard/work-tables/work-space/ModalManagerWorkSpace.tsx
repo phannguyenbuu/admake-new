@@ -141,7 +141,7 @@ export default function ModalManagerWorkSpace({
                   </Text>
                 </div>
               </div>
-              <Button
+              {/* <Button
                 type="primary"
                 icon={<PlusOutlined />}
                 onClick={() => setIsOpenModalCreateSpace(true)}
@@ -150,7 +150,7 @@ export default function ModalManagerWorkSpace({
                 className="!bg-gradient-to-r !from-[#0891b2] !to-[#0e7490] !border-none !rounded-xl !shadow-lg hover:!shadow-xl !transition-all !duration-300 hover:!scale-105 !font-semibold !px-6"
               >
                 Tạo bảng công việc mới
-              </Button>
+              </Button> */}
             </div>
           </div>
 
@@ -216,7 +216,7 @@ export default function ModalManagerWorkSpace({
                         <div className="w-full h-full bg-gradient-to-br from-[#0891b2] to-[#0e7490] flex items-center justify-center text-white text-xl font-bold relative overflow-hidden">
                           <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent"></div>
                           <span className="relative">
-                            {workspace.name.charAt(0).toUpperCase()}
+                            {workspace.name && workspace.name.charAt(0).toUpperCase()}
                           </span>
                         </div>
                       )}

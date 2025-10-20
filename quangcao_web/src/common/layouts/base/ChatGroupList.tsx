@@ -105,7 +105,7 @@ const ChatGroupList: React.FC<ChatGroupListProps> = ({workSpaces}) => {
         </Dropdown>
 
         <Button sx={{color:"#fff"}}
-          onClick={() => setAddGroupModalVisible(true)}>+ Group</Button>
+          onClick={() => setAddGroupModalVisible(true)}>Tạo Nhóm</Button>
        </Stack>
 
       {/* Model popup */}
@@ -141,6 +141,12 @@ const AddGroupModal: React.FC<AddGroupModalProps> = ({ visible, onOk, onCancel }
   const [address, setAddress] = useState<string>("");
 
   const handleOk = () => {
+    if(!groupName || !address || groupName === '' || address === '')
+    {
+      notification.error({message:"Vui lòng nhập tên và địa chỉ !", description:""})
+      return;
+    }
+
     onOk(groupName);
     
     fetch(`${useApiHost()}/group/`, 
@@ -174,7 +180,7 @@ const AddGroupModal: React.FC<AddGroupModalProps> = ({ visible, onOk, onCancel }
       okButtonProps={{ disabled: !groupName.trim() }}
     >
       <Input
-        placeholder="Nhập tên group"
+        placeholder="Nhập tên nhóm"
         value={groupName}
         onChange={(e) => setGroupName(e.target.value)}
         autoFocus

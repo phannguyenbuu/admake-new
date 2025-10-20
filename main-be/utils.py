@@ -1039,11 +1039,12 @@ if __name__ == "__main__":
 
         # print(len(groups), len(works))
         
-        work = db.session.get(Workspace,"20251016233233791675102438")
-        work.version = 51
-
-        
-        db.session.commit()  # commit lần cuối nếu còn phần tử chưa commit
+        work = db.session.get(Workspace,"202510180419324200327c51c9")
+        if work:
+            db.session.delete(work)  # đánh dấu để xóa
+            db.session.commit()      # commit thay đổi
+        else:
+            print("Workspace not found")
 
 
 

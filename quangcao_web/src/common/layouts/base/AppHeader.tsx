@@ -11,7 +11,7 @@ import { useWorkSpaceQueryAll } from "../../hooks/work-space.hook";
 import ChatGroupList from "./ChatGroupList";
 import { useUser } from "../../hooks/useUser";
 import { QuestionOutlined } from '@ant-design/icons';
-
+import AllManagementModal from "../../../components/dashboard/work-tables/AllManagementModal";
 import { useLocation } from "react-router-dom";
 
 import NoteWorkpointModal from "./NoteWorkpointModal";
@@ -98,6 +98,8 @@ export default function AppHeader() {
 
         {/* Menu Chat Group List */}
         <ChatGroupList workSpaces={workSpaces}/>
+
+        <AllManagementModal/>
 
         <div className="flex items-center gap-4 md:gap-6">
           {/* Center - Notification */}
