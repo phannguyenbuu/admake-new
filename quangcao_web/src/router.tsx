@@ -98,7 +98,7 @@ const DevelopeDashboard = () => {
 const adminIndex = useAdminIndex();
 
 
-const routes: TRoute = {
+const baseChildren: TRoute = {
   path: `/`,
   element: <BaseLayout />,
   errorElement: <Error404 />,
