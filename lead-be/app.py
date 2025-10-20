@@ -24,5 +24,6 @@ load_dotenv()  # load biến môi trường trong file .env vào process.env
 # VITE_API_HOST = os.getenv("VITE_API_HOST")
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', debug=True)
+    port = int(os.environ.get('PORT', 5000))  # Lấy biến môi trường PORT hoặc mặc định 5000
+    app.run(host='0.0.0.0', port=port, debug=True)
 

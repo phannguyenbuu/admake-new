@@ -22,7 +22,7 @@ def create_databases(n, user, password, host='localhost', port=5432):
 
 if __name__ == '__main__':
     create_databases(
-        n=10,
+        n=5,
         user='postgres',
         password='mypassword',
         host='31.97.76.62',

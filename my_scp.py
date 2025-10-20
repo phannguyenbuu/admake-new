@@ -182,7 +182,7 @@ server {
     }
 
     location /admin/leads/ {
-        proxy_pass http://127.0.0.1:6000/admin/leads/;
+        proxy_pass http://127.0.0.1:6999/admin/leads/;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -247,8 +247,9 @@ def generate_ecosystem_config(n):
             {
                 "name": "backend-flask-landing-page",
                 "cwd": "./lead-be",
-                "args": "-m gunicorn app:app -b 0.0.0.0:6999",
-                "script": "/root/venv/bin/python",
+                "script": "app.py",
+                "interpreter": "/root/venv/bin/python3",
+                # "args": "-m gunicorn app:app -b 0.0.0.0:6999",
                 "env": {
                     "GENERATE_SOURCEMAP": "false",
                     "HOST": "0.0.0.0",
@@ -268,8 +269,11 @@ def generate_ecosystem_config(n):
             {
                 "name": "backend-flask-n0",
                 "cwd": "./main-be",
-                "args": "-m gunicorn app:app -b 0.0.0.0:6000",
-                "script": "/root/venv/bin/python",
+                "script": "app.py",
+                "interpreter": "/root/venv/bin/python3",
+
+                # "args": "-m gunicorn app:app -b 0.0.0.0:6000",
+                
                 "env": {
                     "GENERATE_SOURCEMAP": "false",
                     "HOST": "0.0.0.0",
@@ -295,9 +299,11 @@ def generate_ecosystem_config(n):
         apps.append({
             "name": f"backend-flask-n{i}",
             "cwd": "./main-be",
-            "args": f"-m gunicorn app:app -b 0.0.0.0:{6000 + i}",
-            "script": "/root/venv/bin/python",
+            "script": "app.py",
+            "interpreter": "/root/venv/bin/python3",
+            # "args": f"-m gunicorn app:app -b 0.0.0.0:{6000 + i}",
             "env": {
+                "PORT": f"{6000 + i}",
                 "GENERATE_SOURCEMAP": "false",
                 "HOST": "0.0.0.0",
                 # "REACT_APP_API_URL": f"http://31.97.76.62:{5000 + i}",
@@ -342,10 +348,16 @@ local_dirs = [
     "main-be/app.py",
     "main-be/.env",
     "main-be/api",
+    "lead-be/app.py",
+    "lead-be/models.py",
+    "lead-be/.env",
+    "lead-be/templates",
     "ecosystem.config.js",
+
 ]
 
+build_nginx_and_ecosystem(5)
 upload_to_vps_multiple(host="31.97.76.62",port=22,username="root",password="@baoLong0511",local_dirs=local_dirs,remote_base_dir="admake")
-build_nginx_and_ecosystem(10)
+
 
 
