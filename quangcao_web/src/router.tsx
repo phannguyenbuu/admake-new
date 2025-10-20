@@ -365,7 +365,29 @@ export function getMainMenuItems(pathname?: string): MenuItem[] {
 }
 
 
-export const router = createBrowserRouter([routes as NonIndexRouteObject], {});
+const createClonedRoute = (path: string): TRoute => ({
+  path,
+  element: <BaseLayout />,
+  errorElement: <Error404 />,
+  children: baseChildren,
+});
+
+// Tạo root route
+const rootRoute: TRoute = {
+  path: "/",
+  element: <BaseLayout />,
+  errorElement: <Error404 />,
+  children: baseChildren,
+};
+
+// Danh sách clone routes cần tạo
+const clonePaths = ["/ad1", "/ad2", "/ad3", "/ad4", "/ad5"];
+
+// Tạo mảng routes bao gồm root và clone routes
+const allRoutes: TRoute[] = [rootRoute, ...clonePaths.map(createClonedRoute)];
+
+
+export const router = createBrowserRouter(allRoutes as NonIndexRouteObject[], {});
 export type Router = typeof router;
 export function FallbackElement() {
   return <div>Loading...</div>;
