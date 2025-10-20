@@ -95,17 +95,16 @@ const DevelopeDashboard = () => {
   )
 }
 
-const adminIndex = useAdminIndex();
 
 
 const routes: TRoute = {
-  path: "/",
+  path: `/${useAdminIndex()}`,
   element: <BaseLayout />,
   errorElement: <Error404 />,
   children: [
     
     {
-      path: `${adminIndex}/login`, // chuyển trang login thành path 'login' tách biệt
+      path: "/login", // chuyển trang login thành path 'login' tách biệt
       index: true,
       lazy: () => import("./app/login/page"),
       title: "Đăng nhập",
@@ -113,7 +112,7 @@ const routes: TRoute = {
     },
     
     {
-      path: `${adminIndex}/chat/:id/:token`,
+      path: "/chat/:id/:token",
       element: <GroupQRPage/>,
       title: "Chat Group",
       ignoreInMenu: true,
@@ -121,21 +120,21 @@ const routes: TRoute = {
 
 
     {
-      path: `${adminIndex}/point/:id/`,
+      path: "/point/:id/",
       element: <Workpoint/>,
       title: "Workpoint",
       ignoreInMenu: true,
     },
 
     {
-      path: `${adminIndex}/dashboard`,
+      path: "/dashboard",
       lazy: () => import("./app/dashboard/page"),
       title: "Bảng điều khiển",
       isMainMenu: true,
       children: [
         
         {
-          path: `${adminIndex}/dashboard`,
+          path: "/dashboard",
           index: true,
           // element: (
           //   <div className="p-6">
@@ -150,13 +149,13 @@ const routes: TRoute = {
         },
         
         {
-          path: `${adminIndex}/dashboard/workpoints`,
+          path: "/dashboard/workpoints",
           element: <WorkPointPage />,
           title: "Chấm công",
           icon: <CheckOutlined />,
         },
         {
-          path: `${adminIndex}/dashboard/users`,
+          path: "/dashboard/users",
           element: (
             <RequireRoles roles={["user:management"]}>
               <UserDashboard />
@@ -167,7 +166,7 @@ const routes: TRoute = {
           icon: <LineChartOutlined />,
         },
         {
-          path: `${adminIndex}/dashboard/supplier`,
+          path: "/dashboard/supplier",
           element: (
             <RequireRoles roles={["user:management"]}>
               <SupplierDashboard />
@@ -179,7 +178,7 @@ const routes: TRoute = {
         },
        
         {
-          path: `${adminIndex}/dashboard/customers`,
+          path: "/dashboard/customers",
           element: (
             <RequireRoles roles={["customer:management"]}>
               <CustomerDashboard />
@@ -191,13 +190,13 @@ const routes: TRoute = {
           isDevelope: false,
         },
         {
-          path: `${adminIndex}/dashboard/work-tables`,
+          path: "/dashboard/work-tables",
           element: <WorkTableDetailPage />,
           title: "Bảng công việc",
           icon: <BarChartOutlined />,
           children: [
             {
-              path: `${adminIndex}/dashboard/work-tables/:boardId`,
+              path: "/dashboard/work-tables/:boardId",
               element: <WorkTableDetailPage />,
             },
           ],
@@ -211,7 +210,7 @@ const routes: TRoute = {
           ignoreInMenu: false,
         },
         {
-          path: `${adminIndex}/dashboard/materials`,
+          path: "/dashboard/materials",
           element: (
             <RequireRoles roles={["warehouse:management"]}>
               {/* <MaterialDashboard /> */}
@@ -224,7 +223,7 @@ const routes: TRoute = {
           isDevelope: true,
         },
         {
-          path: `${adminIndex}/dashboard/statistics`,
+          path: "/dashboard/statistics",
           element: (
             <RequireRoles roles={["warehouse:management"]}>
               {/* <MaterialDashboard /> */}
@@ -234,7 +233,7 @@ const routes: TRoute = {
           icon: <PieChartOutlined  />,
         },
         {
-          path: `${adminIndex}/dashboard/invoices`,
+          path: "/dashboard/invoices",
           element: (
             <RequireRoles roles={["warehouse:management"]}>
               {/* <InvoiceDashboard /> */}
@@ -246,7 +245,7 @@ const routes: TRoute = {
         },
 
         {
-          path: `${adminIndex}/dashboard/accounting`,
+          path: "/dashboard/accounting",
           element: 
             (
             <RequireRoles roles={["warehouse:management"]}>
@@ -257,7 +256,32 @@ const routes: TRoute = {
           roles: ["accounting:management"],
           title: "Kế toán",
           icon: <AccountBookOutlined />,
-        }
+        },
+        // {
+        //   path: "/dashboard/settings",
+        //   element: 
+        //     (
+        //     <RequireRoles roles={["warehouse:management"]}>
+        //       {/* <SettingDashboard /> */}
+        //       <DevelopeDashboard/>
+        //     </RequireRoles>),
+          
+        //   roles: [
+        //     "setting:management",
+        //     "permission:management",
+        //     "role:management",
+        //   ],
+        //   title: "Cài đặt",
+        //   icon: <SettingOutlined />,
+          
+        // },
+        // {
+        //   path: "/dashboard/infor",
+        //   element: <InforDashboard />,
+        //   title: "Hồ sơ",
+        //   icon: <UserOutlined />,
+        //   ignoreInMenu: false,
+        // }
       ],
     },
   ],
