@@ -230,13 +230,97 @@ server {
 
     return base_config + dynamic_locations + end_config
 
+def generate_quanly_nginx(output_file, num_prefixes):
+    base_config = """server {
+        listen 80;
+        server_name quanly.admake.vn;
+
+        return 301 https://$host$request_uri;
+    }
+
+
+    server {    
+        listen 443 ssl http2;
+        listen [::]:443 ssl http2;
+        server_name quanly.admake.vn;
+
+        ssl_certificate /etc/letsencrypt/live/admake.vn/fullchain.pem;
+        ssl_certificate_key /etc/letsencrypt/live/admake.vn/privkey.pem;
+
+        ssl_session_timeout 1d;
+        ssl_session_cache shared:SSL:50m;
+        ssl_session_tickets off;
+
+        ssl_protocols TLSv1.2 TLSv1.3;
+        ssl_ciphers HIGH:!aNULL:!MD5;
+        ssl_prefer_server_ciphers on;
+
+        add_header Strict-Transport-Security "max-age=15768000" always;
+
+        # ssl_stapling on;
+        # ssl_stapling_verify on;
+        ssl_trusted_certificate /etc/letsencrypt/live/admake.vn/chain.pem;
+
+        resolver 8.8.8.8 8.8.4.4 valid=300s;
+        resolver_timeout 5s;
+
+        location / {
+            proxy_pass http://127.0.0.1:4000;
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection 'upgrade';
+            proxy_set_header Host $host;
+            proxy_cache_bypass $http_upgrade;
+
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+
+        location /.well-known/acme-challenge/ {
+            alias /var/www/admake.vn/html/.well-known/acme-challenge/;
+            allow all;
+        }
+    """
+
+    # Sinh phần location lặp từ ad1 đến ad10
+    location_blocks = ""
+    for i in range(1, 11):
+        port = 4000 + i
+        location_blocks += f"""
+        location /ad{i}/ {{
+            proxy_pass http://127.0.0.1:{port};
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection 'upgrade';
+            proxy_set_header Host $host;
+            proxy_cache_bypass $http_upgrade;
+
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }}
+    """
+
+    # Đóng ngoặc cho server
+    final_config = base_config + location_blocks + "\n}\n"
+
+    # Ghi file
+    with open(output_file, "w", encoding="utf-8") as f:
+        f.write(final_config)
+
+    print(f"✅ Đã tạo file cấu hình Nginx: {output_file}")
+
+
 def build_nginx_and_ecosystem(num_prefixes):
     config_content = generate_nginx_config(num_prefixes)
 
     with open("nginx/sites-enabled/admake.vn", "w") as f:
         f.write(config_content)
 
+    generate_quanly_nginx("nginx/sites-enabled/quanly.admake.vn",num_prefixes)
     generate_ecosystem_config(num_prefixes)
+    
     print(f"Đã tạo file cấu hình với các location ad1 đến ad{num_prefixes} thành công.")
     
 

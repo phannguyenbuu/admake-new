@@ -573,15 +573,25 @@ def transfer_customer_to_postgres():
             db.session.add(new_customer)
     db.session.commit()
 
-def delete_content():
-    db.session.execute(text('''
-        DELETE FROM message WHERE user_id IN (
-    SELECT id FROM "user" WHERE "fullName" = 'Đình Cường Phan'
-);
-DELETE FROM "user" WHERE "fullName" = 'Đình Cường Phan';
+def drop_database():
+    with app.app_context():
+        # Lấy URL kết nối hiện tại
+        engine_url = str(db.engine.url)
 
-'''))
-    db.session.commit()
+        # Tạo engine mới với autocommit (không transaction)
+        engine = create_engine(engine_url, isolation_level='AUTOCOMMIT')
+
+        with engine.connect() as conn:
+            # Lấy danh sách database
+            result = conn.execute(text("SELECT datname FROM pg_database;"))
+            databases = [row[0] for row in result]
+
+            for sdb in databases:
+                if sdb.startswith("admake_") and sdb != "admake_chat":
+                    print(f"Dropping database (if exists): {sdb}")
+                    conn.execute(text(f'DROP DATABASE IF EXISTS "{sdb}";'))
+
+        engine.dispose()
 
 def alter_column_id_type():
     
@@ -626,6 +636,60 @@ def add_new_columns(table, cols, col_type):
     db.session.commit()
     print(f"Done altering table {table}")
 
+
+import psycopg2
+import random
+import string
+
+def generate_password(length=8):
+    """Tạo password ngẫu nhiên gồm chữ hoa, chữ thường, số và ký tự đặc biệt."""
+    chars = string.ascii_letters + string.digits + "@#$%&*=+"
+    while True:
+        pwd = ''.join(random.choice(chars) for _ in range(length))
+        # Đảm bảo có ít nhất 1 ký tự mỗi loại
+        if (any(c.islower() for c in pwd) and
+            any(c.isupper() for c in pwd) and
+            any(c.isdigit() for c in pwd) and
+            any(c in "@#$%&*=+" for c in pwd)):
+            return pwd
+
+def create_admin_users(n=10, host='31.97.76.62'):
+    USER = "postgres"
+    PASSWORD = "mypassword"  # nếu có password, điền vào đây
+    PORT = "5432"
+
+    for i in range(1, n + 1):
+        db_name = f"admake_{i}"
+        random_pass = generate_password()
+
+        try:
+            # Kết nối vào database
+            conn = psycopg2.connect(
+                dbname=db_name,
+                user=USER,
+                password=PASSWORD,
+                host=host,
+                port=PORT
+            )
+            cur = conn.cursor()
+
+            # Xóa user admin cũ (nếu có)
+            cur.execute('DELETE FROM "user" WHERE username = %s;', ('admin',))
+
+            # ✅ Chèn user mới
+            cur.execute(
+                'INSERT INTO "user" (username, password) VALUES (%s, %s);',
+                ('admin', random_pass)
+            )
+
+            conn.commit()
+            print(f"✅ [{db_name}] Đã tạo user admin với password: {random_pass}")
+
+        except Exception as e:
+            print(f"❌ Lỗi ở {db_name}: {e}")
+        finally:
+            if 'conn' in locals():
+                conn.close()
 
 
 
@@ -983,76 +1047,5 @@ def generate_salary(min_value=10_000_000, max_value=50_000_000, round_to=100_000
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()
-        # modify_leaves()
-        # update_users_with_accountId('user.json')
-        
-        # show_collections_and_schema()
-        # change_value_type('role', ['id'], 'SERIAL')
-        # change_value_type('group', ['id'], 'SERIAL')
-
-        # create_customer_role()
-        # change_value_type('message', ['group_id'], 'VARCHAR(50)')
-        # change_value_type('workspace', ['id'], 'INTEGER')
-        # renameColumn('task',"materials", "assets")
-
-        # for table in ['message','group_member']:
-        #     renameColumn(table, "createAt", "createdAt")
-        #     renameColumn(table, "create_at", "createdAt")
-        #     renameColumn(table, "created_at", "createdAt")
-        #     renameColumn(table, "updateAt", "updatedAt")
-        #     renameColumn(table, "update_at", "updatedAt"grand world ha
-        #     renameColumn(table, "updated_at", "updatedAt")
-        #     renameColumn(table, "deleted_at", "deletedAt")
-        #     renameColumn(table, "delete_at", "deletedAt")
-        #     add_new_columns(table,['deletedAt'],'TIMESTAMP')
-        #     add_new_columns(table,['version'],'INTEGER')
-
-        # add_new_columns('user',['citizenId','email','facebookAccount','zaloAccount','referrer'],'VARCHAR(80)')
-        # change_value_type('message',['workspace_id'],'INTEGER')
-        # add_new_columns('user',['gender'],'INTEGER')
-        # add_new_columns('lead',['version'],'INTEGER')
-        # add_new_columns('workspace',['address'],'VARCHAR(255)')
-        # add_new_columns('workspace',['address'],'VARCHAR(255)')
-        # add_new_columns('group',['rating_count'],'INTEGER')
-        # add_new_columns('group',['owner_id'],'VARCHAR(50)')
-        # add_new_columns('user',['salary','version'],'INTEGER')
-        # add_new_columns('lead',['expiredAt'],'TIMESTAMP')
-        # renameColumn('lead', "nhuCau", "description")
-        
-        # msgs = db.session.query(Message).filter(Message.message_id == "temp-1760491441221").all()
-        # print(len(msgs))
-
-        # from sqlalchemy import func, and_
-
-        # Message.query.filter(Message.id == 150).delete(synchronize_session=False)
-        # db.session.commit()
-
-
-        # print(Group.query.count(), Workspace.query.count(), Customer.query.count())
-
-        # groups = Group.query.all()
-        # works = Workspace.query.all()
-
-
-
-       
-
-        # print(len(groups), len(works))
-        
-        work = db.session.get(Workspace,"202510180419324200327c51c9")
-        if work:
-            db.session.delete(work)  # đánh dấu để xóa
-            db.session.commit()      # commit thay đổi
-        else:
-            print("Workspace not found")
-
-
-
-            
-
-
-
-            
-
-
-        
+        # drop_database()
+        create_admin_users()
