@@ -1,23 +1,12 @@
-import React from "react";
 import {
   createBrowserRouter,
   type NonIndexRouteObject,
-  Navigate,
 } from "react-router-dom";
 
 import BaseLayout from "./common/layouts/base.layout";
+import type { UserRole } from "./@types/user.type";
 import Error404 from "./app/404";
-import { useInfo } from "./common/hooks/info.hook";
-import { RequireRoles } from "./services/RequireAuth"; // tùy biến nếu cần
-
-import GroupQRPage from "./components/chat/components/GroupQRPage";
-import Workpoint from "./components/chat/components/Workpoint";
-import { WorkPointPage } from "./app/dashboard/workpoints/page";
-import { UserDashboard } from "./app/dashboard/user/page";
-import { SupplierDashboard } from "./app/dashboard/supplier/page";
-import { CustomerDashboard } from "./app/dashboard/customer/page";
-import { WorkTableDetailPage } from "./app/dashboard/work-tables/page";
-
+import React from "react";
 import {
   AccountBookOutlined,
   BookOutlined,
@@ -26,15 +15,58 @@ import {
   FormOutlined,
   HomeOutlined,
   InboxOutlined,
-  LineChartOutlined,
-  PieChartOutlined,
+  SettingOutlined,
   TeamOutlined,
+  UserOutlined,
+  PieChartOutlined,
   BarChartOutlined,
-  AccountBookOutlined,
-} from "@ant-design/icons";
 
+LineChartOutlined,
+
+DotChartOutlined,
+} from "@ant-design/icons";
+import { Tooltip } from "@mui/material";
+import { WorkTableDetailPage } from "./app/dashboard/work-tables/page";
+import { UserDashboard } from "./app/dashboard/user/page";
+import { SupplierDashboard } from "./app/dashboard/supplier/page";
+import { MaterialDashboard } from "./app/dashboard/material/page";
+import { InvoiceDashboard } from "./app/dashboard/invoice/page";
+import { CustomerDashboard } from "./app/dashboard/customer/page";
+import { SettingDashboard } from "./app/dashboard/setting/page";
+import { AccountingDashboard } from "./app/dashboard/accounting/page";
+import { InforDashboard } from "./app/infor/page";
+import { WorkPointPage } from "./app/dashboard/workpoints/page";
+import { useInfo } from "./common/hooks/info.hook";
+// import Error403 from "./app/403";
+import { Navigate } from "react-router-dom";
+import QrPage from "./components/qr/QrPage";
+import RequireAuth from "./services/RequireAuth";
+import GroupQRPage from "./components/chat/components/GroupQRPage";
+import Workpoint from "./components/chat/components/Workpoint";
+import { StatisticDashboard } from "./app/dashboard/statistic/page";
 import { CenterBox } from "./components/chat/components/commons/TitlePanel";
 import { Typography } from "@mui/material";
+import { useApiHost, useAdminIndex } from "./common/hooks/useApiHost";
+
+
+// Route guard: chặn truy cập nếu không có quyền
+function RequireRoles({
+  roles,
+  children,
+}: {
+  roles?: UserRole[];
+  children: React.ReactElement;
+}) {
+  // const { data: user } = useInfo();
+  // const userPermissions = user?.role.permissions || [];
+  // if (!roles || roles.length === 0) return children;
+  // const hasPermission = roles.some((r) => userPermissions.includes(r));
+  // return hasPermission ? children : <Error403 />;
+
+  // console.log(children);
+  // console.log(children);
+  return children;
+}
 
 interface TRoute extends Omit<NonIndexRouteObject, "index" | "children"> {
   children?: TRoute[];
