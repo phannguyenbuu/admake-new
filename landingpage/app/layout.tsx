@@ -3,8 +3,8 @@ import { Inter } from 'next/font/google'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'ADMAKE - Tạo động lực cho doanh nghiệp',
-  description: 'ADMAKE - Tạo động lực cho doanh nghiệp',
+  title: 'ADMAKE - Giải pháp làm nghề thời đại số',
+  description: 'ADMAKE - Giải pháp làm nghề thời đại số',
   generator: 'ADMAKE',
 }
 
