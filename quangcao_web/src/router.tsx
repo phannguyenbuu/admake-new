@@ -46,9 +46,6 @@ import Workpoint from "./components/chat/components/Workpoint";
 import { StatisticDashboard } from "./app/dashboard/statistic/page";
 import { CenterBox } from "./components/chat/components/commons/TitlePanel";
 import { Typography } from "@mui/material";
-import { useApiHost, useAdminIndex } from "./common/hooks/useApiHost";
-
-
 // Route guard: chặn truy cập nếu không có quyền
 function RequireRoles({
   roles,
@@ -70,148 +67,302 @@ function RequireRoles({
 
 interface TRoute extends Omit<NonIndexRouteObject, "index" | "children"> {
   children?: TRoute[];
+  roles?: UserRole[];
   title?: string;
   icon?: React.ReactNode;
   ignoreInMenu?: boolean;
   isDevelope?: boolean;
   isMainMenu?: boolean;
   index?: boolean;
+  tooltip?: string;
   isDivider?: boolean;
 }
+
 
 const DevelopeDashboard = () => {
   return (
     <CenterBox spacing={5}>
-      <Typography
-        color="#00B4B6"
-        fontSize={16}
-        fontStyle="italic"
-        mt={25}
-        textAlign="center"
-      >
+      <Typography color="#00B4B6" fontSize={16} fontStyle="italic" mt={25} textAlign="center">
         Cám ơn quý khách đã quan tâm. Tính năng này đang phát triển ...
       </Typography>
       <Typography color="#00B4B6" fontSize={16} fontStyle="italic" textAlign="center">
         Vui lòng quay lại sau!
       </Typography>
     </CenterBox>
-  );
-};
+  )
+}
 
-// Định nghĩa các route con dưới dạng mảng
-const baseChildren: TRoute[] = [
-  {
-    path: "login",
-    index: true,
-    lazy: () => import("./app/login/page"),
-    title: "Đăng nhập",
-    ignoreInMenu: true,
-  },
-  {
-    path: "chat/:id/:token",
-    element: <GroupQRPage />,
-    title: "Chat Group",
-    ignoreInMenu: true,
-  },
-  {
-    path: "point/:id",
-    element: <Workpoint />,
-    title: "Workpoint",
-    ignoreInMenu: true,
-  },
-  {
-    path: "dashboard",
-    lazy: () => import("./app/dashboard/page"),
-    title: "Bảng điều khiển",
-    isMainMenu: true,
-    children: [
-      {
-        index: true,
-        element: <Navigate to="statistics" replace />,
-        title: "Home",
-        icon: <HomeOutlined />,
-        ignoreInMenu: true,
-      },
-      {
-        path: "workpoints",
-        element: <WorkPointPage />,
-        title: "Chấm công",
-        icon: <CheckOutlined />,
-      },
-      {
-        path: "users",
-        element: (
-          <RequireRoles roles={["user:management"]}>
-            <UserDashboard />
-          </RequireRoles>
-        ),
-        title: "Quản lý nhân sự",
-        icon: <LineChartOutlined />,
-      },
-      {
-        path: "supplier",
-        element: (
-          <RequireRoles roles={["user:management"]}>
-            <SupplierDashboard />
-          </RequireRoles>
-        ),
-        title: "Quản lý thầu phụ",
-        icon: <FormOutlined />,
-      },
-      {
-        path: "customers",
-        element: (
-          <RequireRoles roles={["customer:management"]}>
-            <CustomerDashboard />
-          </RequireRoles>
-        ),
-        title: "Quản lý khách hàng",
-        icon: <TeamOutlined />,
-        isDevelope: false,
-      },
-      {
-        path: "work-tables",
-        element: <WorkTableDetailPage />,
-        title: "Bảng công việc",
-        icon: <BarChartOutlined />,
-        children: [
-          {
-            path: ":boardId",
-            element: <WorkTableDetailPage />,
-          },
-        ],
-      },
-      // Thêm các route dashboard cần thiết khác tương tự...
-    ],
-  },
-];
 
-// Tạo route clone
-const createClonedRoute = (path: string): TRoute => ({
-  path,
-  element: <BaseLayout />,
-  errorElement: <Error404 />,
-  children: baseChildren,
-});
-
-// Root route gốc "/"
-const rootRoute: TRoute = {
+const routes: TRoute = {
   path: "/",
   element: <BaseLayout />,
   errorElement: <Error404 />,
-  children: baseChildren,
+  children: [
+    
+    {
+      path: "/login", // chuyển trang login thành path 'login' tách biệt
+      index: true,
+      lazy: () => import("./app/login/page"),
+      title: "Đăng nhập",
+      ignoreInMenu: true,
+    },
+    
+    {
+      path: "/chat/:id/:token",
+      element: <GroupQRPage/>,
+      title: "Chat Group",
+      ignoreInMenu: true,
+    },
+
+
+    {
+      path: "/point/:id/",
+      element: <Workpoint/>,
+      title: "Workpoint",
+      ignoreInMenu: true,
+    },
+
+    {
+      path: "/dashboard",
+      lazy: () => import("./app/dashboard/page"),
+      title: "Bảng điều khiển",
+      isMainMenu: true,
+      children: [
+        
+        {
+          path: "/dashboard",
+          index: true,
+          // element: (
+          //   <div className="p-6">
+          //     <h1 className="text-2xl font-bold mb-4">Bảng điều khiển</h1>
+          //     <p>Chào mừng bạn đến với hệ thống quản lý!</p>
+          //   </div>
+          // ),
+          element: <Navigate to="/dashboard/statistics" replace />,
+          title: "Home",
+          icon: <HomeOutlined />,
+          ignoreInMenu: true,
+        },
+        
+        {
+          path: "/dashboard/workpoints",
+          element: <WorkPointPage />,
+          title: "Chấm công",
+          icon: <CheckOutlined />,
+        },
+        {
+          path: "/dashboard/users",
+          element: (
+            <RequireRoles roles={["user:management"]}>
+              <UserDashboard />
+            </RequireRoles>
+          ),
+          roles: ["user:management"],
+          title: "Quản lý nhân sự",
+          icon: <LineChartOutlined />,
+        },
+        {
+          path: "/dashboard/supplier",
+          element: (
+            <RequireRoles roles={["user:management"]}>
+              <SupplierDashboard />
+            </RequireRoles>
+          ),
+          roles: ["user:management"],
+          title: "Quản lý thầu phụ",
+          icon: <FormOutlined />,
+        },
+       
+        {
+          path: "/dashboard/customers",
+          element: (
+            <RequireRoles roles={["customer:management"]}>
+              <CustomerDashboard />
+            </RequireRoles>
+          ),
+          roles: ["customer:management"],
+          title: "Quản lý khách hàng",
+          icon: <TeamOutlined />,
+          isDevelope: false,
+        },
+        {
+          path: "/dashboard/work-tables",
+          element: <WorkTableDetailPage />,
+          title: "Bảng công việc",
+          icon: <BarChartOutlined />,
+          children: [
+            {
+              path: "/dashboard/work-tables/:boardId",
+              element: <WorkTableDetailPage />,
+            },
+          ],
+
+          
+        },
+        {
+          path: "divider-1",
+          title: "divider",
+          isDivider: true,  // lá cờ nhận biết đây là divider
+          ignoreInMenu: false,
+        },
+        {
+          path: "/dashboard/materials",
+          element: (
+            <RequireRoles roles={["warehouse:management"]}>
+              {/* <MaterialDashboard /> */}
+              <DevelopeDashboard/>
+            </RequireRoles>
+          ),
+          roles: ["warehouse:management"],
+          title: "Quản lý vật liệu",
+          icon: <InboxOutlined />,
+          isDevelope: true,
+        },
+        {
+          path: "/dashboard/statistics",
+          element: (
+            <RequireRoles roles={["warehouse:management"]}>
+              {/* <MaterialDashboard /> */}
+              <DevelopeDashboard/>
+            </RequireRoles>),
+          title: "Phân tích",
+          icon: <PieChartOutlined  />,
+        },
+        {
+          path: "/dashboard/invoices",
+          element: (
+            <RequireRoles roles={["warehouse:management"]}>
+              {/* <InvoiceDashboard /> */}
+              <DevelopeDashboard/>
+            </RequireRoles>),
+          roles: ["accounting:management"],
+          title: "Báo giá",
+          icon: <FileTextOutlined />,
+        },
+
+        {
+          path: "/dashboard/accounting",
+          element: 
+            (
+            <RequireRoles roles={["warehouse:management"]}>
+              {/* <AccountingDashboard /> */}
+              <DevelopeDashboard/>
+            </RequireRoles>),
+          
+          roles: ["accounting:management"],
+          title: "Kế toán",
+          icon: <AccountBookOutlined />,
+        },
+        // {
+        //   path: "/dashboard/settings",
+        //   element: 
+        //     (
+        //     <RequireRoles roles={["warehouse:management"]}>
+        //       {/* <SettingDashboard /> */}
+        //       <DevelopeDashboard/>
+        //     </RequireRoles>),
+          
+        //   roles: [
+        //     "setting:management",
+        //     "permission:management",
+        //     "role:management",
+        //   ],
+        //   title: "Cài đặt",
+        //   icon: <SettingOutlined />,
+          
+        // },
+        // {
+        //   path: "/dashboard/infor",
+        //   element: <InforDashboard />,
+        //   title: "Hồ sơ",
+        //   icon: <UserOutlined />,
+        //   ignoreInMenu: false,
+        // }
+      ],
+    },
+  ],
 };
 
-// Mảng các đường dẫn clone
-const clonePaths = ["/ad1", "/ad2", "/ad3", "/ad4", "/ad5"];
+type MenuItem = {
+  key: string;
+  icon: React.ReactNode;
+  label: string;
+  active?: boolean;
+  children?: MenuItem[];
+  isDevelope: boolean,
+  tooltip: string,
+  style:any,
+};
 
-// Tạo mảng routes cho tất cả bản clone và root
-const allRoutes: TRoute[] = [rootRoute, ...clonePaths.map(createClonedRoute)];
+export function getMainMenuItems(pathname?: string): MenuItem[] {
+  const { data: user } = useInfo();
+  if (!pathname) {
+    pathname = window.location.pathname;
+  }
+  if (pathname.endsWith("/")) {
+    pathname = pathname.slice(0, -1);
+  }
 
-// Khởi tạo router
-export const router = createBrowserRouter(allRoutes as NonIndexRouteObject[]);
+  const userPermissions = user?.role.permissions || [];
 
-// Fallback khi lazy load
+  const loop = (routes: Array<TRoute | undefined>): MenuItem[] => {
+    return routes.reduce((acc: MenuItem[], route) => {
+      if (!route) return acc;
+
+      const hasPermission = true; // Gộp check quyền nếu cần
+
+      if (!route.ignoreInMenu && hasPermission) {
+        if (route.isDivider) {
+          acc.push({
+            key: route.path || Math.random().toString(),
+            icon: null,
+            label: "---",
+            //@ts-ignore
+            isDivider: true,
+          });
+        } else {
+          const isDeveloping = (route as any).isDevelope || false;
+
+          const push: MenuItem = {
+            key: route.path || "",
+            icon: route.icon || <BookOutlined />,
+            label: route.title || "Menu",
+            active: !isDeveloping, //pathname?.includes(route.path || ""),
+            isDevelope: isDeveloping,
+            tooltip: isDeveloping ? "Tính năng đang phát triển" : "",
+            style: isDeveloping
+              ? { opacity: 0.5, cursor: "not-allowed" }
+              : {},
+          };
+
+          if (!route.children?.length) {
+            acc.push(push);
+          } else {
+            const children = loop(route.children);
+            if (children.length > 0) {
+              acc.push({ ...push, children });
+            }
+          }
+        }
+      }
+
+      return acc;
+    }, []) as MenuItem[];
+  };
+
+  const main =
+    routes.children
+      ?.filter((route) => route.isMainMenu && !route.ignoreInMenu)
+      .map((e) => e.children)
+      .flat() || [];
+
+  return loop(main) as MenuItem[];
+}
+
+
+export const router = createBrowserRouter([routes as NonIndexRouteObject], {});
+export type Router = typeof router;
 export function FallbackElement() {
   return <div>Loading...</div>;
 }
+

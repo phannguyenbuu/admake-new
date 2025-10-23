@@ -50,7 +50,6 @@ server {
         }
     
         location /ad1/ {
-            proxy_pass http://127.0.0.1:4001;
             proxy_http_version 1.1;
             proxy_set_header Upgrade $http_upgrade;
             proxy_set_header Connection 'upgrade';
@@ -60,10 +59,13 @@ server {
             proxy_set_header X-Real-IP $remote_addr;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
             proxy_set_header X-Forwarded-Proto $scheme;
+
+            rewrite ^/ad1/(.*)$ /$1 break;
+
+            proxy_pass http://127.0.0.1:4001;
         }
     
         location /ad2/ {
-            proxy_pass http://127.0.0.1:4002;
             proxy_http_version 1.1;
             proxy_set_header Upgrade $http_upgrade;
             proxy_set_header Connection 'upgrade';
@@ -73,10 +75,13 @@ server {
             proxy_set_header X-Real-IP $remote_addr;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
             proxy_set_header X-Forwarded-Proto $scheme;
+
+            rewrite ^/ad2/(.*)$ /$1 break;
+
+            proxy_pass http://127.0.0.1:4002;
         }
     
         location /ad3/ {
-            proxy_pass http://127.0.0.1:4003;
             proxy_http_version 1.1;
             proxy_set_header Upgrade $http_upgrade;
             proxy_set_header Connection 'upgrade';
@@ -86,10 +91,13 @@ server {
             proxy_set_header X-Real-IP $remote_addr;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
             proxy_set_header X-Forwarded-Proto $scheme;
+
+            rewrite ^/ad3/(.*)$ /$1 break;
+
+            proxy_pass http://127.0.0.1:4003;
         }
     
         location /ad4/ {
-            proxy_pass http://127.0.0.1:4004;
             proxy_http_version 1.1;
             proxy_set_header Upgrade $http_upgrade;
             proxy_set_header Connection 'upgrade';
@@ -99,10 +107,13 @@ server {
             proxy_set_header X-Real-IP $remote_addr;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
             proxy_set_header X-Forwarded-Proto $scheme;
+
+            rewrite ^/ad4/(.*)$ /$1 break;
+
+            proxy_pass http://127.0.0.1:4004;
         }
     
         location /ad5/ {
-            proxy_pass http://127.0.0.1:4005;
             proxy_http_version 1.1;
             proxy_set_header Upgrade $http_upgrade;
             proxy_set_header Connection 'upgrade';
@@ -112,10 +123,13 @@ server {
             proxy_set_header X-Real-IP $remote_addr;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
             proxy_set_header X-Forwarded-Proto $scheme;
+
+            rewrite ^/ad5/(.*)$ /$1 break;
+
+            proxy_pass http://127.0.0.1:4005;
         }
     
         location /ad6/ {
-            proxy_pass http://127.0.0.1:4006;
             proxy_http_version 1.1;
             proxy_set_header Upgrade $http_upgrade;
             proxy_set_header Connection 'upgrade';
@@ -125,10 +139,13 @@ server {
             proxy_set_header X-Real-IP $remote_addr;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
             proxy_set_header X-Forwarded-Proto $scheme;
+
+            rewrite ^/ad6/(.*)$ /$1 break;
+
+            proxy_pass http://127.0.0.1:4006;
         }
     
         location /ad7/ {
-            proxy_pass http://127.0.0.1:4007;
             proxy_http_version 1.1;
             proxy_set_header Upgrade $http_upgrade;
             proxy_set_header Connection 'upgrade';
@@ -138,10 +155,13 @@ server {
             proxy_set_header X-Real-IP $remote_addr;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
             proxy_set_header X-Forwarded-Proto $scheme;
+
+            rewrite ^/ad7/(.*)$ /$1 break;
+
+            proxy_pass http://127.0.0.1:4007;
         }
     
         location /ad8/ {
-            proxy_pass http://127.0.0.1:4008;
             proxy_http_version 1.1;
             proxy_set_header Upgrade $http_upgrade;
             proxy_set_header Connection 'upgrade';
@@ -151,10 +171,13 @@ server {
             proxy_set_header X-Real-IP $remote_addr;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
             proxy_set_header X-Forwarded-Proto $scheme;
+
+            rewrite ^/ad8/(.*)$ /$1 break;
+
+            proxy_pass http://127.0.0.1:4008;
         }
     
         location /ad9/ {
-            proxy_pass http://127.0.0.1:4009;
             proxy_http_version 1.1;
             proxy_set_header Upgrade $http_upgrade;
             proxy_set_header Connection 'upgrade';
@@ -164,10 +187,13 @@ server {
             proxy_set_header X-Real-IP $remote_addr;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
             proxy_set_header X-Forwarded-Proto $scheme;
+
+            rewrite ^/ad9/(.*)$ /$1 break;
+
+            proxy_pass http://127.0.0.1:4009;
         }
     
         location /ad10/ {
-            proxy_pass http://127.0.0.1:4010;
             proxy_http_version 1.1;
             proxy_set_header Upgrade $http_upgrade;
             proxy_set_header Connection 'upgrade';
@@ -177,6 +203,10 @@ server {
             proxy_set_header X-Real-IP $remote_addr;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
             proxy_set_header X-Forwarded-Proto $scheme;
+
+            rewrite ^/ad10/(.*)$ /$1 break;
+
+            proxy_pass http://127.0.0.1:4010;
         }
     
 }

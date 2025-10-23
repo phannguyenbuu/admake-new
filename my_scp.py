@@ -289,7 +289,6 @@ def generate_quanly_nginx(output_file, num_prefixes):
         port = 4000 + i
         location_blocks += f"""
         location /ad{i}/ {{
-            proxy_pass http://127.0.0.1:{port};
             proxy_http_version 1.1;
             proxy_set_header Upgrade $http_upgrade;
             proxy_set_header Connection 'upgrade';
@@ -299,6 +298,10 @@ def generate_quanly_nginx(output_file, num_prefixes):
             proxy_set_header X-Real-IP $remote_addr;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
             proxy_set_header X-Forwarded-Proto $scheme;
+
+            rewrite ^/ad{i}/(.*)$ /$1 break;
+
+            proxy_pass http://127.0.0.1:{port};
         }}
     """
 
@@ -345,7 +348,7 @@ def generate_ecosystem_config(n):
                 "name": "admake landing page",
                 "cwd": "./landingpage",
                 "script": "npm",
-                "args": "run dev -- --port 4999",
+                "args": "run start",
                 "env": {
                     "PORT": "4999"
                 }
@@ -440,7 +443,7 @@ local_dirs = [
 
 ]
 
-build_nginx_and_ecosystem(5)
+build_nginx_and_ecosystem(0)
 upload_to_vps_multiple(host="31.97.76.62",port=22,username="root",password="@baoLong0511",local_dirs=local_dirs,remote_base_dir="admake")
 
 
