@@ -118,6 +118,7 @@ export const SupplierDashboard: IPage["Component"] = () => {
                 toggle("openCreate")();
                 handleRefetch();
               }}
+              isSupplier={true}
             />
           </div>
         </div>
@@ -138,6 +139,7 @@ export const SupplierDashboard: IPage["Component"] = () => {
                 handleRefetch();
               }}
               user={user as User}
+              isSupplier={true}
             />
           </div>
         </div>
@@ -145,6 +147,7 @@ export const SupplierDashboard: IPage["Component"] = () => {
     </div>
   );
 };
+
 export const loader = async () => {
   // Simulate loading delay
   await new Promise((resolve) => setTimeout(resolve, 2000));

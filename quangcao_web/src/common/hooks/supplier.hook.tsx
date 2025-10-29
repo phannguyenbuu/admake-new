@@ -20,20 +20,20 @@ export function useSupplierDetail(id?: string) {
   });
 }
 
-export function useCreateUser() {
+export function useCreateSupplier() {
   return useMutation({
     mutationFn: (dto: User) => SupplierService.create(dto),
   });
 }
 
-export function useUpdateUser() {
+export function useUpdateSupplier() {
   return useMutation({
     mutationFn: ({ dto, id }: { dto: User; id: string }) =>
       SupplierService.update(id, dto),
   });
 }
 
-export function useDeleteUser() {
+export function useDeleteSupplier() {
   return useMutation({
     mutationFn: (id: string) => SupplierService.delete(id),
   });

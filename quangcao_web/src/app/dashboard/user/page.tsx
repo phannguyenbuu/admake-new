@@ -118,6 +118,7 @@ export const UserDashboard: IPage["Component"] = () => {
                 toggle("openCreate")();
                 handleRefetch();
               }}
+              isSupplier={false}
             />
           </div>
         </div>
@@ -138,6 +139,7 @@ export const UserDashboard: IPage["Component"] = () => {
                 handleRefetch();
               }}
               user={user as User}
+              isSupplier={false}
             />
           </div>
         </div>

@@ -60,6 +60,7 @@ export interface FormUserProps {
   onRefresh?: () => void;
   user?: User;
   buttonText?: string;
+  isSupplier?: boolean;
 }
 
 export interface UserList {

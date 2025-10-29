@@ -1048,4 +1048,9 @@ if __name__ == "__main__":
     with app.app_context():
         db.create_all()
         # drop_database()
-        create_admin_users()
+        # create_admin_users()
+
+        workspace = db.session.get(Workspace, "2025102822391474348050b809")
+        user = db.session.get(User, workspace.owner_id)
+        workspace.name = user.username
+        db.session.commit()

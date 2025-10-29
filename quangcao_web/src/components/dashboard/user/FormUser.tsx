@@ -25,6 +25,7 @@ export default function FormUser({
   onRefresh,
   user,
   buttonText,
+  isSupplier,
 }: FormUserProps) {
   const [form] = Form.useForm();
   const [file, setFile] = useState<File | null>(null);
@@ -68,7 +69,7 @@ export default function FormUser({
         phone: user.phone,
         username: user.username,
         password: user.password,
-        role_id: role ? role.id : user.role?.id,
+        role_id: isSupplier ? 101 : (role ?  role.id : user.role?.id),
         salary: user.salary,
 
         gender: user.gender,
@@ -94,6 +95,10 @@ export default function FormUser({
     // Lấy tất cả key của values để append vào formData
     Object.entries(values).forEach(([key, value]) => {
       // Nếu là file, xử lý riêng
+      
+      if(isSupplier && key === "role_id")
+        value = 101;
+      console.log("Key data", isSupplier, key, value);
       if (key === 'avatar' && file) {
         formData.append(key, file);
       } else if (value !== undefined && value !== null) {
@@ -105,6 +110,8 @@ export default function FormUser({
     if (values.password && values.password.trim() !== "") {
       formData.append("password", values.password);
     }
+
+    console.log("Create User", formData);
 
     // Các thao tác gọi API create/update
     if (isEditing && user) {
@@ -145,7 +152,7 @@ export default function FormUser({
         level={3}
         className="text-center !text-[#00B4B6] !mb-4 sm:mb-6 !font-bold !text-lg sm:!text-xl lg:!text-2xl flex-shrink-0"
       >
-        BẢNG NHÂN SỰ
+        {isSupplier? "BẢNG THẦU PHỤ":"BẢNG NHÂN SỰ"}
       </Typography.Title>
 
       <Form

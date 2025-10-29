@@ -12,7 +12,7 @@ def get_users():
     page = request.args.get("page", 1, type=int)
     limit = request.args.get("limit", 10, type=int)
     search = request.args.get("search", "", type=str)
-
+    
     users, pagination = get_query_page_users(page,limit,search)
 
     return jsonify({
@@ -39,6 +39,8 @@ def get_query_page_users(page,limit,search):
             (User.username.ilike(f"%{search}%")) | 
             (User.fullName.ilike(f"%{search}%"))
         )
+    
+    query = query.order_by(desc(User.updatedAt))
 
     split_length = func.array_length(func.regexp_split_to_array(User.fullName, ' '), 1)
     last_name = func.split_part(User.fullName, ' ', split_length)
@@ -53,7 +55,7 @@ def get_query_page_users(page,limit,search):
 @user_bp.route("/", methods=["POST"])
 def create_user():
     data = request.get_json()
-    # print('USER', data)
+    print('USER', data)
     new_user = User.create_item(data)
         
     db.session.add(new_user)
@@ -104,4 +106,11 @@ def update_user(id):
 
 
 
+@user_bp.route("/<string:id>", methods=["DELETE"])
+def delete_user(id):
+    user = db.session.get(User, id)
+    if user:
+        db.session.delete(user)
+    db.session.commit()
 
+    return jsonify({"message": "User deleted"}), 200

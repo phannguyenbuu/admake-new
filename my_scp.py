@@ -443,8 +443,13 @@ local_dirs = [
 
 ]
 
-build_nginx_and_ecosystem(0)
-upload_to_vps_multiple(host="31.97.76.62",port=22,username="root",password="@baoLong0511",local_dirs=local_dirs,remote_base_dir="admake")
+# build_nginx_and_ecosystem(0)
+upload_to_vps_multiple(host="31.97.76.62",
+                       port=22,
+                       username="root",
+                       password="@baoLong0511",
+                       local_dirs=local_dirs,
+                       remote_base_dir="admake")
 
 
 

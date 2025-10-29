@@ -95,6 +95,7 @@ export const UserForm: React.FC<UserFormProps> = ({
           form.resetFields();
           toggle("openEdit")();
           onRefetch?.();
+          
         },
         onError: () => {
           message.error("Có lỗi xảy ra khi cập nhật thông tin!");

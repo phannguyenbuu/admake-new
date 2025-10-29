@@ -157,9 +157,23 @@
   157  options
   158  rm -rf ~/.pm2
   159  cd school
-  160  env $(cat .env.dev3006) pm2 start npm --name "school3D" -- start
-  161  git pull origin main
-  162  env $(cat .env.dev3007) pm2 start npm --name "school3D-SEQ" -- start
+
+
+
+
+# env $(cat .env.dev3006) pm2 start npm --name "school3D" -- start
+# env $(cat .env.dev3007) pm2 start npm --name "school3D-SEQ" -- start
+
+
+
+# env $(cat .env.dev3006) pm2 start serve --name "school3D" -- -s build -l 3006
+# env $(cat .env.dev3007) pm2 start serve --name "school3D-SEQ" -- -s build -l 3007
+
+pm2 start app.py --name "school-Admin"
+pm2 start ./start-serve-3006.sh --name "school3D"
+pm2 start ./start-serve-3007.sh --name "school3D-SEQ"
+
+
   163  pm2 logs 1
   164  sudo nginx -t
   165  sudo systemctl restart nginx
@@ -175,7 +189,7 @@
   175  cd school
   176  cd src
   177  cd admin
-  178  pm2 start app.py --name "school-Admin"
+  178  
   179  pm2 logs 2
   180  sudo ufw allow 5006
   181  cd ..

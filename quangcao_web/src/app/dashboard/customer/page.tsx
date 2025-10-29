@@ -8,7 +8,8 @@ import { EditOutlined } from "@ant-design/icons";
 import { columnsCustomer } from "../../../common/data";
 import FormCustomer from "../../../components/dashboard/customer-managerment/FormCustomer";
 import { useDebounce } from "../../../common/hooks/useDebounce";
-
+import { notification } from "antd";
+import { useApiHost } from "../../../common/hooks/useApiHost";
 export const CustomerDashboard: IPage["Component"] = () => {
   const [query, setQuery] = useState<Partial<PaginationDto>>({
     page: 1,
@@ -62,6 +63,47 @@ export const CustomerDashboard: IPage["Component"] = () => {
     setQuery({ ...query, search: searchValue, page: 1 });
   };
 
+  const deleteCustomer = async (customerId:string) => {
+    console.log('Id', customerId);
+  try {
+    const response = await fetch(`${useApiHost()}/customer/${customerId}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (response.status === 204) {
+      // Không có body JSON, xử lý thành công ở đây
+      notification.error({message:'Xóa thành công khách hàng!'});
+      
+    } else if (response.ok) {
+      // Nếu có JSON trả về, parse JSON
+      const data = await response.json();
+      console.log('Response data:', data);
+    } else {
+      // Lỗi từ server
+      const errorData = await response.json().catch(() => ({}));
+      console.error('Error:', errorData);
+    }
+
+    
+    // Thực hiện refresh list hoặc cập nhật UI nếu cần
+  } catch (error) {
+    notification.error({message:'Network error: ' + error?.message});
+  }
+};
+
+const handleDeleteCustomer = () => {
+  if(!customer || !customer.id) 
+  {
+    notification.error({message:"Null customer"});
+    return;
+  }
+  deleteCustomer(customer.id);
+}
+
+
   return (
     <div className="min-h-screen p-2 w-full">
       <ButtonComponent
@@ -109,11 +151,13 @@ export const CustomerDashboard: IPage["Component"] = () => {
         }}
       />
       <FormCustomer
+        // onDelete={null}
         onCancel={toggle("openCreate")}
         open={config.openCreate}
         onRefresh={refetch}
       />
       <FormCustomer
+        onDelete={handleDeleteCustomer}
         onCancel={toggle("openUpdate")}
         open={config.openUpdate}
         initialValues={customer as Customer}

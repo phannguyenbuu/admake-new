@@ -33,9 +33,9 @@ const StatisticsMonthDays: React.FC<StatisticsMonthDaysProps> = ({ selectedRecor
 
             <Typography>{selectedRecord.username}</Typography>
 
-            <Typography>Tổng giờ làm trong tháng</Typography>
+            <Typography>Tổng giờ làm trong tháng: {}</Typography>
             <Typography>Tổng giờ tăng ca trong tháng</Typography>
-            <Typography>Thưởng theo công vi</Typography>
+            <Typography>Thưởng theo việc</Typography>
            
           </CenterBox>
           

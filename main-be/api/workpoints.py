@@ -79,6 +79,7 @@ def get_batch_workpoint_detail():
     for user in users:
         user_id = user["id"]
         username = user["fullName"]
+        salary = user["salary"]
         user_role = user.get("role") and user["role"].get("name")
         # user_role = user.get("role", {}).get("name")  # Trả về None nếu `role` hoặc `name` không tồn tại
 
@@ -89,9 +90,10 @@ def get_batch_workpoint_detail():
             for wp_data in wp_data_list:
                 wp_data["username"] = username
                 wp_data["userrole"] = user_role
+                wp_data["salary"] = salary
             result.extend(wp_data_list)
         else:
-            result.append({"user_id": user_id,"username": username,"userrole": user_role})
+            result.append({"user_id": user_id,"username": username,"userrole": user_role,"salary": salary})
             
         # if wp_data:
         #     result.append(wp_data)
@@ -103,6 +105,7 @@ def get_batch_workpoint_detail():
             for lp_data in lp_data_list:
                 lp_data["username"] = username
                 lp_data["userrole"] = user_role
+                lp_data["salary"] = salary
             # Thêm toàn bộ list wp_data_list vào leave_result, hoặc theo cách bạn muốn
             leave_result.extend(lp_data_list)
             
@@ -120,6 +123,7 @@ def get_batch_workpoint_detail():
         user_id = wp_data.get("user_id")
         username = wp_data.get("username")
         userrole = wp_data.get("userrole")
+        salary = wp_data.get("salary")
 
         if user_id not in grouped_result:
             # Tạo nhóm mới với 'user_id', 'username' và danh sách chứa wp_data
@@ -127,6 +131,7 @@ def get_batch_workpoint_detail():
                 "user_id": user_id,
                 "username": username,
                 "userrole": userrole,
+                "salary": salary,
                 "items": []
             }
         # Thêm wp_data vào danh sách items của user

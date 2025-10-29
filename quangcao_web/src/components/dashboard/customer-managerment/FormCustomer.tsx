@@ -29,6 +29,7 @@ import { statusOptions } from "../../../common/utils/helpEnum.util";
 const { Title, Text } = Typography;
 
 interface FormCustomerProps {
+  onDelete: () => void | null;
   onCancel: () => void;
   initialValues?: Customer;
   open: boolean;
@@ -36,7 +37,7 @@ interface FormCustomerProps {
 }
 
 export default function FormCustomer({
-  onCancel,
+  onDelete,onCancel,
   initialValues,
   open,
   onRefresh,
@@ -51,7 +52,7 @@ export default function FormCustomer({
   const isPending = isCreating || isUpdating || isLoadingCustomerDetail;
 
   useEffect(() => {
-    // console.log('initialValues', initialValues);
+    console.log('initialValues', initialValues);
     if (initialValues) {
       form.setFieldsValue({
         ...initialValues,
@@ -90,7 +91,7 @@ export default function FormCustomer({
     };
 
 
-    console.log("Customers:", values, initialValues?.id, customerDetail);
+    // console.log("Customers:", values, initialValues?.id, customerDetail);
     if (customerDetail) {
       updateCustomer(
         { dto: formattedValues, id: initialValues?.id || "" },
@@ -98,7 +99,7 @@ export default function FormCustomer({
           onSuccess: () => {
             message.success("Cập nhật khách hàng thành công");
             form.resetFields();
-            onCancel();
+            // onDelete();
             onRefresh();
           },
           onError: () => {
@@ -111,7 +112,7 @@ export default function FormCustomer({
         onSuccess: () => {
           message.success("Tạo khách hàng thành công");
           form.resetFields();
-          onCancel();
+          // onDelete();
           onRefresh();
         },
         onError: () => {
@@ -123,27 +124,28 @@ export default function FormCustomer({
 
   // Hàm kiểm tra form có hợp lệ không
   const isFormValid = () => {
+    
     try {
       // Kiểm tra các trường bắt buộc cơ bản
-      if (!formValues.fullName || !formValues.phone) {
+      if (!formValues.user_fullName || !formValues.user_phone) {
         return false;
       }
 
       // Kiểm tra nếu có thông tin thi công thì phải có đầy đủ thời gian
-      if (
-        formValues.workInfo &&
-        (!formValues.workStart || !formValues.workEnd)
-      ) {
-        return false;
-      }
+      // if (
+      //   formValues.workInfo &&
+      //   (!formValues.workStart || !formValues.workEnd)
+      // ) {
+      //   return false;
+      // }
 
-      // Kiểm tra nếu có địa điểm thì phải có đầy đủ thời gian
-      if (
-        formValues.workAddress &&
-        (!formValues.workStart || !formValues.workEnd)
-      ) {
-        return false;
-      }
+      // // Kiểm tra nếu có địa điểm thì phải có đầy đủ thời gian
+      // if (
+      //   formValues.workAddress &&
+      //   (!formValues.workStart || !formValues.workEnd)
+      // ) {
+      //   return false;
+      // }
 
       return true;
     } catch (error) {
@@ -153,6 +155,12 @@ export default function FormCustomer({
 
   // Kiểm tra form có hợp lệ để enable/disable nút submit
   const canSubmit = isFormValid();
+
+  const handleCancel = () => {
+    form.resetFields();
+    onCancel();
+  };
+
 
   // Hàm xử lý khi click nút submit
   const handleSubmit = () => {
@@ -169,6 +177,8 @@ export default function FormCustomer({
       .catch(() => {
         message.error("Vui lòng kiểm tra lại thông tin");
       });
+
+      onCancel();
   };
 
   // Theo dõi thay đổi form để cập nhật validation
@@ -291,7 +301,7 @@ export default function FormCustomer({
 
               <div className="grid grid-cols-1 gap-3 sm:gap-4">
                 <Form.Item
-                  name="fullName"
+                  name="user_fullName"
                   label={
                     <div className="flex items-center gap-1.5 sm:gap-2">
                       <span className="text-gray-800 font-medium text-xs sm:text-sm">
@@ -312,7 +322,29 @@ export default function FormCustomer({
                 </Form.Item>
 
                 <Form.Item
-                  name="phone"
+                  name="name"
+                  label={
+                    <div className="flex items-center gap-1.5 sm:gap-2">
+                      <span className="text-gray-800 font-medium text-xs sm:text-sm">
+                        Tên gợi nhớ
+                      </span>
+                      <div className="w-1 h-1 bg-[#00B4B6] rounded-full"></div>
+                    </div>
+                  }
+                  rules={[{ required: false, message: "Nhập tên gợi nhớ" }]}
+                  className="!mb-0"
+                >
+                  <Input
+                    placeholder="Nhập tên gợi nhớ"
+                    className="!h-9 sm:!h-10 !text-xs sm:!text-sm !rounded-lg !border !border-gray-300 focus:!border-[#00B4B6] focus:!shadow-lg hover:!border-[#00B4B6] !transition-all !duration-200 !shadow-sm"
+                    size="middle"
+                    prefix={<UserOutlined className="text-[#00B4B6] mr-2" />}
+                  />
+                </Form.Item>
+
+
+                <Form.Item
+                  name="user_phone"
                   label={
                     <div className="flex items-center gap-1.5 sm:gap-2">
                       <span className="text-gray-800 font-medium text-xs sm:text-sm">
@@ -337,11 +369,103 @@ export default function FormCustomer({
                     prefix={<PhoneOutlined className="text-[#00B4B6] mr-2" />}
                   />
                 </Form.Item>
+
+                {/* khối 3: Địa điểm và giá cả */}
+            <div className="bg-gray-50 rounded-lg border border-gray-200 shadow-sm p-3 sm:p-4 hover:shadow-md transition-all duration-300">
+              <div className="flex items-center gap-2 mb-2 sm:mb-3">
+                <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-md bg-gradient-to-r from-purple-100 to-purple-200 flex items-center justify-center">
+                  <EnvironmentOutlined className="!text-purple-600 !text-xs sm:!text-sm" />
+                </div>
+                <Text strong className="!text-gray-800 !text-sm sm:!text-base">
+                  Địa chỉ
+                </Text>
+              </div>
+
+              <Form.Item
+                name="user_address"
+                label={
+                  <div className="flex items-center gap-1.5 sm:gap-2">
+                    <div className="w-1 h-1 bg-purple-500 rounded-full"></div>
+                    {/*<span className="text-gray-800 font-medium text-xs sm:text-sm">
+                      Địa điểm thi công
+                    </span>*/}
+                    <span className="text-gray-400 text-xs font-normal">
+                      (Tùy chọn)
+                    </span>
+                  </div>
+                }
+                className="!mb-3"
+              >
+                <Input.TextArea
+                  rows={2}
+                  placeholder="Nhập địa điểm thi công..."
+                  className="!rounded-lg !border !border-gray-300 focus:!border-[#00B4B6] focus:!shadow-lg hover:!border-[#00B4B6] !transition-all !duration-200 !shadow-sm !resize-none !text-xs sm:!text-sm"
+                />
+              </Form.Item>
+
+              {/* <div className="grid grid-cols-1 gap-3 sm:gap-4">
+                <Form.Item
+                  name="workPrice"
+                  label={
+                    <div className="flex items-center gap-1.5 sm:gap-2">
+                      <div className="w-1 h-1 bg-purple-500 rounded-full"></div>
+                      <span className="text-gray-800 font-medium text-xs sm:text-sm">
+                        Đơn giá
+                      </span>
+                    </div>
+                  }
+                  rules={[
+                    {
+                      pattern: /^[0-9]+$/,
+                      message: "Đơn giá không hợp lệ, chỉ nhập số",
+                    },
+                  ]}
+                  className="!mb-0"
+                >
+                  <InputNumber
+                    placeholder="Nhập đơn giá"
+                    className="!w-full !h-9 sm:!h-10 !text-xs sm:!text-sm !rounded-lg !border !border-gray-300 focus:!border-[#00B4B6] focus:!shadow-lg hover:!border-[#00B4B6] !transition-all !duration-200 !shadow-sm"
+                    min={0}
+                    step={1000}
+                    formatter={(value) =>
+                      `${value ?? 0}`.replace(/\B(?=(\d{3})+(?!\d))/g, ".")
+                    }
+                    parser={(value) => {
+                      if (!value) return 0;
+                      const numValue = value.replace(/\./g, "");
+                      return (numValue ? Number(numValue) : 0) as 0;
+                    }}
+                    prefix={<DollarOutlined className="text-[#00B4B6] mr-2" />}
+                  />
+                </Form.Item>
+
+                <Form.Item
+                  name="status"
+                  label={
+                    <div className="flex items-center gap-1.5 sm:gap-2">
+                      <div className="w-1 h-1 bg-purple-500 rounded-full"></div>
+                      <span className="text-gray-800 font-medium text-xs sm:text-sm">
+                        Trạng thái
+                      </span>
+                    </div>
+                  }
+                  className="!mb-0"
+                >
+                  <Select
+                    placeholder="Chọn trạng thái"
+                    options={statusOptions}
+                    className="!h-9 sm:!h-10 !text-xs sm:!text-sm !rounded-lg !border !border-gray-300 focus:!border-[#00B4B6] focus:!shadow-lg hover:!border-[#00B4B6] !transition-all !duration-200 !shadow-sm"
+                    size="middle"
+                  />
+                </Form.Item>
+              </div> */}
+            </div>
+
               </div>
             </div>
 
             {/* khối 2: Thông tin thi công */}
-            <div className="bg-gray-50 rounded-lg border border-gray-200 shadow-sm p-3 sm:p-4 mb-3 sm:mb-4 hover:shadow-md transition-all duration-300">
+            {/* <div className="bg-gray-50 rounded-lg border border-gray-200 shadow-sm p-3 sm:p-4 mb-3 sm:mb-4 hover:shadow-md transition-all duration-300">
               <div className="flex items-center gap-2 mb-2 sm:mb-3">
                 <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-md bg-gradient-to-r from-orange-100 to-orange-200 flex items-center justify-center">
                   <ToolOutlined className="!text-orange-600 !text-xs sm:!text-sm" />
@@ -416,111 +540,26 @@ export default function FormCustomer({
                   />
                 </Form.Item>
               </div>
-            </div>
+            </div> */}
 
-            {/* khối 3: Địa điểm và giá cả */}
-            <div className="bg-gray-50 rounded-lg border border-gray-200 shadow-sm p-3 sm:p-4 hover:shadow-md transition-all duration-300">
-              <div className="flex items-center gap-2 mb-2 sm:mb-3">
-                <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-md bg-gradient-to-r from-purple-100 to-purple-200 flex items-center justify-center">
-                  <EnvironmentOutlined className="!text-purple-600 !text-xs sm:!text-sm" />
-                </div>
-                <Text strong className="!text-gray-800 !text-sm sm:!text-base">
-                  Địa điểm và giá cả
-                </Text>
-              </div>
-
-              <Form.Item
-                name="workAddress"
-                label={
-                  <div className="flex items-center gap-1.5 sm:gap-2">
-                    <div className="w-1 h-1 bg-purple-500 rounded-full"></div>
-                    <span className="text-gray-800 font-medium text-xs sm:text-sm">
-                      Địa điểm thi công
-                    </span>
-                    <span className="text-gray-400 text-xs font-normal">
-                      (Tùy chọn)
-                    </span>
-                  </div>
-                }
-                className="!mb-3"
-              >
-                <Input.TextArea
-                  rows={2}
-                  placeholder="Nhập địa điểm thi công..."
-                  className="!rounded-lg !border !border-gray-300 focus:!border-[#00B4B6] focus:!shadow-lg hover:!border-[#00B4B6] !transition-all !duration-200 !shadow-sm !resize-none !text-xs sm:!text-sm"
-                />
-              </Form.Item>
-
-              <div className="grid grid-cols-1 gap-3 sm:gap-4">
-                <Form.Item
-                  name="workPrice"
-                  label={
-                    <div className="flex items-center gap-1.5 sm:gap-2">
-                      <div className="w-1 h-1 bg-purple-500 rounded-full"></div>
-                      <span className="text-gray-800 font-medium text-xs sm:text-sm">
-                        Đơn giá
-                      </span>
-                    </div>
-                  }
-                  rules={[
-                    {
-                      pattern: /^[0-9]+$/,
-                      message: "Đơn giá không hợp lệ, chỉ nhập số",
-                    },
-                  ]}
-                  className="!mb-0"
-                >
-                  <InputNumber
-                    placeholder="Nhập đơn giá"
-                    className="!w-full !h-9 sm:!h-10 !text-xs sm:!text-sm !rounded-lg !border !border-gray-300 focus:!border-[#00B4B6] focus:!shadow-lg hover:!border-[#00B4B6] !transition-all !duration-200 !shadow-sm"
-                    min={0}
-                    step={1000}
-                    formatter={(value) =>
-                      `${value ?? 0}`.replace(/\B(?=(\d{3})+(?!\d))/g, ".")
-                    }
-                    parser={(value) => {
-                      if (!value) return 0;
-                      const numValue = value.replace(/\./g, "");
-                      return (numValue ? Number(numValue) : 0) as 0;
-                    }}
-                    prefix={<DollarOutlined className="text-[#00B4B6] mr-2" />}
-                  />
-                </Form.Item>
-
-                <Form.Item
-                  name="status"
-                  label={
-                    <div className="flex items-center gap-1.5 sm:gap-2">
-                      <div className="w-1 h-1 bg-purple-500 rounded-full"></div>
-                      <span className="text-gray-800 font-medium text-xs sm:text-sm">
-                        Trạng thái
-                      </span>
-                    </div>
-                  }
-                  className="!mb-0"
-                >
-                  <Select
-                    placeholder="Chọn trạng thái"
-                    options={statusOptions}
-                    className="!h-9 sm:!h-10 !text-xs sm:!text-sm !rounded-lg !border !border-gray-300 focus:!border-[#00B4B6] focus:!shadow-lg hover:!border-[#00B4B6] !transition-all !duration-200 !shadow-sm"
-                    size="middle"
-                  />
-                </Form.Item>
-              </div>
-            </div>
-
+            
             {/* Enhanced Footer - Fixed */}
-          </Form>{" "}
+          </Form>
         </div>
         <div className="flex flex-row justify-end gap-2 sm:gap-3 pt-4 sm:pt-6 border-t border-gray-100 mt-4 sm:mt-6 bg-white sticky bottom-0 px-4 sm:px-6 pb-4 sm:pb-6">
+          {onDelete  &&
           <Button
-            onClick={onCancel}
+            onClick={() => {
+              onDelete();
+              onRefresh();
+              handleCancel();
+            }}
             disabled={isPending}
             size="middle"
             className="!h-9 sm:!h-10 !px-4 sm:!px-6 !rounded-lg !text-gray-700 hover:!bg-gray-50 !font-medium !text-xs sm:!text-sm !transition-all !duration-200 !shadow-sm hover:!shadow-md hover:!scale-105 !order-1 sm:!order-1 !drop-shadow-md !border-none"
           >
-            ❌ Hủy bỏ
-          </Button>
+            ❌ Xóa khách hàng
+          </Button>}
           <Button
             type="primary"
             htmlType="submit"

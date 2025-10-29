@@ -22,6 +22,8 @@ def get_suppliers():
         # Lọc theo tên (user.fullName), cách này dùng ilike để không phân biệt hoa thường
         query = query.filter(User.fullName.ilike(f"%{search}%"))
 
+    query = query.order_by(desc(User.updatedAt))
+
     # Phân trang
     pagination = query.paginate(page=page, per_page=limit, error_out=False)
 
@@ -43,18 +45,19 @@ def get_suppliers():
 @supplier_bp.route("/", methods=["POST"])
 def create_supplier():
     data = request.get_json()
+    print('Create new supplier', data)
 
     # chia dữ liệu thành phần User và supplier
     user_fields = get_model_columns(User)
-    supplier_fields = get_model_columns(supplier)
+    # supplier_fields = get_model_columns(supplier)
 
     user_data = {k: v for k, v in data.items() if k in user_fields}
-    supplier_data = {k: v for k, v in data.items() if k in supplier_fields}
+    # supplier_data = {k: v for k, v in data.items() if k in supplier_fields}
 
     # ép kiểu ngày tháng nếu có
     for key in ['workStart', 'workEnd']:
-        if key in supplier_data and isinstance(supplier_data[key], str):
-            supplier_data[key] = dateStr(supplier_data[key])
+        if key in user_data and isinstance(user_data[key], str):
+            user_data[key] = dateStr(user_data[key])
 
     # tạo User trước
     new_user = User(
@@ -62,19 +65,19 @@ def create_supplier():
         **user_data,
         role_id=-1
     )
-    db.session.add(new_user)
-    db.session.flush()  # lấy id mà chưa commit
+    # db.session.add(new_user)
+    # db.session.flush()  # lấy id mà chưa commit
 
     # tạo supplier gắn với user_id
-    new_supplier = supplier(
-        id=generate_datetime_id(),   # ✅ cũng cần id cho supplier
-        **supplier_data,
-        user_id=new_user.id
-    )
-    db.session.add(new_supplier)
+    # new_supplier = supplier(
+    #     id=generate_datetime_id(),   # ✅ cũng cần id cho supplier
+    #     **supplier_data,
+    #     user_id=new_user.id
+    # )
+    # db.session.add(new_supplier)
     db.session.commit()
 
-    return jsonify(new_supplier.to_dict()), 201
+    return jsonify(new_user.to_dict()), 201
 
 @supplier_bp.route("/<string:id>", methods=["GET"])
 def get_supplier_detail(id):
@@ -83,30 +86,62 @@ def get_supplier_detail(id):
         abort(404, description="supplier not found")
     return jsonify(supplier.to_dict())
 
+# @supplier_bp.route("/<string:id>", methods=["PUT"])
+# def update_supplier(id):
+#     data = request.get_json()
+#     supplier = db.session.get(supplier, id)
+#     if not supplier:
+#         return jsonify({"error": "supplier not found"}), 404
+
+#     user = supplier.user  # quan hệ tới User
+
+#     user_fields = get_model_columns(User)
+#     supplier_fields = get_model_columns(supplier)
+
+#     # update User
+#     for key, value in data.items():
+#         if key in user_fields and hasattr(user, key):
+#             setattr(user, key, value)
+
+#     # update supplier
+#     for key, value in data.items():
+#         if key in supplier_fields and hasattr(supplier, key):
+#             if key in ['workStart', 'workEnd'] and isinstance(value, str):
+#                 value = dateStr(value)
+#             setattr(supplier, key, value)
+
+#     db.session.commit()
+#     return jsonify(supplier.to_dict()), 200
+
+
 @supplier_bp.route("/<string:id>", methods=["PUT"])
-def update_supplier(id):
+def update_user(id):
     data = request.get_json()
-    supplier = db.session.get(supplier, id)
-    if not supplier:
-        return jsonify({"error": "supplier not found"}), 404
-
-    user = supplier.user  # quan hệ tới User
-
-    user_fields = get_model_columns(User)
-    supplier_fields = get_model_columns(supplier)
-
-    # update User
+    print('PUT user', data)
+    user = db.session.get(User, id)
+    if not user:
+        return jsonify({"error": "user not found"}), 404
+    
     for key, value in data.items():
-        if key in user_fields and hasattr(user, key):
-            setattr(user, key, value)
-
-    # update supplier
-    for key, value in data.items():
-        if key in supplier_fields and hasattr(supplier, key):
+        if hasattr(user, key):
             if key in ['workStart', 'workEnd'] and isinstance(value, str):
                 value = dateStr(value)
-            setattr(supplier, key, value)
 
+            setattr(user, key, value)
+        
+    try:
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": str(e)}), 500
+    
+    return jsonify(user.to_dict()), 200
+
+@supplier_bp.route("/<string:id>", methods=["DELETE"])
+def delete_user(id):
+    user = db.session.get(User, id)
+    if user:
+        db.session.delete(user)
     db.session.commit()
-    return jsonify(supplier.to_dict()), 200
 
+    return jsonify({"message": "Supplier deleted"}), 200
