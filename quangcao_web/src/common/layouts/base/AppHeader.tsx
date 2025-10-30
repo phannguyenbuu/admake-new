@@ -66,7 +66,8 @@ export default function AppHeader() {
 
   const handleLogout = () => {
     // Xóa token
-    localStorage.removeItem("ACCESS_TOKEN");
+    localStorage.removeItem("Admake-User-Access");
+    sessionStorage.removeItem("accessToken");
 
     // Invalidate tất cả queries để xóa cache data cũ
     queryClient.clear();
@@ -75,7 +76,7 @@ export default function AppHeader() {
     refetchInfo();
 
     message.success("Đăng xuất thành công");
-    navigate("/");
+    navigate("/login");
   };
 
   // console.log('WSA',workSpaces);

@@ -1,4 +1,4 @@
-import { Modal, Button, Typography, Form } from "antd";
+import { Modal, Button, Typography, Form, notification } from "antd";
 import {
   PlusOutlined,
   TeamOutlined,
@@ -79,6 +79,10 @@ export default function ModalManagerWorkSpace({
     setDeleteModalVisible(false);
     setDeletingWorkspace(null);
   }, []);
+
+  const handleDeleteSuccess = ((name:string | undefined) => {
+    notification.success({message:'Đã xóa thành công', description:name});
+  });
 
   return (
     <>
@@ -364,6 +368,7 @@ export default function ModalManagerWorkSpace({
         closeDeleteModal={closeDeleteModal}
         deletingWorkspace={deletingWorkspace || ({} as WorkSpace)}
         refetchWorkSpaces={onRefresh || (() => {})}
+        onSuccess={() => handleDeleteSuccess(deletingWorkspace?.name)}
       />
     </>
   );

@@ -167,4 +167,24 @@ def get_workspace_detail(id):
 
     return jsonify(result)
 
-__all__ = ['customer_bp']
+
+
+@workspace_bp.route("/<string:workspace_id>", methods=["DELETE"])
+def delete_workspace(workspace_id):
+    workspace = db.session.get(Workspace, workspace_id)
+    if not workspace:
+        return jsonify({"error": "Workspace not found"}), 404
+    
+    # print(workspace.owner_id)
+    owner = db.session.get(User, workspace.owner_id)
+
+    if owner:
+        for customer in owner.customer:
+            db.session.delete(customer)
+        db.session.delete(owner)
+
+    db.session.delete(workspace)
+    db.session.commit()
+    return jsonify({"message": "Workspace deleted successfully"}), 200
+
+__all__ = ['workspace_bp']

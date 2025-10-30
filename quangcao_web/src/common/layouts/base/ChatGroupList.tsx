@@ -12,6 +12,8 @@ import {Button, Input} from "@mui/material";
 import {Box, Stack} from "@mui/material";
 import { UpdateButtonContext } from "../../hooks/useUpdateButtonTask.tsx";
 import type { WorkSpace } from "../../../@types/work-space.type.ts";
+import { SearchOutlined } from "@ant-design/icons";
+import { Input as AntdInput, Menu } from "antd";
 
 interface ChatGroupListProps {
   workSpaces?: WorkSpace[];
@@ -21,12 +23,34 @@ const ChatGroupList: React.FC<ChatGroupListProps> = ({workSpaces}) => {
   const [chatGroupList, setChatGroupList] = useState<WorkSpace[]>([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedId, setSelectedId] = useState<WorkSpace | null>(null);
+  const [searchText, setSearchText] = useState("");
+  const [filteredItems, setFilteredItems] = useState<WorkSpace[]>([]); // items là danh sách menu gốc
   
   //@ts-ignore
   const {userId, userRoleId} = useUser();
 
+  
+
 
   const [addGroupModalVisible, setAddGroupModalVisible] = useState(false);
+
+  useEffect(() => {
+    setFilteredItems(chatGroupList); // Khởi tạo danh sách đầy đủ khi component load
+  }, [chatGroupList]);
+
+
+  const handleSearch = (value: string) => {
+    setSearchText(value);
+    if (!value) {
+      // Nếu input rỗng, hiện hết danh sách gốc
+      setFilteredItems(chatGroupList);
+    } else {
+      const filtered = chatGroupList.filter((el) =>
+        el.name.toLowerCase().includes(value.toLowerCase())
+      );
+      setFilteredItems(filtered);
+    }
+  };
 
   const handleAddGroupOk = async (name: string) => {
     // gọi API POST /group với tên group = name
@@ -34,17 +58,6 @@ const ChatGroupList: React.FC<ChatGroupListProps> = ({workSpaces}) => {
   };
   
   useEffect(() => {
-    // console.log('!!!API', API_HOST);
-
-    // fetch(`${useApiHost()}/group/`)
-    //   .then((res) => res.json())
-    //   .then((data: WorkSpace[]) => 
-    //     {
-    //       // console.log('GroupData', data);
-    //       setChatGroupList(data);
-    //     })
-    //   .catch((error) => console.error("Failed to load group data", error));
-
     setChatGroupList(workSpaces);
   }, [workSpaces]);
   
@@ -75,9 +88,9 @@ const ChatGroupList: React.FC<ChatGroupListProps> = ({workSpaces}) => {
   const spanStyle: React.CSSProperties = {
     cursor: "pointer",
     position: "relative",
-    top:-20,
-    left: 20,
-    marginTop: 15,
+    top: -20,
+    left: 0,
+    marginTop: 0,
     height: 25,
     width: 80,
     fontWeight: 700,
@@ -87,24 +100,60 @@ const ChatGroupList: React.FC<ChatGroupListProps> = ({workSpaces}) => {
     transition: "background-color 0.3s",
   };
 
+  const menu = (
+    <div style={{ padding: 8 }}>
+      <AntdInput
+        allowClear  
+        placeholder="Tìm kiếm tên khách hàng"
+        value={searchText}
+        prefix={<SearchOutlined className="!text-cyan-500 !text-xs sm:!text-sm" />}  // Biểu tượng search
+        onChange={(e) => handleSearch(e.target.value)}
+        style={{ marginBottom: 8 }}
+      />
+
+      {filteredItems && 
+      <Menu
+        items={filteredItems?.map(el => ({
+          key: el.id,
+          label: el.name,
+        }))}
+        onClick={onMenuClick}
+        style={{ maxHeight: '50vh', overflowY: "auto" }}
+      />}
+    </div>
+  );
+
   return (
     <div className="flex items-center">
-      <Stack direction="row" spacing={2} px={0.5}
-        sx={{backgroundColor:"#00B4B6", maxHeight:30, borderRadius: 5}}>
-        <Dropdown menu={{ items, onClick: onMenuClick }}>
-          <Box sx = {{width: 120,height: 25, top: 2,position: "relative",borderRadius: 10,
-              backgroundColor: isHover ? 'rgba(255,255,255,0.5)' : 'rgba(255,255,255,0.25)',
-              transition: "background-color 1s ease"}}>
-            <span style={spanStyle}
-              onMouseEnter={() => setIsHover(true)}
-              onMouseLeave={() => setIsHover(false)}
-            >
-              CHAT
-            </span>
+      <Stack
+        direction="row"
+        spacing={2}
+        px={0.5}
+        sx={{ backgroundColor: "#00B4B6", maxHeight: 30, borderRadius: 5 }}
+      >
+        <Dropdown overlay={menu} trigger={["click"]}>
+          <Box
+            sx={{
+              width: 120,
+              height: 25,
+              top: 2,
+              position: "relative",
+              borderRadius: 10,
+              backgroundColor: isHover ? "rgba(255,255,255,0.5)" : "rgba(255,255,255,0.25)",
+              transition: "background-color 1s ease",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              cursor: "pointer",
+            }}
+            onMouseEnter={() => setIsHover(true)}
+            onMouseLeave={() => setIsHover(false)}
+          >
+            <span style={spanStyle}>CHAT</span>
           </Box>
         </Dropdown>
 
-        <Button sx={{color:"#fff"}}
+        <Button sx={{color:"#fff", whiteSpace:'nowrap'}}
           onClick={() => setAddGroupModalVisible(true)}>Tạo Nhóm</Button>
        </Stack>
 

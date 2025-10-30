@@ -24,15 +24,6 @@ def create_group():
     return jsonify(new_workspace.to_dict()), 201
 
 
-@group_bp.route("/<int:workspace_id>", methods=["DELETE"])
-def delete_group(workspace_id):
-    workspace = Workspace.get_by_id(workspace_id)
-    if not workspace:
-        return jsonify({"error": "Workspace not found"}), 404
-
-    db.session.delete(workspace)
-    db.session.commit()
-    return jsonify({"message": "Workspace deleted successfully"}), 200
 
 
 @group_bp.route("/<int:id>", methods=["GET"])

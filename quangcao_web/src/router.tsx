@@ -271,13 +271,13 @@ const routes: TRoute = {
         //   icon: <SettingOutlined />,
           
         // },
-        // {
-        //   path: "/dashboard/infor",
-        //   element: <InforDashboard />,
-        //   title: "Hồ sơ",
-        //   icon: <UserOutlined />,
-        //   ignoreInMenu: false,
-        // }
+        {
+          path: "/dashboard/infor",
+          element: <InforDashboard />,
+          title: "Hồ sơ",
+          icon: <UserOutlined />,
+          ignoreInMenu: false,
+        }
       ],
     },
   ],

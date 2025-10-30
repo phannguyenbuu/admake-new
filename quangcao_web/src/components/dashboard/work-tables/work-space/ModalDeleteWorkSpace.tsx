@@ -1,8 +1,9 @@
-import { Modal, Button, Typography, message } from "antd";
+import { Modal, Button, Typography, message, notification } from "antd";
 import { DeleteOutlined } from "@ant-design/icons";
 import { useDeleteWorkSpace } from "../../../../common/hooks/work-space.hook";
 import { useCallback } from "react";
 import type { WorkSpace } from "../../../../@types/work-space.type";
+import { useApiHost } from "../../../../common/hooks/useApiHost";
 
 const { Title, Text } = Typography;
 
@@ -25,18 +26,26 @@ export default function ModalDeleteWorkSpace({
     useDeleteWorkSpace();
 
   const handleDelete = useCallback(() => {
-    deleteWorkSpace(deletingWorkspace._id, {
-      onSuccess: () => {
-        message.success("Xóa bảng công việc thành công!");
-        refetchWorkSpaces();
-        closeDeleteModal();
-        onSuccess?.(); // Gọi callback success
-      },
-      onError: () => {
-        message.error("Có lỗi xảy ra khi xóa bảng công việc!");
-      },
+  if (!deletingWorkspace?.id) return;
+
+  fetch(`${useApiHost()}/workspace/${deletingWorkspace.id}`, {
+    method: 'DELETE',
+  })
+    .then((response) => {
+      if (!response.ok) {
+        notification.error({message:`Failed to delete workspace`});
+      }
+      return response.json();
+    })
+    .then(() => {
+      if (typeof onSuccess === 'function') onSuccess();
+      // if (typeof deleteWorkSpace === 'function') deleteWorkSpace();
+      if (typeof closeDeleteModal === 'function') closeDeleteModal();
+    })
+    .catch((error) => {
+      notification.error({message:`Delete error: ${error}`});
     });
-  }, [deleteWorkSpace, closeDeleteModal, deletingWorkspace, onSuccess]);
+}, [deleteWorkSpace, closeDeleteModal, deletingWorkspace, onSuccess]);
 
   return (
     <Modal

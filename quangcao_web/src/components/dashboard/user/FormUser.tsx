@@ -288,7 +288,7 @@ export default function FormUser({
                     Chức vụ:
                   </span>
                 }
-                rules={[{ required: false, message: "Chọn chức vụ" }]}
+                rules={[{ required: true, message: "Chọn chức vụ" }]}
                 className="!mb-0"
               >
                 <Select

@@ -16,16 +16,11 @@ def get_customers():
     limit = request.args.get("limit", 10, type=int)
     search = request.args.get("search", "", type=str)
 
-    # print('customer', Customer.query.all())
+    # print('customer', Customer.query.all(), search)
 
     query = Workspace.query
     if search:
-        query = query.filter(
-            or_(
-                Workspace.user.fullName.ilike(f"%{search}%"),
-                Workspace.name.ilike(f"%{search}%")
-            )
-        )
+        query = query.filter(Workspace.name.ilike(f"%{search}%"))
 
     query = query.order_by(desc(Workspace.updatedAt))
 

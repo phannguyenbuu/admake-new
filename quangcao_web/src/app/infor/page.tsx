@@ -5,9 +5,11 @@ import { useInfo } from "../../common/hooks/info.hook";
 import { UserHeader } from "../../components/dashboard/info/UserHeader";
 import { UserForm } from "../../components/dashboard/info/UserForm";
 import { useState } from "react";
+import { useUser } from "../../common/hooks/useUser";
 
 export const InforDashboard: IPage["Component"] = () => {
-  const { data: info, isLoading: isLoadingInfo, refetch } = useInfo();
+  // const { data: info, isLoading: isLoadingInfo, refetch } = useInfo();
+  const {userId, username, userRoleId, userRole, userIcon} = useUser();
 
   const [config, setConfig] = useState({
     openEdit: false,
@@ -18,38 +20,6 @@ export const InforDashboard: IPage["Component"] = () => {
       setConfig((prev) => ({ ...prev, [key]: !prev[key] }));
     };
   };
-
-  const handleEdit = () => {
-    toggle("openEdit")();
-  };
-
-  if (isLoadingInfo) {
-    return (
-      <div className="h-screen w-full flex items-center justify-center overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-gray-100 to-gray-200" />
-        <div className="text-center relative z-10">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-500 mx-auto mb-4"></div>
-          <p className="text-gray-600">Đang tải thông tin...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (!info) {
-    return (
-      <div className="h-screen w-full flex items-center justify-center overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-gray-100 to-gray-200" />
-        <div className="text-center relative z-10">
-          <h1 className="text-2xl font-bold text-red-600 mb-4">
-            Lỗi tải thông tin
-          </h1>
-          <p className="text-gray-600">
-            Không thể tải thông tin người dùng. Vui lòng thử lại.
-          </p>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="py-3 lg:pt-20 w-full flex items-center justify-center overflow-hidden">
@@ -63,10 +33,24 @@ export const InforDashboard: IPage["Component"] = () => {
           bodyStyle={{ padding: "0" }}
         >
           {/* Header với Avatar */}
-          <UserHeader info={info} onRefetch={() => refetch()} />
+          {/* <UserHeader info={info} onRefetch={() => refetch()} /> */}
+
+          <div className="bg-gradient-to-br from-gray-600 to-gray-800 rounded-t-xl sm:rounded-t-2xl p-4 sm:p-6 lg:p-8">
+            <div className="flex flex-col items-center relative">
+              {/* User Info */}
+              <div className="text-center text-white">
+                <h2 className="text-lg sm:text-xl lg:text-2xl font-semibold mb-1 drop-shadow-lg">
+                  {username}
+                </h2>
+                <p className="text-sm sm:text-base text-cyan-200 drop-shadow-md">
+                  {userRole?.name}
+                </p>
+              </div>
+            </div>
+          </div>
 
           {/* Edit Form Button */}
-          <div className="absolute top-4 right-4 z-20">
+          {/* <div className="absolute top-4 right-4 z-20">
             <Tooltip title="Chỉnh sửa thông tin" placement="bottom">
               <Button
                 shape="circle"
@@ -76,15 +60,15 @@ export const InforDashboard: IPage["Component"] = () => {
                 size="small"
               />
             </Tooltip>
-          </div>
+          </div> */}
 
           {/* Form Information */}
-          <UserForm
+          {/* <UserForm
             info={info}
             config={config}
             toggle={toggle}
             onRefetch={() => refetch()}
-          />
+          /> */}
         </Card>
       </div>
     </div>

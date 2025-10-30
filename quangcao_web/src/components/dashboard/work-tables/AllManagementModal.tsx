@@ -97,14 +97,18 @@ export default function AllManagementModal() {
             width: 120,
             height: 25,
             top: 2,
+            padding: 1,
             position: "relative",
             borderRadius: 10,
-            backgroundColor: isHover ? "rgba(255,255,255,0.5)" : "rgba(255,255,255,0.25)",
+            backgroundColor: isHover ? "rgba(255,255,255,0.5)" : "#00B4B5",
             transition: "background-color 1s ease",
             cursor: "pointer",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
+            whiteSpace:'nowrap',
+            color:'#fff',
+            fontWeight: 500
           }}
           onMouseEnter={() => setIsHover(true)}
           onMouseLeave={() => setIsHover(false)}
