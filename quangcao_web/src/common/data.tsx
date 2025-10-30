@@ -500,7 +500,8 @@ export const columnsWorkPoint = (handleOpenModal: (record: WorkDaysProps) => voi
           onClick={() => handleOpenModal(record)}
         >
         <div>{text}</div>
-        <span className="!text-base" style={{fontSize:8,fontStyle:'italic'}}>{record.userrole}</span>
+        <span style={{fontSize:12,fontStyle:'italic'}}>{record.userrole}</span>
+        <p style={{fontSize:8,color:'red',fontStyle:'italic'}}>Click để xem bảng lương</p>
       </div>
     )},
   },

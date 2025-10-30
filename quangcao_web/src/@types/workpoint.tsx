@@ -46,6 +46,7 @@ export interface Workpoint {
 
 
 export interface WorkDaysProps {
+  salary: number;
   items: Workpoint[];
   leaves: Leave[];
   user_id: string;

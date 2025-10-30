@@ -139,8 +139,8 @@ export default function WorkDays({record}: {record:WorkDaysProps}) {
   type StatusKey = 'in' | 'out' | 'off' | 'null';
 
   const colors: Record<StatusKey, string> = {
-    in: 'red',
-    out: 'green',
+    in: 'green',
+    out: 'red',
     off: '#999',
     null: 'white',
   };
@@ -285,7 +285,7 @@ return (
         <Stack direction="row" spacing={2} style={{ padding: 20, minHeight: '80vh', width:'fit-content' }}>
           {modalImg?.in?.img && 
             <Stack>
-              <Typography textAlign="center">Check in</Typography>
+              <Typography textAlign="center">Check in {modalImg?.in?.time}</Typography>
               <img
                 src={`${useApiStatic()}/${modalImg.in.img}`}
                 alt="Check-in"
@@ -306,7 +306,7 @@ return (
 
           {modalImg?.out?.img && 
             <Stack>
-              <Typography textAlign="center">Check out</Typography>
+              <Typography textAlign="center">Check out {modalImg?.out?.time}</Typography>
               <img
                 src={`${useApiStatic()}/${modalImg.out.img}`}
                 alt="Check-out"
