@@ -32,22 +32,23 @@ def login():
     user = User.query.filter_by(username=username).first()
 
     if user:
-        print('Login:', username,password, user.password)
+        print('Login:', username, password, user.lead_id) 
         # if user and check_password_hash(user.password, password):
         if user.password == password:
             print('Start login')
             login_user(user)  # tạo session cho user
             session.permanent = True
-
             
-            access_token = create_access_token(identity=user.id, expires_delta=datetime.timedelta(days=15))
+            access_token = create_access_token(identity={'user_id':user.id, 'lead_id': user.lead_id}, 
+                                               expires_delta=datetime.timedelta(days=15))
 
             result = {
                     'access_token': access_token,
                     "id": user.id, 
                     "username": user.username, 
                     "role_id": user.role_id,
-                    "role": user.update_role()
+                    "role": user.update_role(),
+                    "lead_id": user.lead_id
                 }
             
             print('JWT', result)
@@ -86,7 +87,8 @@ def me():
         'username': user.username,
         'role_id': user.role_id,
         "role": user.update_role(),
-        'icon': user.icon
+        'icon': user.icon,
+        'lead_id': user.lead_id
     })
 
 

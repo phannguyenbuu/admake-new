@@ -1,5 +1,5 @@
 import json
-from models import db, app, User, LeadPayload, Workpoint,Leave, Customer, Material, parse_date, Role, Message, Task, Workspace, generate_datetime_id
+from models import db, app, User, LeadPayload, Workpoint,Leave, Customer, Material, Role, Message, Task, Workspace, generate_datetime_id
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 import json
@@ -16,49 +16,6 @@ from sqlalchemy.sql import func, text
 from psycopg2.extras import Json
 from sqlalchemy import create_engine, inspect
 from sqlalchemy.orm.attributes import flag_modified
-
-def load_customers():
-    with open("json/customers.json", "r", encoding="utf-8") as f:
-        data = json.load(f)
-        for item in data:
-            customer = Customer(
-                fullName=item.get("fullName"),
-                phone=item.get("phone"),
-                workInfo=item.get("workInfo"),
-                workStart=parse_date(item.get("workStart")),
-                workEnd=parse_date(item.get("workEnd")),
-                workAddress=item.get("workAddress"),
-                workPrice=item.get("workPrice"),
-                status=item.get("status"),
-                deletedAt=parse_date(item.get("deletedAt")),
-                createdAt=parse_date(item.get("createdAt")),
-                updatedAt=parse_date(item.get("updatedAt")),
-            )
-            db.session.add(customer)
-        db.session.commit()
-
-
-def load_materials():
-    with open("json/materials.json", "r", encoding="utf-8") as f:
-        datas = json.load(f)
-
-        for data in datas:
-            mtl = Material(
-                name=data.get('name'),
-                quantity=data.get('quantity'),
-                unit=data.get('unit'),
-                price=data.get('price'),
-                image=data.get('image'),
-                description=data.get('description'),
-                supplier=data.get('supplier'),
-                version=data.get('__v'),
-                deletedAt=parse_date(data.get("deletedAt")),
-                createdAt=parse_date(data.get("createdAt")),
-                updatedAt=parse_date(data.get("updatedAt")),
-            )
-            db.session.add(mtl)
-        db.session.commit()
-
 
 def load_users():
     with open("json/users.json", "r", encoding="utf-8") as f:
@@ -945,6 +902,10 @@ FOREIGN KEY (user_id) REFERENCES "user"(id);
     
     db.session.commit()
 
+def alter_data():
+    # for table in ['material','user','role','workspace','task','message','workpoint','leave']:
+    db.session.execute(text(f'''ALTER TABLE "lead" ADD COLUMN address VARCHAR(255);'''))
+    db.session.commit()
 
 def delete_customer_user():
     db.session.execute(text('''
@@ -1044,13 +1005,42 @@ def generate_salary(min_value=10_000_000, max_value=50_000_000, round_to=100_000
     rounded_salary = raw_salary - (raw_salary % round_to)
     return rounded_salary
 
+def parse_csv(path):
+    import pandas as pd
+    from datetime import datetime
+    import csv
+
+    df = pd.read_csv('register.csv', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+    print(df.columns.tolist())
+    df.columns = df.columns.str.replace('\n', '').str.strip()
+    # createdAt,Company,Phone,Address,SoftUsed,Requirement,Col6,Rate,Email
+    for idx, row in df.iterrows():
+        createdAt = datetime.strptime(row['createdAt'], '%d/%m/%Y %H:%M:%S')
+        lead = LeadPayload(
+            name = '',
+            company = row['Company'],
+            address = row['Address'],
+            email = row['Email'],
+            phone = row['Phone'],  # đã loại bỏ \n
+            description = f"{row['SoftUsed']}#{row['Requirement']}#{row['Col6']}#{row['Rate']}",
+            industry = '',
+            companySize = '',
+            balance_amount = 0,
+            createdAt = createdAt,
+           
+            
+        )
+        print(lead.to_dict())
+
+        db.session.add(lead)
+
+    db.session.commit()
+
+
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()
-        # drop_database()
-        # create_admin_users()
-
-        workspace = db.session.get(Workspace, "2025102822391474348050b809")
-        user = db.session.get(User, workspace.owner_id)
-        workspace.name = user.username
-        db.session.commit()
+        
+        parse_csv('register.csv')
+        # alter_data()
+        

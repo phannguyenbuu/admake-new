@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect, useRef } from 'r
 import { useApiHost } from './useApiHost';
 import type { Role } from '../../@types/role.type';
 import WebFont from 'webfontloader';
+import { message, notification } from 'antd';
 
 interface UserContextProps {
   userId: string | null;
@@ -9,6 +10,7 @@ interface UserContextProps {
   userRoleId: number;
   userRole: Role | null;
   userIcon: string | null;
+  userLeadId: number | null;
   login: (credentials: { username: string; password: string }) => Promise<void>;
   logout: () => Promise<void>;
   checkAuthStatus: () => Promise<void>;
@@ -24,7 +26,8 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     });
   }, []);
-  
+
+  const [userLeadId, setUserLeadId] = useState<number | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
   const [username, setUsername] = useState<string | null>(null);
   const [userRoleId, setUserRoleId] = useState<number>(0);
@@ -64,11 +67,12 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setUserRoleId(data.role_id);
       setUserRole(data.role);
       setUserIcon(data.icon ?? 'images/avatar.png');
+      setUserLeadId(data.lead_id ?? null);
 
       // Sau khi đăng nhập thành công, bạn có thể redirect đến trang chính
       window.location.href = '/dashboard'; // hoặc route bạn muốn
     } catch (error) {
-      console.error('Login error:', error);
+      notification.error({message:'Login error:', description: `${error}` || ''});
       // alert(error instanceof Error ? error.message : 'Login failed');
     }
   };
@@ -118,6 +122,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setUserRoleId(0);
     setUserRole(null);
     setUserIcon(null);
+    setUserLeadId(null);
 
     isLoggingOutRef.current = false;
     window.location.href = '/login';
@@ -146,12 +151,13 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       if (res.ok) {
         const data = await res.json();
-        // console.log("Auth Status", data);
+        console.log("Auth Status", data);
         setUserId(data.userId);
         setUsername(data.username);
         setUserRoleId(data.role_id ?? 0);
         setUserRole(data.role ?? null);
         setUserIcon(data.icon ?? 'images/avatar.png');
+        setUserLeadId(data.lead_id ?? null);
       } else if (res.status === 401) {
         // Token hết hạn hoặc không hợp lệ, xóa token, chuyển về login
         console.warn("Access token expired or invalid, logging out.");
@@ -162,6 +168,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setUserRoleId(0);
         setUserRole(null);
         setUserIcon(null);
+        setUserLeadId(null);
       }
     } catch (error) {
       console.error("Failed to check auth status:", error);
@@ -175,7 +182,8 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   return (
-    <UserContext.Provider value={{ userId, username, userRoleId, userRole,
+    <UserContext.Provider value={{ userId, username, 
+      userRoleId, userRole, userLeadId,
       userIcon, login, logout, checkAuthStatus }}>
       {children}
     </UserContext.Provider>

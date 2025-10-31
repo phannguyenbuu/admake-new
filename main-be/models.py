@@ -72,11 +72,9 @@ class Material(BaseModel):
     image = db.Column(db.String(255))
     description = db.Column(db.Text)
     supplier = db.Column(db.String(255))
-    # version = db.Column(db.Integer)
-
-    # deletedAt = db.Column(db.DateTime, nullable=True)
-    # createdAt = db.Column(db.DateTime, default=datetime.datetime.utcnow)
-    # updatedAt = db.Column(db.DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
+    
+    lead_id = db.Column(db.Integer, db.ForeignKey('lead.id'))
+    lead = db.relationship('LeadPayload', backref='materials')
 
     def to_dict(self):
         result = {}
@@ -88,6 +86,13 @@ class Material(BaseModel):
             result[column.name] = value
         return result
     
+    @staticmethod
+    def create_item(params):
+        item = Material(**params)
+        item.id = generate_datetime_id()
+        db.session.add(item)
+        db.session.commit()
+        return item
 
 def generate_datetime_id():
     now = datetime.datetime.utcnow()
@@ -138,13 +143,8 @@ class User(BaseModel):
     taxCode = db.Column(db.String(50))
 
     workpoints = db.relationship('Workpoint', backref='user', lazy=True)
-
-    # customer = db.relationship("Customer", back_populates="user", uselist=False)
-
-    # deletedAt = db.Column(db.DateTime, nullable=True)
-    # createdAt = db.Column(db.DateTime, default=datetime.datetime.utcnow)
-    # updatedAt = db.Column(db.DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
-    # version = db.Column(db.Integer)
+    lead_id = db.Column(db.Integer, db.ForeignKey('lead.id'))
+    lead = db.relationship('LeadPayload', backref='users')
 
     def update_role(self):
         role = db.session.get(Role, self.role_id)
@@ -181,6 +181,8 @@ class User(BaseModel):
         filtered_params["id"] = generate_datetime_id()
         
         return User(**filtered_params)
+    
+    
 
     
 class Customer(db.Model):
@@ -224,10 +226,8 @@ class Role(BaseModel):
     
     permissions = db.Column(JSON)  # lưu list permissions
     name = db.Column(db.String(255))
-    # deletedAt = db.Column(db.DateTime, nullable=True)
-    # createdAt = db.Column(db.DateTime, default=datetime.datetime.utcnow)
-    # updatedAt = db.Column(db.DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
-    # version = db.Column(db.Integer)
+    lead_id = db.Column(db.Integer, db.ForeignKey('lead.id'))
+    lead = db.relationship('LeadPayload', backref='roles')
 
     def to_dict(self):
         result = {}
@@ -240,15 +240,12 @@ class Role(BaseModel):
         return result
 
     @staticmethod
-    def create_item(data):
-        return Role(
-            permissions=data.get("permissions"),
-            name=data.get("name"),
-            deletedAt=data.get("deletedAt"),
-            createdAt=parse_date(data.get("createdAt")),
-            updatedAt=parse_date(data.get("updatedAt")),
-            version=data.get("__v"),
-        )
+    def create_item(params):
+        item = Role(**params)
+        item.id = generate_datetime_id()
+        db.session.add(item)
+        db.session.commit()
+        return item
     
 class Workspace(BaseModel):
     __tablename__ = "workspace"
@@ -267,7 +264,8 @@ class Workspace(BaseModel):
 
     status = db.Column(db.String(50))
     
-    
+    lead_id = db.Column(db.Integer, db.ForeignKey('lead.id'))
+    lead = db.relationship('LeadPayload', backref='workspaces')
 
     def to_dict(self):
         result = {}
@@ -323,6 +321,8 @@ class Task(BaseModel):
     start_time = db.Column(db.Date)
 
     check_reward = db.Column(db.Boolean, default = False)
+    lead_id = db.Column(db.Integer, db.ForeignKey('lead.id'))
+    lead = db.relationship('LeadPayload', backref='tasks')
 
     def to_dict(self):
         result = {}
@@ -341,21 +341,6 @@ class Task(BaseModel):
 
     @staticmethod
     def parse(data):
-        # title = data.get("title", '')
-        # description = data.get("description", '')
-        
-        # assign_ids = data.get("assign_ids", '')
-        # customer_id = data.get("customer_id", '')
-
-        
-        # start_time = data.get("start_time", None)
-        # end_time = data.get("end_time", None)
-
-        # type = data.get("type", '')
-        # reward = data.get("reward", 0)
-        # amount = data.get("amount", '')
-        # salary_type = data.get("salary_type", '')
-
         return Task(
             id=generate_datetime_id(),
             workspace_id = data.get("workspace_id", ''),
@@ -371,139 +356,12 @@ class Task(BaseModel):
             amount = data.get("amount"),
             salary_type = data.get("salary_type", '')
         )
-
-# class Group(BaseModel):
-#     __tablename__ = 'group'
-#     __table_args__ = {'quote': True}
-
-#     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-#     owner_id = db.Column(db.String(50))
-#     name = db.Column(db.String(120), nullable=True)
-#     description = db.Column(db.String(255))
-#     address = db.Column(db.String(255))
-#     documents = db.Column(db.JSON, default=[])  # Lưu danh sách đường dẫn tài liệu
-#     images = db.Column(db.JSON, default=[])     # Lưu danh sách đường dẫn hình ảnh
-#     chats = db.Column(db.JSON, default=[])      # Lưu danh sách message ID lưu lại
-#     rating_count = db.Column(db.Integer, default=0)
-#     rating_sum = db.Column(db.Integer, default=0)
-#     status = db.Column(db.String(10), default=0)
-    
-#     def to_dict(self):
-#         result = {}
-#         for column in self.__table__.columns:
-#             value = getattr(self, column.name)
-#             # print(f"DEBUG: Column {column.name} value type: {type(value)}")
-#             if isinstance(value, (datetime.datetime, datetime.date)):
-#                 value = value.isoformat()
-#             result[column.name] = value
-
-#         # result['members'] = self.total_members
-                
-#         return result
-    
-#     @staticmethod
-#     def create_item(params):
-#         description_value = params.get('description') or generate_datetime_id()
-
-#         group = Group(
-#             name=params.get('name', 0),
-#             description=description_value,
-#             address=params.get('address', 0),
-#             documents=[],
-#             images=[],
-#             chats=[],
-
-#             rating_sum=params.get('rating_sum', 0),
-            
-#             # createdAt=to_date(params.get('createdAt','')),
-#             # updatedAt=to_date(params.get('updatedAt','')),
-#         )
-
-#         db.session.add(group)
-#         db.session.commit()
-#         return group
-    
-#     @property
-#     def rating(self):
-#         if self.rating_count == 0:
-#             return 0
-#         return round(self.rating_sum / self.rating_count, 2)
-    
-#     @property
-#     def total_members(self):
-#         return GroupMember.query.filter_by(group_id=self.id).count()
-
-#     @property
-#     def total_messages(self):
-#         return Message.query.filter_by(group_id=self.id).count()
-    
-#     @property
-#     def all_messages(self):
-#         return Message.query.filter_by(group_id=self.id).order_by(Message.createdAt).all()
-
-#     @property
-#     def last_message(self):
-#         msgs = Message.query.filter_by(group_id=self.id)
-
-#         if msgs.count() > 0:
-#             last_msg = msgs.order_by(Message.createdAt.desc()).first()
-#             if last_msg:
-#                 # Trả lại đoạn text hoặc thông tin bạn muốn hiển thị
-#                 return f"{last_msg.createdAt}|{last_msg.text[:50]}"  # cắt ngắn 50 ký tự
-#         return ''
-
-# class GroupMember(db.Model):
-    # __tablename__ = 'group_member'
-
-    # id = db.Column(db.Integer, primary_key=True)
-    
-    # group_id = db.Column(db.Integer, db.ForeignKey('group.id'), nullable=True)
-    # user_id = db.Column(db.String(80), db.ForeignKey('user.id'), nullable=True)
-
-    # role = db.Column(db.String(20), default='member')
-
-    # user = db.relationship('User', backref='group_members')
-    # group = db.relationship('Group', backref='group_members')
-
-    # def to_dict(self):
-    #     result = {}
-    #     for column in self.__table__.columns:
-    #         value = getattr(self, column.name)
-    #         # print(f"DEBUG: Column {column.name} value type: {type(value)}")
-    #         if isinstance(value, (datetime.datetime, datetime.date)):
-    #             value = value.isoformat()
-    #         result[column.name] = value
-    #     return result
-
-    # @staticmethod
-    # def create_item(params):
-    #     try:
-    #         user_id = str(params.get('user_id',0))
-    #         user_exists = User.query.filter_by(accountId=user_id).first()
-            
-    #         group_id = params.get('group_id', 0)
-    #         group_exists = Group.query.filter_by(id=group_id).first()
-
-    #         if user_exists and group_exists:
-    #             gr = GroupMember(
-    #                 user_id=user_id,
-    #                 group_id=group_id,
-    #                 role=params.get('role', ''),
-    #             )
-        
-    #             db.session.add(gr)  # hoặc bulk insert
-    #             db.session.commit()
-    #             return gr
-    #         else:
-    #             print('No exist',user_id,group_id)
-    #     except IntegrityError as e:
-    #         db.session.rollback()
-    #         # Kiểm tra có phải lỗi unique constraint vi phạm không
-    #         if 'user_accountId_key' in str(e.orig):
-    #             print("Duplicate accountId, bỏ qua bản ghi này")
-    #             # Hoặc xử lý theo ý bạn, ví dụ bỏ qua, log lại,...
-    #         else:
-    #             raise  # lỗi khác thì raise tiếp
+    @staticmethod
+    def create_item(params):
+        item = Task(**params)
+        db.session.add(item)
+        db.session.commit()
+        return item
 
 from sqlalchemy.exc import IntegrityError
 class Message(BaseModel):
@@ -526,7 +384,8 @@ class Message(BaseModel):
     type = db.Column(db.String(10), nullable=True)
     
     user = db.relationship('User', foreign_keys=[user_id])
-    # group = db.relationship('Group', foreign_keys=[group_id])
+    lead_id = db.Column(db.Integer, db.ForeignKey('lead.id'))
+    lead = db.relationship('LeadPayload', backref='messages')
 
     def to_dict(self):
         result = {}
@@ -554,6 +413,9 @@ class Workpoint(BaseModel):
 
     checklist = db.Column(db.JSON)
     user_id = db.Column(db.String(80), db.ForeignKey('user.id'), nullable=True)
+
+    lead_id = db.Column(db.Integer, db.ForeignKey('lead.id'))
+    lead = db.relationship('LeadPayload', backref='workpoints')
 
     def __repr__(self):
         return f'<Workpoint id={self.id} user_id={self.user_id}>'
@@ -622,6 +484,9 @@ class Leave(BaseModel):
     noon = db.Column(db.Boolean, default = False)
     user_id = db.Column(db.String(50))
 
+    lead_id = db.Column(db.Integer, db.ForeignKey('lead.id'))
+    lead = db.relationship('LeadPayload', backref='leaves')
+
     def __repr__(self):
         return f'<Leave {self.reason}>'
     
@@ -642,15 +507,6 @@ class Leave(BaseModel):
         db.session.commit()
         return item
     
-
-class Location(db.Model):
-    __tablename__ = 'locations'
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(255), nullable=False)
-    gps_lat = db.Column(db.Float, nullable=False)
-    gps_lng = db.Column(db.Float, nullable=False)
-    type = db.Column(db.Enum('chi_nhanh', 'cong_trinh', name='location_type'), nullable=False)
-
 class UsingHistoryData(db.Model):
     __tablename__ = 'using'
     id = db.Column(db.Integer, primary_key=True)
@@ -664,6 +520,7 @@ class LeadPayload(BaseModel):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(120), nullable=False)
     company = db.Column(db.String(120), nullable=False)
+    address = db.Column(db.String(255), nullable=False)
     email = db.Column(db.String(120), nullable=False)
     phone = db.Column(db.String(50), nullable=False)
     description = db.Column(db.Text)
@@ -672,9 +529,8 @@ class LeadPayload(BaseModel):
     balance_amount = db.Column(db.Float)
 
     expiredAt = db.Column(db.DateTime, default=datetime.datetime.utcnow)
-    # Quan hệ 1-n: một Lead có nhiều historyUsing
     history_using = db.relationship('UsingHistoryData', backref='lead', cascade='all, delete-orphan')
-
+    
     def __repr__(self):
         return f'<Lead {self.name}>'
     
@@ -694,27 +550,6 @@ class LeadPayload(BaseModel):
         db.session.add(item)
         db.session.commit()
         return item
-
-def parse_date(d):
-    # d có dạng {"$date": "2025-07-21T01:03:22.362Z"}
-    if isinstance(d, dict) and "$date" in d:
-        return datetime.datetime.fromisoformat(d["$date"].replace("Z", "+00:00"))
-    return None
-
+    
 def dateStr(tm):
     return datetime.datetime.strptime(tm, '%Y-%m-%d').date() if tm else None
-
-if __name__ == "__main__":
-    with app.app_context():
-        db.create_all()
-        # users = read_users_from_sqlite()
-        # update_users_to_postgres()
-        # update_users_to_postgres()
-
-    
-        # print_table_record_counts()
-
-    # alter_columns()
-    # transfer_data_to_postgres()
-
-    # show_collections()
