@@ -1009,33 +1009,73 @@ def parse_csv(path):
     import pandas as pd
     from datetime import datetime
     import csv
-
+    
     df = pd.read_csv('register.csv', quotechar='"', quoting=csv.QUOTE_MINIMAL)
     print(df.columns.tolist())
-    df.columns = df.columns.str.replace('\n', '').str.strip()
+    # df.columns = df.columns.str.replace('\n', '').str.strip()
     # createdAt,Company,Phone,Address,SoftUsed,Requirement,Col6,Rate,Email
+    df.columns = ['createdAt', 'Company', 'Phone', 'Address', 'SoftUsed', 'Requirement', 'Col6', 'Rate', 'Email']
     for idx, row in df.iterrows():
         createdAt = datetime.strptime(row['createdAt'], '%d/%m/%Y %H:%M:%S')
+        description = f"{row.get('SoftUsed', '')}#{row.get('Requirement', '')}#{row.get('Col6', '')}#{row.get('Rate', '')}"
+        
+
         lead = LeadPayload(
-            name = '',
+            name = '',  # hoặc lấy từ CSV nếu có
             company = row['Company'],
+            
             address = row['Address'],
             email = row['Email'],
-            phone = row['Phone'],  # đã loại bỏ \n
-            description = f"{row['SoftUsed']}#{row['Requirement']}#{row['Col6']}#{row['Rate']}",
-            industry = '',
+            phone = str(row['Phone']),
+            description = description,
+            industry = '',  # hoặc giá trị mặc định
             companySize = '',
-            balance_amount = 0,
+            balance_amount = 0,  # Nếu có cột tương ứng, xử lý kiểu dữ liệu phù hợp
+            expiredAt = None,
+            deletedAt = None,
             createdAt = createdAt,
-           
+            updatedAt = None,
+            
+            version = None,
             
         )
         print(lead.to_dict())
 
-        db.session.add(lead)
+       stmt = insert(LeadPayload)
+    with db.session() as session:
+        session.execute(stmt, values)
+        session.commit()
 
-    db.session.commit()
+def bulk_insert_from_df(df):
+    # Chuyển DataFrame thành list các dict tương ứng cột - giá trị
+    data = []
 
+    for idx, row in df.iterrows():
+        createdAt = datetime.strptime(row['createdAt'], '%d/%m/%Y %H:%M:%S')
+        description = f"{row.get('SoftUsed', '')}#{row.get('Requirement', '')}#{row.get('Col6', '')}#{row.get('Rate', '')}"
+
+        data.append({
+            'name': '',
+            'company': row['Company'],
+            'address': row['Address'],
+            'email': row['Email'],
+            'phone': str(row['Phone']),
+            'description': description,
+            'industry': '',
+            'companySize': '',
+            'balance_amount': 0,
+            'expiredAt': None,
+            'deletedAt': None,
+            'createdAt': createdAt,
+            'updatedAt': None,
+            'version': None,
+        })
+
+    stmt = insert(LeadPayload)
+
+    with db.session() as session:
+        session.execute(stmt, data)
+        session.commit()
 
 if __name__ == "__main__":
     with app.app_context():
