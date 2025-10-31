@@ -27,6 +27,7 @@ const JobAsset: React.FC<JobAssetProps> = ({ title, role, taskDetail }) => {
   const [assets, setAssets] = useState<string[]>(taskDetail?.assets ?? []);
   const [filteredAssets, setFilteredAssets] = useState<string[]>([]);
   const [thumbLoading, setThumbLoading] = useState(false);
+  
 
   console.log('JobAsset role:', role, 'title:', title);
 
@@ -84,7 +85,7 @@ const JobAsset: React.FC<JobAssetProps> = ({ title, role, taskDetail }) => {
       const result = await response.json();
       notification.success({ message: "Đã upload thành công!", description: result });
       console.log('success is image?',result.filename,isImageFile(result.filename));
-      setFilteredAssets(prev => prev ? [result.filename,...prev, ] : [result.filename]);
+      setFilteredAssets(prev => prev ? [...prev, result.filename] : [result.filename]);
       // setFilteredAssets(assets.filter(el => el && el.includes('#' + role)));
     } catch (err: any) {
       notification.error({ message: "Lỗi upload ảnh:", description: err.message });
@@ -126,7 +127,7 @@ const JobAsset: React.FC<JobAssetProps> = ({ title, role, taskDetail }) => {
         {filteredAssets.map((el, index) => (
           <Stack key={index} direction="column" alignItems="center" spacing={1}>
             {isImageFile(el) ? 
-              thumbLoading ? (
+              thumbLoading && index === filteredAssets.length - 1 ? (
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 100 }}>
             <CircularProgress size={24} /> {/* import từ @mui/material */}
           </div>
