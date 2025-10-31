@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify, abort
-from models import db, User, dateStr, app
+from models import db, User, dateStr, app,LeadPayload
 from flask import Flask, request, jsonify, session
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 import datetime
@@ -11,9 +11,11 @@ user_bp = Blueprint('user', __name__, url_prefix='/api/user')
 def get_users():
     page = request.args.get("page", 1, type=int)
     limit = request.args.get("limit", 10, type=int)
+    lead_id = request.args.get("lead", 0, type=int)
     search = request.args.get("search", "", type=str)
     
-    users, pagination = get_query_page_users(page,limit,search)
+    
+    users, pagination = get_query_page_users(lead_id,page,limit,search)
 
     return jsonify({
         "data": users,
@@ -26,11 +28,20 @@ def get_users():
         }
     })
 
-def get_query_page_users(page,limit,search):
-    query = User.query.filter(
+from collections import namedtuple
+
+def get_query_page_users(lead_id,page,limit,search):
+    lead = db.session.get(LeadPayload, lead_id)
+
+    if not lead:
+        Pagination = namedtuple('Pagination', ['total', 'pages'])
+        empty_pagination = Pagination(total=0, pages=0)
+        return [], empty_pagination
+
+    query = lead.users.filter(
         and_(
             User.role_id > 0,
-            User.role_id < 100
+            User.role_id < 100,
         )
     )
 
@@ -45,7 +56,7 @@ def get_query_page_users(page,limit,search):
     split_length = func.array_length(func.regexp_split_to_array(User.fullName, ' '), 1)
     last_name = func.split_part(User.fullName, ' ', split_length)
 
-    query = query.order_by(last_name, User.id)
+    query = query.order_by(desc(User.updatedAt)).order_by(last_name, User.id)
 
     pagination = query.paginate(page=page, per_page=limit, error_out=False)
     users = [c.to_dict() for c in pagination.items]

@@ -144,7 +144,7 @@ class User(BaseModel):
 
     workpoints = db.relationship('Workpoint', backref='user', lazy=True)
     lead_id = db.Column(db.Integer, db.ForeignKey('lead.id'))
-    lead = db.relationship('LeadPayload', backref='users')
+    lead = db.relationship('LeadPayload', backref=db.backref('users', lazy='dynamic'))
 
     def update_role(self):
         role = db.session.get(Role, self.role_id)

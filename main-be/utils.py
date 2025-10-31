@@ -1005,57 +1005,28 @@ def generate_salary(min_value=10_000_000, max_value=50_000_000, round_to=100_000
     rounded_salary = raw_salary - (raw_salary % round_to)
     return rounded_salary
 
+from sqlalchemy import insert
+from datetime import datetime
+
 def parse_csv(path):
     import pandas as pd
-    from datetime import datetime
     import csv
-    
-    df = pd.read_csv('register.csv', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-    print(df.columns.tolist())
-    # df.columns = df.columns.str.replace('\n', '').str.strip()
-    # createdAt,Company,Phone,Address,SoftUsed,Requirement,Col6,Rate,Email
+
+    df = pd.read_csv(path, quotechar='"', quoting=csv.QUOTE_MINIMAL)
     df.columns = ['createdAt', 'Company', 'Phone', 'Address', 'SoftUsed', 'Requirement', 'Col6', 'Rate', 'Email']
-    for idx, row in df.iterrows():
-        createdAt = datetime.strptime(row['createdAt'], '%d/%m/%Y %H:%M:%S')
-        description = f"{row.get('SoftUsed', '')}#{row.get('Requirement', '')}#{row.get('Col6', '')}#{row.get('Rate', '')}"
-        
 
-        lead = LeadPayload(
-            name = '',  # hoặc lấy từ CSV nếu có
-            company = row['Company'],
-            
-            address = row['Address'],
-            email = row['Email'],
-            phone = str(row['Phone']),
-            description = description,
-            industry = '',  # hoặc giá trị mặc định
-            companySize = '',
-            balance_amount = 0,  # Nếu có cột tương ứng, xử lý kiểu dữ liệu phù hợp
-            expiredAt = None,
-            deletedAt = None,
-            createdAt = createdAt,
-            updatedAt = None,
-            
-            version = None,
-            
-        )
-        print(lead.to_dict())
-
-       stmt = insert(LeadPayload)
     with db.session() as session:
-        session.execute(stmt, values)
+        session.query(LeadPayload).delete()  # Xoá trắng bảng trước khi chèn
         session.commit()
 
-def bulk_insert_from_df(df):
-    # Chuyển DataFrame thành list các dict tương ứng cột - giá trị
     data = []
 
-    for idx, row in df.iterrows():
+    for _, row in df.iterrows():
         createdAt = datetime.strptime(row['createdAt'], '%d/%m/%Y %H:%M:%S')
         description = f"{row.get('SoftUsed', '')}#{row.get('Requirement', '')}#{row.get('Col6', '')}#{row.get('Rate', '')}"
 
         data.append({
-            'name': '',
+            'name': '',  # Hoặc map từ CSV nếu có
             'company': row['Company'],
             'address': row['Address'],
             'email': row['Email'],
@@ -1081,6 +1052,16 @@ if __name__ == "__main__":
     with app.app_context():
         db.create_all()
         
-        parse_csv('register.csv')
+        # parse_csv('register.csv')
         # alter_data()
+
+        
+        # for user in User.query.all():
+        #     user.lead_id = 1
+
+        # db.session.commit()
+        lead = db.session.get(LeadPayload,1)
+        users = lead.users
+
+        print(len(users))
         

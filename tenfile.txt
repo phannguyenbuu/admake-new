@@ -1,0 +1,500 @@
+    3  cd ..
+    4  npm start
+    5  sudo ufw allow 3006
+    6  npm start
+    7  sudo apt update
+    8  sudo apt install nodejs
+    9  sudo apt install npm
+   10  npm install pm2 -g
+   11  pm2 -v
+   12  pm2 start npm --name "schoolcis" -- start
+   13  pm2 logs 0
+   14  sudo apt install nginx
+   15  sudo systemctl status nginx
+   16  sudo ufw allow 'Nginx Full'
+   17  sudo ufw reload
+   18  sudo apt install certbot python3-certbot-nginx
+   19  sudo certbot --nginx -d 3dmap.cis.edu.vn
+   20  sudo certbot renew --dry-run
+   21  sudo certbot --nginx -d 3dmap.sedbergh.edu.vn
+   22  cd /etc/letenscrypt
+   23  cd /etc/letsenscrypt
+   24  cd /etc/letsencrypt
+   25  cd live
+   26  ls
+   27  cd 3dmap.cis.edu.vn
+   28  ls
+   29  cd /var/www/
+   30  ls
+   31  mkdir /html
+   32  ls
+   33  mkdir 3dmap.cis.edu.vn/html
+   34  mkdir 3dmap.cis.edu.vn
+   35  cd 3dmap.cis.edu.vn
+   36  mkdir html
+   37  sudo chown -R $USER:$USER /var/www/3dmap.cis.edu.vn/html
+   38  sudo chmod -R 755 /var/www/3dmap.cis.edu.vn
+   39  echo '<html><body><h1>Welcome to 3dmap.cis.edu.vn!/h1></body></html>' | sudo tee /var/www/3dmap.cis.edu.vn/html/index.html
+   40  ls
+   41  cd html
+   42  ls
+   43  cd ..
+   44  mkdir 3dmap.sedbergh.edu.vn
+   45  cd 3dmap.sedbergh.edu.vn
+   46  mkdir html
+   47  echo '<html><body><h1>Welcome to 3dmap.sedbergh.edu.vn!/h1></body></html>' | sudo tee /var/www/3dmap.sedbergh.edu.vn/html/index.html
+   48  cd hmtl
+   49  cd html
+   50  ls
+   51  nano index.html
+   52  cd /etc/nginx
+   53  sudo nginx -t
+   54  grep -r "server_name 3dmap.cis.edu.vn" /etc/nginx/
+   55  cd site-enabled
+   56  cd sites-enabled
+   57  ls
+   58  rm -rf default
+   59  sodu nginx -t
+   60  sudo nginx -t
+   61  sudo systemctl restart nginx
+   62  cd /root/school
+   63  pm2 kill
+   64  options
+   65  cd..
+   66  cd ..
+   67  options
+   68  rm -rf ~/.pm2
+   69  cd school
+   70  env $(cat .env.dev3006) pm2 start npm --name "school3D" -- start
+   71  git pull origin main
+   72  env $(cat .env.dev3007) pm2 start npm --name "school3D-SEQ" -- start
+   73  pm2 logs 1
+   74  sudo nginx -t
+   75  sudo systemctl restart nginx
+   76  sudo nginx -t
+   77  sudo systemctl restart nginx
+   78  cd ..
+   79  python -m venv venv
+   80  python3 -m venv venv
+   81  apt install python3.12-venv
+   82  python3 -m venv venv
+   83  source venv/bin/activate
+   84  pip install Flask
+   85  cd school
+   86  cd src
+   87  cd admin
+   88  pm2 start app.py --name "school-Admin"
+   89  pm2 logs 2
+   90  sudo ufw allow 5006
+   91  cd ..
+   92  git pull origin main
+   93  sudo nginx -t
+   94  sudo systemctl restart nginx
+   95  git pull origin main
+   96  cd src
+   97  src admin
+   98  cd admin
+   99  ls
+  100  cd static
+  101  ls
+  102  cd images
+  103  ls
+  104  sudo nginx -t
+  105  sudo systemctl restart nginx
+  106  sudo nginx -t
+  107  sudo systemctl restart nginx
+  108  pm2 ls
+  109  pm2 logs 2
+  110  git pull origin main
+  111  pm2 logs 4
+  112  pm2 logs 2
+  113  cd ..
+  114  git pull origin main
+  115  pm2 logs 2
+  116  git pull origin main
+  117  sudo apt update
+  118  sudo apt upgrade
+  119  sudo apt install postgresql postgresql-contrib
+  120  sudo systemctl start postgresql
+  121  sudo systemctl status postgresql
+  122  psql -U postgres -d
+  123  psql -U postgres -
+  124  psql -U postgres 
+  125  psql -U postgres
+  126  nano /etc/postgresql/<version>/main/pg_hba.conf
+  127  cd /etc/postgresql
+  128  ls
+  129  cd 16
+  130  cd main
+  131  nano pg_hba.conf
+  132  not
+  133  sudo systemctl restart postgresql
+  134  sudo -u postgres psql
+  135  nano pg_hba.conf
+  136  sudo -u postgres psql
+  137  sudo systemctl restart postgresql
+  138  sudo -u postgres psql
+  139  pg_restore -U postgres -d admake_chat --clean /root/admake_chat_20251043_1.dump
+  140  sudo -u postgres createdb admake_chat
+  141  pg_restore -U postgres -d admake_chat --clean /root/admake_chat_20251043_1.dump
+  142  pg_restore -U postgres -d admake_chat /root/admake_chat_20251043_1.dump
+  143  sudo -u postgres psql
+  144  sudo -u postgres psql -d postgres
+  145  pg_restore -U postgres -d admake_chat /root/admake_chat_20251043_1.dump
+  146  sudo -u postgres psql -d postgres
+  147  sudo -u postgres psql -d admake_chat
+  148  cd /root/admake
+  149  cd quangcao_web
+  150  npm run dev
+  151  npm install vite
+  152  npm install vite --legacy-peer-deps
+  153  npm run dev
+  154  rm -rf node_modules
+  155  npm install --legacy-peer-deps
+  156  npm run dev
+  157  rm -rf node_modules
+  158  rm -rf package-lock.json
+  159  npm install --legacy-peer-deps
+  160  npm run dev
+  161  pm2 start npm --name "quangcao_web" -- run dev
+  162  cd ..
+  163  cd main-be
+  164  pm2 start app.py --name "main-be"
+  165  pm2 logs 4
+  166  pip install Flask-SQLAlchemy
+  167  pm2 logs 4
+  168  pm2 restart 4
+  169  pm2 logs 4
+  170  pip install flask-cors
+  171  pm2 restart 4
+  172  pm2 logs 4
+  173  pip install pytz
+  174  pm2 restart 4
+  175  pm2 logs 4
+  176  pip install psycopg2-binary
+  177  pm2 restart 4
+  178  pm2 logs 4
+  179  4|main-be  |   File "/root/admake/main-be/models.py", line 17, in <module>
+  180  pip install flask-jwt-extended
+  181  pm2 restart 4
+  182  pm2 logs 4
+  183  pip install python-dotenv
+  184  pm2 restart 4
+  185  pm2 logs 4
+  186  pip install flask-socketio
+  187  pm2 restart 4
+  188  pm2 logs 4
+  189  pip install flask-login
+  190  pm2 restart 4
+  191  pm2 logs 4
+  192  cd ..
+  193  git pull origin 
+  194  git pull origin main
+  195  git commit -m "K"
+  196  git add .
+  197  git commit -m "K"
+  198  git pull origin main
+  199  pm2 restart 4
+  200  pm2 logs 4
+  201  nano main-be/app.py
+  202  git pull origin main
+  203  git config --global pull.rebase true
+  204  git config pull.rebase false
+  205  git pull origin main
+  206  nano main-be/app.py
+  207  pm2 restart 4
+  208  pm2 logs 4
+  209  git pull origin main
+  210  git status
+  211  git add .
+  212  git pull origin main
+  213  git commit -m "KLL"
+  214  git config --global user.email phannguyenbuu@gmail.com
+  215  git commit -m "KLL"
+  216  git checkout main
+  217  git commit -m "KLL"
+  218  git pull origin main
+  219  sudo certbot certonly --manual --preferred-challenges=dns -d "admake.vn" -d "*.admake.vn"
+  220  sudo certbot certonly --manual --preferred-challenges=dns -d "archbox.pw" -d "*.archbox.pw"
+  221  sudo certbot certonly --manual --preferred-challenges=dns -d "archbox.pw" -d "*.archbox.pw"
+  222  sudo certbot certonly --manual --preferred-challenges=dns -d "archbox.pw" -d "*.archbox.pw"
+  223  sudo certbot certonly --manual --preferred-challenges=dns -d "archbox.pw" -d "*.archbox.pw"
+  224  cd /etc/nginx
+  225  cd sites-enbled
+  226  cd sites-enabled
+  227  ls
+  228  rm -rf admake.vn
+  229  ls
+  230  sudo nginx -t
+  231  sudo nginx -t
+  232  sudo systemctl restart nginx
+  233  pm2 ls
+  234  pm2 logs 3
+  235  pm2 logs 3
+  236  pm2 logs 4
+  237  sudo certbot certonly --manual --preferred-challenges=dns -d "admake.vn" -d "*.admake.vn"
+  238  sudo certbot certonly --manual --preferred-challenges=dns -d "admake.vn" -d "*.admake.vn"
+  239  sudo certbot certonly --manual --preferred-challenges=dns -d "admake.vn" -d "*.admake.vn"
+  240  sudo certbot certonly --manual --preferred-challenges=dns -d "admake.vn" -d "*.admake.vn"
+  241  sudo certbot certonly --manual --preferred-challenges=dns -d "admake.vn" -d "*.admake.vn"
+  242  sudo certbot certonly --manual --preferred-challenges=dns -d "admake.vn" -d "*.admake.vn"
+  243  sudo certbot certonly --manual --preferred-challenges=dns -d "admake.vn" -d "*.admake.vn"
+  244  rm -rf archbox.pw
+  245  rm -rf b-one.archbox.pw
+  246  ls
+  247  sudo nginx -t
+  248  sudo systemctl restart nginx
+  249  sudo ufw allow 5432
+  250  sudo netstat -tulnp | grep 5432
+  251  sudo systemctl status postgresql
+  252  nano /etc/postgresql/16/main/postgresql.conf
+  253  nano /etc/postgresql/16/main/pg_hba.conf
+  254  sudo systemctl restart postgresql
+  255  rm -rf b-one.admake.vn
+  256  sudo nginx -t
+  257  sudo systemctl restart postgresql
+  258  sudo systemctl restart nginx
+  259  ls
+  260  sudo nginx -t
+  261  sudo systemctl restart nginx
+  262  certificate
+  263  sudo tail -n 50 /var/log/nginx/error.log
+  264  cd /var/www
+  265  ls
+  266  mkdir admake.vn
+  267  cd admake.vn
+  268  mkdir html
+  269  cd hmtl
+  270  cd html
+  271  ls
+  272  sudo mkdir -p /var/www/admake.vn/html/.well-known/acme-challenge
+  273  sudo chown -R www-data:www-data /var/www/admake.vn/html/.well-known
+  274  sudo chmod -R 755 /var/www/admake.vn/html/.well-known
+  275  ls
+  276  ls
+  277  ls -a
+  278  cd .well-known
+  279  ls
+  280  sudo nginx -t
+  281  sudo systemctl restart nginx
+  282  sudo tail -n 50 /var/log/nginx/error.log
+  283  sudo ss -tulnp | grep 5170
+  284  sudo ufw allow 5170/tcp
+  285  sudo nginx -t
+  286  sudo systemctl restart nginx
+  287  sudo tail -n 50 /var/log/nginx/error.log
+  288  sudo ss -tulnp | grep 5170
+  289  sudo ss -tulnp | grep 5170
+  290  sudo nginx -t
+  291  sudo systemctl restart nginx
+  292  sudo tail -n 50 /var/log/nginx/error.log
+  293  sudo tail -n 50 /var/log/nginx/error.log
+  294  sudo ss -tulnp | grep 5007
+  295  sudo nginx -t
+  296  sudo systemctl restart nginx
+  297  sudo ufw allow 5007
+  298  sudo tail -n 50 /var/log/nginx/error.log
+  299  ls
+  300  sudo chown -R www-data:www-data /var/www/admake.vn/html/.well-known
+  301  sudo chmod -R 755 /var/www/admake.vn/html/.well-known
+  302  sudo nginx -t
+  303  sudo systemctl restart nginx
+  304  sudo tail -n 50 /var/log/nginx/error.log
+  305  sudo tail -n 50 /var/log/nginx/error.log
+  306  sudo tail -n 50 /var/log/nginx/access.log
+  307  sudo tail -n 50 /var/log/nginx/access.log
+  308  sudo nginx -t
+  309  sudo systemctl restart nginx
+  310  sudo tail -n 50 /var/log/nginx/access.log
+  311  sudo tail -n 50 /var/log/nginx/access.log
+  312  sudo tail -n 50 /var/log/nginx/access.log
+  313  sudo ln -s /etc/nginx/sites-available/bone.admake.vn.conf /etc/nginx/sites-enabled/
+  314  ls -l /etc/nginx/sites-enabled/
+  315  nano /etc/nginx/sites-enabled/bone.admake.vn.conf
+  316  nslookup bone.admake.vn
+  317  ping bone.admake.vn
+  318  cd /etc/nginx
+  319  cd sites-enabled
+  320  rm -rf bone.admake.vn
+  321  ls
+  322  rm -rf bone.admake.vn.conf
+  323  nslookup quanly.admake.vn
+  324  sudo nginx -t
+  325  nano /etc/nginx/sites-enabled/bone.admake.vn.conf
+  326  rm -rf bone.admake.vn.conf
+  327  sudo systemctl restart nginx
+  328  cd /root/admake
+  329  git pull origin main
+  330  git pull origin main
+  331  git pull origin main
+  332  pm2 logs 4
+  333  pm2 logs 4
+  334  cd school
+  335  cd /root/school
+  336  git pull origin main
+  337  pm2 logs 0
+  338  sudo tail -n 50 /var/log/nginx/error.log
+  339  sudo ss -tulpn | grep 5006
+  340  sudo nginx -t
+  341  sudo systemctl restart nginx
+  342  cd ..
+  343  cd admake
+  344  git pull origin main
+  345  cd landingpage
+  346  ls
+  347  git pull origin main
+  348  sudo nginx -t
+  349  sudo systemctl restart nginx
+  350  rm -rf main-be/__pycache__/models.cpython-312.pyc
+  351  git pull origin main
+  352  cd landing_page
+  353  ls
+  354  cd landingpage
+  355  npm install --legacy-peer-deps
+  356  npm run dev
+  357  pm2 start npm --name "admake landing page" -- start
+  358  pm2 logs 5
+  359  pm2 kill 5
+  360  pm2 delete 5
+  361  pm2 start npm --name "admake landing page" run dev
+  362  pm2 start npm --name "admake landing page" -- run dev
+  363  pm2 delete 6
+  364  pm2 logs 7
+  365  pm2 logs 0
+  366  pm2 logs 4
+  367  git pull origin main
+  368  cd admake
+  369  cd admake
+  370  git pull origin main
+  371  pm2 logs 4
+  372  pm2 logs 4
+  373  top
+  374  ps -p 30739 -o pid,cmd
+  375  ps -p 43629 -o pid,cmd
+  376  cd admake_chat
+  377  cd admak
+  378  cd admake
+  379  git pull orgion main
+  380  git pull origin main
+  381  git reset --hard HEAD
+  382  git pull origin main
+  383  pm2 logs 4
+  384  pm2 logs 4
+  385  pm2 logs 4
+  386  pm2 logs 4
+  387  cd main-be
+  388  ls
+  389  cd static
+  390  ls
+  391  git reset --hard HEAD
+  392  git pull origin main
+  393  cd ..
+  394  cd ..
+  395  git pull origin main
+  396  pm2 logs 4
+  397  git pull origin main
+  398  pm2 logs 4
+  399  pm2 logs 4
+  400  git pull origin main
+  401  pm2 logs 4
+  402  history > history_output.txt
+  403  cd admake
+  404  ls
+  405  pm2 ls
+  406  sudo systemctl restart nginx
+  407  git pull origin main
+  408  pm2 start npm --name "admake landing page" -- run dev
+  409  pm2 logs 0
+  410  npm install --legacy-peer-deps
+  411  cd landing_page
+  412  cd landingpage
+  413  pm2 delete 0
+  414  pm2 kill
+  415  pm2 start npm --name "admake landing page" -- run dev
+  416  pm2 logs 0
+  417  sudo ufw allow 3000
+  418  cd ..
+  419  cd ..
+  420  source venv/bin/activate
+  421  cd admake
+  422  cd main-be
+  423  pm2 start app.py --name "main-be"
+  424  pm2 logs 1
+  425  cd ..
+  426  cd ..
+  427  ls
+  428  ls
+  429  cd school
+  430  env $(cat .env.dev3006) pm2 start npm --name "school3D" -- start
+  431  pm2 logs 2
+  432  env $(cat .env.dev3007) pm2 start npm --name "school3D-SEQ" -- start
+  433  cd src/admin
+  434  pm2 start app.py --name "school-Admin"
+  435  pm2 logs 4
+  436  cd /root/admake/quangcao_web
+  437  pm2 start npm --name "quangcao_web" -- run dev
+  438  pm2 logs 5
+  439  pm2 logs 1
+  440  pm2 logs 1
+  441  pg_restore -U postgres -d admake_chat --clean /root/admake_chat_25_10_09_09_57.dump
+  442  psql -U postgres
+  443  pg_restore -U postgres -d admake_chat --clean /root/admake_chat_25_10_09_09_57.dump
+  444  psql -U postgres
+  445  psql -U admake_caht
+  446  psql -U admake_chat
+  447  psql -U postgres
+  448  pg_restore --clean --dbname=admake_chat admake_chat_25_10_09_09_57.dump
+  449  cd ..
+  450  cd ..
+  451  pg_restore --clean --dbname=admake_chat admake_chat_25_10_09_09_57.dump
+  452  pg_restore -U postgres --clean --dbname=admake_chat admake_chat_25_10_09_09_57.dump
+  453  pg_restore --clean --if-exists --dbname=admake_chat -U postgres admake_chat_25_10_09_09_57.dump
+  454  pm2 logs 1
+  455  pm2 logs 1
+  456  pm2 logs 1
+  457  pm2 logs 1
+  458  pm2 logs 1
+  459  pm2 logs 1
+  460  pm2 logs 1
+  461  git reset --hard HEAD
+  462  cd admake
+  463  git reset --hard HEAD
+  464  git pull origin main
+  465  pm2 logs 1
+  466  cd ..
+  467  pg_restore --clean --if-exists --dbname=admake_chat -U postgres admake_chat_25_10_09_17_27.dump
+  468  psql -U postgres
+  469  pg_restore --clean --if-exists --dbname=admake_chat -U postgres admake_chat_25_10_09_17_2.dump
+  470  pm2 logs 1
+  471  pm2 restart 1
+  472  pm2 logs 1
+  473  git reset --hard HEAD
+  474  git pull origin main
+  475  cd admake
+  476  git reset --hard HEAD
+  477  git pull origin main
+  478  pm2 logs 1
+  479  git reset --hard HEAD
+  480  git pull origin main
+  481  git reset --hard HEAD
+  482  rm -rf  main-be/__pycache__/models.cpython-312.pyc
+  483  git reset --hard HEAD
+  484  git pull origin main
+  485  rm -rf  main-be/api/supplier.py
+  486  git reset --hard HEAD
+  487  git pull origin main
+  488  pm2 logs 1
+  489  pm2 logs 1
+  490  psql -U admake_chat
+  491  psql -U postgres admake_chat
+  492  pm2 logs 1
+  493  cd ..
+  494  pg_restore --clean --if-exists --dbname=admake_chat -U postgres admake_chat_25_10_17_10_28.dump
+  495  pm2 logs 1
+  496  pg_restore --clean --if-exists --dbname=admake_chat -U postgres admake_chat_25_10_10_00_33.dump
+  497  pm2 logs 1
+  498  cd admake
+  499  git reset --hard HEAD
+  500  git pull origin main
+  501  pm2 ls
+  502  history > tenfile.txt
