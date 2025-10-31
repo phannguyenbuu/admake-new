@@ -13,8 +13,7 @@ def get_users():
     limit = request.args.get("limit", 10, type=int)
     lead_id = request.args.get("lead", 0, type=int)
     search = request.args.get("search", "", type=str)
-    
-    
+        
     users, pagination = get_query_page_users(lead_id,page,limit,search)
 
     return jsonify({
@@ -29,29 +28,34 @@ def get_users():
     })
 
 from collections import namedtuple
-
-def get_query_page_users(lead_id,page,limit,search):
-    lead = db.session.get(LeadPayload, lead_id)
-
-    if not lead:
-        Pagination = namedtuple('Pagination', ['total', 'pages'])
-        empty_pagination = Pagination(total=0, pages=0)
-        return [], empty_pagination
-
-    query = lead.users.filter(
-        and_(
-            User.role_id > 0,
-            User.role_id < 100,
+def get_query_page_users(lead_id, page, limit, search):
+    if lead_id != 0:
+        lead = db.session.get(LeadPayload, lead_id)
+        if not lead:
+            Pagination = namedtuple('Pagination', ['total', 'pages'])
+            empty_pagination = Pagination(total=0, pages=0)
+            return [], empty_pagination
+        
+        query = lead.users.filter(
+            and_(
+                User.role_id > 0,
+                User.role_id < 100,
+            )
         )
-    )
+    else:
+        # Lấy toàn bộ user khi lead_id == 0
+        query = User.query.filter(
+            and_(
+                User.role_id > 0,
+                User.role_id < 100,
+            )
+        )
 
     if search:
         query = query.filter(
             (User.username.ilike(f"%{search}%")) | 
             (User.fullName.ilike(f"%{search}%"))
         )
-    
-    query = query.order_by(desc(User.updatedAt))
 
     split_length = func.array_length(func.regexp_split_to_array(User.fullName, ' '), 1)
     last_name = func.split_part(User.fullName, ' ', split_length)

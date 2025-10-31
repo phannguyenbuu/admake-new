@@ -3,7 +3,7 @@ import { useState } from "react";
 import ModalCreateSpace from "../dashboard/work-tables/work-space/ModalCreateSpace";
 import { PlusOutlined } from "@ant-design/icons";
 import "./mobile-menu.css";
-import { useCheckPermission } from "../../common/hooks/checkPermission.hook";
+// import { useCheckPermission } from "../../common/hooks/checkPermission.hook";
 
 interface FooterMenuBarProps {
   mobileMenuItems: Array<{
@@ -27,7 +27,7 @@ export default function FooterMenuBar({
 }: FooterMenuBarProps) {
   const { pathname } = useLocation();
   const navigate = useNavigate();
-  const adminMode = useCheckPermission();
+  // const adminMode = useCheckPermission();
 
   // State cho mobile workspace modal
   const [showMobileWorkspaceModal, setShowMobileWorkspaceModal] =
@@ -167,7 +167,7 @@ export default function FooterMenuBar({
                   ))}
 
                   {/* Add new board button */}
-                  {adminMode && (
+                  {/* {adminMode && ( */}
                     <button
                       onClick={() => {
                         setShowMobileWorkspaceModal(false);
@@ -177,7 +177,7 @@ export default function FooterMenuBar({
                     >
                       <PlusOutlined /> Tạo bảng mới
                     </button>
-                  )}
+                  {/* )} */}
                 </div>
               )}
             </div>

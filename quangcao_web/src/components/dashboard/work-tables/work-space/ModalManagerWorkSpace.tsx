@@ -7,7 +7,7 @@ import {
 } from "@ant-design/icons";
 import type { WorkSpace } from "../../../../@types/work-space.type";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useCheckPermission } from "../../../../common/hooks/checkPermission.hook";
+// import { useCheckPermission } from "../../../../common/hooks/checkPermission.hook";
 import { useState, useCallback, useEffect } from "react";
 import ModalEditWorkSpace from "./ModalEditWorkSpace";
 import ModalDeleteWorkSpace from "./ModalDeleteWorkSpace";
@@ -29,7 +29,7 @@ export default function ModalManagerWorkSpace({
   setIsOpenModalCreateSpace,
   onRefresh,
 }: ModalManagerWorkSpaceProps) {
-  const adminMode = useCheckPermission();
+  // const adminMode = useCheckPermission();
   const { pathname } = useLocation();
   const navigate = useNavigate();
 
@@ -264,7 +264,7 @@ export default function ModalManagerWorkSpace({
                     </div>
 
                     {/* Action Buttons - chỉ hiện khi là admin */}
-                    {adminMode && (
+                    
                       <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                         <Button
                           type="text"
@@ -296,7 +296,7 @@ export default function ModalManagerWorkSpace({
                           <span className="text-xs font-medium">Xóa</span>
                         </Button>
                       </div>
-                    )}
+                    
 
                     {/* Enhanced Arrow indicator */}
                     <div

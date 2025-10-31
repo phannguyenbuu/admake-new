@@ -15,5 +15,6 @@ export type BaseEntity = {
 export type PaginationDto = {
   page: number;
   limit: number;
+  lead: number;
   search: string;
 };

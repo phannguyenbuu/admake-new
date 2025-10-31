@@ -303,7 +303,7 @@ export function getMainMenuItems(pathname?: string): MenuItem[] {
     pathname = pathname.slice(0, -1);
   }
 
-  const userPermissions = user?.role.permissions || [];
+  // const userPermissions = user?.role.permissions || [];
 
   const loop = (routes: Array<TRoute | undefined>): MenuItem[] => {
     return routes.reduce((acc: MenuItem[], route) => {

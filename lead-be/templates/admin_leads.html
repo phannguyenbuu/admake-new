@@ -22,6 +22,7 @@
                     </th>
                     <th>ID</th>
                     <th style="width:200px">Họ và tên</th>
+                    <th style="width:200px">Username</th>
                     <th style="width:200px">Công ty</th>
                     
                     <th>Liên hệ</th>
@@ -41,6 +42,10 @@
                     </td>
                     <td>{{ lead.id }}</td>
                     <td>{{ lead.name }}</td>
+                    <td>
+                        <p>{{ lead.username }}</p>
+                        <p style="font-size:10px">{{ lead.password }}</p>
+                    </td>
                     <td>
                         <p>{{ lead.company }}</p>
                         <p style="font-size:10px">{{ lead.companySize }}</p>

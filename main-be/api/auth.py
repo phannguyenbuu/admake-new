@@ -38,9 +38,13 @@ def login():
             print('Start login')
             login_user(user)  # tạo session cho user
             session.permanent = True
+
+            additional_claims = {"lead_id": user.lead_id}
+            access_token = create_access_token(identity=str(user.id), additional_claims=additional_claims, expires_delta=datetime.timedelta(days=15))
+
             
-            access_token = create_access_token(identity={'user_id':user.id, 'lead_id': user.lead_id}, 
-                                               expires_delta=datetime.timedelta(days=15))
+            # access_token = create_access_token(identity={'user_id':user.id, 'lead_id': user.lead_id}, 
+            #                                    expires_delta=datetime.timedelta(days=15))
 
             result = {
                     'access_token': access_token,
@@ -73,22 +77,27 @@ def auth_status():
 @auth_bp.route('/me', methods=['GET'])
 @jwt_required()
 def me():
+    from flask_jwt_extended import get_jwt
     current_user_id = get_jwt_identity()
-    app.logger.debug(f"JWT identity extracted: {current_user_id}")
+
+    print(f"JWT identity extracted: {current_user_id}")
 
     user = User.query.get(current_user_id)
     if not user:
-        app.logger.warning(f"User {current_user_id} not found in database.")
+        print(f"User {current_user_id} not found in database.")
         return jsonify({'error': 'User not found'}), 404
 
-    app.logger.info(f"User found: {user.username} (ID: {user.id})")
+    claims = get_jwt()  # trả về dictionary các claims trong token
+    lead_id = claims.get('lead_id')
+
+    print(f"User found: {user.username} (ID: {user.id})")
     return jsonify({
         'userId': user.id,
         'username': user.username,
         'role_id': user.role_id,
         "role": user.update_role(),
         'icon': user.icon,
-        'lead_id': user.lead_id
+        'lead_id': lead_id
     })
 
 

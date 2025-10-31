@@ -904,7 +904,9 @@ FOREIGN KEY (user_id) REFERENCES "user"(id);
 
 def alter_data():
     # for table in ['material','user','role','workspace','task','message','workpoint','leave']:
-    db.session.execute(text(f'''ALTER TABLE "lead" ADD COLUMN address VARCHAR(255);'''))
+    db.session.execute(text(f'''ALTER TABLE "lead" ADD COLUMN "fullName" VARCHAR(120);'''))
+    db.session.execute(text(f'''ALTER TABLE "lead" ADD COLUMN username VARCHAR(50);'''))
+    db.session.execute(text(f'''ALTER TABLE "lead" ADD COLUMN password VARCHAR(50);'''))
     db.session.commit()
 
 def delete_customer_user():
@@ -1060,8 +1062,32 @@ if __name__ == "__main__":
         #     user.lead_id = 1
 
         # db.session.commit()
-        lead = db.session.get(LeadPayload,1)
-        users = lead.users
+        # lead = db.session.get(LeadPayload,1)
+        # users = lead.users
 
-        print(len(users))
+        # print(len(users))
+
+
+
+        
+
+        # for lead in LeadPayload.query.all():
+        #     user = User.create_item({
+        #         "username": lead.username,
+        #         "fullName": lead.company,
+        #         "companyName": lead.company,
+        #         "address": lead.address,
+        #         "lead_id": lead.id,
+        #         "password": lead.password,
+        #         "role": "2"
+        #     })
+
+
+        #     db.session.add(user)
+        
+        # db.session.commit()
+
+        users = User.query.filter(User.lead_id == 139).all()
+        for user in users:
+            print(user.username, user.fullName)
         

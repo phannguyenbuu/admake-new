@@ -9,15 +9,19 @@ import TableComponent from "../../../components/table/TableComponent";
 import { EditOutlined } from "@ant-design/icons";
 import { columnsUser } from "../../../common/data";
 import { useDebounce } from "../../../common/hooks/useDebounce";
+import { useUser } from "../../../common/hooks/useUser";
 
 export const UserDashboard: IPage["Component"] = () => {
   const [config, setConfig] = useState({
     openCreate: false,
     openUpdate: false,
   });
+
+  const {userId, username, userRoleId, userRole, userLeadId } = useUser();
   const [query, setQuery] = useState<Partial<PaginationDto>>({
     page: 1,
     limit: 10,
+    lead: userLeadId,
     search: "",
   });
   const [isRefetching, setIsRefetching] = useState(false);

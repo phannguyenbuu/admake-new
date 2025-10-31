@@ -16,7 +16,7 @@ import {
 import { message, Menu } from "antd";
 import type { WorkSpace } from "../../@types/work-space.type";
 import "./mobile-menu.css";
-import { useCheckPermission } from "../../common/hooks/checkPermission.hook";
+// import { useCheckPermission } from "../../common/hooks/checkPermission.hook";
 import ModalManagerWorkSpace from "../dashboard/work-tables/work-space/ModalManagerWorkSpace";
 
 // Hook để theo dõi kích thước màn hình

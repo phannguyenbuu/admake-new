@@ -22,6 +22,7 @@ import type { Role } from "../../../@types/role.type";
 import type { User } from '../../../@types/user.type';
 import { InputNumber } from "antd";
 import { useApiHost } from "../../../common/hooks/useApiHost";
+import { useUser } from "../../../common/hooks/useUser";
 
 export default function FormUser({
   onCancel,
@@ -39,6 +40,7 @@ export default function FormUser({
   const { mutate: updateUser, isPending: isUpdating } = useUpdateUser();
   const { data: settings } = useSettingQuery();
   const { data: roles } = useRoleQuery();
+  const {userLeadId} = useUser();
 
   const [width, setWidth] = useState(0);
 
@@ -86,6 +88,7 @@ export default function FormUser({
   useEffect(() => {
     if (user) {
       form.setFieldsValue({
+        lead_id: userLeadId,
         fullName: user.fullName,
         phone: user.phone,
         username: user.username,
@@ -103,6 +106,8 @@ export default function FormUser({
 
         // Thêm các field khác nếu có trong form
       });
+
+      
     } else {
       form.resetFields();
     }
@@ -147,7 +152,7 @@ export default function FormUser({
       
       if(isSupplier && key === "role_id")
         value = 101;
-      console.log("Key data", isSupplier, key, value);
+      // console.log("Key data", isSupplier, key, value);
       if (key === 'avatar' && file) {
         formData.append(key, file);
       } else if (value !== undefined && value !== null) {
@@ -160,6 +165,7 @@ export default function FormUser({
       formData.append("password", values.password);
     }
 
+    formData.append('lead_id', userLeadId.toString());
     console.log("Create User", formData);
 
     // Các thao tác gọi API create/update

@@ -70,7 +70,14 @@ class LeadPayload(BaseModel):
     __tablename__ = 'lead'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(120), nullable=False)
+
+    fullName = db.Column(db.String(120), nullable=False)
+    username = db.Column(db.String(50), nullable=False)
+    password = db.Column(db.String(50), nullable=False)
+    
+    
     company = db.Column(db.String(120), nullable=False)
+    address = db.Column(db.String(255), nullable=False)
     email = db.Column(db.String(120), nullable=False)
     phone = db.Column(db.String(50), nullable=False)
     description = db.Column(db.Text)
@@ -78,6 +85,7 @@ class LeadPayload(BaseModel):
     companySize = db.Column(db.String(50), nullable=False)
     expiredAt = db.Column(db.DateTime, default=datetime.datetime.utcnow)
     balance_amount = db.Column(db.Float)
+
 
     # Quan hệ 1-n: một Lead có nhiều historyUsing
     history_using = db.relationship('UsingHistoryData', backref='lead', cascade='all, delete-orphan')

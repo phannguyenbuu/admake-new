@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, useEffect, useRef } from 'r
 import { useApiHost } from './useApiHost';
 import type { Role } from '../../@types/role.type';
 import WebFont from 'webfontloader';
-import { message, notification } from 'antd';
+import { notification } from 'antd';
 
 interface UserContextProps {
   userId: string | null;
@@ -10,7 +10,7 @@ interface UserContextProps {
   userRoleId: number;
   userRole: Role | null;
   userIcon: string | null;
-  userLeadId: number | null;
+  userLeadId: number;
   login: (credentials: { username: string; password: string }) => Promise<void>;
   logout: () => Promise<void>;
   checkAuthStatus: () => Promise<void>;
@@ -27,7 +27,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
   }, []);
 
-  const [userLeadId, setUserLeadId] = useState<number | null>(null);
+  const [userLeadId, setUserLeadId] = useState<number>(0);
   const [userId, setUserId] = useState<string | null>(null);
   const [username, setUsername] = useState<string | null>(null);
   const [userRoleId, setUserRoleId] = useState<number>(0);
@@ -122,7 +122,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setUserRoleId(0);
     setUserRole(null);
     setUserIcon(null);
-    setUserLeadId(null);
+    setUserLeadId(0);
 
     isLoggingOutRef.current = false;
     window.location.href = '/login';
@@ -140,6 +140,9 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
       return;
     }
+
+    console.log("Sending token:", accessToken);
+
 
     try {
       const res = await fetch(`${API_HOST}/auth/me`, {
@@ -168,7 +171,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setUserRoleId(0);
         setUserRole(null);
         setUserIcon(null);
-        setUserLeadId(null);
+        setUserLeadId(0);
       }
     } catch (error) {
       console.error("Failed to check auth status:", error);
