@@ -16,6 +16,7 @@ import WorkDays, {QRColumn} from "../app/dashboard/workpoints/WorkDays";
 import type { Workpoint, WorkDaysProps } from "../@types/workpoint";
 import type { ColumnsType } from "antd/es/table";
 import StatisticsMonthDays from "../app/dashboard/workpoints/StatisticsMonthDays";
+import type { WorkSpace } from "../@types/work-space.type";
 
 export const columnsMaterial = [
   {
@@ -86,7 +87,7 @@ export const columnsCustomer = [
     dataIndex: "name",
     key: "name",
     width: 200,
-     render: (text: string, record: User) => (
+     render: (text: string, record: WorkSpace) => (
       <div>
         <div>{text}</div>
         <span className="!text-cyan-700" style={{fontSize:12,fontStyle:'italic'}}>{record?.user_fullName}</span>

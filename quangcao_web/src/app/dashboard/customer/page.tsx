@@ -10,6 +10,7 @@ import FormCustomer from "../../../components/dashboard/customer-managerment/For
 import { useDebounce } from "../../../common/hooks/useDebounce";
 import { notification } from "antd";
 import { useApiHost } from "../../../common/hooks/useApiHost";
+import type { WorkSpace } from "../../../@types/work-space.type";
 export const CustomerDashboard: IPage["Component"] = () => {
   const [query, setQuery] = useState<Partial<PaginationDto>>({
     page: 1,
@@ -44,7 +45,7 @@ export const CustomerDashboard: IPage["Component"] = () => {
 }, [error]);
   
 
-  const [customer, setCustomer] = useState<Customer | null>(null);
+  const [customer, setCustomer] = useState<WorkSpace | null>(null);
 
   useEffect(() => {
     
@@ -63,45 +64,28 @@ export const CustomerDashboard: IPage["Component"] = () => {
     setQuery({ ...query, search: searchValue, page: 1 });
   };
 
-  const deleteCustomer = async (customerId:string) => {
-    console.log('Id', customerId);
-  try {
-    const response = await fetch(`${useApiHost()}/customer/${customerId}`, {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    });
-
-    if (response.status === 204) {
-      // Không có body JSON, xử lý thành công ở đây
-      notification.error({message:'Xóa thành công khách hàng!'});
-      
-    } else if (response.ok) {
-      // Nếu có JSON trả về, parse JSON
-      const data = await response.json();
-      console.log('Response data:', data);
-    } else {
-      // Lỗi từ server
-      const errorData = await response.json().catch(() => ({}));
-      console.error('Error:', errorData);
-    }
-
-    
-    // Thực hiện refresh list hoặc cập nhật UI nếu cần
-  } catch (error) {
-    notification.error({message:'Network error: ' + error?.message});
-  }
-};
 
 const handleDeleteCustomer = () => {
-  if(!customer || !customer.id) 
-  {
-    notification.error({message:"Null customer"});
-    return;
+    if (!customer || !customer.owner_id) return;
+
+    fetch(`${useApiHost()}/workspace/${customer.id}`, {
+      method: 'DELETE',
+    })
+      .then((response) => {
+        if (!response.ok) {
+          notification.error({message:`Không xóa được khách hàng`});
+        }
+        return response.json();
+      })
+      .then(() => {
+        notification.success({message:`Xóa khách hàng ${customer.name} thành công`});
+        refetch();
+      })
+      .catch((error) => {
+        notification.error({message:`Delete error: ${error}`});
+      });
   }
-  deleteCustomer(customer.id);
-}
+
 
 
   return (
@@ -112,7 +96,7 @@ const handleDeleteCustomer = () => {
         title="Thêm khách hàng"
         onSearch={handleSearch}
       />
-      <TableComponent<Customer>
+      <TableComponent<WorkSpace>
         columns={columnsCustomer}
         dataSource={customers?.data}
         loading={isLoading}
@@ -160,7 +144,7 @@ const handleDeleteCustomer = () => {
         onDelete={handleDeleteCustomer}
         onCancel={toggle("openUpdate")}
         open={config.openUpdate}
-        initialValues={customer as Customer}
+        initialValues={customer as WorkSpace}
         onRefresh={refetch}
       />
     </div>

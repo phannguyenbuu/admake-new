@@ -25,13 +25,14 @@ import {
   useUpdateCustomer,
 } from "../../../common/hooks/customer.hook";
 import { statusOptions } from "../../../common/utils/helpEnum.util";
+import { WorkSpace } from "../../../@types/work-space.type";
 
 const { Title, Text } = Typography;
 
 interface FormCustomerProps {
-  onDelete: () => void | null;
+  onDelete?: () => void | null;
   onCancel: () => void;
-  initialValues?: Customer;
+  initialValues?: WorkSpace;
   open: boolean;
   onRefresh: () => void;
 }
@@ -56,8 +57,8 @@ export default function FormCustomer({
     if (initialValues) {
       form.setFieldsValue({
         ...initialValues,
-        workStart: dayjs(initialValues.workStart),
-        workEnd: dayjs(initialValues.workEnd),
+        // workStart: dayjs(initialValues.workStart),
+        // workEnd: dayjs(initialValues.workEnd),
       });
     } else {
       form.resetFields();

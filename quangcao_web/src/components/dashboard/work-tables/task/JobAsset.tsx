@@ -6,21 +6,34 @@ import type { Task } from "../../../../@types/work-space.type";
 import { useApiHost, useApiStatic } from "../../../../common/hooks/useApiHost";
 import { notification } from "antd";
 import DescriptionIcon from "@mui/icons-material/Description"; // icon tài liệu
+import { CircularProgress } from '@mui/material';
+
 
 const isImageFile = (filename: string) => {
   // console.log('f',filename);
   if (!filename) return false;
-  const ext = filename.split('.').pop()?.toLowerCase();
+  const ext = filename.split('#')[0].split('.').pop()?.toLowerCase();
   return ext === "jpg" || ext === "jpeg" || ext === "png" || ext === "gif" || ext === "bmp" || ext === "webp";
 };
 
 interface JobAssetProps {
-  taskDetail: Task | null;
+  title?: string;
+  role?: string; // là ứng tiền hay hình ảnh tham khảo công trình
+  taskDetail?: Task;
 }
 
-const JobAsset: React.FC<JobAssetProps> = ({ taskDetail }) => {
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+const JobAsset: React.FC<JobAssetProps> = ({ title, role, taskDetail }) => {
+  // const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [assets, setAssets] = useState<string[]>(taskDetail?.assets ?? []);
+  const [filteredAssets, setFilteredAssets] = useState<string[]>([]);
+  const [thumbLoading, setThumbLoading] = useState(false);
+
+  console.log('JobAsset role:', role, 'title:', title);
+
+  useEffect(()=>{
+    if(!assets) return;
+    setFilteredAssets(assets.filter(el => el && el.includes('#' + role)));
+  },[assets, role]);
 
   const formatDate = (date: Date): string => {
     const pad = (n: number) => (n < 10 ? "0" + n : n);
@@ -38,19 +51,27 @@ const JobAsset: React.FC<JobAssetProps> = ({ taskDetail }) => {
   useEffect(()=>{
     if(!taskDetail) return;
     setAssets(taskDetail?.assets);
+    console.log('JobAsset taskdetail:', role, 'title:', title);
+    // setSelectedFile(null);
   },[taskDetail]);
 
-  const handleSend = async (file: File) => {
+  
+  // useEffect(() => {
     
+  // }, [taskDetail]);
 
+  const handleSend = async (file: File) => {
+    setThumbLoading(true);
     const now = new Date();
     const dateTimeStr = formatDate(now);
 
     const formData = new FormData();
     formData.append("time", dateTimeStr);
-    formData.append("role", "task");
+    formData.append("role", role || '');
     formData.append("file", file);
     formData.append("user_id", taskDetail?.id.toString() ?? '');
+
+    console.log('Upload', role, Object.fromEntries(formData.entries()));
 
     try {
       const response = await fetch(`${useApiHost()}/task/${taskDetail?.id}/upload`, {
@@ -61,11 +82,14 @@ const JobAsset: React.FC<JobAssetProps> = ({ taskDetail }) => {
       if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
 
       const result = await response.json();
-      notification.success({ message: "Đã upload thành công!", description: result.filename });
-
-      setAssets(prev => prev ? [...prev, result.filename] : [result.filename]);
+      notification.success({ message: "Đã upload thành công!", description: result });
+      console.log('success is image?',result.filename,isImageFile(result.filename));
+      setFilteredAssets(prev => prev ? [result.filename,...prev, ] : [result.filename]);
+      // setFilteredAssets(assets.filter(el => el && el.includes('#' + role)));
     } catch (err: any) {
       notification.error({ message: "Lỗi upload ảnh:", description: err.message });
+    } finally {
+      setThumbLoading(false);
     }
   };
 
@@ -74,14 +98,13 @@ const JobAsset: React.FC<JobAssetProps> = ({ taskDetail }) => {
 
     if (e.target.files && e.target.files.length > 0) {
       const file = e.target.files[0];
-      setSelectedFile(file);
+      // setSelectedFile(file);
       handleSend(file);
     }
   };
 
-  useEffect(() => {
-    setSelectedFile(null);
-  }, [taskDetail]);
+
+  
 
   return (
     <div className="bg-gray-50 rounded-lg border border-gray-200 shadow-sm p-3 sm:p-4 mb-3 sm:mb-4 hover:shadow-md transition-all duration-300">
@@ -90,42 +113,52 @@ const JobAsset: React.FC<JobAssetProps> = ({ taskDetail }) => {
           <ProjectOutlined className="!text-cyan-600 !text-xs sm:!text-sm" />
         </div>
         <Typography className="!text-gray-800 !text-sm sm:!text-base" fontWeight="bold">
-          Tài liệu
+          {title}
         </Typography>
       </div>
       <Stack direction="row" spacing={1}>
-        <Stack direction="row" spacing={1}>
-        {
-          assets && assets.map((el, index) => (
-            <Stack key={index} direction="column" alignItems="center" spacing={1}>
-              {isImageFile(el) ? (
-                <a href={`${useApiStatic()}/${el}`} target="_blank" rel="noreferrer">
-              
+        <Stack
+        direction="row"
+        spacing={1}
+        useFlexGap
+        sx={{ flexWrap: 'wrap', overflow: 'hidden' }} // Thêm thuộc tính flexWrap để xuống dòng
+      >
+        {filteredAssets.map((el, index) => (
+          <Stack key={index} direction="column" alignItems="center" spacing={1}>
+            {isImageFile(el) ? 
+              thumbLoading ? (
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 100 }}>
+            <CircularProgress size={24} /> {/* import từ @mui/material */}
+          </div>
+        ) : (
+              <a href={`${useApiStatic()}/${el.split('#')[0]}`} target="_blank" rel="noreferrer">
                 <img
-                  src={`${useApiStatic()}/${el}`}
+                  src={`${useApiStatic()}/${el.split('#')[0]}`}
                   alt={`asset-${index}`}
                   style={{ maxWidth: 100, maxHeight: 100, borderRadius: 4 }}
                 />
-                </a>
-              ) : (
-                <DescriptionIcon fontSize="large" />
-              )}
-              <Typography fontSize={12} sx={{ maxWidth: 100, wordBreak: 'break-word' }}>
-                {el}
-              </Typography>
-            </Stack>
-          ))
-        }
+              </a>
+            ) : (
+              <DescriptionIcon fontSize="large" />
+            )}
+            <Typography fontSize={12} sx={{ maxWidth: 100, wordBreak: 'break-word' }}>
+              {el}
+            </Typography>
+          </Stack>
+        ))
+      }
+
         </Stack>
 
         <input
+          key={`file-change-${role}`}
           accept="image/*"
           style={{ display: "none" }}
-          id="upload-image-file"
+          id={`upload-image-file-${role}`}
           type="file"
           onChange={handleFileChange}
         />
-        <label htmlFor="upload-image-file">
+        <label htmlFor={`upload-image-file-${role}`}>
           <IconButton
             color="primary"
             component="span"

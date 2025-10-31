@@ -96,8 +96,8 @@ export default function AllManagementModal() {
           sx={{
             width: 120,
             height: 25,
-            top: 2,
-            padding: 1,
+            top: 0,
+            padding: 1.8,
             position: "relative",
             borderRadius: 10,
             backgroundColor: isHover ? "rgba(255,255,255,0.5)" : "#00B4B5",

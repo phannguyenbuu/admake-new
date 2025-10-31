@@ -39,7 +39,7 @@ export interface WorkSpace {
   
   users: UserSearchProps[],
   customers: UserSearchProps[]
-
+  user_fullName: string;
   // id: number,
   // members: number,
   owner_id: string;

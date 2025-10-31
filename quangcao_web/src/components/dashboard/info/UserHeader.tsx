@@ -107,7 +107,3 @@ export const UserHeader: React.FC<UserHeaderProps> = ({ info, onRefetch }) => {
             {info?.role?.name || "Chưa cập nhật"}
           </p>
         </div>
-      </div>
-    </div>
-  );
-};

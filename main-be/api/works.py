@@ -181,6 +181,7 @@ def delete_workspace(workspace_id):
     if owner:
         for customer in owner.customer:
             db.session.delete(customer)
+        db.session.query(Message).filter(Message.user_id == owner.id).delete()
         db.session.delete(owner)
 
     db.session.delete(workspace)

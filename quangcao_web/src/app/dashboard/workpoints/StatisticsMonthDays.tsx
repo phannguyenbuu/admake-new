@@ -142,37 +142,37 @@ const StatisticsMonthDays: React.FC<StatisticsMonthDaysProps> = ({ selectedRecor
                 <TableRow>
                   <TableCell style={{fontWeight:700}}>Nội dung</TableCell>
                   <TableCell style={{fontWeight:700}}>Giá trị</TableCell>
-                  <TableCell style={{fontWeight:700}}>Lương giờ/VND</TableCell>
+                  <TableCell style={{fontWeight:700}}>Lương giờ</TableCell>
                   <TableCell style={{fontWeight:700}}>Nhân hệ số</TableCell>
-                  <TableCell style={{fontWeight:700}}>Thành tiền/VND</TableCell>
+                  <TableCell style={{fontWeight:700}}>Thành tiền</TableCell>
                 </TableRow>
                 <TableRow>
                   <TableCell>Tổng giờ làm trong tháng</TableCell>
                   <TableCell>{timeWork.toFixed(3)}</TableCell>
-                  <TableCell>{formatMoney(salaryUnit)}</TableCell>
+                  <TableCell>{formatMoney(salaryUnit)} ₫</TableCell>
                   <TableCell>1.0</TableCell>
-                  <TableCell>{formatMoney(salaryUnit * 1 * timeWork)}</TableCell>
+                  <TableCell>{formatMoney(salaryUnit * 1 * timeWork)} ₫</TableCell>
                 </TableRow>
                 <TableRow>
                   <TableCell>Tổng giờ tăng ca trong tháng</TableCell>
                   <TableCell>{overTimeWork.toFixed(3)}</TableCell>
-                  <TableCell>{formatMoney(salaryUnit)}</TableCell>
+                  <TableCell>{formatMoney(salaryUnit)} ₫</TableCell>
                   <TableCell>{OVERTIME_RATIO}</TableCell>
-                  <TableCell>{formatMoney(salaryUnit * OVERTIME_RATIO * overTimeWork)}</TableCell>
+                  <TableCell>{formatMoney(salaryUnit * OVERTIME_RATIO * overTimeWork)} ₫</TableCell>
                 </TableRow>
                 <TableRow>
                   <TableCell>Thưởng theo việc</TableCell>
-                  <TableCell>{bonusSalary}</TableCell>
+                  <TableCell>{formatMoney(bonusSalary)} ₫</TableCell>
                   <TableCell>-</TableCell>
                   <TableCell>-</TableCell>
-                  <TableCell>{bonusSalary}</TableCell>
+                  <TableCell>{formatMoney(bonusSalary)} ₫</TableCell>
                 </TableRow>
                 <TableRow>
                   <TableCell style={{fontWeight:700}}>Tổng lương</TableCell>
                   <TableCell>-</TableCell>
                   <TableCell>-</TableCell>
                   <TableCell>-</TableCell>
-                  <TableCell>{formatMoney(salaryUnit * 1 * timeWork + salaryUnit * 1.5 * overTimeWork + bonusSalary)}</TableCell>
+                  <TableCell>{formatMoney(salaryUnit * 1 * timeWork + salaryUnit * 1.5 * overTimeWork + bonusSalary)} ₫</TableCell>
                 </TableRow>
               </TableBody>
             </Table>

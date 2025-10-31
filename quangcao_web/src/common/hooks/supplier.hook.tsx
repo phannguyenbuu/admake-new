@@ -5,6 +5,7 @@ import type { User } from "../../@types/user.type";
 
 export const USER_QUERY_KEY = "supplier/queryPagination";
 export const USER_DETAIL_QUERY_KEY = "supplier/queryDetail";
+
 export function useSupplierQuery(dto: Partial<PaginationDto> = {}) {
   return useQuery({
     queryKey: [USER_QUERY_KEY, dto],

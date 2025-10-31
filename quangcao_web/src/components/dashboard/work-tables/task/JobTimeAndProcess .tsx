@@ -5,10 +5,13 @@ import { CalendarOutlined, ConsoleSqlOutlined } from "@ant-design/icons";
 import dayjs, { Dayjs } from "dayjs";
 import utc from 'dayjs/plugin/utc';
 import timezone from "dayjs/plugin/timezone";
-dayjs.extend(utc);
-dayjs.extend(timezone);
+
 import type { Mode, UserSearchProps } from "../../../../@types/work-space.type";
 import type { Task } from "../../../../@types/work-space.type";
+import JobAsset from "./JobAsset";
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 const { Text } = Typography;
 
@@ -19,7 +22,7 @@ interface TimeType {
 
 interface JobTimeAndProcessProps {
   form: any;
-  taskDetail: Task | null;
+  taskDetail?: Task;
 }
 
 const JobTimeAndProcess: React.FC<JobTimeAndProcessProps> = ({taskDetail, form}) => {
@@ -214,8 +217,8 @@ const JobTimeAndProcess: React.FC<JobTimeAndProcessProps> = ({taskDetail, form})
               Tiền công: {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND', maximumFractionDigits: 0 }).format(taskDetail?.reward || 0)} ({taskDetail?.type === 'MONTHLY' ?'Lương tháng':'Công khoán' })
             </Typography>
           </>}
-        
-      </Stack>
+      <JobAsset key="cash-assets" title = 'Ứng tiền' taskDetail={taskDetail} role="cash"/>
+    </Stack>
   );
 };
 
@@ -230,7 +233,7 @@ export function DateFormPicker({
   form,
   onChange
 }: {
-  taskDetail:Task | null,
+  taskDetail?:Task,
   mode: string;
   title: string;
   timeValue: Dayjs | null;

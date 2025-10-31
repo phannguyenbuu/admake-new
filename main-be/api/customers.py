@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify, abort
-from models import db, Workspace, dateStr, User, generate_datetime_id, Customer
+from models import db, Workspace, dateStr, User, generate_datetime_id, Customer, Message
 from api.groups import create_group
 import datetime
 from sqlalchemy import desc
@@ -132,13 +132,19 @@ def delete_customer(id):
     customer = db.session.get(Workspace, id)
     if not customer:
         return jsonify({"error": "Workspace not found"}), 404
+    
+    
 
     # Nếu muốn xóa luôn user liên quan:
     user = db.session.get(User, customer.owner_id)
+    print('DELETE', customer, customer.owner_id, user)
+
     if user:
+        db.session.query(Message).filter(Message.user_id == user.id).delete()
         db.session.delete(user)
 
     db.session.delete(customer)
+
     db.session.commit()
 
     return jsonify({"message": "Customer and user deleted"}), 200

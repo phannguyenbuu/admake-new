@@ -9,9 +9,11 @@ import {
   Image,
   Select,
   Tooltip,
+  notification,
 } from "antd";
+import { CloseOutlined } from "@ant-design/icons";
 import { PlusOutlined, InfoCircleOutlined } from "@ant-design/icons";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { FormUserProps } from "../../../@types/user.type";
 import { useCreateUser, useUpdateUser } from "../../../common/hooks/user.hook";
 import { useSettingQuery } from "../../../common/hooks/setting.hook";
@@ -19,6 +21,7 @@ import { useRoleQuery } from "../../../common/hooks/role.hook";
 import type { Role } from "../../../@types/role.type";
 import type { User } from '../../../@types/user.type';
 import { InputNumber } from "antd";
+import { useApiHost } from "../../../common/hooks/useApiHost";
 
 export default function FormUser({
   onCancel,
@@ -26,15 +29,33 @@ export default function FormUser({
   user,
   buttonText,
   isSupplier,
+  isAppend,
 }: FormUserProps) {
   const [form] = Form.useForm();
   const [file, setFile] = useState<File | null>(null);
   const [isDragging, setIsDragging] = useState(false);
-
+  const divRef = useRef<HTMLDivElement>(null);
   const { mutate: createUser, isPending: isCreating } = useCreateUser();
   const { mutate: updateUser, isPending: isUpdating } = useUpdateUser();
   const { data: settings } = useSettingQuery();
   const { data: roles } = useRoleQuery();
+
+  const [width, setWidth] = useState(0);
+
+  useEffect(() => {
+    if (divRef.current) {
+      setWidth(divRef.current.offsetWidth);
+    }
+    
+    function handleResize() {
+      if (divRef.current) {
+        setWidth(divRef.current.offsetWidth);
+      }
+    }
+    
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   // Get salary levels from settings
   const salaryLevels =
@@ -87,6 +108,34 @@ export default function FormUser({
     }
   }, [user, form, role]);
 
+  const handleDelete = () => {
+    if (!user) return;
+
+    fetch(`${useApiHost()}/user/${user.id}`, {
+      method: "DELETE",
+    })
+      .then((response) => {
+        if (!response.ok) {
+          notification.error({message:"Xóa user thất bại"});
+        }
+        // Xử lý khi xóa thành công, ví dụ cập nhật state hoặc thông báo
+        notification.success({message:`User ${user.fullName} đã được xóa`});
+        if(onRefresh)
+          onRefresh();
+
+        if(onCancel)
+          onCancel();
+      })
+      .catch((error) => {
+        notification.error({message:"Lỗi khi xóa user:", description:error});
+        if(onCancel)
+          onCancel();
+      });
+
+    
+  };
+
+
 
   const handleSubmit = async (values: any) => {
   try {
@@ -137,10 +186,10 @@ export default function FormUser({
     message.error("Có lỗi xảy ra!");
   }
 };
-
+  
 
   return (
-    <div
+    <div ref={divRef}
       className="
         w-full max-w-4xl mx-auto bg-white rounded-lg sm:rounded-xl lg:rounded-2xl
         shadow-lg sm:shadow-xl lg:shadow-2xl p-3 sm:p-4 border border-gray-100
@@ -148,12 +197,21 @@ export default function FormUser({
         max-h-[calc(100vh-200px)] -mt-13 sm:max-h-[calc(100vh-120px)]
       "
     >
+      <Button
+        type="text"
+        icon={<CloseOutlined />}
+        onClick={onCancel}  // Hàm xử lý đóng form/modal bạn truyền vào
+        style={{position:'relative', marginLeft:width - 60}}
+        size="small"
+      />
       <Typography.Title
         level={3}
         className="text-center !text-[#00B4B6] !mb-4 sm:mb-6 !font-bold !text-lg sm:!text-xl lg:!text-2xl flex-shrink-0"
       >
         {isSupplier? "BẢNG THẦU PHỤ":"BẢNG NHÂN SỰ"}
       </Typography.Title>
+
+      {/* <Typography.Text>{user?.id}</Typography.Text> */}
 
       <Form
         form={form}
@@ -162,77 +220,7 @@ export default function FormUser({
         autoComplete="off"
         className="flex-1 flex flex-col min-h-0"
       >
-        {/* Upload avatar */}
-        <div className="flex flex-col items-center mb-4 sm:mb-6 flex-shrink-0">
-          <div className="w-full text-left mb-3 sm:mb-4 text-sm sm:text-base font-semibold text-gray-700">
-            Ảnh đại diện:
-          </div>
-          <div className="flex flex-col items-center">
-            <div
-              className={`w-20 h-20 sm:w-24 sm:h-24 lg:w-32 lg:h-32 border-2 border-dashed border-cyan-400 rounded-full flex flex-col items-center justify-center bg-white transition-all duration-300 cursor-pointer relative overflow-hidden shadow-lg hover:shadow-xl ${
-                isDragging
-                  ? "bg-cyan-100 border-cyan-600 shadow-2xl"
-                  : "hover:bg-cyan-50 border-cyan-400"
-              }`}
-              onClick={() => document.getElementById("avatar-input")?.click()}
-              onDragOver={(e) => {
-                e.preventDefault();
-                setIsDragging(true);
-              }}
-              onDragLeave={(e) => {
-                e.preventDefault();
-                setIsDragging(false);
-              }}
-              onDrop={(e) => {
-                e.preventDefault();
-                if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-                  setFile(e.dataTransfer.files[0]);
-                }
-              }}
-            >
-              {file || user?.avatar ? (
-                <Image
-                  src={
-                    file
-                      ? URL.createObjectURL(file)
-                      : `${import.meta.env.VITE_API_IMAGE}/${user?.avatar}`
-                  }
-                  alt="avatar preview"
-                  className="w-full h-full object-cover rounded-full"
-                  preview={false}
-                />
-              ) : (
-                <div className="flex flex-col items-center justify-center p-1 sm:p-2">
-                  <PlusOutlined className="!text-sm sm:!text-lg lg:!text-xl !text-[#00B4B6] !mb-1" />
-                  <span className="text-xs text-gray-500 text-center px-1">
-                    Thêm ảnh
-                  </span>
-                </div>
-              )}
-            </div>
-
-            <input
-              id="avatar-input"
-              type="file"
-              accept="image/*"
-              onChange={(e) => setFile(e.target.files?.[0] || null)}
-              className="hidden"
-            />
-
-            <div className="flex flex-col items-center mt-2 sm:mt-3 space-y-2">
-              <span className="text-xs text-gray-500 text-center px-2">
-                Kéo thả ảnh hoặc chọn từ tệp
-              </span>
-              <button
-                type="button"
-                className="text-xs bg-cyan-500 hover:bg-cyan-600 text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg font-medium transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105"
-                onClick={() => document.getElementById("avatar-input")?.click()}
-              >
-                Chọn tệp
-              </button>
-            </div>
-          </div>
-        </div>
+        
 
 
 
@@ -450,13 +438,13 @@ export default function FormUser({
 
         {/* Footer buttons */}
         <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4 lg:gap-6 mt-4 sm:mt-6 flex-shrink-0">
-          <Button
-            onClick={onCancel}
+          {!isAppend && <Button
+            onClick={handleDelete}
             disabled={isCreating || isUpdating}
             className="!border-cyan-400 !text-cyan-500 !text-sm sm:!text-base !font-semibold !px-6 sm:!px-8 !py-2 sm:!py-3 !h-9 sm:!h-10 !min-w-[100px] sm:!min-w-[120px] !rounded-lg hover:!bg-cyan-50 hover:!border-cyan-500 !transition-all !duration-300 !shadow-lg hover:!shadow-xl !order-2 sm:!order-1"
           >
-            HỦY
-          </Button>
+             {isSupplier? "XÓA THẦU PHỤ":"XÓA NHÂN SỰ"}
+          </Button>}
           <Button
             type="primary"
             htmlType="submit"

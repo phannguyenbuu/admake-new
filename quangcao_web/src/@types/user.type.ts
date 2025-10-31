@@ -14,7 +14,7 @@ export type UserRole =
   | "warehouse:management";
 
 export type User = BaseEntity & {
-  user_id: string;
+  id: string;
   username: string;
   password: string;
   fullName?: string;
@@ -61,6 +61,7 @@ export interface FormUserProps {
   user?: User;
   buttonText?: string;
   isSupplier?: boolean;
+  isAppend?: boolean;
 }
 
 export interface UserList {

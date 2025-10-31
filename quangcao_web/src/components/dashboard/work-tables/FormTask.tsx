@@ -357,7 +357,7 @@ export default function FormTask({
             {/* Vật liệu */}
             {/* <MaterialInfo taskDetail={taskDetail ?? null}/> */}
 
-            <JobAsset taskDetail={taskDetail}/>
+            
           </Stack>
           {/* Nhân sự */}
       </Form>

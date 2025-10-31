@@ -112,6 +112,7 @@ export const SupplierDashboard: IPage["Component"] = () => {
           `}</style>
           <div className="w-full">
             <FormUser
+              isAppend={true}
               onCancel={toggle("openCreate")}
               onRefresh={() => {
                 // TODO: Implement create user
@@ -132,6 +133,7 @@ export const SupplierDashboard: IPage["Component"] = () => {
           `}</style>
           <div className="w-full">
             <FormUser
+              isAppend={false}
               onCancel={toggle("openUpdate")}
               onRefresh={() => {
                 // TODO: Implement update user

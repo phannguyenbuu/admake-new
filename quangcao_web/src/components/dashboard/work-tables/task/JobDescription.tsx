@@ -3,22 +3,22 @@ import { Form, Input, Typography } from "antd";
 import type { Mode } from "../../../../@types/work-space.type";
 import type { FormTaskDetailProps } from "../../../../@types/work-space.type";
 import {Stack, Box} from "@mui/material";
-
+import JobAsset from "./JobAsset";
+import { Task } from "../../../../@types/work-space.type";
 const { Text } = Typography;
 const { TextArea } = Input;
 
-interface TaskDetailType {
-  description?: string;
-}
+// interface TaskDetailType {
+//   description?: string;
+// }
 
 interface JobDescriptionProps {
-  
-  taskDetail?: TaskDetailType | null;
+  taskDetail?: Task;
   form: any;
 }
 
 const JobDescription: React.FC<JobDescriptionProps> = ({ taskDetail, form }) => {
-  const [desc, setDesc] = useState(taskDetail?.description || "");
+  // const [desc, setDesc] = useState(taskDetail?.description || "");
 
   useEffect(() => {
   if (taskDetail) {
@@ -46,7 +46,7 @@ const JobDescription: React.FC<JobDescriptionProps> = ({ taskDetail, form }) => 
         </Text>
       </div>
 
-      {(
+      
         <Form.Item
           name="description"
           className="!mb-0"
@@ -59,7 +59,8 @@ const JobDescription: React.FC<JobDescriptionProps> = ({ taskDetail, form }) => 
             className="!rounded-lg !border !border-gray-300 focus:!border-cyan-500 focus:!shadow-lg hover:!border-cyan-500 !transition-all !duration-200 !shadow-sm !resize-none !text-xs sm:!text-sm h-40"
           />
         </Form.Item>
-      )}
+      
+      <JobAsset key="task-assets" taskDetail={taskDetail} title='Tài liệu' role="task"/>
     </div>
   );
 };

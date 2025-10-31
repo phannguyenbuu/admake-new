@@ -111,6 +111,14 @@ def update_task_status(id):
 
 @task_bp.route("/<string:id>/upload", methods=["PUT"])
 def update_task_assets(id):
+    time = request.form.get("time")
+    role = request.form.get("role")
+    user_id = request.form.get("user_id")
+    file = request.files.get("file")
+
+    if not role:
+        role = ''
+
     task = Task.query.get(id)
     if not task:
         abort(404, description="Task not found")
@@ -121,9 +129,8 @@ def update_task_assets(id):
     if file.filename == '':
         return jsonify({'error': 'Empty filename'}), 400
     
-
     filename, filepath = upload_a_file_to_vps(file)
-
+    print('upload:', filename, filepath)
     ls = []
 
     # task.assets có thể None hoặc list
@@ -132,15 +139,20 @@ def update_task_assets(id):
 
     # thêm file mới nếu có
     if filename:
-        ls.append(filename)
+        ls.append(f'{filename}#{role}')
 
     # gán lại trường assets là list Python
     task.assets = ls
 
+    print('Task_asset', ls)
+
     flag_modified(task, "assets")
     db.session.commit()
 
-    return jsonify(task.to_dict())
+    return jsonify({
+        'filename': filename,
+        'assets': ls,
+        **task.to_dict()})
 
 
 

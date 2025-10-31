@@ -26,26 +26,26 @@ export default function ModalDeleteWorkSpace({
     useDeleteWorkSpace();
 
   const handleDelete = useCallback(() => {
-  if (!deletingWorkspace?.id) return;
+    if (!deletingWorkspace?.id) return;
 
-  fetch(`${useApiHost()}/workspace/${deletingWorkspace.id}`, {
-    method: 'DELETE',
-  })
-    .then((response) => {
-      if (!response.ok) {
-        notification.error({message:`Failed to delete workspace`});
-      }
-      return response.json();
+    fetch(`${useApiHost()}/workspace/${deletingWorkspace.id}`, {
+      method: 'DELETE',
     })
-    .then(() => {
-      if (typeof onSuccess === 'function') onSuccess();
-      // if (typeof deleteWorkSpace === 'function') deleteWorkSpace();
-      if (typeof closeDeleteModal === 'function') closeDeleteModal();
-    })
-    .catch((error) => {
-      notification.error({message:`Delete error: ${error}`});
-    });
-}, [deleteWorkSpace, closeDeleteModal, deletingWorkspace, onSuccess]);
+      .then((response) => {
+        if (!response.ok) {
+          notification.error({message:`Failed to delete workspace`});
+        }
+        return response.json();
+      })
+      .then(() => {
+        if (typeof onSuccess === 'function') onSuccess();
+        // if (typeof deleteWorkSpace === 'function') deleteWorkSpace();
+        if (typeof closeDeleteModal === 'function') closeDeleteModal();
+      })
+      .catch((error) => {
+        notification.error({message:`Delete error: ${error}`});
+      });
+  }, [deleteWorkSpace, closeDeleteModal, deletingWorkspace, onSuccess]);
 
   return (
     <Modal
