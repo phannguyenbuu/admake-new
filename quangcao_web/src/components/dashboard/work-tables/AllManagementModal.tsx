@@ -45,13 +45,12 @@ export default function AllManagementModal() {
 
   useEffect(() => {
   async function fetchTasks() {
-    const apiUrl = `${useApiHost()}/task/`;
+    const apiUrl = `${useApiHost()}/task/inlead/${userLeadId}`;
+    // const formData = new FormData();
+    // formData.append('lead', userLeadId.toString()); 
+
     try {
-      const response = await fetch(apiUrl, {
-        method: "POST", // đổi thành POST hoặc method có hỗ trợ body
-        headers: { "Content-Type": "application/json" },
-        // body: JSON.stringify({ lead: userLeadId }) // thêm lead_id vào body JSON
-      });
+      const response = await fetch(apiUrl, { method: "GET"});
       if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
       const data = await response.json();
       console.log(data);

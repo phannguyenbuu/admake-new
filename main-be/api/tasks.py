@@ -6,13 +6,11 @@ from api.messages import upload_a_file_to_vps
 
 task_bp = Blueprint('task', __name__, url_prefix='/api/task')
 
-@task_bp.route("/", methods=["GET"])
-def get_tasks():
-    lead_id, lead = get_lead_by_json(request)
-
-    if lead_id == 0 or not lead:
-        abort(404, description="Unknown lead")
-
+@task_bp.route("/inlead/<string:lead_id>", methods=["GET"])
+def get_tasks(lead_id):
+    if lead_id == 0:
+        print("Zero lead")
+        abort(404, "Zero lead")
     workspaces = Workspace.query.filter(Workspace.lead_id == lead_id)
 
     result = []
