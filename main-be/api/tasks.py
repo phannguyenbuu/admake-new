@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify, abort
-from models import db, Task, dateStr, User, Customer, Role
+from models import db, Task, dateStr, User, Customer, Role,get_lead_by_json, get_lead_by_arg, Workspace
 import datetime
 from sqlalchemy.orm.attributes import flag_modified
 from api.messages import upload_a_file_to_vps
@@ -8,8 +8,21 @@ task_bp = Blueprint('task', __name__, url_prefix='/api/task')
 
 @task_bp.route("/", methods=["GET"])
 def get_tasks():
-    tasks = [t.to_dict() for t in Task.query.all()]
+    lead_id, lead = get_lead_by_json(request)
 
+    if lead_id == 0 or not lead:
+        abort(404, description="Unknown lead")
+
+    workspaces = Workspace.query.filter(Workspace.lead_id == lead_id)
+
+    result = []
+
+    for work in workspaces:
+        result += Task.query.filter_by(workspace_id=work.id).all()
+
+    tasks = [t.to_dict() for t in result]
+
+    print('Tak', tasks)
     return jsonify(tasks)
 
 @task_bp.route("/<string:id>", methods=["GET"])

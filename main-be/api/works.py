@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify, abort
-from models import app, db, Workspace, Task, dateStr,Message, generate_datetime_id, User, create_customer_method, get_model_columns, LeadPayload
+from models import app, db, Workspace, Task, dateStr,Message, generate_datetime_id, User, create_customer_method, get_model_columns, LeadPayload,get_lead_by_json, get_lead_by_arg
 import datetime
 from collections import defaultdict
 from sqlalchemy import desc
@@ -10,29 +10,10 @@ workspace_bp = Blueprint('workspace', __name__, url_prefix='/api/workspace')
 
 @workspace_bp.route("/", methods=["GET"])
 def get_workspaces():
-    # print(app.config.get('MAX_CONTENT_LENGTH'))
-    lead_id = request.get_json().get("lead", 0)
+    lead_id, lead = get_lead_by_json(request)
 
-    try:
-        lead_id = int(lead_id)
-    except (TypeError, ValueError):
-        lead_id = 0
-
-    if lead_id == 0:
-        print("Zero lead")
-        abort(404, description="Zero lead")
-        
-    lead = db.session.get(LeadPayload, lead_id)
-
-    
-
-    if not lead:
-        print('Lead not found', lead_id)
-        abort(404, description="Lead not found")
-
-    
-
-    # query = Workspace.query.filter(Workspace.lead_id == lead_id)
+    if lead_id == 0 or not lead:
+        abort(404, description="Unknown lead")
 
     workspaces = Workspace.query.filter(Workspace.lead_id == lead_id).order_by(desc(Workspace.updatedAt)).all()
     return jsonify([c.to_dict() for c in workspaces])

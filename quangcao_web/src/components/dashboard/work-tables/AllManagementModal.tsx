@@ -5,6 +5,7 @@ import { MoreOutlined } from "@ant-design/icons";
 import columnThemes from "./theme.json";
 import { UpdateButtonContext } from "../../../common/hooks/useUpdateButtonTask";
 import { useApiHost } from "../../../common/hooks/useApiHost";
+import { useUser } from "../../../common/hooks/useUser";
 import type { ColumnType, Task, TasksResponse } from "../../../@types/work-space.type";
 import "./css/css.css";
 import "./work-space/workspace.css";
@@ -24,6 +25,7 @@ const items = [
 export default function AllManagementModal() {
   const [columns, setColumns] = useState<ColumnType[]>([]);
   const context = useContext(UpdateButtonContext);
+  const {userLeadId} = useUser();
   if (!context) throw new Error("UpdateButtonContext not found");
 
   const [tasksData, setTasksData] = useState<Task[]>([]);
@@ -31,35 +33,41 @@ export default function AllManagementModal() {
   const [roleVisible, setRoleVisible] = useState(false);
   const [isHover, setIsHover] = useState(false);
 
-  const convertBoardToColumns = useCallback(
-    (boardData: TasksResponse): ColumnType[] => {
-      return fixedColumns.map((col) => ({
-        ...col,
-        tasks: boardData[col.type]?.tasks || [],
-      }));
-    },
-    []
-  );
+  // const convertBoardToColumns = useCallback(
+  //   (boardData: TasksResponse): ColumnType[] => {
+  //     return fixedColumns.map((col) => ({
+  //       ...col,
+  //       tasks: boardData[col.type]?.tasks || [],
+  //     }));
+  //   },
+  //   []
+  // );
 
   useEffect(() => {
-    async function fetchTasks() {
-      const apiUrl = `${useApiHost()}/task/`;
-      try {
-        const response = await fetch(apiUrl, {
-          method: "GET",
-          headers: { "Content-Type": "application/json" },
-        });
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-        const data = await response.json();
-        setTasksData(data);
-      } catch (error) {
-        console.error("Failed to fetch tasks data:", error);
-      }
+  async function fetchTasks() {
+    const apiUrl = `${useApiHost()}/task/`;
+    try {
+      const response = await fetch(apiUrl, {
+        method: "POST", // đổi thành POST hoặc method có hỗ trợ body
+        headers: { "Content-Type": "application/json" },
+        // body: JSON.stringify({ lead: userLeadId }) // thêm lead_id vào body JSON
+      });
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+      const data = await response.json();
+      console.log(data);
+      setTasksData(data);
+    } catch (error) {
+      console.error("Failed to fetch tasks data:", error);
     }
-    fetchTasks();
-  }, []);
+  }
+  fetchTasks();
+}, []);
+
 
   useEffect(() => {
+    console.log(tasksData);
+    if(!tasksData) return;
+
     const groupedTasks = tasksData.reduce((acc: any, task) => {
       if (!acc[task.status]) acc[task.status] = [];
       acc[task.status].push(task);

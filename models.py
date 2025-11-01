@@ -644,33 +644,3 @@ def create_customer_method(data):
     print(new_customer.to_dict())
     
     return jsonify(new_customer.to_dict()), 201
-
-def get_lead_by_json(request):
-    lead_id = request.get_json().get("lead", 0)
-
-    try:
-        lead_id = int(lead_id)
-    except (TypeError, ValueError):
-        lead_id = 0
-
-    if lead_id == 0:
-        print("Zero lead")
-        abort(404, description="Zero lead")
-        
-    lead = db.session.get(LeadPayload, lead_id)
-    return lead_id, lead
-
-def get_lead_by_arg(request):
-    lead_id = request.args.get("lead", 0, type=int)
-
-    try:
-        lead_id = int(lead_id)
-    except (TypeError, ValueError):
-        lead_id = 0
-
-    if lead_id == 0:
-        print("Zero lead")
-        abort(404, description="Zero lead")
-        
-    lead = db.session.get(LeadPayload, lead_id)
-    return lead_id, lead
