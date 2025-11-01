@@ -16,3 +16,6 @@ quangcao_backend-main.zip
 quangcao_website-main.zip
 react-chat-app-main.zip
 chat-be/requirements.txt
+Include/
+Lib/
+Scripts/

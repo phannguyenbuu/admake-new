@@ -46,11 +46,8 @@ export default function AllManagementModal() {
   useEffect(() => {
   async function fetchTasks() {
     const apiUrl = `${useApiHost()}/task/inlead/${userLeadId}`;
-    // const formData = new FormData();
-    // formData.append('lead', userLeadId.toString()); 
-
     try {
-      const response = await fetch(apiUrl, { method: "GET"});
+      const response = await fetch(apiUrl, {method: "GET"});
       if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
       const data = await response.json();
       console.log(data);
@@ -125,7 +122,7 @@ export default function AllManagementModal() {
       </Dropdown>
 
       <Modal
-        title="Bảng công việc"
+        title="BẢNG CÔNG VIỆC TỔNG HỢP"
         open={statusVisible}
         onCancel={handleStatusOk}
         style={{ minWidth: "95vw", padding: 0 }}

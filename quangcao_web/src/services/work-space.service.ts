@@ -1,10 +1,14 @@
 import type { WorkSpace } from "../@types/work-space.type";
 import axiosClient from "./axiosClient";
+import type { PaginationDto } from "../@types/common.type";
 
 export const WorkSpaceService = {
-  getAll: () => {
-    return axiosClient.get("/workspace/");
+  getAll: (dto: Partial<PaginationDto> = {}) => {
+    return axiosClient.get("/workspace/", { params: dto });
   },
+  // getAll: (lead_id:number) => {
+  //   return axiosClient.get(`/workspace/inlead/${lead_id}`);
+  // },
   getTaskById: (id: string) => {
     return axiosClient.get(`/workspace/${id}/tasks`);
   },

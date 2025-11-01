@@ -268,7 +268,7 @@ class Role(BaseModel):
     @staticmethod
     def create_item(params):
         item = Role(**params)
-        item.id = generate_datetime_id()
+        # item.id = generate_datetime_id()
         db.session.add(item)
         db.session.commit()
         return item

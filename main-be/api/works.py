@@ -10,17 +10,21 @@ workspace_bp = Blueprint('workspace', __name__, url_prefix='/api/workspace')
 
 @workspace_bp.route("/", methods=["GET"])
 def get_workspaces():
-    lead_id, lead = get_lead_by_json(request)
+    # lead_id, lead = get_lead_by_json(request)
+    page = request.args.get("page", 1, type=int)
+    limit = request.args.get("limit", 10, type=int)
+    lead_id = request.args.get("lead", 0, type=int)
+    search = request.args.get("search", "", type=str)
 
-    if lead_id == 0 or not lead:
-        abort(404, description="Unknown lead")
+    # if lead_id == 0 or not lead:
+    #     abort(404, description="Unknown lead")
 
     workspaces = Workspace.query.filter(Workspace.lead_id == lead_id).order_by(desc(Workspace.updatedAt)).all()
     return jsonify([c.to_dict() for c in workspaces])
 
 
 @workspace_bp.route("/", methods=["POST"])
-def create_worksapce_route():
+def create_workspace_route():
     # data = request.get_json()
     # new_workspace = create_workspace(data)
 
@@ -54,16 +58,20 @@ def get_role(user):
     else:
         return ""
 
-def get_all_users_and_customers():
+def get_all_users_by_lead_id(lead_id):
+
+    if lead_id == 0:
+        return []
+
     users = [{
         "fullName": user.fullName,
         "user_id": user.id,
         "role": get_role(user),
         "phone": user.phone
-        } for user in User.query.all() if not user.role_id or user.role_id > 0]
+        } for user in User.query.all() if user.lead_id == lead_id and (not user.role_id or user.role_id > 0)]
 
     
-    return users, []
+    return users
 
 @workspace_bp.route("/<string:id>", methods=["PUT"])
 def update_workspace(id):
@@ -156,9 +164,9 @@ def get_workspace_detail(id):
     # print('TASK', tasks)
     
     result = work.to_dict()
-    users, customers = get_all_users_and_customers()
+    users = get_all_users_by_lead_id(work.lead_id)
     result["users"] = users
-    result["customers"] = customers
+    result["customers"] = []
 
     return jsonify(result)
 

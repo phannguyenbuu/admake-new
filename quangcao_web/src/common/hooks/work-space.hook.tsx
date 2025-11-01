@@ -2,16 +2,16 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { WorkSpaceService } from "../../services/work-space.service";
 import type { Task, WorkSpace } from "../../@types/work-space.type";
 import { TaskService } from "../../services/task.service";
+import { useUser } from "./useUser";
 import type { PaginationDto } from "../../@types/common.type";
+
 export const TASK_QUERY_KEY = "task/query";
 export const WORK_SPACE_DETAIL_QUERY_KEY = "workspace/queryDetail";
-
-
 // export function useWorkSpaceQueryAll() {
-  
+//   const {userLeadId} = useUser();
 //   return useQuery({
 //     queryKey: [WORK_SPACE_DETAIL_QUERY_KEY],
-//     queryFn: () => WorkSpaceService.getAll(),
+//     queryFn: () => WorkSpaceService.getAll(userLeadId),
 //   });
 // }
 
@@ -22,7 +22,6 @@ export function useWorkSpaceQueryAll(dto: Partial<PaginationDto> = {}) {
     queryFn: () => WorkSpaceService.getAll(dto),
   });
 }
-
 
 export function useWorkSpaceQueryById(id: string) {
   return useQuery({

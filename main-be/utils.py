@@ -904,9 +904,9 @@ FOREIGN KEY (user_id) REFERENCES "user"(id);
 
 def alter_data():
     # for table in ['material','user','role','workspace','task','message','workpoint','leave']:
-    db.session.execute(text(f'''ALTER TABLE "lead" ADD COLUMN "fullName" VARCHAR(120);'''))
-    db.session.execute(text(f'''ALTER TABLE "lead" ADD COLUMN username VARCHAR(50);'''))
-    db.session.execute(text(f'''ALTER TABLE "lead" ADD COLUMN password VARCHAR(50);'''))
+    # db.session.execute(text(f'''ALTER TABLE "lead" ADD COLUMN "fullName" VARCHAR(120);'''))
+    # db.session.execute(text(f'''ALTER TABLE "lead" ADD COLUMN username VARCHAR(50);'''))
+    # db.session.execute(text(f'''ALTER TABLE "lead" ADD COLUMN password VARCHAR(50);'''))
     db.session.commit()
 
 def delete_customer_user():
@@ -1087,10 +1087,21 @@ if __name__ == "__main__":
         
         # db.session.commit()
 
-        users = User.query.filter(User.lead_id == 139).all()
-        for user in users:
-            print(user.username, user.fullName)
-            user.role_id = 2
-        
+        # users = User.query.filter(User.lead_id == 139).all()
+        # for user in users:
+        #     print(user.username, user.fullName)
+        #     user.role_id = 2
+
+        # role = db.session.get(Role,-1)
+        Role.create_item({
+    
+    "id": -2,
+    "lead_id": 0,
+    "name": "LEAD",
+    "permissions": [],
+
+  },)
+        for role in Role.query.all():
+            role.lead_id = 0 
         db.session.commit()
         

@@ -18,6 +18,8 @@ import type { WorkSpace } from "../../@types/work-space.type";
 import "./mobile-menu.css";
 // import { useCheckPermission } from "../../common/hooks/checkPermission.hook";
 import ModalManagerWorkSpace from "../dashboard/work-tables/work-space/ModalManagerWorkSpace";
+import type { PaginationDto } from "../../@types/common.type";
+import { useUser } from "../../common/hooks/useUser";
 
 // Hook để theo dõi kích thước màn hình
 const useWindowSize = () => {
@@ -47,10 +49,17 @@ export default function RenderMenuBar({}) {
   const { pathname } = useLocation();
   const navigate = useNavigate();
   const { width } = useWindowSize();
+  const {userLeadId} = useUser();
 
+  const [query, setQuery] = useState<Partial<PaginationDto>>({
+      page: 1,
+      limit: 10,
+      lead: userLeadId,
+      search: "",
+    });
   // Sử dụng API hooks
   const { data: workSpaces, refetch: refetchWorkSpaces } =
-    useWorkSpaceQueryAll();
+    useWorkSpaceQueryAll(query);
 
   // console.log("Init works", workSpaces);
 
