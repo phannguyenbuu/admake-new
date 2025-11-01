@@ -24,8 +24,8 @@ import {
   useCustomerDetail,
   useUpdateCustomer,
 } from "../../../common/hooks/customer.hook";
-import { statusOptions } from "../../../common/utils/helpEnum.util";
-import { WorkSpace } from "../../../@types/work-space.type";
+import { useUser } from "../../../common/hooks/useUser";
+import type { WorkSpace } from "../../../@types/work-space.type";
 
 const { Title, Text } = Typography;
 
@@ -44,6 +44,7 @@ export default function FormCustomer({
   onRefresh,
 }: FormCustomerProps) {
   const [form] = Form.useForm();
+  const {userLeadId} = useUser();
   const [formValues, setFormValues] = useState<any>({});
   const { mutate: createCustomer, isPending: isCreating } = useCreateCustomer();
   const { mutate: updateCustomer, isPending: isUpdating } = useUpdateCustomer();
@@ -53,7 +54,7 @@ export default function FormCustomer({
   const isPending = isCreating || isUpdating || isLoadingCustomerDetail;
 
   useEffect(() => {
-    console.log('initialValues', initialValues);
+    console.log('initialValues', initialValues, userLeadId);
     if (initialValues) {
       form.setFieldsValue({
         ...initialValues,
@@ -71,24 +72,25 @@ export default function FormCustomer({
     
     const formattedValues = {
       ...values,
-      ...(values.workInfo && {
-        workInfo: values.workInfo,
-      }),
-      ...(values.workAddress && {
-        workAddress: values.workAddress,
-      }),
-      ...(values.workPrice && {
-        workPrice: values.workPrice,
-      }),
-      ...(values.status && {
-        status: values.status,
-      }),
-      ...(values.workStart && {
-        workStart: dayjs(values.workStart).format("YYYY-MM-DD"),
-      }),
-      ...(values.workEnd && {
-        workEnd: dayjs(values.workEnd).format("YYYY-MM-DD"),
-      }),
+      lead:userLeadId,
+      // ...(values.workInfo && {
+      //   workInfo: values.workInfo,
+      // }),
+      // ...(values.workAddress && {
+      //   workAddress: values.workAddress,
+      // }),
+      // ...(values.workPrice && {
+      //   workPrice: values.workPrice,
+      // }),
+      // ...(values.status && {
+      //   status: values.status,
+      // }),
+      // ...(values.workStart && {
+      //   workStart: dayjs(values.workStart).format("YYYY-MM-DD"),
+      // }),
+      // ...(values.workEnd && {
+      //   workEnd: dayjs(values.workEnd).format("YYYY-MM-DD"),
+      // }),
     };
 
 
@@ -109,6 +111,7 @@ export default function FormCustomer({
         }
       );
     } else {
+      console.log('Cretae Customer', formattedValues);
       createCustomer(formattedValues, {
         onSuccess: () => {
           message.success("Tạo khách hàng thành công");

@@ -1,7 +1,7 @@
 import React,  { useEffect, useState, useRef, useContext } from "react";
 import { Dropdown, Avatar, Modal, notification } from "antd";
 import { UserOutlined } from "@ant-design/icons";
-import { useNavigate } from "react-router-dom";
+
 import { useApiHost } from "../../hooks/useApiHost";
 import type { MenuProps } from "antd/lib";
 import Group from '../../../components/chat/pages/dashboard/Group.tsx';
@@ -10,7 +10,7 @@ import type { MenuInfo } from 'rc-menu/lib/interface';
 import { useUser } from "../../hooks/useUser.tsx";
 import {Button, Input} from "@mui/material";
 import {Box, Stack} from "@mui/material";
-import { UpdateButtonContext } from "../../hooks/useUpdateButtonTask.tsx";
+
 import type { WorkSpace } from "../../../@types/work-space.type.ts";
 import { SearchOutlined } from "@ant-design/icons";
 import { Input as AntdInput, Menu } from "antd";
@@ -94,7 +94,7 @@ const ChatGroupList: React.FC<ChatGroupListProps> = ({workSpaces}) => {
     height: 25,
     width: 80,
     fontWeight: 700,
-    color: "#777",
+    color: "#fff",
     padding: "0px 20px",
     borderRadius: 10,
     transition: "background-color 0.3s",
@@ -139,7 +139,7 @@ const ChatGroupList: React.FC<ChatGroupListProps> = ({workSpaces}) => {
               top: 2,
               position: "relative",
               borderRadius: 10,
-              backgroundColor: isHover ? "rgba(255,255,255,0.5)" : "rgba(255,255,255,0.25)",
+              backgroundColor: isHover ? "rgba(255,255,255,0.5)" : "none",
               transition: "background-color 1s ease",
               display: "flex",
               alignItems: "center",
@@ -153,8 +153,8 @@ const ChatGroupList: React.FC<ChatGroupListProps> = ({workSpaces}) => {
           </Box>
         </Dropdown>
 
-        <Button sx={{color:"#fff", whiteSpace:'nowrap'}}
-          onClick={() => setAddGroupModalVisible(true)}>Tạo Nhóm</Button>
+        {/* <Button sx={{color:"#fff", whiteSpace:'nowrap'}}
+          onClick={() => setAddGroupModalVisible(true)}>Tạo Nhóm</Button> */}
        </Stack>
 
       {/* Model popup */}

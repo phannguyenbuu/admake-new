@@ -11,10 +11,14 @@ import { useDebounce } from "../../../common/hooks/useDebounce";
 import { notification } from "antd";
 import { useApiHost } from "../../../common/hooks/useApiHost";
 import type { WorkSpace } from "../../../@types/work-space.type";
+import { useUser } from "../../../common/hooks/useUser";
+
 export const CustomerDashboard: IPage["Component"] = () => {
+  const {userLeadId} = useUser();
   const [query, setQuery] = useState<Partial<PaginationDto>>({
     page: 1,
     limit: 10,
+    lead:userLeadId,
     search: "",
   });
   const [config, setConfig] = useState({

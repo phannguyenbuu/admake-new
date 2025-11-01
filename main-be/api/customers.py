@@ -1,24 +1,32 @@
 from flask import Blueprint, request, jsonify, abort
-from models import db, Workspace, dateStr, User, generate_datetime_id, Customer, Message
-from api.groups import create_group
+from models import db, Workspace, dateStr, User, create_customer_method, Message, LeadPayload, get_model_columns
+# from api.groups import create_group
 import datetime
 from sqlalchemy import desc
 from sqlalchemy import or_
 
 customer_bp = Blueprint('customer', __name__, url_prefix='/api/customer')
-def get_model_columns(model):
-    """Lấy danh sách tên các cột từ 1 model"""
-    return [c.name for c in model.__table__.columns]
 
 @customer_bp.route("/", methods=["GET"])
 def get_customers():
     page = request.args.get("page", 1, type=int)
     limit = request.args.get("limit", 10, type=int)
     search = request.args.get("search", "", type=str)
+    lead_id = request.args.get("lead", 0, type=int)
+
+    if lead_id == 0:
+        print("Zero lead")
+        abort(404, description="Zero lead")
+        
+    lead = db.session.get(LeadPayload, lead_id)
+
+    if not lead:
+        abort(404, description="Lead not found")
 
     # print('customer', Customer.query.all(), search)
 
-    query = Workspace.query
+    query = Workspace.query.filter(Workspace.lead_id == lead_id)
+
     if search:
         query = query.filter(Workspace.name.ilike(f"%{search}%"))
 
@@ -42,40 +50,10 @@ def get_customers():
 @customer_bp.route("/", methods=["POST"])
 def create_customer():
     data = request.get_json()
-
-    # chia dữ liệu thành phần User và Customer
-    user_fields = get_model_columns(User)
-    customer_fields = get_model_columns(Workspace)
-
-    user_data = {k: v for k, v in data.items() if f"user_{k}" in user_fields}
-    customer_data = {k: v for k, v in data.items() if k in customer_fields}
-
-    # ép kiểu ngày tháng nếu có
-    for key in ['workStart', 'workEnd']:
-        if key in customer_data and isinstance(customer_data[key], str):
-            customer_data[key] = dateStr(customer_data[key])
-
-    # tạo User trước
-    new_user = User(
-        id=generate_datetime_id(),   # ✅ bắt buộc gán id string
-        **user_data,
-        role_id=-1
-    )
-    db.session.add(new_user)
-    db.session.flush()  # lấy id mà chưa commit
-
-    # tạo Customer gắn với user_id
-    new_customer = Workspace(
-        id=generate_datetime_id(),   # ✅ cũng cần id cho customer
-        name = data.get("name",""),
-        owner_id=new_user.id
-    )
-    db.session.add(new_customer)
-    db.session.commit()
-
-    print(new_customer.to_dict())
     
-    return jsonify(new_customer.to_dict()), 201
+    return create_customer_method(data)
+
+
 
 @customer_bp.route("/<string:id>", methods=["GET"])
 def get_customer_detail(id):

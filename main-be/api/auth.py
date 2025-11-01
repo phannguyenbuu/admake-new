@@ -90,7 +90,7 @@ def me():
     claims = get_jwt()  # trả về dictionary các claims trong token
     lead_id = claims.get('lead_id')
 
-    print(f"User found: {user.username} (ID: {user.id})")
+    print(f"User found: {user.username} (ID: {user.id}) - Lead: {lead_id} - Role: {user.role_id} - role: {user.update_role()}")
     return jsonify({
         'userId': user.id,
         'username': user.username,

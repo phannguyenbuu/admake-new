@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify, abort
-from models import db, dateStr, User, generate_datetime_id
+from models import db, dateStr, User, generate_datetime_id, LeadPayload
 from api.groups import create_group
 import datetime
 from sqlalchemy import desc
@@ -14,9 +14,14 @@ def get_suppliers():
     page = request.args.get("page", 1, type=int)
     limit = request.args.get("limit", 10, type=int)
     search = request.args.get("search", "", type=str)
+    lead_id = request.args.get("lead", 0, type=int)
+    lead = db.session.get(LeadPayload, lead_id)
 
-    # Lọc user có role_id = 2 (nhà cung cấp)
-    query = User.query.filter(User.role_id > 100)
+    if not lead:
+        abort(404, description="Lead not found")
+
+
+    query = lead.users.filter(User.role_id > 100)
 
     if search:
         # Lọc theo tên (user.fullName), cách này dùng ilike để không phân biệt hoa thường

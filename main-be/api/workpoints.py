@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify, abort
-from models import db, app, Workpoint, Message,User, dateStr, generate_datetime_id, Leave
+from models import db, app, Workpoint, Message,User, dateStr, generate_datetime_id, Leave, LeadPayload
 from api.chat import socketio
 from sqlalchemy import desc
 from datetime import datetime, time, date
@@ -11,18 +11,14 @@ workpoint_bp = Blueprint('workpoint', __name__, url_prefix='/api/workpoint')
 
 @workpoint_bp.route("/", methods=["GET"])
 def get_workpoints():
-    workpoints = Workpoint.query.order_by(desc(Workpoint.createdAt)).all()
+    lead_id = request.args.get("lead", 0, type=int)
+    lead = db.session.get(LeadPayload, lead_id)
+
+    if not lead:
+        abort(404, description="Lead not found")
+
+    workpoints = Workpoint.query.filter(Workpoint.user_id.in_([user.id for user in lead.users])).order_by(desc(Workpoint.createdAt)).all()
     return jsonify([c.to_dict() for c in workpoints])
-
-# @workpoint_bp.route("/", methods=["POST"])
-# def create_workpoint():
-#     data = request.get_json()
-
-#     new_workpoint = Workpoint.create_item(data)
-#     db.session.add(new_workpoint)
-#     db.session.commit()
-
-#     return jsonify(new_workpoint.to_dict()), 201
 
 @workpoint_bp.route("/today/<string:user_id>", methods=["GET"])
 def get_workpoint_today_detail(user_id):

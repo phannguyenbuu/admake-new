@@ -421,14 +421,14 @@ def generate_ecosystem_config(n):
 
 
 
-upload_to_vps_multiple(
-    host="31.97.76.62",
-    port=22,
-    username="root",
-    password="@baoLong0511",
-    local_dirs=["nginx"],
-    remote_base_dir="/etc"
-)
+# upload_to_vps_multiple(
+#     host="31.97.76.62",
+#     port=22,
+#     username="root",
+#     password="@baoLong0511",
+#     local_dirs=["nginx"],
+#     remote_base_dir="/etc"
+# )
 
 local_dirs = [
     "main-be/models.py",

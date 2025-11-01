@@ -10,6 +10,7 @@ import { columnsWorkPoint } from "../../../common/data";
 // import { useDebounce } from "../../../common/hooks/useDebounce";
 import { useState, useEffect } from "react";
 import { useApiHost } from "../../../common/hooks/useApiHost";
+import { useUser } from "../../../common/hooks/useUser";
 import type { Workpoint, WorkDaysProps } from "../../../@types/workpoint";
 // import type { Leave } from "../../../@types/leave.type";
 
@@ -29,6 +30,8 @@ export const WorkPointPage: IPage["Component"] = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedRecord, setSelectedRecord] = useState<WorkDaysProps | null>(null);
 
+  const {userLeadId} = useUser();
+
   const handleOpenModal = (record: WorkDaysProps) => {
     setSelectedRecord(record);
     setModalVisible(true);
@@ -46,6 +49,7 @@ export const WorkPointPage: IPage["Component"] = () => {
       const response = await fetch(
         `${useApiHost()}/workpoint/page?` +
           new URLSearchParams({
+            lead: userLeadId.toString(),
             page: String(page),
             limit: String(limit),
             search,

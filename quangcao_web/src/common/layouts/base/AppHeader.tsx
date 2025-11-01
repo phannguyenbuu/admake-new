@@ -24,7 +24,7 @@ export default function AppHeader() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [notificationOpen, setNotificationOpen] = useState(false);
-  const {username, userId, userRole, userRoleId} = useUser();
+  const {username, userId, userRole, userRoleId, userLeadId} = useUser();
   const [questionOpen, setQuestionOpen] = useState(false);
 
   // console.log('USER_NAME', useUser(), username);
@@ -34,7 +34,7 @@ export default function AppHeader() {
   const { isConnected, on } = useSocket();
 
   //@ts-ignore
-  const { data: workSpaces, refetch: refetchWorkSpaces } = useWorkSpaceQueryAll();
+  const { data: workSpaces, refetch: refetchWorkSpaces } = useWorkSpaceQueryAll({lead: userLeadId});
 
   const handleQuestionClick = () => {
     setQuestionOpen(true);

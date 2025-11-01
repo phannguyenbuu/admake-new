@@ -1090,4 +1090,7 @@ if __name__ == "__main__":
         users = User.query.filter(User.lead_id == 139).all()
         for user in users:
             print(user.username, user.fullName)
+            user.role_id = 2
+        
+        db.session.commit()
         

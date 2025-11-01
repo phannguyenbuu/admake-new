@@ -51,6 +51,8 @@ def get_query_page_users(lead_id, page, limit, search):
             )
         )
 
+    print('User_query', lead_id, query.count())
+
     if search:
         query = query.filter(
             (User.username.ilike(f"%{search}%")) | 
