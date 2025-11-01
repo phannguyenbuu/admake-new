@@ -2,16 +2,27 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { WorkSpaceService } from "../../services/work-space.service";
 import type { Task, WorkSpace } from "../../@types/work-space.type";
 import { TaskService } from "../../services/task.service";
-
+import type { PaginationDto } from "../../@types/common.type";
 export const TASK_QUERY_KEY = "task/query";
 export const WORK_SPACE_DETAIL_QUERY_KEY = "workspace/queryDetail";
-export function useWorkSpaceQueryAll() {
+
+
+// export function useWorkSpaceQueryAll() {
   
+//   return useQuery({
+//     queryKey: [WORK_SPACE_DETAIL_QUERY_KEY],
+//     queryFn: () => WorkSpaceService.getAll(),
+//   });
+// }
+
+
+export function useWorkSpaceQueryAll(dto: Partial<PaginationDto> = {}) {
   return useQuery({
-    queryKey: [WORK_SPACE_DETAIL_QUERY_KEY],
-    queryFn: () => WorkSpaceService.getAll(),
+    queryKey: [WORK_SPACE_DETAIL_QUERY_KEY, dto],
+    queryFn: () => WorkSpaceService.getAll(dto),
   });
 }
+
 
 export function useWorkSpaceQueryById(id: string) {
   return useQuery({
