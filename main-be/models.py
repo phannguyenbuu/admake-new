@@ -200,7 +200,7 @@ class User(BaseModel):
         gender_map = {
             "female": 1,
             "male": 0,
-            "other": 3
+            "other": 2
         }
         if "gender" in filtered_params and isinstance(filtered_params["gender"], str):
             filtered_params["gender"] = gender_map.get(filtered_params["gender"].lower(), filtered_params["gender"])
@@ -252,8 +252,8 @@ class Role(BaseModel):
     
     permissions = db.Column(JSON)  # lưu list permissions
     name = db.Column(db.String(255))
-    lead_id = db.Column(db.Integer, db.ForeignKey('lead.id'))
-    lead = db.relationship('LeadPayload', backref='roles')
+    # lead_id = db.Column(db.Integer, db.ForeignKey('lead.id'))
+    # lead = db.relationship('LeadPayload', backref='roles')
 
     def to_dict(self):
         result = {}

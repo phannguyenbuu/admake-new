@@ -108,6 +108,20 @@ def update_user(id):
                 value = dateStr(value)
 
             setattr(user, key, value)
+    gender_map = {
+        "female": 1,
+        "male": 0,
+        "other": 2
+    }
+
+    if "gender" in data and isinstance(data["gender"], str):
+        gender_val = gender_map.get(data["gender"].lower())
+        if gender_val is not None:
+            setattr(user, "gender", gender_val)
+        else:
+            # Xử lý trường hợp giá trị gender không hợp lệ
+            # Có thể raise lỗi hoặc gán giá trị mặc định, vd:
+            setattr(user, "gender", 3)  # mặc định 'other'
         
     try:
         db.session.commit()
