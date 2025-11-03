@@ -24,8 +24,3 @@ export interface UpdateData {
   phone: string;
   password?: string;
 }
-
-export interface UserHeaderProps {
-  info: Pick<User, "fullName" | "role" | "avatar">;
-  onRefetch?: () => void;
-}

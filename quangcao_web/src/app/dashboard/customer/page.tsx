@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import type { IPage, PaginationDto } from "../../../@types/common.type";
-import type { Customer } from "../../../@types/customer.type";
+// import type { Customer } from "../../../@types/customer.type";
 import { useCustomerQuery } from "../../../common/hooks/customer.hook";
 import ButtonComponent from "../../../components/Button";
 import TableComponent from "../../../components/table/TableComponent";

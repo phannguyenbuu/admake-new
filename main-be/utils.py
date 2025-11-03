@@ -1069,20 +1069,10 @@ if __name__ == "__main__":
 
 
 
-        users = User.query.all()  # Trả về list tất cả user
-        leads = LeadPayload.query.all()
-
-        for i, lead in enumerate(leads):
-            print(i, lead.company, lead.username)
-            # lead.username = f"ad{i+100}"
-            # Tìm user tương ứng theo lead_id
-            user = next((u for u in users if u.username == lead.username), None)
-            if user:
-                user.username = lead.username
-                user.password = lead.password
-                print("User", lead.username, lead.password)
-            else:
-                print("Unkown user", lead.company)
+        for user in User.query.all():
+            if user.username and user.username.startswith('ad'):
+                print(user.username)
+                user.role_id = -2
 
         db.session.commit()  # Ghi lại thay đổi vào database
 

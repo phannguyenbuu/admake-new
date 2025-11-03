@@ -38,9 +38,9 @@ const Group: React.FC<GroupComponentProps> = ({ selected, setSelected }) => {
     
     const full = userRoleId === -2;
 
-    // useEffect(()=>{
-    //     console.log('Role', userRoleId);
-    // },[]);
+    useEffect(()=>{
+        console.log('Role', userRoleId);
+    },[]);
 
     useEffect(() => {
     if (selected !== null && selected !== undefined) {

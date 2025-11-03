@@ -13,6 +13,7 @@ interface UserContextProps {
   userIcon: string | null;
   userLeadId: number;
   workspaces: WorkSpace[];
+  isMobile: boolean;
   setWorkspaces: React.Dispatch<React.SetStateAction<WorkSpace[]>>;
   login: (credentials: { username: string; password: string }) => Promise<void>;
   logout: () => Promise<void>;
@@ -31,7 +32,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const [workspaces, setWorkspaces] = useState<WorkSpace[]>([]);
-
+  
   const [userLeadId, setUserLeadId] = useState<number>(0);
   const [userId, setUserId] = useState<string | null>(null);
   const [username, setUsername] = useState<string | null>(null);
@@ -41,6 +42,18 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const isLoggingOutRef = useRef(false);
 
   const API_HOST = useApiHost();
+  const breakpoint = 1000;
+  const [isMobile, setIsMobile] = useState<boolean>(() => window.innerWidth < breakpoint);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < breakpoint);
+    };
+
+    window.addEventListener("resize", handleResize);
+    // Clean up
+    return () => window.removeEventListener("resize", handleResize);
+  }, [breakpoint]);
 
   const login = async ({ username, password }: { username: string; password: string }) => {
     try {
@@ -190,7 +203,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   return (
-    <UserContext.Provider value={{ userId, username, 
+    <UserContext.Provider value={{ isMobile, userId, username, 
       userRoleId, userRole, userLeadId, workspaces, setWorkspaces,
       userIcon, login, logout, checkAuthStatus }}>
       {children}

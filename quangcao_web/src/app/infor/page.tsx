@@ -2,7 +2,7 @@ import type { IPage } from "../../@types/common.type";
 import { Card, Button, Tooltip } from "antd";
 import { EditOutlined } from "@ant-design/icons";
 import { useInfo } from "../../common/hooks/info.hook";
-import { UserHeader } from "../../components/dashboard/info/UserHeader";
+
 import { UserForm } from "../../components/dashboard/info/UserForm";
 import { useState } from "react";
 import { useUser } from "../../common/hooks/useUser";
@@ -33,8 +33,7 @@ export const InforDashboard: IPage["Component"] = () => {
           bodyStyle={{ padding: "0" }}
         >
           {/* Header với Avatar */}
-          {/* <UserHeader info={info} onRefetch={() => refetch()} /> */}
-
+          
           <div className="bg-gradient-to-br from-gray-600 to-gray-800 rounded-t-xl sm:rounded-t-2xl p-4 sm:p-6 lg:p-8">
             <div className="flex flex-col items-center relative">
               {/* User Info */}

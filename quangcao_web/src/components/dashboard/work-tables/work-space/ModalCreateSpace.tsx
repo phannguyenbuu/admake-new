@@ -84,7 +84,7 @@ export default function ModalCreateSpace({
         <div className="p-8">
           <Form
             layout="vertical"
-            onFinish={handleCreate}
+            // onFinish={handleCreate}
             form={form}
             autoComplete="off"
             className="space-y-6"

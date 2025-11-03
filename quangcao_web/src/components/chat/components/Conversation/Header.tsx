@@ -6,6 +6,7 @@ import StyledBadge from '../StyledBadge';
 import { useUser } from '../../../../common/hooks/useUser';
 import SearchIcon from '@mui/icons-material/Search';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import { Flex } from 'antd';
 // import type { GroupProps } from '../../../../@types/chat.type';
 
 interface HeaderProps {
@@ -148,15 +149,17 @@ const Header: React.FC<HeaderProps>
 export default Header
 
 export const LogoAdmake = () => {
+  const {userRoleId, isMobile} = useUser();
   return (
-    <div className="flex items-center justify-end pb-5 w-full" 
-      style={{ scale: 0.75, transform:'translateX(-50%)' }}>
-      <div className="flex items-center justify-center" style={{borderRadius:50, overflow:'hidden'}}>
-        <img src="/logo.jpg" alt="logo" className="w-13 h-13" />
+    <div style={{marginLeft:isMobile ? 0: 0,  display:'flex' }}>
+      <div style={{borderRadius:50, overflow:'hidden'}}>
+        <img src="/logo.jpg" alt="logo" 
+          style={{width: 40, height: "auto", objectFit: "contain",}} />
       </div>
-      <div className="flex items-center justify-center">
-        <img src="/ADMAKE.svg" alt="ADMAKE" className="h-8" />
-      </div>
+      
+        <img src="/ADMAKE.svg" alt="ADMAKE"  
+          style={{width: 80, height: "auto", objectFit: "contain",}}/>
+      
     </div>
   )
 }
