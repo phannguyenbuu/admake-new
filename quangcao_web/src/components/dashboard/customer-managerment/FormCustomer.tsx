@@ -45,9 +45,9 @@ export default function FormCustomer({
   onRefresh,
 }: FormCustomerProps) {
   const [form] = Form.useForm();
-  const {userLeadId, setWorkspaces} = useUser();
+  const {userLeadId, workspaces, setWorkspaces} = useUser();
   const [formValues, setFormValues] = useState<any>({});
-  const { mutate: createCustomer, data:workSpaces, error, isPending: isCreating } = useCreateCustomer();
+  const { mutate: createCustomer, data:workSpaceItem, error, isPending: isCreating } = useCreateCustomer();
   const { mutate: updateCustomer, isPending: isUpdating } = useUpdateCustomer();
   const { data: customerDetail, isLoading: isLoadingCustomerDetail } = useCustomerDetail(initialValues?.id);
 
@@ -121,11 +121,11 @@ export default function FormCustomer({
           form.resetFields();
           // onDelete();
           onRefresh();
-          setWorkspaces((prev) => {
-            if (!workSpaces) return prev;
-            const newItems = workSpaces.filter(ws => !prev.some(p => p.id === ws.id));
-            return [...prev, ...newItems];
-          });
+          // setWorkspaces((prev) => {
+          //   if (!workspaces || !workSpaceItem ) return prev;
+          //   // const newItems = workSpaces.filter(ws => !prev.some(p => p.id === ws.id));
+          //   return [...prev, ...workSpaceItem];
+          // });
 
         },
         onError: () => {

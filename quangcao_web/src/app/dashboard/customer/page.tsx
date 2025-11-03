@@ -13,8 +13,9 @@ import { useApiHost } from "../../../common/hooks/useApiHost";
 import type { WorkSpace } from "../../../@types/work-space.type";
 import { useUser } from "../../../common/hooks/useUser";
 
+
 export const CustomerDashboard: IPage["Component"] = () => {
-  const {userLeadId} = useUser();
+  const {userLeadId, setWorkspaces} = useUser();
   const [query, setQuery] = useState<Partial<PaginationDto>>({
     page: 1,
     limit: 10,
@@ -39,6 +40,7 @@ export const CustomerDashboard: IPage["Component"] = () => {
   useEffect(() => {
     if (customers) {
       console.log("Received new data:", customers);
+      setWorkspaces(customers.data);
     }
   }, [customers]);
 

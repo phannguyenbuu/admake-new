@@ -57,13 +57,7 @@ export default function RenderMenuBar({}) {
       lead: userLeadId,
       search: "",
     });
-  // Sử dụng API hooks
-  // const { data: workSpaces, refetch: refetchWorkSpaces } =
-  //   useWorkSpaceQueryAll(query);
-
-  // console.log("Init works", workSpaces);
-
-  // const { mutate: createWorkSpace } = useCreateWorkSpace();
+  
 
   const adminMode = true; //useCheckPermission();
 
@@ -73,31 +67,16 @@ export default function RenderMenuBar({}) {
   // Desktop menu state - phải được khai báo trước khi có early return
   const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
 
-  // const handleAddBoard = (values: { name: string }) => {
-  //   setIsModalOpen(false);
-
-  //   // Sử dụng API để tạo workspace mới
-  //   createWorkSpace(
-  //     {
-  //       name: values.name,
-  //     } as WorkSpace,
-  //     {
-  //       onSuccess: () => {
-  //         message.success("Tạo workspace mới thành công!");
-  //         refetchWorkSpaces(); // Refetch danh sách sau khi tạo
-  //       },
-  //       onError: () => {
-  //         message.error("Có lỗi xảy ra khi tạo workspace!");
-  //       },
-  //     }
-  //   );
-  // };
-
   const handleTabletWorkTablesClick = () => {
     if (isTablet) {
       setIsTabletWorkspaceModalOpen(true);
     }
   };
+
+  useEffect(()=>
+  {
+    console.log('WS', workspaces);
+  },[workspaces]);
 
   // Lấy menu items từ router và filter cho mobile
   const allMenuItems = getMainMenuItems(pathname);
