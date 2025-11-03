@@ -24,6 +24,8 @@ def load_user(user_id):
 
 @auth_bp.route('/login', methods=['POST'])
 def login():
+    check_admake_database_exists()
+
     data = request.get_json()
     print(data)
     username = data.get('username')
@@ -117,3 +119,115 @@ def invalid_token_callback(error):
 def missing_token_callback(error):
     app.logger.warning(f"Missing token error: {error}")
     return jsonify({"message": "Request missing token"}), 401
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+from sqlalchemy import create_engine, text
+from sqlalchemy.exc import OperationalError
+from dotenv import load_dotenv
+from urllib.parse import urlparse
+import os
+import subprocess
+
+
+def create_admake_chat_database(db_name="admake_chat", db_user="postgres"):
+    try:
+        # Dùng lệnh createdb của postgresql
+        subprocess.run(
+            ["createdb", "-U", db_user, db_name],
+            check=True
+        )
+        print(f"Database '{db_name}' đã được tạo thành công.")
+    except subprocess.CalledProcessError as e:
+        print(f"Lỗi khi tạo database '{db_name}': {e}")
+
+# Gọi hàm tạo db
+
+
+def restore_database_from_latest_dump(db_name="admake_chat", db_user="postgres", dump_dir="/root"):
+    create_admake_chat_database()
+
+    # Lấy danh sách file .dump trong thư mục
+    dump_files = [f for f in os.listdir(dump_dir) if f.endswith(".dump")]
+    if not dump_files:
+        print("Không tìm thấy file dump nào trong thư mục", dump_dir)
+        return False
+    
+    # Lấy file mới nhất dựa vào thời gian sửa đổi
+    latest_dump = max(dump_files, key=lambda f: os.path.getmtime(os.path.join(dump_dir, f)))
+    latest_dump_path = os.path.join(dump_dir, latest_dump)
+    print("File dump mới nhất:", latest_dump_path)
+
+    # Câu lệnh restore pg_restore
+    cmd = [
+        "pg_restore",
+        "--clean",
+        "--if-exists",
+        f"--dbname={db_name}",
+        "-U", db_user,
+        latest_dump_path,
+    ]
+
+    try:
+        # Chạy lệnh restore, cần user có quyền hoặc thực thi dưới user postgres
+        subprocess.run(cmd, check=True)
+        print(f"Restore database '{db_name}' từ file {latest_dump} thành công.")
+        return True
+    except subprocess.CalledProcessError as e:
+        print("Lỗi khi restore database:", e)
+        return False
+
+
+
+def check_admake_database_exists():
+    load_dotenv()
+
+    database_url = os.getenv("DATABASE_URL")
+    if not database_url:
+        print("Cảnh báo: Biến môi trường DATABASE_URL chưa được thiết lập!")
+        return False
+
+    # Phân tích URL để lấy database default (postgres) để connect
+    parsed_url = urlparse(database_url)
+    # Thay database trong URL thành 'postgres' để connect kiểm tra
+    db_default_url = database_url.replace(parsed_url.path, "/postgres", 1)
+
+    # Lấy tên database muốn kiểm tra từ URL gốc
+    db_name = parsed_url.path.lstrip("/")
+
+    engine = create_engine(db_default_url)
+    try:
+        with engine.connect() as conn:
+            result = conn.execute(
+                text("SELECT 1 FROM pg_database WHERE datname = :dbname"), {"dbname": db_name}
+            )
+            exists = result.scalar() is not None
+            if not exists:
+                print(f"Cảnh báo: Database '{db_name}' không tồn tại. Đang restore từ file dump")
+                restore_database_from_latest_dump()
+            return exists
+    except OperationalError as e:
+        print(f"Lỗi kết nối tới server: {e}")
+        return False
+    

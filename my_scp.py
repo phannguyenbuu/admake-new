@@ -435,6 +435,7 @@ local_dirs = [
     "main-be/app.py",
     "main-be/.env",
     "main-be/api",
+    "main-be/procs.py",
     "lead-be/app.py",
     "lead-be/models.py",
     "lead-be/.env",

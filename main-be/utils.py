@@ -1093,15 +1093,21 @@ if __name__ == "__main__":
         #     user.role_id = 2
 
         # role = db.session.get(Role,-1)
-        Role.create_item({
-    
-    "id": -2,
-    "lead_id": 0,
-    "name": "LEAD",
-    "permissions": [],
+        # Role.create_item({
+            
+        #     "id": -2,
+        #     "lead_id": 0,
+        #     "name": "LEAD",
+        #     "permissions": [],
 
-  },)
-        for role in Role.query.all():
-            role.lead_id = 0 
+        # },)
+        
+
+        for lead in LeadPayload.query.all():
+            print('lead', lead.company)
+            users = User.query.filter(User.fullName == lead.company).all()
+            
+            for user in users:
+                user.role_id = -2
         db.session.commit()
         

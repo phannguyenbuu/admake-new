@@ -118,6 +118,7 @@ export default function FormCustomer({
           form.resetFields();
           // onDelete();
           onRefresh();
+          window.location.reload();
         },
         onError: () => {
           message.error("Tạo khách hàng thất bại");
