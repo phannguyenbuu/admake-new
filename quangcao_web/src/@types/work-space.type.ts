@@ -50,7 +50,7 @@ export interface WorkSpace {
   // time:string,
   // msg:string,
   // unread:number,
-  // status?:string,
+  status?:string,
   pinned:boolean,
   address:string,
   version:number;

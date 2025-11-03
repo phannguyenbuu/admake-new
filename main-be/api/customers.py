@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify, abort
-from models import db, Workspace, dateStr, User, create_customer_method, Message, LeadPayload, get_model_columns
+from models import db, Workspace, dateStr, User, create_workspace_method, Message, LeadPayload, get_model_columns
 # from api.groups import create_group
 import datetime
 from sqlalchemy import desc
@@ -51,7 +51,7 @@ def get_customers():
 def create_customer():
     data = request.get_json()
     
-    return create_customer_method(data)
+    return create_workspace_method(data)
 
 
 
@@ -76,34 +76,34 @@ def get_customer_detail(id):
 @customer_bp.route("/<string:id>", methods=["PUT"])
 def update_customer(id):
     data = request.get_json()
-    customer = db.session.get(Workspace, id)
-    if not customer:
+    workspace = db.session.get(Workspace, id)
+    if not workspace:
         return jsonify({"error": "Workspace not found"}), 404
 
-    user = db.session.get(User, customer.owner_id)
+    user = db.session.get(User, workspace.owner_id)
 
     if not user:
         abort(404, description="Workspace owner not found")
 
     user_fields = get_model_columns(User)
-    customer_fields = get_model_columns(Workspace)
+    workspace_fields = get_model_columns(Workspace)
 
     # update User
-    for k, value in data.items():
-        if k.startswith("user_"):
-            key = k.replace("user_", "")
-            if key in user_fields and hasattr(user, key):
-                setattr(user, key, value)
+    for key, value in data.items():
+        if key in user_fields and hasattr(user, key):
+            if key in ['workStart', 'workEnd'] and isinstance(value, str):
+                    value = dateStr(value)
+            setattr(user, key, value)
 
     # update Customer
     for key, value in data.items():
-        if not key.startswith("user_") and key in customer_fields and hasattr(customer, key):
-                if key in ['workStart', 'workEnd'] and isinstance(value, str):
-                    value = dateStr(value)
-                setattr(customer, key, value)
+        if key in workspace_fields and hasattr(workspace, key):
+            if key in ['workStart', 'workEnd'] and isinstance(value, str):
+                value = dateStr(value)
+            setattr(workspace, key, value)
 
     db.session.commit()
-    return jsonify(customer.to_dict()), 200
+    return jsonify(workspace.to_dict()), 200
 
 @customer_bp.route("/<string:id>", methods=["DELETE"])
 def delete_customer(id):

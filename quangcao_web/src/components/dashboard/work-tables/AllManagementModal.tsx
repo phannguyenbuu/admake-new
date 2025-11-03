@@ -33,16 +33,6 @@ export default function AllManagementModal() {
   const [roleVisible, setRoleVisible] = useState(false);
   const [isHover, setIsHover] = useState(false);
 
-  // const convertBoardToColumns = useCallback(
-  //   (boardData: TasksResponse): ColumnType[] => {
-  //     return fixedColumns.map((col) => ({
-  //       ...col,
-  //       tasks: boardData[col.type]?.tasks || [],
-  //     }));
-  //   },
-  //   []
-  // );
-
   useEffect(() => {
   async function fetchTasks() {
     const apiUrl = `${useApiHost()}/task/inlead/${userLeadId}`;

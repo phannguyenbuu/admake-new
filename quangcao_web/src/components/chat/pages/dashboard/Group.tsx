@@ -10,15 +10,16 @@ import ChatElement from '../../components/ChatElement';
 import Conversation from "../../components/Conversation";
 import { socket } from '../../components/Conversation/socket';
 import Contact from '../../components/Contact';
-import type { GroupProps, MessageTypeProps } from '../../../../@types/chat.type';
+import type { MessageTypeProps } from '../../../../@types/chat.type';
 import { useUser } from '../../../../common/hooks/useUser';
 
 import { useApiHost } from '../../../../common/hooks/useApiHost';
 import { notification } from 'antd';
+import type { WorkSpace } from '../../../../@types/work-space.type';
 
 interface GroupComponentProps {
-  selected: GroupProps | null;
-  setSelected: React.Dispatch<React.SetStateAction<GroupProps | null>> | null;
+  selected: WorkSpace | null;
+  setSelected: React.Dispatch<React.SetStateAction<WorkSpace | null>> | null;
 }
 
 const Group: React.FC<GroupComponentProps> = ({ selected, setSelected }) => {
@@ -26,20 +27,26 @@ const Group: React.FC<GroupComponentProps> = ({ selected, setSelected }) => {
     const [showRight, setShowRight] = useState(false);
     const [messageList, setMessages] = useState<MessageTypeProps[]>([]);
     const [title, setTitle] = useState('');
-    const [currentGroup, setcurrentGroup] = useState<GroupProps | null>(null);
+    const [currentGroup, setcurrentGroup] = useState<WorkSpace | null>(null);
     const [status, setStatus] = useState<string | undefined>('');
     const [_loading, setLoading] = useState(false);
     const [_error, setError] = useState(null);
     const urlApi = useApiHost();
-    const {userRoleId} = useUser();
-    const [showFooter, setShowFooter] = useState<boolean>(false);
-    const full = userRoleId > 0;
+    const {userRoleId, workspaces} = useUser();
+    // const [showFooter, setShowFooter] = useState<boolean>(false);
+
+    
+    const full = userRoleId === -2;
+
+    // useEffect(()=>{
+    //     console.log('Role', userRoleId);
+    // },[]);
 
     useEffect(() => {
     if (selected !== null && selected !== undefined) {
     //   console.log("SLEED", selected);
       handleClick(selected); // Có thể truyền tên trống hoặc lấy từ data thực tế
-      setShowFooter(selected?.status === "talk" || selected?.status === "pass");
+    //   setShowFooter(selected?.status === "talk" || selected?.status === "pass");
     }
   }, [selected]);
 
@@ -56,12 +63,10 @@ const Group: React.FC<GroupComponentProps> = ({ selected, setSelected }) => {
          })
      .catch(console.error);
 
- }
-
- 
+    }
 
     //   Xử lý khi click vào group
-    const handleClick = (el:GroupProps) => {
+    const handleClick = (el:WorkSpace) => {
         if(setSelected)
         {
             setSelected(el);
@@ -95,88 +100,55 @@ const Group: React.FC<GroupComponentProps> = ({ selected, setSelected }) => {
     };
 
 
-const [groupList, setGroupList] = useState<GroupProps[]>([]);
-  const API_HOST = useApiHost();
+// const [workspaces, setGroupList] = useState<GroupProps[]>([]);
+//   const API_HOST = useApiHost();
   
-  useEffect(() => {
-    // console.log('!!!API', API_HOST);
+//   useEffect(() => {
+//     setGroupList(workspaces);
 
-    fetch(`${API_HOST}/group/`)
-      .then((res) => res.json())
-      .then((data: GroupProps[]) => 
-        {
-        //   console.log('GroupData', data);
-          setGroupList(data);
-        })
-      .catch((error) => console.error("Failed to load group data", error));
-  }, []);
+//     // fetch(`${API_HOST}/group/`)
+//     //   .then((res) => res.json())
+//     //   .then((data: GroupProps[]) => 
+//     //     {
+//     //     //   console.log('GroupData', data);
+//     //       setGroupList(data);
+//     //     })
+//     //   .catch((error) => console.error("Failed to load group data", error));
+//   }, []);
 
 
   
- useEffect(() => {
-    if (!currentGroup) return;
+    useEffect(() => {
+        if (!currentGroup) return;
 
-    socket.on('admake/chat/message_deleted', ({ message_id }) => {
-        setMessages(prev => prev.filter(m => m.message_id !== message_id));
-    });
+        socket.on('admake/chat/message_deleted', ({ message_id }) => {
+            setMessages(prev => prev.filter(m => m.message_id !== message_id));
+        });
 
-    //   Join vào room group hiện tại
-    socket.emit('admake/chat/join_group', { group_id: currentGroup.version });
+        //   Join vào room group hiện tại
+        socket.emit('admake/chat/join_group', { group_id: currentGroup.version });
 
-    //   Lắng nghe tin nhắn mới realtime
-    socket.on('admake/chat/message', (msg) => {
-        console.log('Current Group ID', currentGroup, msg);
-        if (msg.group_id === currentGroup.version) {  // chỉ thêm tin nhắn cùng group
-            setMessages(prev => [...prev, msg]);  // thêm tin nhắn mới vào cuối
-        }
-    });
+        //   Lắng nghe tin nhắn mới realtime
+        socket.on('admake/chat/message', (msg) => {
+            console.log('Current Group ID', currentGroup, msg);
+            if (msg.group_id === currentGroup.version) {  // chỉ thêm tin nhắn cùng group
+                setMessages(prev => [...prev, msg]);  // thêm tin nhắn mới vào cuối
+            }
+        });
 
-    //   Cleanup khi unmount hoặc khi currentGroup thay đổi
-    return () => {
-        socket.off('admake/chat/message');
-        socket.off('admake/chat/message_deleted');
-        socket.emit('admake/chat/leave_group', { group_id: currentGroup.version }); // tùy backend có xử lý leave room không
-    };
- }, [currentGroup]);
-
-
- const handleDeleteGroup = () => {
-  if (!selected) return;
-
-  fetch(`${useApiHost()}/group/${selected.id}`, {
-    method: "DELETE",
-    headers: { "Content-Type": "application/json" },
-  })
-    .then((response) => {
-      if (!response.ok) throw new Error("Xóa nhóm thất bại");
-      return response.json();
-    })
-    .then(() => {
-      notification.success({message:"Xóa nhóm chat thành công"});
-
-      // Cập nhật lại groupList loại bỏ nhóm đã xóa
-      setGroupList((prevGroupList) =>
-        prevGroupList.filter((group) => group.id !== selected.id)
-      );
-
-      
-    })
-    .catch((err) => {
-      console.error(err);
-      notification.error({message:"Lỗi khi xóa nhóm chat"});
-    });
-};
+        //   Cleanup khi unmount hoặc khi currentGroup thay đổi
+        return () => {
+            socket.off('admake/chat/message');
+            socket.off('admake/chat/message_deleted');
+            socket.emit('admake/chat/leave_group', { group_id: currentGroup.version }); // tùy backend có xử lý leave room không
+        };
+    }, [currentGroup]);
 
 
-useEffect(()=>{
-    // setSelected && setSelected(groupList && groupList.length > 0 ? groupList[0] : null);
-},[groupList]);
 
+    const theme = useTheme();
 
- const theme = useTheme();
-//  const [openDialog, setOpenDialog] = useState(false);
-
- return (
+    return (
      <>
          <Stack direction={'row'}>
             { full &&
@@ -187,45 +159,13 @@ useEffect(()=>{
                 boxShadow: '0px 0px 2px rgba(0,0,0,0.25)'
              }}>
                  <Stack p={0} spacing={2}>
-                     {/* <Search>
-                         <SearchIconWrapper>
-                             <SearchIcon color="primary" />
-                         </SearchIconWrapper>
-                     </Search> */}
-                    
-                     {/* <Divider /> */}
                      <Stack spacing={0.5} className='scrollbar' sx={{ flexGrow: 1, overflowY: 'hidden'}}>
-                        {/* <Typography variant='subtitle2' sx={{ color: '#676667' }}>Pinned</Typography>
-                        {groupList && groupList.filter(el => el.name === 'TELEGRAM' || el.name === 'APPLE').map((el, idx) => (
-                            <ChatElement
-                                id={el.id}
-                                img={el.img}
-                                online={true}
-                                time={el.time}
-                                name={el.name}
-                                msg={el.msg}
-                                note={el.address}
-                                unread={el.unread}
-                                onClick={() => handleClick(el)}
-                                key={`ChatElement-${idx}`}
-                            />
-                        ))} */}
-
-                        {/* <Typography variant='subtitle2' sx={{ color: '#676667' }}>All Groups</Typography> */}
                         <Stack spacing={0} sx={{height:'82vh', border:'1px solid #ccc', overflowY:'auto', overflowX:'hidden'}}>
-                            
-                            {groupList && groupList.filter(el => !el.pinned).map((el, idx) => (
-                                <ChatElement
-                                    id={el.id}
-                                    img={el.img}
-                                    online={true}
-                                    time={el.time}
-                                    name={el.name}
-                                    msg={el.msg}
-                                    note={el.address}
-                                    unread={el.unread}
+                            {workspaces && workspaces.map((el, idx) => (
+                                <ChatElement workspace={el}
                                     onClick={() => handleClick(el)}
                                     key={`ChatElement-${idx}`}
+                                    selected={selected?.id === el.id}
                                 />
                             ))}
                         </Stack> 
@@ -244,8 +184,8 @@ useEffect(()=>{
                 userId=''
                 username=''
                 onDelete={handleDeleteMessage}
-                showFooter={showFooter}
-                onGroupDelete={handleDeleteGroup}
+                // showFooter={showFooter}
+                // onGroupDelete={handleDeleteGroup}
             />
         
             {full &&
@@ -257,7 +197,7 @@ useEffect(()=>{
                      sm: "block",
                  },
                  boxShadow: '0px 0px 2px rgba(0,0,0,0.25)'}}>
-                    <Contact messages={messageList} groupEl={selected ?? null} setShowFooter={setShowFooter}/>
+                    <Contact messages={messageList} groupEl={selected ?? null}/>
              </Box>}
          </Stack>
 

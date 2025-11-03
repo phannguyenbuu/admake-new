@@ -20,7 +20,7 @@ import type { StatusType } from "./task/JobInfoCard";
 import type { FormTaskDetailProps } from "../../../@types/work-space.type";
 import {Stack, Box} from "@mui/material";
 import type { UserList, User } from "../../../@types/user.type";
-import type { Customer, CustomerList } from "../../../@types/customer.type";
+// import type { Customer, CustomerList } from "../../../@types/customer.type";
 import type { Id } from "@hello-pangea/dnd";
 import { UpdateButtonContext } from "../../../common/hooks/useUpdateButtonTask";
 import JobAsset from "./task/JobAsset";

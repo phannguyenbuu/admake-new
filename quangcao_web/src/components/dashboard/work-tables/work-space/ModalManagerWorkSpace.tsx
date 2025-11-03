@@ -207,10 +207,10 @@ export default function ModalManagerWorkSpace({
                   >
                     {/* Enhanced Workspace Cover */}
                     <div className="relative w-20 h-16 rounded-xl overflow-hidden flex-shrink-0 shadow-md group-hover:shadow-lg transition-all duration-300">
-                      {workspace.cover ? (
+                      {workspace.status ? (
                         <>
                           <img
-                            src={workspace.cover}
+                            src={workspace.status}
                             alt="workspace cover"
                             className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
                           />

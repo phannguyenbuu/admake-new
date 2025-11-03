@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify, abort
-from models import app, db, Workspace, Task, dateStr,Message, generate_datetime_id, User, create_customer_method, get_model_columns, LeadPayload,get_lead_by_json, get_lead_by_arg
+from models import app, db, Workspace, Task, dateStr,Message, generate_datetime_id, User, create_workspace_method, get_model_columns, LeadPayload,get_lead_by_json, get_lead_by_arg
 import datetime
 from collections import defaultdict
 from sqlalchemy import desc
@@ -27,8 +27,8 @@ def get_workspaces():
 def create_workspace_route():
     # data = request.get_json()
     # new_workspace = create_workspace(data)
-
-    return create_customer_method(request.get_json())
+    # print("Create Workspace JSON", request.get_json())
+    return create_workspace_method(request.get_json())
 
 def create_workspace(data):
     name = data.get('name')

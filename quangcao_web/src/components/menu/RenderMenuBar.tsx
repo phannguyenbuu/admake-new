@@ -9,10 +9,10 @@ import {
   CheckOutlined,
   PlusOutlined,
 } from "@ant-design/icons";
-import {
-  useWorkSpaceQueryAll,
-  useCreateWorkSpace,
-} from "../../common/hooks/work-space.hook";
+// import {
+//   useWorkSpaceQueryAll,
+//   useCreateWorkSpace,
+// } from "../../common/hooks/work-space.hook";
 import { message, Menu } from "antd";
 import type { WorkSpace } from "../../@types/work-space.type";
 import "./mobile-menu.css";
@@ -49,7 +49,7 @@ export default function RenderMenuBar({}) {
   const { pathname } = useLocation();
   const navigate = useNavigate();
   const { width } = useWindowSize();
-  const {userLeadId} = useUser();
+  const {userLeadId, workspaces} = useUser();
 
   const [query, setQuery] = useState<Partial<PaginationDto>>({
       page: 1,
@@ -58,41 +58,40 @@ export default function RenderMenuBar({}) {
       search: "",
     });
   // Sử dụng API hooks
-  const { data: workSpaces, refetch: refetchWorkSpaces } =
-    useWorkSpaceQueryAll(query);
+  // const { data: workSpaces, refetch: refetchWorkSpaces } =
+  //   useWorkSpaceQueryAll(query);
 
   // console.log("Init works", workSpaces);
 
-  const { mutate: createWorkSpace } = useCreateWorkSpace();
+  // const { mutate: createWorkSpace } = useCreateWorkSpace();
 
   const adminMode = true; //useCheckPermission();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isTabletWorkspaceModalOpen, setIsTabletWorkspaceModalOpen] =
-    useState(false);
+  const [isTabletWorkspaceModalOpen, setIsTabletWorkspaceModalOpen] = useState(false);
 
   // Desktop menu state - phải được khai báo trước khi có early return
   const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
 
-  const handleAddBoard = (values: { name: string }) => {
-    setIsModalOpen(false);
+  // const handleAddBoard = (values: { name: string }) => {
+  //   setIsModalOpen(false);
 
-    // Sử dụng API để tạo workspace mới
-    createWorkSpace(
-      {
-        name: values.name,
-      } as WorkSpace,
-      {
-        onSuccess: () => {
-          message.success("Tạo workspace mới thành công!");
-          refetchWorkSpaces(); // Refetch danh sách sau khi tạo
-        },
-        onError: () => {
-          message.error("Có lỗi xảy ra khi tạo workspace!");
-        },
-      }
-    );
-  };
+  //   // Sử dụng API để tạo workspace mới
+  //   createWorkSpace(
+  //     {
+  //       name: values.name,
+  //     } as WorkSpace,
+  //     {
+  //       onSuccess: () => {
+  //         message.success("Tạo workspace mới thành công!");
+  //         refetchWorkSpaces(); // Refetch danh sách sau khi tạo
+  //       },
+  //       onError: () => {
+  //         message.error("Có lỗi xảy ra khi tạo workspace!");
+  //       },
+  //     }
+  //   );
+  // };
 
   const handleTabletWorkTablesClick = () => {
     if (isTablet) {
@@ -174,8 +173,8 @@ export default function RenderMenuBar({}) {
       <FooterMenuBar
         mobileMenuItems={mobileMenuItems}
         // @ts-ignore
-        boards={workSpaces || []}
-        onAddBoard={handleAddBoard}
+        // boards={workspaces || []}
+        // onAddBoard={handleAddBoard}
       />
     );
   }
@@ -189,7 +188,7 @@ export default function RenderMenuBar({}) {
         const hasChildren =
           item.key === "/dashboard/work-tables" &&
           // @ts-ignore
-          (workSpaces || []).length > 0;
+          (workspaces || []).length > 0;
 
         if (hasChildren && !isTablet) {
           // Menu item có children (workspaces)
@@ -214,14 +213,14 @@ export default function RenderMenuBar({}) {
             ),
             children: [
               // @ts-ignore
-              ...(workSpaces || []).map((workspace: WorkSpace) => ({
+              ...(workspaces || []).map((workspace: WorkSpace) => ({
                 key: `/dashboard/work-tables/${workspace.id}`,
                 label: (
                   <div className="flex items-center gap-3 py-1 px-2 rounded-lg hover:bg-white/10 transition-all duration-200">
                     <div className="w-10 h-6 rounded-lg bg-white/90 overflow-hidden flex-shrink-0 border border-white/40 shadow-md">
-                      {workspace.cover ? (
+                      {workspace.status ? (
                         <img
-                          src={workspace.cover}
+                          src={workspace.status}
                           alt="cover"
                           className="w-full h-full object-cover"
                         />
@@ -287,22 +286,22 @@ export default function RenderMenuBar({}) {
       </div>
 
       {/* Modal tạo bảng mới cho Desktop */}
-      <div className="!z-[10001]">
+      {/* <div className="!z-[10001]">
         <ModalCreateSpace
           open={isModalOpen}
           onCancel={() => setIsModalOpen(false)}
-          onCreate={handleAddBoard}
+          // onCreate={handleAddBoard}
         />
-      </div>
+      </div> */}
 
       {/* Modal Workspace cho Tablet - Enhanced UI */}
       <ModalManagerWorkSpace
         isTabletWorkspaceModalOpen={isTabletWorkspaceModalOpen}
         setIsTabletWorkspaceModalOpen={setIsTabletWorkspaceModalOpen}
         // @ts-ignore
-        workSpaces={workSpaces || []}
+        workSpaces={workspaces || []}
         setIsOpenModalCreateSpace={setIsModalOpen}
-        onRefresh={refetchWorkSpaces}
+        // onRefresh={refetchWorkSpaces}
       />
     </>
   );

@@ -1,19 +1,19 @@
-export interface GroupProps {
-  id: number,
-  members: number,
-  user_id: string;
-  name:string,
-  message_id: string;
-  description: string;
-  img:string,
-  time:string,
-  msg:string,
-  unread:number,
-  status?:string,
-  pinned:boolean,
-  address:string,
-  version:number;
-}
+// export interface GroupProps {
+//   id: number,
+//   members: number,
+//   user_id: string;
+//   name:string,
+//   message_id: string;
+//   description: string;
+//   img:string,
+//   time:string,
+//   msg:string,
+//   unread:number,
+//   status?:string,
+//   pinned:boolean,
+//   address:string,
+//   version:number;
+// }
 
 export interface MsgListTypeProps {
   menu?: any;

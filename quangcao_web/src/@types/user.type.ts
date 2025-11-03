@@ -36,6 +36,8 @@ export type User = BaseEntity & {
   zaloAccount: string,
   referrer: string,
   taxCode: string,
+
+  lead_id: number,
 };
 
 export type JwtResponse = {

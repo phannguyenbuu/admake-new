@@ -50,7 +50,7 @@ export function getTitleByStatus(type: string): string | undefined {
 
 export default function ManagermentBoard({workspaceId,}: ManagermentBoardProps) {
   // const adminMode = useCheckPermission();
-  const [refreshFormTask, setRefreshFormTask] = useState<boolean>(false);
+  // const [refreshFormTask, setRefreshFormTask] = useState<boolean>(false);
 
   const context = useContext(UpdateButtonContext);
   if (!context) throw new Error("UpdateButtonContext not found");

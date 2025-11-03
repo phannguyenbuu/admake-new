@@ -18,12 +18,13 @@ import {
   EnvironmentOutlined,
   DollarOutlined,
 } from "@ant-design/icons";
-import type { Customer } from "../../../@types/customer.type";
+// import type { Customer } from "../../../@types/customer.type";
 import {
   useCreateCustomer,
   useCustomerDetail,
   useUpdateCustomer,
 } from "../../../common/hooks/customer.hook";
+// import { useCreateUser } from "../../../common/hooks/user.hook";
 import { useUser } from "../../../common/hooks/useUser";
 import type { WorkSpace } from "../../../@types/work-space.type";
 
@@ -44,9 +45,9 @@ export default function FormCustomer({
   onRefresh,
 }: FormCustomerProps) {
   const [form] = Form.useForm();
-  const {userLeadId} = useUser();
+  const {userLeadId, setWorkspaces} = useUser();
   const [formValues, setFormValues] = useState<any>({});
-  const { mutate: createCustomer, isPending: isCreating } = useCreateCustomer();
+  const { mutate: createCustomer, data:workSpaces, error, isPending: isCreating } = useCreateCustomer();
   const { mutate: updateCustomer, isPending: isUpdating } = useUpdateCustomer();
   const { data: customerDetail, isLoading: isLoadingCustomerDetail } = useCustomerDetail(initialValues?.id);
 
@@ -67,7 +68,7 @@ export default function FormCustomer({
   }, [initialValues, form]);
 
   const onFinish = (
-    values: Omit<Customer, "createdAt" | "updatedAt" | "deletedAt">
+    values: Omit<WorkSpace, "createdAt" | "updatedAt" | "deletedAt">
   ) => {
     
     const formattedValues = {
@@ -112,14 +113,20 @@ export default function FormCustomer({
         }
       );
     } else {
-      console.log('Cretae Customer', formattedValues);
+      console.log('Cretae customer', formattedValues);
+      
       createCustomer(formattedValues, {
         onSuccess: () => {
           message.success("Tạo khách hàng thành công");
           form.resetFields();
           // onDelete();
           onRefresh();
-          window.location.reload();
+          setWorkspaces((prev) => {
+            if (!workSpaces) return prev;
+            const newItems = workSpaces.filter(ws => !prev.some(p => p.id === ws.id));
+            return [...prev, ...newItems];
+          });
+
         },
         onError: () => {
           message.error("Tạo khách hàng thất bại");
@@ -133,7 +140,7 @@ export default function FormCustomer({
     
     try {
       // Kiểm tra các trường bắt buộc cơ bản
-      if (!formValues.user_fullName || !formValues.user_phone) {
+      if (!formValues.fullName || !formValues.phone) {
         return false;
       }
 
@@ -307,7 +314,7 @@ export default function FormCustomer({
 
               <div className="grid grid-cols-1 gap-3 sm:gap-4">
                 <Form.Item
-                  name="user_fullName"
+                  name="fullName"
                   label={
                     <div className="flex items-center gap-1.5 sm:gap-2">
                       <span className="text-gray-800 font-medium text-xs sm:text-sm">
@@ -350,7 +357,7 @@ export default function FormCustomer({
 
 
                 <Form.Item
-                  name="user_phone"
+                  name="phone"
                   label={
                     <div className="flex items-center gap-1.5 sm:gap-2">
                       <span className="text-gray-800 font-medium text-xs sm:text-sm">
@@ -388,7 +395,7 @@ export default function FormCustomer({
               </div>
 
               <Form.Item
-                name="user_address"
+                name="address"
                 label={
                   <div className="flex items-center gap-1.5 sm:gap-2">
                     <div className="w-1 h-1 bg-purple-500 rounded-full"></div>

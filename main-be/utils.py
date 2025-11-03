@@ -1069,21 +1069,36 @@ if __name__ == "__main__":
 
 
 
-        
+        users = User.query.all()  # Trả về list tất cả user
+        leads = LeadPayload.query.all()
 
-        # for lead in LeadPayload.query.all():
-        #     user = User.create_item({
-        #         "username": lead.username,
-        #         "fullName": lead.company,
-        #         "companyName": lead.company,
-        #         "address": lead.address,
-        #         "lead_id": lead.id,
-        #         "password": lead.password,
-        #         "role": "2"
-        #     })
+        for i, lead in enumerate(leads):
+            print(i, lead.company, lead.username)
+            # lead.username = f"ad{i+100}"
+            # Tìm user tương ứng theo lead_id
+            user = next((u for u in users if u.username == lead.username), None)
+            if user:
+                user.username = lead.username
+                user.password = lead.password
+                print("User", lead.username, lead.password)
+            else:
+                print("Unkown user", lead.company)
+
+        db.session.commit()  # Ghi lại thay đổi vào database
+
+            # lead.password = "Test@1234"
+            # user = User.create_item({
+            #     "username": lead.username,
+            #     "fullName": lead.company,
+            #     "companyName": lead.company,
+            #     "address": lead.address,
+            #     "lead_id": lead.id,
+            #     "password": lead.password,
+            #     "role": "2"
+            # })
 
 
-        #     db.session.add(user)
+        # db.session.add(user)
         
         # db.session.commit()
 
@@ -1102,12 +1117,14 @@ if __name__ == "__main__":
 
         # },)
         
+        # user = User.query.filter(User.companyName == "B-one academy").first()
+        # print(user)
+        # user.username = "b-one"
+        # user.password = "Test@1234"
+        # for lead in LeadPayload.query.all():
+        #     print('lead', lead.company)
+        #     user = User.query.filter(User.fullName == lead.company).first()
+        #     user.role_id = -2
 
-        for lead in LeadPayload.query.all():
-            print('lead', lead.company)
-            users = User.query.filter(User.fullName == lead.company).all()
-            
-            for user in users:
-                user.role_id = -2
-        db.session.commit()
+        
         

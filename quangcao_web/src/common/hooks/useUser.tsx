@@ -3,6 +3,7 @@ import { useApiHost } from './useApiHost';
 import type { Role } from '../../@types/role.type';
 import WebFont from 'webfontloader';
 import { notification } from 'antd';
+import type { WorkSpace } from '../../@types/work-space.type';
 
 interface UserContextProps {
   userId: string | null;
@@ -11,6 +12,8 @@ interface UserContextProps {
   userRole: Role | null;
   userIcon: string | null;
   userLeadId: number;
+  workspaces: WorkSpace[];
+  setWorkspaces: React.Dispatch<React.SetStateAction<WorkSpace[]>>;
   login: (credentials: { username: string; password: string }) => Promise<void>;
   logout: () => Promise<void>;
   checkAuthStatus: () => Promise<void>;
@@ -26,6 +29,8 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     });
   }, []);
+
+  const [workspaces, setWorkspaces] = useState<WorkSpace[]>([]);
 
   const [userLeadId, setUserLeadId] = useState<number>(0);
   const [userId, setUserId] = useState<string | null>(null);
@@ -186,7 +191,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   return (
     <UserContext.Provider value={{ userId, username, 
-      userRoleId, userRole, userLeadId,
+      userRoleId, userRole, userLeadId, workspaces, setWorkspaces,
       userIcon, login, logout, checkAuthStatus }}>
       {children}
     </UserContext.Provider>

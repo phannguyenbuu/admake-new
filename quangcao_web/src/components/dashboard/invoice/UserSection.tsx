@@ -38,8 +38,8 @@ export const UserSection: React.FC<UserSectionProps> = ({
       const payload: any = (p as any)?.data;
       const items: User[] = payload?.data ?? payload ?? [];
       for (const u of items) {
-        if (!seen.has(u._id)) {
-          seen.add(u._id);
+        if (!seen.has(u.id)) {
+          seen.add(u.id);
           merged.push(u);
         }
       }
@@ -52,7 +52,7 @@ export const UserSection: React.FC<UserSectionProps> = ({
     if (!allUsers.length) return;
     setUserCache((prev) => {
       const next = { ...prev };
-      for (const u of allUsers) next[u._id] = u;
+      for (const u of allUsers) next[u.id] = u;
       return next;
     });
   }, [allUsers]);
@@ -60,7 +60,7 @@ export const UserSection: React.FC<UserSectionProps> = ({
   // Đảm bảo selectedUsers có trong data (khi KHÔNG search) → tự fetch thêm
   useEffect(() => {
     if (!selectedUsers?.length || debouncedUserSearch) return;
-    const currentIds = new Set(allUsers.map((u) => u._id));
+    const currentIds = new Set(allUsers.map((u) => u.id));
     const missing = selectedUsers.filter((id) => !currentIds.has(id));
     if (missing.length > 0 && hasNextPage && !isFetchingNextPage) {
       fetchNextPage();
@@ -78,8 +78,8 @@ export const UserSection: React.FC<UserSectionProps> = ({
   const displayUsers = useMemo(() => {
     const selectedSet = new Set(selectedUsers);
     return [...allUsers].sort((a, b) => {
-      const aSel = selectedSet.has(a._id) ? 1 : 0;
-      const bSel = selectedSet.has(b._id) ? 1 : 0;
+      const aSel = selectedSet.has(a.id) ? 1 : 0;
+      const bSel = selectedSet.has(b.id) ? 1 : 0;
       if (aSel !== bSel) return bSel - aSel;
       const aName = (a.fullName || a.username || "").toLowerCase();
       const bName = (b.fullName || b.username || "").toLowerCase();
@@ -95,9 +95,9 @@ export const UserSection: React.FC<UserSectionProps> = ({
   const toggleRow = (user: User, willCheck: boolean) => {
     if (disabled) return;
     if (willCheck) {
-      setUserCache((prev) => ({ ...prev, [user._id]: user }));
+      setUserCache((prev) => ({ ...prev, [user.id]: user }));
     }
-    onUserCheck(willCheck, user._id);
+    onUserCheck(willCheck, user.id);
   };
 
   return (
@@ -141,11 +141,11 @@ export const UserSection: React.FC<UserSectionProps> = ({
                 )}
 
                 {displayUsers.map((u) => {
-                  const isChecked = selectedUsers.includes(u._id);
+                  const isChecked = selectedUsers.includes(u.id);
                   const name = u.fullName || u.username || "Người dùng";
                   return (
                     <button
-                      key={u._id}
+                      key={u.id}
                       type="button"
                       onClick={() => toggleRow(u, !isChecked)}
                       className={

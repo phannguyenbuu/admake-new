@@ -11,13 +11,13 @@ import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 interface HeaderProps {
   title: string;
   status: string | null;
-  onGroupDelete?: () => void;
-  onAddMember?: () => void;
-  onLeaveGroup?: () => void;
+  // onGroupDelete?: () => void;
+  // onAddMember?: () => void;
+  // onLeaveGroup?: () => void;
 }
 
 const Header: React.FC<HeaderProps> 
-  = ({ title, status, onGroupDelete, onAddMember, onLeaveGroup }) => {
+  = ({ title, status }) => {
 
   const {userRoleId} = useUser();
   const full = userRoleId > 0;
@@ -39,10 +39,10 @@ const Header: React.FC<HeaderProps>
   };
 
   // // Xử lý các sự kiện menu
-  const handleDeleteGroup = () => {
-    handleMenuClose();
-    if (onGroupDelete) onGroupDelete();
-  };
+  // const handleDeleteGroup = () => {
+  //   handleMenuClose();
+  //   if (onGroupDelete) onGroupDelete();
+  // };
 
   // const handleAddMember = () => {
   //   handleMenuClose();
@@ -108,11 +108,11 @@ const Header: React.FC<HeaderProps>
             >
               {/* {userRole === 'lead' &&  */}
                 <>
-                  <MenuItem onClick={handleDeleteGroup}>
+                  {/* <MenuItem onClick={handleDeleteGroup}>
                     <ListItemIcon>
                       <DeleteIcon fontSize="small" />
                     </ListItemIcon>Xóa Nhóm
-                  </MenuItem>
+                  </MenuItem> */}
                   <Divider />
                   <MenuItem>
                     <ListItemIcon>

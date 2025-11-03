@@ -589,7 +589,7 @@ def get_model_columns(model):
     """Lấy danh sách tên các cột từ 1 model"""
     return [c.name for c in model.__table__.columns]
 
-def create_customer_method(data):
+def create_workspace_method(data):
     # lead_id = data.get("lead", 0, type=int)
     lead_id = data.get("lead", 0)
     try:
@@ -597,7 +597,8 @@ def create_customer_method(data):
     except (TypeError, ValueError):
         lead_id = 0
         
-    print("Lead_id", lead_id)
+    print("Create Workspace Lead_id", lead_id)
+    
 
     if lead_id == 0:
         print('Zero lead')
@@ -609,11 +610,13 @@ def create_customer_method(data):
         print('Unkown lead')
         abort(404, description="Lead not found")
 
+    print("CreateData", data)
+
     # chia dữ liệu thành phần User và Customer
     user_fields = get_model_columns(User)
     customer_fields = get_model_columns(Workspace)
 
-    user_data = {k: v for k, v in data.items() if f"user_{k}" in user_fields}
+    user_data = {k: v for k, v in data.items() if k in user_fields}
     customer_data = {k: v for k, v in data.items() if k in customer_fields}
 
     # ép kiểu ngày tháng nếu có
@@ -632,18 +635,19 @@ def create_customer_method(data):
     db.session.flush()  # lấy id mà chưa commit
 
     # tạo Customer gắn với user_id
-    new_customer = Workspace(
+    new_workspace = Workspace(
         id=generate_datetime_id(),   # ✅ cũng cần id cho customer
         lead_id = lead_id,
         name = data.get("name",""),
         owner_id=new_user.id
     )
-    db.session.add(new_customer)
+    db.session.add(new_workspace)
     db.session.commit()
 
-    print(new_customer.to_dict())
+    print("Create_Result")
+    print(new_workspace.to_dict())
     
-    return jsonify(new_customer.to_dict()), 201
+    return jsonify(new_workspace.to_dict()), 201
 
 def get_lead_by_json(request):
     lead_id = request.get_json().get("lead", 0)

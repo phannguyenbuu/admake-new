@@ -4,7 +4,7 @@ import type { Mode } from "../../../../@types/work-space.type";
 import type { FormTaskDetailProps } from "../../../../@types/work-space.type";
 import {Stack, Box} from "@mui/material";
 import JobAsset from "./JobAsset";
-import { Task } from "../../../../@types/work-space.type";
+import type { Task } from "../../../../@types/work-space.type";
 const { Text } = Typography;
 const { TextArea } = Input;
 

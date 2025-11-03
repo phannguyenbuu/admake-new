@@ -3,6 +3,7 @@ import { useState } from "react";
 import ModalCreateSpace from "../dashboard/work-tables/work-space/ModalCreateSpace";
 import { PlusOutlined } from "@ant-design/icons";
 import "./mobile-menu.css";
+import { useUser } from "../../common/hooks/useUser";
 // import { useCheckPermission } from "../../common/hooks/checkPermission.hook";
 
 interface FooterMenuBarProps {
@@ -12,18 +13,18 @@ interface FooterMenuBarProps {
     icon: React.ReactNode;
     path: string;
   }>;
-  boards: Array<{
-    _id: string;
-    name: string;
-    cover?: string;
-  }>;
-  onAddBoard: (values: { name: string }) => void;
+  // boards: Array<{
+  //   _id: string;
+  //   name: string;
+  //   cover?: string;
+  // }>;
+  // onAddBoard: (values: { name: string }) => void;
 }
 
 export default function FooterMenuBar({
   mobileMenuItems,
-  boards,
-  onAddBoard,
+  // boards,
+  // onAddBoard,
 }: FooterMenuBarProps) {
   const { pathname } = useLocation();
   const navigate = useNavigate();
@@ -33,6 +34,7 @@ export default function FooterMenuBar({
   const [showMobileWorkspaceModal, setShowMobileWorkspaceModal] =
     useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const {workspaces} = useUser();
 
   return (
     <>
@@ -105,7 +107,7 @@ export default function FooterMenuBar({
 
             {/* Content */}
             <div className="p-4 max-h-[60vh] overflow-y-auto">
-              {boards.length === 0 ? (
+              {workspaces.length === 0 ? (
                 <div className="text-center py-8 text-gray-500">
                   <p>Chưa có bảng công việc nào</p>
                   <button
@@ -120,9 +122,9 @@ export default function FooterMenuBar({
                 </div>
               ) : (
                 <div className="space-y-2">
-                  {boards.map((board) => (
+                  {workspaces.map((workspace) => (
                     <div
-                      key={board._id}
+                      key={workspace.id}
                       onClick={(e) => {
                         e.preventDefault();
                         e.stopPropagation();
@@ -132,19 +134,19 @@ export default function FooterMenuBar({
 
                         // Navigate sau khi modal đã đóng
                         setTimeout(() => {
-                          navigate(`/dashboard/work-tables/${board._id}`);
+                          navigate(`/dashboard/work-tables/${workspace.id}`);
                         }, 150);
                       }}
                       className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-colors ${
-                        pathname === `/dashboard/work-tables/${board._id}`
+                        pathname === `/dashboard/work-tables/${workspace.id}`
                           ? "bg-[#00B4B6]/10 border border-[#00B4B6]/20"
                           : "bg-gray-50 hover:bg-gray-100"
                       }`}
                     >
                       <div className="w-12 h-8 rounded-lg bg-white border border-gray-200 overflow-hidden flex-shrink-0">
-                        {board.cover ? (
+                        {workspace.status ? (
                           <img
-                            src={board.cover}
+                            src={workspace.status}
                             alt="cover"
                             className="w-full h-full object-cover"
                           />
@@ -156,12 +158,12 @@ export default function FooterMenuBar({
                       </div>
                       <span
                         className={`font-medium flex-1 ${
-                          pathname === `/dashboard/work-tables/${board._id}`
+                          pathname === `/dashboard/work-tables/${workspace.id}`
                             ? "text-[#00B4B6]"
                             : "text-gray-800"
                         }`}
                       >
-                        {board.name}
+                        {workspace.name}
                       </span>
                     </div>
                   ))}
@@ -191,7 +193,7 @@ export default function FooterMenuBar({
           open={isModalOpen}
           onCancel={() => setIsModalOpen(false)}
           onCreate={(values) => {
-            onAddBoard(values);
+            // onAddBoard(values);
             setIsModalOpen(false);
           }}
         />

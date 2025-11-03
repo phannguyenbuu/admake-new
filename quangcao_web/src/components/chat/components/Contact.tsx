@@ -3,12 +3,13 @@ import React, { useState, useEffect } from 'react';
 import {useTheme } from "@mui/material/styles";
 import '../css/global.css';
 import { useApiStatic } from '../../../common/hooks/useApiHost';
-import type { GroupProps, MessageTypeProps } from '../../../@types/chat.type';
+import type { MessageTypeProps } from '../../../@types/chat.type';
 import type { SlideProps } from '@mui/material';
 import StarIcon from '@mui/icons-material/Star';
 import RatingButtons from './RatingButtons';
 
 import QRCode from './QRCode';
+import type { WorkSpace } from '../../../@types/work-space.type';
 
 const Transition = React.forwardRef(function Transition(
   props: SlideProps & { children: React.ReactElement<any, any> },
@@ -69,20 +70,20 @@ const DeleteDialog: React.FC<BlockDialogProps> = ({ open, handleClose }) => {
 }
 
 interface ContactProps {
-  groupEl: GroupProps | null;
+  groupEl: WorkSpace | null;
   messages: MessageTypeProps[];
-  setShowFooter: React.Dispatch<React.SetStateAction<boolean>>;
+  // setShowFooter: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const Contact: React.FC<ContactProps> = ( { groupEl, messages, setShowFooter }) => {
+const Contact: React.FC<ContactProps> = ( { groupEl, messages }) => {
  
-  const theme = useTheme();
+  // const theme = useTheme();
   // const dispatch = useDispatch();
 
   const [openBlock, setOpenBlock] = useState(false);
   const [openDelete, setOpenDelete] = useState(false);
   const [photos, setPhotos] = useState<MessageTypeProps[]>([]);
-  const [groupId,setGroupId] = useState<number>(0);
+  const [groupId, setGroupId] = useState<number>(0);
   // const {userId, username, userRole, userIcon } = useUser();
 
   useEffect(()=>{
@@ -121,13 +122,9 @@ const Contact: React.FC<ContactProps> = ( { groupEl, messages, setShowFooter }) 
   return (
     <Box sx={{width:'20vw', p:1, ml:0, height:'80vh', boxSizing: 'border-box'}}>
         <Typography ml={0} fontWeight={300} fontSize={12}>Trạng thái dự án</Typography>
-          <Stack direction="row" sx={{ maxWidth:300 }}>
-              <RatingButtons groupEl={groupEl} setShowFooter={setShowFooter}/>
-          </Stack>
+        <RatingButtons groupEl={groupEl}/>
         
-        <Stack className='scrollbar' sx={{position:'relative', flexGrow:1}} p={1}
-        spacing={3}>
-          
+        <Stack className='scrollbar' sx={{position:'relative', flexGrow:1}} p={1} spacing={3}>
           <Tabs value={tabValue} onChange={handleChange} aria-label="nav tabs">
             <Tab 
               iconPosition="start" 

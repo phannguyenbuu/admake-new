@@ -1,17 +1,18 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { QRCodeSVG  } from 'qrcode.react';
-import type { GroupProps } from '../../../@types/chat.type';
+// import type { WorkSpace } from '../../../@types/chat.type';
 import { useApiHost } from '../../../common/hooks/useApiHost';
 import { ToggleButton, ToggleButtonGroup } from '@mui/material';
 import LockIcon from '@mui/icons-material/Lock';
 import { notification } from 'antd';
+import type { WorkSpace } from '../../../@types/work-space.type';
 
 interface RatingButtonsProps {
-  groupEl: GroupProps | null;
-  setShowFooter: React.Dispatch<React.SetStateAction<boolean>>;
+  groupEl: WorkSpace | null;
+  // setShowFooter: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const RatingButtons: React.FC<RatingButtonsProps> = ({setShowFooter, groupEl }) => {
+const RatingButtons: React.FC<RatingButtonsProps> = ({ groupEl }) => {
   const [value, setValue] = React.useState<string | null | undefined>(groupEl?.status);
   
   useEffect(() => {
@@ -36,7 +37,7 @@ const RatingButtons: React.FC<RatingButtonsProps> = ({setShowFooter, groupEl }) 
 
     if (newValue !== null) {
       setValue(newValue);
-      setShowFooter(newValue === "talk" || newValue === "pass");
+      // setShowFooter(newValue === "talk" || newValue === "pass");
 
       const data = { group_id: groupEl?.version };
 
@@ -119,7 +120,8 @@ const RatingButtons: React.FC<RatingButtonsProps> = ({setShowFooter, groupEl }) 
       onChange={handleChange}
       aria-label="rating"
       size="small"
-      sx={{ gap: 0, width: 300 }}
+      
+      sx={{ gap: 0, backgroundColor:'none' }}
     >
       <ToggleButton value="start" 
           sx={{ ...toggleSize,

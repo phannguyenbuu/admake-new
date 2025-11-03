@@ -1,7 +1,8 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import type { PaginationDto } from "../../@types/common.type";
 import { CustomerService } from "../../services/customer.service";
-import type { Customer } from "../../@types/customer.type";
+// import type { Customer } from "../../@types/customer.type";
+import type { WorkSpace } from "../../@types/work-space.type";
 
 export const CUSTOMER_QUERY_KEY = "customer/queryPagination";
 export const CUSTOMER_DETAIL_QUERY_KEY = "customer/queryDetail";
@@ -25,7 +26,7 @@ export function useCustomerDetail(id?: string) {
 export function useCreateCustomer() {
   return useMutation({
     mutationFn: (
-      dto: Omit<Customer, "createdAt" | "updatedAt" | "deletedAt">
+      dto: Omit<WorkSpace, "createdAt" | "updatedAt" | "deletedAt">
     ) => CustomerService.createCustomer(dto),
   });
 }
@@ -36,7 +37,7 @@ export function useUpdateCustomer() {
       dto,
       id,
     }: {
-      dto: Omit<Customer, "createdAt" | "updatedAt" | "deletedAt">;
+      dto: Omit<WorkSpace, "createdAt" | "updatedAt" | "deletedAt">;
       id: string;
     }) => CustomerService.updateCustomer(id, dto),
   });

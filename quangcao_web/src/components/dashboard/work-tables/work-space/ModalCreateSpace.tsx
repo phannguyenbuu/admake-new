@@ -6,17 +6,17 @@ const { Title, Text } = Typography;
 export default function ModalCreateSpace({
   open,
   onCancel,
-  onCreate,
+  // onCreate,
 }: {
   open: boolean;
   onCancel: () => void;
   onCreate?: (values: { name: string }) => void;
 }) {
   const [form] = Form.useForm();
-  const handleCreate = (values: { name: string }) => {
-    onCreate?.(values);
-    form.resetFields();
-  };
+  // const handleCreate = (values: { name: string }) => {
+  //   onCreate?.(values);
+  //   form.resetFields();
+  // };
   return (
     <Modal
       title={

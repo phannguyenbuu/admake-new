@@ -1,5 +1,6 @@
 import type { PaginationDto } from "../@types/common.type";
-import type { Customer } from "../@types/customer.type";
+// import type { Customer } from "../@types/customer.type";
+import type { WorkSpace } from "../@types/work-space.type";
 import axiosClient from "./axiosClient";
 
 export const CustomerService = {
@@ -11,13 +12,13 @@ export const CustomerService = {
     return axiosClient.get(`/customer/${id}`);
   },
   createCustomer: (
-    dto: Omit<Customer, "createdAt" | "updatedAt" | "deletedAt">
+    dto: Omit<WorkSpace, "createdAt" | "updatedAt" | "deletedAt">
   ) => {
-    return axiosClient.post("/customer/", dto);
+    return axiosClient.post("/customer/", dto).then(response => response.data);
   },
   updateCustomer: (
     id: string,
-    dto: Omit<Customer, "createdAt" | "updatedAt" | "deletedAt">
+    dto: Omit<WorkSpace, "createdAt" | "updatedAt" | "deletedAt">
   ) => {
     return axiosClient.put(`/customer/${id}`, dto);
   },

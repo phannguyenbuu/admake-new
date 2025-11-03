@@ -113,7 +113,7 @@ const handleDeleteCustomer = () => {
                 <EditOutlined
                   className="!text-cyan-600 !cursor-pointer !text-xl"
                   onClick={() => {
-                    console.log('CRecord', record);
+                    // console.log('CRecord', record);
                     setCustomer(record);
                     toggle("openUpdate")();
                   }}

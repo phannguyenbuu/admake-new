@@ -24,7 +24,7 @@ export default function AppHeader() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [notificationOpen, setNotificationOpen] = useState(false);
-  const {username, userId, userRole, userRoleId, userLeadId} = useUser();
+  const {username, userId, userRole, userRoleId, userLeadId, workspaces, setWorkspaces} = useUser();
   const [questionOpen, setQuestionOpen] = useState(false);
 
   // console.log('USER_NAME', useUser(), username);
@@ -34,7 +34,12 @@ export default function AppHeader() {
   const { isConnected, on } = useSocket();
 
   //@ts-ignore
-  const { data: workSpaces, refetch: refetchWorkSpaces } = useWorkSpaceQueryAll({lead: userLeadId});
+  const { data: receiveWorkSpaces, refetch: refetchWorkSpaces } = useWorkSpaceQueryAll({lead: userLeadId});
+
+  useEffect(()=>{
+    //@ts-ignore
+    setWorkspaces(receiveWorkSpaces);
+  },[receiveWorkSpaces]);
 
   const handleQuestionClick = () => {
     setQuestionOpen(true);
@@ -98,7 +103,7 @@ export default function AppHeader() {
         </div>
 
         {/* Menu Chat Group List */}
-        <ChatGroupList workSpaces={workSpaces}/>
+        <ChatGroupList/>
 
         <AllManagementModal/>
 

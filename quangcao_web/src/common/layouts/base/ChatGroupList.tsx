@@ -15,62 +15,51 @@ import type { WorkSpace } from "../../../@types/work-space.type.ts";
 import { SearchOutlined } from "@ant-design/icons";
 import { Input as AntdInput, Menu } from "antd";
 
-interface ChatGroupListProps {
-  workSpaces?: WorkSpace[];
-}
-
-const ChatGroupList: React.FC<ChatGroupListProps> = ({workSpaces}) => {
-  const [chatGroupList, setChatGroupList] = useState<WorkSpace[]>([]);
+const ChatGroupList = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedId, setSelectedId] = useState<WorkSpace | null>(null);
   const [searchText, setSearchText] = useState("");
   const [filteredItems, setFilteredItems] = useState<WorkSpace[]>([]); // items là danh sách menu gốc
   
   //@ts-ignore
-  const {userId, userRoleId} = useUser();
-
-  
-
-
-  const [addGroupModalVisible, setAddGroupModalVisible] = useState(false);
+  const {userId, userRoleId, workspaces} = useUser();
 
   useEffect(() => {
-    setFilteredItems(chatGroupList); // Khởi tạo danh sách đầy đủ khi component load
-  }, [chatGroupList]);
-
+    setFilteredItems(workspaces); // Khởi tạo danh sách đầy đủ khi component load
+  }, [workspaces]);
 
   const handleSearch = (value: string) => {
     setSearchText(value);
     if (!value) {
       // Nếu input rỗng, hiện hết danh sách gốc
-      setFilteredItems(chatGroupList);
+      setFilteredItems(workspaces);
     } else {
-      const filtered = chatGroupList.filter((el) =>
+      const filtered = workspaces.filter((el) =>
         el.name.toLowerCase().includes(value.toLowerCase())
       );
       setFilteredItems(filtered);
     }
   };
 
-  const handleAddGroupOk = async (name: string) => {
-    // gọi API POST /group với tên group = name
-    setAddGroupModalVisible(false);
-  };
+  // const handleAddGroupOk = async (name: string) => {
+  //   // gọi API POST /group với tên group = name
+  //   setAddGroupModalVisible(false);
+  // };
   
-  useEffect(() => {
-    setChatGroupList(workSpaces);
-  }, [workSpaces]);
+  // useEffect(() => {
+  //   setChatGroupList(workspaces);
+  // }, [workspaces]);
   
 
-  const items: MenuProps["items"] = (chatGroupList || []).map((group) => ({
-    key: group.id,
-    label: group.name,
-    icon: <UserOutlined />,
-  }));
+  // const items: MenuProps["items"] = (workspaces || []).map((group) => ({
+  //   key: group.id,
+  //   label: group.name,
+  //   icon: <UserOutlined />,
+  // }));
 
   const onMenuClick: MenuProps["onClick"] = (info: MenuInfo) => {
-    // console.log('chatGroupList',chatGroupList, info);
-    const group = chatGroupList.find(g => g.id.toString() === info.key);
+    // console.log('workspaces',workspaces, info);
+    const group = workspaces.find(g => g.id.toString() === info.key);
     if (group) {
       console.log('Selected Group:', group);
       setSelectedId(group);
@@ -167,11 +156,11 @@ const ChatGroupList: React.FC<ChatGroupListProps> = ({workSpaces}) => {
       </Modal>
 
 
-      <AddGroupModal
+      {/* <AddGroupModal
         visible={addGroupModalVisible}
         onOk={handleAddGroupOk}
         onCancel={() => setAddGroupModalVisible(false)}
-      />
+      /> */}
 
     </div>
   );
@@ -179,69 +168,69 @@ const ChatGroupList: React.FC<ChatGroupListProps> = ({workSpaces}) => {
 
 export default ChatGroupList;
 
-interface AddGroupModalProps {
-  visible: boolean;
-  onOk: (groupName: string) => void;
-  onCancel: () => void;
-}
+// interface AddGroupModalProps {
+//   visible: boolean;
+//   onOk: (groupName: string) => void;
+//   onCancel: () => void;
+// }
 
-const AddGroupModal: React.FC<AddGroupModalProps> = ({ visible, onOk, onCancel }) => {
-  const [groupName, setGroupName] = useState<string>("");
-  const [address, setAddress] = useState<string>("");
+// const AddGroupModal: React.FC<AddGroupModalProps> = ({ visible, onOk, onCancel }) => {
+//   const [groupName, setGroupName] = useState<string>("");
+//   const [address, setAddress] = useState<string>("");
 
-  const handleOk = () => {
-    if(!groupName || !address || groupName === '' || address === '')
-    {
-      notification.error({message:"Vui lòng nhập tên và địa chỉ !", description:""})
-      return;
-    }
+//   const handleOk = () => {
+//     if(!groupName || !address || groupName === '' || address === '')
+//     {
+//       notification.error({message:"Vui lòng nhập tên và địa chỉ !", description:""})
+//       return;
+//     }
 
-    onOk(groupName);
+//     onOk(groupName);
     
-    fetch(`${useApiHost()}/group/`, 
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
-          name: groupName,
-          address: address,
-         }),
-      })
-      .then((response) => response.json())
-      .then((data) => {
-        notification.success({message: "Tạo nhóm chat mới thành công",
-          description: `Bắt đầu thảo luận công việc và hợp đồng`,
-        });
+//     fetch(`${useApiHost()}/group/`, 
+//       {
+//         method: "POST",
+//         headers: { "Content-Type": "application/json" },
+//         body: JSON.stringify({ 
+//           name: groupName,
+//           address: address,
+//          }),
+//       })
+//       .then((response) => response.json())
+//       .then((data) => {
+//         notification.success({message: "Tạo nhóm chat mới thành công",
+//           description: `Bắt đầu thảo luận công việc và hợp đồng`,
+//         });
 
-        setTimeout(()=>{
-          window.location.reload();
-        })
-      })
-      .catch((err) => console.error(err));
-  };
+//         setTimeout(()=>{
+//           window.location.reload();
+//         })
+//       })
+//       .catch((err) => console.error(err));
+//   };
   
-  return (
-    <Modal
-      title="Tạo group mới"
-      open={visible}
-      onOk={handleOk}
-      onCancel={onCancel}
-      okButtonProps={{ disabled: !groupName.trim() }}
-    >
-      <Input
-        placeholder="Nhập tên nhóm"
-        value={groupName}
-        onChange={(e) => setGroupName(e.target.value)}
-        autoFocus
-        style={{width:300}}
-      />
-      <Input
-        placeholder="Địa chỉ / Ghi chú thêm"
-        value={address}
-        onChange={(e) => setAddress(e.target.value)}
-        autoFocus
-        style={{width:300}}
-      />
-    </Modal>
-  );
-};
+//   return (
+//     <Modal
+//       title="Tạo group mới"
+//       open={visible}
+//       onOk={handleOk}
+//       onCancel={onCancel}
+//       okButtonProps={{ disabled: !groupName.trim() }}
+//     >
+//       <Input
+//         placeholder="Nhập tên nhóm"
+//         value={groupName}
+//         onChange={(e) => setGroupName(e.target.value)}
+//         autoFocus
+//         style={{width:300}}
+//       />
+//       <Input
+//         placeholder="Địa chỉ / Ghi chú thêm"
+//         value={address}
+//         onChange={(e) => setAddress(e.target.value)}
+//         autoFocus
+//         style={{width:300}}
+//       />
+//     </Modal>
+//   );
+// };
