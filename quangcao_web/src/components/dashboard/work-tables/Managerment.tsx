@@ -21,7 +21,7 @@ import {
   useDeleteTask,
   useWorkSpaceQueryById,
 } from "../../../common/hooks/work-space.hook";
-import { useCheckPermission } from "../../../common/hooks/checkPermission.hook";
+// import { useCheckPermission } from "../../../common/hooks/checkPermission.hook";
 import DragableTaskCard from "./work-space/DragableTaskCard";
 import columnThemes from "./theme.json";
 import WorkspaceHeader from "./work-space/WorkspaceHeader";
@@ -49,7 +49,7 @@ export function getTitleByStatus(type: string): string | undefined {
 }
 
 export default function ManagermentBoard({workspaceId,}: ManagermentBoardProps) {
-  const adminMode = useCheckPermission();
+  // const adminMode = useCheckPermission();
   const [refreshFormTask, setRefreshFormTask] = useState<boolean>(false);
 
   const context = useContext(UpdateButtonContext);
@@ -134,7 +134,7 @@ export default function ManagermentBoard({workspaceId,}: ManagermentBoardProps) 
 
   const onDragStart = useCallback(
     (start: any) => {
-      if (!adminMode) return;
+      // if (!adminMode) return;
 
       // Kiểm tra xem task có đang ở cột "Khoán thưởng" không
       const sourceColumn = columns.find((col) =>
@@ -178,12 +178,12 @@ export default function ManagermentBoard({workspaceId,}: ManagermentBoardProps) 
         }
       }
     },
-    [adminMode, columns]
+    [ columns]
   );
 
   const onDragUpdate = useCallback(
     (update: any) => {
-      if (!adminMode) return;
+      // if (!adminMode) return;
 
       // Kiểm tra xem có đang cố gắng kéo vào cột "Khoán thưởng" không
       if (update.destination?.droppableId) {
@@ -229,7 +229,7 @@ export default function ManagermentBoard({workspaceId,}: ManagermentBoardProps) 
         }
       }
     },
-    [adminMode, columns]
+    [ columns]
   );
 
   
@@ -255,7 +255,7 @@ export default function ManagermentBoard({workspaceId,}: ManagermentBoardProps) 
   const onDragEnd = useCallback(
     (result: DropResult) => {
       setShowUpdateButton(0);
-      if (!adminMode) return;
+      // if (!adminMode) return;
       const { source, destination } = result;
 
       // Reset drag state ngay lập tức
@@ -365,7 +365,7 @@ export default function ManagermentBoard({workspaceId,}: ManagermentBoardProps) 
       // Nếu không phải cột khoán thưởng, xử lý bình thường
       proceedWithDragAndDrop();
     },
-    [columns, resetDragState, draggedTaskId, updateTaskStatus, adminMode]
+    [columns, resetDragState, draggedTaskId, updateTaskStatus]
   );
 
   // Load data from API when component mounts or workspaceId changes

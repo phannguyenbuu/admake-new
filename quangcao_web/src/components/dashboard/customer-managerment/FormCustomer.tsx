@@ -104,6 +104,7 @@ export default function FormCustomer({
             form.resetFields();
             // onDelete();
             onRefresh();
+            // window.location.reload();
           },
           onError: () => {
             message.error("Cập nhật khách hàng thất bại");

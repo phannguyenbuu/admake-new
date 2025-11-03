@@ -24,7 +24,7 @@ import {
   useDeleteTask,
   useWorkSpaceQueryById,
 } from "../../../../common/hooks/work-space.hook";
-import { useCheckPermission } from "../../../../common/hooks/checkPermission.hook";
+// import { useCheckPermission } from "../../../../common/hooks/checkPermission.hook";
 import type { DraggableProvided, DraggableStateSnapshot } from "@hello-pangea/dnd";
 
 interface DragableTaskCardProps {

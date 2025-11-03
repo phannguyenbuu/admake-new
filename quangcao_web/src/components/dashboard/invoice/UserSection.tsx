@@ -4,7 +4,7 @@ import type { User } from "../../../@types/user.type";
 import { useState, useCallback, useMemo, useEffect } from "react";
 import { useDebounce } from "../../../common/hooks/useDebounce";
 import type { UserSectionProps } from "../../../@types/invoice.type";
-import { useCheckPermission } from "../../../common/hooks/checkPermission.hook";
+// import { useCheckPermission } from "../../../common/hooks/checkPermission.hook";
 import { useUsersInfinite } from "../../../common/hooks/user.hook";
 
 export const UserSection: React.FC<UserSectionProps> = ({
@@ -15,7 +15,7 @@ export const UserSection: React.FC<UserSectionProps> = ({
 }) => {
   const [userSearch, setUserSearch] = useState("");
   const debouncedUserSearch = useDebounce(userSearch, 150);
-  const adminMode = useCheckPermission();
+  // const adminMode = useCheckPermission();
 
   // Cache thông tin user theo id để không bị "Unknown" khi đổi search
   const [userCache, setUserCache] = useState<Record<string, User>>({});
@@ -93,7 +93,7 @@ export const UserSection: React.FC<UserSectionProps> = ({
 
   // Toggle chọn user — lưu luôn user vào cache khi check
   const toggleRow = (user: User, willCheck: boolean) => {
-    if (disabled || !adminMode) return;
+    if (disabled) return;
     if (willCheck) {
       setUserCache((prev) => ({ ...prev, [user._id]: user }));
     }
@@ -108,7 +108,7 @@ export const UserSection: React.FC<UserSectionProps> = ({
         className="!bg-white !rounded-xl"
         expandIconPosition="end"
       >
-        {adminMode && !disabled && (
+        {!disabled && (
           <Collapse.Panel
             header={<b>Nhân sự</b>}
             key="1"
@@ -152,7 +152,7 @@ export const UserSection: React.FC<UserSectionProps> = ({
                         "w-full text-left px-3 py-3 border-b last:border-b-0 transition " +
                         (isChecked ? "bg-cyan-50" : "hover:bg-slate-50")
                       }
-                      disabled={disabled || !adminMode}
+                      disabled={disabled}
                     >
                       <div className="flex items-center gap-3">
                         <Checkbox
@@ -196,7 +196,7 @@ export const UserSection: React.FC<UserSectionProps> = ({
       </Collapse>
 
       {/* Selected Users dùng cache để luôn có tên */}
-      {adminMode && !disabled && (
+      {!disabled && (
         <div className="px-3 pt-3">
           <div className="font-semibold text-sm mb-2">
             Nhân sự đã chọn ({selectedUsers.length})
@@ -219,7 +219,7 @@ export const UserSection: React.FC<UserSectionProps> = ({
               <span className="text-cyan-700 font-semibold truncate flex-1">
                 {name}
               </span>
-              {adminMode && (
+              {/* {adminMode && ( */}
                 <Button
                   type="text"
                   icon={<DeleteOutlined className="!text-red-500" />}
@@ -228,7 +228,7 @@ export const UserSection: React.FC<UserSectionProps> = ({
                   className="!-mr-1 !text-red-500"
                   disabled={disabled}
                 />
-              )}
+              
             </div>
           );
         })}

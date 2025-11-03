@@ -6,7 +6,7 @@ import type { PaginationDto } from "../../../@types/common.type";
 import { useState, useCallback, useMemo, useEffect, useRef } from "react";
 import { useDebounce } from "../../../common/hooks/useDebounce";
 import type { MaterialSectionProps } from "../../../@types/invoice.type";
-import { useCheckPermission } from "../../../common/hooks/checkPermission.hook";
+// import { useCheckPermission } from "../../../common/hooks/checkPermission.hook";
 
 const formatVND = (n?: number) => (n ?? 0).toLocaleString("vi-VN") + "đ";
 
@@ -20,7 +20,7 @@ export const MaterialSection: React.FC<MaterialSectionProps> = ({
 }) => {
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebounce(search, 150);
-  const adminMode = useCheckPermission();
+  // const adminMode = useCheckPermission();
 
   const query: Partial<PaginationDto> = useMemo(
     () => ({ page: 1, limit: 10, search: debouncedSearch }),
@@ -79,7 +79,7 @@ export const MaterialSection: React.FC<MaterialSectionProps> = ({
   }, []);
 
   const toggleRow = (checked: boolean, m: Material) => {
-    if (disabled || !adminMode) return;
+    if (disabled) return;
     onCheck(checked, m);
   };
 
@@ -121,7 +121,7 @@ export const MaterialSection: React.FC<MaterialSectionProps> = ({
         className="!bg-white !rounded-xl"
         expandIconPosition="end"
       >
-        {adminMode && !disabled && (
+        {!disabled && (
           <Collapse.Panel
             header={<b>Vật liệu</b>}
             key="1"
@@ -163,7 +163,7 @@ export const MaterialSection: React.FC<MaterialSectionProps> = ({
                       type="button"
                       onClick={() => toggleRow(!checked, m)}
                       className="w-full text-left px-3 py-3 border-b last:border-b-0 hover:bg-slate-50 active:bg-slate-100 transition select-none"
-                      disabled={disabled || !adminMode}
+                      disabled={disabled}
                     >
                       <div className="flex items-center gap-3">
                         <Checkbox
@@ -212,7 +212,7 @@ export const MaterialSection: React.FC<MaterialSectionProps> = ({
       </Collapse>
 
       {/* Vật liệu đã chọn */}
-      {adminMode && !disabled && (
+      {!disabled && (
         <div className="px-3 pt-3">
           <div className="font-semibold text-sm mb-2">
             Vật liệu đã chọn ({selected.length})
@@ -261,7 +261,7 @@ export const MaterialSection: React.FC<MaterialSectionProps> = ({
                   className="!w-24"
                   size="middle"
                   keyboard={false}
-                  disabled={!adminMode || disabled}
+                  disabled={disabled}
                 />
                 <div className="text-sm font-semibold text-emerald-600">
                   = {formatVND((m?.price || 0) * qty)}
