@@ -95,7 +95,7 @@ const routes: TRoute = {
           //     <p>Chào mừng bạn đến với hệ thống quản lý!</p>
           //   </div>
           // ),
-          element: <Navigate to="/dashboard/user" replace />,
+          element: <Navigate to="/dashboard/users" replace />,
           title: "Home",
           icon: <HomeOutlined />,
           ignoreInMenu: true,

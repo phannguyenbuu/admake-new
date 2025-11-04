@@ -419,7 +419,7 @@ def generate_ecosystem_config(n):
 
 
 
-# save_dump()
+save_dump()
 
 local_dirs = [
     "main-be/models.py",

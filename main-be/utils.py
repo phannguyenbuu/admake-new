@@ -1052,13 +1052,13 @@ if __name__ == "__main__":
         db.create_all()
         
         # parse_csv('register.csv')
-        alter_data()
+        # alter_data()
 
         
-        # for user in User.query.all():
-        #     user.lead_id = 1
-
-        # db.session.commit()
+        for user in User.query.all():
+            print(user)
+        User.query.all()[0].version = 2
+        db.session.commit()
         # lead = db.session.get(LeadPayload,1)
         # users = lead.users
 

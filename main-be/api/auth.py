@@ -152,14 +152,12 @@ import subprocess
 
 
 def create_admake_chat_database(db_name="admake_chat", db_user="postgres"):
-    env = os.environ.copy()
-    env['PGPASSWORD'] = "myPass"
     try:
         # Dùng lệnh createdb của postgresql
         subprocess.run(
             ["createdb", "-U", db_user, db_name],
-            check=True,
-            env=env
+            check=True
+            # env=env
         )
         print(f"Database '{db_name}' đã được tạo thành công.")
     except subprocess.CalledProcessError as e:
@@ -192,12 +190,12 @@ def restore_database_from_latest_dump(db_name="admake_chat", db_user="postgres",
         latest_dump_path,
     ]
 
-    env = os.environ.copy()
-    env['PGPASSWORD'] = 'myPass'
+    # env = os.environ.copy()
+    # env['PGPASSWORD'] = 'myPass'
 
     try:
         # Chạy lệnh restore, cần user có quyền hoặc thực thi dưới user postgres
-        subprocess.run(cmd, check=True, env=env)
+        subprocess.run(cmd, check=True)
         print(f"Restore database '{db_name}' từ file {latest_dump} thành công.")
         return True
     except subprocess.CalledProcessError as e:
@@ -221,6 +219,10 @@ def check_admake_database_exists():
 
     # Lấy tên database muốn kiểm tra từ URL gốc
     db_name = parsed_url.path.lstrip("/")
+
+    print("URL kết nối kiểm tra:", db_default_url)
+    # engine = create_engine(db_default_url)
+
 
     engine = create_engine(db_default_url)
     try:
