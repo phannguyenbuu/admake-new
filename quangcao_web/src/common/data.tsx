@@ -173,14 +173,17 @@ export const columnsUser = [
     ),
   },
   {
-    title: "Mạng XH",
+    title: "Tài khoản",
     dataIndex: "zaloAccount",
     key: "zaloAccount",
     width: 150,
     render: (zaloAccount: string, record: User) => (
       <div>
         <span className="!text-cyan-700 !line-clamp-2 !text-base custom-font-size">
-          Zalo: {record.zaloAccount}
+          Bank: {record.bankAccount}
+        </span>
+        <span className="!text-cyan-700 !line-clamp-2 !text-base custom-font-size">
+          MST: {record.taxCode}
         </span>
         <span className="!text-cyan-700 !line-clamp-2 !text-base custom-font-size">
           FB: {record.facebookAccount}

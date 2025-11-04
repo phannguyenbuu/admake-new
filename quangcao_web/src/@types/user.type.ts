@@ -33,7 +33,7 @@ export type User = BaseEntity & {
   citizenId: string,
   email: string,
   facebookAccount: string,
-  zaloAccount: string,
+  bankAccount: string,
   referrer: string,
   taxCode: string,
 

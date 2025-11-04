@@ -101,7 +101,7 @@ export default function FormUser({
         citizenId: user.citizenId,
         email: user.email,
         facebookAccount: user.facebookAccount,
-        zaloAccount: user.zaloAccount,
+        bankAccount: user.bankAccount,
         referrer: user.referrer,
 
         // Thêm các field khác nếu có trong form
