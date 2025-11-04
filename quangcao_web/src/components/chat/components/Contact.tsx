@@ -7,7 +7,7 @@ import type { MessageTypeProps } from '../../../@types/chat.type';
 import type { SlideProps } from '@mui/material';
 import StarIcon from '@mui/icons-material/Star';
 import RatingButtons from './RatingButtons';
-
+import { useUser } from '../../../common/hooks/useUser';
 import QRCode from './QRCode';
 import type { WorkSpace } from '../../../@types/work-space.type';
 
@@ -84,7 +84,7 @@ const Contact: React.FC<ContactProps> = ( { groupEl, messages }) => {
   const [openDelete, setOpenDelete] = useState(false);
   const [photos, setPhotos] = useState<MessageTypeProps[]>([]);
   const [groupId, setGroupId] = useState<number>(0);
-  // const {userId, username, userRole, userIcon } = useUser();
+  const {userId, username, userRole, userIcon, isMobile } = useUser();
 
   useEffect(()=>{
     if(messages && messages.length > 0)
@@ -117,12 +117,13 @@ const Contact: React.FC<ContactProps> = ( { groupEl, messages }) => {
     window.open(`${useApiStatic()}/${fileUrl}`, '_blank');
   }
 
-  const tabStyle = {fontSize:10, padding: '4px 8px', minWidth: '5vw',  marginRight: 0.2,borderRadius:'5px', background:"#ccc" };
+  const tabStyle = {fontSize:10, padding: '4px 8px', minWidth: 80,  
+            marginRight: 0.2,borderRadius:'5px', background:"#ccc" };
  
   return (
-    <Box sx={{width:'20vw', p:1, ml:0, height:'80vh', boxSizing: 'border-box'}}>
-        <Typography ml={0} fontWeight={300} fontSize={12}>Trạng thái dự án</Typography>
-        <RatingButtons groupEl={groupEl}/>
+    <Box sx={{width: isMobile ? '80vw' :'30vw', p:1, ml:0, height:'fit-content', boxSizing: 'border-box'}}>
+        {/* <Typography ml={0} fontWeight={300} fontSize={12}>Trạng thái dự án</Typography> */}
+        {/* <RatingButtons groupEl={groupEl}/> */}
         
         <Stack className='scrollbar' sx={{position:'relative', flexGrow:1}} p={1} spacing={3}>
           <Tabs value={tabValue} onChange={handleChange} aria-label="nav tabs">
@@ -141,18 +142,19 @@ const Contact: React.FC<ContactProps> = ( { groupEl, messages }) => {
               aria-controls="tabpanel-0" 
               sx={tabStyle}
             />
-            <Tab 
+            {/* <Tab 
               icon={<StarIcon />} 
               iconPosition="start" 
               label="" 
               id="tab-1" 
               aria-controls="tabpanel-1" 
               sx={tabStyle}
-            />
+            /> */}
             
           </Tabs>
           {tabValue === 0 && (
-            <Stack direction="column" spacing={0} sx={{width: '20vw', height:'68vh',overflowY:'auto', overflowX:'hidden'}}>
+            <Stack direction="column" spacing={0} 
+              sx={{width: '100%', height:'100%', paddingBottom: 2, overflowY:'auto', overflowX:'hidden'}}>
               <QRCode title="Mã QR cho khách hàng" filename='qrcode-admake-khachhang.png'
                 url={`${window.location.origin}/chat/${groupEl?.version}/${groupEl?.id}`}/>
               <QRCode title="Mã QR cho nhân viên" filename='qrcode-admake-nhanvien.png'
@@ -160,7 +162,7 @@ const Contact: React.FC<ContactProps> = ( { groupEl, messages }) => {
              </Stack>
             )}
            {tabValue === 1 && (
-              <Box sx={{ p: 0.5,width: '20vw', height:'68vh', overflowY:'scroll' }}>
+              <Box sx={{ p: 0.5,width: '100%', height:'100%', overflowY:'scroll', paddingBottom: 2,  }}>
                 {photos.length > 0 ? photos.map((groupEl, idx) => (
                   <img 
                     key={idx}
@@ -174,12 +176,11 @@ const Contact: React.FC<ContactProps> = ( { groupEl, messages }) => {
               }
               </Box>
             )}
-            {tabValue === 2 && (
+            {/* {tabValue === 2 && (
               <Box sx={{ p: 0.5, height:'60vh', overflowY:'scroll' }}>
                 <Typography variant="body1">Chưa có tin nhắn lưu</Typography>
-                {/* Hiển thị danh sách message hoặc nội dung khác */}
               </Box>
-            )}
+            )} */}
           <Divider/>
           
         </Stack>

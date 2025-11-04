@@ -20,7 +20,7 @@ interface HeaderProps {
 const Header: React.FC<HeaderProps> 
   = ({ title, status }) => {
 
-  const {userRoleId} = useUser();
+  const {userRoleId, isMobile} = useUser();
   const full = userRoleId > 0;
   // const {userId, username, userRole, userIcon } = useUser();
   // console.log("User_Info", userId, username, userRole );
@@ -39,30 +39,11 @@ const Header: React.FC<HeaderProps>
     setAnchorEl(null);
   };
 
-  // // Xử lý các sự kiện menu
-  // const handleDeleteGroup = () => {
-  //   handleMenuClose();
-  //   if (onGroupDelete) onGroupDelete();
-  // };
-
-  // const handleAddMember = () => {
-  //   handleMenuClose();
-  //   if (onAddMember) onAddMember();
-  // };
-
-  // const handleLeaveGroup = () => {
-  //   handleMenuClose();
-  //   if (onLeaveGroup) onLeaveGroup();
-  // };
-
-
-
   return (
-    <Box p={0.2} sx={{ width: full ? '50vw':'100vw', 
-      backgroundColor: theme.palette.mode === 'light' ? '#F8FAFF' : "#fff", 
+    <Box p={0.2} sx={{ backgroundColor: '#F8FAFF', 
       boxShadow:'0px 0px 2px rgba(0,0,0,0.25)'}}>
     <Stack alignItems={'center'} direction='row' justifyContent={'space-between'}
-    sx={{width:'100%', height:'100%'}}>
+      sx={{width:'100%', height:'100%'}}>
         <Stack direction={'row'} spacing={2}>
             <Box>
               <StyledBadge  overlap="circular"
@@ -103,42 +84,13 @@ const Header: React.FC<HeaderProps>
                 anchorEl={anchorEl}
                 open={open}
                 onClose={handleMenuClose}
-                // MenuListProps={{
-                // 'aria-labelledby': 'group-button',
-                // }}
             >
-              {/* {userRole === 'lead' &&  */}
-                <>
-                  {/* <MenuItem onClick={handleDeleteGroup}>
-                    <ListItemIcon>
-                      <DeleteIcon fontSize="small" />
-                    </ListItemIcon>Xóa Nhóm
-                  </MenuItem> */}
-                  <Divider />
-                  <MenuItem>
-                    <ListItemIcon>
-                      <DeleteIcon fontSize="small" />
-                    </ListItemIcon>Thay đổi thông tin
-                  </MenuItem>
-                  
-                </> 
-
-                {/* {userRole !== 'user' && 
-                <>
-                  <MenuItem>
-                    <ListItemIcon>
-                      <StarIcon fontSize="small" />
-                    </ListItemIcon>Rate
-                  </MenuItem>
-                  <Divider />
-                </>}
-
-                <MenuItem onClick={handleAddMember}><ListItemIcon>
-                <PersonAddIcon fontSize="small" />
-              </ListItemIcon>Add member</MenuItem>
-                <MenuItem onClick={handleLeaveGroup}><ListItemIcon>
-                <ExitToAppIcon fontSize="small" />
-              </ListItemIcon>Leave this group</MenuItem> */}
+              <Divider />
+              <MenuItem>
+                <ListItemIcon>
+                  <DeleteIcon fontSize="small" />
+                </ListItemIcon>Thay đổi thông tin
+              </MenuItem>
           </Menu>
         </Stack>}
     </Stack>

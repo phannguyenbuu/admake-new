@@ -84,10 +84,10 @@ const QRCode: React.FC<RatingButtonsProps> = ({ title, url, filename }) => {
   const w = 180;
 
   return (
-      <Stack direction="column" spacing={1} style={{ padding:20, flexDirection:'column'}}>
+      <Stack direction="column" spacing={1} style={{ padding:5, flexDirection:'column'}}>
         <Stack direction="row" sx={{overflowX:'visible'}}>
           <DownloadIcon onClick={handleDownloadPNG} style={{width:40,height:40, color:'#0084a5ff', cursor:'pointer'}}/>  
-          <p style={{whiteSpace:'normal',wordBreak: 'break-word',textAlign:'left',fontSize:10}}>{title}</p>
+            <p style={{whiteSpace:'nowrap',wordBreak: 'break-word', textAlign:'left',fontSize:10}}>{title}</p>
            <button
               onClick={handleCopy}
               style={{

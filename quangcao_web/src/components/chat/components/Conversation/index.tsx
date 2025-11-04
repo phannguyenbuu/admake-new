@@ -22,7 +22,7 @@ interface ConversationProps {
 const Conversation: React.FC<ConversationProps> = ({title,status,messages,setMessages, groupEl, onDelete}) => {
   const boxRef = useRef<HTMLDivElement | null>(null);
   
-  const {userId, userRoleId} = useUser();
+  const {userId, userRoleId, isMobile} = useUser();
   const full = userRoleId === -2;
 
   useEffect(()=>{
@@ -30,11 +30,12 @@ const Conversation: React.FC<ConversationProps> = ({title,status,messages,setMes
   },[groupEl?.status]);
 
   return (
-    <Stack ref={boxRef} sx={{ width: full ? '50vw' : '100vw', backgroundImage: "url(/backGround.png)"}}>
+    <Stack ref={boxRef} sx={{ width: full && !isMobile ? '50vw' : '85vw', height:'72vh',
+        backgroundImage: "url(/backGround.png)"}}>
         <Header title={title} status={status}/>
         
         <Box className='scrollbar'
-          height={full ? '70vh':'80vh'}
+          height='72vh'
           sx={{position:'relative', ml:0, overflowY:'scroll',}}>
           <Message messages = {messages} menu={true} onDelete={onDelete}/>
         </Box>

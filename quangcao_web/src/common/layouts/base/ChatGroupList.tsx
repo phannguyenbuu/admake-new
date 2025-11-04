@@ -22,7 +22,7 @@ const ChatGroupList = () => {
   const [filteredItems, setFilteredItems] = useState<WorkSpace[]>([]); // items là danh sách menu gốc
   
   //@ts-ignore
-  const {userId, userRoleId, workspaces} = useUser();
+  const {userId, userRoleId, workspaces, isMobile} = useUser();
 
   useEffect(() => {
     setFilteredItems(workspaces); // Khởi tạo danh sách đầy đủ khi component load
@@ -150,9 +150,9 @@ const ChatGroupList = () => {
 
       {/* Model popup */}
       <Modal open={modalVisible} onOk={handleOk} onCancel={handleOk} footer={null}
-        title={`ID: ${selectedId?.id} - ${selectedId?.name}`}
+        title={`${selectedId?.name}`}
         okText="OK" cancelButtonProps={{ style: { display: "none" } }}
-        style={{ padding:0, minWidth: '96vw'}}
+        style={{ padding:0, minWidth: '96vw', top:60}}
         >
         <Group selected={selectedId} setSelected={setSelectedId}/>
       </Modal>
@@ -169,70 +169,3 @@ const ChatGroupList = () => {
 };
 
 export default ChatGroupList;
-
-// interface AddGroupModalProps {
-//   visible: boolean;
-//   onOk: (groupName: string) => void;
-//   onCancel: () => void;
-// }
-
-// const AddGroupModal: React.FC<AddGroupModalProps> = ({ visible, onOk, onCancel }) => {
-//   const [groupName, setGroupName] = useState<string>("");
-//   const [address, setAddress] = useState<string>("");
-
-//   const handleOk = () => {
-//     if(!groupName || !address || groupName === '' || address === '')
-//     {
-//       notification.error({message:"Vui lòng nhập tên và địa chỉ !", description:""})
-//       return;
-//     }
-
-//     onOk(groupName);
-    
-//     fetch(`${useApiHost()}/group/`, 
-//       {
-//         method: "POST",
-//         headers: { "Content-Type": "application/json" },
-//         body: JSON.stringify({ 
-//           name: groupName,
-//           address: address,
-//          }),
-//       })
-//       .then((response) => response.json())
-//       .then((data) => {
-//         notification.success({message: "Tạo nhóm chat mới thành công",
-//           description: `Bắt đầu thảo luận công việc và hợp đồng`,
-//         });
-
-//         setTimeout(()=>{
-//           window.location.reload();
-//         })
-//       })
-//       .catch((err) => console.error(err));
-//   };
-  
-//   return (
-//     <Modal
-//       title="Tạo group mới"
-//       open={visible}
-//       onOk={handleOk}
-//       onCancel={onCancel}
-//       okButtonProps={{ disabled: !groupName.trim() }}
-//     >
-//       <Input
-//         placeholder="Nhập tên nhóm"
-//         value={groupName}
-//         onChange={(e) => setGroupName(e.target.value)}
-//         autoFocus
-//         style={{width:300}}
-//       />
-//       <Input
-//         placeholder="Địa chỉ / Ghi chú thêm"
-//         value={address}
-//         onChange={(e) => setAddress(e.target.value)}
-//         autoFocus
-//         style={{width:300}}
-//       />
-//     </Modal>
-//   );
-// };

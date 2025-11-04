@@ -42,7 +42,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const isLoggingOutRef = useRef(false);
 
   const API_HOST = useApiHost();
-  const breakpoint = 1000;
+  const breakpoint = 786;
   const [isMobile, setIsMobile] = useState<boolean>(() => window.innerWidth < breakpoint);
 
   useEffect(() => {

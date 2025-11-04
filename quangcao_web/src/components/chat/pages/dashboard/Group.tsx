@@ -32,7 +32,7 @@ const Group: React.FC<GroupComponentProps> = ({ selected, setSelected }) => {
     const [_loading, setLoading] = useState(false);
     const [_error, setError] = useState(null);
     const urlApi = useApiHost();
-    const {userRoleId, workspaces} = useUser();
+    const {userRoleId, workspaces, isMobile} = useUser();
     // const [showFooter, setShowFooter] = useState<boolean>(false);
 
     
@@ -150,7 +150,7 @@ const Group: React.FC<GroupComponentProps> = ({ selected, setSelected }) => {
 
     return (
      <>
-         <Stack direction={'row'}>
+         <Stack direction={isMobile ? 'column': 'row'}>
             { full &&
              <Box sx={{
                 backgroundColor: theme.palette.mode === 'light' ? '#F8FAFF' : "#fff",
@@ -160,7 +160,7 @@ const Group: React.FC<GroupComponentProps> = ({ selected, setSelected }) => {
              }}>
                  <Stack p={0} spacing={2}>
                      <Stack spacing={0.5} className='scrollbar' sx={{ flexGrow: 1, overflowY: 'hidden'}}>
-                        <Stack spacing={0} sx={{height:'82vh', border:'1px solid #ccc', overflowY:'auto', overflowX:'hidden'}}>
+                        <Stack spacing={0} sx={{height:'72vh', border:'1px solid #ccc', overflowY:'auto', overflowX:'hidden'}}>
                             {workspaces && workspaces.map((el, idx) => (
                                 <ChatElement workspace={el}
                                     onClick={() => handleClick(el)}
@@ -189,13 +189,13 @@ const Group: React.FC<GroupComponentProps> = ({ selected, setSelected }) => {
             />
         
             {full &&
-             <Box sx={{ height: '100%',
+             <Box sx={{ 
                   backgroundColor: theme.palette.mode === 'light' ? '#F8FAFF' : "#fff",
                  width: 320,
-                 display: {
-                     xs: showRight ? "block" : "none",
-                     sm: "block",
-                 },
+                //  display: {
+                //      xs: showRight ? "block" : "none",
+                //      sm: "block",
+                //  },
                  boxShadow: '0px 0px 2px rgba(0,0,0,0.25)'}}>
                     <Contact messages={messageList} groupEl={selected ?? null}/>
              </Box>}
