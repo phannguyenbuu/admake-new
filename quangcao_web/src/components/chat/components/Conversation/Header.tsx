@@ -157,8 +157,8 @@ export const LogoAdmake = () => {
           style={{width: 40, height: "auto", objectFit: "contain",}} />
       </div>
       
-        <img src="/ADMAKE.svg" alt="ADMAKE"  
-          style={{width: 80, height: "auto", objectFit: "contain",}}/>
+      <img src="/ADMAKE.svg" alt="ADMAKE"  
+        style={{width: 80, height: "auto", objectFit: "contain",}}/>
       
     </div>
   )

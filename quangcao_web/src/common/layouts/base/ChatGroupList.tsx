@@ -123,7 +123,7 @@ const ChatGroupList = () => {
         <Dropdown overlay={menu} trigger={["click"]}>
           <Box
             sx={{
-              width: 120,
+              width: 100,
               height: 25,
               top: 2,
               position: "relative",
@@ -134,6 +134,8 @@ const ChatGroupList = () => {
               alignItems: "center",
               justifyContent: "center",
               cursor: "pointer",
+              fontWeight: 500,
+              fontSize: 12
             }}
             onMouseEnter={() => setIsHover(true)}
             onMouseLeave={() => setIsHover(false)}

@@ -88,7 +88,7 @@ export default function AllManagementModal() {
       <Dropdown menu={menu}>
         <Box
           sx={{
-            width: 120,
+            width: 100,
             height: 25,
             top: 0,
             padding: 1.8,
@@ -102,7 +102,8 @@ export default function AllManagementModal() {
             justifyContent: "center",
             whiteSpace:'nowrap',
             color:'#fff',
-            fontWeight: 500
+            fontWeight: 500,
+            fontSize: 12
           }}
           onMouseEnter={() => setIsHover(true)}
           onMouseLeave={() => setIsHover(false)}

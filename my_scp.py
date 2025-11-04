@@ -441,7 +441,7 @@ local_dirs = [
     "lead-be/.env",
     "lead-be/templates",
     "ecosystem.config.js",
-
+    "nginx",
 ]
 
 # build_nginx_and_ecosystem(0)

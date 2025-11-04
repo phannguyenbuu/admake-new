@@ -89,12 +89,12 @@ export default function AppHeader() {
 
   return (
     <>
-      <Header className="flex items-center justify-between !px-4 md:!px-8 !bg-white shadow-sm h-14 md:h-16 sticky top-0 z-30 border-b border-gray-200">
+      <Header className="flex items-center gap-1 justify-between !px-4 md:!px-8 !bg-white shadow-sm h-14 md:h-16 sticky top-0 z-30 border-b border-gray-200">
         {/* Logo Section - Left side */}
         <div className="flex items-center gap-3">
           {/* Logo icon */}
-          <div className="flex items-center justify-center">
-            <img src="/logo.jpg" alt="logo" className="w-13 h-13" />
+          <div>
+            <img src="/logo.jpg" alt="logo" style={{width:40,height:'auto'}} />
           </div>
           {/* Logo text */}
           <div className="flex items-center justify-center">
@@ -107,7 +107,7 @@ export default function AppHeader() {
 
         <AllManagementModal/>
 
-        <div>
+        
           <div onClick={handleQuestionClick}
             className="p-0 rounded-full hover:bg-gray-100 transition-all duration-200 flex items-center justify-center">
             <QuestionOutlined 
@@ -166,10 +166,10 @@ export default function AppHeader() {
               />
             </Dropdown>
           </div>
-        </div>
+        
       </Header>
 
-      {location === '/dashboard/workpoints' 
+      {location === '/dashboard/workpoints'
         && <NoteWorkpointModal questionOpen={questionOpen} onCancel={handleCancel} />}
     </>
   );

@@ -8,6 +8,7 @@ import {
   UserOutlined as ProfileIcon,
   CheckOutlined,
   PlusOutlined,
+  LineChartOutlined,
 } from "@ant-design/icons";
 // import {
 //   useWorkSpaceQueryAll,
@@ -89,7 +90,8 @@ export default function RenderMenuBar({}) {
     const mobileMenuKeys = [
       "/dashboard/workpoints",
       "/dashboard/work-tables",
-      "/dashboard/infor",
+      "/dashboard/users",
+      "/dashboard/customers",
     ];
 
     // Lấy menu items từ router và filter cho mobile
@@ -113,10 +115,16 @@ export default function RenderMenuBar({}) {
           path: "/dashboard/work-tables",
         },
         {
-          key: "/dashboard/infor",
-          label: "Tài khoản",
-          icon: <ProfileIcon />,
-          path: "/dashboard/infor",
+          key: "/dashboard/users",
+          label: "Nhân sự",
+          icon: <LineChartOutlined />,
+          path: "/dashboard/users",
+        },
+        {
+          key: "/dashboard/customers",
+          label: "Khách hàng",
+          icon: <TeamOutlined />,
+          path: "/dashboard/customers",
         },
       ];
 
