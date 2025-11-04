@@ -402,6 +402,19 @@ export default function FormUser({
 </Row>
 
 <Row gutter={[16, 16]}>
+   <Col xs={24} sm={12} lg={8}>
+    <Form.Item
+      name="bankAccount"
+      label={<span className="text-sm sm:text-base font-semibold text-gray-700">Tài khoản ngân hàng:</span>}
+      className="!mb-0"
+    >
+      <Input
+        placeholder="Nhập tài khoản ngân hàng"
+        className="!text-sm sm:!text-base !h-9 sm:!h-10 !rounded-lg !border-gray-300 focus:!border-cyan-500 !shadow-lg hover:!shadow-xl !transition-all !duration-300"
+      />
+    </Form.Item>
+  </Col>
+
   <Col xs={24} sm={12} lg={8}>
     <Form.Item
       name="facebookAccount"
@@ -417,17 +430,18 @@ export default function FormUser({
 
   <Col xs={24} sm={12} lg={8}>
     <Form.Item
-      name="zaloAccount"
-      label={<span className="text-sm sm:text-base font-semibold text-gray-700">Tài khoản zalo:</span>}
+      name="referrer"
+      label={<span className="text-sm sm:text-base font-semibold text-gray-700">Mã số thuế cá nhân:</span>}
       className="!mb-0"
     >
       <Input
-        placeholder="Nhập tài khoản zalo"
+        placeholder="Nhập mã số thuế cá nhân"
         className="!text-sm sm:!text-base !h-9 sm:!h-10 !rounded-lg !border-gray-300 focus:!border-cyan-500 !shadow-lg hover:!shadow-xl !transition-all !duration-300"
       />
     </Form.Item>
   </Col>
 
+ 
   <Col xs={24} sm={12} lg={8}>
     <Form.Item
       name="referrer"
