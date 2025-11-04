@@ -11,7 +11,7 @@ const IS_SATURDAY_NOON_OFF = true;
 // Tăng ca dưới 1 giờ sẽ không tính giờ
 
 interface StatisticsMonthDaysProps {
-    selectedRecord:WorkDaysProps;
+    selectedRecord: WorkDaysProps | null;
     modalVisible: boolean;
     handleOk: () => void;
 }
@@ -133,8 +133,8 @@ const StatisticsMonthDays: React.FC<StatisticsMonthDaysProps> = ({ selectedRecor
             </Typography>
           </Box>
 
-          <Typography>{selectedRecord.username.toUpperCase()}</Typography>
-          <Typography style={{fontWeight:300, fontSize:12, fontStyle:'italic'}}>{selectedRecord.userrole}</Typography>
+          <Typography>{selectedRecord?.username.toUpperCase()}</Typography>
+          <Typography style={{fontWeight:300, fontSize:12, fontStyle:'italic'}}>{selectedRecord?.userrole}</Typography>
           
           <TableContainer component={Paper} sx={{ mt: 2 }}>
             <Table>

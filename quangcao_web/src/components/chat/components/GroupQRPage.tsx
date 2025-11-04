@@ -2,8 +2,9 @@
 import React,  { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import Group from "../pages/dashboard/Group";
-import type { GroupProps } from "../../../@types/chat.type";
+// import type { GroupProps } from "../../../@types/chat.type";
 import { useApiHost } from "../../../common/hooks/useApiHost";
+import type { WorkSpace } from "../../../@types/work-space.type";
 
 const GroupQRPage = () => {
   const { id, token } = useParams<{ id: string, token: string }>();
@@ -12,7 +13,7 @@ const GroupQRPage = () => {
   // Nếu hợp lệ thì render Group, không hợp lệ có thể redirect hoặc báo lỗi
 
   // Ví dụ gọi API trong useEffect và lưu trạng thái check
-  const [selected, setSelected] = React.useState<GroupProps | null>(null);
+  const [selected, setSelected] = React.useState<WorkSpace | null>(null);
   const [verified, setVerified] = React.useState(false);
   const [loading, setLoading] = React.useState(true);
 

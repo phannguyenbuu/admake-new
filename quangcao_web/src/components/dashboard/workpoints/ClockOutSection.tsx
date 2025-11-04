@@ -7,7 +7,7 @@ import { convertAttendanceStatus } from "../../../utils/convert.util";
 import { AttendanceStatus } from "../../../common/enum/attendance.enum";
 import { useEffect, useState } from "react";
 import ImagePreviewModal from "../../modal/ImagePreviewModal";
-// import LocationMapModal from "../goong-map/map";
+import LocationMapModal from "../goong-map/map";
 import CheckInForm from "./CheckInForm";
 import { prepareImageForUpload } from "../../../utils/prepareImageForUpload";
 

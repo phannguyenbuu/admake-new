@@ -9,10 +9,10 @@ import JobInfoCard from "./task/JobInfoCard";
 import JobCustomerInfo from "./task/JobCustomerInfo";
 import JobDescription from "./task/JobDescription";
 import JobTimeAndProcess from "./task/JobTimeAndProcess ";
-import MaterialInfo from "./task/MaterialInfo";
+
 import { useApiHost } from "../../../common/hooks/useApiHost";
 // import CheckInOut from "./CheckInOut";
-import CommentSection from "./CommentSection";
+// import CommentSection from "./CommentSection";
 import dayjs from "dayjs";
 import { duration } from "@mui/material";
 import { Form } from "antd";

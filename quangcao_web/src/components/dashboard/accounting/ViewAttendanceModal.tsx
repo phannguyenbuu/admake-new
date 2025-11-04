@@ -16,7 +16,7 @@ import {
 } from "@ant-design/icons";
 import dayjs from "dayjs";
 import { convertAttendanceStatus } from "../../../utils/convert.util";
-// import LocationMapModal from "../goong-map/map";
+import LocationMapModal from "../goong-map/map";
 import ImagePreviewModal from "../../modal/ImagePreviewModal";
 
 const { Text, Title } = Typography;

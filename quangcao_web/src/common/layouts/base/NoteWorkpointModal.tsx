@@ -18,7 +18,20 @@ const theme = createTheme({
   },
 });
 
-const defaultState = {
+interface DefaultState {
+  [key: string]: string | boolean;
+  in_morning: string;
+  out_morning: string;
+  in_noon: string;
+  out_noon: string;
+  include_saturday_afternoon: boolean;
+  night_overtime: string;
+  holiday_overtime: string;
+}
+
+
+const defaultState: DefaultState  = {
+  
   in_morning: "07:30",
   out_morning: "11:30",
   in_noon: "13:30",
@@ -33,7 +46,7 @@ const NoteWorkpointModal: React.FC<NoteWorkpointModalProps> = ({
   onCancel,
   children,
 }) => {
-      const [formState, setFormState] = useState(defaultState);
+      const [formState, setFormState] = useState<DefaultState>(defaultState);
     
       const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value, type, checked } = e.target;

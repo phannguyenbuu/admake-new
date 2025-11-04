@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { QRCodeSVG  } from 'qrcode.react';
-import type { GroupProps } from '../../../@types/chat.type';
 import { useApiHost } from '../../../common/hooks/useApiHost';
 import { Dropdown, Avatar, Modal } from "antd";
 import { ToggleButton, ToggleButtonGroup, Stack } from '@mui/material';

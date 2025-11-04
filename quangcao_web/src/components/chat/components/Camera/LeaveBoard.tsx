@@ -39,8 +39,8 @@ const fetchTaskByUser = async (userId: string): Promise<Task[]> => {
 interface LeaveBoardProps {
   // mode: { adminMode: boolean; userMode: boolean };
   
-  userId: string | null;
-  open: boolean;
+  userId?: string;
+  open?: boolean;
   onCancel: () => void;
 }
 
@@ -78,7 +78,15 @@ function LeaveDatePickerOneDay({
         onClose={() => setOpen(false)}
         value={value}
         onChange={handleChange}
-        renderInput={(params) => <TextField {...params} />}
+        slots={{ textField: TextField }} // Gán TextField cho slot textField
+        slotProps={{
+          textField: {
+            // Thêm props cho TextField nếu cần
+            variant: 'outlined',
+            size: 'small',
+            // ...
+          }
+        }}
         disablePast
       />
       <Stack direction="row" spacing={2} mt={1}>
@@ -130,7 +138,15 @@ function LeaveDatePickerMultipleDays({
           onClose={() => setOpenStart(false)}
           value={startValue}
           onChange={handleStartChange}
-          renderInput={(params) => <TextField {...params} />}
+          slots={{ textField: TextField }} // Gán TextField cho slot textField
+          slotProps={{
+            textField: {
+              // Thêm props cho TextField nếu cần
+              variant: 'outlined',
+              size: 'small',
+              // ...
+            }
+          }}
           disablePast
         />
         <DatePicker
@@ -140,7 +156,15 @@ function LeaveDatePickerMultipleDays({
           onClose={() => setOpenEnd(false)}
           value={endValue}
           onChange={handleEndChange}
-          renderInput={(params) => <TextField {...params} />}
+          slots={{ textField: TextField }} // Gán TextField cho slot textField
+          slotProps={{
+            textField: {
+              // Thêm props cho TextField nếu cần
+              variant: 'outlined',
+              size: 'small',
+              // ...
+            }
+          }}
           disablePast
           minDate={startValue ?? undefined}
         />

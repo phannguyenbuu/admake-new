@@ -1,10 +1,10 @@
 import { Layout, Dropdown, Avatar, Popover, Modal, message } from "antd";
 import { BellOutlined, UserOutlined, LogoutOutlined } from "@ant-design/icons";
-import NotificationDropdown from "../../../components/NotificationDropdown";
+// import NotificationDropdown from "../../../components/NotificationDropdown";
 import { useNavigate } from "react-router-dom";
 import { useInfo } from "../../hooks/info.hook";
 import { useGetNotification } from "../../hooks/notification.hook";
-import { useSocket } from "../../../socket/SocketContext";
+// import { useSocket } from "../../../socket/SocketContext";
 import { useEffect, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useWorkSpaceQueryAll } from "../../hooks/work-space.hook";
@@ -31,7 +31,7 @@ export default function AppHeader() {
   
   // call hook useInfo
   const { data: info, refetch: refetchInfo } = useInfo();
-  const { isConnected, on } = useSocket();
+  // const { isConnected, on } = useSocket();
 
   //@ts-ignore
   const { data: receiveWorkSpaces, refetch: refetchWorkSpaces } = useWorkSpaceQueryAll({lead: userLeadId});
@@ -54,17 +54,17 @@ export default function AppHeader() {
     limit: 10,
   });
 
-  useEffect(() => {
-    if (isConnected) {
-      on("notification", () => {
-        refetch();
-      });
-    }
-  }, [isConnected, on, refetch]);
+  // useEffect(() => {
+  //   if (isConnected) {
+  //     on("notification", () => {
+  //       refetch();
+  //     });
+  //   }
+  // }, [isConnected, on, refetch]);
 
-  const handleNotificationClick = () => {
-    setNotificationOpen(!notificationOpen);
-  };
+  // const handleNotificationClick = () => {
+  //   setNotificationOpen(!notificationOpen);
+  // };
 
   // @ts-ignore
   const unreadCount = notificationsData?.meta?.unread || 0;
@@ -107,73 +107,7 @@ export default function AppHeader() {
 
         <AllManagementModal/>
 
-        <div className="flex items-center gap-4 md:gap-6">
-          {/* Center - Notification */}
-          <div className="flex items-center justify-end">
-            <div className="relative flex items-center">
-              <Popover
-                content={<NotificationDropdown />}
-                trigger="click"
-                placement="bottom"
-                overlayClassName="notification-popover"
-                arrow={false}
-                open={notificationOpen}
-                onOpenChange={setNotificationOpen}
-                overlayStyle={{
-                  padding: "8px",
-                  maxWidth: "calc(100vw - 32px)",
-                }}
-                getPopupContainer={(triggerNode) =>
-                  triggerNode.parentElement || document.body
-                }
-                styles={{
-                  body: {
-                    padding: 0,
-                    borderRadius: "12px",
-                    overflow: "hidden",
-                  },
-                }}
-              >
-                <div
-                  className="relative cursor-pointer group flex items-center justify-end"
-                  style={{gap:50}}
-                  
-                >
-                  
-
-
-                  <div style={{gap:50}}
-                    onClick={handleNotificationClick}
-                   className="p-2.5 rounded-full hover:bg-gray-100 transition-all duration-200 flex items-center justify-center">
-                    
-
-                    <BellOutlined
-                      className={`text-lg md:text-xl transition-colors duration-200 ${
-                        notificationOpen || unreadCount > 0
-                          ? "text-cyan-500"
-                          : "text-gray-600 group-hover:text-cyan-500"
-                      }`}
-                    />
-
-                    
-                    {/* Unread notification badge */}
-                    {unreadCount > 0 && (
-                      <div className="absolute -top-1 -right-1 min-w-[20px] h-[20px] bg-red-500 rounded-full flex items-center justify-center shadow-lg">
-                        <span className="text-white text-xs font-bold leading-none">
-                          {unreadCount > 99 ? "99+" : unreadCount}
-                        </span>
-                      </div>
-                    )}
-                    {/* Pulse animation for new notifications */}
-                    {unreadCount > 0 && (
-                      <div className="absolute -top-1 -right-1 w-[20px] h-[20px] bg-red-500 rounded-full animate-ping opacity-30"></div>
-                    )}
-                  </div>
-                </div>
-              </Popover>
-            </div>
-          </div>
-        
+        <div>
           <div onClick={handleQuestionClick}
             className="p-0 rounded-full hover:bg-gray-100 transition-all duration-200 flex items-center justify-center">
             <QuestionOutlined 

@@ -170,6 +170,7 @@ export default function FormUser({
 
     // Các thao tác gọi API create/update
     if (isEditing && user) {
+      //@ts-ignore
       updateUser({ dto: formData, id: user.id }, {
         onSuccess: () => {
           message.success("Cập nhật người dùng thành công!");
@@ -179,6 +180,7 @@ export default function FormUser({
         onError: () => message.error("Có lỗi xảy ra khi cập nhật người dùng!")
       });
     } else {
+      //@ts-ignore
       createUser(formData, {
         onSuccess: () => {
           message.success("Tạo người dùng thành công!");

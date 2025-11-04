@@ -7,7 +7,6 @@ import { useUser } from "../../../../common/hooks/useUser.js";
 import type { MessageTypeProps } from '../../../../@types/chat.type.js';
 import { generateUniqueIntId } from '../../../../@types/chat.type.js';
 import { useApiHost } from '../../../../common/hooks/useApiHost.js';
-import type { GroupProps } from '../../../../@types/chat.type.js';
 import CameraIcon from '@mui/icons-material/Camera';
 import SendIcon from '@mui/icons-material/Send';
 import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
@@ -15,6 +14,7 @@ import LinkIcon from '@mui/icons-material/Link';
 import SentimentSatisfiedIcon from '@mui/icons-material/SentimentSatisfied';
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import { notification } from 'antd';
+import type { WorkSpace } from '../../../../@types/work-space.type.js';
 
 const StyledInput = styled(TextField)(({ theme }) => ({
   "& .MuiInputBase-input": {
@@ -62,7 +62,7 @@ interface ChatInputProps {
   inputValue: string;
   setInputValue: React.Dispatch<React.SetStateAction<string>>;
   setOpenPicker: React.Dispatch<React.SetStateAction<boolean>>;
-  groupEl: GroupProps | null;
+  groupEl: WorkSpace | null;
   handleSendMessage: (message: string, url: string) => void;
 }
 
@@ -181,7 +181,7 @@ const ChatInput = forwardRef<HTMLDivElement, ChatInputProps>(
 
 interface FooterProps {
   setMessages: React.Dispatch<React.SetStateAction<MessageTypeProps[]>>;
-  groupEl: GroupProps | null;
+  groupEl: WorkSpace | null;
 }
 
 const Footer = forwardRef<HTMLDivElement, FooterProps>(

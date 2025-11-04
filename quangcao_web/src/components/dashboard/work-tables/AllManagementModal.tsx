@@ -136,7 +136,7 @@ export default function AllManagementModal() {
                 }}
               >
                 <CardTitle title={col.title} length={col?.tasks?.length ?? 0} />
-                {col.tasks.map((task) => (
+                {col?.tasks?.map((task) => (
                   <CardStaticItem
                     key={task.id}
                     theme={theme}

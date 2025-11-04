@@ -58,7 +58,7 @@ const DragableTaskCard: React.FC<DragableTaskCardProps> = ({
         index={idx}
         isDragDisabled={isRewardColumn} // Vô hiệu hóa drag cho task trong cột khoán thưởng
     >
-        {(provided, snapshot) => 
+        {(provided, snapshot?) => 
         <CardItem provided={provided} 
             snapshot={snapshot} 
             theme={theme}
@@ -101,19 +101,19 @@ export const CardItem: React.FC<CardItemProps> = ({
 
     return (
     <div
-      ref={provided.innerRef}
-      {...provided.draggableProps}
-      {...provided.dragHandleProps}
+      ref={provided?.innerRef}
+      {...provided?.draggableProps}
+      {...provided?.dragHandleProps}
       className={`task-card group/task relative mb-3 transition-all duration-200 ${
         isRewardColumn ? "cursor-not-allowed opacity-90" : "cursor-pointer"
       } ${
-        snapshot.isDragging
+        snapshot?.isDragging
           ? "shadow-xl scale-105 ring-2 ring-[#00B4B6]/30 z-50 border-2 border-[#00B4B6]/50 rotate-1"
           : "shadow-md hover:shadow-lg hover:scale-[1.01] hover:-translate-y-0.5"
-      } ${!snapshot.isDragging ? "drag-item-reset" : ""}`}
+      } ${!snapshot?.isDragging ? "drag-item-reset" : ""}`}
       style={{
-        ...provided.draggableProps.style,
-        ...(snapshot.isDragging
+        ...provided?.draggableProps.style,
+        ...(snapshot?.isDragging
           ? {
               transition: "none",
               zIndex: 99999,
@@ -122,15 +122,15 @@ export const CardItem: React.FC<CardItemProps> = ({
               top: 0,
               left: 0,
               margin: 0,
-              transform: provided.draggableProps.style?.transform || "none",
+              transform: provided?.draggableProps.style?.transform || "none",
             }
           : {}),
       }}
       onClick={() => {
-        if (!snapshot.isDragging && !isDragging) {
-          setSelectedTask(task);
-          setEditingTaskId(task.id);
-          setShowFormTask(true);
+        if (!snapshot?.isDragging && !isDragging) {
+          if(setSelectedTask) setSelectedTask(task);
+          if(setEditingTaskId) setEditingTaskId(task.id);
+          if(setShowFormTask) setShowFormTask(true);
         }
       }}
     >
@@ -145,7 +145,7 @@ export const CardItem: React.FC<CardItemProps> = ({
         className={`relative bg-white rounded-xl p-2 sm:p-3 border transition-all duration-300 ${
           isRewardColumn ? "border-purple-200 bg-purple-50/30" : ""
         } ${
-          snapshot.isDragging
+          snapshot?.isDragging
             ? "shadow-xl border-[#00B4B6]/50 bg-white/95 backdrop-blur-sm"
             : "shadow-md border-gray-100/50 group-hover/task:shadow-lg group-hover/task:border-gray-200/70"
         }`}

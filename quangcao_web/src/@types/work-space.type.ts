@@ -101,7 +101,7 @@ export interface ColumnType {
   id: string;
   title: string;
   type: string;
-  task? : Task[];
+  tasks? : Task[];
 }
 
 export interface ManagermentBoardProps {
