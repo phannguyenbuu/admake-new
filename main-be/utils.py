@@ -903,10 +903,7 @@ FOREIGN KEY (user_id) REFERENCES "user"(id);
     db.session.commit()
 
 def alter_data():
-    # for table in ['material','user','role','workspace','task','message','workpoint','leave']:
-    # db.session.execute(text(f'''ALTER TABLE "lead" ADD COLUMN "fullName" VARCHAR(120);'''))
-    # db.session.execute(text(f'''ALTER TABLE "lead" ADD COLUMN username VARCHAR(50);'''))
-    # db.session.execute(text(f'''ALTER TABLE "lead" ADD COLUMN password VARCHAR(50);'''))
+    db.session.execute(text(f'''ALTER TABLE "user" RENAME COLUMN "zaloAccount" TO "bankAccount";'''))
     db.session.commit()
 
 def delete_customer_user():
@@ -1055,7 +1052,7 @@ if __name__ == "__main__":
         db.create_all()
         
         # parse_csv('register.csv')
-        # alter_data()
+        alter_data()
 
         
         # for user in User.query.all():
@@ -1069,12 +1066,12 @@ if __name__ == "__main__":
 
 
 
-        for user in User.query.all():
-            if user.username and user.username.startswith('ad'):
-                print(user.username)
-                user.role_id = -2
+        # for user in User.query.all():
+        #     if user.username and user.username.startswith('ad'):
+        #         print(user.username)
+        #         user.role_id = -2
 
-        db.session.commit()  # Ghi lại thay đổi vào database
+        # db.session.commit()  # Ghi lại thay đổi vào database
 
             # lead.password = "Test@1234"
             # user = User.create_item({

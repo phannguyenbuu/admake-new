@@ -137,7 +137,7 @@ class User(BaseModel):
     citizenId = db.Column(db.String(80))
     email = db.Column(db.String(80))
     facebookAccount = db.Column(db.String(80))
-    zaloAccount = db.Column(db.String(80))
+    bankAccount = db.Column(db.String(80))
     referrer = db.Column(db.String(80))
 
     taxCode = db.Column(db.String(50))
