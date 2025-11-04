@@ -62,8 +62,6 @@ def upload_to_vps(host, port, username, password, local_path, remote_path):
 
 
 def upload_to_vps_multiple(host, port, username, password, local_dirs, remote_base_dir):
-    save_dump()
-
     ssh = paramiko.SSHClient()
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     ssh.connect(hostname=host, port=port, username=username, password=password, timeout=60)
@@ -421,14 +419,7 @@ def generate_ecosystem_config(n):
 
 
 
-# upload_to_vps_multiple(
-#     host="31.97.76.62",
-#     port=22,
-#     username="root",
-#     password="@baoLong0511",
-#     local_dirs=["nginx"],
-#     remote_base_dir="/etc"
-# )
+# save_dump()
 
 local_dirs = [
     "main-be/models.py",
@@ -445,7 +436,7 @@ local_dirs = [
 ]
 
 # build_nginx_and_ecosystem(0)
-upload_to_vps_multiple(host="31.97.76.62",
+upload_to_vps_multiple(host="148.230.100.33",
                        port=22,
                        username="root",
                        password="@baoLong0511",

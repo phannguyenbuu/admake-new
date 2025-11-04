@@ -152,11 +152,14 @@ import subprocess
 
 
 def create_admake_chat_database(db_name="admake_chat", db_user="postgres"):
+    env = os.environ.copy()
+    env['PGPASSWORD'] = "myPass"
     try:
         # Dùng lệnh createdb của postgresql
         subprocess.run(
             ["createdb", "-U", db_user, db_name],
-            check=True
+            check=True,
+            env=env
         )
         print(f"Database '{db_name}' đã được tạo thành công.")
     except subprocess.CalledProcessError as e:
@@ -189,9 +192,12 @@ def restore_database_from_latest_dump(db_name="admake_chat", db_user="postgres",
         latest_dump_path,
     ]
 
+    env = os.environ.copy()
+    env['PGPASSWORD'] = 'myPass'
+
     try:
         # Chạy lệnh restore, cần user có quyền hoặc thực thi dưới user postgres
-        subprocess.run(cmd, check=True)
+        subprocess.run(cmd, check=True, env=env)
         print(f"Restore database '{db_name}' từ file {latest_dump} thành công.")
         return True
     except subprocess.CalledProcessError as e:

@@ -41,22 +41,6 @@ const ChatGroupList = () => {
     }
   };
 
-  // const handleAddGroupOk = async (name: string) => {
-  //   // gọi API POST /group với tên group = name
-  //   setAddGroupModalVisible(false);
-  // };
-  
-  // useEffect(() => {
-  //   setChatGroupList(workspaces);
-  // }, [workspaces]);
-  
-
-  // const items: MenuProps["items"] = (workspaces || []).map((group) => ({
-  //   key: group.id,
-  //   label: group.name,
-  //   icon: <UserOutlined />,
-  // }));
-
   const onMenuClick: MenuProps["onClick"] = (info: MenuInfo) => {
     // console.log('workspaces',workspaces, info);
     const group = workspaces.find(g => g.id.toString() === info.key);
@@ -143,9 +127,6 @@ const ChatGroupList = () => {
             <span style={spanStyle}>CHAT</span>
           </Box>
         </Dropdown>
-
-        {/* <Button sx={{color:"#fff", whiteSpace:'nowrap'}}
-          onClick={() => setAddGroupModalVisible(true)}>Tạo Nhóm</Button> */}
        </Stack>
 
       {/* Model popup */}
@@ -156,14 +137,6 @@ const ChatGroupList = () => {
         >
         <Group selected={selectedId} setSelected={setSelectedId}/>
       </Modal>
-
-
-      {/* <AddGroupModal
-        visible={addGroupModalVisible}
-        onOk={handleAddGroupOk}
-        onCancel={() => setAddGroupModalVisible(false)}
-      /> */}
-
     </div>
   );
 };
