@@ -166,7 +166,7 @@ def create_admake_chat_database(db_name="admake_chat", db_user="postgres"):
 # Gọi hàm tạo db
 
 
-def restore_database_from_latest_dump(db_name="admake_chat", db_user="postgres", dump_dir="/root"):
+def restore_database_from_latest_dump(db_name="admake_chat", db_user="postgres", dump_dir="/root/backup"):
     create_admake_chat_database()
 
     # Lấy danh sách file .dump trong thư mục

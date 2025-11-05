@@ -24,7 +24,7 @@ def save_dump():
     now = datetime.datetime.now()
     timestamp = now.strftime("%y_%m_%d_%H_%M")
 
-    remote_dump_path = f"/root/admake_chat_{timestamp}.dump"
+    remote_dump_path = f"/root/backup/admake_chat_{timestamp}.dump"
     print("Dump file remote:", remote_dump_path)
 
     # Thực thi lệnh pg_dump trên server Linux
@@ -97,7 +97,7 @@ load_dotenv()  # load biến môi trường trong file .env vào process.env
 if __name__ == "__main__":
     t = threading.Thread(target=periodic_save_dump, daemon=True)
     t.start()
-    
+
     port = int(os.environ.get('PORT', 5000))  # Lấy biến môi trường PORT hoặc mặc định 5000
     socketio.run(app, host='0.0.0.0', debug=True, port=port, allow_unsafe_werkzeug=True)
 
