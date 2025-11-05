@@ -67,7 +67,7 @@ const periods = [
 ];
 
 function WorkpointGrid({ workpoint }: Props) {
-  const tabStyle = { maxHeight: 15, fontSize:12, fontWeight: 300, whiteSpace:'nowrap', maxWidth: 60};
+  const tabStyle = { maxHeight: 15, fontSize:14, fontWeight: 700, whiteSpace:'nowrap', maxWidth: 60};
   return (
      
     <TableContainer component={Paper} sx={{ maxWidth: 800, minHeight: 250, gap: 5, background:'none' }}>
@@ -96,14 +96,14 @@ function WorkpointGrid({ workpoint }: Props) {
                 <TableCell sx={tabStyle}>{label}</TableCell>
                 <TableCell sx={tabStyle}>
                   {periodData?.in?.time ? 
-                  <Box sx={{background:'#00B4B6',p:1,borderRadius:2,width: 72}}>
+                  <Box sx={{background:'#00B4B6',p:1,borderRadius:2}}>
                   {new Date(periodData.in.time).toLocaleTimeString()}
                   </Box>
                   : '---'}
                 </TableCell>
                 <TableCell sx={tabStyle}>
                   {periodData?.out?.time ? 
-                  <Box sx={{background:'#00B4B6',p:1,borderRadius:2,width: 72}}>
+                  <Box sx={{background:'#00B4B6',p:1,borderRadius:2}}>
                   {new Date(periodData.out.time).toLocaleTimeString()}
                   </Box>
                   : '---'}

@@ -78,6 +78,7 @@ function LeaveDatePickerOneDay({
         onClose={() => setOpen(false)}
         value={value}
         onChange={handleChange}
+        enableAccessibleFieldDOMStructure={false}
         slots={{ textField: TextField }} // Gán TextField cho slot textField
         slotProps={{
           textField: {
@@ -138,6 +139,7 @@ function LeaveDatePickerMultipleDays({
           onClose={() => setOpenStart(false)}
           value={startValue}
           onChange={handleStartChange}
+          enableAccessibleFieldDOMStructure={false}
           slots={{ textField: TextField }} // Gán TextField cho slot textField
           slotProps={{
             textField: {
@@ -156,6 +158,7 @@ function LeaveDatePickerMultipleDays({
           onClose={() => setOpenEnd(false)}
           value={endValue}
           onChange={handleEndChange}
+          enableAccessibleFieldDOMStructure={false}
           slots={{ textField: TextField }} // Gán TextField cho slot textField
           slotProps={{
             textField: {

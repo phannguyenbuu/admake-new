@@ -375,7 +375,7 @@ async function postWorkpointCheck(imgUrl: string, lat:string, long:string) {
     <Stack p={1} height='100vh' spacing={1}>
       <Stack direction="row" spacing={0} style={{width:'90vw', marginLeft:10}}>
         <LogoAdmake/>
-        <Box style={{width:'50vw', marginTop: 20, marginLeft: -140}}>
+        <Box style={{width:'50vw', fontWeight:500, marginTop: 10, marginLeft: 20}}>
           {userEl?.fullName}
         </Box>
       </Stack>
