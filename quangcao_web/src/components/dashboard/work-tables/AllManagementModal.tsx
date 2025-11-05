@@ -25,7 +25,7 @@ const items = [
 export default function AllManagementModal() {
   const [columns, setColumns] = useState<ColumnType[]>([]);
   const context = useContext(UpdateButtonContext);
-  const {userLeadId} = useUser();
+  const {userLeadId, isMobile} = useUser();
   if (!context) throw new Error("UpdateButtonContext not found");
 
   const [tasksData, setTasksData] = useState<Task[]>([]);
@@ -116,7 +116,7 @@ export default function AllManagementModal() {
         title="BẢNG CÔNG VIỆC TỔNG HỢP"
         open={statusVisible}
         onCancel={handleStatusOk}
-        style={{ minWidth: "95vw", padding: 0 }}
+        style={{ minWidth: isMobile ? "320vw" : "95vw", padding: 0 }}
         footer={null}
       >
         <Stack direction="row" spacing={1}>
