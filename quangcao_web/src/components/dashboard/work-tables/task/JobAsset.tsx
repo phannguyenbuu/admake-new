@@ -19,7 +19,7 @@ const isImageFile = (filename: string) => {
 interface JobAssetProps {
   title?: string;
   role?: string; // là ứng tiền hay hình ảnh tham khảo công trình
-  taskDetail?: Task;
+  taskDetail: Task | null;
 }
 
 const JobAsset: React.FC<JobAssetProps> = ({ title, role, taskDetail }) => {

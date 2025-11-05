@@ -179,7 +179,7 @@ const CameraDialog: React.FC<CameraDialogProps> = ({userEl}) => {
 
   const capturePhoto = () => {
     // Nếu có camera, chụp ảnh từ video
-    console.log("Có camera, chụp ảnh từ video");
+    // console.log("Có camera, chụp ảnh từ video");
     const video = videoRef.current;
     const canvas = canvasRef.current;
       
@@ -218,6 +218,8 @@ const CameraDialog: React.FC<CameraDialogProps> = ({userEl}) => {
       setCaptured(true);
       getLocation();
       setStep(2);
+
+      // console.log("A-2");
       return;
     }
 
@@ -433,7 +435,7 @@ async function postWorkpointCheck(imgUrl: string, lat:string, long:string) {
         </>
       )}
 
-      {!isSupplier && step === 2 && (
+      {step === 2 && (
         <>
           <CenterBox>
             <Box sx={{ textAlign: "center", mt: 1 }}>
@@ -466,10 +468,10 @@ async function postWorkpointCheck(imgUrl: string, lat:string, long:string) {
 
               <Button onClick={handleBack}>Chụp lại</Button>
           </Stack>
-
-          <canvas ref={canvasRef} style={{ display: "none" }} />
         </>)
       }
+          <canvas ref={canvasRef} style={{ display: "none" }} />
+        
 
         {!isSupplier && sendSuccessMsg && (
           <Typography

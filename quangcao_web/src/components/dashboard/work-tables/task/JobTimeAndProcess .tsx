@@ -24,7 +24,7 @@ interface TimeType {
 
 interface JobTimeAndProcessProps {
   form: any;
-  taskDetail?: Task;
+  taskDetail: Task | null;
   salaryType?: string;
   setSalaryType?: (salaryType: string) => void;
 }
@@ -285,7 +285,7 @@ export function DateFormPicker({
   form,
   onChange
 }: {
-  taskDetail?:Task,
+  taskDetail:Task | null,
   mode: string;
   title: string;
   timeValue: Dayjs | null;

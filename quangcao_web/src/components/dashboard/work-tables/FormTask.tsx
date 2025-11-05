@@ -24,90 +24,14 @@ import type { UserList, User } from "../../../@types/user.type";
 import type { Id } from "@hello-pangea/dnd";
 import { UpdateButtonContext } from "../../../common/hooks/useUpdateButtonTask";
 // import JobAsset from "./task/JobAsset";
-
+import TaskHeader from "./task/FormTaskHeader";
 const { Title, Text } = Typography;
 
 
-interface TaskHeaderProps {
-  // mode: { adminMode: boolean; userMode: boolean };
-  taskDetail: Task;
-  isLoading: boolean;
-  onSuccess: () => void;
-  onUpdate: () => void;
-  updateTaskStatus: (taskId: string, newStatus: string) => Promise<void>;
-  // showUpdateButtonMode: number;
-  
-}
+
 
 const cellStyle = {maxWidth:400, minWidth:400};
 
-// TaskHeader.tsx
-function TaskHeader({ taskDetail, onSuccess, updateTaskStatus, 
-  isLoading, onUpdate }: TaskHeaderProps) {
-
-  const context = useContext(UpdateButtonContext);
-  if (!context) throw new Error("UpdateButtonContext not found");
-  const { showUpdateButton, setShowUpdateButton } = context;
-  
-  console.log('Task:', taskDetail);
-
-  useEffect(()=>{
-    console.log('showUpdateButton',showUpdateButton);
-  },[showUpdateButton]);
-
-
-  useEffect(()=>{
-    if (!taskDetail) setShowUpdateButton(0);
-
-  },[taskDetail]);
-
-  const handleReward = async () => {
-    // console.log("A_Task", taskDetail,updateTaskStatus);
-    if (!taskDetail) return;
-    if (!updateTaskStatus) return;
-
-    try {
-      await updateTaskStatus(taskDetail.id, "REWARD");
-      console.log("Nghiệm thu thành công!", taskDetail);
-    } catch (error) {
-      console.error("Lỗi nghiệm thu:", error);
-    }
-
-    if(onSuccess)
-      onSuccess();
-  };
-
-  
-
-
-  return (
-    <Stack direction="row" spacing={5}>
-      <div className="flex items-center gap-2 px-4 py-3">
-        <div className="icon-container">
-          {/* Icon component here */}
-        </div>
-        <div>
-          <Title level={5}>{taskDetail ? "Chỉnh sửa công việc" : "Tạo công việc mới"}</Title>
-        </div>
-      </div>
-
-      <Stack direction="row" spacing={1}>
-        {showUpdateButton === 0 && 
-          <Button type="primary" loading={isLoading} onClick={onUpdate}>
-            ✅ Cập nhật
-          </Button>
-        }
-
-        {showUpdateButton === 1 && 
-          <Button type="primary" loading={isLoading} onClick={handleReward}>
-            🏆 Nghiệm Thu
-          </Button>
-        }
-        
-      </Stack>
-    </Stack>
-  );
-}
 
 // // TaskComments.tsx
 // function TaskComments({ taskId, disabled }: { taskId?: string; disabled: boolean }) {
@@ -122,7 +46,7 @@ interface FormTaskProps {
   onSuccess: () => void;
   initialValues: Task | null;
   users: UserSearchProps[];
-  customers: UserSearchProps[];
+  // customers: UserSearchProps[];
   updateTaskStatus: (taskId: string, newStatus: string) => Promise<void>;
   // showUpdateButtonMode: number;
   // setShowUpdateButton: (value: number) => void;
@@ -130,31 +54,16 @@ interface FormTaskProps {
 
 export default function FormTask({ 
   updateTaskStatus, open, onCancel, taskId, onSuccess,
-  workspaceId, users, customers,
-  // showUpdateButtonMode, setShowUpdateButton
+  workspaceId, users, 
  }: FormTaskProps) {
   const context = useContext(UpdateButtonContext);
   if (!context) throw new Error("UpdateButtonContext not found");
   const { setShowUpdateButton } = context;
 
-  const { data:taskDetail, isLoading, isError, error } = useGetTaskById(taskId || "");
+  const { data:sourceTaskDetail, isLoading, isError, error } = useGetTaskById(taskId || "");
   const [salaryType, setSalaryType] = useState<string>('');
-  // const [material, setMaterial] = useState<{ selectedMaterials: any[], materialQuantities: { [key: string]: number } }>({
-  //   selectedMaterials: [],
-  //   materialQuantities: {},
-  // });
-  // const [users, setUsers] = useState<{ selectedUsers: string[] }>({ selectedUsers: [] });
-
-  // const [customer, setCustomer] = useState<{
-  //   searchValue: string;
-  //   selectedId: string | null;
-  //   selectedCustomer: Customer | null;
-  //   isTyping: boolean;
-  // }>({ searchValue: "", selectedId: null, selectedCustomer: null, isTyping: false });
-
-  const [currentStatus, setCurrentStatus] = useState<StatusType>("OPEN");
-  // const { data: customers } = useCustomerQuery({ limit: 50, search: customer.searchValue });
-  // const { data: customerDetail } = useCustomerDetail(customer.selectedId || "");
+  
+  // const [currentStatus, setCurrentStatus] = useState<StatusType>("OPEN");
   const [form] = Form.useForm();
 
   const [customerSearch, setCustomerSearch] = useState('');
@@ -163,34 +72,40 @@ export default function FormTask({
   const [userSelected, setUserSelected] = useState<UserSearchProps | null>(null);
 
   const [userList, setUserList] = useState<UserItemProps[]>([]);
-  const [customerObj, setCustomerObj] = useState<UserItemProps | null>(null);
+  // const [customerObj, setCustomerObj] = useState<UserItemProps | null>(null);
+
+  const [taskDetail, setTaskDetail] = useState<Task | null>(null);
+
 
   useEffect(()=>{
-    if(!taskDetail || !taskDetail?.assign_ids)
+    if(!sourceTaskDetail || !sourceTaskDetail?.assign_ids)
       return;
-    setCurrentStatus(taskDetail?.status ?? '');
-    setCustomerObj(taskDetail?.customer_id);
-    setUserList(taskDetail?.assign_ids);
 
-    console.log('taskDetail', taskDetail.id);
+    setTaskDetail(sourceTaskDetail);
 
-    if(taskDetail?.status === "DONE" && taskDetail?.check_reward)
+    // setCurrentStatus(taskDetail?.status ?? '');
+    // setCustomerObj(taskDetail?.customer_id);
+    setUserList(sourceTaskDetail?.assign_ids);
+
+    // console.log('taskDetail', taskDetail.id);
+
+    if(sourceTaskDetail?.status === "DONE" && sourceTaskDetail?.check_reward)
       setShowUpdateButton(1);
-    else if(taskDetail?.status === "REWARD")
+    else if(sourceTaskDetail?.status === "REWARD")
       setShowUpdateButton(2);
     else
       setShowUpdateButton(0);
 
-  },[taskDetail]);
+  },[sourceTaskDetail]);
 
   const onUserDelete = (idToDelete: string | null) => {
     const newList = userList.filter(user => user.id !== idToDelete);
     setUserList(newList);
   };
 
-  useEffect(()=>{
-    setCustomerObj({id: customerSelected?.user_id ?? null, name:customerSelected?.fullName ?? null});
-  },[customerSelected]);
+  // useEffect(()=>{
+  //   setCustomerObj({id: customerSelected?.user_id ?? null, name:customerSelected?.fullName ?? null});
+  // },[customerSelected]);
 
   useEffect(() => {
     if (!userSelected)
@@ -278,10 +193,10 @@ export default function FormTask({
 
   useEffect(() => {
     form.setFieldsValue({
-      customer_id: customerObj?.id || null,
+      // customer_id: customerObj?.id || null,
       assign_ids: userList ? userList.map(user => user.id) : [],
     });
-  }, [customerObj, userList, form]);
+  }, [userList, form]);
 
   useEffect(() => {
     setUserSearch("");
@@ -291,7 +206,7 @@ export default function FormTask({
 
     if(!taskId)
     {
-      setCustomerObj(null);
+      // setCustomerObj(null);
       setUserList([]);
     }
 
@@ -320,8 +235,8 @@ export default function FormTask({
             <Form.Item name="workspace_id" initialValue={workspaceId} hidden>
             </Form.Item>
 
-            <Form.Item name="customer_id" initialValue={customerObj?.id} hidden>
-            </Form.Item>
+            {/* <Form.Item name="customer_id" initialValue={customerObj?.id} hidden> */}
+            {/* </Form.Item> */}
 
             {/* Lưu assign_ids ẩn */}
             <Form.Item name="assign_ids" initialValue={userList?.map(user => user.id)} hidden>
@@ -338,7 +253,7 @@ export default function FormTask({
 
                  {customerObj && <UserItem user={customerObj} onDelete={()=> setCustomerObj(null)}/>}
               </Stack> */}
-              <JobInfoCard taskDetail={taskDetail ?? null} currentStatus={currentStatus} form={form} />
+              <JobInfoCard taskDetail={taskDetail ?? null} currentStatus={taskDetail?.status ?? ''} form={form} />
 
               <Stack style={cellStyle}>
                 <JobAgentInfo 
@@ -359,7 +274,8 @@ export default function FormTask({
             <Stack direction="row" spacing = {5}>
               <JobDescription taskDetail={taskDetail ?? null} form={form} salaryType={salaryType}/>
               {/* Thời gian và quy trình */}
-              <JobTimeAndProcess form={form} taskDetail={taskDetail ?? null} 
+              <JobTimeAndProcess form={form} 
+                taskDetail={taskDetail} 
                 salaryType={salaryType}
                 setSalaryType={setSalaryType}/>
             </Stack>

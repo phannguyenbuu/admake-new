@@ -440,7 +440,7 @@ export default function ManagermentBoard({workspaceId,}: ManagermentBoardProps) 
         // @ts-ignore
         users = {workspaceData?.users}
         // @ts-ignore
-        customers = {workspaceData?.customers}
+        // customers = {workspaceData?.customers}
         updateTaskStatus={updateTaskStatus}
       />
 

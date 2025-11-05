@@ -13,7 +13,7 @@ const { TextArea } = Input;
 // }
 
 interface JobDescriptionProps {
-  taskDetail?: Task;
+  taskDetail: Task | null;
   form: any;
   salaryType: string;
 }
