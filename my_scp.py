@@ -95,7 +95,7 @@ def save_dump():
     # Kết nối SSH tới server Linux
     ssh = SSHClient()
     ssh.set_missing_host_key_policy(AutoAddPolicy())
-    ssh.connect('31.97.76.62', username='root', password='@baoLong0511')
+    ssh.connect('148.230.100.33', username='root', password='@baoLong0511')
 
     now = datetime.datetime.now()
     timestamp = now.strftime("%y_%m_%d_%H_%M")
