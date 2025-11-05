@@ -12,6 +12,9 @@ import CommentIcon from '@mui/icons-material/Comment';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { getTitleByStatus } from "../../../dashboard/work-tables/Managerment";
 import { notification } from "antd";
+import JobDescription from "../../../dashboard/work-tables/task/JobDescription";
+import { Form, Input } from "antd";
+const { TextArea } = Input;
 
 const fetchTaskByUser = async (userId: string): Promise<Task[]> => {
   const response = await fetch(`${useApiHost()}/task/by_user/${userId}`);
@@ -65,7 +68,7 @@ const TaskBoard = ({ userId, open, onCancel }: TaskBoardProps) => {
         style={{boxSizing:'border-box'}}>
         
         {data && data.length > 0 ?  data.map((el) => 
-        <Stack style={{background:'#ddd', padding: 10, borderRadius: 20,
+        <Stack spacing={1} style={{background:'#ddd', padding: 10, borderRadius: 20,
           width: isMobile ? 320:'',
          }}>
             <Stack direction="row" spacing={1} >
@@ -75,6 +78,14 @@ const TaskBoard = ({ userId, open, onCancel }: TaskBoardProps) => {
                 {el?.workspace ?? ''}
               </Typography>
             </Stack>
+            <TextArea readOnly 
+                value={el?.description}
+                        rows={3}
+                        showCount
+                        maxLength={1000}
+                        placeholder="Mô tả chi tiết về công việc cần thực hiện..."
+                        className="!rounded-lg !border !border-gray-300 focus:!border-cyan-500 focus:!shadow-lg hover:!border-cyan-500 !transition-all !duration-200 !shadow-sm !resize-none !text-xs sm:!text-sm h-40"
+                      />
 
             <JobTimeAndProcess key={el.id} form={null} taskDetail={el ?? null}/>
         </Stack>)

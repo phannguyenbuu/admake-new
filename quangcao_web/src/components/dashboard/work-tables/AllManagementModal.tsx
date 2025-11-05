@@ -125,7 +125,7 @@ export default function AllManagementModal() {
           style={{
             position: "fixed",
             top: 64,
-            right: 10,
+            right: isMobile ? 10 : 60,
             zIndex: 1000,
             background: "transparent",
             border: "none",

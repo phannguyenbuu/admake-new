@@ -37,7 +37,7 @@ const JobDescription: React.FC<JobDescriptionProps> = ({ salaryType, taskDetail,
 
 
   return (
-    <Stack style={{ minWidth:400 }}>
+    <Stack style={{ minWidth:300 }}>
       <div className="flex items-center gap-2 mb-2 sm:mb-3">
         <span className="text-green-600 text-xs sm:text-sm">📝</span>
         
