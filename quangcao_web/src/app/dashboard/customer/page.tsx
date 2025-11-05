@@ -72,6 +72,7 @@ export const CustomerDashboard: IPage["Component"] = () => {
 
 
 const handleDeleteCustomer = () => {
+    console.log("DELETE", customer);
     if (!customer || !customer.owner_id) return;
 
     fetch(`${useApiHost()}/workspace/${customer.id}`, {
@@ -80,11 +81,12 @@ const handleDeleteCustomer = () => {
       .then((response) => {
         if (!response.ok) {
           notification.error({message:`Không xóa được khách hàng`});
-        }
+        }else
+          notification.success({message:`Xóa khách hàng ${customer.name} thành công`});
         return response.json();
       })
       .then(() => {
-        notification.success({message:`Xóa khách hàng ${customer.name} thành công`});
+        
         refetch();
       })
       .catch((error) => {

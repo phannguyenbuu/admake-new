@@ -69,7 +69,10 @@ def get_customer_detail(id):
 
     user_fields = get_model_columns(User)
     for k in user_fields:
-        result[f"user_{k}"] = getattr(user, k, None)
+        if k != 'id':
+            result[k] = getattr(user, k, None)
+
+    print('Customer', result)
     
     return jsonify(result)
 

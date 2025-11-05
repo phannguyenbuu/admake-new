@@ -21,6 +21,8 @@ import WorkpointGrid from "./WorkpointTable";
 import { CurrentDateTime } from "./WorkpointTable";
 import TaskBoard from "./TaskBoard";
 import LeaveBoard from "./LeaveBoard";
+import { notification } from "antd";
+import { useNavigate, useLocation } from 'react-router-dom';
 
 interface CameraDialogProps {
   userEl: User | null;
@@ -77,6 +79,22 @@ const CameraDialog: React.FC<CameraDialogProps> = ({userEl}) => {
   const [openWork, setOpenWork] = useState(userEl?.role && userEl?.role_id > 100);
   const [openHoliday, setOpenHoliday] = useState(false);
   const [hasCamera, setHasCamera] = useState(false);
+
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    const href = window.location.href; // chuỗi href cần kiểm tra
+
+    if (href.includes("?zarsrc")) {
+      const baseHref = href.split("?zarsrc")[0];
+      
+      if (location.pathname + location.search !== new URL(baseHref).pathname + new URL(baseHref).search) {
+        window.location.href = baseHref;
+      }
+    } 
+
+  },[]);
 
   useEffect(() => {
     navigator.mediaDevices.enumerateDevices()
@@ -343,14 +361,15 @@ async function postWorkpointCheck(imgUrl: string, lat:string, long:string) {
       const new_filename = result.data.file_url;
       postWorkpointCheck(new_filename, lat, long);
 
-      setSendSuccessMsg(`Đã gửi thành công!`);
+      
       setTimeout(() => {
+        notification.success({message:`Đã gửi thành công!`});
         setStep(1);
         setOpenWork(true);
       }, 1000);
     })
     .catch((err) => {
-      setError("Lỗi upload ảnh: " + err.message);
+      notification.error({message:"Lỗi upload ảnh: " + err.message});
     });
 
     setImageData(null);
@@ -473,13 +492,13 @@ async function postWorkpointCheck(imgUrl: string, lat:string, long:string) {
           <canvas ref={canvasRef} style={{ display: "none" }} />
         
 
-        {!isSupplier && sendSuccessMsg && (
+        {/* {!isSupplier && sendSuccessMsg && (
           <Typography
             sx={{ position:'fixed',mt: 2, mx: 2, top: 80, fontSize: 10, color: "green", wordBreak: "break-word" }}
           >
             {sendSuccessMsg}
           </Typography>
-        )}
+        )} */}
       
       
       <TaskBoard open={openWork} userId={userEl?.id} onCancel={handleWorkBoardCancel}/>

@@ -309,10 +309,11 @@ class Workspace(BaseModel):
 
         if user:
             for column in user.__table__.columns:
-                value = getattr(user, column.name)
-                # print(f"DEBUG: Column {column.name} value type: {type(value)}")
-                if not isinstance(value, (datetime.datetime, datetime.date)):
-                    result["user_" + column.name] = value
+                if column.name != "id":
+                    value = getattr(user, column.name)
+                    # print(f"DEBUG: Column {column.name} value type: {type(value)}")
+                    if not isinstance(value, (datetime.datetime, datetime.date)):
+                        result[column.name] = value
         return result
 
     @staticmethod

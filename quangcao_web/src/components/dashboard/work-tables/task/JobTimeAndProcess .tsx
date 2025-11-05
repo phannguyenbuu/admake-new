@@ -29,7 +29,7 @@ interface JobTimeAndProcessProps {
   setSalaryType?: (salaryType: string) => void;
 }
 
-const JobTimeAndProcess: React.FC<JobTimeAndProcessProps> = ({taskDetail,setSalaryType,salaryType, form}) => {
+const JobTimeAndProcess: React.FC<JobTimeAndProcessProps> = ({taskDetail, setSalaryType, salaryType, form}) => {
   const [startDate, setStartDate] = useState<Dayjs | null>(taskDetail?.start_time ? dayjs(taskDetail.start_time) : null);
   const [endDate, setEndDate] = useState<Dayjs | null>(taskDetail?.end_time ? dayjs(taskDetail.end_time) : null);
   
@@ -295,7 +295,7 @@ export function DateFormPicker({
 }) {
   useEffect(() => {
     if(!form) return;
-
+    console.log("TIME", mode, timeValue);
     form.setFieldsValue({ [mode]: timeValue });
   }, [timeValue]);
 

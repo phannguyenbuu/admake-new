@@ -176,9 +176,10 @@ def get_workspace_detail(id):
 def delete_workspace(workspace_id):
     workspace = db.session.get(Workspace, workspace_id)
     if not workspace:
+        print('Cannot find workspace', workspace_id)
         return jsonify({"error": "Workspace not found"}), 404
     
-    # print(workspace.owner_id)
+    print('Delete workspace', workspace.owner_id)
     owner = db.session.get(User, workspace.owner_id)
 
     if owner:
