@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import LoginForm from "./login.form";
 import { useEffect, Suspense } from "react";
 
-export const Component = () => {
+const Login = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -33,3 +33,5 @@ export const Component = () => {
     </Suspense>
   );
 };
+
+export default Login;

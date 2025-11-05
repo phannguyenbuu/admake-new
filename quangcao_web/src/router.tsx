@@ -18,6 +18,7 @@ import { InforDashboard } from "./app/infor/page";
 // import { WorkPointPage } from "./app/dashboard/workpoints/page";
 import { useInfo } from "./common/hooks/info.hook";
 import { Navigate } from "react-router-dom";
+import Login from "./app/login/page";
 import GroupQRPage from "./components/chat/components/GroupQRPage";
 import Workpoint from "./components/chat/components/Workpoint";
 import { CenterBox } from "./components/chat/components/commons/TitlePanel";
@@ -66,7 +67,7 @@ const routes: TRoute = {
     {
       path: "/login", // chuyển trang login thành path 'login' tách biệt
       index: true,
-      lazy: () => import("./app/login/page"),
+      element: <Login />,
       title: "Đăng nhập",
       ignoreInMenu: true,
     },
