@@ -143,7 +143,7 @@ const JobAsset: React.FC<JobAssetProps> = ({ title, role, taskDetail }) => {
               <DescriptionIcon fontSize="large" />
             )}
             <Typography fontSize={12} sx={{ maxWidth: 100, wordBreak: 'break-word' }}>
-              {el}
+              {el.length > 9 ? `${el.substring(0, 9)}...` : el}
             </Typography>
           </Stack>
         ))

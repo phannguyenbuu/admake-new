@@ -15,9 +15,10 @@ const { TextArea } = Input;
 interface JobDescriptionProps {
   taskDetail?: Task;
   form: any;
+  salaryType: string;
 }
 
-const JobDescription: React.FC<JobDescriptionProps> = ({ taskDetail, form }) => {
+const JobDescription: React.FC<JobDescriptionProps> = ({ salaryType, taskDetail, form }) => {
   // const [desc, setDesc] = useState(taskDetail?.description || "");
 
   useEffect(() => {
@@ -59,8 +60,8 @@ const JobDescription: React.FC<JobDescriptionProps> = ({ taskDetail, form }) => 
             className="!rounded-lg !border !border-gray-300 focus:!border-cyan-500 focus:!shadow-lg hover:!border-cyan-500 !transition-all !duration-200 !shadow-sm !resize-none !text-xs sm:!text-sm h-40"
           />
         </Form.Item>
-      
-      <JobAsset key="task-assets" taskDetail={taskDetail} title='Tài liệu' role="task"/>
+      {salaryType === "REWARD" &&
+        <JobAsset key="cash-assets" title = 'Ứng tiền' taskDetail={taskDetail} role="cash"/>}
     </div>
   );
 };

@@ -10,6 +10,8 @@ import { EditOutlined } from "@ant-design/icons";
 import { columnsUser } from "../../../common/data";
 import { useDebounce } from "../../../common/hooks/useDebounce";
 import { useUser } from "../../../common/hooks/useUser";
+import { QRColumn } from "../workpoints/WorkDays";
+import type { WorkDaysProps } from "../../../@types/workpoint";
 
 export const SupplierDashboard: IPage["Component"] = () => {
   const {userLeadId} = useUser();
@@ -77,7 +79,17 @@ export const SupplierDashboard: IPage["Component"] = () => {
           type: "radio",
           columnWidth: 100,
           renderCell: (_, record) => {
+          const item:WorkDaysProps = {
+            salary: 0,
+              items: [],
+              leaves: [],
+              user_id: record.id,
+              username: record?.fullName ?? '',
+              userrole: "supplier"
+          }
+
             return (
+              <>
               <EditOutlined
                 className="!text-cyan-600 !cursor-pointer !text-xl"
                 onClick={() => {
@@ -85,6 +97,9 @@ export const SupplierDashboard: IPage["Component"] = () => {
                   toggle("openUpdate")();
                 }}
               />
+
+              <QRColumn record = {item}/>
+              </>
             );
           },
         }}

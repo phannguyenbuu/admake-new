@@ -55,6 +55,7 @@ function drawTextOnCanvas(
 }
 
 const CameraDialog: React.FC<CameraDialogProps> = ({userEl}) => {
+  
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
     
@@ -73,7 +74,7 @@ const CameraDialog: React.FC<CameraDialogProps> = ({userEl}) => {
   const [workpoint, setWorkpoint] = useState<Workpoint | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [openWork, setOpenWork] = useState(false);
+  const [openWork, setOpenWork] = useState(userEl?.role && userEl?.role_id > 100);
   const [openHoliday, setOpenHoliday] = useState(false);
   const [hasCamera, setHasCamera] = useState(false);
 
@@ -371,6 +372,8 @@ async function postWorkpointCheck(imgUrl: string, lat:string, long:string) {
     setOpenHoliday(true);
   }
 
+  const isSupplier = userEl?.role_id && userEl?.role_id > 100;
+
   return (
     <Stack p={1} height='100vh' spacing={1}>
       <Stack direction="row" spacing={0} style={{width:'90vw', marginLeft:10}}>
@@ -383,31 +386,41 @@ async function postWorkpointCheck(imgUrl: string, lat:string, long:string) {
       {step === 1 && (
         <>
         <CenterBox>
-          <CurrentDateTime />
-          <WorkpointGrid workpoint={workpoint}/>
+           {!isSupplier &&
+           <>
+            <CurrentDateTime />
+            <WorkpointGrid workpoint={workpoint}/>
+          </>
+           }
 
           <Stack direction="row" spacing={1} p={1}>
-          <Button variant="contained"  
-              sx={{
-                backgroundColor:"#00B4B6",
-                  mt: 1, height: 50,maxWidth:300, mb:1 }} onClick={capturePhoto}>
-            Điểm danh
-          </Button>
+
+            {!isSupplier &&
+            <>
+              <Button variant="contained"  
+                  sx={{
+                    backgroundColor:"#00B4B6",
+                      mt: 1, height: 50,maxWidth:300, mb:1 }} onClick={capturePhoto}>
+                Điểm danh
+              </Button>
+              
+              <Button variant="contained"  
+                  sx={{
+                    backgroundColor:"#00B4B6",
+                      mt: 1, height: 50,maxWidth:300, mb:1 }} onClick={handleHolidayClick}>
+                Nghỉ phép
+              </Button>
+              </>}
+          
           <Button variant="contained"  
               sx={{
                 backgroundColor:"#00B4B6",
                   mt: 1, height: 50,maxWidth:300, mb:1 }} onClick={handleTaskClick}>
             Nhiệm vụ
           </Button>
-          <Button variant="contained"  
-              sx={{
-                backgroundColor:"#00B4B6",
-                  mt: 1, height: 50,maxWidth:300, mb:1 }} onClick={handleHolidayClick}>
-            Nghỉ phép
-          </Button>
-          
           </Stack>
           
+          {!isSupplier &&
           <video
             ref={videoRef}
             width="100%"
@@ -415,51 +428,50 @@ async function postWorkpointCheck(imgUrl: string, lat:string, long:string) {
             autoPlay
             playsInline
             style={{ borderRadius: 8, backgroundColor: "#000", width:'100%', maxWidth:400 }}
-          />
+          />}
           </CenterBox>
         </>
       )}
 
-      {step === 2 && (
-        <CenterBox>
-          <Box sx={{ textAlign: "center", mt: 1 }}>
-            {imageURL && (
-              <img
-                src={imageURL}
-                alt="Ảnh đã chụp"
-                style={{ maxWidth: "100%", borderRadius: 8, height:'60vh' }}
-              />
-            )}
-            {position.latitude && position.longitude && (
-              <Typography sx={{ mt: 1 }}>
-                {statusMsg}
+      {!isSupplier && step === 2 && (
+        <>
+          <CenterBox>
+            <Box sx={{ textAlign: "center", mt: 1 }}>
+              {imageURL && (
+                <img
+                  src={imageURL}
+                  alt="Ảnh đã chụp"
+                  style={{ maxWidth: "100%", borderRadius: 8, height:'60vh' }}
+                />
+              )}
+              {position.latitude && position.longitude && (
+                <Typography sx={{ mt: 1 }}>
+                  {statusMsg}
+                </Typography>
+              )}
+            </Box>
+            {error && (
+              <Typography color="error" sx={{ mt: 1 }}>
+                {error}
               </Typography>
             )}
-          </Box>
-          {error && (
-            <Typography color="error" sx={{ mt: 1 }}>
-              {error}
-            </Typography>
-          )}
-        </CenterBox>
-      )}
-
-      {/* <CameraSelector /> */}
+          </CenterBox>
       
-      {step === 2 && 
-      <Stack spacing={2} direction="row" sx={{position:'fixed', bottom:50, left: '50%',
-        transform: 'translateX(-50%)',}}>
-          <Button onClick={handleSend} variant="contained" 
-            sx={{ backgroundColor:"#00B4B6" }}>
-            Gửi
-          </Button>
+          <Stack spacing={2} direction="row" sx={{position:'fixed', bottom:50, left: '50%',
+            transform: 'translateX(-50%)',}}>
+              <Button onClick={handleSend} variant="contained" 
+                sx={{ backgroundColor:"#00B4B6" }}>
+                Gửi
+              </Button>
 
-          <Button onClick={handleBack}>Chụp lại</Button>
-      </Stack>}
+              <Button onClick={handleBack}>Chụp lại</Button>
+          </Stack>
 
-      <canvas ref={canvasRef} style={{ display: "none" }} />
+          <canvas ref={canvasRef} style={{ display: "none" }} />
+        </>)
+      }
 
-        {sendSuccessMsg && (
+        {!isSupplier && sendSuccessMsg && (
           <Typography
             sx={{ position:'fixed',mt: 2, mx: 2, top: 80, fontSize: 10, color: "green", wordBreak: "break-word" }}
           >
@@ -469,7 +481,9 @@ async function postWorkpointCheck(imgUrl: string, lat:string, long:string) {
       
       
       <TaskBoard open={openWork} userId={userEl?.id} onCancel={handleWorkBoardCancel}/>
-      <LeaveBoard open={openHoliday} userId={userEl?.id} onCancel={handleHolidayBoardCancel}/>
+
+      {!isSupplier &&
+        <LeaveBoard open={openHoliday} userId={userEl?.id} onCancel={handleHolidayBoardCancel}/>}
       
     </Stack>
   );

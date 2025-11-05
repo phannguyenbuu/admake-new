@@ -3,6 +3,7 @@ from models import db, Task, dateStr, User, Customer, Role,get_lead_by_json, get
 import datetime
 from sqlalchemy.orm.attributes import flag_modified
 from api.messages import upload_a_file_to_vps
+from sqlalchemy import cast, Text
 
 task_bp = Blueprint('task', __name__, url_prefix='/api/task')
 
@@ -92,8 +93,6 @@ def update_task(id):
 
 @task_bp.route("/by_user/<string:user_id>", methods=["GET"])
 def get_task_by_user_id(user_id):
-    from sqlalchemy import cast, Text
-
     tasks = Task.query.filter(
         cast(Task.assign_ids, Text).like(f'%"{user_id}"%')
     ).order_by(Task.start_time).all()

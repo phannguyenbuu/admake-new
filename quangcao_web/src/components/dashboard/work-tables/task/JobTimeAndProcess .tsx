@@ -23,12 +23,13 @@ interface TimeType {
 interface JobTimeAndProcessProps {
   form: any;
   taskDetail?: Task;
+  setSalaryType?: (salaryType: string) => void;
 }
 
-const JobTimeAndProcess: React.FC<JobTimeAndProcessProps> = ({taskDetail, form}) => {
+const JobTimeAndProcess: React.FC<JobTimeAndProcessProps> = ({taskDetail,setSalaryType, form}) => {
   const [startDate, setStartDate] = useState<Dayjs | null>(taskDetail?.start_time ? dayjs(taskDetail.start_time) : null);
   const [endDate, setEndDate] = useState<Dayjs | null>(taskDetail?.end_time ? dayjs(taskDetail.end_time) : null);
-
+  
   const [endTime, setEndTime] = useState<Dayjs | null>(taskDetail?.end_time ? dayjs(taskDetail.end_time) : null);
 
   const [totalDays, setTotalDays] = useState<number | null>(null);
@@ -92,7 +93,10 @@ const JobTimeAndProcess: React.FC<JobTimeAndProcessProps> = ({taskDetail, form})
     }
   }, [startDate, endDate]);
 
-
+  const handleTypeChange = (value: string) => {
+    if(setSalaryType)
+      setSalaryType(value);
+  };
 
   return (
     <Stack spacing={0.2} sx={{maxWidth:400, overflowX:'hidden'}}>
@@ -166,12 +170,13 @@ const JobTimeAndProcess: React.FC<JobTimeAndProcessProps> = ({taskDetail, form})
             rules={[{ required: true, message: "Chọn hình thức làm việc" }]}
             className="!mb-0"
             style={{minWidth:300}}
+            
           >
             <Select
               placeholder="Chọn hình thức"
               className="!h-9 sm:!h-10 !rounded-lg focus:!border-cyan-500 focus:!shadow-lg hover:!border-cyan-500 !transition-all !duration-200 !text-xs sm:!text-sm !shadow-sm"
               size="middle"
-              // disabled={!mode.adminMode}
+              onChange={handleTypeChange}
             >
               <Select.Option value="REWARD">💼 Công khoán</Select.Option>
               <Select.Option value="MONTHLY">📅 Lương tháng</Select.Option>
@@ -217,7 +222,8 @@ const JobTimeAndProcess: React.FC<JobTimeAndProcessProps> = ({taskDetail, form})
               Tiền công: {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND', maximumFractionDigits: 0 }).format(taskDetail?.reward || 0)} ({taskDetail?.type === 'MONTHLY' ?'Lương tháng':'Công khoán' })
             </Typography>
           </>}
-      <JobAsset key="cash-assets" title = 'Ứng tiền' taskDetail={taskDetail} role="cash"/>
+      
+      <JobAsset key="task-assets" taskDetail={taskDetail} title='Tài liệu' role="task"/>
     </Stack>
   );
 };

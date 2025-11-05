@@ -1,4 +1,5 @@
 import json
+from api.tasks import get_task_by_user_id
 from models import db, app, User, LeadPayload, Workpoint,Leave, Customer, Material, Role, Message, Task, Workspace, generate_datetime_id
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
@@ -1051,67 +1052,7 @@ if __name__ == "__main__":
     with app.app_context():
         db.create_all()
         
-        # parse_csv('register.csv')
-        # alter_data()
-
         
-        for user in User.query.all():
-            print(user)
-        User.query.all()[0].version = 2
-        db.session.commit()
-        # lead = db.session.get(LeadPayload,1)
-        # users = lead.users
 
-        # print(len(users))
-
-
-
-        # for user in User.query.all():
-        #     if user.username and user.username.startswith('ad'):
-        #         print(user.username)
-        #         user.role_id = -2
-
-        # db.session.commit()  # Ghi lại thay đổi vào database
-
-            # lead.password = "Test@1234"
-            # user = User.create_item({
-            #     "username": lead.username,
-            #     "fullName": lead.company,
-            #     "companyName": lead.company,
-            #     "address": lead.address,
-            #     "lead_id": lead.id,
-            #     "password": lead.password,
-            #     "role": "2"
-            # })
-
-
-        # db.session.add(user)
-        
-        # db.session.commit()
-
-        # users = User.query.filter(User.lead_id == 139).all()
-        # for user in users:
-        #     print(user.username, user.fullName)
-        #     user.role_id = 2
-
-        # role = db.session.get(Role,-1)
-        # Role.create_item({
-            
-        #     "id": -2,
-        #     "lead_id": 0,
-        #     "name": "LEAD",
-        #     "permissions": [],
-
-        # },)
-        
-        # user = User.query.filter(User.companyName == "B-one academy").first()
-        # print(user)
-        # user.username = "b-one"
-        # user.password = "Test@1234"
-        # for lead in LeadPayload.query.all():
-        #     print('lead', lead.company)
-        #     user = User.query.filter(User.fullName == lead.company).first()
-        #     user.role_id = -2
-
-        
-        
+        result = get_task_by_user_id('2025110502524438962077743c')
+        print(result.data)

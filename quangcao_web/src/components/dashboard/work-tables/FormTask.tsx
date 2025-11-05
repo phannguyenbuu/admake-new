@@ -23,7 +23,7 @@ import type { UserList, User } from "../../../@types/user.type";
 // import type { Customer, CustomerList } from "../../../@types/customer.type";
 import type { Id } from "@hello-pangea/dnd";
 import { UpdateButtonContext } from "../../../common/hooks/useUpdateButtonTask";
-import JobAsset from "./task/JobAsset";
+// import JobAsset from "./task/JobAsset";
 
 const { Title, Text } = Typography;
 
@@ -134,6 +134,7 @@ export default function FormTask({
   const { setShowUpdateButton } = context;
 
   const { data:taskDetail, isLoading, isError, error } = useGetTaskById(taskId || "");
+  const [salaryType, setSalaryType] = useState<string>('');
   // const [material, setMaterial] = useState<{ selectedMaterials: any[], materialQuantities: { [key: string]: number } }>({
   //   selectedMaterials: [],
   //   materialQuantities: {},
@@ -349,9 +350,9 @@ export default function FormTask({
             </Stack>
 
             <Stack direction="row" spacing = {2}>
-              <JobDescription taskDetail={taskDetail ?? null} form={form}/>
+              <JobDescription taskDetail={taskDetail ?? null} form={form} salaryType={salaryType}/>
               {/* Thời gian và quy trình */}
-              <JobTimeAndProcess form={form} taskDetail={taskDetail ?? null}/>
+              <JobTimeAndProcess form={form} taskDetail={taskDetail ?? null} setSalaryType={setSalaryType}/>
             </Stack>
 
             {/* Vật liệu */}

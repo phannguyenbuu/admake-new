@@ -10,6 +10,7 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import CommentIcon from '@mui/icons-material/Comment';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { getTitleByStatus } from "../../../dashboard/work-tables/Managerment";
+import { notification } from "antd";
 
 const fetchTaskByUser = async (userId: string): Promise<Task[]> => {
   const response = await fetch(`${useApiHost()}/task/by_user/${userId}`);
@@ -28,8 +29,8 @@ const useTaskByUserMutation = () => {
 interface TaskBoardProps {
   // mode: { adminMode: boolean; userMode: boolean };
   
-  userId: string | undefined;
-  open: boolean;
+  userId?: string;
+  open?: boolean;
   onCancel: () => void;
 }
 
@@ -38,12 +39,16 @@ const TaskBoard = ({ userId, open, onCancel }: TaskBoardProps) => {
     
     useEffect(() => {
         if (userId) {
-            mutate(userId); // userId đã chắc chắn là string, không undefined
+          mutate(userId); // userId đã chắc chắn là string, không undefined
         }
     },[]);
 
     useEffect(() => {
-        if(!data) return;
+        if(!data) 
+          {
+            // notification.error({message:"Unkown task data", description: userId});
+            return;
+          }
         console.log('Working tasks', data);
     },[data]);
 
@@ -53,23 +58,20 @@ const TaskBoard = ({ userId, open, onCancel }: TaskBoardProps) => {
     <Modal open={open} onCancel={onCancel} footer={null} width={900} style={{marginTop:0}}>
       <Stack spacing = {2} py={2} alignItems="flex-start" justifyContent="flex-start">
         
-        {data && data.map((el) => 
+        {data && data.length > 0 ?  data.map((el) => 
         <>
-            <Typography style={{fontStyle:'italic', fontSize:10, fontWeight:300}}>
-                {el?.workspace ?? ''}
-            </Typography>
-
-            <JobTimeAndProcess key={el.id} form={null} taskDetail={el ?? null}/>
-            
             <Stack direction="row" spacing={0}>
-                <Button style={{color:"#999"}}><CommentIcon/></Button>
-                <Button style={{...btnStyle, border:'1px solid #999'}}>ỨNG LƯƠNG</Button>
-                <Button style={btnStyle}><ArrowForwardIcon/>{getTitleByStatus(el.status)}</Button>
+              <Button style={btnStyle}><ArrowForwardIcon/>{getTitleByStatus(el.status)}</Button>
+              <Typography style={{fontStyle:'italic', fontSize:10, fontWeight:500}}>
+                {el?.workspace ?? ''}
+              </Typography>
             </Stack>
 
+            <JobTimeAndProcess key={el.id} form={null} taskDetail={el ?? null}/>
+
             <Divider color = "#0092b8" style={{width:300}}/>
-        </>
-        )}
+        </>): <Typography style={{fontStyle:'italic', textAlign:'center'}}>Chưa có nhiệm vụ</Typography>
+        }
       </Stack>
     </Modal>
     )
