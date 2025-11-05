@@ -118,7 +118,24 @@ export default function AllManagementModal() {
         onCancel={handleStatusOk}
         style={{ minWidth: isMobile ? "320vw" : "95vw", padding: 0 }}
         footer={null}
+        closable={false}
       >
+        <button
+          onClick={handleStatusOk}
+          style={{
+            position: "fixed",
+            top: 64,
+            right: 10,
+            zIndex: 1000,
+            background: "transparent",
+            border: "none",
+            fontSize: "1.5rem",
+            cursor: "pointer"
+          }}
+        >
+          ×
+        </button>
+        
         <Stack direction="row" spacing={1}>
           {columns.map((col, colIdx) => {
             const theme = columnThemes[colIdx];
