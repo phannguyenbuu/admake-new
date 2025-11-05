@@ -6,7 +6,7 @@ import { useInfo } from "../../../common/hooks/info.hook";
 import { useCustomerQuery, useCustomerDetail } from "../../../common/hooks/customer.hook";
 import { useGetTaskById } from "../../../common/hooks/work-space.hook";
 import JobInfoCard from "./task/JobInfoCard";
-import JobCustomerInfo from "./task/JobCustomerInfo";
+import JobAgentInfo from "./task/JobAgentInfo";
 import JobDescription from "./task/JobDescription";
 import JobTimeAndProcess from "./task/JobTimeAndProcess ";
 
@@ -38,6 +38,8 @@ interface TaskHeaderProps {
   // showUpdateButtonMode: number;
   
 }
+
+const cellStyle = {maxWidth:400, minWidth:400};
 
 // TaskHeader.tsx
 function TaskHeader({ taskDetail, onSuccess, updateTaskStatus, 
@@ -74,6 +76,8 @@ function TaskHeader({ taskDetail, onSuccess, updateTaskStatus,
     if(onSuccess)
       onSuccess();
   };
+
+  
 
 
   return (
@@ -296,16 +300,19 @@ export default function FormTask({
 
   return (
     <Modal open={open} onCancel={onCancel} footer={null} centered width={900}>
-      <Stack direction="row" spacing = {2}>
+      
+      
         <TaskHeader updateTaskStatus={updateTaskStatus} 
                 taskDetail={taskDetail} 
                 isLoading={isLoading}
                 onUpdate={handleUpdate}  
                 onSuccess={onSuccess}
                 />
-      </Stack>
       
-        <Form form={form} style={{maxHeight:'80vh', overflowY:'auto'}}>
+
+      
+      
+        <Form form={form} style={cellStyle}>
           <Stack spacing={1}>
             
             
@@ -322,7 +329,7 @@ export default function FormTask({
             
             <Stack direction="row" spacing = {2}>
               {/* <Stack>
-                <JobCustomerInfo form={form} mode="customer" 
+                <JobAgentInfo form={form} mode="customer" 
                   users={customers}
                   setSearchValue={setCustomerSearch} 
                   searchValue={customerSearch} 
@@ -333,8 +340,8 @@ export default function FormTask({
               </Stack> */}
               <JobInfoCard taskDetail={taskDetail ?? null} currentStatus={currentStatus} form={form} />
 
-              <Stack>
-                <JobCustomerInfo 
+              <Stack style={cellStyle}>
+                <JobAgentInfo 
                   form={form} 
                   mode="user"
                   users={users}
@@ -349,10 +356,12 @@ export default function FormTask({
               </Stack>
             </Stack>
 
-            <Stack direction="row" spacing = {2}>
+            <Stack direction="row" spacing = {5}>
               <JobDescription taskDetail={taskDetail ?? null} form={form} salaryType={salaryType}/>
               {/* Thời gian và quy trình */}
-              <JobTimeAndProcess form={form} taskDetail={taskDetail ?? null} setSalaryType={setSalaryType}/>
+              <JobTimeAndProcess form={form} taskDetail={taskDetail ?? null} 
+                salaryType={salaryType}
+                setSalaryType={setSalaryType}/>
             </Stack>
 
             {/* Vật liệu */}
@@ -386,7 +395,7 @@ const UserItem: React.FC<UserItemSubProps> = ({user,onDelete}) => {
         aria-label={`Xóa ${user.name}`}
         type="button"
       >
-        ❌
+        ×
       </button>
     </Stack>
   );

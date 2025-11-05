@@ -7,7 +7,7 @@ import type { UserSearchProps } from "../../../../@types/work-space.type";
 
 const { Text } = Typography;
 
-interface JobCustomerInfoProps {
+interface JobAgentInfoProps {
   mode: "customer"|"user"|string;
   
   users: UserSearchProps[] ,
@@ -22,7 +22,7 @@ interface JobCustomerInfoProps {
 //   return (obj as Customer).workAddress !== undefined;
 // }
 
-const JobCustomerInfo: React.FC<JobCustomerInfoProps> = ({ 
+const JobAgentInfo: React.FC<JobAgentInfoProps> = ({ 
   form,
   users,
   mode,
@@ -86,7 +86,7 @@ const JobCustomerInfo: React.FC<JobCustomerInfoProps> = ({
   };
 
   return (
-    <div className="p-3 border border-gray-200 shadow-sm rounded shadow-sm">
+    <>
       <Form.Item
         label={`Tìm ${rolename}`}
         name={mode}
@@ -120,8 +120,8 @@ const JobCustomerInfo: React.FC<JobCustomerInfoProps> = ({
           )}
         </div>
       )}
-    </div>
+    </>
   );
 };
 
-export default JobCustomerInfo;
+export default JobAgentInfo;

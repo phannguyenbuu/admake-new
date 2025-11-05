@@ -29,7 +29,8 @@ def save_dump():
 
     # Thực thi lệnh pg_dump trên server Linux
     pg_dump_cmd = f"pg_dump -U postgres -d admake_chat -F c -f {remote_dump_path}"
-    stdin, stdout, stderr = ssh.exec_command(pg_dump_cmd)
+    env_cmd = f"PGPASSWORD=myPass {pg_dump_cmd}"
+    stdin, stdout, stderr = ssh.exec_command(env_cmd)
 
     # Đợi lệnh hoàn thành
     exit_status = stdout.channel.recv_exit_status()

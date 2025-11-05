@@ -44,7 +44,7 @@ const JobInfoCard: React.FC<JobInfoCardProps> = ({ currentStatus, taskDetail, fo
   }, [taskDetail, form]);
 
   return (
-    <div className="bg-gray-50 rounded-lg border border-gray-200 shadow-sm p-3 sm:p-4 mb-3 sm:mb-4 hover:shadow-md transition-all duration-300">
+    <Stack style={{minWidth:400}}>
       <div className="flex items-center gap-2 mb-2 sm:mb-3">
         <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-md bg-gradient-to-r from-cyan-500/10 to-cyan-600/10 flex items-center justify-center">
           <ProjectOutlined className="!text-cyan-600 !text-xs sm:!text-sm" />
@@ -71,36 +71,8 @@ const JobInfoCard: React.FC<JobInfoCardProps> = ({ currentStatus, taskDetail, fo
           />
         </Form.Item>
 
-        {/* <Stack spacing={1}>
-          <Stack direction="row" spacing={1}>
-            <span className="text-xs text-gray-600 mb-2 font-medium">Danh sách</span>
-            <Tag
-              color={getStatusMeta(currentStatus).color}
-              className="!px-3 !py-1.5 !rounded-lg !border-none !font-medium !text-xs !shadow-md !w-fit"
-            >
-              {getStatusMeta(currentStatus).icon} {getStatusMeta(currentStatus).label}
-            </Tag>
-          </Stack>
-          <Stack direction="row" spacing={1}>
-            <span className="text-xs text-gray-600 mb-2 font-medium">Trạng thái</span>
-            <Tag
-              color={getStatusMeta(currentStatus).color}
-              className="!px-3 !py-1.5 !rounded-lg !border-none !font-medium !text-xs !shadow-md !w-fit"
-            >
-              {currentStatus === "OPEN"
-                ? "⏳ Chưa nhận việc"
-                : currentStatus === "IN_PROGRESS"
-                ? "🚀 Đang thực hiện"
-                : currentStatus === "DONE"
-                ? "✅ Đã hoàn thành"
-                : currentStatus === "REWARD"
-                ? "🏆 Đã Nghiệm Thu"
-                : "⏳ Chưa nhận việc"}
-            </Tag>
-          </Stack>
-        </Stack> */}
       </Stack>
-    </div>
+    </Stack>
     
   );
 };

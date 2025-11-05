@@ -177,6 +177,7 @@ interface CardTitleProps {
   title: string;
   length: number;
 }
+
 export const CardTitle: React.FC<CardTitleProps> = ({ title, length }) => (
   <div className="flex items-center justify-between !text-white !text-sm font-semibold" style={{ padding: 8 }}>
     <div className="flex items-center gap-2 min-w-0">
@@ -195,6 +196,7 @@ interface CardStaticItemProps {
   task: Task;
   theme: any;
 }
+
 export const CardStaticItem: React.FC<CardStaticItemProps> = ({
   isRewardColumn,
   task,
@@ -213,9 +215,10 @@ export const CardStaticItem: React.FC<CardStaticItemProps> = ({
     ></div>
 
     <div
-      className={`relative bg-white rounded-xl p-2 sm:p-3 border transition-all duration-300 ${
-        isRewardColumn ? "border-purple-200 bg-purple-50/30" : ""
-      } shadow-md border-gray-100/50 group-hover/task:shadow-lg group-hover/task:border-gray-200/70`}
+      className={`relative bg-white rounded-xl p-2 sm:p-3 border transition-all duration-300 
+
+      shadow-md border-gray-100/50 group-hover/task:shadow-lg group-hover/task:border-gray-200/70`
+    }
     >
       {isRewardColumn && (
         <div className="absolute -top-2 -right-2 bg-purple-500 text-white text-xs px-2 py-1 rounded-full font-bold shadow-lg">
@@ -244,14 +247,14 @@ export const CardStaticItem: React.FC<CardStaticItemProps> = ({
         )}
       </div>
 
-      <div className="flex items-center justify-between mt-2 pt-2 border-t border-gray-100/50">
+      {/* <div className="flex items-center justify-between mt-2 pt-2 border-t border-gray-100/50">
         <div className="flex gap-1">
           <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: theme.color }}></div>
           <div className="w-1.5 h-1.5 bg-gray-200 rounded-full"></div>
           <div className="w-1.5 h-1.5 bg-gray-200 rounded-full"></div>
         </div>
         <div className="text-xs text-gray-400 font-mono flex-shrink-0">#{task.id?.slice(-4)}</div>
-      </div>
+      </div> */}
     </div>
   </div>
 );

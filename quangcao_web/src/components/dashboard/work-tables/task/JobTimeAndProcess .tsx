@@ -2,6 +2,7 @@ import React, {useEffect, useState} from "react";
 import {Stack, Box} from "@mui/material";
 import { Form, DatePicker, Select, InputNumber, Typography } from "antd";
 import { CalendarOutlined, ConsoleSqlOutlined } from "@ant-design/icons";
+import { Table, TableBody, TableCell, TableRow, TableContainer, Paper } from '@mui/material';
 import dayjs, { Dayjs } from "dayjs";
 import utc from 'dayjs/plugin/utc';
 import timezone from "dayjs/plugin/timezone";
@@ -9,6 +10,7 @@ import timezone from "dayjs/plugin/timezone";
 import type { Mode, UserSearchProps } from "../../../../@types/work-space.type";
 import type { Task } from "../../../../@types/work-space.type";
 import JobAsset from "./JobAsset";
+import { useUser } from "../../../../common/hooks/useUser";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -23,10 +25,11 @@ interface TimeType {
 interface JobTimeAndProcessProps {
   form: any;
   taskDetail?: Task;
+  salaryType?: string;
   setSalaryType?: (salaryType: string) => void;
 }
 
-const JobTimeAndProcess: React.FC<JobTimeAndProcessProps> = ({taskDetail,setSalaryType, form}) => {
+const JobTimeAndProcess: React.FC<JobTimeAndProcessProps> = ({taskDetail,setSalaryType,salaryType, form}) => {
   const [startDate, setStartDate] = useState<Dayjs | null>(taskDetail?.start_time ? dayjs(taskDetail.start_time) : null);
   const [endDate, setEndDate] = useState<Dayjs | null>(taskDetail?.end_time ? dayjs(taskDetail.end_time) : null);
   
@@ -98,46 +101,42 @@ const JobTimeAndProcess: React.FC<JobTimeAndProcessProps> = ({taskDetail,setSala
       setSalaryType(value);
   };
 
+  const {isMobile} = useUser();
+
   return (
-    <Stack spacing={0.2} sx={{maxWidth:400, overflowX:'hidden'}}>
-      
-      
-      
-        <div className="flex items-center gap-2 mb-2 sm:mb-3">
-          <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-md bg-gradient-to-r from-orange-100 to-orange-200 flex items-center justify-center">
-            <CalendarOutlined className="!text-orange-600 !text-xs sm:!text-sm" />
-          </div>
-          <Text strong className="!text-gray-800 !text-sm sm:!text-base">
-            { form ? "Thời gian & quy trình": taskDetail?.title ?? '' }
-          </Text>
+    <Stack spacing={0.5} sx={{minWidth:400, overflowX:'hidden'}}>
+      <div className="flex items-center gap-2 mb-2 sm:mb-3">
+        <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-md bg-gradient-to-r from-orange-100 to-orange-200 flex items-center justify-center">
+          <CalendarOutlined className="!text-orange-600 !text-xs sm:!text-sm" />
         </div>
+        <Text strong className="!text-gray-800 !text-sm sm:!text-base">
+          { form ? "Thời gian & quy trình": taskDetail?.title ?? '' }
+        </Text>
+      </div>
 
-      {form ?
-      <>
-        <DateFormPicker form={form} mode="start_time" title="Bắt đầu"
-          taskDetail={taskDetail}
-          // timeValue={taskDetail?.start_time ? dayjs(taskDetail?.start_time) : null}
-          timeValue={startDate}
-          onChange={(date) => setStartDate(date)}
-          disabledDateFunc={(current: Dayjs) => current && current < dayjs().startOf("day")}/>
+      <TableContainer style={{overflowX:'hidden', 
+        width: isMobile? 300 : '',
+        borderRadius:20 , background:'#ddd'}}>
+        <TableRow style={{maxWidth:150}}>
+          <TableCell>
+            {form ?
+              <DateFormPicker form={form} mode="start_time" title="Bắt đầu"
+                taskDetail={taskDetail}
+                // timeValue={taskDetail?.start_time ? dayjs(taskDetail?.start_time) : null}
+                timeValue={startDate}
+                onChange={(date) => setStartDate(date)}
+                disabledDateFunc={(current: Dayjs) => current && current < dayjs().startOf("day")}
+                />
+                :
+                //@ts-ignore
+                <Typography>Từ <span style={{color:"#0092b8"}}>{taskDetail?.start_time ?? ''}</span></Typography>
+              }
+          </TableCell>
+             
+          
 
-        <DateFormPicker form={form} mode="end_time" title="Kết thúc"
-          taskDetail={taskDetail}
-          // timeValue={taskDetail?.end_time ? dayjs(taskDetail?.end_time) : null}
-          timeValue={endDate}
-          onChange={(date) => setEndDate(date)}
-          disabledDateFunc={(current: Dayjs) =>
-            (current && current < dayjs(taskDetail?.start_time).startOf('day'))}/>
-      </>
-      :
-      <>
-        {/* @ts-ignore */}
-        <Typography>Từ ngày <span style={{color:"#0092b8"}}>{taskDetail?.start_time ?? ''}</span> đến <span style={{color:"#0092b8"}}>{taskDetail?.end_time ?? ''}</span></Typography>
-      </>
-    }
-
-        <Stack direction="row" spacing={2}>
-        
+          
+          <TableCell>
           <div className="flex items-center gap-1.5 sm:gap-2 mb-1.5">
             <div className="w-1 h-1 bg-orange-500 rounded-full"></div>
             <span className="text-gray-800 font-medium text-xs sm:text-sm">Tổng</span>
@@ -145,7 +144,33 @@ const JobTimeAndProcess: React.FC<JobTimeAndProcessProps> = ({taskDetail,setSala
           <div className="bg-cyan-600 text-white px-3 py-2 rounded-lg text-xs sm:text-sm font-bold text-center shadow-md h-9 sm:h-10 flex items-center justify-center">
             {totalDays !== null ? `⏱️ ${totalDays} ngày` : "-"}
           </div>
+          </TableCell>
+        </TableRow>
+
+      
+
         
+      
+          <TableRow style={{maxWidth:150}}>
+            <TableCell style={{maxWidth:150}}>
+            {form ?
+            <DateFormPicker form={form} mode="end_time" title="Kết thúc"
+              taskDetail={taskDetail}
+              // timeValue={taskDetail?.end_time ? dayjs(taskDetail?.end_time) : null}
+              timeValue={endDate}
+              onChange={(date) => setEndDate(date)}
+              disabledDateFunc={(current: Dayjs) =>
+                (current && current < dayjs(taskDetail?.start_time).startOf('day'))}
+              />
+              :
+              //@ts-ignore
+              <Typography>Đến <span style={{color:"#0092b8"}}>{taskDetail?.end_time ?? ''}</span></Typography>
+            }
+          </TableCell>
+
+          
+        
+        <TableCell style={{maxWidth:150}}>
           <div className="flex items-center gap-1.5 sm:gap-2 mb-1.5">
             <div className="w-1 h-1 bg-orange-500 rounded-full"></div>
             <span className="text-gray-800 font-medium text-xs sm:text-sm">Còn lại</span>
@@ -153,75 +178,96 @@ const JobTimeAndProcess: React.FC<JobTimeAndProcessProps> = ({taskDetail,setSala
           <div className="bg-cyan-600 text-white px-3 py-2 rounded-lg text-xs sm:text-sm font-bold text-center shadow-md h-9 sm:h-10 flex items-center justify-center">
             {!remainingDays || remainingDays === 0 ? `Hết hạn` : `${remainingDays} ngày`}
           </div>
-
-          </Stack>
+        </TableCell>
+      </TableRow>
+      
+      <TableRow>
         
-        {form ? 
-        <>
-          <Form.Item
-            name="type"
-            label={
-              <div className="flex items-center gap-1.5 sm:gap-2">
-                <div className="w-1 h-1 bg-orange-500 rounded-full"></div>
-                <span className="text-gray-800 font-medium text-xs sm:text-sm">Trả lương</span>
-                <span className="text-red-500">*</span>
-              </div>
-            }
-            rules={[{ required: true, message: "Chọn hình thức làm việc" }]}
-            className="!mb-0"
-            style={{minWidth:300}}
-            
-          >
-            <Select
-              placeholder="Chọn hình thức"
-              className="!h-9 sm:!h-10 !rounded-lg focus:!border-cyan-500 focus:!shadow-lg hover:!border-cyan-500 !transition-all !duration-200 !text-xs sm:!text-sm !shadow-sm"
-              size="middle"
-              onChange={handleTypeChange}
-            >
-              <Select.Option value="REWARD">💼 Công khoán</Select.Option>
-              <Select.Option value="MONTHLY">📅 Lương tháng</Select.Option>
-            </Select>
-          </Form.Item>
+          
+          
+       
+        </TableRow>
 
-          <Form.Item
-            name="reward"
-            label={
-              <div className="flex items-center gap-1.5 sm:gap-2">
-                <div className="w-1 h-1 bg-orange-500 rounded-full"></div>
-                <span className="text-gray-800 font-medium text-xs sm:text-sm">
-                  {selectedType === "REWARD" ? "Tiền công": "Thưởng thêm"}
-                  </span>
-                <span className="text-red-500">*</span>
-              </div>
-            }
-            rules={[{ required: true, message: "Nhập mức lương" }]}
-            className="!mb-0"
-            style={{minWidth:300}}
-          >
-            <InputNumber
-              size="large"
-              controls={false}
-              placeholder="Nhập mức lương"
-              className="!w-full !rounded-lg !border !transition-all !duration-200 !text-xs sm:!text-sm !shadow-sm"
-              min={0}
-              step={1000}
-              // disabled={!mode.adminMode}
-              formatter={(value) =>
-                `${value ?? 0}`.replace(/\B(?=(\d{3})+(?!\d))/g, ".")
-              }
-              parser={(value: string | undefined) => {
-                if (!value) return 0;
-                const numValue = value.replace(/\./g, "");
-                return numValue ? Number(numValue) : 0;
-              }}
-            />
-          </Form.Item>
-          </>
-          : <>
-            <Typography style={{fontWeight:700, color:'#0092b8'}}>
-              Tiền công: {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND', maximumFractionDigits: 0 }).format(taskDetail?.reward || 0)} ({taskDetail?.type === 'MONTHLY' ?'Lương tháng':'Công khoán' })
-            </Typography>
-          </>}
+        <TableCell style={{maxWidth:150}}>
+            {form ? (
+              <Form.Item
+                name="type"
+                
+                rules={[{ required: false, message: "Chọn hình thức làm việc" }]}
+                className="!mb-0"
+                style={{ minWidth: 300 }}
+              >
+
+                <div className="flex items-center gap-1.5 sm:gap-2">
+                  <div className="w-1 h-1 bg-orange-500 rounded-full"></div>
+                  <span className="text-gray-800 font-medium text-xs sm:text-sm">Trả lương</span>
+                  {/* <span className="text-red-500">*</span> */}
+                </div>
+                <Select
+                  placeholder="Chọn hình thức"
+                  // className="!h-9 sm:!h-10 !rounded-lg focus:!border-cyan-500 focus:!shadow-lg hover:!border-cyan-500 !transition-all !duration-200 !text-xs sm:!text-sm !shadow-sm"
+                  size="middle"
+                  style={{width:150}}
+                  onChange={handleTypeChange}
+                >
+                  <Select.Option value="REWARD">💼 Công khoán</Select.Option>
+                  <Select.Option value="MONTHLY">📅 Lương tháng</Select.Option>
+                </Select>
+                </Form.Item>
+              ) : (
+                <Typography style={{ fontWeight: 700, color: '#0092b8' }}>
+                  {taskDetail?.type === 'MONTHLY' ? 'Phụ cấp' : 'Công khoán'}
+                </Typography>
+              )}
+          </TableCell>
+
+          <TableCell style={{maxWidth:150}}>
+            {form ? (
+              <Form.Item
+                name="reward"
+                
+                rules={[{ required: false, message: 'Nhập mức lương' }]}
+                className="!mb-0"
+                style={{ minWidth: 300 }}
+              >
+                
+
+                  <div className="flex items-center gap-1.5 sm:gap-2">
+                    <div className="w-1 h-1 bg-orange-500 rounded-full"></div>
+                    <span className="text-gray-800 font-medium text-xs sm:text-sm">
+                      {salaryType === "REWARD" ? 'Tiền công' : 'Phụ cấp'}
+                    </span>
+                    {/* <span className="text-red-500">*</span> */}
+                  </div>
+                
+
+                <InputNumber
+                  style={{maxWidth:150}}
+                  size="large"
+                  controls={false}
+                  placeholder={'Nhập mức lương'}
+                  className="!w-full !rounded-lg !border !transition-all !duration-200 !text-xs sm:!text-sm !shadow-sm"
+                  min={0}
+                  step={1000}
+                  formatter={(value) =>
+                    `${value ?? 0}`.replace(/\B(?=(\d{3})+(?!\d))/g, ".")
+                  }
+                  parser={(value: string | undefined): number => {
+                    if (!value) return 0;
+                    const numValue = value.replace(/\./g, "");
+                    return Number(numValue) || 0;
+                  }}
+                />
+              </Form.Item>
+            ) : (
+              <Typography style={{ fontWeight: 700, color: '#0092b8' }}>
+                {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND', maximumFractionDigits: 0 }).format(taskDetail?.reward || 0)}
+              </Typography>
+            )}
+          </TableCell>
+
+
+      </TableContainer>
       
       <JobAsset key="task-assets" taskDetail={taskDetail} title='Tài liệu' role="task"/>
     </Stack>
@@ -293,16 +339,14 @@ export function DateFormPicker({
   return (
     <Form.Item
       name={mode}
-      label={
-        <div className="flex items-center gap-1.5 sm:gap-2">
+      rules={[{ required: true, message: "Chọn ngày" }]}
+      className="!mb-0"
+    >
+      <div className="flex items-center gap-1.5 sm:gap-2">
           <div className="w-1 h-1 bg-orange-500 rounded-full"></div>
           <span className="text-gray-800 font-medium text-xs sm:text-sm">{title}</span>
           <span className="text-red-500">*</span>
         </div>
-      }
-      rules={[{ required: true, message: "Chọn ngày" }]}
-      className="!mb-0"
-    >
       <DatePicker
         className="!flex-1 !h-9 sm:!h-10 !text-xs sm:!text-sm !rounded-lg !border !border-gray-300 focus:!border-cyan-500 focus:!shadow-lg hover:!border-cyan-500 !transition-all !duration-200 !shadow-sm"
         format="DD/MM/YYYY"

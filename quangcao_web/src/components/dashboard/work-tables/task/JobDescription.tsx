@@ -37,11 +37,10 @@ const JobDescription: React.FC<JobDescriptionProps> = ({ salaryType, taskDetail,
 
 
   return (
-    <div className="bg-gray-50 rounded-lg border border-gray-200 shadow-sm p-3 sm:p-4 mb-3 sm:mb-4 hover:shadow-md transition-all duration-300 w-120">
+    <Stack style={{ minWidth:400 }}>
       <div className="flex items-center gap-2 mb-2 sm:mb-3">
-        <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-md bg-gradient-to-r from-green-100 to-green-200 flex items-center justify-center">
-          <span className="text-green-600 text-xs sm:text-sm">📝</span>
-        </div>
+        <span className="text-green-600 text-xs sm:text-sm">📝</span>
+        
         <Text strong className="!text-gray-800 !text-sm sm:!text-base">
           Mô tả công việc
         </Text>
@@ -62,7 +61,7 @@ const JobDescription: React.FC<JobDescriptionProps> = ({ salaryType, taskDetail,
         </Form.Item>
       {salaryType === "REWARD" &&
         <JobAsset key="cash-assets" title = 'Ứng tiền' taskDetail={taskDetail} role="cash"/>}
-    </div>
+    </Stack>
   );
 };
 

@@ -7,7 +7,7 @@ import { useApiHost, useApiStatic } from "../../../../common/hooks/useApiHost";
 import { notification } from "antd";
 import DescriptionIcon from "@mui/icons-material/Description"; // icon tài liệu
 import { CircularProgress } from '@mui/material';
-
+import { useUser } from "../../../../common/hooks/useUser";
 
 const isImageFile = (filename: string) => {
   // console.log('f',filename);
@@ -27,9 +27,9 @@ const JobAsset: React.FC<JobAssetProps> = ({ title, role, taskDetail }) => {
   const [assets, setAssets] = useState<string[]>(taskDetail?.assets ?? []);
   const [filteredAssets, setFilteredAssets] = useState<string[]>([]);
   const [thumbLoading, setThumbLoading] = useState(false);
-  
+  const {isMobile} = useUser();
 
-  console.log('JobAsset role:', role, 'title:', title);
+  // console.log('JobAsset role:', role, 'title:', title);
 
   useEffect(()=>{
     if(!assets) return;
@@ -108,22 +108,28 @@ const JobAsset: React.FC<JobAssetProps> = ({ title, role, taskDetail }) => {
   
 
   return (
-    <div className="bg-gray-50 rounded-lg border border-gray-200 shadow-sm p-3 sm:p-4 mb-3 sm:mb-4 hover:shadow-md transition-all duration-300">
+    <Stack style={{maxWidth: isMobile? 300: '100%'}}>
       <div className="flex items-center gap-2 mb-2 sm:mb-3">
-        <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-md bg-gradient-to-r from-cyan-500/10 to-cyan-600/10 flex items-center justify-center">
-          <ProjectOutlined className="!text-cyan-600 !text-xs sm:!text-sm" />
-        </div>
+        <label htmlFor={`upload-image-file-${role}`}>
+          <IconButton color="primary" component="span"
+            aria-label="upload picture" size="small"
+            sx={{ border: "1px dashed #3f51b5", width: 40, height: 40,}} >
+            <AddIcon />
+          </IconButton>
+        </label>
         <Typography className="!text-gray-800 !text-sm sm:!text-base" fontWeight="bold">
           {title}
         </Typography>
       </div>
+
       <Stack direction="row" spacing={1}>
         <Stack
-        direction="row"
-        spacing={1}
-        useFlexGap
-        sx={{ flexWrap: 'wrap', overflow: 'hidden' }} // Thêm thuộc tính flexWrap để xuống dòng
-      >
+          direction="row"
+          spacing={1}
+          useFlexGap
+          sx={{ flexWrap: 'wrap', overflowY: 'auto', height: 150 }} // Thêm thuộc tính flexWrap để xuống dòng
+        >
+
         {filteredAssets.map((el, index) => (
           <Stack key={index} direction="column" alignItems="center" spacing={1}>
             {isImageFile(el) ? 
@@ -159,31 +165,9 @@ const JobAsset: React.FC<JobAssetProps> = ({ title, role, taskDetail }) => {
           type="file"
           onChange={handleFileChange}
         />
-        <label htmlFor={`upload-image-file-${role}`}>
-          <IconButton
-            color="primary"
-            component="span"
-            aria-label="upload picture"
-            size="small"
-            sx={{
-              border: "1px dashed #3f51b5",
-              width: 40,
-              height: 40,
-            }}
-          >
-            <AddIcon />
-          </IconButton>
-        </label>
-{/* 
-        {selectedFile && (
-          <Typography variant="body2" sx={{ ml: 1 }}>
-            {selectedFile.name}
-          </Typography>
-        )} */}
-
         
       </Stack>
-    </div>
+    </Stack>
   );
 };
 
