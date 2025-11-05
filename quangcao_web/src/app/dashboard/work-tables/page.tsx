@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import ManagermentBoard from "../../../components/dashboard/work-tables/Managerment";
 import { useWorkSpaceQueryTaskById } from "../../../common/hooks/work-space.hook";
 
-export const WorkTableDetailPage: IPage["Component"] = () => {
+const WorkTableDetailPage: IPage["Component"] = () => {
   const { boardId } = useParams();
 
  
@@ -67,3 +67,5 @@ export const loader = async () => {
   await new Promise((resolve) => setTimeout(resolve, 2000));
   return { userId: 1, name: "John Doe" };
 };
+
+export default WorkTableDetailPage;

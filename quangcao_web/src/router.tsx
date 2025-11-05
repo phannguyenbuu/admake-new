@@ -10,12 +10,12 @@ import {
   BarChartOutlined,LineChartOutlined,
 } from "@ant-design/icons";
 
-import { WorkTableDetailPage } from "./app/dashboard/work-tables/page";
-import { UserDashboard } from "./app/dashboard/user/page";
-import { SupplierDashboard } from "./app/dashboard/supplier/page";
-import { CustomerDashboard } from "./app/dashboard/customer/page";
+// import { WorkTableDetailPage } from "./app/dashboard/work-tables/page";
+// import { UserDashboard } from "./app/dashboard/user/page";
+// import { SupplierDashboard } from "./app/dashboard/supplier/page";
+// import { CustomerDashboard } from "./app/dashboard/customer/page";
 import { InforDashboard } from "./app/infor/page";
-import { WorkPointPage } from "./app/dashboard/workpoints/page";
+// import { WorkPointPage } from "./app/dashboard/workpoints/page";
 import { useInfo } from "./common/hooks/info.hook";
 import { Navigate } from "react-router-dom";
 import GroupQRPage from "./components/chat/components/GroupQRPage";
@@ -50,6 +50,13 @@ const DevelopeDashboard = () => {
   )
 }
 
+const DashboardPage = lazy(() => import("./app/dashboard/page"));
+const WorkPointPage = lazy(() => import("./app/dashboard/workpoints/page"));
+const UserDashboard = lazy(() => import("./app/dashboard/user/page"));
+const CustomerDashboard = lazy(() => import("./app/dashboard/customer/page"));
+const SupplierDashboard = lazy(() => import("./app/dashboard/supplier/page"));
+const WorkTableDetailPage = lazy(() => import("./app/dashboard/work-tables/page"));
+
 const routes: TRoute = {
   path: "/",
   element: <BaseLayout />,
@@ -81,7 +88,12 @@ const routes: TRoute = {
 
     {
       path: "/dashboard",
-      lazy: () => import("./app/dashboard/page"),
+      element: (
+        <Suspense fallback={<div>Loading...</div>}>
+          <DashboardPage />
+        </Suspense>
+      ),
+      // lazy: () => import("./app/dashboard/page"),
       title: "Bảng điều khiển",
       isMainMenu: true,
       children: [
@@ -103,20 +115,31 @@ const routes: TRoute = {
         
         {
           path: "/dashboard/workpoints",
-          element: <WorkPointPage />,
+          element: (
+            <Suspense fallback={<div>Loading...</div>}>
+              <WorkPointPage />
+            </Suspense>
+          ),
           title: "Chấm công",
           icon: <CheckOutlined />,
         },
         {
           path: "/dashboard/users",
-          element: (<UserDashboard />),
+         element: (
+            <Suspense fallback={<div>Loading...</div>}>
+              <UserDashboard />
+            </Suspense>
+          ),
           roles: ["user:management"],
           title: "Quản lý nhân sự",
           icon: <LineChartOutlined />,
         },
         {
           path: "/dashboard/supplier",
-          element: (<SupplierDashboard />),
+          element: (
+            <Suspense fallback={<div>Loading...</div>}>
+              <SupplierDashboard />
+          </Suspense>),
           roles: ["user:management"],
           title: "Quản lý thầu phụ",
           icon: <FormOutlined />,
@@ -124,7 +147,10 @@ const routes: TRoute = {
        
         {
           path: "/dashboard/customers",
-          element: (<CustomerDashboard />),
+          element: (
+            <Suspense fallback={<div>Loading...</div>}>
+          <CustomerDashboard />
+          </Suspense>),
           roles: ["customer:management"],
           title: "Quản lý khách hàng",
           icon: <TeamOutlined />,
@@ -132,7 +158,9 @@ const routes: TRoute = {
         },
         {
           path: "/dashboard/work-tables",
-          element: <WorkTableDetailPage />,
+          element: (<Suspense fallback={<div>Loading...</div>}>
+            <WorkTableDetailPage />
+            </Suspense>),
           title: "Bảng công việc",
           icon: <BarChartOutlined />,
           children: [

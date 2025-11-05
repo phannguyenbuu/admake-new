@@ -16,7 +16,7 @@ import type { Workpoint, WorkDaysProps } from "../../../@types/workpoint";
 
 import StatisticsMonthDays from "./StatisticsMonthDays";
 
-export const WorkPointPage: IPage["Component"] = () => {
+const WorkPointPage: IPage["Component"] = () => {
   const [query, setQuery] = useState({
     page: 1,
     limit: 10,
@@ -122,3 +122,5 @@ export const WorkPointPage: IPage["Component"] = () => {
               </>
   );
 };
+
+export default WorkPointPage;

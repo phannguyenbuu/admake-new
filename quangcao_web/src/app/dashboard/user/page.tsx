@@ -11,7 +11,7 @@ import { columnsUser } from "../../../common/data";
 import { useDebounce } from "../../../common/hooks/useDebounce";
 import { useUser } from "../../../common/hooks/useUser";
 
-export const UserDashboard: IPage["Component"] = () => {
+const UserDashboard: IPage["Component"] = () => {
   const [config, setConfig] = useState({
     openCreate: false,
     openUpdate: false,
@@ -158,3 +158,4 @@ export const loader = async () => {
   await new Promise((resolve) => setTimeout(resolve, 2000));
   return { userId: 1, name: "John Doe" };
 };
+export default UserDashboard;

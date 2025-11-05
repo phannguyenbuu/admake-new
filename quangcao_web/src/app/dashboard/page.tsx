@@ -7,6 +7,9 @@ import DashLayout from "../../common/layouts/dash.layout";
 export const Component: IPage["Component"] = () => {
   return <DashLayout />;
 };
+
+export default Component;
+
 export const loader = async () => {
   await delay(2000); // Simulate loading delay
   // if (!localStorage.getItem(TOKEN_LABEL)) {

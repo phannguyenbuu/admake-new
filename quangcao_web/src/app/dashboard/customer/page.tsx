@@ -14,7 +14,7 @@ import type { WorkSpace } from "../../../@types/work-space.type";
 import { useUser } from "../../../common/hooks/useUser";
 
 
-export const CustomerDashboard: IPage["Component"] = () => {
+const CustomerDashboard: IPage["Component"] = () => {
   const {userLeadId, setWorkspaces} = useUser();
   const [query, setQuery] = useState<Partial<PaginationDto>>({
     page: 1,
@@ -164,3 +164,5 @@ export const loader = async () => {
   await new Promise((resolve) => setTimeout(resolve, 2000));
   return { userId: 1, name: "John Doe" };
 };
+
+export default CustomerDashboard;

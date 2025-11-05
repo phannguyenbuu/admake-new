@@ -13,7 +13,7 @@ import { useUser } from "../../../common/hooks/useUser";
 import { QRColumn } from "../workpoints/WorkDays";
 import type { WorkDaysProps } from "../../../@types/workpoint";
 
-export const SupplierDashboard: IPage["Component"] = () => {
+const SupplierDashboard: IPage["Component"] = () => {
   const {userLeadId} = useUser();
   const [config, setConfig] = useState({
     openCreate: false,
@@ -173,3 +173,5 @@ export const loader = async () => {
   await new Promise((resolve) => setTimeout(resolve, 2000));
   return { userId: 1, name: "John Doe" };
 };
+
+export default SupplierDashboard;
