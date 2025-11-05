@@ -1,10 +1,10 @@
-import { useNavigate } from "react-router-dom";
+import { redirect, useNavigate } from "react-router-dom";
 import LoginForm from "./login.form";
-import { useEffect, Suspense } from "react";
+import { useEffect } from "react";
 
-const Login = () => {
+export const Login = () => {
   const navigate = useNavigate();
-
+  
   useEffect(() => {
     const accessToken = sessionStorage.getItem("accessToken");
     if (accessToken) {
@@ -15,23 +15,29 @@ const Login = () => {
   }, [navigate]);
 
   return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-sm min-w-[400px]">
-          {/* logo */}
-          <div className="flex items-center justify-center pb-5">
-            <div className="flex items-center justify-center">
-              <img src="/logo.jpg" alt="logo" className="w-13 h-13" />
-            </div>
-            <div className="flex items-center justify-center">
-              <img src="/ADMAKE.svg" alt="ADMAKE" className="h-8" />
-            </div>
+    <div className="flex items-center justify-center min-h-screen">
+      <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-sm min-w-[400px]">
+        {/* logo */}
+        <div className="flex items-center justify-center pb-5">
+          <div className="flex items-center justify-center">
+            <img src="/logo.jpg" alt="logo" className="w-13 h-13" />
           </div>
-          <LoginForm />
+          <div className="flex items-center justify-center">
+            <img src="/ADMAKE.svg" alt="ADMAKE" className="h-8" />
+          </div>
         </div>
+        <LoginForm />
       </div>
-    </Suspense>
+    </div>
   );
+};
+
+// Loader vẫn có thể dùng để redirect nếu cần
+export const loader = async () => {
+  if (sessionStorage.getItem("accessToken")) {
+    return redirect("/dashboard");
+  }
+  return null;
 };
 
 export default Login;
