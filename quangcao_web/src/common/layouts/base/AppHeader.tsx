@@ -1,4 +1,4 @@
-import { Layout, Dropdown, Avatar, Popover, Modal, message } from "antd";
+import { Layout, Dropdown, Avatar, Popover, Modal, message, notification } from "antd";
 import { BellOutlined, UserOutlined, LogoutOutlined } from "@ant-design/icons";
 // import NotificationDropdown from "../../../components/NotificationDropdown";
 import { useNavigate } from "react-router-dom";
@@ -80,12 +80,9 @@ export default function AppHeader() {
     // Reset info
     refetchInfo();
 
-    message.success("Đăng xuất thành công");
-    navigate("/login");
+    notification.success({message:"Đăng xuất thành công"});
+    window.location.href = "https://quanly.admake.vn/login";  // chuyển trang theo URL tuyệt đối
   };
-
-  // console.log('WSA',workSpaces);
-
 
   return (
     <>

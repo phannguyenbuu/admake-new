@@ -31,6 +31,9 @@ def login():
     username = data.get('username')
     password = data.get('password')
 
+    return login_user_form(username,password)
+
+def login_user_form(username, password):
     user = User.query.filter_by(username=username).first()
 
     if user:
@@ -64,6 +67,7 @@ def login():
     else:
         print("Cannot find username", username)
         return jsonify({'status': 'fail', 'message': 'Invalid credentials wrong password'}), 401
+    
 
 @auth_bp.route('/logout', methods=['POST'])
 def logout():

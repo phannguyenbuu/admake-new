@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Login - ADMAKE</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css" rel="stylesheet"/>
+<style>
+    body, html {
+      height: 100%;
+      margin: 0;
+    }
+    .center-container {
+      display: flex;
+      justify-content: center; /* căn giữa ngang */
+      align-items: center;     /* căn giữa dọc */
+      height: 100vh;           /* chiều cao 100% viewport */
+      
+      background-image: url("{{ url_for('static', filename='backGround.png') }}");
+      background-repeat: no-repeat;      /* không lặp lại ảnh */
+      background-size: cover;            /* phóng to ảnh phủ hết div, giữ tỉ lệ */
+      background-position: center; 
+  }
+</style>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link as="script" as_="script" href="/ADMAKE.svg" rel="preload"/>
+<link as="script" as_="script" href="/avatar-default.svg" rel="preload"/>
+<link as="image" as_="script" href="/backGround.png" rel="preload"/>
+<link as="script" as_="script" href="/index.html" rel="preload"/>
+<link as="image" as_="script" href="/logo.jpg" rel="preload"/>
+<link as="script" as_="script" href="/logo.svg" rel="preload"/>
+<link as="script" as_="script" href="/assets/data-B0_16dMn.js" rel="preload"/>
+<link as="script" as_="script" href="/assets/FormUser-YNCYQEr5.js" rel="preload"/>
+<link as="style" as_="script" href="/assets/index-BLRx-9Eb.css" rel="preload"/>
+<link as="script" as_="script" href="/assets/index-BRcBPy4Q.js" rel="preload"/>
+<link as="script" as_="script" href="/assets/index-DiGFFq6q.js" rel="preload"/>
+<link as="script" as_="script" href="/assets/page-BCTRpq0k.js" rel="preload"/>
+<link as="script" as_="script" href="/assets/page-BqTRXK4O.js" rel="preload"/>
+<link as="script" as_="script" href="/assets/page-C4mrcCaC.js" rel="preload"/>
+<link as="script" as_="script" href="/assets/page-ChSu9rfq.js" rel="preload"/>
+<link as="style" as_="script" href="/assets/page-CW-Azc8I.css" rel="preload"/>
+<link as="script" as_="script" href="/assets/page-DAr2MPyG.js" rel="preload"/>
+<link as="script" as_="script" href="/assets/page-FEHBxnTB.js" rel="preload"/>
+<link as="script" as_="script" href="/assets/useDebounce-7kbKwHh3.js" rel="preload"/>
+<link as="script" as_="script" href="/data-B0_16dMn.js" rel="preload"/>
+<link as="script" as_="script" href="/FormUser-YNCYQEr5.js" rel="preload"/>
+<link as="style" as_="script" href="/index-BLRx-9Eb.css" rel="preload"/>
+<link as="script" as_="script" href="/index-BRcBPy4Q.js" rel="preload"/>
+<link as="script" as_="script" href="/index-DiGFFq6q.js" rel="preload"/>
+<link as="script" as_="script" href="/page-BCTRpq0k.js" rel="preload"/>
+<link as="script" as_="script" href="/page-BqTRXK4O.js" rel="preload"/>
+<link as="script" as_="script" href="/page-C4mrcCaC.js" rel="preload"/>
+<link as="script" as_="script" href="/page-ChSu9rfq.js" rel="preload"/>
+<link as="style" as_="script" href="/page-CW-Azc8I.css" rel="preload"/>
+<link as="script" as_="script" href="/page-DAr2MPyG.js" rel="preload"/>
+<link as="script" as_="script" href="/page-FEHBxnTB.js" rel="preload"/>
+<link as="script" as_="script" href="/useDebounce-7kbKwHh3.js" rel="preload"/>
+</head>
+<body>
+<div class="center-container">
+<div class="bg-white p-8 rounded-lg shadow-md w-full max-w-sm min-w-[400px]">
+<div class="flex items-center justify-center pb-5">
+<img alt="logo" class="w-13 h-13" src="{{ url_for('static', filename='logo.jpg') }}" style="position: relative; width:60px;height:60px;border-radius: 30px;top:15px"/>
+<img alt="ADMAKE" class="h-8" src="{{ url_for('static', filename='ADMAKE.svg') }}"/>
+</div>
+<form action="https://quanly.admake.vn/dashboard" method="POST" style="max-width: 250px; display:flex; flex-direction: column; gap:20px;margin-top: 20px;">
+<input name="username" placeholder="Tên đăng nhập" required="" style="max-width: 250px; font-size:16px; padding:10px 20px; border-radius: 20px; border: 1px solid #ccc;" type="text"/>
+<div style="position: relative; max-width: 250px">
+<input id="password" name="password" placeholder="Mật khẩu" required="" style="max-width: 250px; font-size:16px;  padding:10px 20px; border-radius: 20px;  border: 1px solid #ccc;" type="password"/>
+<i class="bi bi-eye-slash" id="togglePassword" style="position: absolute; right: 30px; top: 50%; transform: translateY(-50%); cursor: pointer;"></i>
+</div>
+<button style="background-color: #00B5B4; width: 250px;border:none; font-size:16px; padding:10px 20px;border-radius: 20px;" type="submit">Đăng nhập</button>
+</form>
+</div>
+</div>
+<script>
+    const togglePassword = document.querySelector('#togglePassword');
+    const password = document.querySelector('#password');
+
+    togglePassword.addEventListener('click', function () {
+      const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+      password.setAttribute('type', type);
+      this.classList.toggle('bi-eye');
+      this.classList.toggle('bi-eye-slash');
+    });
+
+
+    
+
+  </script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const loginForm = document.querySelector('form');
+
+    loginForm.addEventListener('submit', function(event) {
+      event.preventDefault();  // ngăn submit mặc định form reload trang
+
+      fetch('/login', {
+        method: 'POST',
+        body: new FormData(loginForm),
+        credentials: 'include',  // Cho phép gửi cookie
+        mode: 'cors'
+      })
+        .then(resp => resp.json())
+        .then(data => {
+          if (data.access_token) {
+            sessionStorage.setItem('accessToken', data.access_token);
+            window.location.href = '/dashboard';  // redirect bằng JS
+          } else {
+            console.error('Không nhận được access token:', data);
+            alert('Sai thông tin đăng nhập, vui lòng kiểm tra lại.');
+          }
+        })
+        .catch(error => {
+          console.error('Lỗi khi gửi request:', error);
+          alert('Lỗi đăng nhập, vui lòng thử lại sau.');
+        });
+    });
+  });
+  </script>
+</body>
+</html>

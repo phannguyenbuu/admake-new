@@ -42,8 +42,7 @@ db = SQLAlchemy(app)
 
 jwt = JWTManager(app)
 
-
-CORS(app)
+CORS(app, supports_credentials=True, origins=['https://quanly.admake.vn','http://localhost:5173'])
 
 
 class BaseModel(db.Model):
@@ -679,3 +678,53 @@ def get_lead_by_arg(request):
         
     lead = db.session.get(LeadPayload, lead_id)
     return lead_id, lead
+
+
+from paramiko import SSHClient, AutoAddPolicy
+from scp import SCPClient
+import time
+
+def save_dump():
+    # Kết nối SSH tới server Linux
+    ssh = SSHClient()
+    ssh.set_missing_host_key_policy(AutoAddPolicy())
+    ssh.connect('148.230.100.33', username='root', password='@baoLong0511')
+
+    now = datetime.datetime.now()
+    timestamp = now.strftime("%y_%m_%d_%H_%M")
+
+    remote_dump_path = f"/root/backup/admake_chat_{timestamp}.dump"
+    print("Dump file remote:", remote_dump_path)
+
+    # Thực thi lệnh pg_dump trên server Linux
+    pg_dump_cmd = f"pg_dump -U postgres -d admake_chat -F c -f {remote_dump_path}"
+    env_cmd = f"PGPASSWORD=myPass {pg_dump_cmd}"
+    stdin, stdout, stderr = ssh.exec_command(env_cmd)
+
+    # Đợi lệnh hoàn thành
+    exit_status = stdout.channel.recv_exit_status()
+    if exit_status == 0:
+        print("Dump database thành công trên server.")
+    else:
+        error = stderr.read().decode()
+        print("Lỗi khi dump database:", error)
+        ssh.close()
+        return
+
+    # Tải file dump về local Windows
+    local_folder = "./backup"
+    os.makedirs(local_folder, exist_ok=True)
+    local_dump_path = os.path.join(local_folder, f"admake_chat_{timestamp}.dump")
+
+    scp = SCPClient(ssh.get_transport())
+    scp.get(remote_dump_path, local_dump_path)
+    print(f"Đã tải file dump về: {local_dump_path}")
+
+    scp.close()
+    ssh.close()
+
+def periodic_save_dump(interval_minutes=30):
+    while True:
+        # Gọi hàm save_dump hoặc tác vụ của bạn ở đây
+        save_dump()
+        time.sleep(interval_minutes * 60)  # nghỉ theo khoảng thời gian quy định

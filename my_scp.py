@@ -1,5 +1,60 @@
 import os
 import paramiko
+import os
+from bs4 import BeautifulSoup
+from bs4 import NavigableString
+
+def get_all_files(folders):
+    file_list = []
+    for directory in folders:
+        for root, dirs, files in os.walk(directory):
+            for file in files:
+                # Tạo đường dẫn relative với từng folder
+                rel_dir = os.path.relpath(root, directory)
+                if rel_dir == '.':
+                    rel_dir = ''
+                rel_file = os.path.join(rel_dir, file).replace("\\", "/")
+                file_list.append(rel_file)
+    return file_list
+
+def append_preload_link():
+
+    # Đường dẫn file template và thư mục assets
+    html_file_path = 'main-be/templates/login.html'
+    
+    folders_to_scan = ['quangcao_web/dist','quangcao_web/dist/assets',]
+
+    # Đọc file HTML
+    with open(html_file_path, 'r', encoding='utf-8') as file:
+        soup = BeautifulSoup(file, 'html.parser')
+
+    # Xóa tất cả thẻ <link rel="preload">
+    for link_tag in soup.find_all('link', rel='preload'):
+        link_tag.decompose()
+
+    # Lấy danh sách file preload từ dist và assets
+    files_to_preload = get_all_files(folders_to_scan)
+
+    # Thêm thẻ preload mới vào <head>
+    head = soup.head
+    for file_rel_path in files_to_preload:
+        preload_link = soup.new_tag('link', rel='preload', href=f"/{file_rel_path}", as_='script')
+        # Bạn có thể kiểm tra đuôi file để set as='style' hay 'image' nếu muốn chính xác hơn
+        if file_rel_path.endswith('.css'):
+            preload_link['as'] = 'style'
+        elif file_rel_path.endswith(('.png', '.jpg', '.jpeg', '.gif', '.webp')):
+            preload_link['as'] = 'image'
+        else:
+            preload_link['as'] = 'script'
+        head.append(preload_link)
+        head.append(NavigableString('\n'))
+
+    # Ghi lại file HTML đã chỉnh sửa
+    with open(html_file_path, 'w', encoding='utf-8') as file:
+        file.write(str(soup))
+
+    print('Cập nhật preload links thành công trong', html_file_path)
+
 
 def sftp_mkdirs(sftp, remote_path):
     dirs = remote_path.strip('/').split('/')
@@ -132,23 +187,23 @@ def save_dump():
     ssh.close()
 
 
-save_dump()
+append_preload_link()
 
 local_dirs = [
+    "main-be/templates",
     "main-be/models.py",
     "main-be/app.py",
-    "main-be/.env",
+    
+    # "main-be/.env",
     "main-be/api",
-    "main-be/procs.py",
-    "lead-be/app.py",
-    "lead-be/models.py",
-    "lead-be/.env",
-    "lead-be/templates",
-    "ecosystem.config.js",
-    "nginx",
+    # "main-be/procs.py",
+    # "lead-be/app.py",
+    # "lead-be/models.py",
+    # "lead-be/.env",
+    # "lead-be/templates",
+    # "dump.pm2"
 ]
 
-# build_nginx_and_ecosystem(0)
 upload_to_vps_multiple(host="148.230.100.33",
                        port=22,
                        username="root",
