@@ -43,7 +43,7 @@ export interface WorkSpace {
   // id: number,
   // members: number,
   owner_id: string;
-  // name:string,
+  fullName:string,
   // message_id: string;
   description: string;
   // img:string,

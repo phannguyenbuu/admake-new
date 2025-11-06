@@ -64,13 +64,13 @@ const routes: TRoute = {
   errorElement: <Error404 />,
   children: [
     
-    // {
-    //   path: "/login", // chuyển trang login thành path 'login' tách biệt
-    //   index: true,
-    //   element: <Login />,
-    //   title: "Đăng nhập",
-    //   ignoreInMenu: true,
-    // },
+    {
+      path: "/login", // chuyển trang login thành path 'login' tách biệt
+      index: true,
+      element: <Login />,
+      title: "Đăng nhập",
+      ignoreInMenu: true,
+    },
     
     {
       path: "/chat/:id/:token",

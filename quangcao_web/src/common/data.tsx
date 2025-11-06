@@ -90,14 +90,14 @@ export const columnsCustomer = [
      render: (text: string, record: WorkSpace) => (
       <div>
         <div>{text}</div>
-        <span className="!text-cyan-700" style={{fontSize:12,fontStyle:'italic'}}>{record?.user_fullName}</span>
+        <span className="!text-cyan-700" style={{fontSize:12,fontStyle:'italic'}}>{record?.fullName}</span>
       </div>
     ),
   },
   {
     title: "Số điện thoại",
-    dataIndex: "user_phone",
-    key: "user_phone",
+    dataIndex: "phone",
+    key: "phone",
     width: 150,
     render: (phone: string) => (
       <span className="!line-clamp-1 !text-base">{phone}</span>

@@ -29,7 +29,7 @@ def append_preload_link():
         soup = BeautifulSoup(file, 'html.parser')
 
     # Xóa tất cả thẻ <link rel="preload">
-    for link_tag in soup.find_all('link', rel='preload'):
+    for link_tag in soup.find_all('link', rel='prefetch'):
         link_tag.decompose()
 
     # Lấy danh sách file preload từ dist và assets
@@ -38,11 +38,11 @@ def append_preload_link():
     # Thêm thẻ preload mới vào <head>
     head = soup.head
     for file_rel_path in files_to_preload:
-        preload_link = soup.new_tag('link', rel='preload', href=f"/{file_rel_path}", as_='script')
+        preload_link = soup.new_tag('link', rel='prefetch', href=f"/{file_rel_path}", as_='script')
         # Bạn có thể kiểm tra đuôi file để set as='style' hay 'image' nếu muốn chính xác hơn
         if file_rel_path.endswith('.css'):
             preload_link['as'] = 'style'
-        elif file_rel_path.endswith(('.png', '.jpg', '.jpeg', '.gif', '.webp')):
+        elif file_rel_path.endswith(('.png', '.jpg', '.jpeg', '.gif', '.webp', '.svg')):
             preload_link['as'] = 'image'
         else:
             preload_link['as'] = 'script'
