@@ -63,7 +63,7 @@ export default function TaskHeader({ taskDetail, onSuccess, updateTaskStatus,
           {/* Icon component here */}
         </div>
         <div>
-          <Title level={5}>{taskDetail ? "Chỉnh sửa công việc" : "Tạo công việc mới"}</Title>
+          <Title level={5}>{taskDetail ? "Cập nhật công việc" : "Tạo công việc mới"}</Title>
         </div>
       </div>
 

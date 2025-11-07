@@ -430,7 +430,7 @@ export default function FormUser({
 
   <Col xs={24} sm={12} lg={8}>
     <Form.Item
-      name="referrer"
+      name="taxCode"
       label={<span className="text-sm sm:text-base font-semibold text-gray-700">Mã số thuế cá nhân:</span>}
       className="!mb-0"
     >
