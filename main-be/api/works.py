@@ -30,27 +30,6 @@ def create_workspace_route():
     # print("Create Workspace JSON", request.get_json())
     return create_workspace_method(request.get_json())
 
-def create_workspace(data):
-    name = data.get('name')
-    address = data.get('address')
-
-    max_version = db.session.query(func.max(Workspace.version)).scalar()
-    if max_version is None:
-        max_version = 0
-
-
-    new_workspace = Workspace(
-        id=generate_datetime_id(),
-        name=name,
-        address=address,
-        version=max_version + 1
-    )
-    
-    db.session.add(new_workspace)
-    db.session.commit()
-    
-    return new_workspace
-
 def get_role(user):
     s = user.update_role()
     if s:
@@ -133,7 +112,7 @@ def post_workspace_reward_task(group_id):
         msg.react["rate"] = rate
         flag_modified(msg, "react")
     # db.session.commit()
-    work = Workspace.query.filter(Workspace.version == group_id).first()
+    work = Workspace.query.filter(Workspace.id == group_id).first()
     
     tasks = Task.query.filter_by(workspace_id=work.id).all()
     print('tasks',work, len(tasks))

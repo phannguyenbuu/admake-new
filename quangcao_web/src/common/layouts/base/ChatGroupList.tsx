@@ -12,12 +12,15 @@ import {Button, Input} from "@mui/material";
 import {Box, Stack} from "@mui/material";
 
 import type { WorkSpace } from "../../../@types/work-space.type.ts";
+import { ChatGroupProvider } from "../../../components/chat/ProviderChat.tsx";
 import { SearchOutlined } from "@ant-design/icons";
 import { Input as AntdInput, Menu } from "antd";
+import { useChatGroup } from "../../../components/chat/ProviderChat.tsx";
 
 const ChatGroupList = () => {
+  const {workspaceEl, setWorkspaceEl} = useChatGroup();
   const [modalVisible, setModalVisible] = useState(false);
-  const [selectedId, setSelectedId] = useState<WorkSpace | null>(null);
+  // const [selectedId, setSelectedId] = useState<WorkSpace | null>(null);
   const [searchText, setSearchText] = useState("");
   const [filteredItems, setFilteredItems] = useState<WorkSpace[]>([]); // items là danh sách menu gốc
   
@@ -46,14 +49,14 @@ const ChatGroupList = () => {
     const group = workspaces.find(g => g.id.toString() === info.key);
     if (group) {
       console.log('Selected Group:', group);
-      setSelectedId(group);
+      setWorkspaceEl(group);
       setModalVisible(true);
     }
   };
 
   const handleOk = () => {
     setModalVisible(false);
-    setSelectedId(null);
+    setWorkspaceEl(null);
   };
 
   const [isHover, setIsHover] = useState(false);
@@ -97,6 +100,7 @@ const ChatGroupList = () => {
   );
 
   return (
+    
     <div className="flex items-center">
       <Stack
         direction="row"
@@ -131,13 +135,14 @@ const ChatGroupList = () => {
 
       {/* Model popup */}
       <Modal open={modalVisible} onOk={handleOk} onCancel={handleOk} footer={null}
-        title={`${selectedId?.name}`}
+        title={`${workspaceEl?.name}`}
         okText="OK" cancelButtonProps={{ style: { display: "none" } }}
         style={{ padding:0, minWidth: '96vw', top:60}}
         >
-        <Group selected={selectedId} setSelected={setSelectedId}/>
+        <Group/>
       </Modal>
     </div>
+    
   );
 };
 

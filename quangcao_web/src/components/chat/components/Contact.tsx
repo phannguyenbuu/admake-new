@@ -10,6 +10,7 @@ import RatingButtons from './RatingButtons';
 import { useUser } from '../../../common/hooks/useUser';
 import QRCode from './QRCode';
 import type { WorkSpace } from '../../../@types/work-space.type';
+import { useChatGroup } from '../ProviderChat';
 
 const Transition = React.forwardRef(function Transition(
   props: SlideProps & { children: React.ReactElement<any, any> },
@@ -70,29 +71,29 @@ const DeleteDialog: React.FC<BlockDialogProps> = ({ open, handleClose }) => {
 }
 
 interface ContactProps {
-  groupEl: WorkSpace | null;
   messages: MessageTypeProps[];
-  // setShowFooter: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const Contact: React.FC<ContactProps> = ( { groupEl, messages }) => {
- 
+const Contact: React.FC<ContactProps> = ( { messages }) => {
+//  console.log('QR', workspaceEl);
   // const theme = useTheme();
   // const dispatch = useDispatch();
+
+  const {workspaceEl, setWorkspaceEl} = useChatGroup();
 
   const [openBlock, setOpenBlock] = useState(false);
   const [openDelete, setOpenDelete] = useState(false);
   const [photos, setPhotos] = useState<MessageTypeProps[]>([]);
-  const [groupId, setGroupId] = useState<number>(0);
+  const [groupId, setGroupId] = useState<string | undefined>(undefined);
   const {userId, username, userRole, userIcon, isMobile } = useUser();
 
   useEffect(()=>{
     if(messages && messages.length > 0)
     {
-      setGroupId(messages[0].group_id);
-      setPhotos(messages.filter((groupEl)=>groupEl.type === 'img' || groupEl.type === 'doc'));
+      setGroupId(messages[0].workspace_id);
+      setPhotos(messages.filter((workspaceEl)=>workspaceEl.type === 'img' || workspaceEl.type === 'doc'));
     }
-  },[messages, groupEl]);
+  },[messages, workspaceEl]);
 
   const handleCloseBlock = () =>{
     setOpenBlock(false);
@@ -123,7 +124,7 @@ const Contact: React.FC<ContactProps> = ( { groupEl, messages }) => {
   return (
     <Box sx={{width: isMobile ? '80vw' :'30vw', p:1, ml:0, height:'fit-content', boxSizing: 'border-box'}}>
         {/* <Typography ml={0} fontWeight={300} fontSize={12}>Trạng thái dự án</Typography> */}
-        {/* <RatingButtons groupEl={groupEl}/> */}
+        {/* <RatingButtons workspaceEl={workspaceEl}/> */}
         
         <Stack className='scrollbar' sx={{position:'relative', flexGrow:1}} p={1} spacing={3}>
           <Tabs value={tabValue} onChange={handleChange} aria-label="nav tabs">
@@ -156,20 +157,20 @@ const Contact: React.FC<ContactProps> = ( { groupEl, messages }) => {
             <Stack direction="column" spacing={0} 
               sx={{width: '100%', height:'100%', paddingBottom: 2, overflowY:'auto', overflowX:'hidden'}}>
               <QRCode title="Mã QR cho khách hàng" filename='qrcode-admake-khachhang.png'
-                url={`${window.location.origin}/chat/${groupEl?.version}/${groupEl?.id}`}/>
+                url={`${window.location.origin}/chat/${workspaceEl?.id}`}/>
               <QRCode title="Mã QR cho nhân viên" filename='qrcode-admake-nhanvien.png'
-                url={`${window.location.origin}/chat/${groupEl?.version}/a${groupEl?.id}`}/>
+                url={`${window.location.origin}/chat/a${workspaceEl?.id}`}/>
              </Stack>
             )}
            {tabValue === 1 && (
               <Box sx={{ p: 0.5,width: '100%', height:'100%', overflowY:'scroll', paddingBottom: 2,  }}>
-                {photos.length > 0 ? photos.map((groupEl, idx) => (
+                {photos.length > 0 ? photos.map((workspaceEl, idx) => (
                   <img 
                     key={idx}
-                    src={`${useApiStatic()}/${groupEl.file_url}`} 
-                    alt={groupEl.file_url.split('_')[0]} 
+                    src={`${useApiStatic()}/${workspaceEl.file_url}`} 
+                    alt={workspaceEl.file_url.split('_')[0]} 
                     style={{ width: '100%', height: 'auto', marginBottom: 8, cursor: 'pointer' }}
-                    onClick={() => handlePhotoClick(groupEl.file_url)}
+                    onClick={() => handlePhotoClick(workspaceEl.file_url)}
                   />
                 )) : 
               <Typography variant="body1">Chưa có tài liệu</Typography>

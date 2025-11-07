@@ -19,39 +19,34 @@ def on_connect():
 
 @socketio.on('admake/chat/join_group')
 def on_join_group(data):
-    group_id = str(data.get('group_id'))
+    workspace_id = str(data.get('workspace_id'))
 
-    print('join', group_id)
+    print('join', workspace_id)
 
-    if group_id:
-        join_room(group_id)
-        print(f"Socket {request.sid} joined room {group_id}")
-        socketio.emit('room_joined', {'group_id': group_id}, room=request.sid)
+    if workspace_id:
+        join_room(workspace_id)
+        print(f"Socket {request.sid} joined room {workspace_id}")
+        socketio.emit('room_joined', {'workspace_id': workspace_id}, room=request.sid)
 
 @socketio.on('admake/chat/leave_group')
 def on_leave_group(data):
-    group_id = str(data.get('group_id'))
-    if group_id:
-        leave_room(group_id)
-        print(f"Socket {request.sid} left room {group_id}")
-        socketio.emit('room_left', {'group_id': group_id}, room=request.sid)
+    workspace_id = str(data.get('workspace_id'))
+    if workspace_id:
+        leave_room(workspace_id)
+        print(f"Socket {request.sid} left room {workspace_id}")
+        socketio.emit('room_left', {'workspace_id': workspace_id}, room=request.sid)
 
 @socketio.on('admake/chat/message')
 def handle_message(data):
-    first_user = User.query.first()
-    if first_user is not None:
-        user_id = first_user.id  # Lấy id của user đầu tiên
-    else:
-        user_id = None  # Hoặc giá trị mặc định phù hợp
+    print('Socketio Receive data', data)
     
-    print('Receive data', data)
-    group_id = data['group_id']
     workspace_id = data['workspace_id']
     message_id = data['message_id']
-    # user_id = User.query.first() # data['user_id']
+    user_id = data['user_id']
+    
     username = data['username']
     role = data['role']
-    # icon = data['icon']
+    
     text = data.get('text')
     file_url = data.get('file_url')
     link = data.get('link')
@@ -69,7 +64,6 @@ def handle_message(data):
         elif any(ext.endswith(e) for e in ['.jpg', '.png', '.gif', '.webp']):
             type = 'img'
 
-
     # Lưu message mới
     print('Saving role', role)
     msg = Message(
@@ -82,6 +76,7 @@ def handle_message(data):
                   role=role,
                   file_url=file_url, 
                   updatedAt=time)
+    
     db.session.add(msg)
     db.session.commit()
     
@@ -94,11 +89,10 @@ def handle_message(data):
         'user_id': user_id,
         'username': username,
         'link': link,
-        'group_id': group_id,
         'createdAt': time_str,
         'incoming': False,
         'role':role,
-    }, room=str(group_id), skip_sid=request.sid)
+    }, room=str(workspace_id), skip_sid=request.sid)
 
     emit('admake/chat/message_ack', {
         'status': 'success',
@@ -112,7 +106,7 @@ def handle_message_rate(data):
     print('Receive rate', data)
     message_id = data['message_id']
     rate = data['rate']
-    group_id = data['group_id']
+    workspace_id = data['workspace_id']
 
     msg = Message.query.filter(Message.message_id == message_id).first()
     
@@ -129,10 +123,10 @@ def handle_message_rate(data):
         flag_modified(msg, "react")
 
 
-    work = Workspace.query.filter(Workspace.version == group_id).first()
+    work = Workspace.query.filter(Workspace.id == workspace_id).first()
         
     if not work:
-        print("Workspace not found", group_id)
+        print("Workspace not found", workspace_id)
         return
     
     tasks = Task.query.filter_by(workspace_id=work.id).all()
@@ -149,8 +143,8 @@ def handle_message_rate(data):
     emit('admake/chat/rate', {
         'rate':rate,
         'message_id': message_id,
-        'group_id': group_id,
-    }, room=str(group_id), skip_sid=request.sid)
+        'workspace_id': workspace_id,
+    }, room=str(workspace_id), skip_sid=request.sid)
 
     emit('admake/chat/rate_ack', {
         'status': 'success',

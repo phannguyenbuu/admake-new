@@ -323,10 +323,6 @@ class Workspace(BaseModel):
         db.session.commit()
         return item
     
-    @staticmethod
-    def get_by_id(workspace_id):
-        return Workspace.query.filter(Workspace.version == workspace_id).first()
-    
 class Task(BaseModel):
     __tablename__ = "task"
 
@@ -394,7 +390,7 @@ class Message(BaseModel):
     __tablename__ = 'message'
 
     
-    workspace_id = db.Column(db.Integer)
+    workspace_id = db.Column(db.String(50))
     message_id = db.Column(db.String(80), primary_key=True)
     # group_id = db.Column(db.Integer, nullable=True)
     user_id = db.Column(db.String(80), db.ForeignKey('user.id'), nullable=True)

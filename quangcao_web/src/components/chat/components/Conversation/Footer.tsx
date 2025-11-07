@@ -15,6 +15,7 @@ import SentimentSatisfiedIcon from '@mui/icons-material/SentimentSatisfied';
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import { notification } from 'antd';
 import type { WorkSpace } from '../../../../@types/work-space.type.js';
+import { useChatGroup } from '../../ProviderChat.js';
 
 const StyledInput = styled(TextField)(({ theme }) => ({
   "& .MuiInputBase-input": {
@@ -62,18 +63,17 @@ interface ChatInputProps {
   inputValue: string;
   setInputValue: React.Dispatch<React.SetStateAction<string>>;
   setOpenPicker: React.Dispatch<React.SetStateAction<boolean>>;
-  groupEl: WorkSpace | null;
   handleSendMessage: (message: string, url: string) => void;
 }
 
 const ChatInput = forwardRef<HTMLDivElement, ChatInputProps>(
-  ({ inputValue, setInputValue, setOpenPicker, groupEl, 
+  ({ inputValue, setInputValue, setOpenPicker, 
     handleSendMessage 
   }, ref: Ref<HTMLDivElement>) => {
 
   const [openAction, setOpenAction] = useState(false);
   const {userId, username, userRoleId, userIcon } = useUser();
-   
+  const {workspaceEl, setWorkspaceEl} = useChatGroup();
   
   const handleUploadDocument = async () => {
     setOpenAction(prev => !prev);
@@ -96,7 +96,7 @@ const ChatInput = forwardRef<HTMLDivElement, ChatInputProps>(
               
         const formData = new FormData();
         formData.append("file", file);
-        formData.append("groupId", groupEl?.version.toString() || '');
+        formData.append("groupId", workspaceEl?.id.toString() || '');
         formData.append("role", userRoleId.toString());
         formData.append("userId", userId?.toString() || '');
 
@@ -181,16 +181,17 @@ const ChatInput = forwardRef<HTMLDivElement, ChatInputProps>(
 
 interface FooterProps {
   setMessages: React.Dispatch<React.SetStateAction<MessageTypeProps[]>>;
-  groupEl: WorkSpace | null;
 }
 
 const Footer = forwardRef<HTMLDivElement, FooterProps>(
-  ({ groupEl, setMessages }, ref: Ref<HTMLDivElement>) => {
+  ({ setMessages }, ref: Ref<HTMLDivElement>) => {
   // const [showFileUpload, setShowFileUpload] = useState(false);
   const {userId, username, userRoleId} = useUser();
   const [openPicker, setOpenPicker] = useState(false);
   const [inputValue, setInputValue] = useState('');
   const full = userRoleId > 0;
+
+  const {workspaceEl} = useChatGroup();
   
   useEffect(() => {
     socket.connect();
@@ -198,7 +199,7 @@ const Footer = forwardRef<HTMLDivElement, FooterProps>(
 
     socket.on('connect', () => {
       console.log('Connected to server', socket.id);
-      socket.emit('join', { group_id: groupEl?.version });
+      socket.emit('join', { group_id: workspaceEl?.id });
     });
 
     socket.on('admake/chat/message', (msg) => {
@@ -223,7 +224,7 @@ const Footer = forwardRef<HTMLDivElement, FooterProps>(
       socket.off('disconnect');
       socket.disconnect();
     };
-  }, [groupEl?.version]);
+  }, [workspaceEl?.id]);
 
   function get_user_name():string {
     const user = JSON.parse(localStorage.getItem('Admake-User-Access') || '{}');
@@ -264,7 +265,7 @@ const Footer = forwardRef<HTMLDivElement, FooterProps>(
       
       const data: MessageTypeProps = {
         id: generateUniqueIntId(),
-        workspace_id: groupEl?.version || 0,
+        workspace_id: workspaceEl?.id || '',
         react: {rate:0},
         preview: '',
         reply: '',
@@ -272,8 +273,8 @@ const Footer = forwardRef<HTMLDivElement, FooterProps>(
         icon: '',
         type: getTypeName(file_url),
         incoming: false,
-        group_id: groupEl?.version || 0,
-        user_id: '',
+        group_id: workspaceEl?.id || '',
+        user_id: userId,
         username: get_user_name(),
         text: message,
         file_url,
@@ -286,7 +287,7 @@ const Footer = forwardRef<HTMLDivElement, FooterProps>(
         status: 'sending'
       };
 
-      console.log('Send message', socket.io.opts.host, data);
+      console.log('Send message', data);
 
       setMessages(prev => [...prev, data]);
       socket.emit('admake/chat/message', data);
@@ -305,7 +306,7 @@ const Footer = forwardRef<HTMLDivElement, FooterProps>(
       
       const data: MessageTypeProps = {
         id: generateUniqueIntId(),
-        workspace_id: groupEl?.version || 0,
+        workspace_id: workspaceEl?.id,
         react: {rate:0},
         preview: '',
         reply: '',
@@ -313,7 +314,7 @@ const Footer = forwardRef<HTMLDivElement, FooterProps>(
         icon: '',
         type: 'timeline',
         incoming: false,
-        group_id: groupEl?.version || 0,
+        group_id: workspaceEl?.id,
         user_id: '',
         username: get_user_name(),
         text: 'Quý khách hàng vui lòng đánh giá dự án này?',
@@ -349,7 +350,6 @@ const Footer = forwardRef<HTMLDivElement, FooterProps>(
             inputValue={inputValue}
             setInputValue={setInputValue}
             setOpenPicker={setOpenPicker}
-            groupEl={groupEl}
             handleSendMessage={sendMessage}
           />
           

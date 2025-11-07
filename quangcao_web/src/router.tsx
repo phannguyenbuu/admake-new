@@ -22,6 +22,7 @@ import Login from "./app/login/page";
 import GroupQRPage from "./components/chat/components/GroupQRPage";
 import Workpoint from "./components/chat/components/Workpoint";
 import { CenterBox } from "./components/chat/components/commons/TitlePanel";
+import { ChatGroupProvider } from "./components/chat/ProviderChat";
 import { Typography } from "@mui/material";
 
 interface TRoute extends Omit<NonIndexRouteObject, "index" | "children"> {
@@ -73,8 +74,8 @@ const routes: TRoute = {
     },
     
     {
-      path: "/chat/:id/:token",
-      element: <GroupQRPage/>,
+      path: "/chat/:id",
+      element: <ChatGroupProvider><GroupQRPage/></ChatGroupProvider>,
       title: "Chat Group",
       ignoreInMenu: true,
     },

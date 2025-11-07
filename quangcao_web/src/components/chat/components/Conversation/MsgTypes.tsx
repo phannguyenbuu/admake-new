@@ -216,31 +216,31 @@ const TextMsg: React.FC<MsgTypeProps> = ({el, menu, onDelete}) => {
     if(!el) return null;
     const theme = useTheme();
     const {userRoleId} = useUser();
-    const full = userRoleId > 0;
+    const full = userRoleId === -2;
 
     // const { userId, username } = useUser();
     // const [incoming, setIncoming ] = useState(true);
     // const [bkColor, setBkColor ] = useState("#fff");
     // const [textColor, setTextColor ] = useState("#000");
 
-    const isIncoming = el.role < 0; //username !== el.user_role;
-    // console.log('TextMsg',username, el.user_role);
+    const isCustomer = el.role === -1; //username !== el.user_role;
+    console.log('TextMsg',el.username, el.role);
 
-    const bkColor = isIncoming
+    const bkColor = isCustomer
     ? '#fff'
     : el.status === 'sending'
     ? '#b0b0b0'
     : "#00B4B6";
 
-    const textColor = isIncoming ? '#000' : '#fff';
+    const textColor = isCustomer ? '#000' : '#fff';
 
     // console.log('icon', el.icon);
     
     return (
-        <Stack key={`DefaultMsg-${el.message_id}-Wrapper`} direction='row' justifyContent={isIncoming ? 'start' : 'end'}>
+        <Stack key={`DefaultMsg-${el.message_id}-Wrapper`} direction='row' justifyContent={isCustomer ? 'start' : 'end'}>
             <Box key={`DefaultMsg-${el.message_id}-Conatiner`} p={0.5} 
                 sx={{ backgroundColor: bkColor, borderRadius: 1.5, width: 'max-content', height:'fit-content'}}>
-                {!isIncoming && 
+                {!isCustomer && 
                     <Stack direction='row' alignItems="center" spacing={1}>
                         {full && 
                           <>
@@ -395,7 +395,7 @@ const TimeLine: React.FC<MsgTypeProps> = ({ el, menu, onDelete }) => {
 const MessageOptions: React.FC<MsgTypeProps> = ({el, onDelete }) => {
   if(!el) return null;
   // const { userId, username } = useUser();
-  const isIncoming = el.role < 0; // username !== el.user_role;
+  const isCustomer = el.role < 0; // username !== el.user_role;
 
     // console.log('MessageOptions',username, el.user_role);
 
@@ -441,7 +441,7 @@ const MessageOptions: React.FC<MsgTypeProps> = ({el, onDelete }) => {
         }}
       >
       <Stack spacing={1} px={1}>
-        {isIncoming &&
+        {isCustomer &&
         <>
         <MenuItem >
             <ListItemIcon>

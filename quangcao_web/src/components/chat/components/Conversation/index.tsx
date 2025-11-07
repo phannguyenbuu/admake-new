@@ -13,21 +13,16 @@ interface ConversationProps {
   status: string | null;
   messages: MessageTypeProps[];
   setMessages: React.Dispatch<React.SetStateAction<MessageTypeProps[]>>;
-  groupEl: WorkSpace | null;
   userId: string;
   username: string;
   onDelete: (id: MessageTypeProps) => void;
 }
 
-const Conversation: React.FC<ConversationProps> = ({title,status,messages,setMessages, groupEl, onDelete}) => {
+const Conversation: React.FC<ConversationProps> = ({title,status,messages,setMessages, onDelete}) => {
   const boxRef = useRef<HTMLDivElement | null>(null);
   
   const {userId, userRoleId, isMobile} = useUser();
   const full = userRoleId === -2;
-
-  useEffect(()=>{
-    
-  },[groupEl?.status]);
 
   return (
     <Stack ref={boxRef} sx={{ width: full && !isMobile ? '50vw' : '85vw', height:'72vh',
@@ -40,7 +35,7 @@ const Conversation: React.FC<ConversationProps> = ({title,status,messages,setMes
           <Message messages = {messages} menu={true} onDelete={onDelete}/>
         </Box>
         
-        <Footer setMessages={setMessages} groupEl={groupEl}/> 
+        <Footer setMessages={setMessages}/> 
     </Stack>
   )
 }

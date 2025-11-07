@@ -5,24 +5,27 @@ import Group from "../pages/dashboard/Group";
 // import type { GroupProps } from "../../../@types/chat.type";
 import { useApiHost } from "../../../common/hooks/useApiHost";
 import type { WorkSpace } from "../../../@types/work-space.type";
+import { useChatGroup } from "../ProviderChat";
+import { useUser } from "../../../common/hooks/useUser";
 
 const GroupQRPage = () => {
-  const { id, token } = useParams<{ id: string, token: string }>();
-
+  const {workspaceEl, setWorkspaceEl} = useChatGroup();
+  const { id } = useParams<{ id: string }>();
+  const {setUserRoleId} = useUser();
   // Gọi API backend check với id và token
   // Nếu hợp lệ thì render Group, không hợp lệ có thể redirect hoặc báo lỗi
 
   // Ví dụ gọi API trong useEffect và lưu trạng thái check
-  const [selected, setSelected] = React.useState<WorkSpace | null>(null);
+  // const [selected, setSelected] = React.useState<WorkSpace | null>(null);
   const [verified, setVerified] = React.useState(false);
   const [loading, setLoading] = React.useState(true);
 
   React.useEffect(() => {
-    console.log("Param", id, token);
-    if (!id || !token) return;
+    console.log("Param", workspaceEl?.role);
+    if (!id) return;
     
     // const accessToken = sessionStorage.getItem('accessToken');
-    fetch(`${useApiHost()}/group/check-access/${id}/${token}/`
+    fetch(`${useApiHost()}/group/check-access/${id}/`
     // , {
     //     method: 'GET',
     //     headers: {
@@ -40,11 +43,11 @@ const GroupQRPage = () => {
   })
     .then(response => {
         if (response.valid) {
-            setVerified(true);
-            setSelected(response.data);
+          setVerified(true);
+          setWorkspaceEl(response.data);
         } else {
         setVerified(false);
-            window.location.href = "/login";
+          window.location.href = "/login";
         }
         setLoading(false);
     })
@@ -52,12 +55,12 @@ const GroupQRPage = () => {
         setVerified(false);
         setLoading(false);
     });
-    }, [id, token]);
+    }, [id]);
 
   if (loading) return <div>Loading...</div>;
   if (!verified) return <div>Access denied or invalid token</div>;
 
-  return <Group selected={selected} setSelected={null}/>;
+  return <Group/>;
 };
 
 export default GroupQRPage;

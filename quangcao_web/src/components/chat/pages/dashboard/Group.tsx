@@ -16,18 +16,19 @@ import { useUser } from '../../../../common/hooks/useUser';
 import { useApiHost } from '../../../../common/hooks/useApiHost';
 import { notification } from 'antd';
 import type { WorkSpace } from '../../../../@types/work-space.type';
+import { ChatGroupProvider, useChatGroup } from '../../ProviderChat';
+// interface GroupComponentProps {
+//   selected: WorkSpace | null;
+//   setSelected: React.Dispatch<React.SetStateAction<WorkSpace | null>> | null;
+// }
 
-interface GroupComponentProps {
-  selected: WorkSpace | null;
-  setSelected: React.Dispatch<React.SetStateAction<WorkSpace | null>> | null;
-}
-
-const Group: React.FC<GroupComponentProps> = ({ selected, setSelected }) => {
+const Group = () => {
+    const {workspaceEl, setWorkspaceEl} = useChatGroup();
     const [showLeft, setShowLeft] = useState(false);
     const [showRight, setShowRight] = useState(false);
     const [messageList, setMessages] = useState<MessageTypeProps[]>([]);
     const [title, setTitle] = useState('');
-    const [currentGroup, setcurrentGroup] = useState<WorkSpace | null>(null);
+    // const [currentGroup, setcurrentGroup] = useState<WorkSpace | null>(null);
     const [status, setStatus] = useState<string | undefined>('');
     const [_loading, setLoading] = useState(false);
     const [_error, setError] = useState(null);
@@ -43,12 +44,11 @@ const Group: React.FC<GroupComponentProps> = ({ selected, setSelected }) => {
     },[]);
 
     useEffect(() => {
-    if (selected !== null && selected !== undefined) {
+    if (workspaceEl !== null && workspaceEl !== undefined) {
     //   console.log("SLEED", selected);
-      handleClick(selected); // Có thể truyền tên trống hoặc lấy từ data thực tế
-    //   setShowFooter(selected?.status === "talk" || selected?.status === "pass");
+      handleClick(workspaceEl);
     }
-  }, [selected]);
+  }, [workspaceEl]);
 
     const handleDeleteMessage = (el:MessageTypeProps) =>{
      fetch(`${urlApi}/message/${el.message_id}`, { method: 'DELETE' })
@@ -67,15 +67,14 @@ const Group: React.FC<GroupComponentProps> = ({ selected, setSelected }) => {
 
     //   Xử lý khi click vào group
     const handleClick = (el:WorkSpace) => {
-        if(setSelected)
-        {
-            setSelected(el);
-        }
+        if(setWorkspaceEl)
+            setWorkspaceEl(el);
+        
         setLoading(true);
 
-        // console.log("EL", el);
+        console.log("EL", el);
 
-        fetch(`${urlApi}/group/${el.version}/messages`)
+        fetch(`${urlApi}/group/${el.id}/messages`)
             .then((res) => res.json())
             .then((data) => {
                 if (data && data.messages) {
@@ -85,7 +84,7 @@ const Group: React.FC<GroupComponentProps> = ({ selected, setSelected }) => {
                     setTitle(el.name);
                     //  console.log('OK2');
                     setStatus(el.status);
-                    setcurrentGroup(el);
+                    setWorkspaceEl(el);
                     //  console.log('OK3');
                 }
                 setLoading(false);
@@ -98,40 +97,21 @@ const Group: React.FC<GroupComponentProps> = ({ selected, setSelected }) => {
             });
         setShowLeft(false);
     };
-
-
-// const [workspaces, setGroupList] = useState<GroupProps[]>([]);
-//   const API_HOST = useApiHost();
-  
-//   useEffect(() => {
-//     setGroupList(workspaces);
-
-//     // fetch(`${API_HOST}/group/`)
-//     //   .then((res) => res.json())
-//     //   .then((data: GroupProps[]) => 
-//     //     {
-//     //     //   console.log('GroupData', data);
-//     //       setGroupList(data);
-//     //     })
-//     //   .catch((error) => console.error("Failed to load group data", error));
-//   }, []);
-
-
   
     useEffect(() => {
-        if (!currentGroup) return;
+        if (!workspaceEl) return;
 
         socket.on('admake/chat/message_deleted', ({ message_id }) => {
             setMessages(prev => prev.filter(m => m.message_id !== message_id));
         });
 
         //   Join vào room group hiện tại
-        socket.emit('admake/chat/join_group', { group_id: currentGroup.version });
+        socket.emit('admake/chat/join_group', { workspace_id: workspaceEl.id });
 
         //   Lắng nghe tin nhắn mới realtime
         socket.on('admake/chat/message', (msg) => {
-            console.log('Current Group ID', currentGroup, msg);
-            if (msg.group_id === currentGroup.version) {  // chỉ thêm tin nhắn cùng group
+            // console.log('Current Group ID', workspaceEl, msg);
+            if (msg.workspace_id === workspaceEl.id) {  // chỉ thêm tin nhắn cùng group
                 setMessages(prev => [...prev, msg]);  // thêm tin nhắn mới vào cuối
             }
         });
@@ -140,11 +120,9 @@ const Group: React.FC<GroupComponentProps> = ({ selected, setSelected }) => {
         return () => {
             socket.off('admake/chat/message');
             socket.off('admake/chat/message_deleted');
-            socket.emit('admake/chat/leave_group', { group_id: currentGroup.version }); // tùy backend có xử lý leave room không
+            socket.emit('admake/chat/leave_group', { group_id: workspaceEl.id }); // tùy backend có xử lý leave room không
         };
-    }, [currentGroup]);
-
-
+    }, [workspaceEl]);
 
     const theme = useTheme();
 
@@ -165,7 +143,7 @@ const Group: React.FC<GroupComponentProps> = ({ selected, setSelected }) => {
                                 <ChatElement workspace={el}
                                     onClick={() => handleClick(el)}
                                     key={`ChatElement-${idx}`}
-                                    selected={selected?.id === el.id}
+                                    selected={workspaceEl?.id === el.id}
                                 />
                             ))}
                         </Stack> 
@@ -174,19 +152,20 @@ const Group: React.FC<GroupComponentProps> = ({ selected, setSelected }) => {
                  </Stack>
              </Box>}
 
-             
+            
             <Conversation
                 setMessages={setMessages}
                 messages={messageList}
                 title={title}
                 status={status || null}
-                groupEl={currentGroup}
+                // groupEl={currentGroup}
                 userId=''
                 username=''
                 onDelete={handleDeleteMessage}
                 // showFooter={showFooter}
                 // onGroupDelete={handleDeleteGroup}
             />
+              
         
             {full &&
              <Box sx={{ 
@@ -197,7 +176,7 @@ const Group: React.FC<GroupComponentProps> = ({ selected, setSelected }) => {
                 //      sm: "block",
                 //  },
                  boxShadow: '0px 0px 2px rgba(0,0,0,0.25)'}}>
-                    <Contact messages={messageList} groupEl={selected ?? null}/>
+                    <Contact messages={messageList}/>
              </Box>}
          </Stack>
 

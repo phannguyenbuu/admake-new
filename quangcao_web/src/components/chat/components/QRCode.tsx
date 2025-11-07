@@ -8,7 +8,6 @@ import DownloadIcon from '@mui/icons-material/Download';
 import { Flex, notification } from 'antd';
 
 interface RatingButtonsProps {
-  // groupEl: GroupProps | null;
   url: string | null;
   title: string | null;
   filename: string | null;
@@ -76,10 +75,6 @@ const QRCode: React.FC<RatingButtonsProps> = ({ title, url, filename }) => {
 
     image.src = url;
   };
-
-  // useEffect(() => {
-  //   setQRContent();
-  // }, [groupEl]);
 
   const w = 180;
 

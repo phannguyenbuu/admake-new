@@ -1,6 +1,5 @@
 from flask import Blueprint, request, jsonify, abort
 from models import db, dateStr, User, generate_datetime_id, LeadPayload
-from api.groups import create_group
 import datetime
 from sqlalchemy import desc
 

@@ -1054,5 +1054,7 @@ if __name__ == "__main__":
         
         
 
-        result = get_task_by_user_id('2025110502524438962077743c')
-        print(result.data)
+        # result = get_task_by_user_id('2025110502524438962077743c')
+        # print(result.data)
+
+        change_value_type('message', ['workspace_id'], 'VARCHAR(50)')

@@ -1,29 +1,21 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { QRCodeSVG  } from 'qrcode.react';
-// import type { WorkSpace } from '../../../@types/chat.type';
-import { useApiHost } from '../../../common/hooks/useApiHost';
 import { ToggleButton, ToggleButtonGroup } from '@mui/material';
 import LockIcon from '@mui/icons-material/Lock';
 import { notification } from 'antd';
-import type { WorkSpace } from '../../../@types/work-space.type';
+import { useChatGroup } from '../ProviderChat';
+import { useApiHost } from '../../../common/hooks/useApiHost';
 
-interface RatingButtonsProps {
-  groupEl: WorkSpace | null;
-  // setShowFooter: React.Dispatch<React.SetStateAction<boolean>>;
-}
-
-const RatingButtons: React.FC<RatingButtonsProps> = ({ groupEl }) => {
-  const [value, setValue] = React.useState<string | null | undefined>(groupEl?.status);
+const RatingButtons = () => {
+  const {workspaceEl} = useChatGroup();
+  const [value, setValue] = React.useState<string | null | undefined>(workspaceEl?.status);
   
   useEffect(() => {
-    if (!groupEl?.status || groupEl?.status === '' || groupEl?.status === '0') {
+    if (!workspaceEl?.status || workspaceEl?.status === '' || workspaceEl?.status === '0') {
       setValue("start");
     } else {
-      setValue(groupEl?.status);
+      setValue(workspaceEl?.status);
     }
-  }, [groupEl]);
-
-  
+  }, [workspaceEl]);
 
   const handleChange = (event: React.MouseEvent<HTMLElement>, newValue: string | null) => {
         
@@ -39,12 +31,11 @@ const RatingButtons: React.FC<RatingButtonsProps> = ({ groupEl }) => {
       setValue(newValue);
       // setShowFooter(newValue === "talk" || newValue === "pass");
 
-      const data = { group_id: groupEl?.version };
-
+      const data = { group_id: workspaceEl?.id };
       
-      groupEl && (groupEl.status = newValue);
+      workspaceEl && (workspaceEl.status = newValue);
 
-      fetch(`${useApiHost()}/group/${groupEl?.version}/status`, { // hoặc đường dẫn chính xác endpoint của bạn
+      fetch(`${useApiHost()}/group/${workspaceEl?.id}/status`, { // hoặc đường dẫn chính xác endpoint của bạn
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
