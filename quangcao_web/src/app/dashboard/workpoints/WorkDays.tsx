@@ -2,7 +2,7 @@ import { Tag, Modal, notification } from "antd";
 import type { User } from "../../../@types/user.type";
 import React, { useState, useEffect } from 'react';
 import { useApiHost, useApiStatic } from "../../../common/hooks/useApiHost";
-import { Stack, Box, Typography } from "@mui/material";
+import { Stack, Box, Typography, Button } from "@mui/material";
 import QRCode from "../../../components/chat/components/QRCode";
 import { useLocation } from "react-router-dom";
 // import type { Checklist, PeriodData, Checklist } from "../../../@types/CheckListType";
@@ -68,12 +68,13 @@ export default function WorkDays({record}: {record:WorkDaysProps}) {
   
   const [totalHour, setTotalHour] = useState<{morning: number,noon: number,evening: number} | null>(null);
   const [mainData, setData] = useState<Workpoint[]>([]);
+  const [currentPeriodModalIndex, setCurrentPeriodModalIndex] = useState<number>(0);
   const [modalImg, setModalImg] = useState<PeriodData | null>(null);
   const todayDate = new Date().getDate();
 
-  // useEffect(() => {
-  //   console.log("Rrd", record.items);
-  // },[]);
+  useEffect(() => {
+    console.log("Rrd", record);
+  },[]);
 
   useEffect(() => {
     setData(record.items);
@@ -156,6 +157,39 @@ export default function WorkDays({record}: {record:WorkDaysProps}) {
     setModalVisible(false);
     setModalImg(null);
   };
+
+  // const deleteWorkpoint = (period: string) => {
+  //   async function fetchRemoveWorkpoint(period: string) {
+  //     try {
+  //       const url = `/workpoint/${encodeURIComponent(id)}/?period=${encodeURIComponent(period)}`;
+  //       const response = await fetch(url, {
+  //         method: 'PUT',
+  //         headers: {
+  //           'Content-Type': 'application/json',
+  //         },
+  //         body: JSON.stringify({
+  //           user_id: record.user_id,
+  //            period }),
+  //       });
+
+  //       if (!response.ok) {
+  //         const errorText = await response.text();
+  //         throw new Error(`Fetch error: ${response.status} ${response.statusText} - ${errorText}`);
+  //       }
+
+  //       const result = await response.json();
+  //       console.log('Remove workpoint result:', result);
+  //       return result;
+
+  //     } catch (error) {
+  //       console.error('Failed to remove workpoint:', error);
+  //       throw error;  // hoặc xử lý lỗi tùy mục đích
+  //     }
+  //   }
+
+  //   fetchRemoveWorkpoint(id, );
+
+  // }
 
 return (
   <>
@@ -249,6 +283,7 @@ return (
                   onClick={() => {
                     // console.log('IMG', imgUrl);
                     if (imgUrl) {
+                      setCurrentPeriodModalIndex(periodIndex);
                       setModalImg(imgUrl);
                       setModalVisible(true);
                     }
@@ -279,6 +314,18 @@ return (
             <Typography sx={{color:"#fff",textAlign:"center",fontSize:10}}>Số giờ làm trong buổi: {modalImg.workhour?.toFixed(2)}</Typography>
           }
         </Box>
+
+        
+        <Button onClick={() => {
+          console.log("Current", currentPeriodModalIndex);
+          console.log("Main data", mainData);
+          console.log("Modal infor", modalImg);
+          // modalImg.in = ;
+        }} 
+          sx={{border:'1px solid #00B5B4', margin: 1, padding:'5px 20px', borderRadius:30}}>
+          <span style={{color:'1px solid #00B5B4'}}>Reset check-in</span>
+        </Button>
+
         {modalImg?.status !== 'off' &&
           <Typography fontSize={10} color="#00B4B6" fontStyle="italic">Nhấp vào hình để xem vị trí trên googlemap</Typography>}
             

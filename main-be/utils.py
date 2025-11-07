@@ -1,6 +1,6 @@
 import json
 from api.tasks import get_task_by_user_id
-from models import db, app, User, LeadPayload, Workpoint,Leave, Customer, Material, Role, Message, Task, Workspace, generate_datetime_id
+from models import db, app, User, LeadPayload, Workpoint,Leave, WorkpointSetting, Customer, Material, Role, Message, Task, Workspace, generate_datetime_id
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 import json
@@ -1048,13 +1048,22 @@ def parse_csv(path):
         session.execute(stmt, data)
         session.commit()
 
+def create_workpoint_settings_for_all_leads():
+    leads = LeadPayload.query.all()
+    for lead in leads:
+        # Kiểm tra xem đã có WorkpointSetting cho lead này chưa để tránh trùng lặp
+        existing_setting = WorkpointSetting.query.filter_by(lead_id=lead.id).first()
+        if not existing_setting:
+            new_setting = WorkpointSetting(
+                lead_id=lead.id
+                # Các trường còn lại sẽ lấy giá trị default đã khai báo trong model
+            )
+            db.session.add(new_setting)
+    db.session.commit()
+
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()
         
-        
-
-        # result = get_task_by_user_id('2025110502524438962077743c')
-        # print(result.data)
-
-        change_value_type('message', ['workspace_id'], 'VARCHAR(50)')
+        ws = WorkpointSetting.query.filter(WorkpointSetting.lead_id == 205).first()
+        print(ws.to_dict())

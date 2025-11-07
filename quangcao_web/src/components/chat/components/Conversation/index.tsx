@@ -23,6 +23,28 @@ const Conversation: React.FC<ConversationProps> = ({title,status,messages,setMes
   
   const {userId, userRoleId, isMobile} = useUser();
   const full = userRoleId === -2;
+  const [boxRect, setBoxRect] = useState({ left: 0, width: 0 });
+
+  // const [left, setLeft] = useState(0);
+  // const [width, setWidth] = useState(0);
+
+  const updateBoxRect = () => {
+    if (boxRef.current) {
+      const rect = boxRef.current.getBoundingClientRect();
+      setBoxRect({ left: rect.left, width: rect.width });
+    }
+  };
+
+  useEffect(() => {
+    // Cập nhật khi component mount
+    updateBoxRect();
+
+    // Lắng nghe resize window cập nhật lại
+    window.addEventListener('resize', updateBoxRect);
+
+    // Cleanup khi component unmount
+    return () => window.removeEventListener('resize', updateBoxRect);
+  }, []);
 
   let w = '85vw';
 
@@ -45,7 +67,7 @@ const Conversation: React.FC<ConversationProps> = ({title,status,messages,setMes
           <Message messages = {messages} menu={true} onDelete={onDelete}/>
         </Box>
         
-        <Footer setMessages={setMessages}/> 
+        <Footer setMessages={setMessages} left = {boxRect.left} width={boxRect.width}/>
     </Stack>
   )
 }

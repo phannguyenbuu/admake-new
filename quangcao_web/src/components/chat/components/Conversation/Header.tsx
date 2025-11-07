@@ -21,7 +21,7 @@ const Header: React.FC<HeaderProps>
   = ({ title, status }) => {
 
   const {userRoleId, isMobile} = useUser();
-  const full = userRoleId > 0;
+  const full = userRoleId === -2;
   // const {userId, username, userRole, userIcon } = useUser();
   // console.log("User_Info", userId, username, userRole );
   // const dispatch = useAppDispatch();

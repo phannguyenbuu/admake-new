@@ -3,7 +3,7 @@ import { BellOutlined, UserOutlined, LogoutOutlined } from "@ant-design/icons";
 // import NotificationDropdown from "../../../components/NotificationDropdown";
 import { useNavigate } from "react-router-dom";
 import { useInfo } from "../../hooks/info.hook";
-import { useGetNotification } from "../../hooks/notification.hook";
+// import { useGetNotification } from "../../hooks/notification.hook";
 // import { useSocket } from "../../../socket/SocketContext";
 import { useEffect, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
@@ -49,10 +49,10 @@ export default function AppHeader() {
     setQuestionOpen(false)
   }
 
-  const { data: notificationsData, refetch } = useGetNotification({
-    page: 1,
-    limit: 10,
-  });
+  // const { data: notificationsData, refetch } = useGetNotification({
+  //   page: 1,
+  //   limit: 10,
+  // });
 
   // useEffect(() => {
   //   if (isConnected) {
@@ -67,7 +67,7 @@ export default function AppHeader() {
   // };
 
   // @ts-ignore
-  const unreadCount = notificationsData?.meta?.unread || 0;
+  // const unreadCount = notificationsData?.meta?.unread || 0;
 
   const handleLogout = () => {
     // Xóa token
@@ -108,11 +108,7 @@ export default function AppHeader() {
           <div onClick={handleQuestionClick}
             className="p-0 rounded-full hover:bg-gray-100 transition-all duration-200 flex items-center justify-center">
             <QuestionOutlined 
-              className={`text-lg md:text-xl transition-colors duration-200 ${
-                notificationOpen || unreadCount > 0
-                  ? "text-cyan-500"
-                  : "text-gray-600 group-hover:text-cyan-500"
-              }`}
+              className={`text-lg md:text-xl transition-colors duration-200`}
             />
 
           </div>

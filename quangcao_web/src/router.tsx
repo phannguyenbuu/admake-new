@@ -24,6 +24,7 @@ import Workpoint from "./components/chat/components/Workpoint";
 import { CenterBox } from "./components/chat/components/commons/TitlePanel";
 import { ChatGroupProvider } from "./components/chat/ProviderChat";
 import { Typography } from "@mui/material";
+import { WorkpointSettingProvider } from "./common/hooks/useWorkpointSetting";
 
 interface TRoute extends Omit<NonIndexRouteObject, "index" | "children"> {
   children?: TRoute[];
@@ -83,7 +84,7 @@ const routes: TRoute = {
 
     {
       path: "/point/:id/",
-      element: <Workpoint/>,
+      element: <WorkpointSettingProvider><Workpoint/></WorkpointSettingProvider>,
       title: "Workpoint",
       ignoreInMenu: true,
     },
@@ -92,7 +93,9 @@ const routes: TRoute = {
       path: "/dashboard",
       element: (
         <Suspense fallback={<div>Loading...</div>}>
-          <DashboardPage />
+          <WorkpointSettingProvider>
+            <DashboardPage />
+          </WorkpointSettingProvider>
         </Suspense>
       ),
       // lazy: () => import("./app/dashboard/page"),
@@ -119,7 +122,9 @@ const routes: TRoute = {
           path: "/dashboard/workpoints",
           element: (
             <Suspense fallback={<div>Loading...</div>}>
-              <WorkPointPage />
+              
+                <WorkPointPage />
+              
             </Suspense>
           ),
           title: "Chấm công",

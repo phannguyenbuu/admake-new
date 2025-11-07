@@ -4,9 +4,10 @@ import { Stack, Box, Typography } from "@mui/material";
 import { CenterBox } from '../../../components/chat/components/commons/TitlePanel';
 import type { PeriodData, WorkDaysProps } from '../../../@types/workpoint';
 import { Table, TableBody, TableCell, TableContainer, TableRow, TableHead, Paper } from '@mui/material';
+import { useWorkpointSetting } from '../../../common/hooks/useWorkpointSetting';
 
-const OVERTIME_RATIO = 1.5;
-const IS_SATURDAY_NOON_OFF = true;
+
+// const IS_SATURDAY_NOON_OFF = true;
 
 // Tăng ca dưới 1 giờ sẽ không tính giờ
 
@@ -19,7 +20,8 @@ interface StatisticsMonthDaysProps {
 function getMaxWorkingHours(month: number, year: number ) {
   const daysInMonth = new Date(year, month, 0).getDate();
   let totalHours = 0;
-  
+  const {workpointSetting} = useWorkpointSetting();
+
   for (let day = 1; day <= daysInMonth; day++) {
     const date = new Date(year, month - 1, day);
     const weekday = date.getDay(); // 0 = Chủ nhật, 6 = Thứ 7
@@ -29,7 +31,7 @@ function getMaxWorkingHours(month: number, year: number ) {
       continue;
     } else if (weekday === 6) {
       // Thứ 7
-      totalHours += IS_SATURDAY_NOON_OFF ? 4 : 8;
+      totalHours += workpointSetting?.work_in_saturday_noon ? 8 : 4;
     } else {
       // Ngày thường
       totalHours += 8;
@@ -76,6 +78,11 @@ const StatisticsMonthDays: React.FC<StatisticsMonthDaysProps> = ({ selectedRecor
   const [salaryUnit, setSalaryUnit] = useState<number>(0);
   const [totalSalary, setTotalSalary] = useState<number>(0);
   const [bonusSalary, setBonusSalary] = useState<number>(0);
+  const {workpointSetting} = useWorkpointSetting();
+  const OVERTIME_RATIO = workpointSetting?.multiply_in_night_overtime || 0;
+
+
+
 
   const current_day = new Date();
   const total_hours = getMaxWorkingHours(current_day.getMonth() + 1, current_day.getFullYear());

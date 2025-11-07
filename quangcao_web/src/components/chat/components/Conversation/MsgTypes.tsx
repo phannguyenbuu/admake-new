@@ -274,7 +274,7 @@ const TimeLine: React.FC<MsgTypeProps> = ({ el, menu, onDelete }) => {
   const [value, setValue] = useState<number | null>(el?.react?.rate ?? 0);
   if(!el) return null;
   const {userRoleId} = useUser();
-  const full = userRoleId > 0;
+  const full = userRoleId === -2;
 
   
   useEffect(() => {

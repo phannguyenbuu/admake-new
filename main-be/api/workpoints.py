@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify, abort
-from models import db, app, Workpoint, Message,User, dateStr, generate_datetime_id, Leave, LeadPayload
+from models import db, app, Workpoint, WorkpointSetting, Message,User, dateStr, generate_datetime_id, Leave, LeadPayload
 from api.chat import socketio
 from sqlalchemy import desc
 from datetime import datetime, time, date
@@ -8,6 +8,11 @@ from api.users import get_query_page_users
 from collections import defaultdict
 
 workpoint_bp = Blueprint('workpoint', __name__, url_prefix='/api/workpoint')
+
+@workpoint_bp.route("/all", methods=["GET"])
+def get_all_workpoints():
+    workpoints = Workpoint.query.order_by(desc(Workpoint.createdAt)).all()
+    return jsonify([c.to_dict() for c in workpoints])
 
 @workpoint_bp.route("/", methods=["GET"])
 def get_workpoints():
@@ -34,6 +39,26 @@ def get_workpoint_detail(user_id):
         abort(404, description="workpoints not found")
 
     return jsonify([c.to_dict() for c in workpoints])
+
+@workpoint_bp.route("/<string:id>/", methods=["PUT"])
+def put_remove_workpoint(id):
+    data = request.args.get_json()
+    prd = data["period"]
+    workpoint = db.session.get(Workpoint,id)
+
+    if not workpoint:
+        abort(404, description="workpoints not found")
+
+    if prd in workpoint.checklist:
+        if 'out' in workpoint.checklist[prd]:
+            del workpoint.checklist[prd]['out']
+        elif 'in' in workpoint.checklist[prd]:
+            del workpoint.checklist[prd]['in']
+
+    flag_modified(workpoint, "checklist")
+    db.session.commit()
+    
+    return jsonify([c.to_dict() for c in workpoint]), 200
 
 @workpoint_bp.route("/page", methods=["GET"])
 def get_batch_workpoint_detail():
@@ -299,3 +324,37 @@ def post_workpoint_by_user_and_date(user_id):
     
     return jsonify(result), 201
 
+
+
+
+
+
+
+@workpoint_bp.route('/setting/<string:lead_id>/', methods=['GET'])
+def get_workpoint_setting(lead_id):
+    workpoint_setting = WorkpointSetting.query.filter_by(lead_id=lead_id).first()
+    if not workpoint_setting:
+        print("WorkpointSetting not found", lead_id)
+        abort(404, description="WorkpointSetting not found")
+    
+    print("WorkpointSetting found", workpoint_setting.to_dict())
+    return jsonify(workpoint_setting.to_dict()), 200
+
+
+@workpoint_bp.route('/setting/<string:lead_id>/', methods=['PUT'])
+def update_workpoint_setting(lead_id):
+    workpoint_setting = WorkpointSetting.query.filter_by(lead_id=lead_id).first()
+    if not workpoint_setting:
+        abort(404, description="WorkpointSetting not found")
+
+    data = request.get_json()
+    if not data:
+        abort(400, description="Invalid JSON body")
+
+    # Cập nhật các trường cho workpoint_setting nếu có trong data
+    for key, value in data.items():
+        if hasattr(workpoint_setting, key):
+            setattr(workpoint_setting, key, value)
+
+    db.session.commit()
+    return jsonify(workpoint_setting.to_dict()), 200

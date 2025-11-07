@@ -181,15 +181,17 @@ const ChatInput = forwardRef<HTMLDivElement, ChatInputProps>(
 
 interface FooterProps {
   setMessages: React.Dispatch<React.SetStateAction<MessageTypeProps[]>>;
+  left: number;
+  width: number;
 }
 
 const Footer = forwardRef<HTMLDivElement, FooterProps>(
-  ({ setMessages }, ref: Ref<HTMLDivElement>) => {
+  ({ setMessages, left, width }, ref: Ref<HTMLDivElement>) => {
   // const [showFileUpload, setShowFileUpload] = useState(false);
   const {userId, username, userRoleId} = useUser();
   const [openPicker, setOpenPicker] = useState(false);
   const [inputValue, setInputValue] = useState('');
-  const full = userRoleId > 0;
+  const full = userRoleId === -2;
 
   const {workspaceEl} = useChatGroup();
   
@@ -339,11 +341,26 @@ const Footer = forwardRef<HTMLDivElement, FooterProps>(
     setInputValue('');
   };
 
+  const parentRef = useRef<HTMLDivElement>(null);
+
   return (
     <>
       {/* {showFileUpload && <FileUpload onUploadComplete={handleUploadComplete} />} */}
 
-        <Stack direction='row' alignItems='center' spacing={0.5} p={0.5} sx={{backgroundColor:"#00B4B6"}}>
+        <Stack
+          direction='row'
+          alignItems='center'
+          spacing={0.5}
+          p={0.5}
+          sx={{
+            backgroundColor: "#00B4B6",
+            position: 'absolute',
+            bottom: full ? 25 : 0,
+            left: left - (full ? 25 : 0),
+            width: width,
+            zIndex: 1300, // đảm bảo nổi trên các phần tử khác
+          }}
+        >
           <ChatInput
             onEnterKey={() => sendMessage(inputValue)}
             ref={ref}

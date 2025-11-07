@@ -13,7 +13,6 @@ def get_tasks(lead_id):
         print("Zero lead")
         abort(404, "Zero lead")
     workspaces = Workspace.query.filter(Workspace.lead_id == lead_id)
-
     result = []
 
     for work in workspaces:
@@ -99,7 +98,14 @@ def get_task_by_user_id(user_id):
 
     if not tasks:
         abort(404, description="Task not found")
-    return jsonify([task.to_dict() for task in tasks])
+
+    result = []
+    for t in tasks:
+        workspace = db.session.get(Workspace, t.workspace_id)
+        if workspace:
+            result.append(t)
+            
+    return jsonify([task.to_dict() for task in result])
 
 @task_bp.route("/<string:id>/status", methods=["PUT"])
 def update_task_status(id):

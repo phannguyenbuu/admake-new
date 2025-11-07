@@ -496,6 +496,8 @@ class Workpoint(BaseModel):
             else:
                 raise  # lỗi khác thì raise tiếp
 
+
+
 class Leave(BaseModel):
     __tablename__ = 'leave'
     id = db.Column(db.Integer, primary_key=True)
@@ -674,6 +676,48 @@ def get_lead_by_arg(request):
         
     lead = db.session.get(LeadPayload, lead_id)
     return lead_id, lead
+
+class WorkpointSetting(db.Model):
+    __tablename__ = 'workpoint_setting'
+    id = db.Column(db.Integer, primary_key=True)
+    morning_in_hour = db.Column(db.Integer, default = 7)  
+    morning_in_minute = db.Column(db.Integer, default = 30)
+    morning_out_hour = db.Column(db.Integer, default = 11)  
+    morning_out_minute = db.Column(db.Integer, default = 30) 
+
+    noon_in_hour = db.Column(db.Integer, default = 13) 
+    noon_in_minute = db.Column(db.Integer, default = 30) 
+    noon_out_hour = db.Column(db.Integer, default = 17) 
+    noon_out_minute = db.Column(db.Integer, default = 30) 
+
+    work_in_saturday_noon = db.Column(db.Boolean, default = False)
+    
+    multiply_in_night_overtime = db.Column(db.Float, default = 1.5) 
+    multiply_in_sun_overtime = db.Column(db.Float, default = 2.0) 
+
+    lead_id = db.Column(db.Integer, db.ForeignKey('lead.id'))
+    lead = db.relationship('LeadPayload', backref='workpoint_setting')
+
+    
+    def __repr__(self):
+        return f'<WorkpointSetting {self.name}>'
+    
+    def to_dict(self):
+        result = {}
+        for column in self.__table__.columns:
+            value = getattr(self, column.name)
+            # print(f"DEBUG: Column {column.name} value type: {type(value)}")
+            if isinstance(value, (datetime.datetime, datetime.date)):
+                value = value.isoformat()
+            result[column.name] = value
+        return result
+
+    @staticmethod
+    def create_item(params):
+        item = WorkpointSetting(**params)
+        db.session.add(item)
+        db.session.commit()
+        return item
 
 
 from paramiko import SSHClient, AutoAddPolicy
