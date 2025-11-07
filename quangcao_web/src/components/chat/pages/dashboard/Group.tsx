@@ -180,7 +180,7 @@ const Group = () => {
              </Box>}
          </Stack>
 
-         <Stack
+         {/* <Stack
              direction="row"
              spacing={30}
              sx={{display: { xs: "flex", sm: "none" }}}
@@ -210,7 +210,7 @@ const Group = () => {
                      <KeyboardArrowLeftIcon fontSize="large" />
                  </Box>}
              </Button>
-         </Stack>
+         </Stack> */}
 
          {/* {openDialog && <CreateGroup open={openDialog} handleClose={handleCloseDialog} />} */}
      </>

@@ -24,13 +24,23 @@ const Conversation: React.FC<ConversationProps> = ({title,status,messages,setMes
   const {userId, userRoleId, isMobile} = useUser();
   const full = userRoleId === -2;
 
+  let w = '85vw';
+
+  if(full)
+  {
+    if(!isMobile)
+      w = '50vw';
+  }else{
+    w = '100vw';
+  }
+
   return (
-    <Stack ref={boxRef} sx={{ width: full && !isMobile ? '50vw' : '85vw', height:'72vh',
+    <Stack ref={boxRef} sx={{ width: w, height:full ? '72vh':'100vh',
         backgroundImage: "url(/backGround.png)"}}>
         <Header title={title} status={status}/>
         
         <Box className='scrollbar'
-          height='72vh'
+          // height={full ? '72vh':'100vh'}
           sx={{position:'relative', ml:0, overflowY:'scroll',}}>
           <Message messages = {messages} menu={true} onDelete={onDelete}/>
         </Box>
