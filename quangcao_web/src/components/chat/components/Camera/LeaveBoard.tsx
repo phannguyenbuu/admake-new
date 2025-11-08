@@ -22,13 +22,7 @@ import type { Leave } from "../../../../@types/leave.type";
 
 
 import "antd/dist/reset.css"; // hoặc `antd/dist/antd.css` tùy version
-const fetchTaskByUser = async (userId: string): Promise<Task[]> => {
-  const response = await fetch(`${useApiHost()}/task/by_user/${userId}`);
-  if (!response.ok) {
-    throw new Error(`Error fetching tasks for user ${userId}`);
-  }
-  return response.json();
-};
+
 
 // const useTaskByUserMutation = () => {
 //   return useMutation<Task[], Error, string>({

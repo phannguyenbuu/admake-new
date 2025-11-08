@@ -50,9 +50,6 @@ export function getTitleByStatus(type: string): string | undefined {
 }
 
 export default function ManagermentBoard() {
-  // const adminMode = useCheckPermission();
-  // const [refreshFormTask, setRefreshFormTask] = useState<boolean>(false);
-
   const context = useContext(UpdateButtonContext);
   if (!context) throw new Error("UpdateButtonContext not found");
   const { showUpdateButton, setShowUpdateButton } = context;
@@ -60,8 +57,7 @@ export default function ManagermentBoard() {
   const {workspaceId} = useUser();
   const { data: workspaceData } = useWorkSpaceQueryById(workspaceId);
 
-  const {tasksData, updateTaskStatus, refetchTasks} = useTaskContext();
-  
+  const {tasksData, updateTaskStatus, refetchTasks, taskDetail, setTaskDetail} = useTaskContext();
   
   const deleteTaskMutation = useDeleteTask();
 
@@ -367,14 +363,13 @@ export default function ManagermentBoard() {
   }, [resetDragState]);
 
   const [showFormTask, setShowFormTask] = useState(false);
-  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
-  const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
-
+  // const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+  
   const handleFormSuccess = useCallback(() => {
     setShowFormTask(false);
-    setSelectedTask(null);
-    setEditingTaskId(null);
-    setSelectedTask(null);
+    // setSelectedTask(null);
+    setTaskDetail(null);
+    // setSelectedTask(null);
     refetchTasks();
   }, [refetchTasks]);
 
@@ -408,17 +403,17 @@ export default function ManagermentBoard() {
                       onDragEnd = {onDragEnd}
                       isDragging = {isDragging}
                       columns = {columns}
-                      setSelectedTask = {setSelectedTask} 
-                      setEditingTaskId = {setEditingTaskId}
+                      // setSelectedTask = {setSelectedTask} 
+                      // setEditingTaskId = {setTaskDetail}
                       setShowFormTask = {setShowFormTask}
       />
 
       <FormTask
         open={showFormTask}
         onCancel={() => { setShowFormTask(false); }}
-        taskId={editingTaskId || undefined}
+        
         // workspaceId={workspaceId}
-        initialValues={selectedTask}
+        initialValues={taskDetail}
         onSuccess={handleFormSuccess}
 
         // @ts-ignore

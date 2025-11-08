@@ -11,6 +11,7 @@ import type { Mode, UserSearchProps } from "../../../../@types/work-space.type";
 import type { Task } from "../../../../@types/work-space.type";
 import JobAsset from "./JobAsset";
 import { useUser } from "../../../../common/hooks/useUser";
+import { useTaskContext } from "../../../../common/hooks/useTask";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -24,26 +25,18 @@ interface TimeType {
 
 interface JobTimeAndProcessProps {
   form: any;
-  taskDetail: Task | null;
-  salaryType?: string;
-  setSalaryType?: (salaryType: string) => void;
+  // salaryType?: string;
+  // setSalaryType?: (salaryType: string) => void;
 }
 
-const JobTimeAndProcess: React.FC<JobTimeAndProcessProps> = ({taskDetail, setSalaryType, salaryType, form}) => {
+const JobTimeAndProcess: React.FC<JobTimeAndProcessProps> = ({form}) => {
+  const {taskDetail, setTaskDetail} = useTaskContext();
   const [startDate, setStartDate] = useState<Dayjs | null>(taskDetail?.start_time ? dayjs(taskDetail.start_time) : null);
   const [endDate, setEndDate] = useState<Dayjs | null>(taskDetail?.end_time ? dayjs(taskDetail.end_time) : null);
   
-  const [endTime, setEndTime] = useState<Dayjs | null>(taskDetail?.end_time ? dayjs(taskDetail.end_time) : null);
-
   const [totalDays, setTotalDays] = useState<number | null>(null);
   const [remainingDays, setRemainingDays] = useState<number | null>(null);
-  const [currentDatePicker, setCurrentDatePicker] = useState<{
-      type: "start_time" | "end_time";
-      value: dayjs.Dayjs | null;
-    }>({ type: "start_time", value: null });
-  const [showDatePickerModal, setShowDatePickerModal] = useState(false);
-  const selectedType = form ? Form.useWatch("type", form) : null; // Lấy giá trị current của field "type"
-
+  
   useEffect(() => {
     setStartDate(taskDetail?.start_time ? dayjs(taskDetail.start_time) : null);
     setEndDate(taskDetail?.end_time ? dayjs(taskDetail.end_time) : null);
@@ -62,13 +55,11 @@ const JobTimeAndProcess: React.FC<JobTimeAndProcessProps> = ({taskDetail, setSal
       setTotalDays(null);
       setRemainingDays(null);
     }
-
-
-
   }, [taskDetail?.start_time, taskDetail?.end_time]);
 
   useEffect(() => {
     if (!form) return;
+    console.log('TTY', taskDetail, form);
 
     if (taskDetail) {
       form.setFieldsValue({
@@ -81,10 +72,8 @@ const JobTimeAndProcess: React.FC<JobTimeAndProcessProps> = ({taskDetail, setSal
         reward: 0
       });
     }
-  }, [form, taskDetail]);
 
-  useEffect(() => {
-    if (startDate && endDate) {
+     if (startDate && endDate) {
       const total = endDate.diff(startDate, "day") + 1;
       setTotalDays(total > 0 ? total : 0);
 
@@ -94,11 +83,10 @@ const JobTimeAndProcess: React.FC<JobTimeAndProcessProps> = ({taskDetail, setSal
       setTotalDays(null);
       setRemainingDays(null);
     }
-  }, [startDate, endDate]);
+  }, [form, taskDetail, startDate, endDate]);
 
   const handleTypeChange = (value: string) => {
-    if(setSalaryType)
-      setSalaryType(value);
+    setTaskDetail(prev => prev ? {...prev, type: value} : prev);
   };
 
   const {isMobile} = useUser();
@@ -208,6 +196,7 @@ const JobTimeAndProcess: React.FC<JobTimeAndProcessProps> = ({taskDetail, setSal
                   // className="!h-9 sm:!h-10 !rounded-lg focus:!border-cyan-500 focus:!shadow-lg hover:!border-cyan-500 !transition-all !duration-200 !text-xs sm:!text-sm !shadow-sm"
                   size="middle"
                   style={{width:150}}
+                  value={taskDetail?.type}
                   onChange={handleTypeChange}
                 >
                   <Select.Option value="REWARD">💼 Công khoán</Select.Option>
@@ -230,16 +219,12 @@ const JobTimeAndProcess: React.FC<JobTimeAndProcessProps> = ({taskDetail, setSal
                 className="!mb-0"
                 style={{ minWidth: 300 }}
               >
-                
-
-                  <div className="flex items-center gap-1.5 sm:gap-2">
-                    <div className="w-1 h-1 bg-orange-500 rounded-full"></div>
-                    <span className="text-gray-800 font-medium text-xs sm:text-sm">
-                      {salaryType === "REWARD" ? 'Tiền công' : 'Phụ cấp'}
-                    </span>
-                    {/* <span className="text-red-500">*</span> */}
-                  </div>
-                
+                <div className="flex items-center gap-1.5 sm:gap-2">
+                  <div className="w-1 h-1 bg-orange-500 rounded-full"></div>
+                  <span className="text-gray-800 font-medium text-xs sm:text-sm">
+                    {taskDetail && taskDetail?.type === "REWARD" ? 'Tiền công' : 'Phụ cấp'}
+                  </span>
+                </div>
 
                 <InputNumber
                   style={{maxWidth:150}}
@@ -249,6 +234,7 @@ const JobTimeAndProcess: React.FC<JobTimeAndProcessProps> = ({taskDetail, setSal
                   className="!w-full !rounded-lg !border !transition-all !duration-200 !text-xs sm:!text-sm !shadow-sm"
                   min={0}
                   step={1000}
+                  value={taskDetail?.reward}
                   formatter={(value) =>
                     `${value ?? 0}`.replace(/\B(?=(\d{3})+(?!\d))/g, ".")
                   }
@@ -256,6 +242,12 @@ const JobTimeAndProcess: React.FC<JobTimeAndProcessProps> = ({taskDetail, setSal
                     if (!value) return 0;
                     const numValue = value.replace(/\./g, "");
                     return Number(numValue) || 0;
+                  }}
+                  onBlur={(e) => {
+                    const valueStr = e.target.value;
+                    const numValue = valueStr.replace(/\./g, "");
+                    const parsedValue = Number(numValue) || 0;
+                    setTaskDetail(prev => prev ? { ...prev, reward: parsedValue } : prev);
                   }}
                 />
               </Form.Item>

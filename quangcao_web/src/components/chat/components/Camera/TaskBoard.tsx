@@ -12,16 +12,22 @@ import CommentIcon from '@mui/icons-material/Comment';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { getTitleByStatus } from "../../../dashboard/work-tables/Managerment";
 import { notification } from "antd";
+import { useTaskContext } from "../../../../common/hooks/useTask";
+import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
+import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import JobDescription from "../../../dashboard/work-tables/task/JobDescription";
 import { Form, Input } from "antd";
 const { TextArea } = Input;
 
 const fetchTaskByUser = async (userId: string): Promise<Task[]> => {
-  const response = await fetch(`${useApiHost()}/task/by_user/${userId}`);
+  const response = await fetch(`${useApiHost()}/task/${userId}/by_user`);
   if (!response.ok) {
     throw new Error(`Error fetching tasks for user ${userId}`);
   }
-  return response.json();
+
+  const json = await response.json();
+  console.log('taskk', json.data);
+  return json.data;
 };
 
 const useTaskByUserMutation = () => {
@@ -41,6 +47,7 @@ interface TaskBoardProps {
 const TaskBoard = ({ userId, open, onCancel }: TaskBoardProps) => {
     const { mutate, data, isPending, isError, error } = useTaskByUserMutation();
     const {isMobile} = useUser();
+    const {taskDetail,setTaskDetail} = useTaskContext();
 
     useEffect(() => {
         if (userId) {
@@ -57,6 +64,20 @@ const TaskBoard = ({ userId, open, onCancel }: TaskBoardProps) => {
         console.log('Working tasks', data);
     },[data]);
 
+    const [currentPage, setCurrentPage] = React.useState(1);
+    const pageSize = 1; // mỗi trang 1 item
+
+    const paginatedData = data && data.length > 0
+      ? data.slice((currentPage - 1) * pageSize, currentPage * pageSize)
+      : [];
+
+    const totalPages = data ? Math.ceil(data.length / pageSize) : 1;
+
+    useEffect(()=>{
+      if(!data) return;
+      setTaskDetail(data[currentPage - 1])
+    },[currentPage]);
+
     const btnStyle = {color:"#fff", padding:5, 
         backgroundColor:'#00B5B4',
         whiteSpace:'nowrap', borderRadius:10};
@@ -64,34 +85,62 @@ const TaskBoard = ({ userId, open, onCancel }: TaskBoardProps) => {
     return (
     <Modal open={open} onCancel={onCancel} footer={null} width={900}>
         
+    <div style={{ marginTop: 20, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 16 }}>
+      <button
+        onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+        disabled={currentPage === 1}
+      >
+        <ArrowBackIosNewIcon fontSize="small" />
+      </button>
+      <span>Trang {currentPage} / {totalPages}</span>
+      <button
+        onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+        disabled={currentPage === totalPages}
+      >
+        <ArrowForwardIosIcon fontSize="small" />
+      </button>
+    </div>
+
       <Stack spacing = {5} py={2} alignItems="flex-start" justifyContent="flex-start"
         style={{boxSizing:'border-box'}}>
         
-        {data && data.length > 0 ?  data.map((el) => 
-        <Stack spacing={1} style={{background:'#ddd', padding: 10, borderRadius: 20,
-          width: isMobile ? 320:'',
-         }}>
-            <Stack direction="row" spacing={1} >
-              <Box style={btnStyle}><ArrowForwardIcon/>{getTitleByStatus(el.status)}</Box>
-              <Typography style={{marginTop:8, fontStyle:'italic', 
-                color:'#00B5B4', fontSize:10, fontWeight:500}}>
-                {el?.workspace ?? ''}
-              </Typography>
-            </Stack>
-            <TextArea readOnly 
-                value={el?.description}
-                        rows={3}
-                        showCount
-                        maxLength={1000}
-                        placeholder="Mô tả chi tiết về công việc cần thực hiện..."
-                        className="!rounded-lg !border !border-gray-300 focus:!border-cyan-500 focus:!shadow-lg hover:!border-cyan-500 !transition-all !duration-200 !shadow-sm !resize-none !text-xs sm:!text-sm h-40"
-                      />
+        {paginatedData.length > 0 ? paginatedData.map(el =>
+      <Stack key={el.id} spacing={1} style={{
+        background: '#ddd',
+        padding: 10,
+        borderRadius: 20,
+        width: isMobile ? 320 : ''
+      }}>
+        <Stack direction="row" spacing={1}>
+          <Box style={btnStyle}>
+            <ArrowForwardIcon />
+            {getTitleByStatus(el.status)}
+          </Box>
+          <Typography style={{
+            marginTop: 8,
+            fontStyle: 'italic',
+            color: '#00B5B4',
+            fontSize: 10,
+            fontWeight: 500
+          }}>
+            {el?.workspace ?? ''}
+          </Typography>
+        </Stack>
+        <TextArea
+          readOnly
+          value={el?.description}
+          rows={3}
+          showCount
+          maxLength={1000}
+          placeholder="Mô tả chi tiết về công việc cần thực hiện..."
+          className="!rounded-lg !border !border-gray-300 focus:!border-cyan-500 focus:!shadow-lg hover:!border-cyan-500 !transition-all !duration-200 !shadow-sm !resize-none !text-xs sm:!text-sm h-40"
+        />
+        <JobTimeAndProcess key={el.id} form={null} />
+      </Stack>
+    ) : (
+      <Typography style={{ fontStyle: 'italic', textAlign: 'center' }}>Chưa có nhiệm vụ</Typography>
+    )}
 
-            <JobTimeAndProcess key={el.id} form={null} taskDetail={el ?? null}/>
-        </Stack>)
-        : 
-        <Typography style={{fontStyle:'italic', textAlign:'center'}}>Chưa có nhiệm vụ</Typography>
-        }
       </Stack>
     </Modal>
     )

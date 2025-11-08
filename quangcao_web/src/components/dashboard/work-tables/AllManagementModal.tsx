@@ -9,17 +9,17 @@ import { useUser } from "../../../common/hooks/useUser";
 import type { ColumnType, Task, TasksResponse } from "../../../@types/work-space.type";
 import "./css/css.css";
 import "./work-space/workspace.css";
-
-const fixedColumns = [
-  { id: "col-0", title: "Phân việc", type: "OPEN" },
-  { id: "col-1", title: "Sản xuất", type: "IN_PROGRESS" },
-  { id: "col-2", title: "Hoàn thiện", type: "DONE" },
-  { id: "col-3", title: "Khoán thưởng", type: "REWARD" },
-];
+import { fixedColumns } from "./Managerment";
+// const fixedColumns = [
+//   { id: "col-0", title: "Phân việc", type: "OPEN" },
+//   { id: "col-1", title: "Sản xuất", type: "IN_PROGRESS" },
+//   { id: "col-2", title: "Hoàn thiện", type: "DONE" },
+//   { id: "col-3", title: "Khoán thưởng", type: "REWARD" },
+// ];
 
 const items = [
   { key: "status", label: "Tiến trình" },
-  { key: "role", label: "Phòng ban" },
+  // { key: "role", label: "Phòng ban" },
 ];
 
 export default function AllManagementModal() {
@@ -34,20 +34,20 @@ export default function AllManagementModal() {
   const [isHover, setIsHover] = useState(false);
 
   useEffect(() => {
-  async function fetchTasks() {
-    const apiUrl = `${useApiHost()}/task/inlead/${userLeadId}`;
-    try {
-      const response = await fetch(apiUrl, {method: "GET"});
-      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-      const data = await response.json();
-      console.log(data);
-      setTasksData(data);
-    } catch (error) {
-      console.error("Failed to fetch tasks data:", error);
+    async function fetchTasks() {
+      const apiUrl = `${useApiHost()}/task/inlead/${userLeadId}`;
+      try {
+        const response = await fetch(apiUrl, {method: "GET"});
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        const data = await response.json();
+        // console.log(data);
+        setTasksData(data);
+      } catch (error) {
+        console.error("Failed to fetch tasks data:", error);
+      }
     }
-  }
-  fetchTasks();
-}, []);
+    fetchTasks();
+  }, []);
 
 
   useEffect(() => {
@@ -246,15 +246,6 @@ export const CardStaticItem: React.FC<CardStaticItemProps> = ({
           </div>
         )}
       </div>
-
-      {/* <div className="flex items-center justify-between mt-2 pt-2 border-t border-gray-100/50">
-        <div className="flex gap-1">
-          <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: theme.color }}></div>
-          <div className="w-1.5 h-1.5 bg-gray-200 rounded-full"></div>
-          <div className="w-1.5 h-1.5 bg-gray-200 rounded-full"></div>
-        </div>
-        <div className="text-xs text-gray-400 font-mono flex-shrink-0">#{task.id?.slice(-4)}</div>
-      </div> */}
     </div>
   </div>
 );

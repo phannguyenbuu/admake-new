@@ -1104,7 +1104,13 @@ if __name__ == "__main__":
         
         # print(remove_workpoint_checklist('20251104103416609650622d78','2025-11-07'))
         
-        restore_checklist_data()
+        # restore_checklist_data()
+        task = Task.query.filter(Task.title== "Không xóa được công việc đã tạo").first()
+
+        if task:
+            task.title = "Xây dựng chiến lược sản xuất"
+        
+        db.session.commit()
 
         
         

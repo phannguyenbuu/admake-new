@@ -25,6 +25,7 @@ import {
 } from "../../../../common/hooks/work-space.hook";
 // import { useCheckPermission } from "../../../../common/hooks/checkPermission.hook";
 import type { DraggableProvided, DraggableStateSnapshot } from "@hello-pangea/dnd";
+import { useTaskContext } from "../../../../common/hooks/useTask";
 
 interface DragableTaskCardProps {
   task: any;
@@ -32,8 +33,8 @@ interface DragableTaskCardProps {
   idx: any;
   theme: any;
   isDragging: boolean;
-  setSelectedTask: React.Dispatch<React.SetStateAction<Task | null>>;
-  setEditingTaskId: React.Dispatch<React.SetStateAction<string | null>>;
+  // setSelectedTask: React.Dispatch<React.SetStateAction<Task | null>>;
+  // setEditingTaskId: React.Dispatch<React.SetStateAction<string | null>>;
   setShowFormTask: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
@@ -44,8 +45,8 @@ const DragableTaskCard: React.FC<DragableTaskCardProps> = ({
   idx,
   theme,
   isDragging,
-  setSelectedTask,
-  setEditingTaskId,
+  // setSelectedTask,
+  // setEditingTaskId,
   setShowFormTask,
 }) => {
     const isRewardColumn = col.type === "REWARD";
@@ -64,8 +65,8 @@ const DragableTaskCard: React.FC<DragableTaskCardProps> = ({
             isRewardColumn={isRewardColumn}
             task={task}
             isDragging={isDragging}
-            setSelectedTask={setSelectedTask}
-            setEditingTaskId={setEditingTaskId}
+            // setSelectedTask={setSelectedTask}
+            // setEditingTaskId={setEditingTaskId}
             setShowFormTask={setShowFormTask}
         />}
     </Draggable>
@@ -81,8 +82,8 @@ interface CardItemProps {
   task: Task;
   theme: any;
   isDragging?: boolean;
-  setSelectedTask?: React.Dispatch<React.SetStateAction<any | null>>;
-  setEditingTaskId?: React.Dispatch<React.SetStateAction<string | null>>;
+  // setSelectedTask?: React.Dispatch<React.SetStateAction<any | null>>;
+  // setEditingTaskId?: React.Dispatch<React.SetStateAction<string | null>>;
   setShowFormTask?: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
@@ -93,10 +94,12 @@ export const CardItem: React.FC<CardItemProps> = ({
   task,
   theme,
   isDragging,
-  setSelectedTask,
-  setEditingTaskId,
+  // setSelectedTask,
+  // setEditingTaskId,
   setShowFormTask,
 }) => {
+
+  const {setTaskDetail} = useTaskContext();
 
     return (
     <div
@@ -127,8 +130,7 @@ export const CardItem: React.FC<CardItemProps> = ({
       }}
       onClick={() => {
         if (!snapshot?.isDragging && !isDragging) {
-          if(setSelectedTask) setSelectedTask(task);
-          if(setEditingTaskId) setEditingTaskId(task.id);
+          if(setTaskDetail) setTaskDetail(task);
           if(setShowFormTask) setShowFormTask(true);
         }
       }}

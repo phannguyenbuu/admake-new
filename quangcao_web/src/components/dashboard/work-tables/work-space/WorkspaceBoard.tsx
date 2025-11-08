@@ -13,6 +13,7 @@ import {
 import columnThemes from "../theme.json";
 import type { Task } from "../../../../@types/work-space.type";
 import { UpdateButtonContext } from "../../../../common/hooks/useUpdateButtonTask";
+import { useTaskContext } from "../../../../common/hooks/useTask";
 
 interface WorkspaceBoardProps {
   columns: ColumnType[];
@@ -21,20 +22,17 @@ interface WorkspaceBoardProps {
   onDragEnd: (result: any) => void;
 //   adminMode?: boolean;
   isDragging?: boolean;
-  setSelectedTask: (task: Task | null) => void;
-  setEditingTaskId: (id: string | null) => void;
+//   setSelectedTask: (task: Task | null) => void;
+//   setEditingTaskId: (id: string | null) => void;
   setShowFormTask: (show: boolean) => void;
 }
 
 const WorkspaceBoard: React.FC<WorkspaceBoardProps> = 
     ({ onDragStart, onDragUpdate, 
         onDragEnd, isDragging,columns,
-        setSelectedTask, setEditingTaskId, setShowFormTask, }) => {
+        setShowFormTask }) => {
 
-   
-            
-    
-
+    const {taskDetail, setTaskDetail} = useTaskContext();
 
     return (
     <div className="relative z-10 px-4 sm:px-6 pt-3">
@@ -122,9 +120,9 @@ const WorkspaceBoard: React.FC<WorkspaceBoardProps> =
                                                     // @ts-ignore
                                                     isDragging = {isDragging}
                                                     // @ts-ignore
-                                                    setSelectedTask= {setSelectedTask}
+                                                    // setSelectedTask= {setSelectedTask}
                                                     // @ts-ignore
-                                                    setEditingTaskId={setEditingTaskId}
+                                                    // setEditingTaskId={setEditingTaskId}
                                                     // @ts-ignore
                                                     setShowFormTask={setShowFormTask}
                                 />
@@ -138,8 +136,8 @@ const WorkspaceBoard: React.FC<WorkspaceBoardProps> =
                                     icon={<PlusOutlined />}
                                     className="group/btn relative h-8 sm:h-10 !border-2 !border-dashed !border-white/40 hover:!border-white/70 !bg-transparent hover:!bg-white/20 !text-white hover:!text-white !font-semibold !rounded-xl !mt-3 transition-all duration-200 transform hover:scale-[1.01] backdrop-blur-sm"
                                     onClick={() => {
-                                    setSelectedTask(null);
-                                    setEditingTaskId(null);
+                                    setTaskDetail(null);
+                                    
                                     setShowFormTask(true);
                                         const context = useContext(UpdateButtonContext);
                                         if (!context) 

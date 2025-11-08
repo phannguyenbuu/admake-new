@@ -65,9 +65,12 @@ const WorkTableDetailPage = lazy(() => import("./app/dashboard/work-tables/page"
 
 const routes: TRoute = {
   path: "/",
-  element: <WorkpointInforProvider>
+  element: 
+  <WorkpointInforProvider>
             <WorkpointSettingProvider>
+              <TaskProvider>
               <BaseLayout />
+              </TaskProvider>
             </WorkpointSettingProvider>
           </WorkpointInforProvider>
           ,
@@ -105,9 +108,9 @@ const routes: TRoute = {
       element: (
         <Suspense fallback={<div>Loading...</div>}>
            
-              <TaskProvider>
+              
                 <DashboardPage/>
-              </TaskProvider>
+              
            
         </Suspense>
       ),

@@ -1,4 +1,4 @@
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Modal, Typography, Button } from "antd";
 import { UpdateButtonContext } from "../../../../common/hooks/useUpdateButtonTask";
 import type { Task } from "../../../../@types/work-space.type";
@@ -17,20 +17,15 @@ export default function TaskHeader({ onSuccess, onUpdate }: TaskHeaderProps) {
 
   const context = useContext(UpdateButtonContext);
   if (!context) throw new Error("UpdateButtonContext not found");
-  const { showUpdateButton, setShowUpdateButton } = context;
+  const [ isReward, setIsReward ] = useState<boolean>(false);
   
-  console.log('Task:', taskDetail);
+  
 
   useEffect(()=>{
-    console.log('showUpdateButton',showUpdateButton);
-  },[showUpdateButton]);
-
-
-  useEffect(()=>{
-    if (!taskDetail) setShowUpdateButton(0);
-    // console.log('TTT', taskDetail);
-    setShowUpdateButton(taskDetail?.status === "DONE" ? 1 : (taskDetail?.status === "REWARD" ? 2: 0));
+    setIsReward(taskDetail?.status === "REWARD");
   },[taskDetail]);
+
+
 
   const handleReward = async () => {
     // console.log("A_Task", taskDetail,updateTaskStatus);
@@ -48,9 +43,6 @@ export default function TaskHeader({ onSuccess, onUpdate }: TaskHeaderProps) {
       onSuccess();
   };
 
-  
-
-
   return (
     <Stack direction="row" spacing={5}>
       <div className="flex items-center gap-2 px-4 py-3">
@@ -63,16 +55,14 @@ export default function TaskHeader({ onSuccess, onUpdate }: TaskHeaderProps) {
       </div>
 
       <Stack direction="row" spacing={1}>
-        {showUpdateButton === 0 && 
+        {!isReward && (taskDetail?.status !== "DONE" ? 
           <Button type="primary" onClick={onUpdate}>
             ✅ Cập nhật
           </Button>
-        }
-
-        {showUpdateButton === 1 && 
+          :
           <Button type="primary" onClick={handleReward}>
             🏆 Nghiệm Thu
-          </Button>
+          </Button>)
         }
         
       </Stack>

@@ -7,6 +7,14 @@ from sqlalchemy import cast, Text
 
 task_bp = Blueprint('task', __name__, url_prefix='/api/task')
 
+
+@task_bp.route("/all", methods=["GET"])
+def get_all_tasks():
+    
+    tasks = [t.to_dict() for t in Task.query.all()]
+    return jsonify(tasks)
+
+
 @task_bp.route("/inlead/<string:lead_id>", methods=["GET"])
 def get_tasks(lead_id):
     if lead_id == 0:
@@ -90,22 +98,41 @@ def update_task(id):
     print('F', task.to_dict())
     return jsonify(task.to_dict())
 
-@task_bp.route("/by_user/<string:user_id>", methods=["GET"])
+@task_bp.route("/<string:user_id>/by_user", methods=["GET"])
 def get_task_by_user_id(user_id):
+    user = db.session.get(User, user_id)
+
+    if not user:
+        abort(404, "No user")
+
     tasks = Task.query.filter(
         cast(Task.assign_ids, Text).like(f'%"{user_id}"%')
     ).order_by(Task.start_time).all()
 
     if not tasks:
-        abort(404, description="Task not found")
+        return jsonify({'message':'Empty list'}),202
 
-    result = []
+    result = {"data":[], "reward":[]}
     for t in tasks:
         workspace = db.session.get(Workspace, t.workspace_id)
         if workspace:
-            result.append(t)
+            result["data"].append(t.to_dict())
+
+            if t.status == "REWARD":
+                total_agent_salary = 0
+
+                for _user_id in t.assign_ids:
+                    member_user = db.session.get(User, _user_id)
+                    if member_user:
+                        total_agent_salary += member_user.salary
+
+                result["reward"].append({"title": t.title,
+                                         "workspace": workspace.name,
+                                         "start_time":t.start_time,
+                                         "end_time":t.end_time,
+                                         "reward": t.reward * user.salary / total_agent_salary})
             
-    return jsonify([task.to_dict() for task in result])
+    return jsonify(result), 200
 
 @task_bp.route("/<string:id>/status", methods=["PUT"])
 def update_task_status(id):

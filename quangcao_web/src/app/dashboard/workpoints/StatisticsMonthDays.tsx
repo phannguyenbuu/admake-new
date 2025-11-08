@@ -6,6 +6,9 @@ import type { PeriodData, WorkDaysProps } from '../../../@types/workpoint';
 import { Table, TableBody, TableCell, TableContainer, TableRow, TableHead, Paper } from '@mui/material';
 import { useWorkpointSetting } from '../../../common/hooks/useWorkpointSetting';
 import { useUser } from '../../../common/hooks/useUser';
+import { useApiHost } from '../../../common/hooks/useApiHost';
+import type { Task } from '../../../@types/work-space.type';
+import dayjs from 'dayjs';
 
 // const IS_SATURDAY_NOON_OFF = true;
 
@@ -75,6 +78,14 @@ const formatMoney: (n: number) => string = (n) => {
   return n.toLocaleString('en-US', { maximumFractionDigits: 0 });
 }
 
+interface RewardProps {
+  title: string,
+  workspace: string,
+  start_time: string,
+  end_time: string,
+  reward: number
+}
+
 const StatisticsMonthDays: React.FC<StatisticsMonthDaysProps> = ({ selectedRecord, modalVisible, handleOk }) => {
   const [timeWork, setTimeWork] = useState<number>(0);
   const [overTimeWork, setOverTimeWork] = useState<number>(0);
@@ -84,13 +95,46 @@ const StatisticsMonthDays: React.FC<StatisticsMonthDaysProps> = ({ selectedRecor
   const {workpointSetting} = useWorkpointSetting();
   const OVERTIME_RATIO = workpointSetting?.multiply_in_night_overtime || 0;
   const {isMobile} = useUser();
-
-
-
   const current_day = new Date();
-  
+  const current_month = current_day.getMonth();
+  const [rewardList, setRewardList] = useState<RewardProps[]>([]);
 
-  // console.log('total_hours', total_hours);
+  const fetchTaskByUser = async (): Promise<Task[]> => {
+    const response = await fetch(`${useApiHost()}/task/${selectedRecord?.user_id}/by_user`);
+    
+    if (!response.ok) {
+      console.log("Error in fetching");
+      throw new Error(`Error fetching tasks for user ${selectedRecord?.user_id}`);
+    }
+    
+    // Chỉ gọi response.json() một lần
+    const json = await response.json();
+
+    // Đảm bảo đúng cấu trúc: json.data và json.reward
+    const data: Task[] = json.data ?? [];
+    const reward_list: RewardProps[] = json.reward ?? [];
+
+    const filtered = data.filter((item: Task) => {
+      if (!item.end_time) return false;
+      if (item.status !== "REWARD") return false;
+
+      const endDate = dayjs(item.end_time).toDate();
+      const now = new Date();
+
+      return endDate.getMonth() === now.getMonth() &&
+            endDate.getFullYear() === now.getFullYear();
+    });
+
+    // console.log('response json', json);
+    setRewardList(reward_list);
+
+    const totalReward = reward_list.reduce((acc, el) => acc + (el.reward || 0), 0);
+    setBonusSalary(totalReward);
+
+    // console.log('res', totalReward);
+
+    return filtered;
+  };
 
   useEffect(()=>{  
     console.log('selectedRecord', selectedRecord);
@@ -104,20 +148,18 @@ const StatisticsMonthDays: React.FC<StatisticsMonthDaysProps> = ({ selectedRecor
     let over_t = 0;
 
     selectedRecord.items && selectedRecord.items.forEach(item => {
-        const checklist = item.checklist;
-        if(!checklist) return;
+      const checklist = item.checklist;
+      if(!checklist) return;
 
-        if(checklist.morning)
-          t += checkWorkhour(checklist.morning, 12);
-        
-        if(checklist.noon)
-          t += checkWorkhour(checklist.noon, 17);
-        
-        if(checklist.evening)
-          over_t += checkWorkhour(checklist.evening, 22);
-      });
-
+      if(checklist.morning)
+        t += checkWorkhour(checklist.morning, 12);
       
+      if(checklist.noon)
+        t += checkWorkhour(checklist.noon, 17);
+      
+      if(checklist.evening)
+        over_t += checkWorkhour(checklist.evening, 22);
+    });
 
       setTimeWork(t);
       setOverTimeWork(over_t);
@@ -126,7 +168,13 @@ const StatisticsMonthDays: React.FC<StatisticsMonthDaysProps> = ({ selectedRecor
 
       setTotalSalary((t  + over_t * OVERTIME_RATIO) * salary_unit);
 
+      fetchTaskByUser();
+
+      
+
     },[selectedRecord, modalVisible]);
+
+    const highlightRow = {fontStyle:"italic", color:'red'};
 
     return (
       <Modal
@@ -137,7 +185,7 @@ const StatisticsMonthDays: React.FC<StatisticsMonthDaysProps> = ({ selectedRecor
           title=""
           okText="OK"
           cancelButtonProps={{ style: { display: 'none' } }}
-          style={{ padding: 20, minWidth: '80vw' }}
+          style={{ padding: 20, minWidth: '90vw' }}
         >
 
         <CenterBox>
@@ -184,6 +232,16 @@ const StatisticsMonthDays: React.FC<StatisticsMonthDaysProps> = ({ selectedRecor
                   <TableCell>-</TableCell>
                   <TableCell>{formatMoney(bonusSalary)} ₫</TableCell>
                 </TableRow>
+                {
+                  rewardList.map((el) =>
+                    <TableRow>
+                      <TableCell style={highlightRow}>+ {el.workspace}</TableCell>
+                      <TableCell style={highlightRow}>({el.title})</TableCell>
+                      <TableCell style={highlightRow}>-</TableCell>
+                      <TableCell style={highlightRow}>-</TableCell>
+                      <TableCell style={highlightRow}>{formatMoney(el.reward)} ₫</TableCell>
+                    </TableRow>)
+                }
                 <TableRow>
                   <TableCell style={{fontWeight:700}}>Tổng lương</TableCell>
                   <TableCell>-</TableCell>

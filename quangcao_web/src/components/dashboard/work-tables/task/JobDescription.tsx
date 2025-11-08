@@ -5,6 +5,8 @@ import type { FormTaskDetailProps } from "../../../../@types/work-space.type";
 import {Stack, Box} from "@mui/material";
 import JobAsset from "./JobAsset";
 import type { Task } from "../../../../@types/work-space.type";
+import { useTaskContext } from "../../../../common/hooks/useTask";
+
 const { Text } = Typography;
 const { TextArea } = Input;
 
@@ -13,13 +15,13 @@ const { TextArea } = Input;
 // }
 
 interface JobDescriptionProps {
-  taskDetail: Task | null;
+  // taskDetail: Task | null;
   form: any;
-  salaryType: string;
+  // salaryType: string;
 }
 
-const JobDescription: React.FC<JobDescriptionProps> = ({ salaryType, taskDetail, form }) => {
-  // const [desc, setDesc] = useState(taskDetail?.description || "");
+const JobDescription: React.FC<JobDescriptionProps> = ({ form }) => {
+  const {taskDetail} = useTaskContext();
 
   useEffect(() => {
   if (taskDetail) {
@@ -59,7 +61,7 @@ const JobDescription: React.FC<JobDescriptionProps> = ({ salaryType, taskDetail,
             className="!rounded-lg !border !border-gray-300 focus:!border-cyan-500 focus:!shadow-lg hover:!border-cyan-500 !transition-all !duration-200 !shadow-sm !resize-none !text-xs sm:!text-sm h-40"
           />
         </Form.Item>
-      {salaryType === "REWARD" &&
+      {taskDetail?.type === "REWARD" &&
         <JobAsset key="cash-assets" title = 'Ứng tiền' taskDetail={taskDetail} role="cash"/>}
     </Stack>
   );
