@@ -17,6 +17,7 @@ import { CenterBox } from "../commons/TitlePanel";
 import { LogoAdmake } from "../Conversation/Header";
 import type { Workpoint } from "../../../../@types/workpoint";
 import { useUser } from "../../../../common/hooks/useUser";
+import { Modal } from "antd";
 
 const NowToString = () => {
   const now = new Date();
@@ -82,41 +83,28 @@ function WorkpointGrid({ workpoint, fetchWorkpoint }: Props) {
   const [isRemoveChecklist, setIsRemoveChecklist] = useState<boolean>(false);
   const {userId,userLeadId} = useUser();
 
+  const [showConfirm, setShowConfirm] = useState<boolean>(false);
+
   const handleRemoveChecklist = () => {
-    // console.log('Lead',userLeadId,workpoint?.user_id);
+    setShowConfirm(true);
+  };
 
-    async function removeWorkpointChecklist() {
-
-      const url = `${useApiHost()}/workpoint/remove/${workpoint?.user_id}/?day=${currentDay()}`;
-      
-      try {
-        // console.log('URL', url);
-        const response = await fetch(url, {
-          method: 'PUT',
-          // headers: {
-          //   'Content-Type': 'application/json',
-          // },
-        });
-
-        // console.log('RSP', response);
-        
-        if (!response.ok) {
-          throw new Error(`Network error: ${response.status}`);
-        }
-        
-        const result = await response.json(); // hoặc response.text() tùy server trả về
-        // console.log("Ok1");
-        fetchWorkpoint();
-        return result;
-      } catch (error) {
-        console.error('Fetch error:', error);
-        throw error;
-      }
-    }
-
-    removeWorkpointChecklist();
+  const confirmRemoveChecklist = async () => {
+    setShowConfirm(false);
     setIsRemoveChecklist(true);
-  }
+
+    try {
+      const url = `${useApiHost()}/workpoint/remove/${workpoint?.user_id}/?day=${currentDay()}`;
+      const response = await fetch(url, { method: 'PUT' });
+      if (!response.ok) throw new Error(`Network error: ${response.status}`);
+      const result = await response.json();
+      fetchWorkpoint();
+      return result;
+    } catch (error) {
+      console.error('Fetch error:', error);
+      throw error;
+    }
+  };
 
   return (
      <>
@@ -124,7 +112,7 @@ function WorkpointGrid({ workpoint, fetchWorkpoint }: Props) {
                    <Button 
                      sx={{
                          // backgroundColor:"#ccc",
-                         border:'1px solid #666', color:'#666',
+                         border:'1px solid #666', color:'#000',
                          mt: 0.5, height: 20,maxWidth:300, mb:1 }} onClick={handleRemoveChecklist}>
                      Xóa điểm danh gần nhất
                    </Button>}
@@ -168,7 +156,9 @@ function WorkpointGrid({ workpoint, fetchWorkpoint }: Props) {
                   : '---'}
                 </TableCell>
                 <TableCell sx={tabStyle}>
-                  {periodData?.workhour !== undefined ? periodData.workhour.toFixed(2) : '---'}
+                  {periodData?.out?.time && periodData?.workhour !== undefined ? 
+                    periodData.workhour.toFixed(2) 
+                    : '---'}
                 </TableCell>
               </TableRow>
             );
@@ -176,7 +166,19 @@ function WorkpointGrid({ workpoint, fetchWorkpoint }: Props) {
         </TableBody>
       </Table>
     </TableContainer>
-      </>
+
+    <Modal
+      title="Bạn có chắc muốn xóa điểm danh ?"
+      open={showConfirm}
+      onOk = {confirmRemoveChecklist}
+      onCancel={() => setShowConfirm(false)}
+      >
+        
+        {/* <button onClick={confirmRemoveChecklist}>Có</button>
+        <button onClick={() => setShowConfirm(false)}>Không</button> */}
+      </Modal>
+    
+    </>
 
   );
 }

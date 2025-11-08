@@ -122,12 +122,12 @@ const NoteWorkpointModal: React.FC<NoteWorkpointModalProps> = ({
             </Stack>
 
             <Stack direction="row" spacing={1}>
-                <Box sx={{width:20,height:20,borderRadius:10,background:'red'}}/>
+                <Box sx={{width:20,height:20,borderRadius:10,background:'green'}}/>
                 <Typography>Đã check-in</Typography>
             </Stack>
 
             <Stack direction="row" spacing={1}>
-                <Box sx={{width:20,height:20,borderRadius:10,background:'green'}}/>
+                <Box sx={{width:20,height:20,borderRadius:10,background:'red'}}/>
                 <Typography>Đã check-out</Typography>
             </Stack>
 

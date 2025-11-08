@@ -393,7 +393,6 @@ class Message(BaseModel):
     
     workspace_id = db.Column(db.String(50))
     message_id = db.Column(db.String(80), primary_key=True)
-    # group_id = db.Column(db.Integer, nullable=True)
     user_id = db.Column(db.String(80), db.ForeignKey('user.id'), nullable=True)
     username =  db.Column(db.String(255))
     

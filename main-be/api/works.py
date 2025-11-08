@@ -89,8 +89,8 @@ def get_workspace_task(id):
     
     return jsonify(tasks_response)
 
-@workspace_bp.route("/<int:group_id>/reward", methods=["PUT"])
-def post_workspace_reward_task(group_id):
+@workspace_bp.route("/<string:workspace_id>/reward", methods=["PUT"])
+def post_workspace_reward_task(workspace_id):
     data = request.get_json()
     message_id = data.get('message_id')
     rate = data.get('rate')
@@ -112,7 +112,7 @@ def post_workspace_reward_task(group_id):
         msg.react["rate"] = rate
         flag_modified(msg, "react")
     # db.session.commit()
-    work = Workspace.query.filter(Workspace.id == group_id).first()
+    work = Workspace.query.filter(Workspace.id == workspace_id).first()
     
     tasks = Task.query.filter_by(workspace_id=work.id).all()
     print('tasks',work, len(tasks))

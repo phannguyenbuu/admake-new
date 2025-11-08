@@ -153,4 +153,19 @@ def handle_message_rate(data):
     }, room=request.sid)
 
 
+@socketio.on('admake/chat/delete')
+def handle_message_delete(data):
+    message_id = data.get('message_id')
+    workspace_id = data.get('workspace_id')
+
+    # Xóa message trong database
+    msg = Message.query.filter(Message.message_id == message_id).first()
+    if msg:
+        db.session.delete(msg)
+        db.session.commit()
+
+        # Phát sự kiện đã xóa đến tất cả client trong phòng workspace_id, trừ sender
+        emit('admake/chat/delete', {'message_id': message_id}, room=str(workspace_id), skip_sid=request.sid)
+    else:
+        print("Message not found to delete", message_id)
 

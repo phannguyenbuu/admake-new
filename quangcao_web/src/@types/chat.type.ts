@@ -33,7 +33,7 @@ interface ReactProps {
 
 export interface MessageTypeProps {
   id: number;
-  group_id?: string;
+  // group_id?: string;
   workspace_id?: string;
 
   file_url:string;

@@ -395,6 +395,7 @@ async function postWorkpointCheck(imgUrl: string, lat:string, long:string) {
         notification.success({message:`Đã gửi thành công!`});
         setStep(1);
         setOpenWork(true);
+        fetchWorkpoint();
       }, 1000);
     })
     .catch((err) => {
@@ -402,6 +403,7 @@ async function postWorkpointCheck(imgUrl: string, lat:string, long:string) {
     });
 
     setImageData(null);
+    
   }
 
   const handleWorkBoardCancel = () => {
@@ -448,8 +450,8 @@ async function postWorkpointCheck(imgUrl: string, lat:string, long:string) {
               <Button 
                 sx={{
                     // backgroundColor:"#ccc",
-                    border:'1px solid #666', color:'#666',
-                    mt: 0.5, height: 20,maxWidth:300, mb:1 }} onClick={() => setModalVisible(true)}>
+                    border:'1px solid #666', color:'#000',
+                    mt: 0.5, height: 20, maxWidth: 300, mb:1 }} onClick={() => setModalVisible(true)}>
                 Bảng lương
               </Button>
 

@@ -16,11 +16,7 @@ import { useUser } from '../../../../common/hooks/useUser';
 import { useApiHost } from '../../../../common/hooks/useApiHost';
 import { notification } from 'antd';
 import type { WorkSpace } from '../../../../@types/work-space.type';
-import { ChatGroupProvider, useChatGroup } from '../../ProviderChat';
-// interface GroupComponentProps {
-//   selected: WorkSpace | null;
-//   setSelected: React.Dispatch<React.SetStateAction<WorkSpace | null>> | null;
-// }
+import { useChatGroup } from '../../ProviderChat';
 
 const Group = () => {
     const {workspaceEl, setWorkspaceEl} = useChatGroup();
@@ -51,17 +47,25 @@ const Group = () => {
   }, [workspaceEl]);
 
     const handleDeleteMessage = (el:MessageTypeProps) =>{
-     fetch(`${urlApi}/message/${el.message_id}`, { method: 'DELETE' })
-         .then(res => {
-         if (!res.ok) throw new Error('Delete failed');
-         return res.json();
-         })
-         .then(() => {
-            //   Cập nhật lại state messageList để xóa message vừa gọi delete
-             console.log('Delete msg:', messageList);
-             setMessages(prevMessages => prevMessages.filter(m => m.message_id !== el.message_id));
-         })
-     .catch(console.error);
+        // fetch(`${urlApi}/message/${el.message_id}`, { method: 'DELETE' })
+        //     .then(res => {
+        //     if (!res.ok) throw new Error('Delete failed');
+        //     return res.json();
+        //     })
+        //     .then(() => {
+        //         //   Cập nhật lại state messageList để xóa message vừa gọi delete
+                
+        setMessages(prevMessages => prevMessages.filter(m => m.message_id !== el.message_id));
+
+        //         if (socket && socket.connected) {
+        //             console.log('Emit delete:', el.message_id, el.workspace_id);
+        socket.emit('admake/chat/delete', {
+            message_id: el.message_id,
+            workspace_id: el.workspace_id,
+        });
+        //         }
+        //     })
+        // .catch(console.error);
 
     }
 
@@ -169,6 +173,7 @@ const Group = () => {
         
             {full &&
              <Box sx={{ 
+                marginTop:10,
                   backgroundColor: theme.palette.mode === 'light' ? '#F8FAFF' : "#fff",
                  width: 320,
                 //  display: {

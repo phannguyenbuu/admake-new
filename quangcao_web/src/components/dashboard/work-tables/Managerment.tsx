@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback, useContext } from "react";
-import { Row, Col, Card, Button, message, Modal } from "antd";
+import { Row, Col, Card, Button, message, Modal, notification } from "antd";
 import { StarOutlined, PlusOutlined, MoreOutlined } from "@ant-design/icons";
 import FormTask from "./FormTask";
 import {
@@ -242,11 +242,11 @@ export default function ManagermentBoard({workspaceId,}: ManagermentBoardProps) 
           id: taskId,
           dto: { status: newStatus },
         });
-        message.success("Cập nhật trạng thái thành công! " + newStatus);
+        notification.success({message:"Cập nhật trạng thái thành công!", description: newStatus});
 
         refetchTasks();
       } catch (error) {
-        message.error("Có lỗi xảy ra khi cập nhật trạng thái!");
+        notification.error({message:"Có lỗi xảy ra khi cập nhật trạng thái!", description: newStatus});
       }
     },
     [updateTaskStatusMutation, refetchTasks]

@@ -16,6 +16,7 @@ import { ChatGroupProvider } from "../../../components/chat/ProviderChat.tsx";
 import { SearchOutlined } from "@ant-design/icons";
 import { Input as AntdInput, Menu } from "antd";
 import { useChatGroup } from "../../../components/chat/ProviderChat.tsx";
+import { useWorkSpaceQueryTaskById } from "../../hooks/work-space.hook.tsx";
 
 const ChatGroupList = () => {
   const {workspaceEl, setWorkspaceEl} = useChatGroup();
@@ -23,7 +24,7 @@ const ChatGroupList = () => {
   // const [selectedId, setSelectedId] = useState<WorkSpace | null>(null);
   const [searchText, setSearchText] = useState("");
   const [filteredItems, setFilteredItems] = useState<WorkSpace[]>([]); // items là danh sách menu gốc
-  
+  const { refetch } = useWorkSpaceQueryTaskById(workspaceEl?.id ?? '');
   //@ts-ignore
   const {userId, userRoleId, workspaces, isMobile} = useUser();
 
@@ -57,6 +58,7 @@ const ChatGroupList = () => {
   const handleOk = () => {
     setModalVisible(false);
     setWorkspaceEl(null);
+    refetch();
   };
 
   const [isHover, setIsHover] = useState(false);

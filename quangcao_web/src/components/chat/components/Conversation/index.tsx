@@ -7,6 +7,7 @@ import Message from './Message';
 import { useUser } from '../../../../common/hooks/useUser';
 import type { MessageTypeProps } from '../../../../@types/chat.type';
 import type { WorkSpace } from '../../../../@types/work-space.type';
+import { socket } from './socket';
 
 interface ConversationProps {
   title: string;
@@ -35,6 +36,25 @@ const Conversation: React.FC<ConversationProps> = ({title,status,messages,setMes
     }
   };
 
+
+  useEffect(() => {
+    console.log('Start_Socket', socket);
+    if (!socket) return;
+
+    const handleDelete = (data: { message_id: string, workspace_id: string }) => {
+      setMessages(prev => prev.filter(msg => msg.message_id !== data.message_id));
+    };
+
+
+    socket.on('admake/chat/delete', handleDelete);
+
+    // Cleanup khi component unmount
+    return () => {
+      socket.off('admake/chat/delete', handleDelete);
+    };
+  }, [socket,  setMessages]);
+  
+
   useEffect(() => {
     // Cập nhật khi component mount
     updateBoxRect();
@@ -57,7 +77,7 @@ const Conversation: React.FC<ConversationProps> = ({title,status,messages,setMes
   }
 
   return (
-    <Stack ref={boxRef} sx={{ width: w, height:full ? '72vh':'100vh',
+    <Stack ref={boxRef} sx={{ width: w, height:full ? '72vh':'92vh',
         backgroundImage: "url(/backGround.png)"}}>
         <Header title={title} status={status}/>
         

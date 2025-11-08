@@ -436,7 +436,7 @@ def transfer_message_to_postgres():
                 id=id_value,
                 # name=name_value,
                 message_id=row_dict['message_id'],
-                group_id=row_dict['group_id'],
+                
                 user_id=row_dict['user_id'],
                 text=row_dict['text'],
                 file_url=row_dict['file_url'],

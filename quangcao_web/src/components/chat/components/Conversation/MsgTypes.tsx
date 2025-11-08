@@ -269,13 +269,14 @@ const TextMsg: React.FC<MsgTypeProps> = ({el, menu, onDelete}) => {
     )
 }
 
+import { useWorkSpaceQueryTaskById } from '../../../../common/hooks/work-space.hook';
 
 const TimeLine: React.FC<MsgTypeProps> = ({ el, menu, onDelete }) => {
   const [value, setValue] = useState<number | null>(el?.react?.rate ?? 0);
   if(!el) return null;
   const {userRoleId} = useUser();
   const full = userRoleId === -2;
-
+  
   
   useEffect(() => {
     
@@ -285,8 +286,11 @@ const TimeLine: React.FC<MsgTypeProps> = ({ el, menu, onDelete }) => {
         console.log('Received rate:', msg);
         setValue(msg.rate);
 
-        if(!window.location.href.includes('/chat/'))
-          window.location.reload();
+        // if(!window.location.href.includes('/chat/'))
+          // window.location.reload();
+        // console.log('workspace_id', el.workspace_id);
+
+        
       });
   
       socket.on('admake/chat/rate_ack', data => {
@@ -316,14 +320,19 @@ const TimeLine: React.FC<MsgTypeProps> = ({ el, menu, onDelete }) => {
     
     if (socket.connected) {
       const data = {
+        workspace_id: el.workspace_id,
         message_id: el.message_id,
         rate: rate,
-        group_id: el.workspace_id,
+        // group_id: el.workspace_id,
       };
 
-      console.log('Send rate message', socket.io.opts.host, data);
+      console.log('Send rate message', el.workspace_id, data);
+
       socket.emit('admake/chat/rate', data);
 
+      // console.log('refetch', el.workspace_id, refetch);
+      
+    
 
       const context = useContext(UpdateButtonContext);
       if (!context) 
@@ -342,7 +351,7 @@ const TimeLine: React.FC<MsgTypeProps> = ({ el, menu, onDelete }) => {
   // const theme = useTheme();
 
   const handleRatingChange = (event: React.SyntheticEvent<Element, Event>, newValue: number | null) => {
-    console.log("Rating value:", newValue, "cho group", el.group_id, " message_id", el.message_id);
+    console.log("Rating value:", newValue, "cho group", el.workspace_id, " message_id", el.message_id);
     setValue(newValue);
     handleReward(newValue);
   };
@@ -356,7 +365,7 @@ const TimeLine: React.FC<MsgTypeProps> = ({ el, menu, onDelete }) => {
   };
 
   const disable = el && el.react && el?.react?.rate != 0;
-  console.log(el?.react?.rate != 0, el);
+  // console.log(el?.react?.rate != 0, el);
 
   return (
     <Stack alignItems='center' justifyContent='space-between' 
@@ -443,7 +452,7 @@ const MessageOptions: React.FC<MsgTypeProps> = ({el, onDelete }) => {
       <Stack spacing={1} px={1}>
         {isCustomer &&
         <>
-        <MenuItem >
+        {/* <MenuItem >
             <ListItemIcon>
                 <FavoriteIcon sx={{ color: 'red' }} fontSize="small" />
             </ListItemIcon>
@@ -460,9 +469,9 @@ const MessageOptions: React.FC<MsgTypeProps> = ({el, onDelete }) => {
             </ListItemIcon>
         </MenuItem>
         
-        <Divider/>
+        <Divider/> */}
 
-        <MenuItem>
+        {/* <MenuItem>
             <ListItemIcon>
                 <ReplyIcon fontSize="small" />
             </ListItemIcon>Reply
@@ -480,14 +489,14 @@ const MessageOptions: React.FC<MsgTypeProps> = ({el, onDelete }) => {
             <ListItemIcon>
                 <ExitToAppIcon fontSize="small" />
             </ListItemIcon>Forward
-        </MenuItem>
+        </MenuItem> */}
         
         <MenuItem onClick={handleDelete}>
             <ListItemIcon>
                 <DeleteIcon fontSize="small" />
             </ListItemIcon>Delete
         </MenuItem>
-
+          </>}
       </Stack>
       </Menu>
     </>

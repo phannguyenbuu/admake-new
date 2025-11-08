@@ -31,7 +31,7 @@ const RatingButtons = () => {
       setValue(newValue);
       // setShowFooter(newValue === "talk" || newValue === "pass");
 
-      const data = { group_id: workspaceEl?.id };
+      const data = { workspace_id: workspaceEl?.id };
       
       workspaceEl && (workspaceEl.status = newValue);
 

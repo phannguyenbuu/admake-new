@@ -108,9 +108,9 @@ import uuid
 def upload_file():
     user_id = request.form.get('userId')
     try:
-        group_id = int(request.form.get('groupId', '0'))
+        workspace_id = int(request.form.get('workspace_id', '0'))
     except ValueError:
-        group_id = 0  # hoặc xử lý lỗi phù hợp
+        workspace_id = 0  # hoặc xử lý lỗi phù hợp
     role = request.form.get('role')
     latitude = request.form.get('latitude')
     longitude = request.form.get('longitude')
@@ -129,7 +129,7 @@ def upload_file():
     data = {
         # 'id': msg.id,
         'user_id': user_id,
-        'group_id': group_id,
+        'workspace_id': workspace_id,
         'username': '',
         # 'text': text,
         'file_url': filename,

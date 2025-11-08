@@ -17,6 +17,7 @@ import { notification } from 'antd';
 import type { WorkSpace } from '../../../../@types/work-space.type.js';
 import { useChatGroup } from '../../ProviderChat.js';
 
+
 const StyledInput = styled(TextField)(({ theme }) => ({
   "& .MuiInputBase-input": {
     paddingTop: '12px',
@@ -71,9 +72,14 @@ const ChatInput = forwardRef<HTMLDivElement, ChatInputProps>(
     handleSendMessage 
   }, ref: Ref<HTMLDivElement>) => {
 
+  
+
   const [openAction, setOpenAction] = useState(false);
   const {userId, username, userRoleId, userIcon } = useUser();
   const {workspaceEl, setWorkspaceEl} = useChatGroup();
+
+  
+
   
   const handleUploadDocument = async () => {
     setOpenAction(prev => !prev);
@@ -188,7 +194,7 @@ interface FooterProps {
 const Footer = forwardRef<HTMLDivElement, FooterProps>(
   ({ setMessages, left, width }, ref: Ref<HTMLDivElement>) => {
   // const [showFileUpload, setShowFileUpload] = useState(false);
-  const {userId, username, userRoleId} = useUser();
+  const {userId, username, userRoleId, isMobile} = useUser();
   const [openPicker, setOpenPicker] = useState(false);
   const [inputValue, setInputValue] = useState('');
   const full = userRoleId === -2;
@@ -201,7 +207,7 @@ const Footer = forwardRef<HTMLDivElement, FooterProps>(
 
     socket.on('connect', () => {
       console.log('Connected to server', socket.id);
-      socket.emit('join', { group_id: workspaceEl?.id });
+      socket.emit('join', { workspace_id: workspaceEl?.id });
     });
 
     socket.on('admake/chat/message', (msg) => {
@@ -275,7 +281,7 @@ const Footer = forwardRef<HTMLDivElement, FooterProps>(
         icon: '',
         type: getTypeName(file_url),
         incoming: false,
-        group_id: workspaceEl?.id || '',
+        // group_id: workspaceEl?.id || '',
         user_id: userId,
         username: get_user_name(),
         text: message,
@@ -316,8 +322,8 @@ const Footer = forwardRef<HTMLDivElement, FooterProps>(
         icon: '',
         type: 'timeline',
         incoming: false,
-        group_id: workspaceEl?.id,
-        user_id: '',
+        // group_id: workspaceEl?.id,
+        user_id: userId,
         username: get_user_name(),
         text: 'Quý khách hàng vui lòng đánh giá dự án này?',
         file_url: '',
@@ -334,6 +340,8 @@ const Footer = forwardRef<HTMLDivElement, FooterProps>(
 
       setMessages(prev => [...prev, data]);
       socket.emit('admake/chat/message', data);
+
+      
     } else {
       console.warn('Socket.IO not connected.');
     }
@@ -342,7 +350,7 @@ const Footer = forwardRef<HTMLDivElement, FooterProps>(
   };
 
   const parentRef = useRef<HTMLDivElement>(null);
-
+  
   return (
     <>
       {/* {showFileUpload && <FileUpload onUploadComplete={handleUploadComplete} />} */}
@@ -355,8 +363,8 @@ const Footer = forwardRef<HTMLDivElement, FooterProps>(
           sx={{
             backgroundColor: "#00B4B6",
             position: 'absolute',
-            bottom: full ? 25 : 0,
-            left: left - (full ? 25 : 0),
+            bottom: full ? (isMobile ? 670 : 25) : 0,
+            left: left - (full ? (isMobile ? 7 : 25) : 0),
             width: width,
             zIndex: 1300, // đảm bảo nổi trên các phần tử khác
           }}
