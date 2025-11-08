@@ -104,16 +104,11 @@ export interface ColumnType {
   tasks? : Task[];
 }
 
-export interface ManagermentBoardProps {
-  workspaceId: string;
-}
-
 export interface FormTaskDetailProps {
   taskDetail: Task | null;
   workspaceId: string;
   form: any;
 }
-
 
 export interface FormTaskProps {
   form: any;

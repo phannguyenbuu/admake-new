@@ -27,6 +27,7 @@ import { Typography } from "@mui/material";
 import { WorkpointSettingProvider } from "./common/hooks/useWorkpointSetting";
 import { WorkpointInforProvider } from "./common/hooks/useWorpointInfor";
 import { RouterProvider } from "react-router-dom";
+import { TaskProvider } from "./common/hooks/useTask";
 
 interface TRoute extends Omit<NonIndexRouteObject, "index" | "children"> {
   children?: TRoute[];
@@ -64,7 +65,12 @@ const WorkTableDetailPage = lazy(() => import("./app/dashboard/work-tables/page"
 
 const routes: TRoute = {
   path: "/",
-  element: <BaseLayout />,
+  element: <WorkpointInforProvider>
+            <WorkpointSettingProvider>
+              <BaseLayout />
+            </WorkpointSettingProvider>
+          </WorkpointInforProvider>
+          ,
   errorElement: <Error404 />,
   children: [
     
@@ -87,11 +93,9 @@ const routes: TRoute = {
     {
       path: "/point/:id/",
       element: 
-      <WorkpointInforProvider>
-      <WorkpointSettingProvider>
-        <Workpoint/>
-        </WorkpointSettingProvider>
-      </WorkpointInforProvider>,
+      
+          <Workpoint/>,
+        
       title: "Workpoint",
       ignoreInMenu: true,
     },
@@ -100,9 +104,11 @@ const routes: TRoute = {
       path: "/dashboard",
       element: (
         <Suspense fallback={<div>Loading...</div>}>
-          <WorkpointSettingProvider>
-            <DashboardPage />
-          </WorkpointSettingProvider>
+           
+              <TaskProvider>
+                <DashboardPage/>
+              </TaskProvider>
+           
         </Suspense>
       ),
       // lazy: () => import("./app/dashboard/page"),
@@ -162,8 +168,8 @@ const routes: TRoute = {
         {
           path: "/dashboard/customers",
           element: (
-            <Suspense fallback={<div>Loading...</div>}>
-          <CustomerDashboard />
+          <Suspense fallback={<div>Loading...</div>}>
+            <CustomerDashboard />
           </Suspense>),
           roles: ["customer:management"],
           title: "Quản lý khách hàng",
@@ -173,7 +179,9 @@ const routes: TRoute = {
         {
           path: "/dashboard/work-tables",
           element: (<Suspense fallback={<div>Loading...</div>}>
-            <WorkTableDetailPage />
+              
+                <WorkTableDetailPage />
+              
             </Suspense>),
           title: "Bảng công việc",
           icon: <BarChartOutlined />,

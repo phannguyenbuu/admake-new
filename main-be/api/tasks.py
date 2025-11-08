@@ -20,7 +20,7 @@ def get_tasks(lead_id):
 
     tasks = [t.to_dict() for t in result]
 
-    print('Tak', tasks)
+    # print('Tak', tasks)
     return jsonify(tasks)
 
 @task_bp.route("/<string:id>", methods=["GET"])

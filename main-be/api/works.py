@@ -87,7 +87,7 @@ def get_workspace_task(id):
     # Chuyển defaultdict về dict bình thường
     tasks_response = dict(grouped)
     
-    return jsonify(tasks_response)
+    return jsonify({'data':tasks_response}),200
 
 @workspace_bp.route("/<string:workspace_id>/reward", methods=["PUT"])
 def post_workspace_reward_task(workspace_id):

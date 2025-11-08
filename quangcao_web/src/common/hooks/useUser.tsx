@@ -13,8 +13,10 @@ interface UserContextProps {
   userIcon: string | null;
   userLeadId: number;
   workspaces: WorkSpace[];
+  workspaceId: string;
   isMobile: boolean;
   setUserLeadId: React.Dispatch<React.SetStateAction<number>>;
+  setWorkspaceId: React.Dispatch<React.SetStateAction<string>>;
   setUserRoleId: React.Dispatch<React.SetStateAction<number>>;
   setWorkspaces: React.Dispatch<React.SetStateAction<WorkSpace[]>>;
   login: (credentials: { username: string; password: string }) => Promise<void>;
@@ -34,7 +36,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const [workspaces, setWorkspaces] = useState<WorkSpace[]>([]);
-  
+  const [workspaceId, setWorkspaceId] = useState<string>("");
   const [userLeadId, setUserLeadId] = useState<number>(0);
   const [userId, setUserId] = useState<string | null>(null);
   
@@ -206,8 +208,9 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   return (
-    <UserContext.Provider value={{ isMobile, userId, username, setUserLeadId,
-      userRoleId, setUserRoleId, userRole, userLeadId, workspaces, setWorkspaces,
+    <UserContext.Provider value={{ isMobile, userId, username, 
+      userRoleId, setUserRoleId, userRole, userLeadId, setUserLeadId, 
+      workspaces, setWorkspaces, workspaceId, setWorkspaceId,
       userIcon, login, logout, checkAuthStatus }}>
       {children}
     </UserContext.Provider>

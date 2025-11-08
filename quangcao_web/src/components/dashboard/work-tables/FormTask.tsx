@@ -27,7 +27,8 @@ import { UpdateButtonContext } from "../../../common/hooks/useUpdateButtonTask";
 import TaskHeader from "./task/FormTaskHeader";
 const { Title, Text } = Typography;
 
-
+import { useTaskContext } from "../../../common/hooks/useTask";
+import { useUser } from "../../../common/hooks/useUser";
 
 
 const cellStyle = {maxWidth:400, minWidth:400};
@@ -42,20 +43,23 @@ interface FormTaskProps {
   open: boolean;
   onCancel: () => void;
   taskId?: string;
-  workspaceId: string;
+  // workspaceId: string;
   onSuccess: () => void;
   initialValues: Task | null;
   users: UserSearchProps[];
   // customers: UserSearchProps[];
-  updateTaskStatus: (taskId: string, newStatus: string) => Promise<void>;
+  // updateTaskStatus: (taskId: string, newStatus: string) => Promise<void>;
   // showUpdateButtonMode: number;
   // setShowUpdateButton: (value: number) => void;
 }
 
 export default function FormTask({ 
-  updateTaskStatus, open, onCancel, taskId, onSuccess,
-  workspaceId, users, 
+  open, onCancel, taskId, onSuccess,
+  users, 
  }: FormTaskProps) {
+  const {workspaceId} = useUser();
+
+
   const context = useContext(UpdateButtonContext);
   if (!context) throw new Error("UpdateButtonContext not found");
   const { setShowUpdateButton } = context;
@@ -74,8 +78,7 @@ export default function FormTask({
   const [userList, setUserList] = useState<UserItemProps[]>([]);
   // const [customerObj, setCustomerObj] = useState<UserItemProps | null>(null);
 
-  const [taskDetail, setTaskDetail] = useState<Task | null>(null);
-
+  const {taskDetail, setTaskDetail} = useTaskContext();
 
   useEffect(()=>{
     if(!sourceTaskDetail || !sourceTaskDetail?.assign_ids)
@@ -103,10 +106,6 @@ export default function FormTask({
     setUserList(newList);
   };
 
-  // useEffect(()=>{
-  //   setCustomerObj({id: customerSelected?.user_id ?? null, name:customerSelected?.fullName ?? null});
-  // },[customerSelected]);
-
   useEffect(() => {
     if (!userSelected)
       return;
@@ -126,14 +125,7 @@ export default function FormTask({
   const handleUpdate = async () => {
     try {
       setIsUpdating(true);
-      // Lấy dữ liệu hiện tại từ form
-      // console.log("Old_task_values", 
-      //             form.getFieldValue("start_time"),
-      //             form.getFieldValue("end_time"));
       const values = await form.validateFields();
-
-      // console.log("New_task_values", values);
-      
 
       const preparedValues = {
         ...values,
@@ -215,17 +207,7 @@ export default function FormTask({
 
   return (
     <Modal open={open} onCancel={onCancel} footer={null} centered width={900}>
-      
-      
-        <TaskHeader updateTaskStatus={updateTaskStatus} 
-                taskDetail={taskDetail} 
-                isLoading={isLoading}
-                onUpdate={handleUpdate}  
-                onSuccess={onSuccess}
-                />
-      
-
-      
+        <TaskHeader onUpdate={handleUpdate} onSuccess={onSuccess}/>
       
         <Form form={form} style={cellStyle}>
           <Stack spacing={1}>

@@ -11,7 +11,6 @@ import {
 import "./css/css.css";
 import type {
   ColumnType,
-  ManagermentBoardProps,
   Task,
   TasksResponse,
 } from "../../../@types/work-space.type";
@@ -29,6 +28,8 @@ import WorkspaceBoard from "./work-space/WorkspaceBoard";
 import WorkspaceModal from "./work-space/WorkspaceModal";
 import "./work-space/workspace.css";
 import { UpdateButtonContext } from "../../../common/hooks/useUpdateButtonTask";
+import { useTaskContext } from "../../../common/hooks/useTask";
+import { useUser } from "../../../common/hooks/useUser";
 
 export interface DeleteConfirmProps {
     visible: boolean;
@@ -48,23 +49,20 @@ export function getTitleByStatus(type: string): string | undefined {
     return col ? col.title : undefined;
 }
 
-export default function ManagermentBoard({workspaceId,}: ManagermentBoardProps) {
+export default function ManagermentBoard() {
   // const adminMode = useCheckPermission();
   // const [refreshFormTask, setRefreshFormTask] = useState<boolean>(false);
 
   const context = useContext(UpdateButtonContext);
   if (!context) throw new Error("UpdateButtonContext not found");
   const { showUpdateButton, setShowUpdateButton } = context;
-  // API hooks
+  
+  const {workspaceId} = useUser();
   const { data: workspaceData } = useWorkSpaceQueryById(workspaceId);
 
-  // console.log('MAN_WSPACE', workspaceData);
-
-  const { data: tasksData, refetch: refetchTasks } = useWorkSpaceQueryTaskById(workspaceId);
+  const {tasksData, updateTaskStatus, refetchTasks} = useTaskContext();
   
-  // console.log('WORKSPACE_DATA', tasksData);
-
-  const updateTaskStatusMutation = useUpdateTaskStatusById();
+  
   const deleteTaskMutation = useDeleteTask();
 
   // Chuyển đổi board data thành columns structure
@@ -92,7 +90,9 @@ export default function ManagermentBoard({workspaceId,}: ManagermentBoardProps) 
     }
 
     // @ts-ignore
-    setColumns(convertBoardToColumns(tasksData || {}));
+    const res = convertBoardToColumns(tasksData);
+    // console.log('resCols', tasksData);
+    setColumns(res || {});
 
 
 
@@ -234,23 +234,7 @@ export default function ManagermentBoard({workspaceId,}: ManagermentBoardProps) 
 
   
 
-  // Hàm cập nhật trạng thái task qua API
-  const updateTaskStatus = useCallback(
-    async (taskId: string, newStatus: string) => {
-      try {
-        await updateTaskStatusMutation.mutateAsync({
-          id: taskId,
-          dto: { status: newStatus },
-        });
-        notification.success({message:"Cập nhật trạng thái thành công!", description: newStatus});
 
-        refetchTasks();
-      } catch (error) {
-        notification.error({message:"Có lỗi xảy ra khi cập nhật trạng thái!", description: newStatus});
-      }
-    },
-    [updateTaskStatusMutation, refetchTasks]
-  );
 
   const onDragEnd = useCallback(
     (result: DropResult) => {
@@ -370,8 +354,8 @@ export default function ManagermentBoard({workspaceId,}: ManagermentBoardProps) 
 
   // Load data from API when component mounts or workspaceId changes
   useEffect(() => {
-    if (tasksData?.data) {
-      setColumns(convertBoardToColumns(tasksData.data));
+    if (tasksData) {
+      setColumns(convertBoardToColumns(tasksData));
     }
   }, [tasksData, convertBoardToColumns]);
 
@@ -433,7 +417,7 @@ export default function ManagermentBoard({workspaceId,}: ManagermentBoardProps) 
         open={showFormTask}
         onCancel={() => { setShowFormTask(false); }}
         taskId={editingTaskId || undefined}
-        workspaceId={workspaceId}
+        // workspaceId={workspaceId}
         initialValues={selectedTask}
         onSuccess={handleFormSuccess}
 

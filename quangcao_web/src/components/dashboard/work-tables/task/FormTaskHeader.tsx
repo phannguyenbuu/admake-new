@@ -3,23 +3,17 @@ import { Modal, Typography, Button } from "antd";
 import { UpdateButtonContext } from "../../../../common/hooks/useUpdateButtonTask";
 import type { Task } from "../../../../@types/work-space.type";
 import { Stack } from "@mui/material";
-// import Title from "antd/es/typography/Title";
+import { useTaskContext } from "../../../../common/hooks/useTask";
 const { Title, Text } = Typography;
 
 interface TaskHeaderProps {
-  // mode: { adminMode: boolean; userMode: boolean };
-  taskDetail: Task | null;
-  isLoading: boolean;
   onSuccess: () => void;
   onUpdate: () => void;
-  updateTaskStatus: (taskId: string, newStatus: string) => Promise<void>;
-  // showUpdateButtonMode: number;
-  
 }
 
 // TaskHeader.tsx
-export default function TaskHeader({ taskDetail, onSuccess, updateTaskStatus, 
-  isLoading, onUpdate }: TaskHeaderProps) {
+export default function TaskHeader({ onSuccess, onUpdate }: TaskHeaderProps) {
+  const {taskDetail, isLoading, updateTaskStatus} = useTaskContext();
 
   const context = useContext(UpdateButtonContext);
   if (!context) throw new Error("UpdateButtonContext not found");
@@ -34,7 +28,8 @@ export default function TaskHeader({ taskDetail, onSuccess, updateTaskStatus,
 
   useEffect(()=>{
     if (!taskDetail) setShowUpdateButton(0);
-
+    // console.log('TTT', taskDetail);
+    setShowUpdateButton(taskDetail?.status === "DONE" ? 1 : (taskDetail?.status === "REWARD" ? 2: 0));
   },[taskDetail]);
 
   const handleReward = async () => {
@@ -69,13 +64,13 @@ export default function TaskHeader({ taskDetail, onSuccess, updateTaskStatus,
 
       <Stack direction="row" spacing={1}>
         {showUpdateButton === 0 && 
-          <Button type="primary" loading={isLoading} onClick={onUpdate}>
+          <Button type="primary" onClick={onUpdate}>
             ✅ Cập nhật
           </Button>
         }
 
         {showUpdateButton === 1 && 
-          <Button type="primary" loading={isLoading} onClick={handleReward}>
+          <Button type="primary" onClick={handleReward}>
             🏆 Nghiệm Thu
           </Button>
         }

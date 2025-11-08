@@ -173,9 +173,6 @@ function WorkpointGrid({ workpoint, fetchWorkpoint }: Props) {
       onOk = {confirmRemoveChecklist}
       onCancel={() => setShowConfirm(false)}
       >
-        
-        {/* <button onClick={confirmRemoveChecklist}>Có</button>
-        <button onClick={() => setShowConfirm(false)}>Không</button> */}
       </Modal>
     
     </>

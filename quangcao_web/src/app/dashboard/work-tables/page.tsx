@@ -3,11 +3,15 @@ import { useParams } from "react-router-dom";
 import { useEffect } from "react";
 import ManagermentBoard from "../../../components/dashboard/work-tables/Managerment";
 import { useWorkSpaceQueryTaskById } from "../../../common/hooks/work-space.hook";
+import { useUser } from "../../../common/hooks/useUser";
 
 const WorkTableDetailPage: IPage["Component"] = () => {
   const { boardId } = useParams();
+  const { workspaceId, setWorkspaceId} = useUser();
 
- 
+  useEffect(()=>{
+    setWorkspaceId(boardId ?? '');
+  },[boardId]);
   
   // Sử dụng hook để lấy task data theo ID
   const {
@@ -59,7 +63,7 @@ const WorkTableDetailPage: IPage["Component"] = () => {
   }
 
   // @ts-ignore
-  return <ManagermentBoard workspaceId={boardId || ""} />;
+  return <ManagermentBoard/>;
 };
 
 export const loader = async () => {

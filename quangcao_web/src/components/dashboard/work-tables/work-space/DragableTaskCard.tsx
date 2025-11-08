@@ -14,7 +14,6 @@ import {
 
 import type {
   ColumnType,
-  ManagermentBoardProps,
   Task,
   TasksResponse,
 } from "../../../../@types/work-space.type";
@@ -168,7 +167,7 @@ export const CardItem: React.FC<CardItemProps> = ({
             </h3>
           </div>
           {task.description && (
-            <p className="text-gray-500 text-xs line-clamp-2 leading-relaxed">{task.description}</p>
+            <p className="text-gray-500 text-xs line-clamp-2 leading-relaxed">{task.description.length > 20 ? task.description.slice(0, 20) + '...' : task.description}</p>
           )}
           {task.reward && (
             <div className="flex items-center gap-1 text-xs text-green-600 font-semibold">

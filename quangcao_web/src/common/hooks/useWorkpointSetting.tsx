@@ -37,6 +37,8 @@ export const WorkpointSettingProvider = ({ children }: {children: React.ReactNod
     const {userLeadId, userId, setUserLeadId } = useUser();
     // const { workpointEl, fetchWorkpointEl } = useWorkpointInfor();
 
+    console.log('LeadId', userLeadId);
+
     
 
   const fetchWorkpointSetting = () => {
