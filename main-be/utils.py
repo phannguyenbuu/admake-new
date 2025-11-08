@@ -1061,11 +1061,44 @@ def create_workpoint_settings_for_all_leads():
             db.session.add(new_setting)
     db.session.commit()
 
+def remove_workpoint_checklist(user_id, day):
+    ws = Workpoint.query.filter(Workpoint.user_id == user_id).all()
+    for w in ws:
+        for k,v in w.checklist.items():
+            for k_1, v_1 in v.items():
+                if type(v_1) == dict:
+                    if (day + "T") in v_1.get('time'):
+                        print(k, k_1, v_1)
+                        w.remove_checklist()
+                        print(w.to_dict())
+                        return True
+    return False
+
+def restore_checklist_data():
+    w = db.session.get(Workpoint,"20251108003114523298c760c4")
+    w.checklist = {
+    "morning": {
+        "in": {
+          "img": "workpoint_20251104103416609650622d78_20251108_073114_-_-.jpg",
+          "lat": "-",
+          "long": "-",
+          "time": "2025-11-08T07:31:14.521442+07:00"
+        },
+        "workhour": 0
+      }
+    }
+
+    flag_modified(w,"checklist")
+    db.session.commit()
+
+
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()
         
-        ws = WorkpointSetting.query.filter(WorkpointSetting.user_id == '20251104103416609650622d78').all()
-        print(len(ws))
+        # print(remove_workpoint_checklist('20251104103416609650622d78','2025-11-07'))
+        
+        restore_checklist_data()
 
-        # user = db.session.get(User,'20251104103416609650622d78')
+        
+        

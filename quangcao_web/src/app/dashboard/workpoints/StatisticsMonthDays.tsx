@@ -152,8 +152,8 @@ const StatisticsMonthDays: React.FC<StatisticsMonthDaysProps> = ({ selectedRecor
           
           <TableContainer component={Paper} sx={{ 
               mt: isMobile ? 0 : 2, 
-              width: isMobile ? 400:'',
-             scale: isMobile ? 0.75 : '' }}>
+              width: isMobile ? 400:'100%',
+             scale: isMobile ? 0.75 : 1 }}>
             <Table>
               <TableBody>
                 <TableRow>

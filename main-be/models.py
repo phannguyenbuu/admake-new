@@ -22,6 +22,7 @@ import logging
 import re
 from flask_cors import CORS
 from flask import Blueprint, request, jsonify, abort
+from sqlalchemy.orm.attributes import flag_modified
 
 app = Flask(__name__)
 app.logger.setLevel(logging.DEBUG)
@@ -469,6 +470,28 @@ class Workpoint(BaseModel):
         db.session.add(self)  # Đánh dấu obj cần update
         db.session.commit()   # Lưu thay đổi
 
+    def remove_checklist(self):
+        keys_to_delete = [
+            ("evening", "out"),
+            ("evening", "in"),
+            ("noon", "out"),
+            ("noon", "in"),
+            ("morning", "out"),
+            ("morning", "in"),
+        ]
+
+        for period, time in keys_to_delete:
+            if period in self.checklist and time in self.checklist[period]:
+                del self.checklist[period][time]
+                if 'workhour' in self.checklist:
+                    del self.checklist['workhour']
+
+                if not self.checklist[period]:
+                    del self.checklist[period]
+                break
+        
+        flag_modified(self, "checklist")
+        db.session.commit()
 
     @staticmethod
     def create_item(params):

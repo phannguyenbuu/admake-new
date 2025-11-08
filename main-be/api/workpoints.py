@@ -351,8 +351,25 @@ def post_workpoint_by_user_and_date(user_id):
 
 
 
+@workpoint_bp.route('/remove/<string:user_id>/', methods=['PUT'])
+def remove_workpoint_checklist(user_id):
+    day = request.args.get("day")
 
+    print('Workday', day, user_id)
 
+    ws = Workpoint.query.filter(Workpoint.user_id == user_id).all()
+    print('Workpoint query', len(ws))
+
+    for w in ws:
+        for k,v in w.checklist.items():
+            for k_1, v_1 in v.items():
+                if type(v_1) == dict:
+                    if (day + "T") in v_1.get('time'):
+                        # print(k, k_1, v_1)
+                        w.remove_checklist()
+                        # print(w.to_dict())
+                        return jsonify({f'message':'Remove workpoint done: {k} {k_1}'}), 200
+    return jsonify({'message':'No workpoint found'}), 200
 
 
 @workpoint_bp.route('/setting/<string:lead_id>/', methods=['GET'])

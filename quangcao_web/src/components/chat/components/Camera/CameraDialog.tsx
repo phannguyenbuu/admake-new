@@ -89,7 +89,7 @@ const CameraDialog: React.FC<CameraDialogProps> = ({userEl}) => {
   useEffect(() => {
     console.log("UserEL", userEl);
     if (!userEl) return;
-    
+
     if (userEl?.id) {
       if(userLeadId === 0)
         setUserLeadId(userEl.lead_id);
@@ -121,18 +121,7 @@ const CameraDialog: React.FC<CameraDialogProps> = ({userEl}) => {
 
   },[]);
 
-  useEffect(() => {
-    navigator.mediaDevices.enumerateDevices()
-      .then(devices => {
-        const videoInputDevices = devices.filter(device => device.kind === 'videoinput');
-        setHasCamera(videoInputDevices.length > 0);
-      })
-      .catch(() => setHasCamera(false));
-  
-    const user = JSON.parse(localStorage.getItem('Admake-User-Access') || '{}');
-    console.log(user.user_id, user.username);
-  
-
+  function fetchWorkpoint() {
     fetch(`${useApiHost()}/workpoint/today/${userEl?.id}`)
     .then(response => {
       if (!response.ok) {
@@ -152,6 +141,21 @@ const CameraDialog: React.FC<CameraDialogProps> = ({userEl}) => {
     .finally(() => {
       setLoading(false);
     });
+  }
+
+  useEffect(() => {
+    navigator.mediaDevices.enumerateDevices()
+      .then(devices => {
+        const videoInputDevices = devices.filter(device => device.kind === 'videoinput');
+        setHasCamera(videoInputDevices.length > 0);
+      })
+      .catch(() => setHasCamera(false));
+  
+    const user = JSON.parse(localStorage.getItem('Admake-User-Access') || '{}');
+    console.log(user.user_id, user.username);
+  
+    fetchWorkpoint();
+    
   },[]);
 
   useEffect(() => {
@@ -420,6 +424,7 @@ async function postWorkpointCheck(imgUrl: string, lat:string, long:string) {
 
   const isSupplier = userEl?.role_id && userEl?.role_id > 100;
 
+
   return (
     <Stack p={1} height='100vh' spacing={1}>
       <Stack direction="row" spacing={0} style={{width:'90vw', marginLeft:10}}>
@@ -440,14 +445,17 @@ async function postWorkpointCheck(imgUrl: string, lat:string, long:string) {
            {!isSupplier &&
            <>
             <CurrentDateTime />
-            <Button 
-              sx={{
-                  // backgroundColor:"#ccc",
-                  border:'1px solid #666', color:'#666',
-                  mt: 1, height: 20,maxWidth:300, mb:1 }} onClick={() => setModalVisible(true)}>
-            Bảng lương
-          </Button>
-            <WorkpointGrid workpoint={workpoint}/>
+              <Button 
+                sx={{
+                    // backgroundColor:"#ccc",
+                    border:'1px solid #666', color:'#666',
+                    mt: 0.5, height: 20,maxWidth:300, mb:1 }} onClick={() => setModalVisible(true)}>
+                Bảng lương
+              </Button>
+
+              
+
+            <WorkpointGrid workpoint={workpoint} fetchWorkpoint={fetchWorkpoint}/>
             
           </>
           

@@ -13,10 +13,10 @@ import {
 } from "@mui/material";
 
 import { useApiHost } from "../../../../common/hooks/useApiHost";
-import type { User } from "../../../../@types/user.type";
 import { CenterBox } from "../commons/TitlePanel";
 import { LogoAdmake } from "../Conversation/Header";
 import type { Workpoint } from "../../../../@types/workpoint";
+import { useUser } from "../../../../common/hooks/useUser";
 
 const NowToString = () => {
   const now = new Date();
@@ -58,6 +58,7 @@ export const CurrentDateTime = () => {
 
 interface Props {
   workpoint: Workpoint | null;
+  fetchWorkpoint: () => void;
 }
 
 const periods = [
@@ -66,10 +67,68 @@ const periods = [
   { key: 'evening', label: 'Tối' },
 ];
 
-function WorkpointGrid({ workpoint }: Props) {
+function currentDay() {
+  const date = new Date();
+
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0'); // tháng từ 0-11, nên +1
+  const day = String(date.getDate()).padStart(2, '0');
+
+  return `${year}-${month}-${day}`;
+}
+
+function WorkpointGrid({ workpoint, fetchWorkpoint }: Props) {
   const tabStyle = { maxHeight: 15, fontSize:14, fontWeight: 700, whiteSpace:'nowrap', maxWidth: 60};
+  const [isRemoveChecklist, setIsRemoveChecklist] = useState<boolean>(false);
+  const {userId,userLeadId} = useUser();
+
+  const handleRemoveChecklist = () => {
+    // console.log('Lead',userLeadId,workpoint?.user_id);
+
+    async function removeWorkpointChecklist() {
+
+      const url = `${useApiHost()}/workpoint/remove/${workpoint?.user_id}/?day=${currentDay()}`;
+      
+      try {
+        // console.log('URL', url);
+        const response = await fetch(url, {
+          method: 'PUT',
+          // headers: {
+          //   'Content-Type': 'application/json',
+          // },
+        });
+
+        // console.log('RSP', response);
+        
+        if (!response.ok) {
+          throw new Error(`Network error: ${response.status}`);
+        }
+        
+        const result = await response.json(); // hoặc response.text() tùy server trả về
+        // console.log("Ok1");
+        fetchWorkpoint();
+        return result;
+      } catch (error) {
+        console.error('Fetch error:', error);
+        throw error;
+      }
+    }
+
+    removeWorkpointChecklist();
+    setIsRemoveChecklist(true);
+  }
+
   return (
-     
+     <>
+     {workpoint && !isRemoveChecklist &&
+                   <Button 
+                     sx={{
+                         // backgroundColor:"#ccc",
+                         border:'1px solid #666', color:'#666',
+                         mt: 0.5, height: 20,maxWidth:300, mb:1 }} onClick={handleRemoveChecklist}>
+                     Xóa điểm danh gần nhất
+                   </Button>}
+
     <TableContainer component={Paper} sx={{ maxWidth: 800, minHeight: 250, gap: 5, background:'none' }}>
       <Table>
         <TableHead>
@@ -117,7 +176,7 @@ function WorkpointGrid({ workpoint }: Props) {
         </TableBody>
       </Table>
     </TableContainer>
-      
+      </>
 
   );
 }

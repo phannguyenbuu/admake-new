@@ -73,10 +73,6 @@ export default function WorkDays({record}: {record:WorkDaysProps}) {
   const todayDate = new Date().getDate();
 
   useEffect(() => {
-    console.log("Rrd", record);
-  },[]);
-
-  useEffect(() => {
     setData(record.items);
   },[record]);
   
@@ -157,39 +153,6 @@ export default function WorkDays({record}: {record:WorkDaysProps}) {
     setModalVisible(false);
     setModalImg(null);
   };
-
-  // const deleteWorkpoint = (period: string) => {
-  //   async function fetchRemoveWorkpoint(period: string) {
-  //     try {
-  //       const url = `/workpoint/${encodeURIComponent(id)}/?period=${encodeURIComponent(period)}`;
-  //       const response = await fetch(url, {
-  //         method: 'PUT',
-  //         headers: {
-  //           'Content-Type': 'application/json',
-  //         },
-  //         body: JSON.stringify({
-  //           user_id: record.user_id,
-  //            period }),
-  //       });
-
-  //       if (!response.ok) {
-  //         const errorText = await response.text();
-  //         throw new Error(`Fetch error: ${response.status} ${response.statusText} - ${errorText}`);
-  //       }
-
-  //       const result = await response.json();
-  //       console.log('Remove workpoint result:', result);
-  //       return result;
-
-  //     } catch (error) {
-  //       console.error('Failed to remove workpoint:', error);
-  //       throw error;  // hoặc xử lý lỗi tùy mục đích
-  //     }
-  //   }
-
-  //   fetchRemoveWorkpoint(id, );
-
-  // }
 
 return (
   <>
@@ -316,7 +279,7 @@ return (
         </Box>
 
         
-        <Button onClick={() => {
+        {/* <Button onClick={() => {
           console.log("Current", currentPeriodModalIndex);
           console.log("Main data", mainData);
           console.log("Modal infor", modalImg);
@@ -324,7 +287,7 @@ return (
         }} 
           sx={{border:'1px solid #00B5B4', margin: 1, padding:'5px 20px', borderRadius:30}}>
           <span style={{color:'1px solid #00B5B4'}}>Reset check-in</span>
-        </Button>
+        </Button> */}
 
         {modalImg?.status !== 'off' &&
           <Typography fontSize={10} color="#00B4B6" fontStyle="italic">Nhấp vào hình để xem vị trí trên googlemap</Typography>}
