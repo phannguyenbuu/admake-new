@@ -1065,5 +1065,7 @@ if __name__ == "__main__":
     with app.app_context():
         db.create_all()
         
-        ws = WorkpointSetting.query.filter(WorkpointSetting.lead_id == 205).first()
-        print(ws.to_dict())
+        ws = WorkpointSetting.query.filter(WorkpointSetting.user_id == '20251104103416609650622d78').all()
+        print(len(ws))
+
+        # user = db.session.get(User,'20251104103416609650622d78')

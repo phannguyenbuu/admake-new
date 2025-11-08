@@ -238,7 +238,7 @@ export default function FormUser({
         {/* Scrollable fields */}
         <div className="flex-1 min-h-0 overflow-y-auto space-y-3 sm:space-y-4 pr-2 scrollbar-thin scrollbar-thumb-cyan-500 scrollbar-track-gray-100 hover:scrollbar-thumb-cyan-600">
           <Row gutter={[16, 16]}>
-            <Col xs={24} sm={24} lg={12}>
+            <Col xs={24} sm={12} lg={12}>
               <Form.Item
                 name="fullName"
                 label={
@@ -256,7 +256,7 @@ export default function FormUser({
               </Form.Item>
             </Col>
 
-            <Col xs={24} sm={24} lg={12}>
+            <Col xs={24} sm={12} lg={12}>
               <Form.Item
                 name="phone"
                 label={
@@ -274,31 +274,36 @@ export default function FormUser({
               </Form.Item>
             </Col>
           </Row>
-
+          
+           {!isSupplier &&
           <Row gutter={[16, 16]}>
-            <Col xs={24} sm={12} lg={12}>
-              <Form.Item
-                name="role_id"
-                label={
-                  <span className="text-sm sm:text-base font-semibold text-gray-700">
-                    Chức vụ:
-                  </span>
-                }
-                rules={[{ required: true, message: "Chọn chức vụ" }]}
-                className="!mb-0"
-              >
-                <Select
-                  placeholder="Chọn chức vụ"
-                  options={roleOptions}
-                  showSearch
-                  allowClear
-                  optionFilterProp="label"
-                  getPopupContainer={() => document.body}
-                  dropdownStyle={{ zIndex: 10000 }}
-                  className="!text-sm sm:!text-base !h-9 sm:!h-10 !rounded-lg !border-gray-300 focus:!border-cyan-500 !shadow-lg hover:!shadow-xl !transition-all !duration-300"
-                />
-              </Form.Item>
-            </Col>
+            
+           
+
+              <Col xs={24} sm={12} lg={12}>
+                <Form.Item
+                  name="role_id"
+                  label={
+                    <span className="text-sm sm:text-base font-semibold text-gray-700">
+                      Chức vụ:
+                    </span>
+                  }
+                  rules={[{ required: true, message: "Chọn chức vụ" }]}
+                  className="!mb-0"
+                >
+                  <Select
+                    placeholder="Chọn chức vụ"
+                    options={roleOptions}
+                    showSearch
+                    allowClear
+                    optionFilterProp="label"
+                    getPopupContainer={() => document.body}
+                    dropdownStyle={{ zIndex: 10000 }}
+                    className="!text-sm sm:!text-base !h-9 sm:!h-10 !rounded-lg !border-gray-300 focus:!border-cyan-500 !shadow-lg hover:!shadow-xl !transition-all !duration-300"
+                  />
+                </Form.Item>
+              </Col>
+            
 
             <Col xs={24} sm={12} lg={12}>
               <Form.Item
@@ -329,7 +334,7 @@ export default function FormUser({
               </Form.Item>
             </Col>
           </Row>
-
+          }
 
 
           <Row gutter={[16, 16]}>

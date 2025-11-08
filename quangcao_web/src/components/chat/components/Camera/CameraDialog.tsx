@@ -23,6 +23,9 @@ import TaskBoard from "./TaskBoard";
 import LeaveBoard from "./LeaveBoard";
 import { notification } from "antd";
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useWorkpointInfor } from "../../../../common/hooks/useWorpointInfor";
+import StatisticsMonthDays from "../../../../app/dashboard/workpoints/StatisticsMonthDays";
+import { useUser } from "../../../../common/hooks/useUser";
 
 interface CameraDialogProps {
   userEl: User | null;
@@ -79,8 +82,30 @@ const CameraDialog: React.FC<CameraDialogProps> = ({userEl}) => {
   const [openWork, setOpenWork] = useState(userEl?.role && userEl?.role_id > 100);
   const [openHoliday, setOpenHoliday] = useState(false);
   const [hasCamera, setHasCamera] = useState(false);
+  const { workpointEl, fetchWorkpointEl } = useWorkpointInfor();
+  const [modalVisible, setModalVisible] = useState(false);
+  const {userLeadId, setUserLeadId} = useUser();
+  
+  useEffect(() => {
+    console.log("UserEL", userEl);
+    if (!userEl) return;
+    
+    if (userEl?.id) {
+      if(userLeadId === 0)
+        setUserLeadId(userEl.lead_id);
+      fetchWorkpointEl(userEl.id);
+    }
+  }, [userEl]);
 
-  const navigate = useNavigate();
+  // useEffect(()=>{
+  //   console.log("ITM", workpointEl);
+  // },[workpointEl]);
+  
+  const handleCloseModal = () => {
+    setModalVisible(false);
+    // setSelectedRecord(null);
+  };
+  
   const location = useLocation();
 
   useEffect(() => {
@@ -402,22 +427,37 @@ async function postWorkpointCheck(imgUrl: string, lat:string, long:string) {
         <Box style={{width:'50vw', fontWeight:500, marginTop: 10, marginLeft: 20}}>
           {userEl?.fullName}
         </Box>
+         
       </Stack>
+
+      
       
       {step === 1 && (
         <>
+        
         <CenterBox>
+          
            {!isSupplier &&
            <>
             <CurrentDateTime />
+            <Button 
+              sx={{
+                  // backgroundColor:"#ccc",
+                  border:'1px solid #666', color:'#666',
+                  mt: 1, height: 20,maxWidth:300, mb:1 }} onClick={() => setModalVisible(true)}>
+            Bảng lương
+          </Button>
             <WorkpointGrid workpoint={workpoint}/>
+            
           </>
+          
            }
 
           <Stack direction="row" spacing={1} p={1}>
 
             {!isSupplier &&
             <>
+           
               <Button variant="contained"  
                   sx={{
                     backgroundColor:"#00B4B6",
@@ -506,6 +546,10 @@ async function postWorkpointCheck(imgUrl: string, lat:string, long:string) {
       {!isSupplier &&
         <LeaveBoard open={openHoliday} userId={userEl?.id} onCancel={handleHolidayBoardCancel}/>}
       
+      <StatisticsMonthDays 
+        selectedRecord={workpointEl} 
+        modalVisible={modalVisible}
+        handleOk={handleCloseModal} />
     </Stack>
   );
 };

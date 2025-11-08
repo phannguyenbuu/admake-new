@@ -5,15 +5,13 @@ import type { User } from "../../../@types/user.type";
 import { useApiHost } from "../../../common/hooks/useApiHost";
 import CameraDialog from "./Camera/CameraDialog";
 import { useLocation } from "react-router-dom";
+import { useWorkpointInfor } from "../../../common/hooks/useWorpointInfor";
 
 const Workpoint = () => {
     
   const { id } = useParams<{ id: string }>();
 
-  // Gọi API backend check với id và token
-  // Nếu hợp lệ thì render Group, không hợp lệ có thể redirect hoặc báo lỗi
-
-  // Ví dụ gọi API trong useEffect và lưu trạng thái check
+  const {workpointEl} = useWorkpointInfor();
   const [selected, setSelected] = React.useState<User | null>(null);
   const [verified, setVerified] = React.useState(false);
   const [loading, setLoading] = React.useState(true);
@@ -34,7 +32,6 @@ const Workpoint = () => {
     .then(response => {
         console.log(response);
         
-
         if (response.valid) {
             setVerified(true);
             setSelected(response.data);

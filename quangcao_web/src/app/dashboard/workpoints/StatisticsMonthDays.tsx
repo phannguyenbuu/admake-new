@@ -5,7 +5,7 @@ import { CenterBox } from '../../../components/chat/components/commons/TitlePane
 import type { PeriodData, WorkDaysProps } from '../../../@types/workpoint';
 import { Table, TableBody, TableCell, TableContainer, TableRow, TableHead, Paper } from '@mui/material';
 import { useWorkpointSetting } from '../../../common/hooks/useWorkpointSetting';
-
+import { useUser } from '../../../common/hooks/useUser';
 
 // const IS_SATURDAY_NOON_OFF = true;
 
@@ -17,10 +17,11 @@ interface StatisticsMonthDaysProps {
     handleOk: () => void;
 }
 
-function getMaxWorkingHours(month: number, year: number ) {
+function getMaxWorkingHours(month: number, year: number,  work_in_saturday_noon: boolean) {
   const daysInMonth = new Date(year, month, 0).getDate();
   let totalHours = 0;
-  const {workpointSetting} = useWorkpointSetting();
+  
+  
 
   for (let day = 1; day <= daysInMonth; day++) {
     const date = new Date(year, month - 1, day);
@@ -31,12 +32,14 @@ function getMaxWorkingHours(month: number, year: number ) {
       continue;
     } else if (weekday === 6) {
       // Thứ 7
-      totalHours += workpointSetting?.work_in_saturday_noon ? 8 : 4;
+      totalHours += work_in_saturday_noon ? 8 : 4;
     } else {
       // Ngày thường
       totalHours += 8;
     }
   }
+
+  // console.log("useWorkpointSetting",workpointSetting);
   
   return totalHours;
 }
@@ -80,18 +83,22 @@ const StatisticsMonthDays: React.FC<StatisticsMonthDaysProps> = ({ selectedRecor
   const [bonusSalary, setBonusSalary] = useState<number>(0);
   const {workpointSetting} = useWorkpointSetting();
   const OVERTIME_RATIO = workpointSetting?.multiply_in_night_overtime || 0;
-
+  const {isMobile} = useUser();
 
 
 
   const current_day = new Date();
-  const total_hours = getMaxWorkingHours(current_day.getMonth() + 1, current_day.getFullYear());
+  
 
   // console.log('total_hours', total_hours);
 
   useEffect(()=>{  
     console.log('selectedRecord', selectedRecord);
     if (!selectedRecord) return;
+
+    const total_hours = getMaxWorkingHours(current_day.getMonth() + 1, 
+      current_day.getFullYear(),
+      workpointSetting?.work_in_saturday_noon ?? false);
 
     let t = 0;
     let over_t = 0;
@@ -119,7 +126,7 @@ const StatisticsMonthDays: React.FC<StatisticsMonthDaysProps> = ({ selectedRecor
 
       setTotalSalary((t  + over_t * OVERTIME_RATIO) * salary_unit);
 
-    },[selectedRecord]);
+    },[selectedRecord, modalVisible]);
 
     return (
       <Modal
@@ -143,7 +150,10 @@ const StatisticsMonthDays: React.FC<StatisticsMonthDaysProps> = ({ selectedRecor
           <Typography>{selectedRecord?.username.toUpperCase()}</Typography>
           <Typography style={{fontWeight:300, fontSize:12, fontStyle:'italic'}}>{selectedRecord?.userrole}</Typography>
           
-          <TableContainer component={Paper} sx={{ mt: 2 }}>
+          <TableContainer component={Paper} sx={{ 
+              mt: isMobile ? 0 : 2, 
+              width: isMobile ? 400:'',
+             scale: isMobile ? 0.75 : '' }}>
             <Table>
               <TableBody>
                 <TableRow>

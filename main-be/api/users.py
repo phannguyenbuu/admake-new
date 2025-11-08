@@ -27,6 +27,17 @@ def get_users():
         }
     })
 
+# @user_bp.route("/<string:user_id/lead", methods=["GET"])
+# def get_user_leadId(user_id):
+#     user = db.session.get(User,user_id)
+
+#     if not user:
+#         print("Unknown user")
+#         abort(404, description="Unknown user")
+
+#     return jsonify()
+    
+
 from collections import namedtuple
 def get_query_page_users(lead_id, page, limit, search):
     if lead_id != 0:

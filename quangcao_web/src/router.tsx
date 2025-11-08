@@ -25,6 +25,8 @@ import { CenterBox } from "./components/chat/components/commons/TitlePanel";
 import { ChatGroupProvider } from "./components/chat/ProviderChat";
 import { Typography } from "@mui/material";
 import { WorkpointSettingProvider } from "./common/hooks/useWorkpointSetting";
+import { WorkpointInforProvider } from "./common/hooks/useWorpointInfor";
+import { RouterProvider } from "react-router-dom";
 
 interface TRoute extends Omit<NonIndexRouteObject, "index" | "children"> {
   children?: TRoute[];
@@ -84,7 +86,12 @@ const routes: TRoute = {
 
     {
       path: "/point/:id/",
-      element: <WorkpointSettingProvider><Workpoint/></WorkpointSettingProvider>,
+      element: 
+      <WorkpointInforProvider>
+      <WorkpointSettingProvider>
+        <Workpoint/>
+        </WorkpointSettingProvider>
+      </WorkpointInforProvider>,
       title: "Workpoint",
       ignoreInMenu: true,
     },

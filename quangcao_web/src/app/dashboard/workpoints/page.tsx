@@ -57,18 +57,6 @@ const WorkPointPage: IPage["Component"] = () => {
       );
       
       const result = await response.json();
-      // const ls: WorkDaysProps[] = [];
-      
-      // result.data.forEach((el:any) => {
-      //   el.status = 'work';
-      //   ls.push(el);
-      // });
-
-      // result.leave.forEach((el:any) => {
-      //   el.status = 'off';
-      //   ls.push(el);
-      // });
-
       
       setWorkpoints(result.data);
       setTotal(result.pagination.total);

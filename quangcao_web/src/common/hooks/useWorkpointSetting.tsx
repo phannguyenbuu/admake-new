@@ -2,6 +2,8 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 import { notification } from "antd";
 import { useApiHost } from "./useApiHost";
 import { useUser } from "./useUser";
+// import { useLocation } from "react-router-dom";
+import { useParams } from 'react-router-dom';
 
 interface DefaultState {
   morning_in_hour: number;
@@ -32,10 +34,14 @@ export const WorkpointSettingProvider = ({ children }: {children: React.ReactNod
   const [workpointSetting, setWorkpointSetting] = useState<DefaultState | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-    const {userLeadId} = useUser();
+    const {userLeadId, userId, setUserLeadId } = useUser();
+    // const { workpointEl, fetchWorkpointEl } = useWorkpointInfor();
+
+    
 
   const fetchWorkpointSetting = () => {
     setLoading(true);
+    
     fetch(`${useApiHost()}/workpoint/setting/${userLeadId}/`)
       .then(res => {
         if (!res.ok) {
@@ -46,6 +52,7 @@ export const WorkpointSettingProvider = ({ children }: {children: React.ReactNod
       })
       .then(data => {
         setWorkpointSetting(data);
+        console.log('Setting Data', data);
         setError(null);
       })
       .catch(err => {
@@ -56,7 +63,14 @@ export const WorkpointSettingProvider = ({ children }: {children: React.ReactNod
       });
   };
 
+  
+
   useEffect(() => {
+    const route = window.location.href.split('/')[1];
+
+    
+    console.log('Setting', location, userLeadId);
+
     if (userLeadId) {
       fetchWorkpointSetting();
     }

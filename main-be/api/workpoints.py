@@ -91,9 +91,6 @@ def get_batch_workpoint_detail():
     for lp in leavepoints:
         leavepoint_dict[lp.user_id].append(lp)
 
-    # if user_id == "202509242213305021912d62bc":
-    
-
     result = []
     leave_result = []
 
@@ -115,9 +112,6 @@ def get_batch_workpoint_detail():
             result.extend(wp_data_list)
         else:
             result.append({"user_id": user_id,"username": username,"userrole": user_role,"salary": salary})
-            
-        # if wp_data:
-        #     result.append(wp_data)
 
         if user_id in leavepoint_dict:
             leavepoints_for_user = leavepoint_dict[user_id]  # là list
@@ -129,14 +123,6 @@ def get_batch_workpoint_detail():
                 lp_data["salary"] = salary
             # Thêm toàn bộ list wp_data_list vào leave_result, hoặc theo cách bạn muốn
             leave_result.extend(lp_data_list)
-            
-        # if wp_data:
-        #     leave_result.append(wp_data)
-
-    # print('leave_result')
-    # print(leave_result)
-    # print('Leave_dict')
-    # print(leavepoint_dict)
 
     grouped_result = {}
 
@@ -171,19 +157,6 @@ def get_batch_workpoint_detail():
                      "noon": lp_data.get("noon"),
                      "reason": lp_data.get("reason")
                      })
-            # username = wp_data.get("username")
-            # userrole = wp_data.get("userrole")
-
-            # if user_id not in leave_grouped_result:
-            #     # Tạo nhóm mới với 'user_id', 'username' và danh sách chứa wp_data
-            #     leave_grouped_result[user_id] = {
-            #         "user_id": user_id,
-            #         "username": username,
-            #         "userrole": userrole,
-            #         "items": []
-            #     }
-            # # Thêm wp_data vào danh sách items của user
-            # leave_grouped_result[user_id]["items"].append(wp_data)
 
     return jsonify({
         "data": list(grouped_result.values()),
@@ -196,6 +169,58 @@ def get_batch_workpoint_detail():
             "pages": pagination.pages,
         }
     })
+
+
+
+
+
+
+
+
+
+@workpoint_bp.route("/by_user/<string:user_id>", methods=["GET"])
+def get_single_workpoint_detail(user_id):
+    user = User.query.get(user_id)
+    if not user:
+        abort(404, description="Invalid user")
+
+    username = user.fullName
+    salary = user.salary
+    # user_role = getattr(user.role, "name", None) if user.role else None
+
+    workpoints = Workpoint.query.filter_by(user_id=user_id).all()
+    leavepoints = Leave.query.filter_by(user_id=user_id).all()
+
+    wp_data_list = [wp.to_dict() for wp in workpoints]
+    for wp_data in wp_data_list:
+        wp_data["username"] = username
+        # wp_data["userrole"] = user_role
+        wp_data["salary"] = salary
+
+    lp_data_list = [lp.to_dict() for lp in leavepoints]
+    for lp_data in lp_data_list:
+        lp_data["username"] = username
+        # lp_data["userrole"] = user_role
+        lp_data["salary"] = salary
+
+    result = {
+        "user_id": user_id,
+        "username": username,
+        # "userrole": user_role,
+        "salary": salary,
+        "items": wp_data_list,
+        "leaves": lp_data_list,
+    }
+
+    return jsonify(result), 200
+
+
+
+
+
+
+
+
 
 @workpoint_bp.route('/check-access/<string:user_id>', methods=['GET'])
 def get_workpoint_checkpoint(user_id):
