@@ -84,7 +84,7 @@ const Conversation: React.FC<ConversationProps> = ({title,status,messages,setMes
         <Box className='scrollbar'
           // height={full ? '72vh':'100vh'}
           sx={{position:'relative', ml:0, overflowY:'scroll',}}>
-          <Message messages = {messages} menu={true} onDelete={onDelete}/>
+          <Message messages = {messages} menu={full} onDelete={onDelete}/>
         </Box>
         
         <Footer setMessages={setMessages} left = {boxRect.left} width={boxRect.width}/>

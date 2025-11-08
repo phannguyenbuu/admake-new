@@ -261,7 +261,7 @@ const JobTimeAndProcess: React.FC<JobTimeAndProcessProps> = ({form}) => {
 
       </TableContainer>
       
-      <JobAsset key="task-assets" taskDetail={taskDetail} title='Tài liệu' role="task"/>
+      <JobAsset key="task-assets" title='Tài liệu' role="task"/>
     </Stack>
   );
 };

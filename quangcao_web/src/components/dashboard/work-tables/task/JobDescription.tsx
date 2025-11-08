@@ -62,7 +62,7 @@ const JobDescription: React.FC<JobDescriptionProps> = ({ form }) => {
           />
         </Form.Item>
       {taskDetail?.type === "REWARD" &&
-        <JobAsset key="cash-assets" title = 'Ứng tiền' taskDetail={taskDetail} role="cash"/>}
+        <JobAsset key="cash-assets" title = 'Ứng tiền' role="cash"/>}
     </Stack>
   );
 };

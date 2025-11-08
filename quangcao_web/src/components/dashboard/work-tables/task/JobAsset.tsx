@@ -8,6 +8,7 @@ import { notification } from "antd";
 import DescriptionIcon from "@mui/icons-material/Description"; // icon tài liệu
 import { CircularProgress } from '@mui/material';
 import { useUser } from "../../../../common/hooks/useUser";
+import { useTaskContext } from "../../../../common/hooks/useTask";
 
 const isImageFile = (filename: string) => {
   // console.log('f',filename);
@@ -19,11 +20,12 @@ const isImageFile = (filename: string) => {
 interface JobAssetProps {
   title?: string;
   role?: string; // là ứng tiền hay hình ảnh tham khảo công trình
-  taskDetail: Task | null;
+  // taskDetail: Task | null;
 }
 
-const JobAsset: React.FC<JobAssetProps> = ({ title, role, taskDetail }) => {
+const JobAsset: React.FC<JobAssetProps> = ({ title, role }) => {
   // const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const {taskDetail} = useTaskContext();
   const [assets, setAssets] = useState<string[]>(taskDetail?.assets ?? []);
   const [filteredAssets, setFilteredAssets] = useState<string[]>([]);
   const [thumbLoading, setThumbLoading] = useState(false);
