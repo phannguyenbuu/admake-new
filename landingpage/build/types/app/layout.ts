@@ -1,4 +1,4 @@
-// File: D:\Dropbox\_Documents\_Vlance_2025\September\admake\landingpage\app\layout.tsx
+// File: C:\Users\2024\Desktop\Admake\admake-new\landingpage\app\layout.tsx
 import * as entry from '../../../app/layout.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 
