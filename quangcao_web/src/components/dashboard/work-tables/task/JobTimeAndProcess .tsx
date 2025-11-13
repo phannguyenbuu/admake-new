@@ -197,7 +197,7 @@ const JobTimeAndProcess: React.FC<JobTimeAndProcessProps> = ({form}) => {
                 </Form.Item>
               ) : (
                 <Typography style={{ fontWeight: 700, color: '#0092b8' }}>
-                  {taskDetail?.type === 'MONTHLY' ? 'Phụ cấp' : 'Công khoán'}
+                  Phụ cấp
                 </Typography>
               )}
           </TableCell>
