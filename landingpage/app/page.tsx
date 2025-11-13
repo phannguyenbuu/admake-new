@@ -25,8 +25,26 @@ import {
   Gift,
   FileCheck,
   Star,
+  Megaphone,
+  Calendar,
+  Sofa,
+  PanelsTopLeft, 
+  Zap,
+  Building,
+  Layers
 } from "lucide-react"
 import LeadForm from "@/components/lead-form"
+
+const categories = [
+  {label: "Quảng cáo", icon: Megaphone},
+  {label: "Sự kiện", icon: Calendar},
+  {label: "Nội thất", icon: Sofa},
+  {label: "Nhôm kính", icon: PanelsTopLeft},
+  {label: "Cơ khí", icon: Cog},
+  {label: "Điện nước", icon: Zap},
+  {label: "Xây dựng", icon: Building},
+  {label: "Thạch cao", icon: Layers},
+];
 
 export default function Page() {
 
@@ -55,8 +73,8 @@ export default function Page() {
             <Link href="#phan-he" className="hover:text-brand-600">
               Phân hệ
             </Link>
-            <Link href="#giao-dien" className="hover:text-brand-600">
-              Giao diện mẫu
+            <Link href="#bang-gia" className="hover:text-brand-600">
+              Bảng giá
             </Link>
             <Link href="#ly-do" className="hover:text-brand-600">
               Lý do chọn
@@ -80,6 +98,14 @@ export default function Page() {
       </header>
       {/* Hero */}
       <section className="relative isolate">
+        <script data-name-bot="bot lộc"
+	        src="https://app.preny.ai/embed-global.js"
+	        data-button-style="width:300px;height:300px;"
+	        data-language="vi"
+	        async
+	        defer
+	        data-preny-bot-id="69016558d7775fd3ed4c5ed8"
+        ></script>
         <div className="absolute inset-0 -z-10">
           <Image
             src="/industrial-factory-workers-machinery.png"
@@ -134,6 +160,7 @@ export default function Page() {
         </div>
 
         {/* Lĩnh vực áp dụng */}
+
         <div className="bg-neutral-800/80 py-10">
           <div className="container mx-auto px-4">
             <div className="mx-auto mb-6 flex h-32 w-32 items-center justify-center rounded-full border-4 border-brand-400 text-center text-[11px] font-semibold uppercase tracking-wide text-white">
@@ -141,25 +168,16 @@ export default function Page() {
               áp dụng
             </div>
             <div className="mx-auto grid max-w-3xl grid-cols-2 gap-3 text-xs sm:grid-cols-3 md:grid-cols-4 lg:text-sm">
-              {[
-    "Quảng cáo",
-    "Sự kiện",
-    "Nội thất",
-    "Nhôm kính",
-    "Cơ khí",
-    "Điện nước",
-    "Xây dựng",
-    "Thạch cao"
-  ].map(
-                (label) => (
+              {categories.map(({ label, icon: Icon }) => (
                   <button
                     key={label}
-                    className="rounded-full bg-brand-500 px-4 py-2 font-medium text-white shadow hover:bg-brand-400"
+                    className="flex items-center gap-3 rounded-full bg-brand-500 px-4 py-2 font-medium text-white shadow hover:bg-brand-400"
                   >
+                    <Icon size={16} />
                     {label}
                   </button>
-                ),
-              )}
+                
+              ))}
             </div>
           </div>
         </div>
@@ -304,7 +322,7 @@ export default function Page() {
       </section> */}
 
       {/* Giao diện mẫu */}
-      <section id="giao-dien" className="bg-brand-300 py-14 text-white">
+      <section id="bang-gia" className="bg-brand-300 py-14 text-white">
         <div className="container mx-auto px-4">
           <h2 className="text-center text-2xl font-bold md:text-3xl">Giao diện mẫu của ADMAKE</h2>
           <div className="mx-auto mt-8 aspect-[16/7] w-full max-w-5xl overflow-hidden rounded-xl border-4 border-black/10 bg-white shadow">
@@ -413,7 +431,7 @@ export default function Page() {
         </div>
       </section>
 
-      {/* Case studies */}
+      {/* Case studies
       <section id="case-study" className="bg-white py-14">
         <div className="container mx-auto px-4">
           <h2 className="text-center text-2xl font-bold md:text-3xl">CÂU CHUYỆN KHÁCH HÀNG</h2>
@@ -444,7 +462,7 @@ export default function Page() {
             <Button className="bg-brand-500 text-white hover:bg-brand-400" onClick={handleClick}>Đặt lịch tư vấn</Button>
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* Footer */}
       <footer id="lien-he" className="relative bg-neutral-900 py-14 text-neutral-200">
