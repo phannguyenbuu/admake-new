@@ -29,8 +29,7 @@ export default function LeadForm() {
     "Điện nước",
     "Xây dựng",
     "Thạch cao",
-    "Nghành cửa",
-    "khác",
+    "Khác",
   ]
   const companySizes = [
     "01 - 10 người",

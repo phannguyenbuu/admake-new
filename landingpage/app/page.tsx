@@ -102,7 +102,7 @@ export default function Page() {
             <p className="mt-4 max-w-2xl text-sm/6 md:text-base/7 text-white/90">
               ADMAKE không chỉ là một phần mềm quản lý, mà là giải pháp đột phá dành riêng cho các xưởng sản xuất và đội nhóm thi công. Sinh ra từ kinh nghiệm thực chiến trong ngành, ADMAKE giải quyết triệt để những bài toán kinh doanh, giúp bạn quản lý vững vàng, phát triển bền vững và thảnh thơi sáng tạo.
             </p>
-            <ul className="mt-6 grid max-w-2xl grid-cols-1 gap-3 text-sm md:grid-cols-2">
+            <ul className="mt-6 grid max-w-2xl grid-cols-1 gap-3 text-sm md:grid-cols-2 font-bold">
               {[
                 { title: "Quản lý công việc chuyên nghiệp", desc: "Sắp xếp, phân việc và theo dõi tiến độ khoa học" },
                 { title: "Chấm công linh hoạt & Tính lương tự động", desc: "Chấm công GPS, nhận diện khuôn mặt, tự động cập nhật lương" },
@@ -170,10 +170,10 @@ export default function Page() {
         <div className="container mx-auto px-4">
           <div className="mx-auto max-w-3xl text-center">
             <h2 className="text-2xl font-bold md:text-3xl">Tổng quan phần mềm ADMAKE</h2>
-            <p className="mt-2 text-white/80">Bộ giải pháp linh hoạt, đáp ứng đa dạng mô hình doanh nghiệp sản xuất.</p>
+            <p className="mt-2 font-bold text-white/80">Bộ giải pháp linh hoạt, đáp ứng đa dạng mô hình doanh nghiệp sản xuất.</p>
           </div>
 
-          <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 font-bold">
             {[
               {
                 icon: Cog,
@@ -233,7 +233,7 @@ export default function Page() {
           <h2 className="text-center text-2xl font-bold md:text-3xl">Tính năng đột phá của ADMAKE
           </h2>
          
-          <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 font-bold">
             {[
               { icon: ClipboardList, title: "Quản lý Công việc chuyên nghiệp", desc: "Sắp xếp, phân việc và theo dõi tiến độ theo từng cột riêng biệt, giúp công việc không bị trôi hay lẫn lộn trong các dòng tin nhắn." },
               { icon: Users, title: "Chấm công linh hoạt & Chính xác", desc: "Chấm công tức thì qua GPS và nhận diện khuôn mặt, ngay cả khi nhân viên ở công trình, không cần máy móc cồng kềnh." },
@@ -328,7 +328,7 @@ export default function Page() {
       <section id="ly-do" className="bg-white py-14">
         <div className="container mx-auto px-4">
           <h2 className="text-center text-2xl font-bold md:text-3xl">Tại sao nên lựa chọn giải pháp ADMAKE?</h2>
-          <div className="mt-8 grid gap-6 md:grid-cols-3">
+          <div className="mt-8 grid gap-6 md:grid-cols-3 font-bold">
             {[
               {
                 title: "Quản lý minh bạch toàn diện, từ A đến Z",
