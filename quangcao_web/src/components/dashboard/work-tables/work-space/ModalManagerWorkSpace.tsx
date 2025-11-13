@@ -145,16 +145,16 @@ export default function ModalManagerWorkSpace({
                   </Text>
                 </div>
               </div>
-              {/* <Button
+              <Button
                 type="primary"
                 icon={<PlusOutlined />}
                 onClick={() => setIsOpenModalCreateSpace(true)}
                 size="large"
-                disabled={!adminMode}
+                // disabled={!adminMode}
                 className="!bg-gradient-to-r !from-[#0891b2] !to-[#0e7490] !border-none !rounded-xl !shadow-lg hover:!shadow-xl !transition-all !duration-300 hover:!scale-105 !font-semibold !px-6"
               >
                 Tạo bảng công việc mới
-              </Button> */}
+              </Button>
             </div>
           </div>
 

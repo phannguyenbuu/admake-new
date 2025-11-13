@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify, abort
-from models import db, User, dateStr, app,LeadPayload
+from models import db, User, dateStr, app,LeadPayload, get_query_page_users
 from flask import Flask, request, jsonify, session
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 import datetime
@@ -38,47 +38,7 @@ def get_users():
 #     return jsonify()
     
 
-from collections import namedtuple
-def get_query_page_users(lead_id, page, limit, search):
-    if lead_id != 0:
-        lead = db.session.get(LeadPayload, lead_id)
-        if not lead:
-            Pagination = namedtuple('Pagination', ['total', 'pages'])
-            empty_pagination = Pagination(total=0, pages=0)
-            return [], empty_pagination
-        
-        query = lead.users.filter(
-            and_(
-                User.role_id > 0,
-                User.role_id < 100,
-            )
-        )
-    else:
-        # Lấy toàn bộ user khi lead_id == 0
-        query = User.query.filter(
-            and_(
-                User.role_id > 0,
-                User.role_id < 100,
-            )
-        )
 
-    print('User_query', lead_id, query.count())
-
-    if search:
-        query = query.filter(
-            (User.username.ilike(f"%{search}%")) | 
-            (User.fullName.ilike(f"%{search}%"))
-        )
-
-    split_length = func.array_length(func.regexp_split_to_array(User.fullName, ' '), 1)
-    last_name = func.split_part(User.fullName, ' ', split_length)
-
-    query = query.order_by(desc(User.updatedAt)).order_by(last_name, User.id)
-
-    pagination = query.paginate(page=page, per_page=limit, error_out=False)
-    users = [c.to_dict() for c in pagination.items]
-
-    return users, pagination
 
 @user_bp.route("/", methods=["POST"])
 def create_user():

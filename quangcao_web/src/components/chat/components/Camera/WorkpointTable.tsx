@@ -111,9 +111,10 @@ function WorkpointGrid({ workpoint, fetchWorkpoint }: Props) {
      {workpoint && !isRemoveChecklist &&
                    <Button 
                      sx={{
-                         // backgroundColor:"#ccc",
-                         border:'1px solid #666', color:'#000',
-                         mt: 0.5, height: 20,maxWidth:300, mb:1 }} onClick={handleRemoveChecklist}>
+                         borderRadius: 10,
+                         border:'1px solid orange', color:'orange',
+                         mt: 0.5, height: 30,maxWidth:300, mb:1 }} onClick={handleRemoveChecklist}>
+                          <img src="/remove-bookmark-svgrepo-com.svg" alt="ADMAKE" style={{width:20}}/>
                      Xóa điểm danh gần nhất
                    </Button>}
 

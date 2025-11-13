@@ -161,11 +161,11 @@ def delete_workspace(workspace_id):
     print('Delete workspace', workspace.owner_id)
     owner = db.session.get(User, workspace.owner_id)
 
-    if owner:
-        for customer in owner.customer:
-            db.session.delete(customer)
-        db.session.query(Message).filter(Message.user_id == owner.id).delete()
-        db.session.delete(owner)
+    # if owner:
+    #     for customer in owner.customer:
+    #         db.session.delete(customer)
+    #     db.session.query(Message).filter(Message.user_id == owner.id).delete()
+    #     db.session.delete(owner)
 
     db.session.delete(workspace)
     db.session.commit()

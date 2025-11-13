@@ -125,7 +125,7 @@ export default function ModalCreateSpace({
                     Lưu ý khi tạo bảng công việc:
                   </Text>
                   <ul className="text-blue-700 text-sm space-y-1">
-                    <li>• Tên bảng sẽ hiển thị cho tất cả thành viên</li>
+                    {/* <li>• Tên bảng sẽ hiển thị cho tất cả thành viên</li> */}
                     <li>• Bạn có thể chỉnh sửa hoặc xóa bảng sau này</li>
                     <li>• Bảng mới sẽ được tạo với trạng thái hoạt động</li>
                   </ul>

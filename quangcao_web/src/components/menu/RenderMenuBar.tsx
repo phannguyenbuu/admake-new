@@ -273,13 +273,13 @@ export default function RenderMenuBar({}) {
       </div>
 
       {/* Modal tạo bảng mới cho Desktop */}
-      {/* <div className="!z-[10001]">
+      <div className="!z-[10001]">
         <ModalCreateSpace
           open={isModalOpen}
           onCancel={() => setIsModalOpen(false)}
           // onCreate={handleAddBoard}
         />
-      </div> */}
+      </div>
 
       {/* Modal Workspace cho Tablet - Enhanced UI */}
       <ModalManagerWorkSpace

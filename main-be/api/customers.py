@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify, abort
-from models import db, Workspace, dateStr, User, create_workspace_method, Message, LeadPayload, get_model_columns
+from models import db, Workspace, dateStr, User, create_workspace_method, Message, LeadPayload, get_model_columns, get_query_page_users
 # from api.groups import create_group
 import datetime
 from sqlalchemy import desc
@@ -23,7 +23,9 @@ def get_customers():
     if not lead:
         abort(404, description="Lead not found")
 
-    # print('customer', Customer.query.all(), search)
+    customers, pagination = get_query_page_users(lead_id,page,limit,search, role_id = -1)
+
+    print('customer', len(customers))
 
     query = Workspace.query.filter(Workspace.lead_id == lead_id)
 
@@ -110,14 +112,12 @@ def update_customer(id):
 
 @customer_bp.route("/<string:id>", methods=["DELETE"])
 def delete_customer(id):
-    customer = db.session.get(Workspace, id)
+    customer = db.session.get(User, id)
     if not customer:
-        return jsonify({"error": "Workspace not found"}), 404
+        return jsonify({"error": "User of customer not found"}), 404
     
-    
-
     # Nếu muốn xóa luôn user liên quan:
-    user = db.session.get(User, customer.owner_id)
+    user = db.session.get(User, customer.id)
     print('DELETE', customer, customer.owner_id, user)
 
     if user:

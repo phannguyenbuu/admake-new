@@ -53,6 +53,13 @@ function toVNISOString(dt: string, h: number): string {
   return clone.toString();
 }
 
+function checkWorkPeriod(item: PeriodData):number { 
+  if(!item.in) 
+    return 0;
+  else
+    return 1;
+}
+
 function checkWorkhour(item: PeriodData, end_time: number):number { 
   if(!item.in) return 0;
   
@@ -88,6 +95,7 @@ interface RewardProps {
 
 const StatisticsMonthDays: React.FC<StatisticsMonthDaysProps> = ({ selectedRecord, modalVisible, handleOk }) => {
   const [timeWork, setTimeWork] = useState<number>(0);
+  const [periodWork, setPeriodWork] = useState<number>(0);
   const [overTimeWork, setOverTimeWork] = useState<number>(0);
   const [salaryUnit, setSalaryUnit] = useState<number>(0);
   const [totalSalary, setTotalSalary] = useState<number>(0);
@@ -146,27 +154,35 @@ const StatisticsMonthDays: React.FC<StatisticsMonthDaysProps> = ({ selectedRecor
 
     let t = 0;
     let over_t = 0;
+    let p = 0;
 
     selectedRecord.items && selectedRecord.items.forEach(item => {
       const checklist = item.checklist;
       if(!checklist) return;
 
       if(checklist.morning)
+      {
         t += checkWorkhour(checklist.morning, 12);
+        p += checkWorkPeriod(checklist.morning);
+      }
       
       if(checklist.noon)
+      {
         t += checkWorkhour(checklist.noon, 17);
+        p += checkWorkPeriod(checklist.noon);
+      }
       
       if(checklist.evening)
         over_t += checkWorkhour(checklist.evening, 22);
     });
 
       setTimeWork(t);
+      setPeriodWork(p);
       setOverTimeWork(over_t);
       const salary_unit = selectedRecord.salary / total_hours;
       setSalaryUnit(salary_unit);
 
-      setTotalSalary((t  + over_t * OVERTIME_RATIO) * salary_unit);
+      setTotalSalary((p * 4  + over_t * OVERTIME_RATIO) * salary_unit);
 
       fetchTaskByUser();
 
@@ -189,7 +205,7 @@ const StatisticsMonthDays: React.FC<StatisticsMonthDaysProps> = ({ selectedRecor
         >
 
         <CenterBox>
-          <Box sx={{ borderRadius: 10, backgroundColor: "#00B4B6", px: 5, py: 1, mb: 2 }}>
+          <Box sx={{ borderRadius: 10, backgroundColor: "#00B4B6", px: 5, py: 1, mb: 0 }}>
             <Typography sx={{ textTransform: "uppercase", color: "#fff", fontWeight: 500, textAlign: "center" }}>
               BẢNG LƯƠNG THÁNG {current_day.getMonth() + 1}
             </Typography>
@@ -202,34 +218,34 @@ const StatisticsMonthDays: React.FC<StatisticsMonthDaysProps> = ({ selectedRecor
               mt: isMobile ? 0 : 2, 
               width: isMobile ? 400:'100%',
              scale: isMobile ? 0.75 : 1 }}>
-            <Table>
+            <Table style={{padding: 0}}>
               <TableBody>
                 <TableRow>
                   <TableCell style={{fontWeight:700}}>Nội dung</TableCell>
                   <TableCell style={{fontWeight:700}}>Giá trị</TableCell>
-                  <TableCell style={{fontWeight:700}}>Lương giờ</TableCell>
-                  <TableCell style={{fontWeight:700}}>Nhân hệ số</TableCell>
+                  <TableCell style={{fontWeight:700}}>Lương/ĐVT</TableCell>
+                  {/* <TableCell style={{fontWeight:700}}>Nhân hệ số</TableCell> */}
                   <TableCell style={{fontWeight:700}}>Thành tiền</TableCell>
                 </TableRow>
                 <TableRow>
-                  <TableCell>Tổng giờ làm trong tháng</TableCell>
-                  <TableCell>{timeWork.toFixed(3)}</TableCell>
-                  <TableCell>{formatMoney(salaryUnit)} ₫</TableCell>
-                  <TableCell>1.0</TableCell>
-                  <TableCell>{formatMoney(salaryUnit * 1 * timeWork)} ₫</TableCell>
+                  <TableCell>Số buổi làm trong tháng</TableCell>
+                  <TableCell>{periodWork}</TableCell>
+                  <TableCell>{formatMoney(salaryUnit * 4)} ₫</TableCell>
+                  {/* <TableCell>1.0</TableCell> */}
+                  <TableCell>{formatMoney(salaryUnit * 4 * periodWork)} ₫</TableCell>
                 </TableRow>
                 <TableRow>
                   <TableCell>Tổng giờ tăng ca trong tháng</TableCell>
                   <TableCell>{overTimeWork.toFixed(3)}</TableCell>
-                  <TableCell>{formatMoney(salaryUnit)} ₫</TableCell>
-                  <TableCell>{OVERTIME_RATIO}</TableCell>
+                  <TableCell>{formatMoney(salaryUnit * OVERTIME_RATIO)} ₫</TableCell>
+                  {/* <TableCell>{OVERTIME_RATIO}</TableCell> */}
                   <TableCell>{formatMoney(salaryUnit * OVERTIME_RATIO * overTimeWork)} ₫</TableCell>
                 </TableRow>
                 <TableRow>
                   <TableCell>Thưởng theo việc</TableCell>
                   <TableCell>{formatMoney(bonusSalary)} ₫</TableCell>
                   <TableCell>-</TableCell>
-                  <TableCell>-</TableCell>
+                  {/* <TableCell>-</TableCell> */}
                   <TableCell>{formatMoney(bonusSalary)} ₫</TableCell>
                 </TableRow>
                 {
@@ -238,7 +254,7 @@ const StatisticsMonthDays: React.FC<StatisticsMonthDaysProps> = ({ selectedRecor
                       <TableCell style={highlightRow}>+ {el.workspace}</TableCell>
                       <TableCell style={highlightRow}>({el.title})</TableCell>
                       <TableCell style={highlightRow}>-</TableCell>
-                      <TableCell style={highlightRow}>-</TableCell>
+                      {/* <TableCell style={highlightRow}>-</TableCell> */}
                       <TableCell style={highlightRow}>{formatMoney(el.reward)} ₫</TableCell>
                     </TableRow>)
                 }
@@ -246,7 +262,7 @@ const StatisticsMonthDays: React.FC<StatisticsMonthDaysProps> = ({ selectedRecor
                   <TableCell style={{fontWeight:700}}>Tổng lương</TableCell>
                   <TableCell>-</TableCell>
                   <TableCell>-</TableCell>
-                  <TableCell>-</TableCell>
+                  {/* <TableCell>-</TableCell> */}
                   <TableCell>{formatMoney(salaryUnit * 1 * timeWork + salaryUnit * 1.5 * overTimeWork + bonusSalary)} ₫</TableCell>
                 </TableRow>
               </TableBody>

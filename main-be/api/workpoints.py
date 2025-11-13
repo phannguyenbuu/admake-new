@@ -65,7 +65,9 @@ def get_batch_workpoint_detail():
     from collections import defaultdict
 
     page = request.args.get("page", 1, type=int)
-    lead_id = request.args.get("lead", 1, type=int)
+    lead_id = request.args.get("lead", 0, type=int)
+
+
 
     limit = request.args.get("limit", 10, type=int)
     search = request.args.get("search", "", type=str)

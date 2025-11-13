@@ -27,7 +27,7 @@ const NoteWorkpointModal: React.FC<NoteWorkpointModalProps> = ({
   onCancel,
   children,
 }) => {
-      const {userLeadId} = useUser();
+      const {userLeadId, isMobile} = useUser();
       const {workpointSetting, setWorkpointSetting} = useWorkpointSetting();
           
       const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -114,11 +114,11 @@ const NoteWorkpointModal: React.FC<NoteWorkpointModalProps> = ({
           title={`Kí hiệu & cấu hình phần chấm công`}
         >
         <ThemeProvider theme={theme}>
-        <Stack direction="row" spacing={10} p={2}>
+        <Stack direction="row" spacing={1} p={2}>
           <Stack spacing={1}>
             <Stack direction="row" spacing={1}>
                 <Box sx={{width:20,height:20,borderRadius:10,background:'none',border:'1px solid #000'}}/>
-                <Typography>Chưa check-in</Typography>
+                <Typography style={{whiteSpace:'nowrap'}}>Chưa check-in</Typography>
             </Stack>
 
             <Stack direction="row" spacing={1}>
@@ -147,14 +147,14 @@ const NoteWorkpointModal: React.FC<NoteWorkpointModalProps> = ({
                   </Typography>
               </Stack>
               <Stack sx={{ }}>
-                <Typography>Tổng giờ làm hành chính</Typography>
+                <Typography style={{whiteSpace:'nowrap'}}>Tổng giờ làm hành chính</Typography>
                 <Typography sx={{pt:3}}>Tổng giờ tăng ca</Typography>
               </Stack>
             </Stack>
             
           </Stack>
           
-          <Stack component="form" onSubmit={handleSubmit} spacing={4}>
+          <Stack component="form" onSubmit={handleSubmit} spacing={1}>
                 <TableContainer component={Paper}>
                   <Table size="small" aria-label="work times table">
                     <TableHead>
@@ -166,51 +166,60 @@ const NoteWorkpointModal: React.FC<NoteWorkpointModalProps> = ({
                     </TableHead>
                     <TableBody>
                       {['morning', 'noon'].map(period => (
-                        <TableRow key={period}>
-                          <TableCell>{period === "morning" ? "Sáng" : "Chiều"}</TableCell>
+                        <TableRow key={period} sx={{ '& > *': { borderBottom: 'unset', padding: 1 } }}>
                           <TableCell>
-                            <TextField
-                              type="number"
-                              name={`${period}_in_hour`}
-                              value={workpointSetting ? workpointSetting[`${period}_in_hour`] : ''}
-                              onChange={handleChange}
-                              inputProps={{ min: 0, max: 23 }}
-                              label="Giờ vào"
-                              required
-                              style={{ width: 75 }}
-                            />
-                            <TextField
-                              type="number"
-                              name={`${period}_in_minute`}
-                              value={workpointSetting ? workpointSetting[`${period}_in_minute`] : ''}
-                              onChange={handleChange}
-                              inputProps={{ min: 0, max: 59, step: 1 }}
-                              label="Phút vào"
-                              required
-                              style={{ width: 75, marginLeft: 8 }}
-                            />
+                            {
+                              isMobile ?
+                              (period === "morning" ? "S" : "C")
+                              : (period === "morning" ? "Sáng" : "Chiều")
+                            }</TableCell>
+                          <TableCell >
+                            <Stack direction="row" style={{maxWidth: isMobile ? 120: ''}}>
+                              <TextField
+                                type="number"
+                                name={`${period}_in_hour`}
+                                value={workpointSetting ? workpointSetting[`${period}_in_hour`] : ''}
+                                onChange={handleChange}
+                                inputProps={{ min: 0, max: 23 }}
+                                label="Giờ vào"
+                                required
+                                style={{ width: 75 }}
+                              />
+                              <TextField
+                                type="number"
+                                name={`${period}_in_minute`}
+                                value={workpointSetting ? workpointSetting[`${period}_in_minute`] : ''}
+                                onChange={handleChange}
+                                inputProps={{ min: 0, max: 59, step: 1 }}
+                                label="Phút vào"
+                                required
+                                style={{ width: 75, marginLeft: 8 }}
+                              />
+                              </Stack>
                           </TableCell>
                           <TableCell>
-                            <TextField
-                              type="number"
-                              name={`${period}_out_hour`}
-                              value={workpointSetting ? workpointSetting[`${period}_out_hour`] : ''}
-                              onChange={handleChange}
-                              inputProps={{ min: 0, max: 23 }}
-                              label="Giờ ra"
-                              required
-                              style={{ width: 75 }}
-                            />
-                            <TextField
-                              type="number"
-                              name={`${period}_out_minute`}
-                              value={workpointSetting ? workpointSetting[`${period}_out_minute`] : ''}
-                              onChange={handleChange}
-                              inputProps={{ min: 0, max: 59, step: 1 }}
-                              label="Phút ra"
-                              required
-                              style={{ width: 75, marginLeft: 8 }}
-                            />
+                            <Stack direction="row" style={{maxWidth: isMobile ? 120: ''}}>
+                              <TextField
+                                type="number"
+                                name={`${period}_out_hour`}
+                                value={workpointSetting ? workpointSetting[`${period}_out_hour`] : ''}
+                                onChange={handleChange}
+                                inputProps={{ min: 0, max: 23 }}
+                                label="Giờ ra"
+                                required
+                                style={{ width: 75 }}
+                              />
+                              <TextField
+                                type="number"
+                                name={`${period}_out_minute`}
+                                value={workpointSetting ? workpointSetting[`${period}_out_minute`] : ''}
+                                onChange={handleChange}
+                                inputProps={{ min: 0, max: 59, step: 1 }}
+                                label="Phút ra"
+                                required
+                                style={{ width: 75, marginLeft: 8 }}
+                              />
+                            </Stack>
                           </TableCell>
                         </TableRow>
                       ))}
@@ -227,6 +236,7 @@ const NoteWorkpointModal: React.FC<NoteWorkpointModalProps> = ({
                         onChange={handleChange}
                       />
                     }
+                     style={{whiteSpace:'nowrap'}}
                     label="Làm chiều thứ 7"
                   />
 
@@ -253,7 +263,7 @@ const NoteWorkpointModal: React.FC<NoteWorkpointModalProps> = ({
                   />
                 </Stack>
 
-                <Button variant="contained" type="submit">Cập nhật</Button>
+                <Button variant="contained" type="submit" style={{backgroundColor:'#00B5B4'}}>Cập nhật</Button>
               </Stack>
 
             </ThemeProvider>

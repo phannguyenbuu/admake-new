@@ -447,15 +447,16 @@ async function postWorkpointCheck(imgUrl: string, lat:string, long:string) {
            {!isSupplier &&
            <>
             <CurrentDateTime />
-              <Button 
-                sx={{
-                    // backgroundColor:"#ccc",
-                    border:'1px solid #666', color:'#000',
-                    mt: 0.5, height: 20, maxWidth: 300, mb:1 }} onClick={() => setModalVisible(true)}>
-                Bảng lương
-              </Button>
-
-              
+           
+            
+            <Button variant="contained"  
+                  sx={{
+                    backgroundColor:"orange",borderRadius:20,
+                      mt: 1, height: 50,maxWidth:300, mb:1 }} onClick={capturePhoto}>
+                <img src="/alarm-svgrepo-com.svg" alt="ADMAKE" style={{width:40}}/>
+                Check-in nhé !
+            </Button>
+             
 
             <WorkpointGrid workpoint={workpoint} fetchWorkpoint={fetchWorkpoint}/>
             
@@ -468,27 +469,39 @@ async function postWorkpointCheck(imgUrl: string, lat:string, long:string) {
             {!isSupplier &&
             <>
            
-              <Button variant="contained"  
-                  sx={{
-                    backgroundColor:"#00B4B6",
-                      mt: 1, height: 50,maxWidth:300, mb:1 }} onClick={capturePhoto}>
-                Điểm danh
-              </Button>
+              
               
               <Button variant="contained"  
-                  sx={{
-                    backgroundColor:"#00B4B6",
+                  sx={{borderRadius:40,
+                    backgroundColor:"#00B4B6",fontSize:10,whiteSpace:'nowrap',
                       mt: 1, height: 50,maxWidth:300, mb:1 }} onClick={handleHolidayClick}>
+                <img src="/holiday-island-tourism-svgrepo-com.svg" alt="ADMAKE" style={{width:32}}/>
                 Nghỉ phép
               </Button>
               </>}
           
-          <Button variant="contained"  
-              sx={{
-                backgroundColor:"#00B4B6",
-                  mt: 1, height: 50,maxWidth:300, mb:1 }} onClick={handleTaskClick}>
-            Nhiệm vụ
-          </Button>
+            <Button variant="contained"  
+                sx={{borderRadius:40,
+                  backgroundColor:"#00B4B6",fontSize:10,textAlign:'left',whiteSpace:'nowrap',
+                    mt: 1, height: 50,maxWidth:300, mb:1 }} onClick={handleTaskClick}>
+              <img src="/task-done-svgrepo-com.svg" alt="ADMAKE" style={{width:32}}/>
+              Nhiệm vụ
+            </Button>
+
+            <Button 
+              // sx={{
+              //     // backgroundColor:"#ccc",
+              //     border:'1px solid #666', color:'#000',
+              //     mt: 0.5, height: 20, maxWidth: 300, mb:1 }} 
+                sx={{
+                  borderRadius:40,
+                   color:'#fff',fontSize:10,
+                    backgroundColor:"#00B4B6",textAlign:'left',whiteSpace:'nowrap',
+                      mt: 1, height: 50,maxWidth:300, mb:1 }}
+                onClick={() => setModalVisible(true)}>
+              <img src="/pay-svgrepo-com.svg" alt="ADMAKE" style={{width:32}}/>
+              Bảng lương
+            </Button>
           </Stack>
           
           {!isSupplier &&
