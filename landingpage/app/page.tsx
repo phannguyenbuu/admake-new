@@ -73,7 +73,7 @@ export default function Page() {
             <Link href="#phan-he" className="hover:text-brand-600">
               Phân hệ
             </Link>
-            <Link href="#bang-gia" className="hover:text-brand-600">
+            <Link href="#giao-dien" className="hover:text-brand-600">
               Bảng giá
             </Link>
             <Link href="#ly-do" className="hover:text-brand-600">
@@ -322,7 +322,7 @@ export default function Page() {
       </section> */}
 
       {/* Giao diện mẫu */}
-      <section id="bang-gia" className="bg-brand-300 py-14 text-white">
+      <section id="giao-dien" className="bg-brand-300 py-14 text-white">
         <div className="container mx-auto px-4">
           <h2 className="text-center text-2xl font-bold md:text-3xl">Giao diện mẫu của ADMAKE</h2>
           <div className="mx-auto mt-8 aspect-[16/7] w-full max-w-5xl overflow-hidden rounded-xl border-4 border-black/10 bg-white shadow">
