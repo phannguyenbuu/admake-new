@@ -170,7 +170,7 @@ export default function Page() {
         <div className="container mx-auto px-4">
           <div className="mx-auto max-w-3xl text-center">
             <h2 className="text-2xl font-bold md:text-3xl">Tổng quan phần mềm ADMAKE</h2>
-            <p className="mt-2 text-white/80">Bộ giải pháp linh hoạt, đáp ứng đa dạng mô hình doanh nghiệp sản xuất.</p>
+            <p className="mt-2 font-bold text-white/80">Bộ giải pháp linh hoạt, đáp ứng đa dạng mô hình doanh nghiệp sản xuất.</p>
           </div>
 
           <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 font-bold">

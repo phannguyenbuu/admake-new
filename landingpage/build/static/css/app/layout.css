@@ -383,6 +383,9 @@
   .isolation-auto {
     isolation: auto;
   }
+  .-z-8 {
+    z-index: calc(8 * -1);
+  }
   .-z-10 {
     z-index: calc(10 * -1);
   }
