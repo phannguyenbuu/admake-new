@@ -23,11 +23,13 @@ def get_customers():
     if not lead:
         abort(404, description="Lead not found")
 
-    customers, pagination = get_query_page_users(lead_id,page,limit,search, role_id = -1)
+    # customers, pagination = get_query_page_users(lead_id,page,limit,search, role_id = -1)
+    
+    # print('customer', len(customers))
 
-    print('customer', len(customers))
-
-    query = Workspace.query.filter(Workspace.lead_id == lead_id)
+    query = Workspace.query.filter(
+            Workspace.lead_id == lead_id,
+            Workspace.owner_id != None)
 
     if search:
         query = query.filter(Workspace.name.ilike(f"%{search}%"))
@@ -54,8 +56,6 @@ def create_customer():
     data = request.get_json()
     
     return create_workspace_method(data)
-
-
 
 @customer_bp.route("/<string:id>", methods=["GET"])
 def get_customer_detail(id):
@@ -110,21 +110,22 @@ def update_customer(id):
     db.session.commit()
     return jsonify(workspace.to_dict()), 200
 
-@customer_bp.route("/<string:id>", methods=["DELETE"])
-def delete_customer(id):
-    customer = db.session.get(User, id)
-    if not customer:
-        return jsonify({"error": "User of customer not found"}), 404
+@customer_bp.route("/<string:workspace_id>", methods=["DELETE"])
+def delete_customer(workspace_id):
+    workspace = db.session.get(Workspace, workspace_id)
+    if not workspace:
+        print('Cannot find workspace', workspace_id)
+        return jsonify({"error": "Workspace not found"}), 404
     
-    # Nếu muốn xóa luôn user liên quan:
-    user = db.session.get(User, customer.id)
-    print('DELETE', customer, customer.owner_id, user)
+    print('Delete workspace', workspace.owner_id)
+    owner = db.session.get(User, workspace.owner_id)
 
-    if user:
-        db.session.query(Message).filter(Message.user_id == user.id).delete()
-        db.session.delete(user)
+    if owner:
+        for customer in owner.customer:
+            db.session.delete(customer)
+        db.session.query(Message).filter(Message.user_id == owner.id).delete()
+        db.session.delete(owner)
 
-    db.session.delete(customer)
+    db.session.delete(workspace)
     db.session.commit()
-
-    return jsonify({"message": "Customer and user deleted"}), 200
+    return jsonify({"message": "Workspace deleted successfully"}), 200

@@ -200,10 +200,10 @@ export default function FormTask({ open, onCancel, onSuccess, users}: FormTaskPr
   },[taskDetail, workspaceId]);
 
   return (
-    <Modal open={open} onCancel={onCancel} footer={null} centered width={900}>
+    <Modal open={open} onCancel={onCancel} footer={null} width={900} >
         <TaskHeader onUpdate={handleUpdate} onSuccess={onSuccess}/>
       
-        <Form form={form} style={cellStyle}>
+        <Form form={form} style={{overflowX:'hidden', maxHeight:'90vh', overflowY:'auto'}}>
           <Stack spacing={1}>
             <Form.Item name="workspace_id" initialValue={workspaceId} hidden>
             </Form.Item>

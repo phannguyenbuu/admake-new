@@ -1,6 +1,10 @@
 import { useEffect, useState, useCallback } from "react";
-import { Row, Col, Card, Button, message, Modal } from "antd";
+import { Row, Col, Card, Button, message, Modal, notification } from "antd";
 import { StarOutlined, PlusOutlined, MoreOutlined } from "@ant-design/icons";
+import CloseIcon from '@mui/icons-material/Close';
+import { Typography, Stack, IconButton, Box, TextField } from "@mui/material";
+import { useApiHost } from "../../../../common/hooks/useApiHost";
+
 import FormTask from "../FormTask";
 import {
   DragDropContext,
@@ -98,10 +102,35 @@ export const CardItem: React.FC<CardItemProps> = ({
   // setEditingTaskId,
   setShowFormTask,
 }) => {
+  const [showConfirm, setShowConfirm] = useState<boolean>(false);
+  const {tasksData, updateTaskStatus, refetchTasks, taskDetail, setTaskDetail} = useTaskContext();
+  // const {setTaskDetail} = useTaskContext();
 
-  const {setTaskDetail} = useTaskContext();
+  const handleDelete = async (id: string) => {
+    setShowConfirm(false);
+
+    try {
+      const response = await fetch(`${useApiHost()}/task/${id}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) {
+        notification.error({"message":`Xóa task không thành công:`, description:response.statusText});
+      }else
+      {
+        notification.success({"message":"Xóa task thành công!"});
+        refetchTasks();
+      }
+      // Bạn có thể gọi lại mutate hoặc cập nhật UI sau khi xóa thành công
+    } catch (error) {
+      message.error("Lỗi khi xóa task!");
+      console.error(error);
+    }
+  };
+
 
     return (
+      <>
     <div
       ref={provided?.innerRef}
       {...provided?.draggableProps}
@@ -181,14 +210,40 @@ export const CardItem: React.FC<CardItemProps> = ({
 
         {/* Task footer */}
         <div className="flex items-center justify-between mt-2 pt-2 border-t border-gray-100/50">
-          <div className="flex gap-1">
-            <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: theme.color }}></div>
-            <div className="w-1.5 h-1.5 bg-gray-200 rounded-full"></div>
-            <div className="w-1.5 h-1.5 bg-gray-200 rounded-full"></div>
-          </div>
+          <IconButton
+            size="small"
+            aria-label="delete"
+            color="error"
+            onClick={(event) => 
+              {
+                event.preventDefault();
+                event.stopPropagation();
+                setShowConfirm(true);
+                
+              }}
+            sx={{
+              color: '#777',
+              top: -10,
+              '&:hover': {
+                color: 'red',
+                backgroundColor: 'rgba(255, 0, 0, 0.1)',
+              },
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
           <div className="text-xs text-gray-400 font-mono flex-shrink-0">#{task.id?.slice(-4)}</div>
         </div>
       </div>
     </div>
+
+     <Modal
+          title="Bạn có chắc muốn xóa công việc ?"
+          open={showConfirm}
+          onOk = {() => handleDelete(task.id)}
+          onCancel={() => setShowConfirm(false)}
+          >
+          </Modal>
+          </>
   );
 }

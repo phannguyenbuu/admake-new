@@ -106,6 +106,14 @@ const ChatInput = forwardRef<HTMLDivElement, ChatInputProps>(
         formData.append("role", userRoleId.toString());
         formData.append("userId", userId?.toString() || '');
 
+        for (const [key, value] of formData.entries()) {
+          console.log(`${key}: ${value}`);
+        }
+
+        // Hoặc log tất cả các entries như mảng
+        console.log('Upload');
+        console.log(Array.from(formData.entries()));
+
         const uploadResponse = await fetch(`${useApiHost()}/message/upload`, {
           method: "POST",
           body: formData,

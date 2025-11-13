@@ -192,10 +192,6 @@ export default function FooterMenuBar({
         <ModalCreateSpace
           open={isModalOpen}
           onCancel={() => setIsModalOpen(false)}
-          onCreate={(values) => {
-            // onAddBoard(values);
-            setIsModalOpen(false);
-          }}
         />
       </div>
     </>

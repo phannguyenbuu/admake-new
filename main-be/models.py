@@ -289,6 +289,17 @@ class Workspace(BaseModel):
     chats = db.Column(db.JSON, default=[])      # Lưu danh sách message ID lưu lại
     rating_sum = db.Column(db.Integer, default=0)
     rating_count = db.Column(db.Integer, default=0)
+    null_workspace = db.Column(db.Boolean, default=False)
+
+
+
+    column_open_name = db.Column(db.String(255), default="Phân việc")
+    column_in_progress_name = db.Column(db.String(255), default="Sản xuất")
+    column_done_name = db.Column(db.String(255), default="Hoàn thiện")
+    column_reward_name = db.Column(db.String(255), default="Khoán thưởng")
+
+
+
 
     status = db.Column(db.String(50))
     
@@ -334,6 +345,7 @@ class Task(BaseModel):
     description = db.Column(db.Text)
     status = db.Column(db.String(50))
     type = db.Column(db.String(50))
+    rate = db.Column(db.Integer)
     reward = db.Column(db.Integer)
     amount = db.Column(db.Integer)
     salary_type = db.Column(db.String(10))
@@ -353,10 +365,29 @@ class Task(BaseModel):
         result = {}
         for column in self.__table__.columns:
             value = getattr(self, column.name)
-            # print(f"DEBUG: Column {column.name} value type: {type(value)}")
+        
             if isinstance(value, (datetime.datetime, datetime.date)):
                 value = value.isoformat()
             result[column.name] = value
+
+        if self.assign_ids:
+            ls = []
+            for id in self.assign_ids:
+                user = db.session.get(User, id)
+                if user:
+                    ls.append({"id":id,"name": user.fullName})
+
+            result["assign_ids"] = ls
+
+        if self.assets:
+            ls = []
+            for asset_id in self.assets:
+                asset = db.session.get(Message, asset_id)
+
+                if asset:
+                    ls.append(asset.to_dict())
+
+            result["assets"] = ls
 
         workspace = db.session.get(Workspace, self.workspace_id)
         if workspace:
@@ -395,6 +426,7 @@ class Message(BaseModel):
     
     workspace_id = db.Column(db.String(50))
     message_id = db.Column(db.String(80), primary_key=True)
+    task_id = db.Column(db.String(80), nullable=True)
     user_id = db.Column(db.String(80), db.ForeignKey('user.id'), nullable=True)
     username =  db.Column(db.String(255))
     
@@ -420,6 +452,10 @@ class Message(BaseModel):
                 value = value.isoformat()
             result[column.name] = value
         
+        
+        user = db.session.get(User, self.user_id)
+        if user:
+            result["username"] = user.fullName if user.fullName else user.username
         # result["role"] = self.user.role_id
         return result
 
@@ -580,6 +616,16 @@ class LeadPayload(BaseModel):
     expiredAt = db.Column(db.DateTime, default=datetime.datetime.utcnow)
     balance_amount = db.Column(db.Float)
 
+    balance_amount = db.Column(db.Float)
+
+
+
+    column_open_name = db.Column(db.String(255), default="Phân việc")
+    column_in_progress_name = db.Column(db.String(255), default="Sản xuất")
+    column_done_name = db.Column(db.String(255), default="Hoàn thiện")
+    column_reward_name = db.Column(db.String(255), default="Khoán thưởng")
+
+
 
     # Quan hệ 1-n: một Lead có nhiều historyUsing
     history_using = db.relationship('UsingHistoryData', backref='lead', cascade='all, delete-orphan')
@@ -611,7 +657,7 @@ def get_model_columns(model):
     """Lấy danh sách tên các cột từ 1 model"""
     return [c.name for c in model.__table__.columns]
 
-def create_workspace_method(data):
+def create_workspace_method(data, has_owner = True):
     # lead_id = data.get("lead", 0, type=int)
     lead_id = data.get("lead", 0)
     try:
@@ -635,33 +681,37 @@ def create_workspace_method(data):
     print("CreateData", data)
 
     # chia dữ liệu thành phần User và Customer
-    user_fields = get_model_columns(User)
-    customer_fields = get_model_columns(Workspace)
+    
+    new_user_id = None
 
-    user_data = {k: v for k, v in data.items() if k in user_fields}
-    customer_data = {k: v for k, v in data.items() if k in customer_fields}
+    if has_owner:
+        user_fields = get_model_columns(User)
+        user_data = {k: v for k, v in data.items() if k in user_fields}
 
-    # ép kiểu ngày tháng nếu có
-    for key in ['workStart', 'workEnd']:
-        if key in customer_data and isinstance(customer_data[key], str):
-            customer_data[key] = dateStr(customer_data[key])
+        new_user = User(
+            id=generate_datetime_id(),   # ✅ bắt buộc gán id string
+            lead_id = lead_id,
+            **user_data,
+            role_id=-1
+        )
+        db.session.add(new_user)
+        db.session.flush()  # lấy id mà chưa commit
 
-    # tạo User trước
-    new_user = User(
-        id=generate_datetime_id(),   # ✅ bắt buộc gán id string
-        lead_id = lead_id,
-        **user_data,
-        role_id=-1
-    )
-    db.session.add(new_user)
-    db.session.flush()  # lấy id mà chưa commit
+        new_user_id = new_user.id
+    # customer_fields = get_model_columns(Workspace)
+    # customer_data = {k: v for k, v in data.items() if k in customer_fields}
+
+    # # ép kiểu ngày tháng nếu có
+    # for key in ['workStart', 'workEnd']:
+    #     if key in customer_data and isinstance(customer_data[key], str):
+    #         customer_data[key] = dateStr(customer_data[key])
 
     # tạo Customer gắn với user_id
     new_workspace = Workspace(
         id=generate_datetime_id(),   # ✅ cũng cần id cho customer
         lead_id = lead_id,
         name = data.get("name",""),
-        owner_id=new_user.id
+        owner_id=new_user_id
     )
     db.session.add(new_workspace)
     db.session.commit()

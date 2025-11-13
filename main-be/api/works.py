@@ -19,16 +19,12 @@ def get_workspaces():
     # if lead_id == 0 or not lead:
     #     abort(404, description="Unknown lead")
 
-    workspaces = Workspace.query.filter(Workspace.lead_id == lead_id).order_by(desc(Workspace.updatedAt)).all()
+    workspaces = Workspace.query.filter(
+                    Workspace.lead_id == lead_id,
+                    Workspace.null_workspace == False
+                ).order_by(desc(Workspace.updatedAt)).all()
+
     return jsonify([c.to_dict() for c in workspaces])
-
-
-@workspace_bp.route("/", methods=["POST"])
-def create_workspace_route():
-    # data = request.get_json()
-    # new_workspace = create_workspace(data)
-    # print("Create Workspace JSON", request.get_json())
-    return create_workspace_method(request.get_json())
 
 def get_role(user):
     s = user.update_role()
@@ -86,11 +82,43 @@ def get_workspace_task(id):
     
     # Chuyển defaultdict về dict bình thường
     tasks_response = dict(grouped)
+
+    print('Task', id)
+    print(tasks_response)
     
-    return jsonify({'data':tasks_response}),200
+    return jsonify({'data':tasks_response,
+                    'namelist':[]}),200
+
+@workspace_bp.route("/<string:workspace_id>/column_name", methods=["PUT"])
+def put_workspace_change_column_name(workspace_id):
+    data = request.get_json()
+    type = data.get('type')
+    name = data.get('name')
+
+    
+    workspace = db.session.get(Workspace, workspace_id)
+
+    print(workspace, type, name)
+
+    if workspace and type and type != '' and name and name != '':
+        if type == "OPEN":
+            workspace.column_open_name = name
+        elif type == "IN_PROGRESS":
+            workspace.column_in_progress_name = name
+        elif type == "DONE":
+            workspace.column_done_name = name
+        elif type == "REWARD":
+            workspace.column_reward_name = name
+    
+    # "OPEN" | "IN_PROGRESS" | "DONE" | "CHECK_REWARD" | "REWARD"
+
+    
+    db.session.commit()
+    
+    return jsonify({"message":"OK"}), 200
 
 @workspace_bp.route("/<string:workspace_id>/reward", methods=["PUT"])
-def post_workspace_reward_task(workspace_id):
+def put_workspace_reward_task(workspace_id):
     data = request.get_json()
     message_id = data.get('message_id')
     rate = data.get('rate')
@@ -149,7 +177,12 @@ def get_workspace_detail(id):
 
     return jsonify(result)
 
-
+@workspace_bp.route("/", methods=["POST"])
+def create_workspace():
+    data = request.get_json()
+    print(data)
+    
+    return create_workspace_method(data, False)
 
 @workspace_bp.route("/<string:workspace_id>", methods=["DELETE"])
 def delete_workspace(workspace_id):
@@ -158,17 +191,10 @@ def delete_workspace(workspace_id):
         print('Cannot find workspace', workspace_id)
         return jsonify({"error": "Workspace not found"}), 404
     
-    print('Delete workspace', workspace.owner_id)
-    owner = db.session.get(User, workspace.owner_id)
+    workspace.null_workspace = True
 
-    # if owner:
-    #     for customer in owner.customer:
-    #         db.session.delete(customer)
-    #     db.session.query(Message).filter(Message.user_id == owner.id).delete()
-    #     db.session.delete(owner)
-
-    db.session.delete(workspace)
     db.session.commit()
     return jsonify({"message": "Workspace deleted successfully"}), 200
+
 
 __all__ = ['workspace_bp']

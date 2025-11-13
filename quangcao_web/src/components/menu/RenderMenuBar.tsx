@@ -74,11 +74,6 @@ export default function RenderMenuBar({}) {
     }
   };
 
-  useEffect(()=>
-  {
-    console.log('WS', workspaces);
-  },[workspaces]);
-
   // Lấy menu items từ router và filter cho mobile
   const allMenuItems = getMainMenuItems(pathname);
 

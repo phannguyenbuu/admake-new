@@ -17,6 +17,9 @@ import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import JobDescription from "../../../dashboard/work-tables/task/JobDescription";
 import { Form, Input } from "antd";
+import JobAsset from "../../../dashboard/work-tables/task/JobAsset";
+import { Tabs } from 'antd';
+
 const { TextArea } = Input;
 
 const fetchTaskByUser = async (userId: string): Promise<Task[]> => {
@@ -45,6 +48,7 @@ interface TaskBoardProps {
 }
 
 const TaskBoard = ({ userId, open, onCancel }: TaskBoardProps) => {
+  const [activeKey, setActiveKey] = useState('task');
     const { mutate, data, isPending, isError, error } = useTaskByUserMutation();
     const {isMobile} = useUser();
     const {taskDetail,setTaskDetail} = useTaskContext();
@@ -54,15 +58,6 @@ const TaskBoard = ({ userId, open, onCancel }: TaskBoardProps) => {
           mutate(userId); // userId đã chắc chắn là string, không undefined
         }
     },[]);
-
-    useEffect(() => {
-        if(!data) 
-          {
-            // notification.error({message:"Unkown task data", description: userId});
-            return;
-          }
-        console.log('Working tasks', data);
-    },[data]);
 
     const [currentPage, setCurrentPage] = React.useState(1);
     const pageSize = 1; // mỗi trang 1 item
@@ -74,9 +69,11 @@ const TaskBoard = ({ userId, open, onCancel }: TaskBoardProps) => {
     const totalPages = data ? Math.ceil(data.length / pageSize) : 1;
 
     useEffect(()=>{
-      if(!data) return;
-      setTaskDetail(data[currentPage - 1])
-    },[currentPage]);
+      console.log('Data', data);
+      if (data && data.length > 0) {
+        setTaskDetail(data[currentPage - 1] || data[0]);
+      }
+    },[currentPage, data]);
 
     const btnStyle = {color:"#fff", padding:5, 
         backgroundColor:'#00B5B4',
@@ -135,7 +132,25 @@ const TaskBoard = ({ userId, open, onCancel }: TaskBoardProps) => {
           placeholder="Mô tả chi tiết về công việc cần thực hiện..."
           className="!rounded-lg !border !border-gray-300 focus:!border-cyan-500 focus:!shadow-lg hover:!border-cyan-500 !transition-all !duration-200 !shadow-sm !resize-none !text-xs sm:!text-sm h-40"
         />
-        <JobTimeAndProcess key={el.id} form={null} />
+        <JobTimeAndProcess key={el.id} form={null}/>
+
+        <Tabs
+          activeKey={activeKey}
+          onChange={key => setActiveKey(key)}
+          items={[
+            {
+              key: 'task',
+              label: 'Tài Liệu',
+              children: <JobAsset title="Tài liệu" type="task" readOnly = {true}/>,
+            },
+            {
+              key: 'comments',
+              label: 'Bình luận',
+              children: <JobAsset title="Bình luận cho mọi người" type="comment" />,
+            },
+          ]}
+        />
+        {/* <JobAsset key="task-assets" title='Tài liệu' type="task"/> */}
       </Stack>
     ) : (
       <Typography style={{ fontStyle: 'italic', textAlign: 'center' }}>Chưa có nhiệm vụ</Typography>

@@ -15,7 +15,7 @@ import { useUser } from "../../../common/hooks/useUser";
 
 
 const CustomerDashboard: IPage["Component"] = () => {
-  const {userLeadId, setWorkspaces} = useUser();
+  const {userLeadId} = useUser();
   const [query, setQuery] = useState<Partial<PaginationDto>>({
     page: 1,
     limit: 10,
@@ -40,7 +40,7 @@ const CustomerDashboard: IPage["Component"] = () => {
   useEffect(() => {
     if (customers) {
       console.log("Received new data:", customers);
-      setWorkspaces(customers.data);
+      // setWorkspaces(customers.data);
     }
   }, [customers]);
 
@@ -75,7 +75,7 @@ const handleDeleteCustomer = () => {
     console.log("DELETE", customer);
     if (!customer || !customer.owner_id) return;
 
-    fetch(`${useApiHost()}/workspace/${customer.id}`, {
+    fetch(`${useApiHost()}/customer/${customer.id}`, {
       method: 'DELETE',
     })
       .then((response) => {

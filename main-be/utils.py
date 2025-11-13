@@ -1105,12 +1105,25 @@ if __name__ == "__main__":
         # print(remove_workpoint_checklist('20251104103416609650622d78','2025-11-07'))
         
         # restore_checklist_data()
-        task = Task.query.filter(Task.title== "Không xóa được công việc đã tạo").first()
+        # task = Task.query.filter(Task.title== "Không xóa được công việc đã tạo").first()
 
-        if task:
-            task.title = "Xây dựng chiến lược sản xuất"
+        # if task:
+        #     task.title = "Xây dựng chiến lược sản xuất"
         
-        db.session.commit()
+        # db.session.commit()
+        # for w in Workspace.query.all():
+        #     w.column_open_name = "Phân việc"
+        #     w.column_in_progress_name = "Sản xuất"
+        #     w.column_done_name = "Hoàn thiện"
+        #     w.column_reward_name="Khoán thưởng"
+
+        # db.session.commit()
+        add_new_columns("task",['rate'],'INTEGER')
+        # add_new_columns("workspace",['column_in_progress_name'],'VARCHAR(255)')
+        # add_new_columns("workspace",['column_done_name'],'VARCHAR(255)')
+        # add_new_columns("workspace",['column_reward_name'],'VARCHAR(255)')
+
+        
 
         
         

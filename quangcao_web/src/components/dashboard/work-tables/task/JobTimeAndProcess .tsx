@@ -102,12 +102,14 @@ const JobTimeAndProcess: React.FC<JobTimeAndProcessProps> = ({form}) => {
         </Text>
       </div>
 
-      <TableContainer style={{overflowX:'hidden', 
-        width: isMobile? 300 : '',
-        borderRadius:20 , background:'#ddd'}}>
+      <TableContainer style={{overflowX:'hidden', padding: 5,
+        width: isMobile? 300 : '', 
+        borderRadius:2 , background:'#ddd'}}>
+          <Table sx={{ '& .MuiTableCell-root': { padding: 0 } }}>
+          {form &&
         <TableRow style={{maxWidth:150}}>
           <TableCell>
-            {form ?
+            
               <DateFormPicker form={form} mode="start_time" title="Bắt đầu"
                 taskDetail={taskDetail}
                 // timeValue={taskDetail?.start_time ? dayjs(taskDetail?.start_time) : null}
@@ -115,14 +117,8 @@ const JobTimeAndProcess: React.FC<JobTimeAndProcessProps> = ({form}) => {
                 onChange={(date) => setStartDate(date)}
                 disabledDateFunc={(current: Dayjs) => current && current < dayjs().startOf("day")}
                 />
-                :
-                //@ts-ignore
-                <Typography>Từ <span style={{color:"#0092b8"}}>{taskDetail?.start_time ?? ''}</span></Typography>
-              }
+            
           </TableCell>
-             
-          
-
           
           <TableCell>
           <div className="flex items-center gap-1.5 sm:gap-2 mb-1.5">
@@ -133,11 +129,7 @@ const JobTimeAndProcess: React.FC<JobTimeAndProcessProps> = ({form}) => {
             {totalDays !== null ? `⏱️ ${totalDays} ngày` : "-"}
           </div>
           </TableCell>
-        </TableRow>
-
-      
-
-        
+        </TableRow>}
       
           <TableRow style={{maxWidth:150}}>
             <TableCell style={{maxWidth:150}}>
@@ -258,10 +250,11 @@ const JobTimeAndProcess: React.FC<JobTimeAndProcessProps> = ({form}) => {
             )}
           </TableCell>
 
-
+        </Table>
       </TableContainer>
       
-      <JobAsset key="task-assets" title='Tài liệu' role="task"/>
+      {taskDetail?.type === "REWARD" && form &&
+        <JobAsset key="cash-assets" title = 'Ứng tiền cho thầu phụ' type="cash"/>}
     </Stack>
   );
 };

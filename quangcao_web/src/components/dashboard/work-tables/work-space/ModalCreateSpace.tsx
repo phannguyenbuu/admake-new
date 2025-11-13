@@ -1,5 +1,7 @@
-import { Button, Form, Input, Typography, Modal } from "antd";
+import { Button, Form, Input, Typography, Modal, notification } from "antd";
 import { PlusOutlined, TeamOutlined } from "@ant-design/icons";
+import { useApiHost } from "../../../../common/hooks/useApiHost";
+import { useUser } from "../../../../common/hooks/useUser";
 
 const { Title, Text } = Typography;
 
@@ -13,10 +15,34 @@ export default function ModalCreateSpace({
   onCreate?: (values: { name: string }) => void;
 }) {
   const [form] = Form.useForm();
-  // const handleCreate = (values: { name: string }) => {
-  //   onCreate?.(values);
-  //   form.resetFields();
-  // };
+  const {userLeadId} = useUser();
+
+  const handleCreate = async (values:{name: string} ) => {
+    try {
+      const response = await fetch(`${useApiHost()}/workspace/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ name: values.name, lead: userLeadId }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Lỗi khi tạo bảng công việc");
+      }
+
+      notification.success({message:"Tạo bảng công việc thành công!", description: values.name});
+      form.resetFields();
+      window.location.reload();
+      // Có thể gọi thêm callback onCreate để cập nhật UI cha nếu cần
+    } catch (error) {
+      notification.error({message:"Tạo bảng công việc thất bại"});
+      console.error(error);
+    }
+  };
+
+
+
   return (
     <Modal
       title={
@@ -84,7 +110,7 @@ export default function ModalCreateSpace({
         <div className="p-8">
           <Form
             layout="vertical"
-            // onFinish={handleCreate}
+            onFinish={handleCreate}
             form={form}
             autoComplete="off"
             className="space-y-6"

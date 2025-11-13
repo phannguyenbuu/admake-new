@@ -363,7 +363,7 @@ export default function ManagermentBoard() {
   }, [resetDragState]);
 
   const [showFormTask, setShowFormTask] = useState(false);
-  // const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+  const {setWorkspaces} = useUser();
   
   const handleFormSuccess = useCallback(() => {
     setShowFormTask(false);
@@ -381,6 +381,8 @@ export default function ManagermentBoard() {
         taskId: null,
         taskTitle: "",
       });
+
+      setWorkspaces(prev => prev.filter(el => el.id !== deleteConfirmModal.taskId));
     }
   }, [deleteConfirmModal.taskId, deleteTaskMutation]);
 
@@ -406,6 +408,7 @@ export default function ManagermentBoard() {
                       // setSelectedTask = {setSelectedTask} 
                       // setEditingTaskId = {setTaskDetail}
                       setShowFormTask = {setShowFormTask}
+
       />
 
       <FormTask

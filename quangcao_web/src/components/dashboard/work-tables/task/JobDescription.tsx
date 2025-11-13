@@ -1,11 +1,13 @@
 import React, {useState,useEffect} from "react";
-import { Form, Input, Typography } from "antd";
+import { Form, Input, notification, Typography } from "antd";
 import type { Mode } from "../../../../@types/work-space.type";
 import type { FormTaskDetailProps } from "../../../../@types/work-space.type";
 import {Stack, Box} from "@mui/material";
 import JobAsset from "./JobAsset";
 import type { Task } from "../../../../@types/work-space.type";
 import { useTaskContext } from "../../../../common/hooks/useTask";
+import { useApiHost } from "../../../../common/hooks/useApiHost";
+import { Tabs } from 'antd';
 
 const { Text } = Typography;
 const { TextArea } = Input;
@@ -21,7 +23,8 @@ interface JobDescriptionProps {
 }
 
 const JobDescription: React.FC<JobDescriptionProps> = ({ form }) => {
-  const {taskDetail} = useTaskContext();
+  const {taskDetail, setTaskDetail} = useTaskContext();
+  const [activeKey, setActiveKey] = useState('task');
 
   useEffect(() => {
   if (taskDetail) {
@@ -38,8 +41,10 @@ const JobDescription: React.FC<JobDescriptionProps> = ({ form }) => {
 }, [taskDetail, form]);
 
 
+
+
   return (
-    <Stack style={{ minWidth:300 }}>
+    <Stack style={{ minWidth:400 }}>
       <div className="flex items-center gap-2 mb-2 sm:mb-3">
         <span className="text-green-600 text-xs sm:text-sm">📝</span>
         
@@ -61,8 +66,25 @@ const JobDescription: React.FC<JobDescriptionProps> = ({ form }) => {
             className="!rounded-lg !border !border-gray-300 focus:!border-cyan-500 focus:!shadow-lg hover:!border-cyan-500 !transition-all !duration-200 !shadow-sm !resize-none !text-xs sm:!text-sm h-40"
           />
         </Form.Item>
-      {taskDetail?.type === "REWARD" &&
-        <JobAsset key="cash-assets" title = 'Ứng tiền' role="cash"/>}
+
+      {/* <JobAsset key="task-assets" title='Tài liệu' type="task" /> */}
+      <Tabs
+        activeKey={activeKey}
+        onChange={key => setActiveKey(key)}
+        items={[
+          {
+            key: 'task',
+            label: 'Tài Liệu',
+            children: <JobAsset title="Thông tin admin đưa ra" type="task" />,
+          },
+          {
+            key: 'comments',
+            label: 'Bình luận',
+            children: <JobAsset title="Bình luận cho mọi người" type="comment" />,
+          },
+        ]}
+      />
+      
     </Stack>
   );
 };

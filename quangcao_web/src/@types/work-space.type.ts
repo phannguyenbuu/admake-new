@@ -1,3 +1,4 @@
+import type { MessageTypeProps } from "./chat.type";
 import type { BaseEntity } from "./common.type";
 import dayjs, { Dayjs } from "dayjs";
 
@@ -54,6 +55,10 @@ export interface WorkSpace {
   pinned:boolean,
   address:string,
   version:number;
+  column_open_name:string,
+  column_in_progress_name:string,
+  column_done_name:string,
+  column_reward_name:string,
 }
 
 export interface MaterialTask {
@@ -84,7 +89,7 @@ export interface Task extends BaseEntity {
   materials: MaterialTask[]; // danh sách vật tư
   start_time?: Dayjs | null; // Thời gian bắt đầu
   end_time?: Dayjs | null; // Thời gian kết thúc
-  assets: string[];
+  assets: MessageTypeProps[];
   check_reward: Boolean | false;
 }
 

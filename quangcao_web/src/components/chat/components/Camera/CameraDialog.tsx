@@ -82,9 +82,9 @@ const CameraDialog: React.FC<CameraDialogProps> = ({userEl}) => {
   const [openWork, setOpenWork] = useState(userEl?.role && userEl?.role_id > 100);
   const [openHoliday, setOpenHoliday] = useState(false);
   const [hasCamera, setHasCamera] = useState(false);
-  const { workpointEl, fetchWorkpointEl } = useWorkpointInfor();
+  const {workpointEl, fetchWorkpointEl } = useWorkpointInfor();
   const [modalVisible, setModalVisible] = useState(false);
-  const {userLeadId, setUserLeadId} = useUser();
+  const {userLeadId, setUserLeadId, setUserId} = useUser();
   
   useEffect(() => {
     console.log("UserEL", userEl);
@@ -94,6 +94,7 @@ const CameraDialog: React.FC<CameraDialogProps> = ({userEl}) => {
       if(userLeadId === 0)
         setUserLeadId(userEl.lead_id);
       fetchWorkpointEl(userEl.id);
+      setUserId(userEl?.id);
     }
   }, [userEl]);
 
@@ -454,7 +455,7 @@ async function postWorkpointCheck(imgUrl: string, lat:string, long:string) {
                     backgroundColor:"orange",borderRadius:20,
                       mt: 1, height: 50,maxWidth:300, mb:1 }} onClick={capturePhoto}>
                 <img src="/alarm-svgrepo-com.svg" alt="ADMAKE" style={{width:40}}/>
-                Check-in nhé !
+                Điểm danh nhé !
             </Button>
              
 
