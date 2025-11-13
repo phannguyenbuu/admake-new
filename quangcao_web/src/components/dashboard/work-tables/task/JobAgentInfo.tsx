@@ -57,8 +57,16 @@ const JobAgentInfo: React.FC<JobAgentInfoProps> = ({
       return;
     }
     // console.log('ed1', customers);
-    const filtered = users.filter((c) => c.fullName && c.fullName.toLowerCase().includes(value.toLowerCase()));
+    // const filtered = users.filter((c) => c.fullName && c.fullName.toLowerCase().includes(value.toLowerCase()));
     // console.log('filtered', filtered);
+
+    const normalizedSearch = removeVietnameseTones(value);
+
+    const filtered = users.filter(c => {
+      if (!c.fullName) return false;
+      return removeVietnameseTones(c.fullName).includes(normalizedSearch);
+    });
+
     setOptions(
       filtered.map((c) => ({
         value: c.fullName || "",  // nếu fullName undefined thì dùng chuỗi rỗng
@@ -85,6 +93,15 @@ const JobAgentInfo: React.FC<JobAgentInfoProps> = ({
     form.setFieldsValue({ [mode]: value });
   };
 
+  function removeVietnameseTones(str:string) {
+    if (!str) return "";
+    str = String(str).toLowerCase();
+    str = str.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    str = str.replace(/đ/g, 'd');
+    return str;
+  }
+
+
   return (
     <>
       <Form.Item
@@ -95,11 +112,22 @@ const JobAgentInfo: React.FC<JobAgentInfoProps> = ({
         <AutoComplete
           style={{ minWidth: 200, maxWidth:300 }}
           options={options}
+          // filterOption={(inputValue, option) => {
+          //   const label = (option as { label?: string; value?: string }).label || (option as { value?: string }).value || '';
+          //   return removeVietnameseTones(label).includes(removeVietnameseTones(inputValue));
+          // }}
           value={searchValue}
           onSearch={handleSearch}
           onSelect={handleSelect}
           placeholder={`Nhập tên hoặc số điện thoại ${rolename}`}
           allowClear
+          // filterOption={(inputValue, option) => {
+          //   const label = option?.label || option?.value || '';
+          //   const normalizedLabel = removeVietnameseTones(label || '').toLowerCase();
+          //   const normalizedInput = removeVietnameseTones(inputValue || '').toLowerCase();
+          //   return normalizedLabel.includes(normalizedInput);
+          // }}
+
         />
       </Form.Item>
 
