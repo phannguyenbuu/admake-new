@@ -204,6 +204,7 @@ const JobAsset: React.FC<JobAssetProps> = ({ title, type, onDelete, readOnly = f
 
       {messageAssets.map((el, index) => 
         <Stack direction="row" key={index} spacing={1} alignItems="center">
+          {readOnly &&
           <IconButton
             size="small"
             aria-label="delete"
@@ -219,7 +220,7 @@ const JobAsset: React.FC<JobAssetProps> = ({ title, type, onDelete, readOnly = f
             }}
           >
             <CloseIcon />
-          </IconButton>
+          </IconButton>}
           
           <Typography style={{ fontSize: 12, fontWeight: 700 }}>
             {el.username}:
@@ -265,6 +266,7 @@ const JobAsset: React.FC<JobAssetProps> = ({ title, type, onDelete, readOnly = f
                 )}
 
                 <Stack direction="row" gap={0}>
+                   {readOnly &&
                   <IconButton
                     size="small"
                     aria-label="delete"
@@ -280,7 +282,7 @@ const JobAsset: React.FC<JobAssetProps> = ({ title, type, onDelete, readOnly = f
                     }}
                   >
                     <CloseIcon />
-                  </IconButton>
+                  </IconButton>}
                   <Typography fontSize={12} sx={{ maxWidth: 100, whiteSpace: 'nowrap' }}>
                     {url && url.length > 9 ? `${url.substring(0, 9)}...` : url}
                   </Typography>

@@ -1111,14 +1111,14 @@ if __name__ == "__main__":
         #     task.title = "Xây dựng chiến lược sản xuất"
         
         # db.session.commit()
-        # for w in Workspace.query.all():
-        #     w.column_open_name = "Phân việc"
-        #     w.column_in_progress_name = "Sản xuất"
-        #     w.column_done_name = "Hoàn thiện"
-        #     w.column_reward_name="Khoán thưởng"
+        for w in Workspace.query.all():
+            w.column_open_name = "Đơn hàng"
+            w.column_in_progress_name = "Phân việc"
+            w.column_done_name = "Thực hiện"
+            w.column_reward_name="Hoàn thiện"
 
-        # db.session.commit()
-        add_new_columns("task",['rate'],'INTEGER')
+        db.session.commit()
+        # add_new_columns("task",['rate'],'INTEGER')
         # add_new_columns("workspace",['column_in_progress_name'],'VARCHAR(255)')
         # add_new_columns("workspace",['column_done_name'],'VARCHAR(255)')
         # add_new_columns("workspace",['column_reward_name'],'VARCHAR(255)')
