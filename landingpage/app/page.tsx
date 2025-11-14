@@ -73,7 +73,7 @@ export default function Page() {
             <Link href="#phan-he" className="hover:text-brand-600">
               Phân hệ
             </Link>
-            <Link href="#giao-dien" className="hover:text-brand-600">
+            <Link href="#bang-gia" className="hover:text-brand-600">
               Bảng giá
             </Link>
             <Link href="#ly-do" className="hover:text-brand-600">
@@ -322,16 +322,16 @@ export default function Page() {
       </section> */}
 
       {/* Giao diện mẫu */}
-      <section id="giao-dien" className="bg-brand-300 py-14 text-white">
+      <section id="bang-gia" className="bg-brand-300 py-14 text-white">
         <div className="container mx-auto px-4">
-          <h2 className="text-center text-2xl font-bold md:text-3xl">Giao diện mẫu của ADMAKE</h2>
+          <h2 className="text-center text-2xl font-bold md:text-3xl">Bảng giá của ADMAKE</h2>
           <div className="mx-auto mt-8 aspect-[16/7] w-full max-w-5xl overflow-hidden rounded-xl border-4 border-black/10 bg-white shadow">
             <Image
-              src="/image.png"
+              src="/A1.png"
               alt="Ảnh chụp giao diện phần mềm"
               width={1040}
               height={420}
-              className="h-full w-full object-cover"
+              className=" w-full object-cover"
             />
           </div>
           <div className="mt-6 flex justify-center gap-3">
@@ -530,7 +530,7 @@ export default function Page() {
                 </Link>
               </Button>
               <Button variant="outline" asChild>
-                <Link href="#giao-dien" className="text-black hover:text-brand-400">Xem giao diện</Link>
+                <Link href="#bang-gia" className="text-black hover:text-brand-400">Xem bảng giá</Link>
               </Button>
             </div>
           </div>
