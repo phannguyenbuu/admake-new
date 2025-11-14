@@ -29,8 +29,10 @@ export default function LeadForm() {
     "Điện nước",
     "Xây dựng",
     "Thạch cao",
-    "Nghành cửa",
-    "khác",
+    "Rèm màn",
+    "Đá hoa cương",
+    "Vệ sinh công nghiệp",
+    "Các ngành nghề khác",
   ]
   const companySizes = [
     "01 - 10 người",
