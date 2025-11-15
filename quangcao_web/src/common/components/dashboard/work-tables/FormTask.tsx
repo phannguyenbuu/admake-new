@@ -10,7 +10,7 @@ import JobAgentInfo from "./task/JobAgentInfo";
 import JobDescription from "./task/JobDescription";
 import JobTimeAndProcess from "./task/JobTimeAndProcess ";
 import { fixedColumns } from "./Managerment";
-
+import type { ZipUserSearchProps } from "../../../@types/work-space.type";
 import { useApiHost } from "../../../common/hooks/useApiHost";
 // import CheckInOut from "./CheckInOut";
 // import CommentSection from "./CommentSection";
@@ -65,18 +65,21 @@ export default function FormTask({ open, onCancel, onSuccess, users, currentColu
   const [customerSelected, setCustomerSelected] = useState<UserSearchProps | null>(null);
   const [userSelected, setUserSelected] = useState<UserSearchProps | null>(null);
 
-  const [userList, setUserList] = useState<UserSearchProps[]>([]);
+  const [userList, setUserList] = useState<ZipUserSearchProps[]>([]);
   
 
   useEffect(()=>{
     if(!taskDetail || !taskDetail?.assign_ids)
       return;
 
-    const selectedUsers = taskDetail?.assign_ids
-      .map(id => users.find(user => user.user_id === id))
-      .filter(user => user !== undefined); // lọc bỏ undefined nếu không tìm thấy
+    console.log("IDS", taskDetail.id, taskDetail.assign_ids, users);
 
-    setUserList(selectedUsers); // cast nếu cần
+    // const selectedUsers = taskDetail?.assign_ids
+    //   .map(id => users.find(user => user.user_id === id))
+    //   .filter(user => user !== undefined); // lọc bỏ undefined nếu không tìm thấy
+
+    // console.log("TDS", selectedUsers);
+    setUserList(taskDetail.assign_ids); // cast nếu cần
     
     if(taskDetail?.status === "DONE" && taskDetail?.check_reward)
       setShowUpdateButton(1);
@@ -88,7 +91,7 @@ export default function FormTask({ open, onCancel, onSuccess, users, currentColu
   },[taskDetail]);
 
   const onUserDelete = (idToDelete: string | null) => {
-    const newList = userList.filter(user => user.user_id !== idToDelete);
+    const newList = userList.filter(user => user.id !== idToDelete);
     setUserList(newList);
   };
 
@@ -97,18 +100,18 @@ export default function FormTask({ open, onCancel, onSuccess, users, currentColu
 
     setUserList(prevUserList => {
       // Kiểm tra userSelected đã tồn tại theo user_id chưa
-      const exists = prevUserList.some(user => user.user_id === userSelected.user_id);
+      const exists = prevUserList.some(user => user.id === userSelected.user_id);
 
       // Nếu chưa có thì thêm mới, nếu có thì giữ nguyên
       if (!exists) {
         return [
           ...prevUserList,
           {
-            user_id: userSelected.user_id, // làm đúng key user_id theo interface
-            fullName: userSelected.fullName ?? null, // nếu bạn muốn đặt tên chuẩn theo interface
-            role: userSelected.role ?? '',
-            phone: userSelected.phone ?? '',
-            workAddress: userSelected.workAddress ?? ''
+            id: userSelected.user_id, // làm đúng key user_id theo interface
+            name: userSelected.fullName ?? null, // nếu bạn muốn đặt tên chuẩn theo interface
+            // role: userSelected.role ?? '',
+            // phone: userSelected.phone ?? '',
+            // workAddress: userSelected.workAddress ?? ''
           }
         ];
       }
@@ -185,7 +188,7 @@ export default function FormTask({ open, onCancel, onSuccess, users, currentColu
   useEffect(() => {
     form.setFieldsValue({
       // customer_id: customerObj?.id || null,
-      assign_ids: userList ? userList.map(user => user.user_id) : [],
+      assign_ids: userList ? userList.map(user => user.id) : [],
     });
   }, [userList, form]);
 
@@ -210,7 +213,7 @@ export default function FormTask({ open, onCancel, onSuccess, users, currentColu
             <Form.Item name="workspace_id" initialValue={workspaceId} hidden>
             </Form.Item>
 
-            <Form.Item name="assign_ids" initialValue={userList?.map(user => user.user_id)} hidden>
+            <Form.Item name="assign_ids" initialValue={userList?.map(user => user.id)} hidden>
             </Form.Item>
             
             <Stack direction="row" spacing = {2}>
@@ -249,18 +252,18 @@ export default function FormTask({ open, onCancel, onSuccess, users, currentColu
 }
 
 interface UserItemSubProps {
-  user: UserSearchProps;
+  user: ZipUserSearchProps;
   onDelete: (id: string | null) => void;
 }
 
 const UserItem: React.FC<UserItemSubProps> = ({user,onDelete}) => {
   return (
     <Stack direction="row" spacing={1} alignItems="center">
-      <Typography>{user.fullName}</Typography>
+      <Typography>{user.name}</Typography>
       <button
-        onClick={() => onDelete && onDelete(user.user_id)}
+        onClick={() => onDelete && onDelete(user.id)}
         style={{ color: 'red', cursor: "pointer", background: "transparent", border: "none", fontSize: "16px" }}
-        aria-label={`Xóa ${user.fullName}`}
+        aria-label={`Xóa ${user.name}`}
         type="button"
       >
         ×

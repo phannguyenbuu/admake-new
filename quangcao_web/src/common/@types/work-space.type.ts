@@ -67,11 +67,17 @@ export interface MaterialTask {
 }
 
 export interface UserSearchProps {
-  "fullName": string,
-  "user_id":  string,
-  "role":  string,
-  "phone":  string,
-  "workAddress": string,
+  fullName: string,
+  user_id:  string,
+  role:  string,
+  phone:  string,
+  workAddress: string,
+}
+
+
+export interface ZipUserSearchProps {
+  name: string,
+  id:  string,
 }
 
 export interface Task extends BaseEntity {
@@ -82,7 +88,7 @@ export interface Task extends BaseEntity {
   reward: number; // số tiền thưởng
   amount: number;
   type: "MONTHLY" | "REWARD" | string;
-  assign_ids: string[]; // id của user
+  assign_ids: ZipUserSearchProps[]; // id của user
   workspace_id: string; // id của workspace
   workspace: string;
   customer_id: string; // id của customer
