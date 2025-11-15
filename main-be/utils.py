@@ -1097,6 +1097,45 @@ def restore_checklist_data():
     flag_modified(w,"checklist")
     db.session.commit()
 
+def resizeThumb():
+    from PIL import Image
+    image_exts = ['.jpg', '.jpeg', '.png', '.gif', '.webp']
+    import re
+    for msg in Message.query.all():
+        if msg.task_id and msg.file_url:
+            filename, ext = os.path.splitext(msg.file_url)
+
+            if not msg.thumb_url:
+                if ext.lower() in image_exts:
+                    # Tạo thumbnail 100x70
+                    try:
+                        img = Image.open(r'/root/admake/main-be/static/' + msg.file_url)
+
+                        if img.mode == "RGBA":
+                            background = Image.new("RGB", img.size, (255, 255, 255))  # nền trắng
+                            background.paste(img, mask=img.split()[3])  # dán ảnh với mask kênh alpha
+                            img = background
+                        
+                        img.thumbnail((100, 70))
+                        
+                        thumb_filename = f"thumb_{filename}{ext}"
+                        thumb_filepath = os.path.join(r'/root/admake/main-be/static/thumbs', thumb_filename)
+                        
+                        img.save(thumb_filepath, "JPEG")
+                        thumb_url = f"thumbs/{thumb_filename}"  # Đường dẫn thumbnail theo cấu trúc server static files
+                        print('created_thumb', thumb_url)
+
+                        msg.thumb_url = thumb_url
+                    except Exception as e:
+                        print("Thumbnail creation failed:", e)
+                        thumb_url = None
+                else:
+                    thumb_url = None
+                    
+
+            # msg.file_url = os.path.basename(msg.file_url)
+
+    db.session.commit()
 
 if __name__ == "__main__":
     with app.app_context():
@@ -1111,15 +1150,17 @@ if __name__ == "__main__":
         #     task.title = "Xây dựng chiến lược sản xuất"
         
         # db.session.commit()
-        for w in Workspace.query.all():
-            if w.name == '':
-                print(w.tdict())
-                db.session.delete(w)
+        # renameColumn('workspace','is_pin','pinned')
+
+        w = Workspace.query.filter(Workspace.name == "Phát lương").first()
+        w.status = "FREE"
+
+        w = Workspace.query.filter(Workspace.name == "Phát thưởng").first()
+        w.status = "FREE"
+
         db.session.commit()
-        # add_new_columns("task",['rate'],'INTEGER')
-        # add_new_columns("workspace",['column_in_progress_name'],'VARCHAR(255)')
-        # add_new_columns("workspace",['column_done_name'],'VARCHAR(255)')
-        # add_new_columns("workspace",['column_reward_name'],'VARCHAR(255)')
+        
+
 
         
 

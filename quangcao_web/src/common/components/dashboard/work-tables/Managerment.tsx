@@ -54,11 +54,11 @@ export default function ManagermentBoard() {
   if (!context) throw new Error("UpdateButtonContext not found");
   const { showUpdateButton, setShowUpdateButton } = context;
   
-  const {workspaceId} = useUser();
+  const {workspaceId, isCurrentWorkspaceFree} = useUser();
   const { data: workspaceData } = useWorkSpaceQueryById(workspaceId);
 
   const {tasksData, updateTaskStatus, refetchTasks, taskDetail, setTaskDetail} = useTaskContext();
-  
+  const [currentColumn, setCurrentColumn] = useState<number>(0);
   const deleteTaskMutation = useDeleteTask();
 
   // Chuyển đổi board data thành columns structure
@@ -181,8 +181,8 @@ export default function ManagermentBoard() {
     (update: any) => {
       // if (!adminMode) return;
 
-      // Kiểm tra xem có đang cố gắng kéo vào cột "Khoán thưởng" không
-      if (update.destination?.droppableId) {
+
+      if(update.destination?.droppableId) {
         const destColIdx = columns.findIndex(
           (c) => c.id === update.destination.droppableId
         );
@@ -408,10 +408,12 @@ export default function ManagermentBoard() {
                       // setSelectedTask = {setSelectedTask} 
                       // setEditingTaskId = {setTaskDetail}
                       setShowFormTask = {setShowFormTask}
-
-      />
+                      currentColumn={currentColumn}
+                      setCurrentColumn = {setCurrentColumn}
+                    />
 
       <FormTask
+        currentColumn={currentColumn}
         open={showFormTask}
         onCancel={() => { setShowFormTask(false); }}
         
@@ -430,6 +432,7 @@ export default function ManagermentBoard() {
                       handleDeleteCancel={handleDeleteCancel}
                       handleDeleteConfirm={handleDeleteConfirm}
                       deleteTaskMutation={deleteConfirmModal}
+                      
                       />
     </div>
   );

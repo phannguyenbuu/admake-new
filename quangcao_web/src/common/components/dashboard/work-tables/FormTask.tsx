@@ -9,6 +9,7 @@ import JobInfoCard from "./task/JobInfoCard";
 import JobAgentInfo from "./task/JobAgentInfo";
 import JobDescription from "./task/JobDescription";
 import JobTimeAndProcess from "./task/JobTimeAndProcess ";
+import { fixedColumns } from "./Managerment";
 
 import { useApiHost } from "../../../common/hooks/useApiHost";
 // import CheckInOut from "./CheckInOut";
@@ -45,9 +46,10 @@ interface FormTaskProps {
   onSuccess: () => void;
   initialValues: Task | null;
   users: UserSearchProps[];
+  currentColumn: number;
 }
 
-export default function FormTask({ open, onCancel, onSuccess, users}: FormTaskProps) {
+export default function FormTask({ open, onCancel, onSuccess, users, currentColumn}: FormTaskProps) {
   const {workspaceId} = useUser();
   const {taskDetail, setTaskDetail} = useTaskContext();
 
@@ -122,7 +124,7 @@ export default function FormTask({ open, onCancel, onSuccess, users}: FormTaskPr
       setIsUpdating(true);
       const values = await form.validateFields();
 
-      console.log("values", form.getFieldsValue());
+      // console.log("values", form.getFieldsValue());
 
       const preparedValues = {
         ...values,
@@ -153,7 +155,7 @@ export default function FormTask({ open, onCancel, onSuccess, users}: FormTaskPr
           console.log("Cập nhật công việc thành công!", taskDetail.id, data);
         }
     } else {
-        preparedValues["status"] = "OPEN";
+        preparedValues["status"] = fixedColumns[currentColumn].type;
         const jsonString = JSON.stringify(preparedValues);
         console.log("New_JSON_values", jsonString);
 

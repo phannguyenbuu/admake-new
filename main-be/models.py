@@ -290,6 +290,7 @@ class Workspace(BaseModel):
     rating_sum = db.Column(db.Integer, default=0)
     rating_count = db.Column(db.Integer, default=0)
     null_workspace = db.Column(db.Boolean, default=False)
+    pinned = db.Column(db.Boolean, default=False)
 
 
 
@@ -301,7 +302,7 @@ class Workspace(BaseModel):
 
 
 
-    status = db.Column(db.String(50))
+    status = db.Column(db.String(50)) # FREE là cái thêm tự do
     
     lead_id = db.Column(db.Integer, db.ForeignKey('lead.id'))
     lead = db.relationship('LeadPayload', backref='workspaces')
@@ -432,6 +433,7 @@ class Message(BaseModel):
     
     text = db.Column(db.String(500))
     file_url = db.Column(db.String(255), nullable=True)
+    thumb_url = db.Column(db.String(255), nullable=True)
     
     role = db.Column(db.Integer, default=0)
     is_favourite = db.Column(db.Boolean, default=False)
@@ -765,6 +767,7 @@ class WorkpointSetting(db.Model):
     noon_out_minute = db.Column(db.Integer, default = 30) 
 
     work_in_saturday_noon = db.Column(db.Boolean, default = False)
+    work_in_sunday = db.Column(db.Boolean, default = False)
     
     multiply_in_night_overtime = db.Column(db.Float, default = 1.5) 
     multiply_in_sun_overtime = db.Column(db.Float, default = 2.0) 

@@ -34,7 +34,23 @@ const NoteWorkpointModal: React.FC<NoteWorkpointModalProps> = ({
         const { name, value, type, checked } = e.target;
 
         if (type === 'checkbox') {
-          setWorkpointSetting(prev => prev ? {...prev, [name]: checked} : prev);
+          setWorkpointSetting(prev => {
+            if (!prev) return prev;
+
+            // Nếu checkbox được check là work_in_sunday thì tự động check work_in_saturday_noon
+            if (name === 'work_in_sunday' && checked) {
+              return {
+                ...prev,
+                [name]: checked,
+                work_in_saturday_noon: true,
+              };
+            } else {
+              return {
+                ...prev,
+                [name]: checked,
+              };
+            }
+          });
         } else if (type === 'number') {
           const val = value === '' ? 0 : parseFloat(value);
           if (!isNaN(val)) {
@@ -42,7 +58,6 @@ const NoteWorkpointModal: React.FC<NoteWorkpointModalProps> = ({
           }
         } else if (name.endsWith('_in_hour') || name.endsWith('_in_minute') || 
                   name.endsWith('_out_hour') || name.endsWith('_out_minute')) {
-          // Với input dạng time "hh:mm", tách lấy phần giờ hoặc phút rồi cập nhật number đúng key
           const [hourOrMinute] = value.split(':');
           const num = parseInt(hourOrMinute, 10);
           if (!isNaN(num)) {
@@ -51,10 +66,9 @@ const NoteWorkpointModal: React.FC<NoteWorkpointModalProps> = ({
               return {...prev, [name]: num};
             });
           }
-        } else {
-          // Nếu còn field nào string mà workpointSetting kiểu number | boolean thì cân nhắc chuyển lại kiểu hoặc loại bỏ
         }
       };
+
 
       const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -78,6 +92,7 @@ const NoteWorkpointModal: React.FC<NoteWorkpointModalProps> = ({
           noon_out_minute: workpointSetting.noon_out_minute,
 
           work_in_saturday_noon: workpointSetting.work_in_saturday_noon,
+          work_in_sunday: workpointSetting.work_in_sunday,
 
           multiply_in_night_overtime: workpointSetting.multiply_in_night_overtime,
           multiply_in_sun_overtime: workpointSetting.multiply_in_sun_overtime,
@@ -227,19 +242,34 @@ const NoteWorkpointModal: React.FC<NoteWorkpointModalProps> = ({
                   </Table>
                 </TableContainer>
 
-                <Stack direction="row" spacing={2}>
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        name="work_in_saturday_noon"
-                        checked={workpointSetting?.work_in_saturday_noon || false}
-                        onChange={handleChange}
-                      />
-                    }
-                     style={{whiteSpace:'nowrap'}}
-                    label="Làm chiều thứ 7"
-                  />
+                <Stack direction="column" spacing={2}>
+                  <Stack direction="row" spacing={2}>
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                          name="work_in_saturday_noon"
+                          checked={workpointSetting?.work_in_saturday_noon || false}
+                          onChange={handleChange}
+                        />
+                      }
+                      style={{whiteSpace:'nowrap'}}
+                      label="Làm chiều thứ 7"
+                    />
 
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                          name="work_in_sunday"
+                          checked={workpointSetting?.work_in_sunday || false}
+                          onChange={handleChange}
+                        />
+                      }
+                      style={{whiteSpace:'nowrap'}}
+                      label="Làm ngày CN"
+                    />
+                  </Stack>
+
+                  <Stack direction="row" spacing={2}>
                   <TextField
                     label="Tăng ca đêm"
                     type="number"
@@ -252,7 +282,7 @@ const NoteWorkpointModal: React.FC<NoteWorkpointModalProps> = ({
                   />
 
                   <TextField
-                    label="Tăng ca Chủ Nhật,Lễ,Tết"
+                    label="Tăng ca vào ngày nghỉ"
                     type="number"
                     name="multiply_in_sun_overtime"
                     value={workpointSetting?.multiply_in_sun_overtime || ''}
@@ -261,6 +291,8 @@ const NoteWorkpointModal: React.FC<NoteWorkpointModalProps> = ({
                     placeholder="Hours"
                     style={{ width: 150 }}
                   />
+                </Stack>
+
                 </Stack>
 
                 <Button variant="contained" type="submit" style={{backgroundColor:'#00B5B4'}}>Cập nhật</Button>

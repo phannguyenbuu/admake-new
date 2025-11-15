@@ -145,13 +145,12 @@ export default function FormUser({
   const handleSubmit = async (values: any) => {
   try {
     const formData = new FormData();
-
+    console.log("Role", isSupplier, values);
     // Lấy tất cả key của values để append vào formData
     Object.entries(values).forEach(([key, value]) => {
       // Nếu là file, xử lý riêng
       
-      if(isSupplier && key === "role_id")
-        value = 101;
+     
       // console.log("Key data", isSupplier, key, value);
       if (key === 'avatar' && file) {
         formData.append(key, file);
@@ -160,13 +159,20 @@ export default function FormUser({
       }
     });
 
+     if(isSupplier)
+      formData.append("role_id", "101");
+      
+
     // Các xử lý riêng biệt nếu cần, ví dụ password
     if (values.password && values.password.trim() !== "") {
       formData.append("password", values.password);
     }
 
     formData.append('lead_id', userLeadId.toString());
-    console.log("Create User", formData);
+    console.log("Create User");
+    for (const [key, value] of formData.entries()) {
+      console.log(`${key}:`, value);
+    }
 
     // Các thao tác gọi API create/update
     if (isEditing && user) {

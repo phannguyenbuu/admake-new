@@ -1,18 +1,69 @@
 import { useEffect, useState, useCallback } from "react";
-import { Row, Col, Card, Button, message, Modal } from "antd";
-import { StarOutlined, PlusOutlined, MoreOutlined } from "@ant-design/icons";
+import { Row, Col, Card, Button, message, Modal, notification } from "antd";
+import { StarOutlined, StarFilled, PlusOutlined, MoreOutlined } from "@ant-design/icons";
 import {
   DragDropContext,
   Droppable,
   Draggable,
   type DropResult,
 } from "@hello-pangea/dnd";
+import { useUser } from "../../../../common/hooks/useUser";
+import { useApiHost } from "../../../../common/hooks/useApiHost";
 
 interface WorkspaceHeaderProps {
   workspaceData: any; // Bạn nên định nghĩa kiểu chính xác hơn
 }
 
 const WorkspaceHeader: React.FC<WorkspaceHeaderProps> = ({ workspaceData }) => {
+  const {currentWorkspace, workspaceId, setWorkspaces} = useUser();
+  const [pinned, setPinned] = useState<boolean>(currentWorkspace?.pinned || false);
+
+  useEffect(()=>{
+    console.log('currentWorkspace', currentWorkspace);
+    setPinned(currentWorkspace?.pinned ?? false);
+  },[currentWorkspace]);
+  
+
+  const togglePin = async () => {
+    fetch(`${useApiHost()}/workspace/${workspaceId}/pin`, {
+      method: 'PUT',
+      body: JSON.stringify({ id: workspaceId, pin: !pinned }),
+      headers: { 'Content-Type': 'application/json' },
+    })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        notification.success({message:'Ghim bảng công việc thành công!'});
+
+        setWorkspaces(prevWorkspaces => {
+          // Tạo mảng mới với item được cập nhật pinned
+          const updatedWorkspaces = prevWorkspaces.map(ws =>
+            ws.id === currentWorkspace?.id ? { ...ws, pinned: !pinned } : ws
+          );
+
+          // Sắp xếp lại: các item pinned=true lên đầu, giữ thứ tự tương đối các item trong mỗi nhóm
+          const sortedWorkspaces = [...updatedWorkspaces].sort((a, b) => {
+            if (a.pinned === b.pinned) return 0; // giữ nguyên thứ tự nếu pinned giống nhau
+            return a.pinned ? -1 : 1; // pinned true lên trước
+          });
+
+          return sortedWorkspaces;
+        });
+
+
+
+        return response.json(); // hoặc response.text() tùy API trả về gì
+      })
+      .then(data => {
+        setPinned(!pinned); // cập nhật trạng thái local sau khi update thành công
+      })
+      .catch(error => {
+        notification.error({message:'Lỗi khi cập nhật trạng thái ghim'});
+      });
+
+  };
+
     return (
     <div className="relative z-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 px-4 sm:px-6 pt-4 pb-3">
         <div className="flex items-center justify-center sm:justify-start gap-3">
@@ -32,7 +83,10 @@ const WorkspaceHeader: React.FC<WorkspaceHeaderProps> = ({ workspaceData }) => {
                 {/* @ts-ignore */}
                   {workspaceData?.address}
                 </span>
-                <StarOutlined className="ml-1 text-white text-base transform group-hover:scale-110 transition-transform duration-200 flex-shrink-0" />
+                {/* <StarOutlined className="ml-1 text-white text-base transform group-hover:scale-110 transition-transform duration-200 flex-shrink-0" /> */}
+                <Button onClick={togglePin} style={{padding: 0, background:'none', border:'none', color: 'yellow'}}>
+                  {pinned ? <StarFilled /> : <StarOutlined />}
+                </Button>
             </div>
             </div>
         </div>
@@ -40,5 +94,7 @@ const WorkspaceHeader: React.FC<WorkspaceHeaderProps> = ({ workspaceData }) => {
     </div>
     )
 }
+
+
 
 export default WorkspaceHeader;

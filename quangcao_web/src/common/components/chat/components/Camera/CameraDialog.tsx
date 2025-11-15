@@ -24,7 +24,7 @@ import LeaveBoard from "./LeaveBoard";
 import { notification } from "antd";
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useWorkpointInfor } from "../../../../common/hooks/useWorpointInfor";
-import StatisticsMonthDays from "../../../../app/dashboard/workpoints/StatisticsMonthDays";
+import SalaryBoard from "../../../../app/dashboard/workpoints/SalaryBoard";
 import { useUser } from "../../../../common/hooks/useUser";
 
 interface CameraDialogProps {
@@ -570,7 +570,7 @@ async function postWorkpointCheck(imgUrl: string, lat:string, long:string) {
       {!isSupplier &&
         <LeaveBoard open={openHoliday} userId={userEl?.id} onCancel={handleHolidayBoardCancel}/>}
       
-      <StatisticsMonthDays 
+      <SalaryBoard 
         selectedRecord={workpointEl} 
         modalVisible={modalVisible}
         handleOk={handleCloseModal} />

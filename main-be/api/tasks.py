@@ -4,6 +4,7 @@ import datetime
 from sqlalchemy.orm.attributes import flag_modified
 from api.messages import upload_a_file_to_vps
 from sqlalchemy import cast, Text
+from PIL import Image
 
 task_bp = Blueprint('task', __name__, url_prefix='/api/task')
 
@@ -162,8 +163,8 @@ def update_task_assets(id):
     if file.filename == '':
         return jsonify({'error': 'Empty filename'}), 400
     
-    filename, filepath = upload_a_file_to_vps(file)
-    print('upload:', filename, filepath)
+    filename, filepath, thumb_url = upload_a_file_to_vps(file)
+    print('upload:', filename, filepath, thumb_url)
     ls = []
 
     # task.assets có thể None hoặc list
@@ -178,14 +179,15 @@ def update_task_assets(id):
                                    "type": type,
                                     "user_id":user_id, 
                                     "task_id":task_id, 
-                                    "file_url":filepath, 
+                                    "file_url":filename, 
+                                    "thumb_url":thumb_url,
                                     })
     ls.append(message.message_id)
 
     # gán lại trường assets là list Python
     task.assets = ls
 
-    print('Task_asset', ls)
+    # print('Task_asset', ls)
 
 
     flag_modified(task, "assets")
@@ -232,7 +234,7 @@ def update_task_message(id):
     # gán lại trường assets là list Python
     task.assets = ls
 
-    print('Task_asset', ls)
+    # print('Task_asset', ls)
 
 
     flag_modified(task, "assets")

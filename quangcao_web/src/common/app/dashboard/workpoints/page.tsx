@@ -14,7 +14,7 @@ import { useUser } from "../../../common/hooks/useUser";
 import type { Workpoint, WorkDaysProps } from "../../../@types/workpoint";
 // import type { Leave } from "../../../@types/leave.type";
 
-import StatisticsMonthDays from "./StatisticsMonthDays";
+import SalaryBoard from "./SalaryBoard";
 
 const WorkPointPage: IPage["Component"] = () => {
   const [query, setQuery] = useState({
@@ -103,7 +103,7 @@ const WorkPointPage: IPage["Component"] = () => {
     </div>
 
     {modalVisible && 
-            <StatisticsMonthDays 
+            <SalaryBoard 
               selectedRecord={selectedRecord}
               modalVisible={modalVisible} 
               handleOk={handleCloseModal} />}

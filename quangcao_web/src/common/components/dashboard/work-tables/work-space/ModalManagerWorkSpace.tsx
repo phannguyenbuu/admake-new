@@ -207,23 +207,14 @@ export default function ModalManagerWorkSpace({
                   >
                     {/* Enhanced Workspace Cover */}
                     <div className="relative w-20 h-16 rounded-xl overflow-hidden flex-shrink-0 shadow-md group-hover:shadow-lg transition-all duration-300">
-                      {workspace.status ? (
-                        <>
-                          <img
-                            src={workspace.status}
-                            alt="workspace cover"
-                            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
-                          />
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
-                        </>
-                      ) : (
-                        <div className="w-full h-full bg-gradient-to-br from-[#0891b2] to-[#0e7490] flex items-center justify-center text-white text-xl font-bold relative overflow-hidden">
-                          <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent"></div>
-                          <span className="relative">
-                            {workspace.name && workspace.name.charAt(0).toUpperCase()}
-                          </span>
-                        </div>
-                      )}
+                      
+                      <div className="w-full h-full bg-gradient-to-br from-[#0891b2] to-[#0e7490] flex items-center justify-center text-white text-xl font-bold relative overflow-hidden">
+                        <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent"></div>
+                        <span className="relative">
+                          {workspace.name && workspace.name.charAt(0).toUpperCase()}
+                        </span>
+                      </div>
+                      
 
                       {/* Active indicator overlay */}
                       {pathname ===
@@ -245,12 +236,6 @@ export default function ModalManagerWorkSpace({
                         >
                           {workspace.name}
                         </Text>
-                        {/* {pathname ===
-                          `/dashboard/work-tables/${workspace.id}` && (
-                          <div className="px-2 py-1 bg-[#0891b2] text-white text-xs font-semibold rounded-full">
-                            Đang hoạt động
-                          </div>
-                        )} */}
                       </div>
                       <div className="flex items-center gap-2">
                         <Text className="text-gray-500 text-sm font-medium">

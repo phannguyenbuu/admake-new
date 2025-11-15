@@ -50,8 +50,8 @@ export interface WorkSpace {
   // img:string,
   // time:string,
   // msg:string,
-  // unread:number,
-  status?:string,
+  is_pin: boolean,
+  status:string,
   pinned:boolean,
   address:string,
   version:number;

@@ -19,25 +19,33 @@ import { useTaskContext } from "../../../../common/hooks/useTask";
 
 interface WorkspaceBoardProps {
   columns: ColumnType[];
-  onDragStart?: (initial: any) => void;   // Kiểu kiểu sự kiện tùy library drag-drop
+  onDragStart?: (initial: any) => void;
   onDragUpdate?: (update: any) => void;
   onDragEnd: (result: any) => void;
-//   adminMode?: boolean;
   isDragging?: boolean;
-//   setSelectedTask: (task: Task | null) => void;
-//   setEditingTaskId: (id: string | null) => void;
+  currentColumn: number;
+  setCurrentColumn: (col: number) => void;
   setShowFormTask: (show: boolean) => void;
 }
 
-const WorkspaceBoard: React.FC<WorkspaceBoardProps> = 
-    ({ onDragStart, onDragUpdate, 
-        onDragEnd, isDragging,columns,
-        setShowFormTask }) => {
+const WorkspaceBoard: React.FC<WorkspaceBoardProps> = ({
+  onDragStart,
+  onDragUpdate,
+  onDragEnd,
+  isDragging,
+  columns,
+  currentColumn,
+  setCurrentColumn,
+  setShowFormTask
+}) => {
     
     const {taskDetail, setTaskDetail} = useTaskContext();
-    const {workspaces, workspaceId, setWorkspaces} = useUser();
+    // const {currentColumn, setCurrentColumn} = useState<number>(0);
+    const {workspaces, workspaceId, setWorkspaces, currentWorkspace, isCurrentWorkspaceFree} = useUser();
     
     const [colNames, setColNames] = useState<string[]>(fixedColumns.map(col => col.title));
+
+    
 
     const updateColumnName = (names:string[]) => {
         setWorkspaces(prev =>
@@ -185,24 +193,25 @@ const WorkspaceBoard: React.FC<WorkspaceBoardProps> =
                                 {provided.placeholder}
 
                                 {/* Add Task Button */}
-                                {colIdx === 0 && (
+                                {(colIdx === 0 || isCurrentWorkspaceFree ) && (
                                 <Button
                                     block
                                     icon={<PlusOutlined />}
                                     className="group/btn relative h-8 sm:h-10 !border-2 !border-dashed !border-white/40 hover:!border-white/70 !bg-transparent hover:!bg-white/20 !text-white hover:!text-white !font-semibold !rounded-xl !mt-3 transition-all duration-200 transform hover:scale-[1.01] backdrop-blur-sm"
                                     onClick={() => {
+                                        setCurrentColumn(isCurrentWorkspaceFree ? colIdx : 0);
                                         setTaskDetail(null);
                                         
                                         setShowFormTask(true);
-                                            const context = useContext(UpdateButtonContext);
-                                            if (!context) 
-                                                throw new Error("UpdateButtonContext not found");
-                                            else
-                                            {
-                                                const { setShowUpdateButton } = context;
-                                                setShowUpdateButton(0);
-                                            }
-                                        }}
+                                        const context = useContext(UpdateButtonContext);
+                                        if (!context) 
+                                            throw new Error("UpdateButtonContext not found");
+                                        else
+                                        {
+                                          const { setShowUpdateButton } = context;
+                                          setShowUpdateButton(0);
+                                        }
+                                      }}
                                     >
                                     <span className="relative z-10 flex items-center gap-2 text-xs sm:text-sm">
                                     Thêm thẻ mới

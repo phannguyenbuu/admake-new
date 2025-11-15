@@ -2,6 +2,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { getMainMenuItems } from "../router";
 import { useEffect, useState } from "react";
 import ModalCreateSpace from "../../common/components/dashboard/work-tables/work-space/ModalCreateSpace";
+import { StarOutlined, StarFilled } from "@ant-design/icons";
 import FooterMenuBar from "./FooterMenuBar";
 import {
   TeamOutlined,
@@ -50,7 +51,7 @@ export default function RenderMenuBar({}) {
   const { pathname } = useLocation();
   const navigate = useNavigate();
   const { width } = useWindowSize();
-  const {userLeadId, workspaces} = useUser();
+  const {userLeadId, workspaces, currentWorkspace} = useUser();
 
   const [query, setQuery] = useState<Partial<PaginationDto>>({
       page: 1,
@@ -199,20 +200,15 @@ export default function RenderMenuBar({}) {
                 key: `/dashboard/work-tables/${workspace.id}`,
                 label: (
                   <div className="flex items-center gap-3 py-1 px-2 rounded-lg hover:bg-white/10 transition-all duration-200">
-                    <div className="w-10 h-6 rounded-lg bg-white/90 overflow-hidden flex-shrink-0 border border-white/40 shadow-md">
-                      {workspace.status ? (
-                        <img
-                          src={workspace.status}
-                          alt="cover"
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center text-cyan-600 text-sm font-bold bg-gradient-to-br from-cyan-50 to-cyan-100">
-                          {workspace.name?.charAt(0)?.toUpperCase() || "?"}
+                  
+                        <div style={{padding: 0, background:'none', border:'none', color: 'yellow'}}>
+                          {/* {workspace.name?.charAt(0)?.toUpperCase() || "?"} */}
+                          {workspace.pinned && <StarFilled />}
                         </div>
-                      )}
-                    </div>
-                    <span className="text-sm font-semibold text-white truncate flex-1 min-w-0">
+                  
+                    <span className="text-sm font-semibold text-white truncate flex-1 min-w-0"
+                      style ={{color: workspace?.status === "FREE" ? "yellow":"#fff"}}
+                    >
                       {workspace.name}
                     </span>
                   </div>

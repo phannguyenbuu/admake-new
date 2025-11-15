@@ -2,7 +2,7 @@ from flask import Blueprint, request, jsonify, abort
 from models import app, db, Workspace, Task, dateStr,Message, generate_datetime_id, User, create_workspace_method, get_model_columns, LeadPayload,get_lead_by_json, get_lead_by_arg
 import datetime
 from collections import defaultdict
-from sqlalchemy import desc
+from sqlalchemy import desc, asc
 from sqlalchemy.orm.attributes import flag_modified
 from sqlalchemy.sql import func
 
@@ -22,8 +22,10 @@ def get_workspaces():
     workspaces = Workspace.query.filter(
                     Workspace.lead_id == lead_id,
                     Workspace.null_workspace == False
-                ).order_by(desc(Workspace.updatedAt)).all()
-
+                ).order_by(
+                    asc(Workspace.pinned),  # ưu tiên bản ghi có pinned True
+                    desc(Workspace.updatedAt)  # sau đó mới theo thời gian cập nhật
+                ).all()
     return jsonify([c.tdict() for c in workspaces])
 
 def get_role(user):
@@ -62,6 +64,20 @@ def update_workspace(id):
     
 
 
+    db.session.commit()
+
+    return jsonify(workspace.tdict())
+
+@workspace_bp.route("/<string:id>/pin", methods=["PUT"])
+def update_workspace_pin(id):
+    workspace = Workspace.query.get(id)
+    if not workspace:
+        abort(404, description="Workspace not found")
+
+    data = request.get_json()
+    pin = data.get('pin', False)
+
+    workspace.pinned = pin
     db.session.commit()
 
     return jsonify(workspace.tdict())

@@ -15,7 +15,7 @@ import { useLocation } from "react-router-dom";
 import WorkDays, {QRColumn} from "../app/dashboard/workpoints/WorkDays";
 import type { Workpoint, WorkDaysProps } from "../@types/workpoint";
 import type { ColumnsType } from "antd/es/table";
-import StatisticsMonthDays from "../app/dashboard/workpoints/StatisticsMonthDays";
+import SalaryBoard from "../app/dashboard/workpoints/SalaryBoard";
 import type { WorkSpace } from "../@types/work-space.type";
 
 export const columnsMaterial = [

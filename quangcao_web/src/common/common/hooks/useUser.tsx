@@ -6,6 +6,7 @@ import { notification } from 'antd';
 import type { WorkSpace } from '../../@types/work-space.type';
 
 interface UserContextProps {
+  isCurrentWorkspaceFree: boolean;
   userId: string | null;
   username: string | null;
   userRoleId: number;
@@ -15,6 +16,7 @@ interface UserContextProps {
   workspaces: WorkSpace[];
   workspaceId: string;
   isMobile: boolean;
+  currentWorkspace: WorkSpace | null;
   setUserId: React.Dispatch<React.SetStateAction<string | null>>;
   setUserLeadId: React.Dispatch<React.SetStateAction<number>>;
   setWorkspaceId: React.Dispatch<React.SetStateAction<string>>;
@@ -37,6 +39,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const [workspaces, setWorkspaces] = useState<WorkSpace[]>([]);
+  const [currentWorkspace, setCurrentWorkspace] = useState<WorkSpace | null>(null);
   const [workspaceId, setWorkspaceId] = useState<string>("");
   const [userLeadId, setUserLeadId] = useState<number>(0);
   const [userId, setUserId] = useState<string | null>(null);
@@ -45,11 +48,26 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [userRoleId, setUserRoleId] = useState<number>(0);
   const [userRole, setUserRole] = useState<Role | null>(null);
   const [userIcon, setUserIcon] = useState<string | null>('images/avatar.png');
+  const [isCurrentWorkspaceFree, setisCurrentWorkspaceFree] = useState<boolean>(false);
+
+  useEffect(()=>{
+    if(currentWorkspace)
+      setisCurrentWorkspaceFree(currentWorkspace?.status === "FREE");
+  },[currentWorkspace]);
+  
   const isLoggingOutRef = useRef(false);
 
   const API_HOST = useApiHost();
   const breakpoint = 786;
   const [isMobile, setIsMobile] = useState<boolean>(() => window.innerWidth < breakpoint);
+
+  useEffect(() => {
+    if(!workspaces && !workspaceId) return;
+    const w = workspaces.find(ws => ws.id === workspaceId);
+
+    if(w)
+      setCurrentWorkspace(w);
+  },[workspaceId, workspaces]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -209,9 +227,9 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   return (
-    <UserContext.Provider value={{ isMobile, userId, username, 
+    <UserContext.Provider value={{ isMobile, userId, username, isCurrentWorkspaceFree,
       userRoleId, setUserRoleId, userRole, userLeadId, setUserLeadId, setUserId,
-      workspaces, setWorkspaces, workspaceId, setWorkspaceId,
+      workspaces, setWorkspaces, workspaceId, setWorkspaceId, currentWorkspace,
       userIcon, login, logout, checkAuthStatus }}>
       {children}
     </UserContext.Provider>

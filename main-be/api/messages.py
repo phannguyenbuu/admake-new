@@ -20,6 +20,8 @@ def get_messages():
         if search:
             query = query.filter(Message.text.ilike(f"%{search}%"))
 
+        query = query.order_by(Message.updatedAt.desc())
+
         pagination = query.paginate(page=page, per_page=limit, error_out=False)
         messages = [c.tdict() for c in pagination.items]
         total = pagination.total
@@ -46,28 +48,25 @@ def create_message():
 
     return jsonify(new_message.tdict()), 201
 
-@message_bp.route("/<int:id>", methods=["GET"])
+@message_bp.route("/<string:id>", methods=["GET"])
 def get_message_detail(id):
     message = db.session.get(Message, id)
     if not message:
         abort(404, description="Message not found")
     return jsonify(message.tdict())
 
-@message_bp.route("/<int:id>/favourite", methods=["PUT"])
+@message_bp.route("/<string:id>/favourite", methods=["PUT"])
 def put_message_favourite(id):
     message = db.session.get(Message, id)
     if not message:
         abort(404, description="Message not found")
 
-    print('match', message, message.is_favourite)
-    # db.session.refresh(message)
-    message.is_favourite = True
-    # db.session.add(message)
+    message.is_favourite = request.get_json().get("favourite", False)
     db.session.commit()
     
     return jsonify({"message":"OK"}), 200
 
-@message_bp.route("/<int:id>", methods=["PUT"])
+@message_bp.route("/<string:id>", methods=["PUT"])
 def update_message(id):
     data = request.get_json()
     # print(data)
@@ -124,7 +123,7 @@ def upload_file():
         return jsonify({'error': 'Empty filename'}), 400
     
 
-    filename, filepath = upload_a_file_to_vps(file)
+    filename, filepath, thumb_url = upload_a_file_to_vps(file)
     
     data = {
         # 'id': msg.id,
@@ -132,6 +131,7 @@ def upload_file():
         'workspace_id': workspace_id,
         'username': '',
         # 'text': text,
+        'thumb_url': thumb_url,
         'file_url': filename,
         'link': filepath,
         'role': role,
@@ -141,19 +141,41 @@ def upload_file():
     }
 
     return jsonify({'message': 'File uploaded successfully', 'filename': filename, 'data': data})
-    
+
+from PIL import Image
 def upload_a_file_to_vps(file):
     name, ext = os.path.splitext(file.filename)
     filename = file.filename
-    filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+    upload_folder = app.config['UPLOAD_FOLDER']
+    thumbs_folder = os.path.join(upload_folder, "thumbs")
+    os.makedirs(thumbs_folder, exist_ok=True)
+
+    filepath = os.path.join(upload_folder, filename)
 
     if os.path.exists(filepath):
         filename = f"{name}_{uuid.uuid4().hex}{ext}"
-        filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        filepath = os.path.join(upload_folder, filename)
         print('New file name because file exists:', filename)
 
     file.save(filepath)
-    return filename, filepath
 
+    # Kiểm tra xem file có phải ảnh không (dựa trên extension đơn giản, bạn có thể dùng thêm kiểm tra MIME nếu cần)
+    image_exts = ['.jpg', '.jpeg', '.png', '.gif', '.webp']
+    if ext.lower() in image_exts:
+        # Tạo thumbnail 100x70
+        try:
+            img = Image.open(filepath)
+            img.thumbnail((100, 70))
+            thumb_filename = f"thumb_{filename}"
+            thumb_filepath = os.path.join(thumbs_folder, thumb_filename)
+            img.save(thumb_filepath, "JPEG")
+            thumb_url = f"thumbs/{thumb_filename}"  # Đường dẫn thumbnail theo cấu trúc server static files
+        except Exception as e:
+            print("Thumbnail creation failed:", e)
+            thumb_url = None
+    else:
+        thumb_url = None
+
+    return filename, filepath, thumb_url
     
 

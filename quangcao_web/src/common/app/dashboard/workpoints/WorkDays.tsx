@@ -9,7 +9,7 @@ import { useLocation } from "react-router-dom";
 import DownloadIcon from '@mui/icons-material/Download';
 import { CenterBox } from "../../../components/chat/components/commons/TitlePanel";
 import type { Workpoint, WorkDaysProps, PeriodData, Checklist } from "../../../@types/workpoint";
-import StatisticsMonthDays from "./StatisticsMonthDays";
+import SalaryBoard from "./SalaryBoard";
 
 interface QRColumnProps {
   record: WorkDaysProps;

@@ -15,6 +15,7 @@ interface DefaultState {
   noon_out_hour: number;
   noon_out_minute: number;
   work_in_saturday_noon: boolean;
+  work_in_sunday: boolean;
   multiply_in_night_overtime: number;
   multiply_in_sun_overtime: number;
   [key: string]: number | boolean;

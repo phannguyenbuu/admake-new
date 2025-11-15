@@ -1,11 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Typography, Stack, IconButton, Box, TextField } from "@mui/material";
 
-import DeleteIcon from '@mui/icons-material/Delete';
-
 import AddIcon from "@mui/icons-material/Add";
-import { ProjectOutlined } from "@ant-design/icons"; // Nếu bạn muốn giữ
-import type { Task } from "../../../../@types/work-space.type";
 import { useApiHost, useApiStatic } from "../../../../common/hooks/useApiHost";
 import { notification } from "antd";
 import DescriptionIcon from "@mui/icons-material/Description"; // icon tài liệu
@@ -15,29 +11,23 @@ import { useTaskContext } from "../../../../common/hooks/useTask";
 import CloseIcon from '@mui/icons-material/Close';
 import type { MessageTypeProps } from "../../../../@types/chat.type";
 import SendIcon from '@mui/icons-material/Send';
-
-const isImageFile = (filename: string) => {
-  // console.log('f',filename);
-  if (!filename) return false;
-  const ext = filename.split('#')[0].split('.').pop()?.toLowerCase();
-  return ext === "jpg" || ext === "jpeg" || ext === "png" || ext === "gif" || ext === "bmp" || ext === "webp";
-};
+import FileUploadWithPreview from "../../../FileUploadWithPreview";
 
 interface JobAssetProps {
   title?: string;
   type?: string; // là ứng tiền hay hình ảnh tham khảo công trình
-  // taskDetail: Task | null;
-  onDelete?: (id: string) => void; 
   readOnly?: boolean;
 }
 
-const JobAsset: React.FC<JobAssetProps> = ({ title, type, onDelete, readOnly = false }) => {
+const JobAsset: React.FC<JobAssetProps> = ({ title, type, readOnly = false }) => {
   // const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const {taskDetail} = useTaskContext();
   const {userId, username, isMobile} = useUser();
   const [messageAssets, setMessageAssets] = useState<MessageTypeProps[]>([]);
   const [filteredAssets, setFilteredAssets] = useState<MessageTypeProps[]>([]);
   const [thumbLoading, setThumbLoading] = useState(false);
+
+  const imageTypes = ["image/jpeg", "image/jpg", "image/png", "image/gif", "image/webp"];
   
   const formatDate = (date: Date): string => {
     const pad = (n: number) => (n < 10 ? "0" + n : n);
@@ -53,13 +43,18 @@ const JobAsset: React.FC<JobAssetProps> = ({ title, type, onDelete, readOnly = f
   };
 
   useEffect(()=>{
-    if(!taskDetail || !taskDetail.assets) return;
+    if(!taskDetail || !taskDetail.assets)
+    {
+      setFilteredAssets([]);
+      setMessageAssets([]);
+      return;
+    } 
 
     const imgList = taskDetail.assets.filter(el => el.type === type && el.file_url && el.file_url != '');
     const msgList = taskDetail.assets.filter(el => el.type === type && el.text && el.text != '');
     // setAssets(taskDetail?.assets);
-    console.log('JobAsset taskdetail:', imgList.length, msgList.length);
-    console.log(msgList);
+    // console.log('JobAsset taskdetail:', imgList.length, msgList.length);
+    // console.log(msgList);
     setFilteredAssets(imgList);
     setMessageAssets(msgList);
   },[taskDetail]);
@@ -148,6 +143,7 @@ const JobAsset: React.FC<JobAssetProps> = ({ title, type, onDelete, readOnly = f
     formData.append("task_id", taskDetail?.id.toString() ?? '');
 
     // console.log('Upload', type, Object.fromEntries(formData.entries()));
+    
 
     try {
       const response = await fetch(`${useApiHost()}/task/${taskDetail?.id}/message`, {
@@ -160,7 +156,7 @@ const JobAsset: React.FC<JobAssetProps> = ({ title, type, onDelete, readOnly = f
       const result = await response.json();
       notification.success({ message: "Đã gửi comment thành công!", description: result });
       // console.log('success is image?',result.filename,isImageFile(result.filename));
-      setMessageAssets(prev => prev ? [...prev, result.message] : [result.message]);
+      
       // setFilteredAssets(assets.filter(el => el && el.includes('#' + role)));
     } catch (err: any) {
       notification.error({ message: "Lỗi gửi comment:", description: err.message });
@@ -188,6 +184,33 @@ const JobAsset: React.FC<JobAssetProps> = ({ title, type, onDelete, readOnly = f
     });
   };
 
+  const handleChangeFavourite = (message_id: string, checked: boolean) => {
+    setMessageAssets(prevMessages =>
+      prevMessages.map(m =>
+        m.message_id === message_id
+          ? { ...m, is_favourite: checked }
+          : m
+      )
+    );
+
+    fetch(`${useApiHost()}/message/${message_id}/favourite`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' }, // phải có header này
+      body: JSON.stringify({ favourite: checked }) // stringify đối tượng JSON
+    })
+      .then(response => {
+        if (!response.ok) {
+          notification.error({ message: 'Failed to check message', description: checked });
+        } else {
+          notification.success({ message: 'Message check successfully', description: checked });
+        }
+      })
+      .catch(error => {
+        console.error('Error deleting message:', error);
+      });
+  };
+
+  
   return (
     <Stack style={{maxWidth: isMobile? 300: '100%'}}>
       <Stack direction="row" sx= {{width:'100%'}}>
@@ -204,7 +227,20 @@ const JobAsset: React.FC<JobAssetProps> = ({ title, type, onDelete, readOnly = f
 
       {messageAssets.map((el, index) => 
         <Stack direction="row" key={index} spacing={1} alignItems="center">
-          {readOnly &&
+          {title === "Thông tin admin đưa ra" &&
+            <input
+              type="checkbox"
+              checked={el.is_favourite}
+              onChange={(e) => handleChangeFavourite(el.message_id, e.target.checked)}/>}
+          
+          <Typography style={{ fontSize: 12, fontWeight: 700 }}>
+            {el.username}:
+          </Typography>
+          <Typography style={{ fontSize: 10, fontWeight: 500 }}>
+            {el.text}
+          </Typography>
+
+          {!readOnly &&
           <IconButton
             size="small"
             aria-label="delete"
@@ -212,7 +248,7 @@ const JobAsset: React.FC<JobAssetProps> = ({ title, type, onDelete, readOnly = f
             onClick={() => handleMessageDelete(el.message_id)}
             sx={{
               color: '#777',
-              top: -10,
+              top: 0,
               '&:hover': {
                 color: 'red',
                 backgroundColor: 'rgba(255, 0, 0, 0.1)',
@@ -221,13 +257,6 @@ const JobAsset: React.FC<JobAssetProps> = ({ title, type, onDelete, readOnly = f
           >
             <CloseIcon />
           </IconButton>}
-          
-          <Typography style={{ fontSize: 12, fontWeight: 700 }}>
-            {el.username}:
-          </Typography>
-          <Typography style={{ fontSize: 10, fontWeight: 500 }}>
-            {el.text}
-          </Typography>
         </Stack>
       )}
 
@@ -247,7 +276,7 @@ const JobAsset: React.FC<JobAssetProps> = ({ title, type, onDelete, readOnly = f
 
             return (
               <Stack key={index} direction="column" alignItems="center" spacing={1} sx={{ width: 'calc(33.33% - 8px)' }}>
-                {url ? (
+                {/* {url ? (
                   thumbLoading && index === filteredAssets.length - 1 ? (
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 100 }}>
                       <CircularProgress size={24} />
@@ -263,10 +292,12 @@ const JobAsset: React.FC<JobAssetProps> = ({ title, type, onDelete, readOnly = f
                   )
                 ) : (
                   <DescriptionIcon fontSize="large" />
-                )}
+                )} */}
+
+                {url && <FileUploadWithPreview handleSend={handleSend} message={el}/>}
 
                 <Stack direction="row" gap={0}>
-                   {readOnly &&
+                  {!readOnly &&
                   <IconButton
                     size="small"
                     aria-label="delete"

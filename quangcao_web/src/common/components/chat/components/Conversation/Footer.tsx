@@ -14,7 +14,6 @@ import LinkIcon from '@mui/icons-material/Link';
 import SentimentSatisfiedIcon from '@mui/icons-material/SentimentSatisfied';
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import { notification } from 'antd';
-import type { WorkSpace } from '../../../../@types/work-space.type.js';
 import { useChatGroup } from '../../ProviderChat.js';
 
 
@@ -42,7 +41,7 @@ const getTypeName = (file_url:string) => {
 
     if(file_url.startsWith('http') || file_url.startsWith('www')) {
       type = 'link';
-    } else if(['.jpg', '.png', '.gif', '.webp', '.mp4', '.avi','.jfif'].some(s => ext.includes(s))) {
+    } else if(['.jpg', '.jpeg', '.png', '.gif', '.webp', '.mp4', '.avi','.jfif'].some(s => ext.includes(s))) {
       type = 'img';
     }
   }
@@ -287,6 +286,7 @@ const Footer = forwardRef<HTMLDivElement, FooterProps>(
         reply: '',
         role: userRoleId,
         icon: '',
+        
         type: getTypeName(file_url),
         incoming: false,
         // group_id: workspaceEl?.id || '',

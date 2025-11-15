@@ -37,6 +37,16 @@ export default function AppHeader() {
   const { data: receiveWorkSpaces, refetch: refetchWorkSpaces } = useWorkSpaceQueryAll({lead: userLeadId});
 
   useEffect(()=>{
+    if(!receiveWorkSpaces) return;
+    //@ts-ignore
+    receiveWorkSpaces.sort((a, b) => {
+      if (a.pinned === b.pinned) {
+        // Nếu cùng pinned, so sánh updatedAt giảm dần
+        return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
+      }
+      // Ưu tiên pinned true lên trước
+      return a.pinned ? -1 : 1;
+    });
     //@ts-ignore
     setWorkspaces(receiveWorkSpaces);
   },[receiveWorkSpaces]);

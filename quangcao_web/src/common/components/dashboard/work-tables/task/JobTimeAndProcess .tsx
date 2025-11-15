@@ -59,7 +59,7 @@ const JobTimeAndProcess: React.FC<JobTimeAndProcessProps> = ({form}) => {
 
   useEffect(() => {
     if (!form) return;
-    console.log('TTY', taskDetail, form);
+    // console.log('TTY', taskDetail, form);
 
     if (taskDetail) {
       form.setFieldsValue({
@@ -280,7 +280,7 @@ export function DateFormPicker({
 }) {
   useEffect(() => {
     if(!form) return;
-    console.log("TIME", mode, timeValue);
+    // console.log("TIME", mode, timeValue);
     form.setFieldsValue({ [mode]: timeValue });
   }, [timeValue]);
 

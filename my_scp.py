@@ -190,9 +190,10 @@ def save_dump():
 append_preload_link()
 
 local_dirs = [
-    "main-be/templates",
+    # "main-be/templates",
     "main-be/models.py",
     "main-be/app.py",
+    "main-be/utils.py",
     
     # "main-be/.env",
     "main-be/api",
