@@ -14,8 +14,8 @@ interface JobAgentInfoProps {
   form: any; // Form instance AntD
   searchValue: string;
   setSearchValue: React.Dispatch<React.SetStateAction<string>>;
-  selectedCustomer: UserSearchProps | null;
-  setSelectedCustomer: React.Dispatch<React.SetStateAction<UserSearchProps | null>>;
+  selectedAgent: UserSearchProps | null;
+  setselectedAgent: React.Dispatch<React.SetStateAction<UserSearchProps | null>>;
 }
 
 // function isCustomer(obj: UserSearchProps): obj is Customer {
@@ -28,8 +28,8 @@ const JobAgentInfo: React.FC<JobAgentInfoProps> = ({
   mode,
   searchValue,
   setSearchValue,
-  selectedCustomer,
-  setSelectedCustomer, }) => {
+  selectedAgent,
+  setselectedAgent, }) => {
   // const [customers, setCustomers] = useState<Customer[]>([]);
   const [options, setOptions] = useState<{ value: string; label: React.ReactNode }[]>([]);
   const rolename = mode === "customer" ? "khách hàng" : "nhân viên";
@@ -38,6 +38,7 @@ const JobAgentInfo: React.FC<JobAgentInfoProps> = ({
   const handleSearch = (value: string) => {
     // console.log('Customers', customers.length, value);
     setSearchValue(value);
+
     if (!value) {
       setOptions(
         users.map((c) => ({
@@ -88,9 +89,10 @@ const JobAgentInfo: React.FC<JobAgentInfoProps> = ({
   // Khi chọn khách hàng
   const handleSelect = (value: string) => {
     const user = users.find((c) => c.fullName === value) || null;
-    setSelectedCustomer(user);
+    setselectedAgent(user);
     // Cập nhật form field nếu form có quản lý
     form.setFieldsValue({ [mode]: value });
+    setSearchValue('');
   };
 
   function removeVietnameseTones(str:string) {
@@ -117,6 +119,7 @@ const JobAgentInfo: React.FC<JobAgentInfoProps> = ({
           //   return removeVietnameseTones(label).includes(removeVietnameseTones(inputValue));
           // }}
           value={searchValue}
+          onChange={val => setSearchValue(val)}
           onSearch={handleSearch}
           onSelect={handleSelect}
           placeholder={`Nhập tên hoặc số điện thoại ${rolename}`}
@@ -131,19 +134,19 @@ const JobAgentInfo: React.FC<JobAgentInfoProps> = ({
         />
       </Form.Item>
 
-      {selectedCustomer && (
+      {selectedAgent && (
         <div>
-          <Text strong>Tên {rolename}:</Text> {selectedCustomer.fullName || "-"} <br />
+          <Text strong>Tên {rolename}:</Text> {selectedAgent.fullName || "-"} <br />
           <Text strong>Số điện thoại:</Text>{" "}
-          {selectedCustomer.phone ? (
-            <a href={`tel:${selectedCustomer.phone.replace(/\s/g, "")}`}>{selectedCustomer.phone}</a>
+          {selectedAgent.phone ? (
+            <a href={`tel:${selectedAgent.phone.replace(/\s/g, "")}`}>{selectedAgent.phone}</a>
           ) : (
             "-"
           )}{" "}
           <br />
-          {selectedCustomer.workAddress && (
+          {selectedAgent.workAddress && (
             <>
-              <Text strong>Địa chỉ làm việc:</Text> {selectedCustomer.workAddress}
+              <Text strong>Địa chỉ làm việc:</Text> {selectedAgent.workAddress}
             </>
           )}
         </div>

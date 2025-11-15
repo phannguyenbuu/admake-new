@@ -124,7 +124,7 @@ export default function FormTask({ open, onCancel, onSuccess, users, currentColu
       setIsUpdating(true);
       const values = await form.validateFields();
 
-      // console.log("values", form.getFieldsValue());
+      console.log("values", form.getFieldsValue());
 
       const preparedValues = {
         ...values,
@@ -223,8 +223,8 @@ export default function FormTask({ open, onCancel, onSuccess, users, currentColu
                   users={users}
                   searchValue={userSearch} 
                   setSearchValue={setUserSearch}
-                  selectedCustomer={userSelected} 
-                  setSelectedCustomer={setUserSelected} 
+                  selectedAgent={userSelected} 
+                  setselectedAgent={setUserSelected} 
                 />
                  
                  {userList && userList.map((el)=> 
