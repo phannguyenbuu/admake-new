@@ -48,7 +48,7 @@ export default defineConfig({
 
   define: { global: "window" },
   server: {
-    allowedHosts: ['localhost', 'archbox.pw','dashboard.archbox.pw','quanly.admake.vn'],
+    allowedHosts: ['localhost', 'archbox.pw','dashboard.archbox.pw','admake.vn','quanly.admake.vn'],
     host: '0.0.0.0',
     watch: {
       usePolling: true,
@@ -60,10 +60,14 @@ export default defineConfig({
   build: {
     rollupOptions: {
       input: {
-        dashboard: fileURLToPath(new URL('./src/dashboard/main.tsx', import.meta.url)),
-        login: fileURLToPath(new URL('./src/login/main.tsx', import.meta.url)),
-        chat: fileURLToPath(new URL('./src/groupchat/main.tsx', import.meta.url)),
-        point: fileURLToPath(new URL('./src/point/main.tsx', import.meta.url)),
+        // dashboard: fileURLToPath(new URL('./src/dashboard/main.tsx', import.meta.url)),
+        // login: fileURLToPath(new URL('./src/login/main.tsx', import.meta.url)),
+        // chat: fileURLToPath(new URL('./src/groupchat/main.tsx', import.meta.url)),
+        // point: fileURLToPath(new URL('./src/point/main.tsx', import.meta.url)),
+        dashboard: path.resolve(__dirname, 'dashboard.html'),
+        chat: path.resolve(__dirname, 'chat.html'),
+        point: path.resolve(__dirname, 'point.html'),
+        login: path.resolve(__dirname, 'login.html'),
       }
     },
     outDir: 'dist',
