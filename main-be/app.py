@@ -32,6 +32,7 @@ from api.supplier import supplier_bp
 from api.leave import leave_bp
 from api.leads import lead_bp
 from api.fureal import fureal_bp
+from api.notifys import notify_bp
 
 app.register_blueprint(customer_bp)
 app.register_blueprint(material_bp)
@@ -48,6 +49,7 @@ app.register_blueprint(supplier_bp)
 app.register_blueprint(leave_bp)
 app.register_blueprint(lead_bp)
 app.register_blueprint(fureal_bp)
+app.register_blueprint(notify_bp)
 
 from api.chat import socketio
 

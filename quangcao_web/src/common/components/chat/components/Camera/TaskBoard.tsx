@@ -19,6 +19,7 @@ import JobDescription from "../../../dashboard/work-tables/task/JobDescription";
 import { Form, Input } from "antd";
 import JobAsset from "../../../dashboard/work-tables/task/JobAsset";
 import { Tabs } from 'antd';
+import type { NotifyProps } from "../../../../@types/notify.type";
 
 const { TextArea } = Input;
 
@@ -50,8 +51,19 @@ interface TaskBoardProps {
 const TaskBoard = ({ userId, open, onCancel }: TaskBoardProps) => {
   const [activeKey, setActiveKey] = useState('task');
     const { mutate, data, isPending, isError, error } = useTaskByUserMutation();
-    const {isMobile} = useUser();
+    const {isMobile,notifyAdmin,generateDatetimeId} = useUser();
     const {taskDetail,setTaskDetail} = useTaskContext();
+
+    const handleFinishWarning = () => {
+      const notify : NotifyProps = {
+          id: generateDatetimeId(),
+          type: 'task',
+          text: `Công việc ${taskDetail?.workspace}/${taskDetail?.title} hoàn thành. Vui lòng chuyển trạng thái !`,
+          target: `/dashboard/work-tables/${taskDetail?.workspace_id}`,
+      };
+
+      notifyAdmin(notify);
+    } 
 
     useEffect(() => {
         if (userId) {
@@ -75,9 +87,10 @@ const TaskBoard = ({ userId, open, onCancel }: TaskBoardProps) => {
       }
     },[currentPage, data]);
 
-    const btnStyle = {color:"#fff", padding:5, 
-        backgroundColor:'#00B5B4',
-        whiteSpace:'nowrap', borderRadius:10};
+    const btnStyle = {color:"#fff", padding:10, 
+      paddingLeft:30, paddingRight:30, 
+      backgroundColor:'#00B5B4',
+      whiteSpace:'nowrap', borderRadius:10};
 
     return (
     <Modal open={open} onCancel={onCancel} footer={null} width={900}>
@@ -109,10 +122,11 @@ const TaskBoard = ({ userId, open, onCancel }: TaskBoardProps) => {
         width: isMobile ? 320 : ''
       }}>
         <Stack direction="row" spacing={1}>
-          <Box style={btnStyle}>
+          <Button style={btnStyle} onClick={handleFinishWarning}>
             <ArrowForwardIcon />
             {getTitleByStatus(el.status)}
-          </Box>
+          </Button>
+
           <Typography style={{
             marginTop: 8,
             fontStyle: 'italic',

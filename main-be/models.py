@@ -338,6 +338,32 @@ class Workspace(BaseModel):
         db.session.commit()
         return item
     
+class Notify(BaseModel):
+    __tablename__ = "notification"
+    id = db.Column(db.String(50), primary_key=True)  # _id.$oid
+    text = db.Column(db.String(255))
+    description = db.Column(db.Text)
+    target = db.Column(db.String(50))
+    type = db.Column(db.String(50))
+    isDelete = db.Column(db.Boolean)
+
+    def tdict(self):
+        result = {}
+        for column in self.__table__.columns:
+            value = getattr(self, column.name)
+        
+            if isinstance(value, (datetime.datetime, datetime.date)):
+                value = value.isoformat()
+            result[column.name] = value
+
+    @staticmethod
+    def create_item(params):
+        item = Notify(**params)
+        db.session.add(item)
+        db.session.commit()
+        return item
+
+    
 class Task(BaseModel):
     __tablename__ = "task"
 

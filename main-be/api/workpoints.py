@@ -381,7 +381,7 @@ def get_workpoint_setting(lead_id):
         print("WorkpointSetting not found", lead_id)
         abort(404, description="WorkpointSetting not found")
     
-    print("WorkpointSetting found", workpoint_setting.tdict())
+    # print("WorkpointSetting found", workpoint_setting.tdict())
     return jsonify(workpoint_setting.tdict()), 200
 
 

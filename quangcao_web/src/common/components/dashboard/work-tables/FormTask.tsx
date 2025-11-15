@@ -1,10 +1,6 @@
 import React, { useState, useEffect, useMemo, useContext } from "react";
 import { Modal, Typography, Button } from "antd";
 import type { Task, UserSearchProps } from "../../../@types/work-space.type";
-// import { useCheckPermission } from "../../../common/hooks/checkPermission.hook";
-import { useInfo } from "../../../common/hooks/info.hook";
-import { useCustomerQuery, useCustomerDetail } from "../../../common/hooks/customer.hook";
-import { useGetTaskById } from "../../../common/hooks/work-space.hook";
 import JobInfoCard from "./task/JobInfoCard";
 import JobAgentInfo from "./task/JobAgentInfo";
 import JobDescription from "./task/JobDescription";

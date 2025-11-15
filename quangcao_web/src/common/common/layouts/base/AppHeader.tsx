@@ -1,4 +1,4 @@
-import { Layout, Dropdown, Avatar, Popover, Modal, message, notification } from "antd";
+import { Button, Layout, Dropdown, Avatar, Popover, Modal, message, notification } from "antd";
 import { BellOutlined, UserOutlined, LogoutOutlined } from "@ant-design/icons";
 // import NotificationDropdown from "../../../components/NotificationDropdown";
 import { useNavigate } from "react-router-dom";
@@ -24,9 +24,9 @@ export default function AppHeader() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [notificationOpen, setNotificationOpen] = useState(false);
-  const {username, userId, userRole, userRoleId, userLeadId, workspaces, setWorkspaces} = useUser();
+  const {username, userId, userRole, userRoleId, userLeadId, workspaces, setWorkspaces, fullName} = useUser();
   const [questionOpen, setQuestionOpen] = useState(false);
-
+  const {getNotifyList, notifyList} = useUser();
   // console.log('USER_NAME', useUser(), username);
   
   // call hook useInfo
@@ -59,25 +59,16 @@ export default function AppHeader() {
     setQuestionOpen(false)
   }
 
-  // const { data: notificationsData, refetch } = useGetNotification({
-  //   page: 1,
-  //   limit: 10,
-  // });
+  
+  useEffect(() => {
+    getNotifyList(); // Gọi lần đầu khi mount
 
-  // useEffect(() => {
-  //   if (isConnected) {
-  //     on("notification", () => {
-  //       refetch();
-  //     });
-  //   }
-  // }, [isConnected, on, refetch]);
+    const intervalId = setInterval(() => {
+      getNotifyList();
+    }, 60000); // 60000ms = 1 phút
 
-  // const handleNotificationClick = () => {
-  //   setNotificationOpen(!notificationOpen);
-  // };
-
-  // @ts-ignore
-  // const unreadCount = notificationsData?.meta?.unread || 0;
+    return () => clearInterval(intervalId); // Cleanup khi unmount
+  }, [getNotifyList]);
 
   const handleLogout = () => {
     // Xóa token
@@ -126,8 +117,14 @@ export default function AppHeader() {
           {/* Admin role text */}
           <div className="hidden md:flex items-center">
             <span className="text-gray-700 font-semibold text-sm px-3 py-1.5 bg-gray-100 rounded-full">
-              {username || "Admin"} / {userRole?.name}
+              {fullName || "Admin"} / {userRole?.name}
             </span>
+
+            <Button style={{background:'none', border:'none'}}>
+              <span className="text-white font-semibold text-sm px-3 py-1.5 bg-red-600 rounded-full">
+                {notifyList.length}
+              </span>
+            </Button>
           </div>
 
           {/* Avatar dropdown */}

@@ -1150,18 +1150,7 @@ if __name__ == "__main__":
         #     task.title = "Xây dựng chiến lược sản xuất"
         
         # db.session.commit()
-        # renameColumn('workspace','is_pin','pinned')
-
-        w = Workspace.query.filter(Workspace.name == "Phát lương").first()
-        w.status = "FREE"
-
-        w = Workspace.query.filter(Workspace.name == "Phát thưởng").first()
-        w.status = "FREE"
-
-        db.session.commit()
-        
-
-
+        renameColumn('notification','title','text')
         
 
         

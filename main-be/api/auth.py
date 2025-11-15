@@ -100,6 +100,7 @@ def me():
     return jsonify({
         'userId': user.id,
         'username': user.username,
+        'fullName': user.fullName,
         'role_id': user.role_id,
         "role": user.update_role(),
         'icon': user.icon,

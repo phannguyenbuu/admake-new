@@ -201,7 +201,7 @@ interface FooterProps {
 const Footer = forwardRef<HTMLDivElement, FooterProps>(
   ({ setMessages, left, width }, ref: Ref<HTMLDivElement>) => {
   // const [showFileUpload, setShowFileUpload] = useState(false);
-  const {userId, username, userRoleId, isMobile} = useUser();
+  const {userId, username, userRoleId, isMobile, generateDatetimeId} = useUser();
   const [openPicker, setOpenPicker] = useState(false);
   const [inputValue, setInputValue] = useState('');
   const full = userRoleId === -2;
@@ -246,28 +246,7 @@ const Footer = forwardRef<HTMLDivElement, FooterProps>(
     return user?.username || '';
   }
 
-  function generateDatetimeId() {
-    const now = new Date();
-      const pad = (num:number, size:number) => num.toString().padStart(size, '0');
-
-      // Tạo chuỗi timestamp dạng YYYYMMDDHHMMSSfff (fff là mili giây)
-      const timestampStr = 
-          now.getUTCFullYear().toString() +
-          pad(now.getUTCMonth() + 1, 2) +
-          pad(now.getUTCDate(), 2) +
-          pad(now.getUTCHours(), 2) +
-          pad(now.getUTCMinutes(), 2) +
-          pad(now.getUTCSeconds(), 2) +
-          pad(now.getUTCMilliseconds(), 3);
-
-      // Tạo chuỗi 6 ký tự hex ngẫu nhiên
-      const randomStr = Array.from({length: 6}, () => 
-          Math.floor(Math.random() * 16).toString(16)
-      ).join('');
-
-      return timestampStr + randomStr;
-  }
-
+  
   // console.log(generateDatetimeId());
 
 
