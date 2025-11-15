@@ -149,7 +149,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         throw new Error(errorData.message || 'Login failed');
       }
 
-      notification.success({message:'Remove notification successful!'})
+      // notification.success({message:'Remove notification successful!'})
       
     } catch (error) {
       notification.error({message:'Login error:', description: `${error}` || ''});
@@ -173,7 +173,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
 
       const data = await res.json();
-      console.log('noti_debug', data);
+      // console.log('noti_debug', data);
      
       if(data) {
         setNotifyList(data.data);

@@ -146,11 +146,12 @@ export default function AllManagementModal() {
                 key={col.id}
                 style={{
                   background: `linear-gradient(135deg, ${theme.color} 0%, ${theme.color}dd 100%)`,
-                  borderRadius: "20px",
+                  borderRadius: 10,
                   overflow: "hidden",
                   width: "100%",
                   boxShadow: "0 0 10px rgba(0,0,0,0.2)",
                   height: "fit-content",
+                  padding:0,
                 }}
               >
                 <CardTitle title={col.title} length={col?.tasks?.length ?? 0} />
