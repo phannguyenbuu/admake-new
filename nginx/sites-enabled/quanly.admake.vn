@@ -5,7 +5,7 @@ server {
     return 301 https://$host$request_uri;
 }
 
-server {    
+server {
     listen 443 ssl http2;
     listen [::]:443 ssl http2;
     server_name quanly.admake.vn;
@@ -23,24 +23,34 @@ server {
 
     add_header Strict-Transport-Security "max-age=15768000" always;
 
-    # ssl_stapling on;
-    # ssl_stapling_verify on;
     ssl_trusted_certificate /etc/letsencrypt/live/admake.vn/chain.pem;
 
     resolver 8.8.8.8 8.8.4.4 valid=300s;
     resolver_timeout 5s;
 
-    location / {
-        root /root/admake/quangcao_web/dist;
-        index index.html;
-        try_files $uri $uri/ /index.html;
+    # Rewrite các đường dẫn đến file html tương ứng
+    location /dashboard {
+        try_files $uri $uri/ /dashboard.html;
     }
 
-    location / {
-        proxy_pass http://127.0.0.1:4000;
+    location /chat {
+        try_files $uri $uri/ /chat.html;
+    }
+
+    location /point {
+        try_files $uri $uri/ /point.html;
+    }
+
+    location /login {
+        try_files $uri $uri/ /login.html;
+    }
+
+    # Proxy các request API/backend nếu cần
+    location /api/ {
+        proxy_pass http://127.0.0.1:4000;  # Thay port backend phù hợp
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection 'upgrade';
+        proxy_set_header Connection "upgrade";
         proxy_set_header Host $host;
         proxy_cache_bypass $http_upgrade;
 
@@ -49,11 +59,11 @@ server {
         proxy_set_header X-Forwarded-Proto $scheme;
     }
 
-    location /login {
-        proxy_pass http://127.0.0.1:6000;
+    location /login-api {
+        proxy_pass http://127.0.0.1:6000;  # Ví dụ backend login port 6000
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection 'upgrade';
+        proxy_set_header Connection "upgrade";
         proxy_set_header Host $host;
         proxy_cache_bypass $http_upgrade;
     }
@@ -63,7 +73,13 @@ server {
         allow all;
     }
 
-    
+    # Các file tĩnh (css, js, hình ảnh)
+    location ~* \.(?:ico|css|js|gif|jpe?g|png|woff2?|eot|ttf|svg|webp)$ {
+        expires 6M;
+        access_log off;
+        add_header Cache-Control "public";
+    }
 
-    error_page 404 /index.html;
+    # Trang lỗi 404 nếu cần
+    error_page 404 /dashboard.html;
 }
