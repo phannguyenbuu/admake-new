@@ -171,7 +171,6 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
 
       const data = await res.json();
-
       console.log('noti_debug', data);
      
       if(data) {

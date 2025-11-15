@@ -2,12 +2,16 @@ import React, { useState } from 'react';
 import { Button, Modal, IconButton } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import type { NotifyProps } from '../../../@types/notify.type';
+import { useUser } from "../../hooks/useUser";
 
-const NotifyModal = ({ notifyList, notifyDelete }: { notifyList: NotifyProps[], notifyDelete: (id: string) => void }) => {
+const NotifyModal = () => {
   const [open, setOpen] = useState(false);
+  const {notifyList, notifyDelete} = useUser();
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
+
+  console.log('NotifyList', notifyList);
 
   return (
     <>
@@ -42,3 +46,5 @@ const NotifyModal = ({ notifyList, notifyDelete }: { notifyList: NotifyProps[], 
     </>
   );
 };
+
+export default NotifyModal;

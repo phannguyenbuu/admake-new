@@ -15,6 +15,7 @@ import AllManagementModal from "../../../components/dashboard/work-tables/AllMan
 import { useLocation } from "react-router-dom";
 import { ChatGroupProvider } from "../../../components/chat/ProviderChat";
 import NoteWorkpointModal from "./NoteWorkpointModal";
+import NotifyModal from "./NotifyModal";
 
 const { Header } = Layout;
 
@@ -86,6 +87,7 @@ export default function AppHeader() {
   };
 
   return (
+    <>
     <ChatGroupProvider>
       <Header className="flex items-center gap-1 justify-between !px-4 md:!px-8 !bg-white shadow-sm h-14 md:h-16 sticky top-0 z-30 border-b border-gray-200">
         {/* Logo Section - Left side */}
@@ -172,5 +174,7 @@ export default function AppHeader() {
       {location === '/dashboard/workpoints'
         && <NoteWorkpointModal questionOpen={questionOpen} onCancel={handleCancel} />}
     </ChatGroupProvider>
+    <NotifyModal />
+    </>
   );
 }

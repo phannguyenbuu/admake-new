@@ -355,6 +355,8 @@ class Notify(BaseModel):
             if isinstance(value, (datetime.datetime, datetime.date)):
                 value = value.isoformat()
             result[column.name] = value
+        
+        return result
 
     @staticmethod
     def create_item(params):
