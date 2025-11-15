@@ -122,11 +122,7 @@ export default function AppHeader() {
               {fullName || "Admin"} / {userRole?.name}
             </span>
 
-            <Button style={{background:'none', border:'none'}}>
-              <span className="text-white font-semibold text-sm px-3 py-1.5 bg-red-600 rounded-full">
-                {notifyList.length}
-              </span>
-            </Button>
+            <NotifyModal />
           </div>
 
           {/* Avatar dropdown */}
@@ -174,7 +170,7 @@ export default function AppHeader() {
       {location === '/dashboard/workpoints'
         && <NoteWorkpointModal questionOpen={questionOpen} onCancel={handleCancel} />}
     </ChatGroupProvider>
-    <NotifyModal />
+    
     </>
   );
 }

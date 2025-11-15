@@ -42,13 +42,13 @@ const useTaskByUserMutation = () => {
 
 interface TaskBoardProps {
   // mode: { adminMode: boolean; userMode: boolean };
-  
+  fullName? : string;
   userId?: string;
   open?: boolean;
   onCancel: () => void;
 }
 
-const TaskBoard = ({ userId, open, onCancel }: TaskBoardProps) => {
+const TaskBoard = ({ userId,fullName, open, onCancel }: TaskBoardProps) => {
   const [activeKey, setActiveKey] = useState('task');
     const { mutate, data, isPending, isError, error } = useTaskByUserMutation();
     const {isMobile,notifyAdmin,generateDatetimeId} = useUser();
@@ -58,7 +58,8 @@ const TaskBoard = ({ userId, open, onCancel }: TaskBoardProps) => {
       const notify : NotifyProps = {
           id: generateDatetimeId(),
           type: 'task',
-          text: `Công việc ${taskDetail?.workspace}/${taskDetail?.title} hoàn thành. Vui lòng chuyển trạng thái !`,
+          description: fullName,
+          text: `Công việc <${taskDetail?.workspace}/${taskDetail?.title}> hoàn thành. Vui lòng chuyển trạng thái !`,
           target: `/dashboard/work-tables/${taskDetail?.workspace_id}`,
       };
 

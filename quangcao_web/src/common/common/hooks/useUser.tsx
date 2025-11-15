@@ -22,6 +22,7 @@ interface UserContextProps {
   
 
   currentWorkspace: WorkSpace | null;
+  setNotifyList: React.Dispatch<React.SetStateAction<NotifyProps[]>>;
   setUserId: React.Dispatch<React.SetStateAction<string | null>>;
   setFullName: React.Dispatch<React.SetStateAction<string | null>>;
   setUserLeadId: React.Dispatch<React.SetStateAction<number>>;
@@ -129,7 +130,8 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         throw new Error(errorData.message || 'Login failed');
       }
 
-      notification.success({message:'Send notification successful!', description:notify.text})
+      notification.success({message: notify.description + ': Send notification successful!', 
+                            description:notify.text})
     } catch (error) {
       notification.error({message:'Login error:', description: `${error}` || ''});
     }
@@ -340,7 +342,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       userRoleId, setUserRoleId, userRole, userLeadId, setUserLeadId, setUserId,
       workspaces, setWorkspaces, workspaceId, setWorkspaceId, currentWorkspace,
       fullName, setFullName,notifyAdmin,
-      notifyDelete, notifyList, getNotifyList, 
+      notifyDelete, notifyList, getNotifyList, setNotifyList,
       userIcon, login, logout, checkAuthStatus }}>
       {children}
     </UserContext.Provider>

@@ -565,7 +565,7 @@ async function postWorkpointCheck(imgUrl: string, lat:string, long:string) {
         )} */}
       
       
-      <TaskBoard open={openWork} userId={userEl?.id} onCancel={handleWorkBoardCancel}/>
+      <TaskBoard open={openWork} userId={userEl?.id} fullName={userEl?.fullName} onCancel={handleWorkBoardCancel}/>
 
       {!isSupplier &&
         <LeaveBoard open={openHoliday} userId={userEl?.id} onCancel={handleHolidayBoardCancel}/>}
