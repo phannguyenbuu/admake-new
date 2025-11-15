@@ -15,7 +15,7 @@ def get_materials():
         query = query.filter(Material.name.ilike(f"%{search}%"))
 
     pagination = query.paginate(page=page, per_page=limit, error_out=False)
-    materials = [c.to_dict() for c in pagination.items]
+    materials = [c.tdict() for c in pagination.items]
 
     return jsonify({
         "data": materials,
@@ -45,14 +45,14 @@ def create_material():
     )
     db.session.add(new_material)
     db.session.commit()
-    return jsonify(new_material.to_dict()), 201
+    return jsonify(new_material.tdict()), 201
 
 @material_bp.route("/<int:id>", methods=["GET"])
 def get_material_detail(id):
     material = db.session.get(Material, id)
     if not material:
         abort(404, description="material not found")
-    return jsonify(material.to_dict())
+    return jsonify(material.tdict())
 
 @material_bp.route("/<int:id>", methods=["PUT"])
 def update_material(id):
@@ -68,6 +68,6 @@ def update_material(id):
                 value = dateStr(value)
             setattr(material, key, value)
     db.session.commit()
-    return jsonify(material.to_dict()), 200
+    return jsonify(material.tdict()), 200
 
 

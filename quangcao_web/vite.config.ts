@@ -36,6 +36,8 @@ export default defineConfig({
             req.url = '/chat.html'; // rewrite về file entry chính của dashboard
           } else if (req.url?.startsWith('/login')) {
             req.url = '/login.html'; // rewrite về file entry chính của dashboard
+          }else if (req.url === '/' || req.url === '') {
+            req.url = '/dashboard.html';
           }
           next();
         });

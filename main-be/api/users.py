@@ -56,14 +56,14 @@ def create_user():
 
     db.session.refresh(new_user)
     
-    return jsonify(new_user.to_dict()), 201
+    return jsonify(new_user.tdict()), 201
 
 @user_bp.route("/<string:id>", methods=["GET"])
 def get_user_detail(id):
     user = db.session.get(User, id)
     if not user:
         abort(404, description="user not found")
-    return jsonify(user.to_dict())
+    return jsonify(user.tdict())
 
 @user_bp.route("/<string:id>", methods=["PUT"])
 def update_user(id):
@@ -100,7 +100,7 @@ def update_user(id):
         db.session.rollback()
         return jsonify({"error": str(e)}), 500
     
-    return jsonify(user.to_dict()), 200
+    return jsonify(user.tdict()), 200
 
 
 

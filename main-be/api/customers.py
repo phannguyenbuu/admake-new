@@ -63,7 +63,7 @@ def get_customer_detail(id):
     if not customer:
         abort(404, description="Customer not found")
 
-    result = customer.to_dict()
+    result = customer.tdict()
     user = db.session.get(User, customer.owner_id)
 
     if not user:
@@ -108,7 +108,7 @@ def update_customer(id):
             setattr(workspace, key, value)
 
     db.session.commit()
-    return jsonify(workspace.to_dict()), 200
+    return jsonify(workspace.tdict()), 200
 
 @customer_bp.route("/<string:workspace_id>", methods=["DELETE"])
 def delete_customer(workspace_id):

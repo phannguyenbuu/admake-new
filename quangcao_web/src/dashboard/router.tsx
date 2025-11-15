@@ -52,20 +52,20 @@ const SupplierDashboard = lazy(() => import("../common/app/dashboard/supplier/pa
 const WorkTableDetailPage = lazy(() => import("../common/app/dashboard/work-tables/page"));
 
 const routes: TRoute = {
-  path: "/dashboard",
+  path: "/",
   element: 
-    <WorkpointInforProvider>
-      <WorkpointSettingProvider>
-        <TaskProvider>
-          <BaseLayout />
-        </TaskProvider>
-      </WorkpointSettingProvider>
-    </WorkpointInforProvider>
-  ,
+  <WorkpointInforProvider>
+            <WorkpointSettingProvider>
+              <TaskProvider>
+              <BaseLayout />
+              </TaskProvider>
+            </WorkpointSettingProvider>
+          </WorkpointInforProvider>
+          ,
   errorElement: <Error404 />,
   children: [
     {
-      path: "",
+      path: "/dashboard",
       element: (
         <Suspense fallback={<div>Loading...</div>}>
           <DashboardPage/>
@@ -75,26 +75,26 @@ const routes: TRoute = {
       isMainMenu: true,
       children: [
         {
-          path: "",
+          path: "/dashboard",
           index: true,
-          element: <Navigate to="users" replace />,
+          element: <Navigate to="/dashboard/users" replace />,
           title: "Home",
           icon: <HomeOutlined />,
           ignoreInMenu: true,
         },
         
         {
-          path: "workpoints",
+          path: "/dashboard/workpoints",
           element: (
             <Suspense fallback={<div>Loading...</div>}>
-              <WorkPointPage />
+                <WorkPointPage />
             </Suspense>
           ),
           title: "Chấm công",
           icon: <CheckOutlined />,
         },
         {
-          path: "users",
+          path: "/dashboard/users",
          element: (
             <Suspense fallback={<div>Loading...</div>}>
               <UserDashboard />
@@ -105,7 +105,7 @@ const routes: TRoute = {
           icon: <LineChartOutlined />,
         },
         {
-          path: "suppliers",
+          path: "/dashboard/supplier",
           element: (
             <Suspense fallback={<div>Loading...</div>}>
               <SupplierDashboard />
@@ -116,7 +116,7 @@ const routes: TRoute = {
         },
        
         {
-          path: "customers",
+          path: "/dashboard/customers",
           element: (
           <Suspense fallback={<div>Loading...</div>}>
             <CustomerDashboard />
@@ -127,7 +127,7 @@ const routes: TRoute = {
           isDevelope: false,
         },
         {
-          path: "work-tables",
+          path: "/dashboard/work-tables",
           element: (<Suspense fallback={<div>Loading...</div>}>
               
                 <WorkTableDetailPage />
@@ -149,7 +149,7 @@ const routes: TRoute = {
           ignoreInMenu: false,
         },
         {
-          path: "materials",
+          path: "/dashboard/materials",
           element: (<DevelopeDashboard/>),
           roles: ["warehouse:management"],
           title: "Quản lý vật liệu",
@@ -157,13 +157,13 @@ const routes: TRoute = {
           isDevelope: true,
         },
         {
-          path: "statistics",
+          path: "/dashboard/statistics",
           element: (<DevelopeDashboard/>),
           title: "Phân tích",
           icon: <PieChartOutlined  />,
         },
         {
-          path: "invoices",
+          path: "/dashboard/invoices",
           element: (<DevelopeDashboard/>),
           roles: ["accounting:management"],
           title: "Báo giá",
@@ -171,7 +171,7 @@ const routes: TRoute = {
         },
 
         {
-          path: "accounting",
+          path: "/dashboard/accounting",
           element: (<DevelopeDashboard/>),
           
           roles: ["accounting:management"],
@@ -179,7 +179,7 @@ const routes: TRoute = {
           icon: <AccountBookOutlined />,
         },
         {
-          path: "infor",
+          path: "/dashboard/infor",
           element: <InforDashboard />,
           title: "Hồ sơ",
           icon: <UserOutlined />,

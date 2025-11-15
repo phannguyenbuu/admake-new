@@ -78,7 +78,7 @@ class Material(BaseModel):
     lead_id = db.Column(db.Integer, db.ForeignKey('lead.id'))
     lead = db.relationship('LeadPayload', backref='materials')
 
-    def to_dict(self):
+    def tdict(self):
         result = {}
         for column in self.__table__.columns:
             value = getattr(self, column.name)
@@ -152,9 +152,9 @@ class User(BaseModel):
         role = db.session.get(Role, self.role_id)
 
         if role:
-            return role.to_dict()
+            return role.tdict()
 
-    def to_dict(self):
+    def tdict(self):
         result = {}
         for column in self.__table__.columns:
             value = getattr(self, column.name)
@@ -229,7 +229,7 @@ class Customer(db.Model):
    
     user = db.relationship("User", backref="customer", uselist=False)
 
-    def to_dict(self):
+    def tdict(self):
         result = {}
         for column in self.__table__.columns:
             value = getattr(self, column.name)
@@ -241,7 +241,7 @@ class Customer(db.Model):
         result["role"] = "Khách hàng"
 
         if self.user:
-            user_data = self.user.to_dict()
+            user_data = self.user.tdict()
             result.update(user_data) 
 
         return result
@@ -257,7 +257,7 @@ class Role(BaseModel):
     # lead_id = db.Column(db.Integer, db.ForeignKey('lead.id'))
     # lead = db.relationship('LeadPayload', backref='roles')
 
-    def to_dict(self):
+    def tdict(self):
         result = {}
         for column in self.__table__.columns:
             value = getattr(self, column.name)
@@ -306,7 +306,7 @@ class Workspace(BaseModel):
     lead_id = db.Column(db.Integer, db.ForeignKey('lead.id'))
     lead = db.relationship('LeadPayload', backref='workspaces')
 
-    def to_dict(self):
+    def tdict(self):
         result = {}
         for column in self.__table__.columns:
             value = getattr(self, column.name)
@@ -317,7 +317,7 @@ class Workspace(BaseModel):
         return result
     
     def all_props(self):
-        result = self.to_dict()
+        result = self.tdict()
         user = db.session.get(User, self.owner_id)
 
         if user:
@@ -361,7 +361,7 @@ class Task(BaseModel):
     lead_id = db.Column(db.Integer, db.ForeignKey('lead.id'))
     lead = db.relationship('LeadPayload', backref='tasks')
 
-    def to_dict(self):
+    def tdict(self):
         result = {}
         for column in self.__table__.columns:
             value = getattr(self, column.name)
@@ -385,7 +385,7 @@ class Task(BaseModel):
                 asset = db.session.get(Message, asset_id)
 
                 if asset:
-                    ls.append(asset.to_dict())
+                    ls.append(asset.tdict())
 
             result["assets"] = ls
 
@@ -443,7 +443,7 @@ class Message(BaseModel):
     lead_id = db.Column(db.Integer, db.ForeignKey('lead.id'))
     lead = db.relationship('LeadPayload', backref='messages')
 
-    def to_dict(self):
+    def tdict(self):
         result = {}
         for column in self.__table__.columns:
             value = getattr(self, column.name)
@@ -480,7 +480,7 @@ class Workpoint(BaseModel):
     def __repr__(self):
         return f'<Workpoint id={self.id} user_id={self.user_id}>'
     
-    def to_dict(self):
+    def tdict(self):
         result = {}
         for column in self.__table__.columns:
             value = getattr(self, column.name)
@@ -574,7 +574,7 @@ class Leave(BaseModel):
     def __repr__(self):
         return f'<Leave {self.reason}>'
     
-    def to_dict(self):
+    def tdict(self):
         result = {}
         for column in self.__table__.columns:
             value = getattr(self, column.name)
@@ -633,7 +633,7 @@ class LeadPayload(BaseModel):
     def __repr__(self):
         return f'<Lead {self.name}>'
     
-    def to_dict(self):
+    def tdict(self):
         result = {}
         for column in self.__table__.columns:
             value = getattr(self, column.name)
@@ -717,9 +717,9 @@ def create_workspace_method(data, has_owner = True):
     db.session.commit()
 
     print("Create_Result")
-    print(new_workspace.to_dict())
+    print(new_workspace.tdict())
     
-    return jsonify(new_workspace.to_dict()), 201
+    return jsonify(new_workspace.tdict()), 201
 
 def get_lead_by_json(request):
     lead_id = request.get_json().get("lead", 0)
@@ -776,7 +776,7 @@ class WorkpointSetting(db.Model):
     def __repr__(self):
         return f'<WorkpointSetting {self.name}>'
     
-    def to_dict(self):
+    def tdict(self):
         result = {}
         for column in self.__table__.columns:
             value = getattr(self, column.name)
@@ -875,6 +875,6 @@ def get_query_page_users(lead_id, page, limit, search, role_id = 0):
     query = query.order_by(desc(User.updatedAt)).order_by(last_name, User.id)
 
     pagination = query.paginate(page=page, per_page=limit, error_out=False)
-    users = [c.to_dict() for c in pagination.items]
+    users = [c.tdict() for c in pagination.items]
 
     return users, pagination

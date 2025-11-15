@@ -93,7 +93,7 @@ class LeadPayload(BaseModel):
     def __repr__(self):
         return f'<Lead {self.name}>'
     
-    def to_dict(self):
+    def tdict(self):
         result = {}
         for column in self.__table__.columns:
             value = getattr(self, column.name)

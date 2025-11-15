@@ -6,7 +6,7 @@ role_bp = Blueprint('role', __name__, url_prefix='/api/role')
 
 @role_bp.route("/", methods=["GET"])
 def get_roles():
-    roles = [c.to_dict() for c in Role.query.all()]
+    roles = [c.tdict() for c in Role.query.all()]
 
     print(roles)
 
@@ -31,14 +31,14 @@ def create_role():
     new_role = Role.parse(data)
     db.session.add(new_role)
     db.session.commit()
-    return jsonify(new_role.to_dict()), 201
+    return jsonify(new_role.tdict()), 201
 
 @role_bp.route("/<int:id>", methods=["GET"])
 def get_role_detail(id):
     role = db.session.get(Role, id)
     if not role:
         abort(404, description="role not found")
-    return jsonify(role.to_dict())
+    return jsonify(role.tdict())
 
 @role_bp.route("/<int:id>", methods=["PUT"])
 def update_role(id):
@@ -54,4 +54,4 @@ def update_role(id):
                 value = dateStr(value)
             setattr(role, key, value)
     db.session.commit()
-    return jsonify(role.to_dict()), 200
+    return jsonify(role.tdict()), 200

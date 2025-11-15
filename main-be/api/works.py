@@ -24,7 +24,7 @@ def get_workspaces():
                     Workspace.null_workspace == False
                 ).order_by(desc(Workspace.updatedAt)).all()
 
-    return jsonify([c.to_dict() for c in workspaces])
+    return jsonify([c.tdict() for c in workspaces])
 
 def get_role(user):
     s = user.update_role()
@@ -64,7 +64,7 @@ def update_workspace(id):
 
     db.session.commit()
 
-    return jsonify(workspace.to_dict())
+    return jsonify(workspace.tdict())
 
 @workspace_bp.route("/<string:id>/tasks", methods=["GET"])
 def get_workspace_task(id):
@@ -77,7 +77,7 @@ def get_workspace_task(id):
     grouped = defaultdict(lambda: {"count": 0, "tasks": []})
     for t in tasks:
         status = t.status or "UNKNOWN"
-        grouped[status]["tasks"].append(t.to_dict())
+        grouped[status]["tasks"].append(t.tdict())
         grouped[status]["count"] += 1
     
     # Chuyển defaultdict về dict bình thường
@@ -170,7 +170,7 @@ def get_workspace_detail(id):
     # tasks = Task.query.filter_by(workspace_id=id).all()
     # print('TASK', tasks)
     
-    result = work.to_dict()
+    result = work.tdict()
     users = get_all_users_by_lead_id(work.lead_id)
     result["users"] = users
     result["customers"] = []

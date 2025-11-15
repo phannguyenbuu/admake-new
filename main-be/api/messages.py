@@ -12,7 +12,7 @@ def get_messages():
     search = request.args.get("search", "", type=str)
 
     if limit == 0:
-        messages = [c.to_dict() for c in Message.query.all()]
+        messages = [c.tdict() for c in Message.query.all()]
         total = len(messages)
         pages = 1
     else:
@@ -21,7 +21,7 @@ def get_messages():
             query = query.filter(Message.text.ilike(f"%{search}%"))
 
         pagination = query.paginate(page=page, per_page=limit, error_out=False)
-        messages = [c.to_dict() for c in pagination.items]
+        messages = [c.tdict() for c in pagination.items]
         total = pagination.total
         pages = pagination.pages
 
@@ -44,14 +44,14 @@ def create_message():
     db.session.add(new_message)
     db.session.commit()
 
-    return jsonify(new_message.to_dict()), 201
+    return jsonify(new_message.tdict()), 201
 
 @message_bp.route("/<int:id>", methods=["GET"])
 def get_message_detail(id):
     message = db.session.get(Message, id)
     if not message:
         abort(404, description="Message not found")
-    return jsonify(message.to_dict())
+    return jsonify(message.tdict())
 
 @message_bp.route("/<int:id>/favourite", methods=["PUT"])
 def put_message_favourite(id):
@@ -80,7 +80,7 @@ def update_message(id):
                 value = dateStr(value)
             setattr(role, key, value)
     db.session.commit()
-    return jsonify(role.to_dict()), 200
+    return jsonify(role.tdict()), 200
 
 @message_bp.route("/<string:message_id>", methods=['DELETE'])
 def delete_message(message_id):

@@ -1070,7 +1070,7 @@ def remove_workpoint_checklist(user_id, day):
                     if (day + "T") in v_1.get('time'):
                         print(k, k_1, v_1)
                         w.remove_checklist()
-                        print(w.to_dict())
+                        print(w.tdict())
                         return True
     return False
 
@@ -1112,11 +1112,9 @@ if __name__ == "__main__":
         
         # db.session.commit()
         for w in Workspace.query.all():
-            w.column_open_name = "Đơn hàng"
-            w.column_in_progress_name = "Phân việc"
-            w.column_done_name = "Thực hiện"
-            w.column_reward_name="Hoàn thiện"
-
+            if w.name == '':
+                print(w.tdict())
+                db.session.delete(w)
         db.session.commit()
         # add_new_columns("task",['rate'],'INTEGER')
         # add_new_columns("workspace",['column_in_progress_name'],'VARCHAR(255)')

@@ -11,7 +11,7 @@ task_bp = Blueprint('task', __name__, url_prefix='/api/task')
 @task_bp.route("/all", methods=["GET"])
 def get_all_tasks():
     
-    tasks = [t.to_dict() for t in Task.query.all()]
+    tasks = [t.tdict() for t in Task.query.all()]
     return jsonify(tasks)
 
 
@@ -26,7 +26,7 @@ def get_tasks(lead_id):
     for work in workspaces:
         result += Task.query.filter_by(workspace_id=work.id).all()
 
-    tasks = [t.to_dict() for t in result]
+    tasks = [t.tdict() for t in result]
 
     # print('Tak', tasks)
     return jsonify(tasks)
@@ -38,7 +38,7 @@ def get_task_by_id(id):
     if task is None:
         abort(404, description="Task not found")
 
-    result = task.to_dict()
+    result = task.tdict()
 
     if task.customer_id:
         customer = db.session.get(User, task.customer_id)
@@ -82,8 +82,8 @@ def update_task(id):
     db.session.commit()
 
     task = Task.query.get(id)
-    print('F', task.to_dict())
-    return jsonify(task.to_dict())
+    print('F', task.tdict())
+    return jsonify(task.tdict())
 
 @task_bp.route("/<string:user_id>/by_user", methods=["GET"])
 def get_task_by_user_id(user_id):
@@ -102,7 +102,7 @@ def get_task_by_user_id(user_id):
     result = {"data":[], "reward":[]}
     for t in tasks:
         workspace = db.session.get(Workspace, t.workspace_id)
-        item = t.to_dict()
+        item = t.tdict()
         if 'workspace' in item and item['workspace']:
             result["data"].append(item)
 
@@ -136,7 +136,7 @@ def update_task_status(id):
         task.check_reward = False
         db.session.commit()
 
-    return jsonify(task.to_dict())
+    return jsonify(task.tdict())
 
 
 
@@ -194,8 +194,8 @@ def update_task_assets(id):
     return jsonify({
         'filename': filename,
         'assets': ls,
-        'message': message.to_dict(),
-        **task.to_dict()})
+        'message': message.tdict(),
+        **task.tdict()})
 
 
 @task_bp.route("/<string:id>/message", methods=["PUT"])
@@ -241,8 +241,8 @@ def update_task_message(id):
     return jsonify({
         'text': text,
         'assets': ls,
-        'message': message.to_dict(),
-        **task.to_dict()})
+        'message': message.tdict(),
+        **task.tdict()})
 
 
 @task_bp.route("/", methods=["POST"])
@@ -257,7 +257,7 @@ def create_task():
     db.session.add(task)
     db.session.commit()
 
-    return jsonify(task.to_dict()), 201
+    return jsonify(task.tdict()), 201
 
 @task_bp.route("/<string:id>", methods=["DELETE"])
 def delete_task(id):

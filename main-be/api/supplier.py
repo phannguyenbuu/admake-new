@@ -32,7 +32,7 @@ def get_suppliers():
     pagination = query.paginate(page=page, per_page=limit, error_out=False)
 
     # Chuyển danh sách kết quả sang dạng dict
-    suppliers = [c.to_dict() for c in pagination.items]
+    suppliers = [c.tdict() for c in pagination.items]
 
     # Trả về json gồm dữ liệu và thông tin phân trang
     return jsonify({
@@ -81,14 +81,14 @@ def create_supplier():
     # db.session.add(new_supplier)
     db.session.commit()
 
-    return jsonify(new_user.to_dict()), 201
+    return jsonify(new_user.tdict()), 201
 
 @supplier_bp.route("/<string:id>", methods=["GET"])
 def get_supplier_detail(id):
     supplier = db.session.get(supplier, id)
     if not supplier:
         abort(404, description="supplier not found")
-    return jsonify(supplier.to_dict())
+    return jsonify(supplier.tdict())
 
 # @supplier_bp.route("/<string:id>", methods=["PUT"])
 # def update_supplier(id):
@@ -115,7 +115,7 @@ def get_supplier_detail(id):
 #             setattr(supplier, key, value)
 
 #     db.session.commit()
-#     return jsonify(supplier.to_dict()), 200
+#     return jsonify(supplier.tdict()), 200
 
 
 @supplier_bp.route("/<string:id>", methods=["PUT"])
@@ -139,7 +139,7 @@ def update_user(id):
         db.session.rollback()
         return jsonify({"error": str(e)}), 500
     
-    return jsonify(user.to_dict()), 200
+    return jsonify(user.tdict()), 200
 
 @supplier_bp.route("/<string:id>", methods=["DELETE"])
 def delete_user(id):
