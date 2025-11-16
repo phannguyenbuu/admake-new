@@ -25,15 +25,15 @@ const Message: React.FC<MsgListTypeProps> = ({ menu, messages, onDelete }) => {
             { 
                 switch (el.type) {
                     case 'timeline':
-                      return <TimeLine el={el} menu={menu}  key={`TimeLineMsg-${el.id}`} onDelete={onDelete}/>
+                      return <TimeLine el={el} menu={menu}  key={`TimeLineMsg-${el.message_id}`} onDelete={onDelete}/>
                     case 'img':
-                      return <MediaMsg el={el} menu={menu}  key={`MediaMsg-${el.id}`} onDelete={onDelete}/>
+                      return <MediaMsg el={el} menu={menu}  key={`MediaMsg-${el.message_id}`} onDelete={onDelete}/>
                     case 'doc':
-                        return <DocMsg el={el} menu={menu}  key={`DocMsg-${el.id}`} onDelete={onDelete}/>
+                        return <DocMsg el={el} menu={menu}  key={`DocMsg-${el.message_id}`} onDelete={onDelete}/>
                     case 'link':
-                        return <LinkMsg el={el} menu={menu}  key={`LinkMsg-${el.id}`} onDelete={onDelete}/>
+                        return <LinkMsg el={el} menu={menu}  key={`LinkMsg-${el.message_id}`} onDelete={onDelete}/>
                     case 'reply':
-                        return <ReplyMsg el={el} menu={menu}  key={`ReplyMsg-${el.id}`} onDelete={onDelete}/>
+                        return <ReplyMsg el={el} menu={menu}  key={`ReplyMsg-${el.message_id}`} onDelete={onDelete}/>
                         
                     default:
                       return <TextMsg el={el} menu={menu}  key={`DefaultMsg-${el.message_id}`} onDelete={onDelete}/>

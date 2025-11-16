@@ -29,6 +29,7 @@ interface UserContextProps {
   setWorkspaceId: React.Dispatch<React.SetStateAction<string>>;
   setUserRoleId: React.Dispatch<React.SetStateAction<number>>;
   setWorkspaces: React.Dispatch<React.SetStateAction<WorkSpace[]>>;
+  setCurrentWorkspace: React.Dispatch<React.SetStateAction<WorkSpace | null>>;
   login: (credentials: { username: string; password: string }) => Promise<void>;
   logout: () => Promise<void>;
   checkAuthStatus: () => Promise<void>;
@@ -341,7 +342,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       isCurrentWorkspaceFree,generateDatetimeId,
       userRoleId, setUserRoleId, userRole, userLeadId, setUserLeadId, setUserId,
       workspaces, setWorkspaces, workspaceId, setWorkspaceId, currentWorkspace,
-      fullName, setFullName,notifyAdmin,
+      fullName, setFullName,notifyAdmin,setCurrentWorkspace,
       notifyDelete, notifyList, getNotifyList, setNotifyList,
       userIcon, login, logout, checkAuthStatus }}>
       {children}

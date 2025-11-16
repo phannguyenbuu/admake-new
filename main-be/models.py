@@ -740,6 +740,7 @@ def create_workspace_method(data, has_owner = True):
         id=generate_datetime_id(),   # ✅ cũng cần id cho customer
         lead_id = lead_id,
         name = data.get("name",""),
+        status = data.get("status",""),
         owner_id=new_user_id
     )
     db.session.add(new_workspace)

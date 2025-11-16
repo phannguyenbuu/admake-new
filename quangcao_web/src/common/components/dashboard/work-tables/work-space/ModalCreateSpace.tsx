@@ -2,20 +2,28 @@ import { Button, Form, Input, Typography, Modal, notification } from "antd";
 import { PlusOutlined, TeamOutlined } from "@ant-design/icons";
 import { useApiHost } from "../../../../common/hooks/useApiHost";
 import { useUser } from "../../../../common/hooks/useUser";
+import { useNavigate } from 'react-router-dom';
+import type { WorkSpace } from "../../../../@types/work-space.type";
 
 const { Title, Text } = Typography;
+
+interface ModalCreateSpaceProps {
+  open: boolean;
+  onCancel: () => void;
+  onCreate?: (values: { name: string }) => void;
+  setIsModalOpen?: (open: boolean) => void;
+}
 
 export default function ModalCreateSpace({
   open,
   onCancel,
-  // onCreate,
-}: {
-  open: boolean;
-  onCancel: () => void;
-  onCreate?: (values: { name: string }) => void;
-}) {
+  onCreate,
+  setIsModalOpen,
+}: ModalCreateSpaceProps) {
+  const navigate = useNavigate();
   const [form] = Form.useForm();
-  const {userLeadId} = useUser();
+  const {userLeadId, setCurrentWorkspace, workspaces, setWorkspaces} = useUser();
+  // form.setFieldValue("status","FREE");
 
   const handleCreate = async (values:{name: string} ) => {
     try {
@@ -24,17 +32,26 @@ export default function ModalCreateSpace({
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ name: values.name, lead: userLeadId }),
+        body: JSON.stringify({ name: values.name, lead: userLeadId, status:"FREE" }),
       });
 
       if (!response.ok) {
         throw new Error("Lỗi khi tạo bảng công việc");
       }
 
+      const wItem:WorkSpace = await response.json();
+
       notification.success({message:"Tạo bảng công việc thành công!", description: values.name});
-      form.resetFields();
-      window.location.reload();
-      // Có thể gọi thêm callback onCreate để cập nhật UI cha nếu cần
+      window.location.href = `${window.location.origin}/dashboard/work-tables/${wItem.id}`
+      // form.resetFields();
+            
+      // setWorkspaces(prev => [...prev, wItem]);
+      // setCurrentWorkspace(wItem);
+
+      // setIsModalOpen(false);
+
+
+
     } catch (error) {
       notification.error({message:"Tạo bảng công việc thất bại"});
       console.error(error);

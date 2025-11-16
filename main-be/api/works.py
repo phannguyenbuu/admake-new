@@ -23,7 +23,7 @@ def get_workspaces():
                     Workspace.lead_id == lead_id,
                     Workspace.null_workspace == False
                 ).order_by(
-                    asc(Workspace.pinned),  # ưu tiên bản ghi có pinned True
+                    asc(Workspace.pinned),  # ưu tiên bản ghi có is_pin True
                     desc(Workspace.updatedAt)  # sau đó mới theo thời gian cập nhật
                 ).all()
     return jsonify([c.tdict() for c in workspaces])

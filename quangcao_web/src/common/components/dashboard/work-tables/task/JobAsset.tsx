@@ -12,6 +12,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import type { MessageTypeProps } from "../../../../@types/chat.type";
 import SendIcon from '@mui/icons-material/Send';
 import FileUploadWithPreview from "../../../FileUploadWithPreview";
+import { Modal } from "antd";
 
 interface JobAssetProps {
   title?: string;
@@ -212,6 +213,7 @@ const JobAsset: React.FC<JobAssetProps> = ({ title, type, readOnly = false }) =>
 
   
   return (
+    <>
     <Stack style={{maxWidth: isMobile? 300: '100%'}}>
       <Stack direction="row" sx= {{width:'100%'}}>
         <label htmlFor={`upload-image-file-${type}`}>
@@ -240,23 +242,7 @@ const JobAsset: React.FC<JobAssetProps> = ({ title, type, readOnly = false }) =>
             {el.text}
           </Typography>
 
-          {!readOnly &&
-          <IconButton
-            size="small"
-            aria-label="delete"
-            color="error"
-            onClick={() => handleMessageDelete(el.message_id)}
-            sx={{
-              color: '#777',
-              top: 0,
-              '&:hover': {
-                color: 'red',
-                backgroundColor: 'rgba(255, 0, 0, 0.1)',
-              },
-            }}
-          >
-            <CloseIcon />
-          </IconButton>}
+          {!readOnly && <DeleteAssetButton el={el} onDelete={handleMessageDelete}/>}
         </Stack>
       )}
 
@@ -276,44 +262,10 @@ const JobAsset: React.FC<JobAssetProps> = ({ title, type, readOnly = false }) =>
 
             return (
               <Stack key={index} direction="column" alignItems="center" spacing={1} sx={{ width: 'calc(33.33% - 8px)' }}>
-                {/* {url ? (
-                  thumbLoading && index === filteredAssets.length - 1 ? (
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 100 }}>
-                      <CircularProgress size={24} />
-                    </div>
-                  ) : (
-                    <a href={`${useApiStatic()}/${url}`} target="_blank" rel="noreferrer">
-                      <img
-                        src={`${useApiStatic()}/${url}`}
-                        alt={`asset-${index}`}
-                        style={{ maxWidth: 100, maxHeight: 100, borderRadius: 4 }}
-                      />
-                    </a>
-                  )
-                ) : (
-                  <DescriptionIcon fontSize="large" />
-                )} */}
-
                 {url && <FileUploadWithPreview handleSend={handleSend} message={el}/>}
 
                 <Stack direction="row" gap={0}>
-                  {!readOnly &&
-                  <IconButton
-                    size="small"
-                    aria-label="delete"
-                    color="error"
-                    onClick={() => handleDelete(el.message_id)}
-                    sx={{
-                      color: '#777',
-                      top: -10,
-                      '&:hover': {
-                        color: 'red',
-                        backgroundColor: 'rgba(255, 0, 0, 0.1)',
-                      },
-                    }}
-                  >
-                    <CloseIcon />
-                  </IconButton>}
+                  {!readOnly && <DeleteAssetButton el={el} onDelete={handleDelete}/>}
                   <Typography fontSize={12} sx={{ maxWidth: 100, whiteSpace: 'nowrap' }}>
                     {url && url.length > 9 ? `${url.substring(0, 9)}...` : url}
                   </Typography>
@@ -335,10 +287,58 @@ const JobAsset: React.FC<JobAssetProps> = ({ title, type, readOnly = false }) =>
         
       </Stack>
     </Stack>
+
+
+
+        
+        
+    </>
   );
 };
 
 export default JobAsset;
+
+
+interface DeleteAssetButtonProps {
+  el: MessageTypeProps;
+  onDelete: (id: string) => void;
+}
+
+const DeleteAssetButton: React.FC<DeleteAssetButtonProps> = ({ el, onDelete }) => {
+  const [showConfirm, setShowConfirm] = useState<boolean>(false);
+
+  return (
+      <>
+        <IconButton
+          size="small"
+          aria-label="delete"
+          color="error"
+          onClick={() => setShowConfirm(true)}
+          sx={{
+            color: '#777',
+            top: -10,
+            '&:hover': {
+              color: 'red',
+              backgroundColor: 'rgba(255, 0, 0, 0.1)',
+            },
+          }}
+        >
+          <CloseIcon />
+        </IconButton>
+        
+        <Modal
+          title="Bạn có chắc muốn xóa ?"
+          open={showConfirm}
+          onOk = {() => {
+            onDelete(el?.message_id);
+           setShowConfirm(false);
+          }}
+          onCancel={() => setShowConfirm(false)}
+          >
+        </Modal>
+      </>
+    );
+}
 
 
 const ChatInput: React.FC<{ title: string; onSend: (message: string) 

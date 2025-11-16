@@ -267,6 +267,7 @@ export default function RenderMenuBar({}) {
       <div className="!z-[10001]">
         <ModalCreateSpace
           open={isModalOpen}
+          setIsModalOpen = {setIsModalOpen}
           onCancel={() => setIsModalOpen(false)}
           // onCreate={handleAddBoard}
         />

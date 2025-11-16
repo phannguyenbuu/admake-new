@@ -1150,7 +1150,12 @@ if __name__ == "__main__":
         #     task.title = "Xây dựng chiến lược sản xuất"
         
         # db.session.commit()
-        renameColumn('notification','title','text')
+        # renameColumn('notification','title','text')
+
+        for key in ["XE HÀNG - MUA HÀNG","THI CÔNG","TEST_R","TEST"]:
+            w = Workspace.query.filter(Workspace.name == key).first()
+            w.status = "FREE"
+        db.session.commit()
         
 
         

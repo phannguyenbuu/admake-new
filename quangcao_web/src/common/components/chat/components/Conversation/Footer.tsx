@@ -258,7 +258,7 @@ const Footer = forwardRef<HTMLDivElement, FooterProps>(
       console.log("Username",  get_user_name());
       
       const data: MessageTypeProps = {
-        id: generateUniqueIntId(),
+        // id: generateUniqueIntId(),
         workspace_id: workspaceEl?.id || '',
         react: {rate:0},
         preview: '',
@@ -300,7 +300,7 @@ const Footer = forwardRef<HTMLDivElement, FooterProps>(
       // console.log("Username",  get_user_name());
       
       const data: MessageTypeProps = {
-        id: generateUniqueIntId(),
+        // id: generateUniqueIntId(),
         workspace_id: workspaceEl?.id,
         react: {rate:0},
         preview: '',

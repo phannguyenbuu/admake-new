@@ -191,7 +191,7 @@ export default function FooterMenuBar({
       <div className="!z-[10001]">
         <ModalCreateSpace
           open={isModalOpen}
-          onCancel={() => setIsModalOpen(false)}
+          onCancel={() => setIsModalOpen && setIsModalOpen(false)}
         />
       </div>
     </>

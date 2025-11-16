@@ -32,7 +32,7 @@ interface ReactProps {
 }
 
 export interface MessageTypeProps {
-  id: number;
+  // id: number;
   isLoading?: boolean;
   workspace_id?: string;
 
