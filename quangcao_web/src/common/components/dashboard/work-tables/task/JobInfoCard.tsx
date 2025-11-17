@@ -18,16 +18,6 @@ interface JobInfoCardProps {
   form: any; // form instance từ Form.useForm()
 }
 
-const getStatusMeta = (status: string) => {
-  const statusMap: Record<string, any> = {
-    OPEN: { color: "blue", label: "Phân việc", icon: "📋" },
-    IN_PROGRESS: { color: "orange", label: "Sản xuất", icon: "⚡" },
-    DONE: { color: "green", label: "Hoàn thiện", icon: "✅" },
-    REWARD: { color: "purple", label: "Đã Nghiệm Thu", icon: "🏆" },
-  };
-  return statusMap[status] || statusMap.OPEN;
-};
-
 const JobInfoCard: React.FC<JobInfoCardProps> = ({ currentStatus, taskDetail, form }) => {
   useEffect(() => {
     if (taskDetail) {

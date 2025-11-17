@@ -1159,8 +1159,9 @@ if __name__ == "__main__":
         # Task.query.filter(Task.type == "salary").delete(synchronize_session=False)
 
         # alter_data()
-        for notify in Notify.query.all():
-            notify.lead_id = 243
+        for lead in LeadPayload.query.all():
+            
+            print(lead.username, lead.fullName)
 
         db.session.commit()
 

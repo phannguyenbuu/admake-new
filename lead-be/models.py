@@ -101,6 +101,8 @@ class LeadPayload(BaseModel):
             if isinstance(value, (datetime.datetime, datetime.date)):
                 value = value.date().isoformat()
             result[column.name] = value
+
+            
         return result
 
     @staticmethod

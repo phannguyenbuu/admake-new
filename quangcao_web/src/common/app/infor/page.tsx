@@ -1,16 +1,13 @@
 import type { IPage } from "../../@types/common.type";
-import { Card, Button, Tooltip } from "antd";
-import { EditOutlined } from "@ant-design/icons";
-import { useInfo } from "../../common/hooks/info.hook";
-
-import { UserForm } from "../../components/dashboard/info/UserForm";
 import { useState } from "react";
+import { Card, Button, Modal, Form, Input, message, notification } from "antd";
 import { useUser } from "../../common/hooks/useUser";
+import { useApiHost } from "../../common/hooks/useApiHost";
 
 export const InforDashboard: IPage["Component"] = () => {
-  // const { data: info, isLoading: isLoadingInfo, refetch } = useInfo();
-  const {userId, username, userRoleId, userRole, userIcon} = useUser();
+  const {userId, username, userLeadId, userRole, fullName} = useUser();
 
+  const [form] = Form.useForm();
   const [config, setConfig] = useState({
     openEdit: false,
   });
@@ -21,7 +18,54 @@ export const InforDashboard: IPage["Component"] = () => {
     };
   };
 
+  const onFinish = async (values: any) => {
+    console.log("Form values", values);
+
+    try {
+      const response = await fetch(`${useApiHost()}/lead/${userLeadId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(values),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        notification.error({message:"Lỗi server:", description:data.description});
+        // message.error(data.description || "Cập nhật thất bại");
+        return;
+      }
+
+      // console.log("Backend response:", data);
+      message.success("Cập nhật thông tin thành công");
+      setConfig((prev) => ({ ...prev, openEdit: false }));
+    } catch (error) {
+      console.error("Fetch error:", error);
+      message.error("Lỗi server");
+    }
+  };
+
+
+  const validatePassword = (_: any, value: string) => {
+    if (!value) {
+      return Promise.reject(new Error("Vui lòng nhập mật khẩu"));
+    }
+    const passwordRegex =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
+    if (!passwordRegex.test(value)) {
+      return Promise.reject(
+        new Error(
+          "Mật khẩu phải gồm ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt"
+        )
+      );
+    }
+    return Promise.resolve();
+  };
+
   return (
+    <>
     <div className="py-3 lg:pt-20 w-full flex items-center justify-center overflow-hidden">
       {/* Background */}
       <div className="absolute inset-0" />
@@ -39,41 +83,124 @@ export const InforDashboard: IPage["Component"] = () => {
               {/* User Info */}
               <div className="text-center text-white">
                 <h2 className="text-lg sm:text-xl lg:text-2xl font-semibold mb-1 drop-shadow-lg">
-                  {username}
+                  {fullName}
                 </h2>
                 <p className="text-sm sm:text-base text-cyan-200 drop-shadow-md">
                   {userRole?.name}
                 </p>
               </div>
+
+
+              <Button type="primary" onClick={toggle("openEdit")} className="mt-4">
+                THAY ĐỔI THÔNG TIN
+              </Button>
             </div>
           </div>
 
-          {/* Edit Form Button */}
-          {/* <div className="absolute top-4 right-4 z-20">
-            <Tooltip title="Chỉnh sửa thông tin" placement="bottom">
-              <Button
-                shape="circle"
-                icon={<EditOutlined />}
-                className="!bg-cyan-500 !text-white !border-none !shadow-xl !hover:!bg-cyan-600 !w-8 !h-8"
-                onClick={handleEdit}
-                size="small"
-              />
-            </Tooltip>
-          </div> */}
-
-          {/* Form Information */}
-          {/* <UserForm
-            info={info}
-            config={config}
-            toggle={toggle}
-            onRefetch={() => refetch()}
-          /> */}
+          
         </Card>
       </div>
+
+
+      
     </div>
+
+    <Modal
+        title="Thay đổi thông tin cá nhân"
+        open={config.openEdit}
+        onCancel={toggle("openEdit")}
+        footer={null}
+        destroyOnClose
+      >
+        <Form form={form} layout="vertical" onFinish={onFinish} preserve={false}>
+          <Form.Item label="Tên" name="name" rules={[{ required: false, message: "Vui lòng nhập tên" }]}>
+            <Input placeholder="Tên của bạn" defaultValue={fullName ?? ''} />
+          </Form.Item>
+
+          <OldPasswordInput leadId={userLeadId}/>
+
+          <Form.Item
+            label="Mật khẩu mới"
+            name="password"
+            rules={[{ validator: validatePassword }]}
+            hasFeedback
+          >
+            <Input.Password placeholder="Nhập mật khẩu mới" />
+          </Form.Item>
+
+          <Form.Item
+            label="Xác nhận mật khẩu"
+            name="confirmPassword"
+            dependencies={["password"]}
+            hasFeedback
+            rules={[
+              { required: true, message: "Vui lòng xác nhận mật khẩu" },
+              ({ getFieldValue }) => ({
+                validator(_, value) {
+                  if (!value || getFieldValue("password") === value) {
+                    return Promise.resolve();
+                  }
+                  return Promise.reject(new Error("Mật khẩu xác nhận không khớp"));
+                },
+              }),
+            ]}
+          >
+            <Input.Password placeholder="Xác nhận mật khẩu" />
+          </Form.Item>
+
+          <Form.Item>
+            <Button type="primary" htmlType="submit" block>
+              Lưu thay đổi
+            </Button>
+          </Form.Item>
+        </Form>
+      </Modal>
+    </>
+
   );
 };
 
 export const loader = async () => {
   return null;
+};
+
+
+const OldPasswordInput = ({ leadId }: { leadId: number }) => {
+  const [valid, setValid] = useState(true);
+
+  const checkOldPassword = async (e: React.FocusEvent<HTMLInputElement>) => {
+    const oldPassword = e.target.value;
+    if (!oldPassword) return;
+
+    try {
+      const res = await fetch(`${useApiHost()}/lead/${leadId}/check-password`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ old_password: oldPassword }),
+      });
+      const data = await res.json();
+      console.log('message',data);
+      if (data.message = "right password") {
+        setValid(true);
+        notification.success({message:"Mật khẩu cũ đúng"});
+      } else {
+        setValid(false);
+        notification.error({message:"Mật khẩu cũ không đúng"});
+      }
+    } catch (error) {
+      notification.error({message:"Mật khẩu cũ không đúng"});
+    }
+  };
+
+  return (
+    <Form.Item
+      name="old_password"
+      label="Mật khẩu cũ"
+      validateStatus={valid ? "" : "error"}
+      help={valid ? "" : "Mật khẩu cũ không đúng"}
+      rules={[{ required: true, message: "Vui lòng nhập mật khẩu cũ" }]}
+    >
+      <Input.Password onBlur={checkOldPassword} />
+    </Form.Item>
+  );
 };

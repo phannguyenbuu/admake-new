@@ -38,10 +38,10 @@ export interface DeleteConfirmProps {
 }
 
 export const fixedColumns = [
-    { id: "col-0", title: "Phân việc", type: "OPEN" },
-    { id: "col-1", title: "Sản xuất", type: "IN_PROGRESS" },
-    { id: "col-2", title: "Hoàn thiện", type: "DONE" },
-    { id: "col-3", title: "Khoán thưởng", type: "REWARD" },
+    { id: "col-0", title: "Đơn hàng", type: "OPEN" },
+    { id: "col-1", title: "Phân việc", type: "IN_PROGRESS" },
+    { id: "col-2", title: "Thực hiện", type: "DONE" },
+    { id: "col-3", title: "Hoàn thiện", type: "REWARD" },
   ];
 
 export function getTitleByStatus(type: string): string | undefined {
@@ -54,7 +54,7 @@ export default function ManagermentBoard() {
   if (!context) throw new Error("UpdateButtonContext not found");
   const { showUpdateButton, setShowUpdateButton } = context;
   
-  const {workspaceId, isCurrentWorkspaceFree} = useUser();
+  const {workspaceId, isCurrentWorkspaceFree, userLeadId} = useUser();
   const { data: workspaceData } = useWorkSpaceQueryById(workspaceId);
 
   const {tasksData, updateTaskStatus, refetchTasks, taskDetail, setTaskDetail} = useTaskContext();
@@ -72,7 +72,6 @@ export default function ManagermentBoard() {
     },
     []
   );
-
 
   const [columns, setColumns] = useState<ColumnType[]>(() =>
     // @ts-ignore

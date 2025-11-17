@@ -10,12 +10,6 @@ import type { ColumnType, Task, TasksResponse } from "../../../@types/work-space
 import "./css/css.css";
 import "./work-space/workspace.css";
 import { fixedColumns } from "./Managerment";
-// const fixedColumns = [
-//   { id: "col-0", title: "Phân việc", type: "OPEN" },
-//   { id: "col-1", title: "Sản xuất", type: "IN_PROGRESS" },
-//   { id: "col-2", title: "Hoàn thiện", type: "DONE" },
-//   { id: "col-3", title: "Khoán thưởng", type: "REWARD" },
-// ];
 
 const items = [
   { key: "status", label: "Tiến trình" },

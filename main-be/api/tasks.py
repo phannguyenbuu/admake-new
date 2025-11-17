@@ -24,7 +24,7 @@ def get_tasks(lead_id):
     if lead_id == 0:
         print("Zero lead")
         abort(404, "Zero lead")
-    workspaces = Workspace.query.filter(Workspace.lead_id == lead_id)
+    workspaces = Workspace.query.filter(Workspace.lead_id == lead_id, Workspace.null_workspace.is_(False))
     result = []
 
     for work in workspaces:

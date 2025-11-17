@@ -20,6 +20,7 @@ interface UserContextProps {
   isMobile: boolean;
   notifyList: NotifyProps[];
   
+  
 
   currentWorkspace: WorkSpace | null;
   setNotifyList: React.Dispatch<React.SetStateAction<NotifyProps[]>>;
@@ -56,6 +57,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [userLeadId, setUserLeadId] = useState<number>(0);
   const [userId, setUserId] = useState<string | null>(null);
   const [fullName, setFullName] = useState<string | null>(null);
+  // const [userPassword, setUserPasssword] = useState<string | null>(null);
   
   const [username, setUsername] = useState<string | null>(null);
   const [userRoleId, setUserRoleId] = useState<number>(0);
@@ -349,7 +351,8 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     <UserContext.Provider value={{ isMobile, userId, username, 
       isCurrentWorkspaceFree,generateDatetimeId,
       userRoleId, setUserRoleId, userRole, userLeadId, setUserLeadId, setUserId,
-      workspaces, setWorkspaces, workspaceId, setWorkspaceId, currentWorkspace,
+      workspaces, setWorkspaces, workspaceId, setWorkspaceId, 
+      currentWorkspace,
       fullName, setFullName,notifyAdmin,setCurrentWorkspace,
       notifyDelete, notifyList, getNotifyList, setNotifyList,
       userIcon, login, logout, checkAuthStatus }}>

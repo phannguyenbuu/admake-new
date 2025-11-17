@@ -294,10 +294,10 @@ class Workspace(BaseModel):
 
 
 
-    column_open_name = db.Column(db.String(255), default="Phân việc")
-    column_in_progress_name = db.Column(db.String(255), default="Sản xuất")
-    column_done_name = db.Column(db.String(255), default="Hoàn thiện")
-    column_reward_name = db.Column(db.String(255), default="Khoán thưởng")
+    column_open_name = db.Column(db.String(255), default="Đơn hàng")
+    column_in_progress_name = db.Column(db.String(255), default="Phân việc")
+    column_done_name = db.Column(db.String(255), default="Thực hiện")
+    column_reward_name = db.Column(db.String(255), default="Hoàn thiện")
 
 
 
@@ -648,16 +648,10 @@ class LeadPayload(BaseModel):
     expiredAt = db.Column(db.DateTime, default=datetime.datetime.utcnow)
     balance_amount = db.Column(db.Float)
 
-    balance_amount = db.Column(db.Float)
-
-
-
-    column_open_name = db.Column(db.String(255), default="Phân việc")
-    column_in_progress_name = db.Column(db.String(255), default="Sản xuất")
-    column_done_name = db.Column(db.String(255), default="Hoàn thiện")
-    column_reward_name = db.Column(db.String(255), default="Khoán thưởng")
-
-
+    column_open_name = db.Column(db.String(255), default="Đơn hàng")
+    column_in_progress_name = db.Column(db.String(255), default="Phân việc")
+    column_done_name = db.Column(db.String(255), default="Thực hiện")
+    column_reward_name = db.Column(db.String(255), default="Hoàn thiện")
 
     # Quan hệ 1-n: một Lead có nhiều historyUsing
     history_using = db.relationship('UsingHistoryData', backref='lead', cascade='all, delete-orphan')
