@@ -32,7 +32,7 @@ import "antd/dist/reset.css"; // hoặc `antd/dist/antd.css` tùy version
 
 interface LeaveBoardProps {
   // mode: { adminMode: boolean; userMode: boolean };
-  
+  id?: number;
   userId?: string;
   open?: boolean;
   onCancel: () => void;

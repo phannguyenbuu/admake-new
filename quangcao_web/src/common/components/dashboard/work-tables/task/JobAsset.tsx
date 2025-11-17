@@ -302,7 +302,7 @@ const JobAsset: React.FC<JobAssetProps> = ({ title, type, readOnly = false }) =>
             { type?.includes("cash") ? `${el.text.split('/')[0]}[${el.text.split('/')[el.text.split('/').length - 1]}]` : el.text }
           </Typography>
 
-          {!readOnly && <DeleteConfirm el={el} onDelete={handleMessageDelete} text='tin nhắn'/>}
+          {!readOnly && <DeleteConfirm elId={el.message_id} onDelete={handleMessageDelete} text='tin nhắn'/>}
         </Stack>
       )}
 
@@ -325,7 +325,7 @@ const JobAsset: React.FC<JobAssetProps> = ({ title, type, readOnly = false }) =>
                 {url && <FileUploadWithPreview handleSend={handleSend} message={el}/>}
 
                 <Stack direction="row" gap={0}>
-                  {!readOnly && <DeleteConfirm el={el} onDelete={handleDelete} text='tài liệu'/>}
+                  {!readOnly && <DeleteConfirm elId={el.message_id} onDelete={handleDelete} text='tài liệu'/>}
                   <Typography fontSize={12} sx={{ maxWidth: 100, whiteSpace: 'nowrap' }}>
                     {url && url.length > 9 ? `${url.substring(0, 9)}...` : url}
                   </Typography>

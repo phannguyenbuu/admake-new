@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify, abort
-from models import db, app, dateStr, Message
+from models import db, app, dateStr, Message, Task, generate_datetime_id
 from api.chat import socketio
 import os
 
@@ -94,6 +94,11 @@ def update_task_message(id):
 
     if not role:
         role = ''
+
+    task = Task.query.get(id)
+    if not task:
+        abort(404, description="Task not found")
+
     
     ls = []
 

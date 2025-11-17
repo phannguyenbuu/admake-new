@@ -7,17 +7,17 @@ import { Modal } from "antd";
 
 interface DeleteAssetButtonProps {
   text?: string;
-  el: MessageTypeProps;
+  elId: string;
   onDelete: (id: string) => void;
 }
 
-const DeleteConfirm: React.FC<DeleteAssetButtonProps> = ({ text, el, onDelete }) => {
+const DeleteConfirm: React.FC<DeleteAssetButtonProps> = ({ text, elId, onDelete }) => {
   const [showConfirm, setShowConfirm] = useState<boolean>(false);
 
   return (
       <>
         <IconButton
-          key = {`delete-${el.message_id}`}
+          key = {`delete-${elId}`}
           size="small"
           aria-label="delete"
           color="error"
@@ -37,7 +37,7 @@ const DeleteConfirm: React.FC<DeleteAssetButtonProps> = ({ text, el, onDelete })
           title={`Bạn có chắc muốn xóa ${text}?`}
           open={showConfirm}
           onOk = {() => {
-            onDelete(el?.message_id);
+            onDelete(elId);
             setShowConfirm(false);
           }}
           onCancel={() => setShowConfirm(false)}

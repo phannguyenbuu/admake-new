@@ -57,11 +57,14 @@ const TaskBoard = ({ userId,fullName, open, onCancel }: TaskBoardProps) => {
     const handleFinishWarning = () => {
       const notify : NotifyProps = {
           id: generateDatetimeId(),
+          user_id: userId,
           type: 'task',
-          description: fullName,
-          text: `Công việc <${taskDetail?.workspace}/${taskDetail?.title}> hoàn thành. Vui lòng chuyển trạng thái !`,
+          description: taskDetail?.workspace_id,
+          text: `<${taskDetail?.workspace}/${taskDetail?.title}> hoàn thành. Vui lòng chuyển trạng thái !`,
           target: `/dashboard/work-tables/${taskDetail?.workspace_id}`,
       };
+
+      console.log('Note', notify);
 
       notifyAdmin(notify);
     } 

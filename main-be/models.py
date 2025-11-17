@@ -341,6 +341,7 @@ class Workspace(BaseModel):
 class Notify(BaseModel):
     __tablename__ = "notification"
     id = db.Column(db.String(50), primary_key=True)  # _id.$oid
+    user_id = db.Column(db.String(50))
     text = db.Column(db.String(255))
     description = db.Column(db.Text)
     target = db.Column(db.String(50))

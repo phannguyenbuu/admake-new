@@ -5,7 +5,7 @@ import { useUser } from "../../common/hooks/useUser";
 import { useApiHost } from "../../common/hooks/useApiHost";
 
 export const InforDashboard: IPage["Component"] = () => {
-  const {userId, username, userRole, fullName} = useUser();
+  const {userId, username, userRole, fullName, setFullName} = useUser();
 
   const [form] = Form.useForm();
   const [config, setConfig] = useState({
@@ -38,7 +38,7 @@ export const InforDashboard: IPage["Component"] = () => {
         return;
       }
 
-      // console.log("Backend response:", data);
+      setFullName(values.fullName);
       message.success("Cập nhật thông tin thành công");
       setConfig((prev) => ({ ...prev, openEdit: false }));
     } catch (error) {
@@ -110,10 +110,10 @@ export const InforDashboard: IPage["Component"] = () => {
         open={config.openEdit}
         onCancel={toggle("openEdit")}
         footer={null}
-        destroyOnClose
+        // destroyOnClose
       >
         <Form form={form} layout="vertical" onFinish={onFinish} preserve={false}>
-          <Form.Item label="Tên" name="name" rules={[{ required: false, message: "Vui lòng nhập tên" }]}>
+          <Form.Item label="Tên" name="fullName" rules={[{ required: false, message: "Vui lòng nhập tên" }]}>
             <Input placeholder="Tên của bạn" defaultValue={fullName ?? ''} />
           </Form.Item>
 

@@ -9,6 +9,7 @@ import { useLocation } from "react-router-dom";
 import DownloadIcon from '@mui/icons-material/Download';
 import { CenterBox } from "../../../components/chat/components/commons/TitlePanel";
 import type { Workpoint, WorkDaysProps, PeriodData, Checklist } from "../../../@types/workpoint";
+import DeleteConfirm from "../../../components/DeleteConfirm";
 // import SalaryBoard from "./SalaryBoard";
 
 interface QRColumnProps {
@@ -259,7 +260,7 @@ return (
       title=""
       okText="OK"
       cancelButtonProps={{ style: { display: 'none' } }}
-      style={{ padding: 20, minWidth: modalImg?.status !== 'off' ?'90vw':250 }}
+      style={{ padding: 20,  minWidth: modalImg?.status !== 'off' ?'90vw':250 }}
     >
       <CenterBox>
         <Box sx={{borderRadius:10, backgroundColor:"#00B4B6", px:5, py:1}}>
@@ -272,7 +273,7 @@ return (
         {modalImg?.status !== 'off' &&
           <Typography fontSize={10} color="#00B4B6" fontStyle="italic">Nhấp vào hình để xem vị trí trên googlemap</Typography>}
             
-        <Stack direction="row" spacing={2} style={{ padding: 20, minHeight: '80vh', width:'fit-content' }}>
+        <Stack direction="row" spacing={2} style={{ padding: 20, height: 400, width:'fit-content' }}>
           {modalImg?.in?.img && 
             <Stack>
               <Typography textAlign="center">Check in {modalImg?.in?.time}</Typography>
@@ -316,6 +317,7 @@ return (
           }
 
           {modalImg?.status === 'off' && 
+          <>
             <Stack>
               <Typography textAlign="center" style={{fontWeight: 700}}>XIN NGHỈ PHÉP</Typography>
               <Typography textAlign="center">
@@ -325,8 +327,11 @@ return (
               </Typography>
               <Typography textAlign="center">Buổi {modalImg.period  == 0 ? 'sáng' : (modalImg.period == 1 ? "chiều" : "tối")}</Typography>
               <Typography textAlign="center">Lý do: {modalImg.text}</Typography>
+              {/* <Typography textAlign="center">{r.id}</Typography> */}
               
             </Stack>
+            {/* <DeleteConfirm text="Bạn muốn xóa nghỉ phép này?" elId={record}/> */}
+            </>
           }
       
         </Stack>

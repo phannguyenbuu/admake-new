@@ -99,7 +99,7 @@ const NotifyModal = () => {
                   <span>{notify.text}</span> <span style={{ fontWeight: 700, color: '#00B5B4' }}>{notify.description}</span>
                 </a>
                 <IconButton aria-label="close" size="small" onClick={() => handleDelete(notify.id ?? '')}>
-                  <CloseIcon fontSize="small" style={{ color: 'red' }} />
+                  <CloseIcon fontSize="small" style={{ color: '#00B5B4' }} />
                 </IconButton>
               </li>
             ))}

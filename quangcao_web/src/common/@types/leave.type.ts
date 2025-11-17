@@ -1,4 +1,5 @@
 export interface Leave {
+  id?: string;
   user_id: string;
   start_time: string; // ISO string
   end_time: string;   // ISO string

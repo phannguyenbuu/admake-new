@@ -24,11 +24,11 @@ def create_leave():
 def delete_leave(leave_id):
     leave = Leave.query.get(leave_id)
     if not leave:
-        return jsonify({"error": "leavePayload not found"}), 404
+        return jsonify({"error": "LeavePayload not found"}), 404
 
     db.session.delete(leave)
     db.session.commit()
-    return jsonify({"message": "leavePayload deleted successfully"}), 200
+    return jsonify({"message": "LeavePayload deleted successfully"}), 200
 
 @leave_bp.route("/<int:leave_id>", methods=["GET"])
 def get_leave_detail(leave_id):
