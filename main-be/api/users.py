@@ -52,6 +52,84 @@ def create_user():
     
     return jsonify(new_user.tdict()), 201
 
+
+
+
+@user_bp.route("/<string:user_id>", methods=["PUT"])
+def update_lead_user_password(user_id):
+    data = request.get_json()
+    print(data)
+
+    user = db.session.get(User, user_id)
+
+    if not user:
+        print("Lead not found")
+        abort(404, description="Lead not found")
+
+    if data.get("old_password") != user.password:
+        print("Mật khẩu cũ không đúng")
+        abort(404, description="Mật khẩu cũ không đúng")
+    
+    # id = db.Column(db.Integer, primary_key=True)
+    # name = db.Column(db.String(120), nullable=False)
+    if data.get("fullName"):
+        user.fullName = data.get("fullName")
+
+    if data.get("username"):
+        user.username = data.get("username")
+
+    if data.get("password"):
+        user.password = data.get("password")
+        
+
+    # if data.get("company"):
+    #     user.company = data.get("company")
+
+    # if data.get("address"):
+    #     user.address = data.get("address")
+
+    # if data.get("email"):
+    #     user.email = data.get("email")
+
+    # if data.get("phone"):
+    #     user.phone = data.get("phone")
+
+    # if data.get("description"):
+    #     user.description = data.get("description")
+
+    # if data.get("industry"):
+    #     user.industry = data.get("industry")
+
+    db.session.commit()
+
+    # companySize = db.Column(db.String(50), nullable=False)
+    # expiredAt = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+    # balance_amount = db.Column(db.Float)
+
+    # balance_amount = db.Column(db.Float)
+
+    db.session.refresh(user)
+    return jsonify(user.tdict()), 201
+
+@user_bp.route("/<string:user_id>/check-password", methods=["POST"])
+def check_password_lead(user_id):
+    data = request.get_json()
+
+    user = db.session.get(User, user_id)
+
+    if not user:
+        print("Lead-user not found")
+        abort(404, description="Lead-user not found")
+
+    if data.get("old_password") != user.password:
+        print("Mật khẩu cũ không đúng")
+        abort(404, description="Mật khẩu cũ không đúng")
+
+    return jsonify({'message':'right password'}), 200
+
+
+
+
 @user_bp.route("/<string:id>", methods=["GET"])
 def get_user_detail(id):
     user = db.session.get(User, id)

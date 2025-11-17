@@ -1,7 +1,6 @@
 import type { JwtResponse, User } from "../@types/user.type";
 import axiosClient from "./axiosClient";
 import { useApiHost } from "../common/hooks/useApiHost";
-import type { AxiosResponse } from "axios";
 
 const API_HOST = useApiHost();
 

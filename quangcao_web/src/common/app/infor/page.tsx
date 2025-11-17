@@ -5,7 +5,7 @@ import { useUser } from "../../common/hooks/useUser";
 import { useApiHost } from "../../common/hooks/useApiHost";
 
 export const InforDashboard: IPage["Component"] = () => {
-  const {userId, username, userLeadId, userRole, fullName} = useUser();
+  const {userId, username, userRole, fullName} = useUser();
 
   const [form] = Form.useForm();
   const [config, setConfig] = useState({
@@ -22,7 +22,7 @@ export const InforDashboard: IPage["Component"] = () => {
     console.log("Form values", values);
 
     try {
-      const response = await fetch(`${useApiHost()}/lead/${userLeadId}`, {
+      const response = await fetch(`${useApiHost()}/user/${userId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -117,7 +117,7 @@ export const InforDashboard: IPage["Component"] = () => {
             <Input placeholder="Tên của bạn" defaultValue={fullName ?? ''} />
           </Form.Item>
 
-          <OldPasswordInput leadId={userLeadId}/>
+          <OldPasswordInput userId={userId ?? ''}/>
 
           <Form.Item
             label="Mật khẩu mới"
@@ -165,7 +165,7 @@ export const loader = async () => {
 };
 
 
-const OldPasswordInput = ({ leadId }: { leadId: number }) => {
+const OldPasswordInput = ({ userId }: { userId: string }) => {
   const [valid, setValid] = useState(true);
 
   const checkOldPassword = async (e: React.FocusEvent<HTMLInputElement>) => {
@@ -173,7 +173,7 @@ const OldPasswordInput = ({ leadId }: { leadId: number }) => {
     if (!oldPassword) return;
 
     try {
-      const res = await fetch(`${useApiHost()}/lead/${leadId}/check-password`, {
+      const res = await fetch(`${useApiHost()}/user/${userId}/check-password`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ old_password: oldPassword }),

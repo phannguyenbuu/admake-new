@@ -1159,13 +1159,28 @@ if __name__ == "__main__":
         # Task.query.filter(Task.type == "salary").delete(synchronize_session=False)
 
         # alter_data()
-        for lead in LeadPayload.query.all():
-            
-            print(lead.username, lead.fullName)
+        # users = User.query.filter(User.username == 'ad104').all()
 
-        db.session.commit()
-
+        # for user in users:
+        #     print(user.lead_id, user.password, user.fullName)
         
+        from sqlalchemy import func
+
+        duplicates = (
+            db.session.query(User.username)
+            .group_by(User.username)
+            .having(func.count(User.username) > 1)
+            .all()
+        )
+
+        for (username,) in duplicates:  # lưu ý duplicates là list các tuple, mỗi tuple một username
+            users_in_group = User.query.filter(User.username == username).all()
+            s = ''
+            for user in users_in_group:
+                s += user.fullName + ';' + str(user.lead_id) + ";"
+            print(f"Username: {username}, Users: {s}")
+
+
 
         
         
