@@ -39,7 +39,7 @@ const DeleteConfirm: React.FC<DeleteAssetButtonProps> = ({ text, el, onDelete })
           open={showConfirm}
           onOk = {() => {
             onDelete(el?.message_id);
-           setShowConfirm(false);
+            setShowConfirm(false);
           }}
           onCancel={() => setShowConfirm(false)}
           >

@@ -5,6 +5,9 @@ from sqlalchemy.orm.attributes import flag_modified
 from api.messages import upload_a_file_to_vps
 from sqlalchemy import cast, Text
 from PIL import Image
+from sqlalchemy import func, cast
+from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy import text
 
 task_bp = Blueprint('task', __name__, url_prefix='/api/task')
 
@@ -260,6 +263,43 @@ def create_task():
     db.session.commit()
 
     return jsonify(task.tdict()), 201
+
+
+@task_bp.route("/<string:user_id>/salary", methods=["GET"])
+def get_user_salary_task(user_id):
+    user = db.session.get(User, user_id)
+    if not user:
+        print("User not found")
+        abort(404, description="User not found")
+
+    user_id_str = str(user_id)
+    
+    tasks = Task.query.filter(text(f"assign_ids::text LIKE '%\"{user_id_str}\"%'")).all()
+    if not tasks or len(tasks) == 0:
+        print("Tasks not found")
+        abort(404, description="Tasks not found")
+
+    ls = [0,0,0,0,0]
+
+    for t in tasks:
+        if t.workspace_id and t.rate > 0:
+            ls[t.rate - 1] += 1
+
+    task = Task.query.filter(
+        text(f"assign_ids::text LIKE '%\"{user_id_str}\"%'"),
+        Task.type == "salary"
+    ).first()
+
+    if not task:
+        print("Task not found")
+        abort(404, description="Task not found")
+    
+    return jsonify({"infor":task.tdict(),
+                    "rates": ls,
+                    }), 200
+        
+        
+
 
 @task_bp.route("/<string:id>", methods=["DELETE"])
 def delete_task(id):

@@ -279,18 +279,9 @@ const TimeLine: React.FC<MsgTypeProps> = ({ el, menu, onDelete }) => {
   
   
   useEffect(() => {
-    
-    
-
       socket.on('admake/chat/rate', (msg) => {
         console.log('Received rate:', msg);
         setValue(msg.rate);
-
-        // if(!window.location.href.includes('/chat/'))
-          // window.location.reload();
-        // console.log('workspace_id', el.workspace_id);
-
-        
       });
   
       socket.on('admake/chat/rate_ack', data => {
@@ -303,19 +294,7 @@ const TimeLine: React.FC<MsgTypeProps> = ({ el, menu, onDelete }) => {
     }, [el]);
 
   const handleReward = async (rate: number | null) => {
-    // const response = await fetch(`${useApiHost()}/workspace/${el.group_id}/reward`, {
-    //   method: "PUT",
-    //   headers: { "Content-Type": "application/json" },
-    //   body: JSON.stringify({"message_id":el.message_id, "rate":rate})
-    // });
-  
-    // if (!response.ok) 
-    //   throw new Error("Nghiệm thu công việc thất bại");
-    // else
-    // {
-    //   console.log("Nghiệm thu công việc thành công!");
-    // }
-
+    
     console.log("Connected rates", socket.connected, socket.io.opts.host);
     
     if (socket.connected) {
@@ -329,10 +308,7 @@ const TimeLine: React.FC<MsgTypeProps> = ({ el, menu, onDelete }) => {
       console.log('Send rate message', el.workspace_id, data);
 
       socket.emit('admake/chat/rate', data);
-
-      // console.log('refetch', el.workspace_id, refetch);
-      
-    
+   
 
       const context = useContext(UpdateButtonContext);
       if (!context) 

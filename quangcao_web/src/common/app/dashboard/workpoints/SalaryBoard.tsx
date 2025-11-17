@@ -9,11 +9,9 @@ import { useUser } from '../../../common/hooks/useUser';
 import { useApiHost } from '../../../common/hooks/useApiHost';
 import type { Task } from '../../../@types/work-space.type';
 import JobAsset from '../../../components/dashboard/work-tables/task/JobAsset';
+import { useTaskContext } from '../../../common/hooks/useTask';
 import dayjs from 'dayjs';
-
-// const IS_SATURDAY_NOON_OFF = true;
-
-// Tăng ca dưới 1 giờ sẽ không tính giờ
+import { number } from 'framer-motion';
 
 interface SalaryBoardProps {
     selectedRecord: WorkDaysProps | null;
@@ -69,27 +67,95 @@ interface RewardProps {
 }
 
 const SalaryBoard: React.FC<SalaryBoardProps> = ({ selectedRecord, modalVisible, handleOk }) => {
+  // const {workpointSetting, setWorkpointSetting} = useWorkpointSetting();
+
   const [timeWork, setTimeWork] = useState<number>(0);
   const [periodWork, setPeriodWork] = useState<number>(0);
   const [overTimeWork, setOverTimeWork] = useState<number>(0);
   const [salaryUnit, setSalaryUnit] = useState<number>(0);
+
   const [totalSalary, setTotalSalary] = useState<number>(0);
   const [bonusSalary, setBonusSalary] = useState<number>(0);
+  const [advanceSalary, setAdvanceSalary] = useState<number>(0);
+  const [punishSalary, setPunishSalary] = useState<number>(0);
+  const [customBonusSalary, setCustomBonusSalary] = useState<number>(0);
+
   const {workpointSetting} = useWorkpointSetting();
   const OVERTIME_RATIO = workpointSetting?.multiply_in_night_overtime || 0;
   const {isMobile} = useUser();
   const current_day = new Date();
   const current_month = current_day.getMonth();
   const [rewardList, setRewardList] = useState<RewardProps[]>([]);
-
+  const {taskDetail, setTaskDetail} = useTaskContext();
+  const [rateTasks, setRateTasks] = useState<number[]>([0,0,0,0,0]);
   const [tabIndex, setTabIndex] = useState(0);
+
+  const [lateMinutes, setLateMinutes] = useState<number>(0);
+  const [earlyMinutes, setEarlyMinutes] = useState<number>(0);
+
+  useEffect(() => {
+    if (!taskDetail) {
+      const fetchData = async () => {
+        try {
+          const response = await fetch(`${useApiHost()}/task/${selectedRecord?.user_id}/salary`, {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json"
+            }
+          });
+          if (!response.ok) {
+            throw new Error("Network response was not ok " + response.statusText);
+          }
+          const data = await response.json();
+          setTaskDetail(data.infor);
+          setRateTasks(data.rates);
+          console.log("Salary tasks data:", data);
+        } catch (error) {
+          console.error("Fetch error:", error);
+        }
+      };
+      fetchData();
+    }
+  }, [selectedRecord, modalVisible]);
+
+  useEffect(()=>{
+    if(!taskDetail) 
+      {
+        setTotalSalary(0);
+        setBonusSalary(0);
+        setAdvanceSalary(0);
+        setPunishSalary(0);
+        setCustomBonusSalary(0);
+        setRateTasks([0,0,0,0,0]);
+        return;
+      }
+
+    let bonus = 0, advance = 0, punish = 0;
+    taskDetail.assets.forEach(el => {
+      if(el.text !== '' && el.text)
+      {
+        if(el.type === "bonus-cash") 
+        {
+          const v = Number(el.text.split('/')[0].replace(/\./g, ''));
+          bonus += v > 0 ? v : 0;
+          punish += v < 0 ? v : 0;
+        }
+        else if(el.type === "advance-salary-cash") 
+          advance += Number(el.text.split('/')[0].replace(/\./g, ''));
+      }
+    });
+
+    setAdvanceSalary(advance);
+    setPunishSalary(punish);
+    setCustomBonusSalary(bonus);
+
+  },[taskDetail])
 
   const handleChange = (_event: React.SyntheticEvent, newIndex: number) => {
     setTabIndex(newIndex);
   };
 
   const isAdmin = !window.location.href.includes('/point/');
-
 
   const fetchTaskByUser = async (): Promise<Task[]> => {
     const response = await fetch(`${useApiHost()}/task/${selectedRecord?.user_id}/by_user`);
@@ -154,9 +220,31 @@ const SalaryBoard: React.FC<SalaryBoardProps> = ({ selectedRecord, modalVisible,
     return totalHours;
   }
 
+  function parseTime(timeString: string, day: Date): Date {
+    const [hours, minutes] = timeString.split(':').map(Number);
+    // Create a new Date object copying the day date parts
+    const date = new Date(day);
+    date.setHours(hours, minutes, 0, 0); // set hours, minutes, seconds, ms
+    return date;
+  }
+
+  function formatHourToTimeString(hour?: number): string {
+    if (hour === undefined) return '00:00'; // or any default time string you want
+    const h = Math.floor(hour);
+    const m = Math.round((hour - h) * 60);
+    return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
+  }
+
+
   useEffect(()=>{  
     // console.log('selectedRecord', selectedRecord);
     if (!selectedRecord) return;
+
+    const expectedTimes = {
+        morning: { start: workpointSetting?.morning_in_hour, end: workpointSetting?.morning_out_hour },
+        noon:{ start: workpointSetting?.noon_in_hour, end: workpointSetting?.noon_in_hour },
+      };
+
 
     const total_hours = getMaxWorkingHours(current_day.getMonth() + 1, 
       current_day.getFullYear());
@@ -165,25 +253,60 @@ const SalaryBoard: React.FC<SalaryBoardProps> = ({ selectedRecord, modalVisible,
     let over_t = 0;
     let p = 0;
 
-    selectedRecord.items && selectedRecord.items.forEach(item => {
-      const checklist = item.checklist;
-      if(!checklist) return;
+    let late = 0;
+let early = 0;
 
-      if(checklist.morning)
-      {
-        t += checkWorkhour(checklist.morning, 12);
-        p += checkWorkPeriod(checklist.morning);
+selectedRecord.items && selectedRecord.items.forEach(item => {
+  const checklist = item.checklist;
+  if (!checklist) return;
+
+  if (checklist.morning) {
+    t += checkWorkhour(checklist.morning, 12);
+    p += checkWorkPeriod(checklist.morning);
+  }
+  if (checklist.noon) {
+    t += checkWorkhour(checklist.noon, 17);
+    p += checkWorkPeriod(checklist.noon);
+  }
+  if (checklist.evening) {
+    over_t += checkWorkhour(checklist.evening, 22);
+  }
+
+  ['morning', 'noon'].forEach(period => {
+    const pData = period === "morning" ? checklist.morning : checklist.noon;
+    if (!pData) return;
+
+    const expectedStart = parseTime( 
+      formatHourToTimeString(period === "morning" ?  
+        expectedTimes.morning.start 
+      : expectedTimes.noon.start), 
+      pData.day);
+    const expectedEnd = parseTime(
+      formatHourToTimeString(period === "morning" ?  
+      expectedTimes.morning.end 
+      :  expectedTimes.noon.end), 
+      pData.day);
+
+    if (pData.in && pData.in.time) {
+      const actualIn = parseTime(pData.in.time, pData.day);
+      if (actualIn > expectedStart) {
+        late += (actualIn.getTime() - expectedStart.getTime()) / 60000; // minutes
       }
-      
-      if(checklist.noon)
-      {
-        t += checkWorkhour(checklist.noon, 17);
-        p += checkWorkPeriod(checklist.noon);
+    }
+    if (pData.out && pData.out.time) {
+      const actualOut = parseTime(pData.out.time, pData.day);
+      if (actualOut < expectedEnd) {
+        early += (expectedEnd.getTime() - actualOut.getTime()) / 60000;
       }
-      
-      if(checklist.evening)
-        over_t += checkWorkhour(checklist.evening, 22);
-    });
+    }
+  });
+});
+
+// set or use late and early as needed, e.g.
+setLateMinutes(late);
+setEarlyMinutes(early);
+
+
 
       setTimeWork(t);
       setPeriodWork(p);
@@ -191,13 +314,19 @@ const SalaryBoard: React.FC<SalaryBoardProps> = ({ selectedRecord, modalVisible,
       const salary_unit = selectedRecord.salary / total_hours;
       setSalaryUnit(salary_unit);
 
-      setTotalSalary((p * 4  + over_t * OVERTIME_RATIO) * salary_unit);
+      // setTotalSalary((p * 4  + over_t * OVERTIME_RATIO) * salary_unit);
 
       fetchTaskByUser();
 
       
 
+
+      
+      
+      
     },[selectedRecord, modalVisible]);
+
+
 
     const highlightRow = {fontStyle:"italic", color:'red'};
     const tabStyle = {fontSize: 10, minWidth: 70, maxWidth: 70, 
@@ -275,43 +404,60 @@ const SalaryBoard: React.FC<SalaryBoardProps> = ({ selectedRecord, modalVisible,
                       <TableCell style={{ fontWeight: 700 }}>Thành tiền</TableCell>
                     </TableRow>
                     <TableRow>
-                      <TableCell>Số buổi làm trong tháng</TableCell>
+                      <TableCell>Số buổi làm</TableCell>
                       <TableCell>{periodWork}</TableCell>
                       <TableCell>{formatMoney(salaryUnit * 4)} ₫</TableCell>
                       <TableCell>{formatMoney(salaryUnit * 4 * periodWork)} ₫</TableCell>
                     </TableRow>
+
                     <TableRow>
-                      <TableCell>Tổng giờ tăng ca trong tháng</TableCell>
+                      <TableCell>Số giờ làm</TableCell>
+                      <TableCell>{timeWork.toLocaleString()}</TableCell>
+                      <TableCell>-</TableCell>
+                      <TableCell>-</TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell>Tổng giờ tăng ca</TableCell>
                       <TableCell>{overTimeWork.toFixed(3)}</TableCell>
                       <TableCell>{formatMoney(salaryUnit * OVERTIME_RATIO)} ₫</TableCell>
                       <TableCell>{formatMoney(salaryUnit * OVERTIME_RATIO * overTimeWork)} ₫</TableCell>
                     </TableRow>
                     <TableRow>
-                      <TableCell>Tổng thưởng</TableCell>
-                      <TableCell>{formatMoney(bonusSalary)} ₫</TableCell>
+                      <TableCell>Tổng phụ cấp</TableCell>
+                      <TableCell>-</TableCell>
                       <TableCell>-</TableCell>
                       <TableCell>{formatMoney(bonusSalary)} ₫</TableCell>
                     </TableRow>
                     <TableRow>
-                      <TableCell>Tổng phạt</TableCell>
-                      <TableCell>{formatMoney(bonusSalary)} ₫</TableCell>
+                      <TableCell>Tổng thưởng</TableCell>
                       <TableCell>-</TableCell>
-                      <TableCell>{formatMoney(bonusSalary)} ₫</TableCell>
+                      <TableCell>-</TableCell>
+                      <TableCell>{formatMoney(customBonusSalary)} ₫</TableCell>
                     </TableRow>
-                    {/* {rewardList.map((el: any, idx: number) => (
-                      <TableRow key={idx}>
-                        <TableCell style={highlightRow}>+ {el.workspace}</TableCell>
-                        <TableCell style={highlightRow}>({el.title})</TableCell>
-                        <TableCell style={highlightRow}>-</TableCell>
-                        <TableCell style={highlightRow}>{formatMoney(el.reward)} ₫</TableCell>
-                      </TableRow>
-                    ))} */}
+                    <TableRow>
+                      <TableCell>Tổng phạt</TableCell>
+                      <TableCell>-</TableCell>
+                      <TableCell>-</TableCell>
+                      <TableCell>{formatMoney(punishSalary)} ₫</TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell>Tạm ứng</TableCell>
+                      <TableCell>-</TableCell>
+                      <TableCell>-</TableCell>
+                      <TableCell>{formatMoney(advanceSalary)} ₫</TableCell>
+                    </TableRow>
                     
                   </TableBody>
                 </Table>
               </TableContainer>
               <Typography style={{marginTop:20, textAlign:'center', color: '#00B5B4'}}>
-                Tổng lương: {formatMoney(salaryUnit * 4 * periodWork + salaryUnit * 1.5 * overTimeWork + bonusSalary)} ₫
+                Tổng lương: {formatMoney(salaryUnit * 4 * periodWork 
+                    + salaryUnit * 1.5 * overTimeWork 
+                    + bonusSalary
+                    + customBonusSalary
+                    + punishSalary
+                    + advanceSalary
+                    )} ₫
               </Typography>
               
             </TabPanel>
@@ -370,16 +516,21 @@ const SalaryBoard: React.FC<SalaryBoardProps> = ({ selectedRecord, modalVisible,
                 <TableRow>
                   <TableCell style={{ fontWeight: 700 }}>Nội dung</TableCell>
                   <TableCell style={{ fontWeight: 700 }}>Giá trị</TableCell>
-                  <TableCell style={{ fontWeight: 700 }}>Lương/ĐVT</TableCell>
-                  <TableCell style={{ fontWeight: 700 }}>Thành tiền</TableCell>
                 </TableRow>
                 
                 <TableRow>
-                  <TableCell>Số giờ đi trễ</TableCell>
-                  <TableCell>{formatMoney(bonusSalary)} ₫</TableCell>
-                  <TableCell>-</TableCell>
-                  <TableCell>{formatMoney(bonusSalary)} ₫</TableCell>
+                  <TableCell>Số phút đi trễ</TableCell>
+                  <TableCell>{lateMinutes}</TableCell>
                 </TableRow>
+
+                {rateTasks && rateTasks.length === 5 &&
+                rateTasks.map((val, idx) => 
+                <TableRow>
+                  <TableCell>Số việc chấm {idx + 1} sao</TableCell>
+                  <TableCell>{val}</TableCell>
+                </TableRow>)
+                }
+                
                 {rewardList.map((el: any, idx: number) => (
                   <TableRow key={idx}>
                     <TableCell style={highlightRow}>+ {el.workspace}</TableCell>
@@ -394,7 +545,7 @@ const SalaryBoard: React.FC<SalaryBoardProps> = ({ selectedRecord, modalVisible,
           </TableContainer>
       </TabPanel>
       <TabPanel value={tabIndex} index={3}>
-        <JobAsset key="cash-assets" title = 'Ứng tiền cho nhân viên' type="advance-salary" readOnly={!isAdmin}/>
+        <JobAsset key="cash-assets" title = 'Ứng tiền cho nhân viên' type="advance-salary-cash" readOnly={!isAdmin}/>
       </TabPanel>
     </Box>
 

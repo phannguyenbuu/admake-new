@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify, abort
-from models import db, User, dateStr, app,LeadPayload, get_query_page_users
+from models import db, User, Task, dateStr, app,LeadPayload, get_query_page_users, generate_datetime_id
 from flask import Flask, request, jsonify, session
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 import datetime
@@ -27,19 +27,6 @@ def get_users():
         }
     })
 
-# @user_bp.route("/<string:user_id/lead", methods=["GET"])
-# def get_user_leadId(user_id):
-#     user = db.session.get(User,user_id)
-
-#     if not user:
-#         print("Unknown user")
-#         abort(404, description="Unknown user")
-
-#     return jsonify()
-    
-
-
-
 @user_bp.route("/", methods=["POST"])
 def create_user():
     data = request.get_json()
@@ -55,6 +42,13 @@ def create_user():
         raise
 
     db.session.refresh(new_user)
+
+    task = Task(
+            id=generate_datetime_id(),
+            type="salary",
+            assign_ids=[new_user.id]
+        )
+    db.session.add(task)
     
     return jsonify(new_user.tdict()), 201
 

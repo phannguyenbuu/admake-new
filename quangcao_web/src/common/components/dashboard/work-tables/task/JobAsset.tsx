@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { Typography, Stack, IconButton, Box, TextField } from "@mui/material";
-
+import { Typography, Stack, IconButton, Box, TextField, Switch } from "@mui/material";
+import { Select, MenuItem, InputLabel, FormControl } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import { useApiHost, useApiStatic } from "../../../../common/hooks/useApiHost";
 import { notification } from "antd";
@@ -19,6 +19,13 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs, { Dayjs } from "dayjs";
 import DeleteConfirm from "../../../DeleteConfirm";
+import { InputNumber } from 'antd';
+import bankList from "./banklist.json";
+
+import 'dayjs/locale/vi';
+
+
+dayjs.locale('vi'); // thiết lập locale
 
 interface JobAssetProps {
   title?: string;
@@ -28,7 +35,7 @@ interface JobAssetProps {
 
 const JobAsset: React.FC<JobAssetProps> = ({ title, type, readOnly = false }) => {
   
-  const {taskDetail} = useTaskContext();
+  const {taskDetail, setTaskDetail} = useTaskContext();
   const {userId, username, isMobile} = useUser();
   const [messageAssets, setMessageAssets] = useState<MessageTypeProps[]>([]);
   const [filteredAssets, setFilteredAssets] = useState<MessageTypeProps[]>([]);
@@ -59,9 +66,11 @@ const JobAsset: React.FC<JobAssetProps> = ({ title, type, readOnly = false }) =>
 
     const imgList = taskDetail.assets.filter(el => el.type === type && el.file_url && el.file_url != '');
     const msgList = taskDetail.assets.filter(el => el.type === type && el.text && el.text != '');
-    // setAssets(taskDetail?.assets);
-    // console.log('JobAsset taskdetail:', imgList.length, msgList.length);
+    
+    
+    console.log('JobAsset taskdetail:', imgList.length, msgList.length);
     // console.log(msgList);
+
     setFilteredAssets(imgList);
     setMessageAssets(msgList);
   },[taskDetail]);
@@ -93,7 +102,18 @@ const JobAsset: React.FC<JobAssetProps> = ({ title, type, readOnly = false }) =>
       notification.success({ message: "Đã upload thành công!", description: result });
       // console.log('success is image?',result.filename,isImageFile(result.filename));
       setFilteredAssets(prev => prev ? [...prev, result.message] : [result.message]);
-      // setFilteredAssets(assets.filter(el => el && el.includes('#' + role)));
+      setTaskDetail(prev => {
+        if (prev === null) return null; // handle null case explicitly
+
+        return {
+          ...prev,
+          assets: [...prev.assets, result.message],
+          // ensure all required fields like title, description exist in prev,
+          // or provide defaults here if needed to satisfy the type
+        };
+      });
+
+
     } catch (err: any) {
       notification.error({ message: "Lỗi upload ảnh:", description: err.message });
     } finally {
@@ -128,6 +148,14 @@ const JobAsset: React.FC<JobAssetProps> = ({ title, type, readOnly = false }) =>
       {
         notification.success({message:'Message deleted successfully', description:message_id});
         setFilteredAssets(prev => prev.filter(asset => asset.message_id !== message_id));
+        setTaskDetail(prev => {
+            if (prev === null) return null;
+            
+            return{
+            ...prev,
+            assets: prev.assets.filter(item => item.message_id !== message_id)
+          }
+        });
       }
     })
     .catch(error => {
@@ -164,7 +192,17 @@ const JobAsset: React.FC<JobAssetProps> = ({ title, type, readOnly = false }) =>
       notification.success({ message: "Đã gửi comment thành công!", description: result });
       // console.log('success is image?',result.filename,isImageFile(result.filename));
       setMessageAssets(prev => prev ? [...prev, result.message] : [result.message]);
-      // setMessageAssets(assets.filter(el => el && el.includes('#' + role)));
+      setTaskDetail(prev => {
+        if (prev === null) return null; // handle null case explicitly
+
+        return {
+          ...prev,
+          assets: [...prev.assets, result.message],
+          // ensure all required fields like title, description exist in prev,
+          // or provide defaults here if needed to satisfy the type
+        };
+      });
+
     } catch (err: any) {
       notification.error({ message: "Lỗi gửi comment:", description: err.message });
     } finally {
@@ -174,7 +212,9 @@ const JobAsset: React.FC<JobAssetProps> = ({ title, type, readOnly = false }) =>
 
   
   const handleMessageDelete = (message_id: string) => {
-    setMessageAssets(prev => prev.filter(asset => asset.message_id !== message_id));
+    
+
+
     fetch(`${useApiHost()}/message/${message_id}`, {
       method: 'DELETE',
     })
@@ -183,6 +223,15 @@ const JobAsset: React.FC<JobAssetProps> = ({ title, type, readOnly = false }) =>
         notification.error({message:'Failed to delete message', description:message_id});
       else
       {
+        setMessageAssets(prev => prev.filter(asset => asset.message_id !== message_id));
+        setTaskDetail(prev => {
+            if (prev === null) return null;
+            
+            return{
+            ...prev,
+            assets: prev.assets.filter(item => item.message_id !== message_id)
+          }
+        });
         notification.success({message:'Message deleted successfully', description:message_id});
       }
     })
@@ -231,7 +280,10 @@ const JobAsset: React.FC<JobAssetProps> = ({ title, type, readOnly = false }) =>
           </IconButton>
         </label>
 
-        <ChatInput onSend={handleMessageSend} title={title ?? ''} isCash={type?.includes('cash')}/>
+        <ChatInput onSend={handleMessageSend} 
+                  title={title ?? ''} 
+                  isCash={type?.includes('cash')}
+                  isChoose={false}/>
       </Stack>}
 
       {messageAssets.map((el, index) => 
@@ -309,9 +361,10 @@ interface ChatInputProps {
   title: string;
   onSend: (message: string) => void;
   isCash?: boolean;
+  isChoose? : boolean;
 }
 
-const ChatInput: React.FC<ChatInputProps> = ({ title, onSend, isCash }) => {
+const ChatInput: React.FC<ChatInputProps> = ({ title, onSend, isCash, isChoose }) => {
   const [formOpen, setFormOpen] = useState(false);
   const [message, setMessage] = useState('');
   const {userId, username, isMobile} = useUser();
@@ -333,9 +386,9 @@ const ChatInput: React.FC<ChatInputProps> = ({ title, onSend, isCash }) => {
     }
   };
 
-  const handleClose = (values: FormValues | null) => {
-    console.log(values);
-    onSend(message);
+  const handleDialogClose = (value: string | null) => {
+    console.log('Send', value);
+    onSend(value ?? '');
     setMessage('');
   }
 
@@ -357,7 +410,11 @@ const ChatInput: React.FC<ChatInputProps> = ({ title, onSend, isCash }) => {
           <SendIcon />
         </IconButton>
       </Box>
-      <TransferFormModal open={formOpen} setOpen={setFormOpen} onClose={handleClose} rewardContent="Thưởng (không chọn là phạt)"/>
+      <TransferFormModal 
+        open={formOpen} 
+        setOpen={setFormOpen} 
+        onClose={handleDialogClose}
+        rewardContent={isChoose? ["Thưởng", "Phạt"]:[]}/>
     </>
   );
 };
@@ -379,7 +436,7 @@ const styleModal = {
 interface FormValues {
   content: string;
   amount: string;
-  isReward: boolean;
+  isChecked: boolean;
   
   bankAccount: string;
   bankName: string;
@@ -390,16 +447,17 @@ interface FormValues {
 interface TransferFormModalProps {
   open: boolean;
   setOpen: (open: boolean) => void;
-  onClose: (values: FormValues | null) => void; 
-  rewardContent?: string;
+  onClose: (value: string | null) => void; 
+  rewardContent?: string[];
 }
 
-function TransferFormModal({ open, setOpen, onClose,rewardContent }: TransferFormModalProps) {
- 
+function TransferFormModal({ open, setOpen, onClose, rewardContent }: TransferFormModalProps) {
+  const [errors, setErrors] = useState<{[key: string]: boolean}>({});
+
   const [values, setValues] = useState<FormValues>({
     content: "",
     amount: "",
-    isReward: false,
+    isChecked: true,
     bankAccount: "",
     bankName: "",
     transferContent: "",
@@ -415,7 +473,7 @@ function TransferFormModal({ open, setOpen, onClose,rewardContent }: TransferFor
   const handleChange =
     (field: keyof FormValues) => (event: React.ChangeEvent<HTMLInputElement>) => {
       const value =
-        field === "isReward" ? event.target.checked : event.target.value;
+        field === "isChecked" ? event.target.checked : event.target.value;
       setValues((prev) => ({ ...prev, [field]: value }));
     };
 
@@ -424,88 +482,204 @@ function TransferFormModal({ open, setOpen, onClose,rewardContent }: TransferFor
   };
 
   const handleSubmit = () => {
+    const newErrors: {[key: string]: boolean} = {};
+
+    if (values.isChecked) {
+      if (!values.bankAccount.trim()) newErrors.bankAccount = true;
+      if (!values.bankName.trim()) newErrors.bankName = true;
+      if (!values.transferContent.trim()) newErrors.transferContent = true;
+      if (!values.transferDate === null) newErrors.transferDate = true;
+    }
+    if (!values.content.trim()) newErrors.content = true;
+    if (!values.amount.trim()) newErrors.amount = true;
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return; // Dừng submit nếu có lỗi
+    }
+
+    setErrors({}); // Xóa lỗi khi submit thành công
+
+    if (!values.isChecked) {
+      values.bankAccount = "";
+      values.bankName = "";
+      values.transferContent = "";
+      values.transferDate = null;
+    }
+
+    // const rawAmount = parseInt(values.amount.replace(/\./g, ''), 10);
+
     console.log("Form submitted with values:", {
       ...values,
       transferDate: values.transferDate?.format("YYYY-MM-DD"),
     });
-    // Xử lý logic gửi dữ liệu hoặc thao tác khác
-    onClose(values);
+
+    
+    let cleanStr = values.amount.replace(/[^\d.-]/g, '');
+    let amountNum = Number(cleanStr);
+
+    const formattedDate = values.transferDate ? values?.transferDate.format('DD-MM-YYYY'):'';
+
+    const parts = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).formatToParts(amountNum);
+
+    const formatted = parts
+      .filter(part => part.type !== 'currency')  // loại bỏ phần currency symbol
+      .map(part => part.value)
+      .join('');
+    
+
+    onClose(`${ rewardContent?.length && rewardContent?.length > 0 
+      && values.isChecked ? "+":"-"}${formatted}/${values.content}/${values.bankAccount}/${values.bankName}/${values.transferContent}/${formattedDate}`);
+
+    setValues({
+      content: "",
+      amount: "",
+      isChecked: true,
+      bankAccount: "",
+      bankName: "",
+      transferContent: "",
+      transferDate: dayjs(),
+    });
+    setOpen(false);
   };
 
-  const handleCancel = () => {
 
+  // useEffect(()=> {
+  //   console.log('Values', values);
+  // },[values]);
+
+  const handleCancel = () => {
+    setOpen(false);
   }
+
+
+
 
   return (
     <>
-      <Modal open={open} onOk={handleClose} onCancel={handleCancel}
-      style={{top:400}}>
-        <Box sx={styleModal}>
+      <Modal open={open} 
+        onOk={handleClose} 
+        onCancel={handleCancel}
+        // closable={false}
+        footer={null}>
+        
           <Typography id="modal-title" variant="h6" mb={2}>
             Nhập thông tin chuyển khoản
           </Typography>
           <Stack spacing={2}>
-            <TextField
-              label="Nội dung"
-              value={values.content}
-              onChange={handleChange("content")}
-              fullWidth
-            />
-            <TextField
-              label="Số tiền"
-              type="number"
-              value={values.amount}
-              onChange={handleChange("amount")}
-              fullWidth
-            />
+            <TextField variant = "standard"
+  label="Nội dung"
+  value={values.content}
+  onChange={handleChange("content")}
+  fullWidth
+  error={Boolean(errors.content)}
+  helperText={errors.content ? "Vui lòng nhập nội dung" : ""}
+/>
+
+
+            
+
+    <InputNumber
+  min={'0'}
+  style={{ width: '100%' }}
+  value={values.amount}
+  formatter={value => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+  parser={value => value?.replace(/\$\s?|(,*)/g, '') as any}
+  onChange={(value) => {
+    // value là số hoặc string đã được parser
+    handleChange("amount")({
+      target: { value: value?.toString() || '' }
+    } as React.ChangeEvent<HTMLInputElement>);
+  }}
+  
+  placeholder="Nhập số tiền"
+/>
+
+{rewardContent && rewardContent.length > 0 &&
             <FormControlLabel
               control={
-                <Checkbox
-                  checked={values.isReward}
-                  onChange={handleChange("isReward")}
+                <Switch
+                  checked={values.isChecked}
+                  onChange={handleChange("isChecked")}
                 />
               }
-              label={rewardContent}
-            />
-            <TextField
-              label="Tài khoản ngân hàng"
-              value={values.bankAccount}
-              onChange={handleChange("bankAccount")}
-              fullWidth
-            />
-            <TextField
-              label="Tên ngân hàng"
-              value={values.bankName}
-              onChange={handleChange("bankName")}
-              fullWidth
-            />
-            <TextField
-              label="Nội dung chuyển khoản"
-              value={values.transferContent}
-              onChange={handleChange("transferContent")}
-              fullWidth
-              multiline
-              rows={3}
-            />
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <DatePicker
-                label="Ngày chuyển khoản"
-                value={values.transferDate}
-                onChange={handleDateChange}
-                //@ts-ignore
-                renderInput={(params) => <TextField {...params} fullWidth />}
-              />
-            </LocalizationProvider>
+              label={values.isChecked ? rewardContent[0] : rewardContent[1]}
+            />}
+
+{values.isChecked && <>
+  <TextField variant = "standard"
+    label="Tài khoản ngân hàng"
+    value={values.bankAccount}
+    onChange={handleChange("bankAccount")}
+    fullWidth
+    error={Boolean(errors.bankAccount)}
+    helperText={errors.bankAccount ? "Vui lòng nhập tài khoản ngân hàng" : ""}
+  />
+  <FormControl fullWidth error={Boolean(errors.bankName)}>
+    <InputLabel id="bank-select-label">Tên ngân hàng</InputLabel>
+    <Select  variant = "standard"
+      labelId="bank-select-label"
+      id="bank-select"
+      value={values.bankName}
+      label="Tên ngân hàng"
+      onChange={(e) => handleChange("bankName")({
+        target: { value: e.target.value }
+      } as React.ChangeEvent<HTMLInputElement>)}
+    >
+      {bankList.map((bank) => (
+        <MenuItem key={bank.code} value={bank.code}>
+          {bank.name}
+        </MenuItem>
+      ))}
+    </Select>
+    {errors.bankName && <Typography color="error" variant="caption">Vui lòng chọn ngân hàng</Typography>}
+  </FormControl>
+  
+  <LocalizationProvider dateAdapter={AdapterDayjs}>
+    <DatePicker
+      enableAccessibleFieldDOMStructure={false}
+      label="Ngày chuyển khoản"
+      value={values.transferDate}
+      onChange={handleDateChange}
+      slots={{ textField: TextField }}
+      slotProps={{
+        textField: {
+          variant: "standard",
+          fullWidth: true,
+          placeholder: 'dd/MM/yyyy',
+          //@ts-ignore
+          format: 'DD/MM/YYYY',   // format đặt đây
+        }
+      }}
+    />
+    
+  </LocalizationProvider>
+
+  <TextField 
+    label="Nội dung chuyển khoản"
+    value={values.transferContent}
+    onChange={handleChange("transferContent")}
+    fullWidth
+    multiline
+    rows={3}
+    error={Boolean(errors.transferContent)}
+    helperText={errors.transferContent ? "Vui lòng nhập nội dung chuyển khoản" : ""}
+  />
+</>}
+
+
+
+            
             <Box textAlign="right">
-              <Button onClick={handleClose} sx={{ mr: 1 }}>
-                Hủy
-              </Button>
               <Button variant="contained" onClick={handleSubmit}>
                 OK
               </Button>
-            </Box>
+              {/* <Button onClick={handleClose} sx={{ mr: 1 }}>
+                Hủy
+              </Button> */}
+            </Box> 
           </Stack>
-        </Box>
+
       </Modal>
     </>
   );
