@@ -4,6 +4,7 @@ import { useDeleteWorkSpace } from "../../../../common/hooks/work-space.hook";
 import { useCallback } from "react";
 import type { WorkSpace } from "../../../../@types/work-space.type";
 import { useApiHost } from "../../../../common/hooks/useApiHost";
+import { useUser } from "../../../../common/hooks/useUser";
 
 const { Title, Text } = Typography;
 
@@ -22,8 +23,8 @@ export default function ModalDeleteWorkSpace({
   onSuccess,
   refetchWorkSpaces,
 }: ModalDeleteWorkSpaceProps) {
-  const { mutate: deleteWorkSpace, isPending: isDeleting } =
-    useDeleteWorkSpace();
+  const { mutate: deleteWorkSpace, isPending: isDeleting } = useDeleteWorkSpace();
+  const {workspaces, setWorkspaces} = useUser();
 
   const handleDelete = useCallback(() => {
     if (!deletingWorkspace?.id) return;
@@ -39,7 +40,7 @@ export default function ModalDeleteWorkSpace({
       })
       .then(() => {
         if (typeof onSuccess === 'function') onSuccess();
-        // if (typeof deleteWorkSpace === 'function') deleteWorkSpace();
+        setWorkspaces(prev => prev.filter(w => w.id !== deletingWorkspace.id));
         if (typeof closeDeleteModal === 'function') closeDeleteModal();
       })
       .catch((error) => {

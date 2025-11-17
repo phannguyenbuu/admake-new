@@ -168,10 +168,7 @@ export default function RenderMenuBar({}) {
     const menuItems = getMainMenuItems(pathname)
       .filter((item) => item.key !== "/dashboard/infor") // Ẩn Profile khỏi desktop menu
       .map((item) => {
-        const hasChildren =
-          item.key === "/dashboard/work-tables" &&
-          // @ts-ignore
-          (workspaces || []).length > 0;
+        const hasChildren = item.key === "/dashboard/work-tables";
 
         if (hasChildren && !isTablet) {
           // Menu item có children (workspaces)
@@ -181,7 +178,7 @@ export default function RenderMenuBar({}) {
             label: (
               <div className="flex items-center justify-between w-full">
                 <span>{item.label}</span>
-                {adminMode && (
+                
                   <div
                     className="w-6 h-6 rounded-md bg-cyan-500 hover:bg-cyan-600 flex items-center justify-center shadow-sm transition-all duration-200"
                     onClick={(e) => {
@@ -191,7 +188,7 @@ export default function RenderMenuBar({}) {
                   >
                     <PlusOutlined className="text-white text-xs font-bold" />
                   </div>
-                )}
+                
               </div>
             ),
             children: [
