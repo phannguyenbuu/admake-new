@@ -119,18 +119,19 @@ const SalaryBoard: React.FC<SalaryBoardProps> = ({ selectedRecord, modalVisible,
   }, [selectedRecord, modalVisible]);
 
   useEffect(()=>{
-    if(!taskDetail) 
-      {
-        setTotalSalary(0);
-        setBonusSalary(0);
-        setAdvanceSalary(0);
-        setPunishSalary(0);
-        setCustomBonusSalary(0);
-        setRateTasks([0,0,0,0,0]);
-        return;
-      }
+    if(!taskDetail || ! taskDetail.assets) 
+    {
+      setTotalSalary(0);
+      setBonusSalary(0);
+      setAdvanceSalary(0);
+      setPunishSalary(0);
+      setCustomBonusSalary(0);
+      setRateTasks([0,0,0,0,0]);
+      return;
+    }
 
     let bonus = 0, advance = 0, punish = 0;
+    
     taskDetail.assets.forEach(el => {
       if(el.text !== '' && el.text)
       {

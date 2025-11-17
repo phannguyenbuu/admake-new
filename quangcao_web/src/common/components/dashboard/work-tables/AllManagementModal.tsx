@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback, useContext } from "react";
 import { Modal, Dropdown, Card } from "antd";
 import { Stack, Box } from "@mui/material";
-import { MoreOutlined } from "@ant-design/icons";
+import { MoreOutlined, StarFilled } from "@ant-design/icons";
 import columnThemes from "./theme.json";
 import { UpdateButtonContext } from "../../../common/hooks/useUpdateButtonTask";
 import { useApiHost } from "../../../common/hooks/useApiHost";
@@ -252,6 +252,14 @@ export const CardStaticItem: React.FC<CardStaticItemProps> = ({
             <span className="truncate">{task.reward.toLocaleString()} VNĐ</span>
           </div>
         )}
+
+         {task.rate > 0 &&
+          <div className="text-xs text-gray-400 font-mono flex-shrink-0">
+            
+            {[...Array(task.rate)].map((_, index) => (
+              <StarFilled key={index} style={{color:'orange'}}/>
+            ))}
+          </div>}
       </div>
     </div>
   </div>

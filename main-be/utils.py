@@ -1,6 +1,6 @@
 import json
 from api.tasks import get_task_by_user_id
-from models import db, app, User, LeadPayload, Workpoint,Leave, WorkpointSetting, Customer, Material, Role, Message, Task, Workspace, generate_datetime_id
+from models import db, app, User, LeadPayload, Notify, Workpoint,Leave, WorkpointSetting, Customer, Material, Role, Message, Task, Workspace, generate_datetime_id
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 import json
@@ -904,7 +904,8 @@ FOREIGN KEY (user_id) REFERENCES "user"(id);
     db.session.commit()
 
 def alter_data():
-    db.session.execute(text(f'''ALTER TABLE "user" RENAME COLUMN "zaloAccount" TO "bankAccount";'''))
+    db.session.execute(text(f'''ALTER TABLE notification ADD COLUMN lead_id INTEGER;
+ALTER TABLE notification ADD CONSTRAINT fk_lead_id FOREIGN KEY (lead_id) REFERENCES lead(id);'''))
     db.session.commit()
 
 def delete_customer_user():
@@ -1152,10 +1153,14 @@ if __name__ == "__main__":
         # db.session.commit()
         # renameColumn('notification','title','text')
 
-        task = db.session.get(Task, "202511170308282171175cfbd0")
-        task.assets = [task.assets[-1]]
-        flag_modified(task,"assets")
+        # task = db.session.get(Task, "202511170308282171175cfbd0")
+        # task.assets = [task.assets[-1]]
+        # flag_modified(task,"assets")
         # Task.query.filter(Task.type == "salary").delete(synchronize_session=False)
+
+        # alter_data()
+        for notify in Notify.query.all():
+            notify.lead_id = 243
 
         db.session.commit()
 

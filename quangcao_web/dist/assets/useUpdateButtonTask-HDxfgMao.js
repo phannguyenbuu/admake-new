@@ -1,1 +1,0 @@
-import{r as t,j as s}from"./index-BMOTHkjS.js";const a=t.createContext(void 0),p=({children:o})=>{const[e,r]=t.useState(0);return s.jsx(a.Provider,{value:{showUpdateButton:e,setShowUpdateButton:r},children:o})};export{a as U,p as a};

@@ -13,7 +13,7 @@ import threading
 
 
 base_dir = os.path.abspath(os.path.dirname(__file__))
-print(base_dir)
+# print(base_dir)
 sys.path.append(base_dir)
 
 

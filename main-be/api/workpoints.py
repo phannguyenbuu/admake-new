@@ -274,7 +274,7 @@ def post_workpoint_by_user_and_date(user_id):
 
     workpoint, now, tz = get_workpoint_today(user_id)
     
-    print('work_point', workpoint, now)
+    # print('work_point', workpoint, now)
 
     if not workpoint:
         
@@ -326,7 +326,7 @@ def post_workpoint_by_user_and_date(user_id):
 
         workpoint.checklist[period]["workhour"] = work_hours
         flag_modified(workpoint, "checklist")
-        print(f"Work hours in {period}: {work_hours:.2f} hours", workpoint.checklist)
+        # print(f"Work hours in {period}: {work_hours:.2f} hours", workpoint.checklist)
     elif "in" not in workpoint.checklist[period]:
         workpoint.checklist[period]["in"] = {
             "time": now.isoformat(),
@@ -337,7 +337,7 @@ def post_workpoint_by_user_and_date(user_id):
 
         workpoint.checklist[period]["workhour"] = 0
         flag_modified(workpoint, "checklist")
-        print(f"Checked in for {period} at {now.isoformat()}")
+        # print(f"Checked in for {period} at {now.isoformat()}")
     else:
         return jsonify(
             message=f"Already checked out for {period}, skipping update",
@@ -357,10 +357,10 @@ def post_workpoint_by_user_and_date(user_id):
 def remove_workpoint_checklist(user_id):
     day = request.args.get("day")
 
-    print('Workday', day, user_id)
+    # print('Workday', day, user_id)
 
     ws = Workpoint.query.filter(Workpoint.user_id == user_id).all()
-    print('Workpoint query', len(ws))
+    # print('Workpoint query', len(ws))
 
     for w in ws:
         for k,v in w.checklist.items():

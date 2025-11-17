@@ -187,7 +187,7 @@ def save_dump():
     ssh.close()
 
 
-append_preload_link()
+# append_preload_link()
 
 local_dirs = [
     # "main-be/templates",

@@ -121,7 +121,8 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
    const notifyAdmin = async (notify:NotifyProps) => {
     try {
       notify.id = generateDatetimeId();
-      
+      notify.lead_id = userLeadId;
+
       const res = await fetch(`${API_HOST}/notify/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -162,9 +163,14 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [notifyList, setNotifyList] = useState<NotifyProps[]>([]);
 
   const getNotifyList = useCallback(async () => {
+    if(!userLeadId || userLeadId === 0) {
+      console.log("Zero Lead");
+      return;
+    }
+    
     try {
-      // console.log('LOGIN 1');
-      const res = await fetch(`${API_HOST}/notify/`, {
+      console.log('LOGIN', userLeadId);
+      const res = await fetch(`${API_HOST}/notify/${userLeadId}`, {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
         // body: JSON.stringify(notify),
@@ -185,7 +191,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } catch (error) {
       notification.error({message:'Fetch notification error:', description: `${error}` || ''});
     }
-  }, []);
+  }, [userLeadId]);
 
   const login = async ({ username, password }: { username: string; password: string }) => {
     try {

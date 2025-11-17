@@ -99,8 +99,8 @@ def get_workspace_task(id):
     # Chuyển defaultdict về dict bình thường
     tasks_response = dict(grouped)
 
-    print('Task', id)
-    print(tasks_response)
+    # print('Task', id)
+    # print(tasks_response)
     
     return jsonify({'data':tasks_response,
                     'namelist':[]}),200
@@ -114,7 +114,7 @@ def put_workspace_change_column_name(workspace_id):
     
     workspace = db.session.get(Workspace, workspace_id)
 
-    print(workspace, type, name)
+    # print(workspace, type, name)
 
     if workspace and type and type != '' and name and name != '':
         if type == "OPEN":
@@ -140,7 +140,7 @@ def put_workspace_reward_task(workspace_id):
     rate = data.get('rate')
 
     msgs = Message.query.filter(Message.message_id == message_id).all()
-    print('msgs', len(msgs))
+    # print('msgs', len(msgs))
 
     if len(msgs) == 0:
         print("Message not found", message_id)
@@ -148,7 +148,7 @@ def put_workspace_reward_task(workspace_id):
     
     msg = msgs[0]
 
-    print('-message', msg, rate, msg.react)
+    # print('-message', msg, rate, msg.react)
     if not msg.react:
         msg.react = {}
 
@@ -159,10 +159,10 @@ def put_workspace_reward_task(workspace_id):
     work = Workspace.query.filter(Workspace.id == workspace_id).first()
     
     tasks = Task.query.filter_by(workspace_id=work.id).all()
-    print('tasks',work, len(tasks))
+    # print('tasks',work, len(tasks))
 
     for task in tasks:
-        print('task', task.title)
+        # print('task', task.title)
         if task.status != "REWARD":
             task.status = "DONE"
             task.check_reward = True
@@ -178,7 +178,7 @@ def put_workspace_reward_task(workspace_id):
 def get_workspace_detail(id):
     work = db.session.get(Workspace, id)
 
-    print('WSPACE', work)
+    # print('WSPACE', work)
     
     if not work:
         abort(404, description="Workspace not found")
@@ -196,7 +196,7 @@ def get_workspace_detail(id):
 @workspace_bp.route("/", methods=["POST"])
 def create_workspace():
     data = request.get_json()
-    print(data)
+    # print(data)
     
     return create_workspace_method(data, False)
 

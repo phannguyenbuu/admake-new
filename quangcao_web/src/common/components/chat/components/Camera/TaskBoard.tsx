@@ -82,7 +82,7 @@ const TaskBoard = ({ userId,fullName, open, onCancel }: TaskBoardProps) => {
     const totalPages = data ? Math.ceil(data.length / pageSize) : 1;
 
     useEffect(()=>{
-      console.log('Data', data);
+      // console.log('Data', data);
       if (data && data.length > 0) {
         setTaskDetail(data[currentPage - 1] || data[0]);
       }

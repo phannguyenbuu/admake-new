@@ -347,6 +347,9 @@ class Notify(BaseModel):
     type = db.Column(db.String(50))
     isDelete = db.Column(db.Boolean)
 
+    lead_id = db.Column(db.Integer, db.ForeignKey('lead.id'))
+    lead = db.relationship('LeadPayload', backref='notifies')
+
     def tdict(self):
         result = {}
         for column in self.__table__.columns:
@@ -418,7 +421,7 @@ class Task(BaseModel):
             result["assets"] = ls
 
         workspace = db.session.get(Workspace, self.workspace_id)
-        if workspace:
+        if workspace and not workspace.null_workspace:
             result['workspace'] = workspace.name
 
         return result
@@ -694,7 +697,7 @@ def create_workspace_method(data, has_owner = True):
     except (TypeError, ValueError):
         lead_id = 0
         
-    print("Create Workspace Lead_id", lead_id)
+    # print("Create Workspace Lead_id", lead_id)
     
 
     if lead_id == 0:
@@ -707,7 +710,7 @@ def create_workspace_method(data, has_owner = True):
         print('Unkown lead')
         abort(404, description="Lead not found")
 
-    print("CreateData", data)
+    # print("CreateData", data)
 
     # chia dữ liệu thành phần User và Customer
     
@@ -746,8 +749,8 @@ def create_workspace_method(data, has_owner = True):
     db.session.add(new_workspace)
     db.session.commit()
 
-    print("Create_Result")
-    print(new_workspace.tdict())
+    # print("Create_Result")
+    # print(new_workspace.tdict())
     
     return jsonify(new_workspace.tdict()), 201
 

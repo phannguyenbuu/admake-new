@@ -51,7 +51,7 @@ def get_task_by_id(id):
         else:
             result["customer_id"] = None
 
-    print('Task detail', result)
+    # print('Task detail', result)
     
     return jsonify({"data": result,"message":"Success"}),200
 
@@ -86,7 +86,7 @@ def update_task(id):
     db.session.commit()
 
     task = Task.query.get(id)
-    print('F', task.tdict())
+    # print('F', task.tdict())
     return jsonify(task.tdict())
 
 @task_bp.route("/<string:user_id>/by_user", methods=["GET"])
@@ -254,7 +254,7 @@ def update_task_message(id):
 def create_task():
     data = request.get_json()
 
-    print('New task', data)
+    # print('New task', data)
 
     # Tạo Task mới từ data
     task = Task.parse(data)
@@ -282,7 +282,7 @@ def get_user_salary_task(user_id):
     ls = [0,0,0,0,0]
 
     for t in tasks:
-        if t.workspace_id and t.rate > 0:
+        if t.workspace_id and t.rate and t.rate > 0:
             ls[t.rate - 1] += 1
 
     task = Task.query.filter(

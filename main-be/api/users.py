@@ -30,7 +30,7 @@ def get_users():
 @user_bp.route("/", methods=["POST"])
 def create_user():
     data = request.get_json()
-    print('USER', data)
+    # print('USER', data)
     new_user = User.create_item(data)
         
     db.session.add(new_user)
@@ -62,7 +62,7 @@ def get_user_detail(id):
 @user_bp.route("/<string:id>", methods=["PUT"])
 def update_user(id):
     data = request.get_json()
-    print('PUT user', data)
+    # print('PUT user', data)
     user = db.session.get(User, id)
     if not user:
         return jsonify({"error": "user not found"}), 404

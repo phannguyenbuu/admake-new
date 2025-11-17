@@ -17,7 +17,7 @@ def admin_leads():
     return render_template('admin_leads.html', leads=leads_data)
 
 base_dir = os.path.abspath(os.path.dirname(__file__))
-print(base_dir)
+# print(base_dir)
 sys.path.append(base_dir)
 
 load_dotenv()  # load biến môi trường trong file .env vào process.env

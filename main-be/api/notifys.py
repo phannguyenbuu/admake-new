@@ -7,9 +7,22 @@ from sqlalchemy import desc, and_, func, select
 
 notify_bp = Blueprint('notify', __name__, url_prefix='/api/notify')
 
-@notify_bp.route("/", methods=["GET"])
-def get_notifies():
-    notifies = Notify.query.order_by(Notify.updatedAt).all()
+
+@notify_bp.route("/all", methods=["GET"])
+def get_notifies_all():
+    
+    notifies = Notify.query.all()
+    data = [notify.tdict() for notify in notifies]
+
+    return jsonify({
+        "data": data,
+    })
+
+
+@notify_bp.route("/<int:lead_id>", methods=["GET"])
+def get_notifies(lead_id):
+    print('Lead', lead_id)
+    notifies = Notify.query.filter(Notify.lead_id==lead_id).order_by(Notify.updatedAt).all()
     data = [notify.tdict() for notify in notifies]
 
     return jsonify({

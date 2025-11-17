@@ -299,7 +299,7 @@ const TimeLine: React.FC<MsgTypeProps> = ({ el, menu, onDelete }) => {
 
   const handleReward = async (rate: number | null) => {
     
-    console.log("Connected rates", socket.connected, socket.io.opts.host);
+    // console.log("Connected rates", socket.connected, socket.io.opts.host);
     
     if (socket.connected) {
       const data = {
@@ -359,10 +359,9 @@ const TimeLine: React.FC<MsgTypeProps> = ({ el, menu, onDelete }) => {
         <Rating
           name="simple-controlled"
           value={value}
-          // defaultValue={el?.react?.rate ?? 0}
           max={5}
           onChange={handleRatingChange}
-          sx={{ color: "#ffff00ff" }}
+          sx={{ color: "orange" }}
 
           disabled = {disable}
         />
