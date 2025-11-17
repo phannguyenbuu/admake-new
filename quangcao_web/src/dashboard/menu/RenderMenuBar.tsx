@@ -200,11 +200,10 @@ export default function RenderMenuBar({}) {
                 key: `/dashboard/work-tables/${workspace.id}`,
                 label: (
                   <div className="flex items-center gap-3 py-1 px-2 rounded-lg hover:bg-white/10 transition-all duration-200">
-                  
-                        <div style={{padding: 0, background:'none', border:'none', color: 'yellow'}}>
-                          {/* {workspace.name?.charAt(0)?.toUpperCase() || "?"} */}
-                          {workspace.pinned && <StarFilled />}
-                        </div>
+                    <div style={{padding: 0, background:'none', border:'none', color: 'yellow'}}>
+                      {/* {workspace.name?.charAt(0)?.toUpperCase() || "?"} */}
+                      {workspace.pinned && <StarFilled />}
+                    </div>
                   
                     <span className="text-sm font-semibold text-white truncate flex-1 min-w-0"
                       style ={{color: workspace?.status === "FREE" ? "yellow":"#fff"}}

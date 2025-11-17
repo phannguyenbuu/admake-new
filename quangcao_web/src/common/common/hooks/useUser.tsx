@@ -120,6 +120,8 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
    const notifyAdmin = async (notify:NotifyProps) => {
     try {
+      notify.id = generateDatetimeId();
+      
       const res = await fetch(`${API_HOST}/notify/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

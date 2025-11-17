@@ -88,17 +88,17 @@ const NotifyModal = () => {
                 style={{
                   ...commonStyles,
                   backgroundColor: 'transparent',
-                  transform: `scale(${scales[notify.id] || 1})`,
+                  transform: `scale(${scales[notify.id ?? ''] || 1})`,
                   transition: 'transform 0.2s ease',
                 }}
                 onMouseEnter={e => e.currentTarget.style.backgroundColor = '#76ffffff'}
-                onMouseMove={(e) => handleMouseMove(e, notify.id)}
-                onMouseLeave={(e) => handleMouseLeave(e, notify.id)}
+                onMouseMove={(e) => handleMouseMove(e, notify.id ?? '')}
+                onMouseLeave={(e) => handleMouseLeave(e, notify.id ?? '')}
               >
                 <a href={notify.target}>
                   <span>{notify.text}</span> <span style={{ fontWeight: 700, color: '#00B5B4' }}>{notify.description}</span>
                 </a>
-                <IconButton aria-label="close" size="small" onClick={() => handleDelete(notify.id)}>
+                <IconButton aria-label="close" size="small" onClick={() => handleDelete(notify.id ?? '')}>
                   <CloseIcon fontSize="small" style={{ color: 'red' }} />
                 </IconButton>
               </li>

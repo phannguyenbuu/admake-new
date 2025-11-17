@@ -65,6 +65,7 @@ const JobAsset: React.FC<JobAssetProps> = ({ title, type, readOnly = false }) =>
     } 
 
     const imgList = taskDetail.assets.filter(el => el.type === type && el.file_url && el.file_url != '');
+
     const msgList = taskDetail.assets.filter(el => el.type === type && el.text && el.text != '');
     
     
@@ -298,7 +299,7 @@ const JobAsset: React.FC<JobAssetProps> = ({ title, type, readOnly = false }) =>
             {el.username}:
           </Typography>
           <Typography style={{ fontSize: 10, fontWeight: 500 }}>
-            {el.text}
+            { type?.includes("cash") ? `${el.text.split('/')[0]}[${el.text.split('/')[el.text.split('/').length - 1]}]` : el.text }
           </Typography>
 
           {!readOnly && <DeleteConfirm el={el} onDelete={handleMessageDelete} text='tin nhắn'/>}

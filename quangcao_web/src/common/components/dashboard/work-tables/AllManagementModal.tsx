@@ -33,21 +33,25 @@ export default function AllManagementModal() {
   const [roleVisible, setRoleVisible] = useState(false);
   const [isHover, setIsHover] = useState(false);
 
-  useEffect(() => {
-    async function fetchTasks() {
-      const apiUrl = `${useApiHost()}/task/inlead/${userLeadId}`;
-      try {
-        const response = await fetch(apiUrl, {method: "GET"});
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-        const data = await response.json();
-        // console.log(data);
-        setTasksData(data);
-      } catch (error) {
-        console.error("Failed to fetch tasks data:", error);
-      }
+
+  async function fetchTasks() {
+    const apiUrl = `${useApiHost()}/task/inlead/${userLeadId}`;
+    try {
+      const response = await fetch(apiUrl, {method: "GET"});
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+      const data = await response.json();
+      // console.log(data);
+      setTasksData(data);
+    } catch (error) {
+      console.error("Failed to fetch tasks data:", error);
     }
+  }
+
+  useEffect(() => {
+    if(!statusVisible) return;
+    
     fetchTasks();
-  }, []);
+  }, [statusVisible]);
 
 
   useEffect(() => {
@@ -153,6 +157,7 @@ export default function AllManagementModal() {
                   height: "fit-content",
                   padding:0,
                 }}
+                
               >
                 <CardTitle title={col.title} length={col?.tasks?.length ?? 0} />
                 {col?.tasks?.map((task) => (
@@ -161,6 +166,7 @@ export default function AllManagementModal() {
                     theme={theme}
                     isRewardColumn={isRewardColumn}
                     task={task}
+                    
                   />
                 ))}
               </Card>

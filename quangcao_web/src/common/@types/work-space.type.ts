@@ -96,6 +96,7 @@ export interface Task extends BaseEntity {
   end_time?: Dayjs | null; // Thời gian kết thúc
   assets: MessageTypeProps[];
   check_reward: Boolean | false;
+  rate: number;
 }
 
 export interface TaskGroup {

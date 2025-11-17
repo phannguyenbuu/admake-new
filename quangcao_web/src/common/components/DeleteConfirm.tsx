@@ -24,7 +24,6 @@ const DeleteConfirm: React.FC<DeleteAssetButtonProps> = ({ text, el, onDelete })
           onClick={() => setShowConfirm(true)}
           sx={{
             color: '#777',
-            top: -10,
             '&:hover': {
               color: 'red',
               backgroundColor: 'rgba(255, 0, 0, 0.1)',

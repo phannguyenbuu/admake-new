@@ -270,10 +270,14 @@ const TextMsg: React.FC<MsgTypeProps> = ({el, menu, onDelete}) => {
 }
 
 import { useWorkSpaceQueryTaskById } from '../../../../common/hooks/work-space.hook';
+import NotifyModal from '../../../../common/layouts/base/NotifyModal';
 
 const TimeLine: React.FC<MsgTypeProps> = ({ el, menu, onDelete }) => {
-  const [value, setValue] = useState<number | null>(el?.react?.rate ?? 0);
   if(!el) return null;
+
+  const {notifyAdmin} = useUser();
+  const [value, setValue] = useState<number | null>(el?.react?.rate ?? 0);
+  
   const {userRoleId} = useUser();
   const full = userRoleId === -2;
   
@@ -302,14 +306,14 @@ const TimeLine: React.FC<MsgTypeProps> = ({ el, menu, onDelete }) => {
         workspace_id: el.workspace_id,
         message_id: el.message_id,
         rate: rate,
-        // group_id: el.workspace_id,
       };
 
       console.log('Send rate message', el.workspace_id, data);
-
+      notifyAdmin({text:`Khách hàng vừa chấm ${rate} sao`, 
+        target: `/dashboard/work-tables/${el?.workspace_id}`});
+      
       socket.emit('admake/chat/rate', data);
    
-
       const context = useContext(UpdateButtonContext);
       if (!context) 
         throw new Error("UpdateButtonContext not found");
@@ -344,6 +348,7 @@ const TimeLine: React.FC<MsgTypeProps> = ({ el, menu, onDelete }) => {
   // console.log(el?.react?.rate != 0, el);
 
   return (
+    <>
     <Stack alignItems='center' justifyContent='space-between' 
       spacing={2} py={5} sx={{backgroundColor:"rgba(0,255,255,0.25)", borderRadius: 5}}>
         <Typography variant='caption' sx={{ color: "#000" }}>
@@ -373,6 +378,7 @@ const TimeLine: React.FC<MsgTypeProps> = ({ el, menu, onDelete }) => {
       {menu && <MessageOptions el={el} onDelete={()=>onDelete(el)}/>}
         </Stack>
   </Stack>
+  </>
   )
   
 }

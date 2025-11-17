@@ -183,10 +183,6 @@ const WorkspaceBoard: React.FC<WorkspaceBoardProps> = ({
                                                     // @ts-ignore
                                                     isDragging = {isDragging}
                                                     // @ts-ignore
-                                                    // setSelectedTask= {setSelectedTask}
-                                                    // @ts-ignore
-                                                    // setEditingTaskId={setEditingTaskId}
-                                                    // @ts-ignore
                                                     setShowFormTask={setShowFormTask}
                                 />
                                 )}

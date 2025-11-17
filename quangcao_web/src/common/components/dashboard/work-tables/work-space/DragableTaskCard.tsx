@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import { Row, Col, Card, Button, message, Modal, notification } from "antd";
-import { StarOutlined, PlusOutlined, MoreOutlined } from "@ant-design/icons";
+import { StarOutlined, PlusOutlined, MoreOutlined, StarFilled } from "@ant-design/icons";
 import CloseIcon from '@mui/icons-material/Close';
 import { Typography, Stack, IconButton, Box, TextField } from "@mui/material";
 import { useApiHost } from "../../../../common/hooks/useApiHost";
@@ -222,8 +222,7 @@ export const CardItem: React.FC<CardItemProps> = ({
                 
               }}
             sx={{
-              color: '#777',
-              top: -10,
+              color: 'orange',
               '&:hover': {
                 color: 'red',
                 backgroundColor: 'rgba(255, 0, 0, 0.1)',
@@ -232,7 +231,12 @@ export const CardItem: React.FC<CardItemProps> = ({
           >
             <CloseIcon />
           </IconButton>
-          <div className="text-xs text-gray-400 font-mono flex-shrink-0">#{task.id?.slice(-4)}</div>
+          <div className="text-xs text-gray-400 font-mono flex-shrink-0">
+            {[...Array(task.rate)].map((_, index) => (
+              <StarFilled key={index} style={{color:'orange'}}/>
+            ))}
+          </div>
+
         </div>
       </div>
     </div>
