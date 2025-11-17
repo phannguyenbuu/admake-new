@@ -81,6 +81,50 @@ def update_message(id):
     db.session.commit()
     return jsonify(role.tdict()), 200
 
+
+
+@message_bp.route("/message", methods=["POST"])
+def update_task_message(id):
+    time = request.form.get("time")
+    role = request.form.get("role")
+    user_id = request.form.get("user_id")
+    task_id = request.form.get("task_id")
+    type = request.form.get("type")
+    text = request.form.get("text")
+
+    if not role:
+        role = ''
+    
+    ls = []
+
+    # task.assets có thể None hoặc list
+    if task.assets:
+        ls = task.assets  # trực tiếp lấy list
+
+    message = Message.create_item({"message_id": generate_datetime_id(),
+                                   "type": type,
+                                    "user_id":user_id, 
+                                    "task_id":task_id, 
+                                    "text":text, 
+                                    })
+    ls.append(message.message_id)
+
+    # gán lại trường assets là list Python
+    task.assets = ls
+
+    # print('Task_asset', ls)
+
+
+    flag_modified(task, "assets")
+    db.session.commit()
+
+    return jsonify({
+        'text': text,
+        'assets': ls,
+        'message': message.tdict(),
+        **task.tdict()})
+
+
 @message_bp.route("/<string:message_id>", methods=['DELETE'])
 def delete_message(message_id):
     message = Message.query.filter_by(message_id=message_id).first()

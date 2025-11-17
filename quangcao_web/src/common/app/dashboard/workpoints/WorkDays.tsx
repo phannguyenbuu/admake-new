@@ -47,15 +47,6 @@ export const QRColumn: React.FC<QRColumnProps> = ({ record }) => {
 };
 
 
-// interface WorkListProps {
-//   checklist: Checklist;
-//   createdAt: string;
-//   updatedAt: string;
-//   id: string;
-//   user_id: string;
-//   username: string;
-// }
-
 const periodMap: Record<keyof Checklist, number> = {morning: 0,noon: 1,evening: 2,};
 
 export default function WorkDays({record}: {record:WorkDaysProps}) {
@@ -277,17 +268,6 @@ return (
             <Typography sx={{color:"#fff",textAlign:"center",fontSize:10}}>Số giờ làm trong buổi: {modalImg.workhour?.toFixed(2)}</Typography>
           }
         </Box>
-
-        
-        {/* <Button onClick={() => {
-          console.log("Current", currentPeriodModalIndex);
-          console.log("Main data", mainData);
-          console.log("Modal infor", modalImg);
-          // modalImg.in = ;
-        }} 
-          sx={{border:'1px solid #00B5B4', margin: 1, padding:'5px 20px', borderRadius:30}}>
-          <span style={{color:'1px solid #00B5B4'}}>Reset check-in</span>
-        </Button> */}
 
         {modalImg?.status !== 'off' &&
           <Typography fontSize={10} color="#00B4B6" fontStyle="italic">Nhấp vào hình để xem vị trí trên googlemap</Typography>}

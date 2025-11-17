@@ -1,6 +1,6 @@
 import React, {useEffect, useState, useRef} from 'react';
 import { Tag, Modal, notification } from "antd";
-import { Stack, Box, Typography } from "@mui/material";
+import { Tabs, Tab, Stack, Box, Typography } from "@mui/material";
 import { CenterBox } from '../../../components/chat/components/commons/TitlePanel';
 import type { PeriodData, WorkDaysProps } from '../../../@types/workpoint';
 import { Table, TableBody, TableCell, TableContainer, TableRow, TableHead, Paper } from '@mui/material';
@@ -8,6 +8,7 @@ import { useWorkpointSetting } from '../../../common/hooks/useWorkpointSetting';
 import { useUser } from '../../../common/hooks/useUser';
 import { useApiHost } from '../../../common/hooks/useApiHost';
 import type { Task } from '../../../@types/work-space.type';
+import JobAsset from '../../../components/dashboard/work-tables/task/JobAsset';
 import dayjs from 'dayjs';
 
 // const IS_SATURDAY_NOON_OFF = true;
@@ -81,6 +82,15 @@ const SalaryBoard: React.FC<SalaryBoardProps> = ({ selectedRecord, modalVisible,
   const current_month = current_day.getMonth();
   const [rewardList, setRewardList] = useState<RewardProps[]>([]);
 
+  const [tabIndex, setTabIndex] = useState(0);
+
+  const handleChange = (_event: React.SyntheticEvent, newIndex: number) => {
+    setTabIndex(newIndex);
+  };
+
+  const isAdmin = !window.location.href.includes('/point/');
+
+
   const fetchTaskByUser = async (): Promise<Task[]> => {
     const response = await fetch(`${useApiHost()}/task/${selectedRecord?.user_id}/by_user`);
     
@@ -145,7 +155,7 @@ const SalaryBoard: React.FC<SalaryBoardProps> = ({ selectedRecord, modalVisible,
   }
 
   useEffect(()=>{  
-    console.log('selectedRecord', selectedRecord);
+    // console.log('selectedRecord', selectedRecord);
     if (!selectedRecord) return;
 
     const total_hours = getMaxWorkingHours(current_day.getMonth() + 1, 
@@ -190,6 +200,9 @@ const SalaryBoard: React.FC<SalaryBoardProps> = ({ selectedRecord, modalVisible,
     },[selectedRecord, modalVisible]);
 
     const highlightRow = {fontStyle:"italic", color:'red'};
+    const tabStyle = {fontSize: 10, minWidth: 70, maxWidth: 70, 
+      paddingLeft: isMobile ? 0: 50,paddingRight: isMobile ? 0: 50,
+      whiteSpace:isMobile?'wrap':'nowrap', borderLeft: '1px solid #666'};
 
     return (
       <Modal
@@ -200,73 +213,192 @@ const SalaryBoard: React.FC<SalaryBoardProps> = ({ selectedRecord, modalVisible,
           title=""
           okText="OK"
           cancelButtonProps={{ style: { display: 'none' } }}
-          style={{ padding: 20, minWidth: '90vw' }}
+          
         >
 
         <CenterBox>
-          <Box sx={{ borderRadius: 10, backgroundColor: "#00B4B6", px: 5, py: 1, mb: 0 }}>
-            <Typography sx={{ textTransform: "uppercase", color: "#fff", fontWeight: 500, textAlign: "center" }}>
-              BẢNG LƯƠNG THÁNG {current_day.getMonth() + 1}
-            </Typography>
-          </Box>
+          <Box sx={{ width: "100%" }}>
 
-          <Typography>{selectedRecord?.username.toUpperCase()}</Typography>
-          <Typography style={{fontWeight:300, fontSize:12, fontStyle:'italic'}}>{selectedRecord?.userrole}</Typography>
-          
-          <TableContainer component={Paper} sx={{ 
-              mt: isMobile ? 0 : 2, 
-              width: isMobile ? 400:'100%',
-             scale: isMobile ? 0.75 : 1 }}>
-            <Table style={{padding: 0}}>
+            <Box sx={{ width:250, borderRadius: 1, backgroundColor: "#00B4B6", px: 1, py: 1, mb: 0,
+              position: "relative",
+              "&:after": {
+                content: '""',
+                position: "absolute",
+                right: -26,
+                top: "50%",
+                transform: "translateY(-50%)",
+                width: 0,
+                height: 0,
+                borderTop: "28px solid transparent",
+                borderBottom: "28px solid transparent",
+                borderLeft: "28px solid #00B4B6",
+              },
+             }}>
+              <Typography sx={{ textTransform: "uppercase", color: "#ccc", fontSize:12,  fontWeight: 500 }}>
+                BẢNG LƯƠNG THÁNG {current_day.getMonth() + 1}
+              </Typography>
+
+              <Typography sx={{ textTransform: "uppercase", color: "#fff"}}>{selectedRecord?.username.toUpperCase()}</Typography>
+              {/* <Typography style={{ fontWeight: 300, fontSize: 12, fontStyle: "italic" }}>{selectedRecord?.userrole}</Typography> */}
+            </Box>
+            
+            <Tabs
+              value={tabIndex}
+              onChange={handleChange}
+              aria-label="nav tabs example"
+              variant={isMobile ? "scrollable" : "standard"}
+              scrollButtons="auto"
+              style={{marginTop: 10}}
+            >
+              <Tab style={tabStyle} label="Lương" id="nav-tab-0" aria-controls="nav-tabpanel-0" />
+              <Tab style={tabStyle} label="Thưởng Phạt" id="nav-tab-1" aria-controls="nav-tabpanel-1" />
+              <Tab style={tabStyle} label="Chuyên Cần" id="nav-tab-2" aria-controls="nav-tabpanel-2" />
+              <Tab style={tabStyle} label="Ứng Tiền" id="nav-tab-3" aria-controls="nav-tabpanel-3" />
+            </Tabs>
+
+          <TabPanel value={tabIndex} index={0}>
+              <TableContainer
+                component={Paper}
+                sx={{
+                  mt: isMobile ? 0 : 2,
+                  ml: isMobile ? -10: 0,
+                  width: isMobile ? 400 : "100%",
+                  scale: isMobile ? 0.75 : 1,
+                }}
+              >
+                <Table style={{ padding: 0 }}>
+                  <TableBody>
+                    <TableRow>
+                      <TableCell style={{ fontWeight: 700 }}>Nội dung</TableCell>
+                      <TableCell style={{ fontWeight: 700 }}>Giá trị</TableCell>
+                      <TableCell style={{ fontWeight: 700 }}>Lương/ĐVT</TableCell>
+                      <TableCell style={{ fontWeight: 700 }}>Thành tiền</TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell>Số buổi làm trong tháng</TableCell>
+                      <TableCell>{periodWork}</TableCell>
+                      <TableCell>{formatMoney(salaryUnit * 4)} ₫</TableCell>
+                      <TableCell>{formatMoney(salaryUnit * 4 * periodWork)} ₫</TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell>Tổng giờ tăng ca trong tháng</TableCell>
+                      <TableCell>{overTimeWork.toFixed(3)}</TableCell>
+                      <TableCell>{formatMoney(salaryUnit * OVERTIME_RATIO)} ₫</TableCell>
+                      <TableCell>{formatMoney(salaryUnit * OVERTIME_RATIO * overTimeWork)} ₫</TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell>Tổng thưởng</TableCell>
+                      <TableCell>{formatMoney(bonusSalary)} ₫</TableCell>
+                      <TableCell>-</TableCell>
+                      <TableCell>{formatMoney(bonusSalary)} ₫</TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell>Tổng phạt</TableCell>
+                      <TableCell>{formatMoney(bonusSalary)} ₫</TableCell>
+                      <TableCell>-</TableCell>
+                      <TableCell>{formatMoney(bonusSalary)} ₫</TableCell>
+                    </TableRow>
+                    {/* {rewardList.map((el: any, idx: number) => (
+                      <TableRow key={idx}>
+                        <TableCell style={highlightRow}>+ {el.workspace}</TableCell>
+                        <TableCell style={highlightRow}>({el.title})</TableCell>
+                        <TableCell style={highlightRow}>-</TableCell>
+                        <TableCell style={highlightRow}>{formatMoney(el.reward)} ₫</TableCell>
+                      </TableRow>
+                    ))} */}
+                    
+                  </TableBody>
+                </Table>
+              </TableContainer>
+              <Typography style={{marginTop:20, textAlign:'center', color: '#00B5B4'}}>
+                Tổng lương: {formatMoney(salaryUnit * 4 * periodWork + salaryUnit * 1.5 * overTimeWork + bonusSalary)} ₫
+              </Typography>
+              
+            </TabPanel>
+
+      <TabPanel value={tabIndex} index={1}>
+        <TableContainer
+                component={Paper}
+                sx={{
+                  mt: isMobile ? 0 : 2,
+                  ml: isMobile ? -10: 0,
+                  width: isMobile ? 400 : "100%",
+                  scale: isMobile ? 0.75 : 1,
+                }}
+              >
+                <Table style={{ padding: 0 }}>
+                  <TableBody>
+                    <TableRow>
+                      <TableCell style={{ fontWeight: 700 }}>Nội dung</TableCell>
+                      <TableCell style={{ fontWeight: 700 }}>Giá trị</TableCell>
+                      <TableCell style={{ fontWeight: 700 }}>Lương/ĐVT</TableCell>
+                      <TableCell style={{ fontWeight: 700 }}>Thành tiền</TableCell>
+                    </TableRow>
+                    
+                    <TableRow>
+                      <TableCell>Thưởng theo việc</TableCell>
+                      <TableCell>{formatMoney(bonusSalary)} ₫</TableCell>
+                      <TableCell>-</TableCell>
+                      <TableCell>{formatMoney(bonusSalary)} ₫</TableCell>
+                    </TableRow>
+                    {rewardList.map((el: any, idx: number) => (
+                      <TableRow key={idx}>
+                        <TableCell style={highlightRow}>+ {el.workspace}</TableCell>
+                        <TableCell style={highlightRow}>({el.title})</TableCell>
+                        <TableCell style={highlightRow}>-</TableCell>
+                        <TableCell style={highlightRow}>{formatMoney(el.reward)} ₫</TableCell>
+                      </TableRow>
+                    ))}
+                    
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            <JobAsset key="cash-assets" title = 'Thưởng/Phạt' type="bonus-cash" readOnly={!isAdmin}/>
+      </TabPanel>
+      <TabPanel value={tabIndex} index={2}>
+        <TableContainer
+            component={Paper}
+            sx={{
+              mt: isMobile ? 0 : 2,
+              ml: isMobile ? -10: 0,
+              width: isMobile ? 400 : "100%",
+              scale: isMobile ? 0.75 : 1,
+            }}
+          >
+            <Table style={{ padding: 0 }}>
               <TableBody>
                 <TableRow>
-                  <TableCell style={{fontWeight:700}}>Nội dung</TableCell>
-                  <TableCell style={{fontWeight:700}}>Giá trị</TableCell>
-                  <TableCell style={{fontWeight:700}}>Lương/ĐVT</TableCell>
-                  {/* <TableCell style={{fontWeight:700}}>Nhân hệ số</TableCell> */}
-                  <TableCell style={{fontWeight:700}}>Thành tiền</TableCell>
+                  <TableCell style={{ fontWeight: 700 }}>Nội dung</TableCell>
+                  <TableCell style={{ fontWeight: 700 }}>Giá trị</TableCell>
+                  <TableCell style={{ fontWeight: 700 }}>Lương/ĐVT</TableCell>
+                  <TableCell style={{ fontWeight: 700 }}>Thành tiền</TableCell>
                 </TableRow>
+                
                 <TableRow>
-                  <TableCell>Số buổi làm trong tháng</TableCell>
-                  <TableCell>{periodWork}</TableCell>
-                  <TableCell>{formatMoney(salaryUnit * 4)} ₫</TableCell>
-                  {/* <TableCell>1.0</TableCell> */}
-                  <TableCell>{formatMoney(salaryUnit * 4 * periodWork)} ₫</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell>Tổng giờ tăng ca trong tháng</TableCell>
-                  <TableCell>{overTimeWork.toFixed(3)}</TableCell>
-                  <TableCell>{formatMoney(salaryUnit * OVERTIME_RATIO)} ₫</TableCell>
-                  {/* <TableCell>{OVERTIME_RATIO}</TableCell> */}
-                  <TableCell>{formatMoney(salaryUnit * OVERTIME_RATIO * overTimeWork)} ₫</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell>Thưởng theo việc</TableCell>
+                  <TableCell>Số giờ đi trễ</TableCell>
                   <TableCell>{formatMoney(bonusSalary)} ₫</TableCell>
                   <TableCell>-</TableCell>
-                  {/* <TableCell>-</TableCell> */}
                   <TableCell>{formatMoney(bonusSalary)} ₫</TableCell>
                 </TableRow>
-                {
-                  rewardList.map((el) =>
-                    <TableRow>
-                      <TableCell style={highlightRow}>+ {el.workspace}</TableCell>
-                      <TableCell style={highlightRow}>({el.title})</TableCell>
-                      <TableCell style={highlightRow}>-</TableCell>
-                      {/* <TableCell style={highlightRow}>-</TableCell> */}
-                      <TableCell style={highlightRow}>{formatMoney(el.reward)} ₫</TableCell>
-                    </TableRow>)
-                }
-                <TableRow>
-                  <TableCell style={{fontWeight:700}}>Tổng lương</TableCell>
-                  <TableCell>-</TableCell>
-                  <TableCell>-</TableCell>
-                  {/* <TableCell>-</TableCell> */}
-                  <TableCell>{formatMoney(salaryUnit * 4 * periodWork + salaryUnit * 1.5 * overTimeWork + bonusSalary)} ₫</TableCell>
-                </TableRow>
+                {rewardList.map((el: any, idx: number) => (
+                  <TableRow key={idx}>
+                    <TableCell style={highlightRow}>+ {el.workspace}</TableCell>
+                    <TableCell style={highlightRow}>({el.title})</TableCell>
+                    <TableCell style={highlightRow}>-</TableCell>
+                    <TableCell style={highlightRow}>{formatMoney(el.reward)} ₫</TableCell>
+                  </TableRow>
+                ))}
+                
               </TableBody>
             </Table>
           </TableContainer>
+      </TabPanel>
+      <TabPanel value={tabIndex} index={3}>
+        <JobAsset key="cash-assets" title = 'Ứng tiền cho nhân viên' type="advance-salary" readOnly={!isAdmin}/>
+      </TabPanel>
+    </Box>
+
+   
         </CenterBox>
 
           
@@ -277,3 +409,25 @@ const SalaryBoard: React.FC<SalaryBoardProps> = ({ selectedRecord, modalVisible,
 }
 
 export default SalaryBoard;
+
+
+interface TabPanelProps {
+  children?: React.ReactNode;
+  index: number;
+  value: number;
+}
+
+function TabPanel(props: TabPanelProps) {
+  const { children, value, index, ...other } = props;
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`nav-tabpanel-${index}`}
+      aria-labelledby={`nav-tab-${index}`}
+      {...other}
+    >
+      {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
+    </div>
+  );
+}

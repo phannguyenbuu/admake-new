@@ -469,9 +469,7 @@ async function postWorkpointCheck(imgUrl: string, lat:string, long:string) {
 
             {!isSupplier &&
             <>
-           
-              
-              
+ 
               <Button variant="contained"  
                   sx={{borderRadius:40,
                     backgroundColor:"#00B4B6",fontSize:10,whiteSpace:'nowrap',
@@ -489,6 +487,7 @@ async function postWorkpointCheck(imgUrl: string, lat:string, long:string) {
               Nhiệm vụ
             </Button>
 
+                  {!isSupplier &&
             <Button 
               // sx={{
               //     // backgroundColor:"#ccc",
@@ -502,7 +501,7 @@ async function postWorkpointCheck(imgUrl: string, lat:string, long:string) {
                 onClick={() => setModalVisible(true)}>
               <img src="/pay-svgrepo-com.svg" alt="ADMAKE" style={{width:32}}/>
               Bảng lương
-            </Button>
+            </Button>}
           </Stack>
           
           {!isSupplier &&

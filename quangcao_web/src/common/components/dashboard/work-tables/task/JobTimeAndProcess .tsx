@@ -254,7 +254,7 @@ const JobTimeAndProcess: React.FC<JobTimeAndProcessProps> = ({form}) => {
       </TableContainer>
       
       {taskDetail?.type === "REWARD" && form &&
-        <JobAsset key="cash-assets" title = 'Ứng tiền cho thầu phụ' type="cash"/>}
+        <JobAsset key="cash-assets" title = 'Ứng tiền cho thầu phụ' type="advance-cash"/>}
     </Stack>
   );
 };
