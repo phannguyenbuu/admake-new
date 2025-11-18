@@ -1,78 +1,121 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Admin Leads</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Admin Leads</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+
+    <style>
+        table.table-striped.table-bordered tbody tr {
+            max-height: 30px; /* giảm chiều cao hàng */
+        }
+        table.table-striped.table-bordered tbody tr td,
+        table.table-striped.table-bordered tbody tr th {
+            padding-top: 0px;
+            padding-bottom: 0px;
+            vertical-align: middle;
+        }
+        table.table-striped.table-bordered tbody tr td p {
+            margin: 0;
+            font-size: 12px; /* giảm cỡ chữ trong thẻ p */
+        }
+    </style>
 </head>
 <body>
-    
-        <div class="container-fluid"  style="padding: 20px;background-color: #00B4B6;color:#fff">
-            <a class="navbar-brand"  href="#">ADMAKE ADMIN</a>
-        </div>
-    
-    <div class="container mt-4">
-        <h1 class="mb-4">Danh sách khách hàng</h1>
-        <table class="table table-striped table-bordered">
-            <thead class="table-light" style="background-color: #00B4B6;">
-                <tr>
-                    <th style="width: 30px;">
-                        <input type="checkbox" id="select-all" />
-                    </th>
-                    <th>ID</th>
-                    <th style="width:200px">Họ và tên</th>
-                    <th style="width:200px">Username</th>
-                    <th style="width:200px">Công ty</th>
-                    
-                    <th>Liên hệ</th>
-                    <th style="width:200px">Nhu cầu</th>
-                    
-                    <!-- <th style="width:200px; font-size:10px">Quy mô công ty</th> -->
-                    <th style="width:100px">Số dư</th>
-                    <th style="width:200px; font-size:10px">Ngày đăng ký/gia hạn/hết hạn</p>
-                    </th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for lead in leads %}
-                <tr>
-                    <td>
-                        <input type="checkbox" name="selected_leads" value="{{ lead.id }}" checked/>
-                    </td>
-                    <td>{{ lead.id }}</td>
-                    <td>{{ lead.name }}</td>
-                    <td>
-                        <p>{{ lead.username }}</p>
-                        <p style="font-size:10px">{{ lead.password }}</p>
-                    </td>
-                    <td>
-                        <p>{{ lead.company }}</p>
-                        <p style="font-size:10px">{{ lead.companySize }}</p>
-                    </td>
-                    
-                    <td>
-                        <p>{{ lead.phone }}</p>
-                        <p style="font-size:10px;text-transform: lowercase;">{{ lead.email }}</p>
-                    </td>
-
-                    
-                    <td>
-                        <p>{{ lead.industry }}</p>
-                        <p style="font-size:10px">{{ lead.description }}</p>
-                    </td>
-                    
-                    <td>{{ lead.balance_amount }}</td>
-                    <td>
-                        <p>{{ lead.createdAt }}</p>
-                        <p style="color:red">{{ lead.updatedAt }}</p>
-                        <p style="color:red; font-weight:700">{{ lead.expiredAt }}</p>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+  
+    <div class="container-fluid" style="padding: 20px;background-color: #00B4B6;color:#fff">
+      <a class="navbar-brand" href="#">ADMAKE ADMIN</a>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  
+  <div class="container mt-4">
+    <h1 class="mb-4">Danh sách khách hàng</h1>
+            <table class="table table-striped table-bordered table-sm">
+      <thead class="table-light" style="background-color: #00B4B6;">
+        <tr>
+          <th style="width: 30px;">
+            <input type="checkbox" id="select-all" />
+          </th>
+          <th>ID</th>
+          <th style="width:200px">Họ và tên</th>
+          <th style="width:200px">Username</th>
+          <th style="width:200px">Công ty</th>
+          
+          <th>Liên hệ</th>
+          <th style="width:200px">Nhu cầu</th>
+          
+          <!-- <th style="width:200px; font-size:10px">Quy mô công ty</th> -->
+          <th style="width:100px">Số dư</th>
+          <th style="width:200px; font-size:10px">Ngày đăng ký/gia hạn/hết hạn</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for lead in leads %}
+        <tr>
+          <td>
+            <input type="checkbox" name="selected_leads" value="{{ lead.id }}" checked/>
+          </td>
+          <td>{{ lead.id }}</td>
+          <td>{{ lead.name }}</td>
+          <td>
+            <p>{{ lead.username }}</p>
+            <p style="font-size:10px">{{ lead.password }}</p>
+          </td>
+          <td>
+            <p>{{ lead.company }}</p>
+            <p style="font-size:10px">{{ lead.companySize }}</p>
+          </td>
+          
+          <td>
+            <p>{{ lead.phone }}</p>
+            <p style="font-size:10px;text-transform: lowercase;">{{ lead.email }}</p>
+          </td>
+          
+          <td>
+            <p>{{ lead.industry }}</p>
+            <p style="font-size:10px">{{ lead.description }}</p>
+          </td>
+          
+          <td>{{ lead.balance_amount }}</td>
+          <td>
+            <p>{{ lead.createdAt }}</p>
+            <p>{{ lead.updatedAt }}</p>
+            <p style="color:red; font-weight:700">{{ lead.expiredAt }}</p>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <!-- Phân trang -->
+    <nav aria-label="Page navigation example">
+     <ul class="pagination justify-content-center">
+      {% if page > 1 %}
+       <li class="page-item">
+        <a class="page-link" href="?page={{ page - 1 }}" aria-label="Previous">
+         <span aria-hidden="true">&laquo;</span>
+        </a>
+       </li>
+      {% endif %}
+
+      {% for p in range(1, total_pages + 1) %}
+            <li class="page-item {% if p == page %}active{% endif %}">
+                <a class="page-link" href="?page={{ p }}">{{ p }}</a>
+            </li>
+            {% endfor %}
+
+
+      {% if page < total_pages %}
+       <li class="page-item">
+        <a class="page-link" href="?page={{ page + 1 }}" aria-label="Next">
+         <span aria-hidden="true">&raquo;</span>
+        </a>
+       </li>
+      {% endif %}
+     </ul>
+    </nav>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

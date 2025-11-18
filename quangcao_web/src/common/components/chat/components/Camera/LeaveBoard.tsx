@@ -12,7 +12,7 @@ import { getTitleByStatus } from "../../../dashboard/work-tables/Managerment";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import TextField from "@mui/material/TextField";
-
+import { useUser } from "../../../../common/hooks/useUser";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 
@@ -22,6 +22,7 @@ import type { Leave } from "../../../../@types/leave.type";
 
 
 import "antd/dist/reset.css"; // hoặc `antd/dist/antd.css` tùy version
+import { message } from "antd";
 
 
 // const useTaskByUserMutation = () => {
@@ -188,7 +189,7 @@ const postLeaveRequest = async (payload: Leave): Promise<any> => {
 
 export const LeaveBoard = ({ userId, open, onCancel }: LeaveBoardProps) => {
   const [tab, setTab] = useState<"oneDay" | "multiDays">("oneDay");
-
+  const {notifyAdmin, fullName} = useUser();
   // State ngày cho nghỉ 1 ngày
   const [oneDayDate, setOneDayDate] = useState<Dayjs | null>(null);
   const [morningChecked, setMorningChecked] = useState(true);
@@ -201,6 +202,9 @@ export const LeaveBoard = ({ userId, open, onCancel }: LeaveBoardProps) => {
   const mutation = useMutation<any, Error, Leave>({
     mutationFn: postLeaveRequest,
     onSuccess: () => {
+      notifyAdmin({text:`Nhân sự xin nghỉ phép`, 
+        description:fullName ?? '', 
+        target:'/dashboard/workpoints'})
       onCancel();
     },
     onError: (error: Error) => {

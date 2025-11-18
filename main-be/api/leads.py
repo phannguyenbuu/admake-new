@@ -18,7 +18,6 @@ def create_lead():
     
     return jsonify(new_lead.tdict()), 201
 
-
 @lead_bp.route("/<int:lead_id>", methods=["DELETE"])
 def delete_lead(lead_id):
     lead = LeadPayload.query.get(lead_id)

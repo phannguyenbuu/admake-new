@@ -166,23 +166,6 @@ class User(BaseModel):
         result["role"] = self.update_role()
 
         return result
-
-    # @staticmethod
-    # def create_item(params):
-    #     allowed_keys = set(c.name for c in User.__table__.columns)
-    #     filtered_params = {k: v for k, v in params.items() if k in allowed_keys}
-
-    #     if params.get("role"):
-    #         role = Role.query.filter_by(name=params.get("role")).first()
-    #         if role:
-    #             filtered_params["role_id"] = role.id
-
-    #     if not "role_id" in filtered_params:
-    #         filtered_params["role_id"] = 0
-
-    #     filtered_params["id"] = generate_datetime_id()
-        
-    #     return User(**filtered_params)
     
     @staticmethod
     def create_item(params):
@@ -634,18 +617,20 @@ class UsingHistoryData(db.Model):
 
 class LeadPayload(BaseModel):
     __tablename__ = 'lead'
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(120), nullable=False)
-    fullName = db.Column(db.String(120), nullable=False)
-    username = db.Column(db.String(50), nullable=False)
-    password = db.Column(db.String(50), nullable=False)
-    company = db.Column(db.String(120), nullable=False)
-    address = db.Column(db.String(255), nullable=False)
-    email = db.Column(db.String(120), nullable=False)
-    phone = db.Column(db.String(50), nullable=False)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    name = db.Column(db.String(120), nullable=True)
+    # fullName = db.Column(db.String(120), nullable=False)
+
+    user_id = db.Column(db.String(50), nullable=True)
+    # username = db.Column(db.String(50), nullable=False)
+    # password = db.Column(db.String(50), nullable=False)
+    company = db.Column(db.String(120), nullable=True)
+    address = db.Column(db.String(255), nullable=True)
+    email = db.Column(db.String(120), nullable=True)
+    phone = db.Column(db.String(50), nullable=True)
     description = db.Column(db.Text)
-    industry = db.Column(db.String(100), nullable=False)
-    companySize = db.Column(db.String(50), nullable=False)
+    industry = db.Column(db.String(100), nullable=True)
+    companySize = db.Column(db.String(50), nullable=True)
     expiredAt = db.Column(db.DateTime, default=datetime.datetime.utcnow)
     balance_amount = db.Column(db.Float)
 
@@ -666,8 +651,15 @@ class LeadPayload(BaseModel):
             value = getattr(self, column.name)
             # print(f"DEBUG: Column {column.name} value type: {type(value)}")
             if isinstance(value, (datetime.datetime, datetime.date)):
-                value = value.isoformat()
+                value = value.date().isoformat() if isinstance(value, datetime.datetime) else value.isoformat()
+
             result[column.name] = value
+
+        user = db.session.get(User, self.user_id)
+        if user:
+            result["username"] = user.username
+            result["password"] = user.password
+            result["fullName"] = user.fullName
         return result
 
     @staticmethod
@@ -814,6 +806,15 @@ class WorkpointSetting(db.Model):
                 value = value.isoformat()
             result[column.name] = value
         return result
+    
+    def clone(self):
+        # Tạo thể hiện mới của lớp
+        new_obj = WorkpointSetting()
+        # Sao chép tất cả các trường ngoại trừ trường bắt đầu bằng '_' và 'id'
+        for attr, value in self.__dict__.items():
+            if not attr.startswith('_') and attr != 'id':
+                setattr(new_obj, attr, value)
+        return new_obj
 
     @staticmethod
     def create_item(params):
@@ -821,6 +822,9 @@ class WorkpointSetting(db.Model):
         db.session.add(item)
         db.session.commit()
         return item
+    
+
+
 
 
 from paramiko import SSHClient, AutoAddPolicy

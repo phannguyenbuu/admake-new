@@ -904,8 +904,7 @@ FOREIGN KEY (user_id) REFERENCES "user"(id);
     db.session.commit()
 
 def alter_data():
-    db.session.execute(text(f'''ALTER TABLE notification ADD COLUMN lead_id INTEGER;
-ALTER TABLE notification ADD CONSTRAINT fk_lead_id FOREIGN KEY (lead_id) REFERENCES lead(id);'''))
+    db.session.execute(text(f'''SELECT pg_get_serial_sequence('lead', 'id');'''))
     db.session.commit()
 
 def delete_customer_user():
@@ -1158,15 +1157,67 @@ if __name__ == "__main__":
         # flag_modified(task,"assets")
         # Task.query.filter(Task.type == "salary").delete(synchronize_session=False)
 
-        # alter_data()
+        
         # users = User.query.filter(User.username == 'ad104').all()
 
         # for user in users:
         #     print(user.lead_id, user.password, user.fullName)
         
-        add_new_columns("notification",["user_id"],"VARCHAR(50)")
+        # for i in range(244, 290):
+        #     user = User(lead_id = i,
+        #                 id = generate_datetime_id(),
+        #                 username = "ad" + str(i),
+        #                 fullName = "Admake" + str(i),
+        #                 password = "Test@1234",
+        #                 role_id = -2
+        #             )
+        #     db.session.add(user)
 
+        # db.session.commit()
 
+        # add_new_columns("lead",["user_id"],"VARCHAR(50)")
 
         
-        
+        # for i in range(290,720):
+        #     user = User(lead_id = i,
+        #                 id = generate_datetime_id(),
+        #                 username = "ad" + str(i),
+        #                 fullName = "Admake" + str(i),
+        #                 password = "Test@1234",
+        #                 role_id = -2
+        #             )
+            
+        #     db.session.add(user)
+        #     lead = LeadPayload(
+        #         id = i,
+        #         user_id = user.id,
+        #         name = "Lead" + str(i),
+        #     )
+            
+        #     db.session.add(lead)
+
+        # db.session.commit()
+        # lead = db.session.get(LeadPayload, 720)
+        # db.session.delete(lead)
+        # db.session.commit()
+
+        # for ws in WorkpointSetting.query.all():
+
+        print(WorkpointSetting.query.count())
+
+        ws = WorkpointSetting.query.first()
+
+        for i,w in enumerate(WorkpointSetting.query.all()):
+            if i > 0:
+                db.session.delete(w)
+
+        for lead in LeadPayload.query.all():
+            if lead.id != ws.lead_id:
+                new_ws = ws.clone()
+                new_ws.lead_id = lead.id
+                db.session.add(new_ws)
+
+        db.session.commit()
+
+
+
