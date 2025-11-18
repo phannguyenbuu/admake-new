@@ -273,7 +273,7 @@ return (
         {modalImg?.status !== 'off' &&
           <Typography fontSize={10} color="#00B4B6" fontStyle="italic">Nhấp vào hình để xem vị trí trên googlemap</Typography>}
             
-        <Stack direction="row" spacing={2} style={{ padding: 20, height: 400, width:'fit-content' }}>
+        <Stack direction="row" spacing={2} style={{ padding: 20, height: modalImg?.status === 'off' ? 200 : '90vh', width:'fit-content' }}>
           {modalImg?.in?.img && 
             <Stack>
               <Typography textAlign="center">Check in {modalImg?.in?.time}</Typography>

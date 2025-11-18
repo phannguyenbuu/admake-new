@@ -1137,6 +1137,11 @@ def resizeThumb():
 
     db.session.commit()
 
+
+def set_lead_user(lead_id, username):
+    lead = db.session.get(LeadPayload, lead_id)
+    lead.user_id = User.query.filter(User.username == username).first().id
+
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()
@@ -1203,19 +1208,27 @@ if __name__ == "__main__":
 
         # for ws in WorkpointSetting.query.all():
 
-        print(WorkpointSetting.query.count())
+        # print(WorkpointSetting.query.count())
 
-        ws = WorkpointSetting.query.first()
+        # ws = WorkpointSetting.query.first()
 
-        for i,w in enumerate(WorkpointSetting.query.all()):
-            if i > 0:
-                db.session.delete(w)
+        # for i,w in enumerate(WorkpointSetting.query.all()):
+        #     if i > 0:
+        #         db.session.delete(w)
 
-        for lead in LeadPayload.query.all():
-            if lead.id != ws.lead_id:
-                new_ws = ws.clone()
-                new_ws.lead_id = lead.id
-                db.session.add(new_ws)
+        # for lead in LeadPayload.query.all():
+        #     if lead.id != ws.lead_id:
+        #         new_ws = ws.clone()
+        #         new_ws.lead_id = lead.id
+        #         db.session.add(new_ws)
+
+        set_lead_user(721, 'ad290')
+        set_lead_user(722, 'ad291')
+
+        # lead = db.session.get(LeadPayload, 721)
+        # lead.user_id = User.query.filter(User.username == 'ad290').first().id
+        # lead = db.session.get(LeadPayload, 722)
+        # lead.user_id = User.query.filter(User.username == 'ad291').first().id
 
         db.session.commit()
 
