@@ -36,14 +36,18 @@ import {
 import LeadForm from "@/components/lead-form"
 
 const categories = [
-  {label: "Quảng cáo", icon: Megaphone},
-  {label: "Sự kiện", icon: Calendar},
-  {label: "Nội thất", icon: Sofa},
-  {label: "Nhôm kính", icon: PanelsTopLeft},
-  {label: "Cơ khí", icon: Cog},
-  {label: "Điện nước", icon: Zap},
-  {label: "Xây dựng", icon: Building},
-  {label: "Thạch cao", icon: Layers},
+  {label: "Quảng cáo", icon: 'qc.png'},
+  {label: "Sự kiện", icon: 'even.png'},
+  {label: "Nội thất", icon: 'nt.png'},
+  {label: "Nhôm kính", icon: 'nk.png'},
+  {label: "Cơ khí", icon: 'ck.png'},
+  {label: "Điện nước", icon: 'đn.png'},
+  {label: "Xây dựng", icon: 'xd.png'},
+  {label: "Thạch cao", icon: 'tc.png'},
+  {label: "Ngành cửa", icon: 'nc.png'},
+  {label: "Rèm màn", icon: 'rm.png'},
+  {label: "Đá hoa cương", icon: 'da.png'},
+  {label: "VSCN", icon: 'vs.png'}
 ];
 
 export default function Page() {
@@ -51,8 +55,8 @@ export default function Page() {
 
   const handleClick = () => {
     const leadForm = document.getElementById('dang-ky');
-    if (leadForm) {
-      leadForm.scrollIntoView({ behavior: 'smooth' });
+      if (leadForm ) {
+        leadForm.scrollIntoView({ behavior: 'smooth' });
     }
   }
   return (
@@ -167,16 +171,16 @@ export default function Page() {
               Lĩnh vực <br />
               áp dụng
             </div>
-            <div className="mx-auto grid max-w-3xl grid-cols-2 gap-3 text-xs sm:grid-cols-3 md:grid-cols-4 lg:text-sm">
-              {categories.map(({ label, icon: Icon }) => (
+            <div className="mx-auto grid max-w-3xl grid-cols-2 gap-2 text-xs sm:grid-cols-3 md:grid-cols-4 lg:text-sm">
+              {categories.map(({ label, icon }) => (
                   <button
                     key={label}
-                    className="flex items-center gap-3 rounded-full bg-brand-500 px-4 py-2 font-medium text-white shadow hover:bg-brand-400"
-                  >
-                    <Icon size={16} />
+                    className="flex items-center gap-3 rounded-full bg-brand-500 pl-2 pr-4 font-medium text-white shadow hover:bg-brand-400"
+                  > 
+                    <img src={icon} alt={label} className="h-10 w-10 rounded-full bg-white shadow-lg" />
                     {label}
                   </button>
-                
+
               ))}
             </div>
           </div>
@@ -321,7 +325,7 @@ export default function Page() {
         </div>
       </section> */}
 
-      {/* Giao diện mẫu */}
+      {/* Bảng giá */}
       <section id="bang-gia" className="bg-brand-300 py-14 text-white">
         <div className="container mx-auto px-4">
           <h2 className="text-center text-2xl font-bold md:text-3xl">Bảng giá của ADMAKE</h2>
