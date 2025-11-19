@@ -45,7 +45,7 @@ def get_all_users_by_lead_id(lead_id):
         "user_id": user.id,
         "role": get_role(user),
         "phone": user.phone
-        } for user in User.query.all() if user.lead_id == lead_id and (not user.role_id or user.role_id > 0)]
+        } for user in User.query.all() if user.lead_id == lead_id and (user.role_id and user.role_id > 0)]
 
     
     return users

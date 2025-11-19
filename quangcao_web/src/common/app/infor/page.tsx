@@ -22,7 +22,7 @@ export const InforDashboard: IPage["Component"] = () => {
     console.log("Form values", values);
 
     try {
-      const response = await fetch(`${useApiHost()}/user/${userId}`, {
+      const response = await fetch(`${useApiHost()}/user/${userId}/password`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

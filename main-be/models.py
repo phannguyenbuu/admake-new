@@ -443,6 +443,7 @@ class Message(BaseModel):
     message_id = db.Column(db.String(80), primary_key=True)
     task_id = db.Column(db.String(80), nullable=True)
     user_id = db.Column(db.String(80), db.ForeignKey('user.id'), nullable=True)
+    
     username =  db.Column(db.String(255))
     
     text = db.Column(db.String(500))

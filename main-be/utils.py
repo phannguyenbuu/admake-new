@@ -1142,6 +1142,21 @@ def set_lead_user(lead_id, username):
     lead = db.session.get(LeadPayload, lead_id)
     lead.user_id = User.query.filter(User.username == username).first().id
 
+def get_all_users_by_lead_id(lead_id):
+
+    if lead_id == 0:
+        return []
+
+    users = [{
+        "fullName": user.fullName,
+        "user_id": user.id,
+        # "role": get_role(user),
+        "phone": user.phone
+        } for user in User.query.all() if user.lead_id == lead_id and (user.role_id or user.role_id > 0)]
+
+    
+    return users
+
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()
@@ -1184,13 +1199,7 @@ if __name__ == "__main__":
 
         
         # for i in range(290,720):
-        #     user = User(lead_id = i,
-        #                 id = generate_datetime_id(),
-        #                 username = "ad" + str(i),
-        #                 fullName = "Admake" + str(i),
-        #                 password = "Test@1234",
-        #                 role_id = -2
-        #             )
+        #     
             
         #     db.session.add(user)
         #     lead = LeadPayload(
@@ -1202,35 +1211,11 @@ if __name__ == "__main__":
         #     db.session.add(lead)
 
         # db.session.commit()
-        # lead = db.session.get(LeadPayload, 720)
-        # db.session.delete(lead)
+        lead_id = 243
+        for user in User.query.all():
+            if user.lead_id == lead_id and (user.role_id and user.role_id > 0):
+                print(user.fullName, user.phone)
+
         # db.session.commit()
-
-        # for ws in WorkpointSetting.query.all():
-
-        # print(WorkpointSetting.query.count())
-
-        # ws = WorkpointSetting.query.first()
-
-        # for i,w in enumerate(WorkpointSetting.query.all()):
-        #     if i > 0:
-        #         db.session.delete(w)
-
-        # for lead in LeadPayload.query.all():
-        #     if lead.id != ws.lead_id:
-        #         new_ws = ws.clone()
-        #         new_ws.lead_id = lead.id
-        #         db.session.add(new_ws)
-
-        set_lead_user(721, 'ad290')
-        set_lead_user(722, 'ad291')
-
-        # lead = db.session.get(LeadPayload, 721)
-        # lead.user_id = User.query.filter(User.username == 'ad290').first().id
-        # lead = db.session.get(LeadPayload, 722)
-        # lead.user_id = User.query.filter(User.username == 'ad291').first().id
-
-        db.session.commit()
-
 
 

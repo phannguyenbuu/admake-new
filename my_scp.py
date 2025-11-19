@@ -195,7 +195,7 @@ local_dirs = [
     "main-be/models.py",
     "main-be/app.py",
     "main-be/utils.py",
-    # "main-be/api",
+    "main-be/api",
 
     # "main-be/.env",
     

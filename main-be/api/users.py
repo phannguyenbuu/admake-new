@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify, abort
-from models import db, User, Task, dateStr, app,LeadPayload, get_query_page_users, generate_datetime_id
+from models import db, User, Task, dateStr, app,LeadPayload, Message, get_query_page_users, generate_datetime_id
 from flask import Flask, request, jsonify, session
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 import datetime
@@ -55,7 +55,7 @@ def create_user():
 
 
 
-@user_bp.route("/<string:user_id>", methods=["PUT"])
+@user_bp.route("/<string:user_id>/password", methods=["PUT"])
 def update_lead_user_password(user_id):
     data = request.get_json()
     print(data)
@@ -179,12 +179,21 @@ def update_user(id):
 
 
 
-
 @user_bp.route("/<string:id>", methods=["DELETE"])
 def delete_user(id):
     user = db.session.get(User, id)
-    if user:
-        db.session.delete(user)
-    db.session.commit()
+    
+    if not user:
+        print("No user", id)
+        abort(404, description = "No user")
+    else:
+        Message.query.filter_by(user_id=user.id).delete(synchronize_session=False)
+        db.session.commit()  # Đảm bảo các message được xóa trước, tránh vi phạm khoá ngoại
+
+        # Lấy user và xóa
+        user = db.session.get(User, user.id)
+        if user:
+            db.session.delete(user)
+            db.session.commit()
 
     return jsonify({"message": "User deleted"}), 200
