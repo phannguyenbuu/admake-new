@@ -1211,10 +1211,11 @@ if __name__ == "__main__":
         #     db.session.add(lead)
 
         # db.session.commit()
-        lead_id = 243
-        for user in User.query.all():
-            if user.lead_id == lead_id and (user.role_id and user.role_id > 0):
-                print(user.fullName, user.phone)
+        # lead_id = 243
+        # for user in User.query.all():
+        #     if user.lead_id == lead_id and (user.role_id and user.role_id > 0):
+        #         print(user.fullName, user.phone)
+        renameColumn("lead","isCheked", "isChecked")
 
         # db.session.commit()
 

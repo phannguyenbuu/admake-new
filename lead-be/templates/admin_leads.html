@@ -54,7 +54,7 @@
         {% for lead in leads %}
         <tr>
           <td>
-            <input type="checkbox" name="selected_leads" value="{{ lead.id }}" checked/>
+            <input type="checkbox" name="selected_leads" value="{{ lead.id }}" {% if lead.isChecked %}checked{% endif %} />
           </td>
           <td>{{ lead.id }}</td>
           <td>{{ lead.name }}</td>
@@ -117,5 +117,44 @@
     </nav>
   </div>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      // Lấy tất cả checkbox trong bảng
+      const checkboxes = document.querySelectorAll("input[name='selected_leads']");
+
+      checkboxes.forEach(chk => {
+        chk.addEventListener('change', function() {
+          const leadId = this.value;
+          const isChecked = this.checked;
+
+          fetch(`https://admake.vn/api/lead/${leadId}/check`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+              // Nếu cần xác thực token bearer hoặc khác thì thêm ở đây
+            },
+            body: JSON.stringify({ isChecked: isChecked })
+          })
+          .then(response => {
+            if (!response.ok) {
+              throw new Error('Lỗi khi gửi dữ liệu');
+            }
+            return response.json();
+          })
+          .then(data => {
+            console.log('Phản hồi từ server:', data);
+            // Có thể thêm thông báo thành công hoặc cập nhật UI
+          })
+          .catch(error => {
+            console.error('Lỗi:', error);
+            // Có thể thông báo lỗi người dùng
+          });
+        });
+      });
+    });
+  </script>
+
 </body>
 </html>

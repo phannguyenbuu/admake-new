@@ -1,5 +1,5 @@
 import React, { useState, useRef} from 'react';
-import { Button, Modal, IconButton } from '@mui/material';
+import { Button, Modal, IconButton, Stack } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import type { NotifyProps } from '../../../@types/notify.type';
 import { useUser } from "../../hooks/useUser";
@@ -77,9 +77,10 @@ const NotifyModal = () => {
         <div style={{
           position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
           backgroundColor: 'white', padding: '20px', borderRadius: '8px', 
-          width: isMobile ? '90vw':'60vw', maxHeight: '80vh', overflowY: 'auto'
+          width: isMobile ? '90vw':'60vw', maxHeight: '80vh', 
         }}>
           {notifyList.length === 0 && <p>Không có thông báo nào</p>}
+          <Stack height='60vh' style ={{overflowX: 'hidden', overflowY: 'auto'}}>
           <ul>
             {notifyList.map((notify) => (
               <li
@@ -104,6 +105,7 @@ const NotifyModal = () => {
               </li>
             ))}
           </ul>
+          </Stack>
           <Button onClick={handleClose} variant="contained" style={{ marginTop: 10, borderRadius: 20, backgroundColor: "#00B5B4" }}>
             OK
           </Button>

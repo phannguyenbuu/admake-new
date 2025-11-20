@@ -198,8 +198,8 @@ class LeadPayload(BaseModel):
     # fullName = db.Column(db.String(120), nullable=False)
 
     user_id = db.Column(db.String(50), nullable=True)
-    # username = db.Column(db.String(50), nullable=False)
-    # password = db.Column(db.String(50), nullable=False)
+    isChecked = db.Column(db.Boolean, default = False)
+
     company = db.Column(db.String(120), nullable=True)
     address = db.Column(db.String(255), nullable=True)
     email = db.Column(db.String(120), nullable=True)

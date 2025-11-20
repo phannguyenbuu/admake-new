@@ -20,6 +20,7 @@ import { Form, Input } from "antd";
 import JobAsset from "../../../dashboard/work-tables/task/JobAsset";
 import { Tabs } from 'antd';
 import type { NotifyProps } from "../../../../@types/notify.type";
+import { CenterBox } from "../commons/TitlePanel";
 
 const { TextArea } = Input;
 
@@ -97,9 +98,12 @@ const TaskBoard = ({ userId,fullName, open, onCancel }: TaskBoardProps) => {
       whiteSpace:'nowrap', borderRadius:10};
 
     return (
-    <Modal open={open} onCancel={onCancel} footer={null} width={900}>
+    <Modal open={open} onCancel={onCancel} footer={null}>
+      <CenterBox>
         
-    <div style={{ marginTop: 20, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 16 }}>
+    <div style={{ marginTop: 0, display: 'flex', justifyContent: 'center', 
+      alignItems: 'center', gap: 16 }}>
+
       <button
         onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
         disabled={currentPage === 1}
@@ -114,7 +118,7 @@ const TaskBoard = ({ userId,fullName, open, onCancel }: TaskBoardProps) => {
         <ArrowForwardIosIcon fontSize="small" />
       </button>
     </div>
-
+  
       <Stack spacing = {5} py={2} alignItems="flex-start" justifyContent="flex-start"
         style={{boxSizing:'border-box'}}>
         
@@ -123,7 +127,7 @@ const TaskBoard = ({ userId,fullName, open, onCancel }: TaskBoardProps) => {
         background: '#ddd',
         padding: 10,
         borderRadius: 20,
-        width: isMobile ? 320 : ''
+        width: isMobile ? 340 : ''
       }}>
         <Stack direction="row" spacing={1}>
           <Button style={btnStyle} onClick={handleFinishWarning}>
@@ -131,15 +135,28 @@ const TaskBoard = ({ userId,fullName, open, onCancel }: TaskBoardProps) => {
             {getTitleByStatus(el.status)}
           </Button>
 
-          <Typography style={{
+          {el.workspace &&
+          <Stack direction="column">
+            <Typography style={{
+              marginTop: 8,
+              fontStyle: 'italic',
+              color: '#00B5B4',
+              fontSize: 10,
+              fontWeight: 500
+            }}>
+              {el?.workspace}
+            </Typography>
+            <Typography style={{
             marginTop: 8,
             fontStyle: 'italic',
             color: '#00B5B4',
             fontSize: 10,
             fontWeight: 500
           }}>
-            {el?.workspace ?? ''}
+            {taskDetail?.title}
           </Typography>
+          </Stack>
+          }
         </Stack>
         <TextArea
           readOnly
@@ -175,6 +192,7 @@ const TaskBoard = ({ userId,fullName, open, onCancel }: TaskBoardProps) => {
     )}
 
       </Stack>
+      </CenterBox>
     </Modal>
     )
 }
