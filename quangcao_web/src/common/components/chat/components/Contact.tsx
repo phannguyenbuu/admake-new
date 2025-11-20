@@ -75,23 +75,17 @@ interface ContactProps {
 }
 
 const Contact: React.FC<ContactProps> = ( { messages }) => {
-//  console.log('QR', workspaceEl);
-  // const theme = useTheme();
-  // const dispatch = useDispatch();
-
-  const {workspaceEl, setWorkspaceEl} = useChatGroup();
-
+  const {workspaceEl} = useChatGroup();
   const [openBlock, setOpenBlock] = useState(false);
   const [openDelete, setOpenDelete] = useState(false);
   const [photos, setPhotos] = useState<MessageTypeProps[]>([]);
-  const [groupId, setGroupId] = useState<string | undefined>(undefined);
-  const {userId, username, userRole, userIcon, isMobile } = useUser();
+  const {isMobile, chatBoxHeight } = useUser();
 
   useEffect(()=>{
     if(messages && messages.length > 0)
     {
-      setGroupId(messages[0].workspace_id);
-      setPhotos(messages.filter((workspaceEl)=>workspaceEl.type === 'img' || workspaceEl.type === 'doc'));
+      setPhotos(messages.filter((workspaceEl)=>workspaceEl.type === 'img' 
+                || workspaceEl.type === 'doc'));
     }
   },[messages, workspaceEl]);
 
@@ -111,21 +105,16 @@ const Contact: React.FC<ContactProps> = ( { messages }) => {
 
   const [activeFileUrl, setActiveFileUrl] = useState<string | null>(null);
   const handlePhotoClick = (fileUrl: string) => {
-    // Chuyển sang tab "Tin nhắn lưu"
-    // setValue(1);
     setActiveFileUrl(fileUrl);
-    // Mở file bằng trình duyệt mặc định (mở tab mới)
     window.open(`${useApiStatic()}/${fileUrl}`, '_blank');
   }
 
-  const tabStyle = {fontSize:10, padding: '4px 8px', minWidth: 80,  
-            marginRight: 0.2,borderRadius:'5px', background:"#ccc" };
- 
+  const tabStyle = {fontSize:12, minWidth: 120};
+   
   return (
-    <Box sx={{width: isMobile ? '80vw' :'30vw', p:1, ml:0, height:'fit-content', boxSizing: 'border-box'}}>
-        {/* <Typography ml={0} fontWeight={300} fontSize={12}>Trạng thái dự án</Typography> */}
-        {/* <RatingButtons workspaceEl={workspaceEl}/> */}
-        
+    <Box sx={{width: isMobile ? '80vw' :'30vw', p:1,
+      minHeight:chatBoxHeight, maxHeight:chatBoxHeight, 
+      boxSizing: 'border-box'}}>
         <Stack className='scrollbar' sx={{position:'relative', flexGrow:1}} p={1} spacing={3}>
           <Tabs value={tabValue} onChange={handleChange} aria-label="nav tabs">
             <Tab 
@@ -136,26 +125,16 @@ const Contact: React.FC<ContactProps> = ( { messages }) => {
               sx={tabStyle}
             />
             <Tab 
-              
               iconPosition="start" 
               label="Tài liệu" 
               id="tab-0" 
               aria-controls="tabpanel-0" 
               sx={tabStyle}
             />
-            {/* <Tab 
-              icon={<StarIcon />} 
-              iconPosition="start" 
-              label="" 
-              id="tab-1" 
-              aria-controls="tabpanel-1" 
-              sx={tabStyle}
-            /> */}
-            
           </Tabs>
           {tabValue === 0 && (
             <Stack direction="column" spacing={0} 
-              sx={{width: '100%', height:'100%', paddingBottom: 2, overflowY:'auto', overflowX:'hidden'}}>
+              sx={{width: '100%', overflowY:'auto', overflowX:'hidden'}}>
               <QRCode title="Mã QR cho khách hàng" filename='qrcode-admake-khachhang.png'
                 url={`${window.location.origin}/chat/${workspaceEl?.id}`}/>
               <QRCode title="Mã QR cho nhân viên" filename='qrcode-admake-nhanvien.png'
@@ -163,7 +142,7 @@ const Contact: React.FC<ContactProps> = ( { messages }) => {
              </Stack>
             )}
            {tabValue === 1 && (
-              <Box sx={{ p: 0.5,width: '100%', height:'100%', overflowY:'scroll', paddingBottom: 2,  }}>
+              <Box sx={{ p: 0.5,width: '100%', overflowY:'scroll', }}>
                 {photos.length > 0 ? photos.map((workspaceEl, idx) => (
                   <img 
                     key={idx}
@@ -177,13 +156,7 @@ const Contact: React.FC<ContactProps> = ( { messages }) => {
               }
               </Box>
             )}
-            {/* {tabValue === 2 && (
-              <Box sx={{ p: 0.5, height:'60vh', overflowY:'scroll' }}>
-                <Typography variant="body1">Chưa có tin nhắn lưu</Typography>
-              </Box>
-            )} */}
           <Divider/>
-          
         </Stack>
       
       {openBlock && <BlockDialog open={openBlock} handleClose={handleCloseBlock}/>}

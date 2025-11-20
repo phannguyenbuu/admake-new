@@ -91,7 +91,8 @@ export default function FooterMenuBar({
             }
           }}
         >
-          <div className="rounded-t-3xl w-full max-h-[70vh] overflow-hidden" style={{ backgroundColor: "#00B5B4" }}>
+          <div className="rounded-t-3xl w-full max-h-[70vh] overflow-hidden" 
+            style={{ backgroundColor: "#00B5B4" }}>
             {/* Header */}
             <div className="flex items-center justify-between p-4 border-b border-gray-200">
               <h3 className="text-lg font-semibold text-gray-800">

@@ -139,7 +139,7 @@ const ChatGroupList = () => {
       <Modal open={modalVisible} onOk={handleOk} onCancel={handleOk} footer={null}
         title={`${workspaceEl?.name}`}
         okText="OK" cancelButtonProps={{ style: { display: "none" } }}
-        style={{ padding:0, minWidth: '96vw', top:60}}
+        style={{ padding:0, minWidth: '96vw', minHeight:'82vh', top:60}}
         >
         <Group/>
       </Modal>

@@ -14,27 +14,23 @@ interface ConversationProps {
   status: string | null;
   messages: MessageTypeProps[];
   setMessages: React.Dispatch<React.SetStateAction<MessageTypeProps[]>>;
-  userId: string;
-  username: string;
   onDelete: (id: MessageTypeProps) => void;
 }
 
 const Conversation: React.FC<ConversationProps> = ({title,status,messages,setMessages, onDelete}) => {
   const boxRef = useRef<HTMLDivElement | null>(null);
   
-  const {userId, userRoleId, isMobile} = useUser();
-  const full = userRoleId === -2;
-  const [boxRect, setBoxRect] = useState({ left: 0, width: 0 });
+  const {userRoleId, isMobile, chatBoxHeight, isFullChatUI} = useUser();
+  // const [boxRect, setBoxRect] = useState({ left: 0, width: 0 });
+  
 
-  // const [left, setLeft] = useState(0);
-  // const [width, setWidth] = useState(0);
 
-  const updateBoxRect = () => {
-    if (boxRef.current) {
-      const rect = boxRef.current.getBoundingClientRect();
-      setBoxRect({ left: rect.left, width: rect.width });
-    }
-  };
+  // const updateBoxRect = () => {
+  //   if (boxRef.current) {
+  //     const rect = boxRef.current.getBoundingClientRect();
+  //     setBoxRect({ left: rect.left, width: rect.width });
+  //   }
+  // };
 
 
   useEffect(() => {
@@ -55,39 +51,32 @@ const Conversation: React.FC<ConversationProps> = ({title,status,messages,setMes
   }, [socket,  setMessages]);
   
 
-  useEffect(() => {
-    // Cập nhật khi component mount
-    updateBoxRect();
+  // useEffect(() => {
+  //   // Cập nhật khi component mount
+  //   updateBoxRect();
 
-    // Lắng nghe resize window cập nhật lại
-    window.addEventListener('resize', updateBoxRect);
+  //   // Lắng nghe resize window cập nhật lại
+  //   window.addEventListener('resize', updateBoxRect);
 
-    // Cleanup khi component unmount
-    return () => window.removeEventListener('resize', updateBoxRect);
-  }, []);
+  //   // Cleanup khi component unmount
+  //   return () => window.removeEventListener('resize', updateBoxRect);
+  // }, []);
 
   let w = '85vw';
 
-  if(full)
-  {
-    if(!isMobile)
-      w = '50vw';
-  }else{
-    w = '100vw';
-  }
-
   return (
-    <Stack ref={boxRef} sx={{ width: w, height:full ? '72vh':'92vh',
-        backgroundImage: "url(/backGround.png)"}}>
+    <Stack sx={{ width: userRoleId === -2 ? ( isMobile ? '' : '50vw' ) : '100vw'}}>
         <Header title={title} status={status}/>
         
         <Box className='scrollbar'
-          // height={full ? '72vh':'100vh'}
-          sx={{position:'relative', ml:0, overflowY:'scroll',}}>
-          <Message messages = {messages} menu={full} onDelete={onDelete}/>
+          sx={{overflowY:'scroll', 
+            minWidth: 320,
+            minHeight:chatBoxHeight - 105, maxHeight:chatBoxHeight - 105,
+            backgroundImage: "url(/backGround.png)"}}>
+          <Message messages = {messages} menu={isFullChatUI} onDelete={onDelete}/>
         </Box>
         
-        <Footer setMessages={setMessages} left = {boxRect.left} width={boxRect.width}/>
+        <Footer setMessages={setMessages}/>
     </Stack>
   )
 }

@@ -21,7 +21,7 @@ import { useChatGroup } from '../../ProviderChat';
 const Group = () => {
     const {workspaceEl, setWorkspaceEl} = useChatGroup();
     const [showLeft, setShowLeft] = useState(false);
-    const [showRight, setShowRight] = useState(false);
+    
     const [messageList, setMessages] = useState<MessageTypeProps[]>([]);
     const [title, setTitle] = useState('');
     // const [currentGroup, setcurrentGroup] = useState<WorkSpace | null>(null);
@@ -29,44 +29,21 @@ const Group = () => {
     const [_loading, setLoading] = useState(false);
     const [_error, setError] = useState(null);
     const urlApi = useApiHost();
-    const {userRoleId, workspaces, isMobile} = useUser();
-    // const [showFooter, setShowFooter] = useState<boolean>(false);
-
+    const {userRoleId, workspaces, isMobile, isFullChatUI, chatBoxHeight} = useUser();
     
-    const full = userRoleId === -2;
-
-    useEffect(()=>{
-        console.log('Role', userRoleId);
-    },[]);
-
     useEffect(() => {
-    if (workspaceEl !== null && workspaceEl !== undefined) {
-    //   console.log("SLEED", selected);
-      handleClick(workspaceEl);
-    }
+        if (workspaceEl !== null && workspaceEl !== undefined) {
+          handleClick(workspaceEl);
+        }
   }, [workspaceEl]);
 
     const handleDeleteMessage = (el:MessageTypeProps) =>{
-        // fetch(`${urlApi}/message/${el.message_id}`, { method: 'DELETE' })
-        //     .then(res => {
-        //     if (!res.ok) throw new Error('Delete failed');
-        //     return res.json();
-        //     })
-        //     .then(() => {
-        //         //   Cập nhật lại state messageList để xóa message vừa gọi delete
-                
         setMessages(prevMessages => prevMessages.filter(m => m.message_id !== el.message_id));
 
-        //         if (socket && socket.connected) {
-        //             console.log('Emit delete:', el.message_id, el.workspace_id);
         socket.emit('admake/chat/delete', {
             message_id: el.message_id,
             workspace_id: el.workspace_id,
         });
-        //         }
-        //     })
-        // .catch(console.error);
-
     }
 
     //   Xử lý khi click vào group
@@ -76,7 +53,7 @@ const Group = () => {
         
         setLoading(true);
 
-        console.log("EL", el);
+        // console.log("EL", el);
 
         fetch(`${urlApi}/group/${el.id}/messages`)
             .then((res) => res.json())
@@ -132,92 +109,37 @@ const Group = () => {
 
     return (
      <>
-         <Stack direction={isMobile ? 'column': 'row'}>
-            { full &&
+        <Stack direction={isMobile ? 'column': 'row'}
+            style={{minHeight: '82vh'}}>
+            { isFullChatUI &&
              <Box sx={{
                 backgroundColor: theme.palette.mode === 'light' ? '#F8FAFF' : "#fff",
                 minWidth: '20vw',
                 display: {xs: showLeft ? "block" : "none", sm: "block",},
                 boxShadow: '0px 0px 2px rgba(0,0,0,0.25)'
              }}>
-                 <Stack p={0} spacing={2}>
-                     <Stack spacing={0.5} className='scrollbar' sx={{ flexGrow: 1, overflowY: 'hidden'}}>
-                        <Stack spacing={0} sx={{height:'72vh', border:'1px solid #ccc', overflowY:'auto', overflowX:'hidden'}}>
-                            {workspaces && workspaces.map((el, idx) => (
-                                <ChatElement workspace={el}
-                                    onClick={() => handleClick(el)}
-                                    key={`ChatElement-${idx}`}
-                                    selected={workspaceEl?.id === el.id}
-                                />
-                            ))}
-                        </Stack> 
-                    
-                     </Stack>
-                 </Stack>
+                <Stack spacing={0.5} className='scrollbar' 
+                    sx={{ flexGrow: 1, height: chatBoxHeight, overflowY: 'hidden'}}>
+                        {workspaces && workspaces.map((el, idx) => (
+                            <ChatElement workspace={el}
+                                onClick={() => handleClick(el)}
+                                key={`ChatElement-${idx}`}
+                                selected={workspaceEl?.id === el.id}
+                            />
+                        ))}
+                </Stack> 
              </Box>}
-
             
             <Conversation
                 setMessages={setMessages}
                 messages={messageList}
                 title={title}
                 status={status || null}
-                // groupEl={currentGroup}
-                userId=''
-                username=''
                 onDelete={handleDeleteMessage}
-                // showFooter={showFooter}
-                // onGroupDelete={handleDeleteGroup}
             />
-              
-        
-            {full &&
-             <Box sx={{ 
-                marginTop:10,
-                  backgroundColor: theme.palette.mode === 'light' ? '#F8FAFF' : "#fff",
-                 width: 320,
-                //  display: {
-                //      xs: showRight ? "block" : "none",
-                //      sm: "block",
-                //  },
-                 boxShadow: '0px 0px 2px rgba(0,0,0,0.25)'}}>
-                    <Contact messages={messageList}/>
-             </Box>}
+
+            {isFullChatUI && <Contact messages={messageList}/>}
          </Stack>
-
-         {/* <Stack
-             direction="row"
-             spacing={30}
-             sx={{display: { xs: "flex", sm: "none" }}}
-         >
-             <Button sx={{
-                 position: "fixed",
-                 top: 400,
-                 left: -8,
-                 justifyContent: "center",
-                 display: { xs: "none", sm: "none" },
-                 zIndex: 999,
-             }}
-            
-             onClick={() => setShowLeft(!showLeft)}>
-                 {!showLeft && <Box sx={{ml:0}}><KeyboardArrowRightIcon fontSize="large"/></Box>}
-             </Button>
-             <Button sx={{
-                 position: "fixed",
-                 top: 390,
-                 right: 50,
-                
-                 justifyContent: "center",
-                 display: { xs: "none", sm: "none" },
-                 zIndex: 999,
-             }} onClick={() => setShowRight(!showRight)}>
-                 {!showRight && <Box sx={{position:'relative', left:20}}>
-                     <KeyboardArrowLeftIcon fontSize="large" />
-                 </Box>}
-             </Button>
-         </Stack> */}
-
-         {/* {openDialog && <CreateGroup open={openDialog} handleClose={handleCloseDialog} />} */}
      </>
  );
 };

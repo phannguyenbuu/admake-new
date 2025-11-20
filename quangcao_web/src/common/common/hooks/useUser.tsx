@@ -19,13 +19,16 @@ interface UserContextProps {
   workspaceId: string;
   isMobile: boolean;
   notifyList: NotifyProps[];
-  
-  
+  chatBoxHeight: number;
+  isFullChatUI: boolean;
 
   currentWorkspace: WorkSpace | null;
+
+  setIsFullChatUI: React.Dispatch<React.SetStateAction<boolean>>;
   setNotifyList: React.Dispatch<React.SetStateAction<NotifyProps[]>>;
   setUserId: React.Dispatch<React.SetStateAction<string | null>>;
   setFullName: React.Dispatch<React.SetStateAction<string | null>>;
+  setChatBoxHeight: React.Dispatch<React.SetStateAction<number>>;
   setUserLeadId: React.Dispatch<React.SetStateAction<number>>;
   setWorkspaceId: React.Dispatch<React.SetStateAction<string>>;
   setUserRoleId: React.Dispatch<React.SetStateAction<number>>;
@@ -64,7 +67,8 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [userRole, setUserRole] = useState<Role | null>(null);
   const [userIcon, setUserIcon] = useState<string | null>('images/avatar.png');
   const [isCurrentWorkspaceFree, setisCurrentWorkspaceFree] = useState<boolean>(false);
-
+  const [chatBoxHeight, setChatBoxHeight] = useState<number>(0);
+  const [isFullChatUI, setIsFullChatUI] = useState<boolean>(true);
 
 
   function generateDatetimeId() {
@@ -88,8 +92,14 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   
         return timestampStr + randomStr;
     }
-  
 
+
+  useEffect(()=>{
+    setIsFullChatUI(userRoleId === -2);
+    console.log('innerHeight', window.innerHeight);
+    setChatBoxHeight(userRoleId === -2 ? window.innerHeight - 145: window.innerHeight);
+  },[userRoleId]);
+  
 
   useEffect(()=>{
     if(currentWorkspace)
@@ -350,7 +360,11 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   return (
     <UserContext.Provider value={{ isMobile, userId, username, 
       isCurrentWorkspaceFree,generateDatetimeId,
-      userRoleId, setUserRoleId, userRole, userLeadId, setUserLeadId, setUserId,
+      userRoleId, setUserRoleId, userRole, 
+      userLeadId, setUserLeadId, 
+      isFullChatUI, setIsFullChatUI,
+      chatBoxHeight, setChatBoxHeight, 
+      setUserId,
       workspaces, setWorkspaces, workspaceId, setWorkspaceId, 
       currentWorkspace,
       fullName, setFullName,notifyAdmin,setCurrentWorkspace,

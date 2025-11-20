@@ -116,13 +116,15 @@ def get_task_by_user_id(user_id):
                 for _user_id in t.assign_ids:
                     member_user = db.session.get(User, _user_id)
                     if member_user:
-                        total_agent_salary += member_user.salary
+                        salary = member_user.salary if member_user.salary is not None else 0
+                        total_agent_salary += salary
+
 
                 result["reward"].append({"title": t.title,
                                          "workspace": workspace.name,
                                          "start_time":t.start_time,
                                          "end_time":t.end_time,
-                                         "reward": t.reward * user.salary / total_agent_salary})
+                                         "reward":  t.reward * user.salary / total_agent_salary if total_agent_salary != 0 else 0})
             
     return jsonify(result), 200
 

@@ -5,7 +5,7 @@ import type { Ref } from 'react';
 import { styled, useTheme } from "@mui/material/styles";
 import { useUser } from "../../../../common/hooks/useUser.js";
 import type { MessageTypeProps } from '../../../../@types/chat.type.js';
-import { generateUniqueIntId } from '../../../../@types/chat.type.js';
+// import { generateUniqueIntId } from '../../../../@types/chat.type.js';
 import { useApiHost } from '../../../../common/hooks/useApiHost.js';
 import CameraIcon from '@mui/icons-material/Camera';
 import SendIcon from '@mui/icons-material/Send';
@@ -15,7 +15,7 @@ import SentimentSatisfiedIcon from '@mui/icons-material/SentimentSatisfied';
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import { notification } from 'antd';
 import { useChatGroup } from '../../ProviderChat.js';
-
+import { getTypeName } from './Message.js';
 
 const StyledInput = styled(TextField)(({ theme }) => ({
   "& .MuiInputBase-input": {
@@ -32,21 +32,6 @@ const Actions = [
     title:'Image'
   },
 ];
-
-const getTypeName = (file_url:string) => {
-  let type = 'msg';
-  if(file_url !== '') {
-    type = 'doc';
-    const ext = file_url.toLowerCase();
-
-    if(file_url.startsWith('http') || file_url.startsWith('www')) {
-      type = 'link';
-    } else if(['.jpg', '.jpeg', '.png', '.gif', '.webp', '.mp4', '.avi','.jfif'].some(s => ext.includes(s))) {
-      type = 'img';
-    }
-  }
-  return type;
-}
 
 
 function formatBytes(bytes:number, decimals:number = 2) {
@@ -71,14 +56,10 @@ const ChatInput = forwardRef<HTMLDivElement, ChatInputProps>(
     handleSendMessage 
   }, ref: Ref<HTMLDivElement>) => {
 
-  
 
   const [openAction, setOpenAction] = useState(false);
-  const {userId, username, userRoleId, userIcon } = useUser();
-  const {workspaceEl, setWorkspaceEl} = useChatGroup();
-
-  
-
+  const {userId, userRoleId, isMobile } = useUser();
+  const {workspaceEl} = useChatGroup();
   
   const handleUploadDocument = async () => {
     setOpenAction(prev => !prev);
@@ -160,7 +141,7 @@ const ChatInput = forwardRef<HTMLDivElement, ChatInputProps>(
       InputProps={{
         disableUnderline: true,
         startAdornment: 
-          <Stack sx={{width:'max-content', mt:-2}}>
+          <Stack sx={{width: 'max-content', mt:-2}}>
             <Stack sx={{position:'relative', display: openAction ? 'inline-block' : 'none'}}>
               {Actions.map((el,idx)=>(
                 <Tooltip key={`ActionItem-${idx}`}  placement='right' title={el.title}>
@@ -175,14 +156,14 @@ const ChatInput = forwardRef<HTMLDivElement, ChatInputProps>(
                 </Fab>
               </Tooltip>
             </Stack>
-            <InputAdornment position="start">
+            <InputAdornment position="start" >
               <IconButton onClick={() => setOpenAction(prev => !prev)}>
                 <LinkIcon/>
               </IconButton>
             </InputAdornment>
           </Stack>,
         endAdornment: 
-          <InputAdornment position="end">
+          <InputAdornment position="end" >
             <IconButton onClick={() => setOpenPicker(prev => !prev)}>
               <SentimentSatisfiedIcon />
             </IconButton>
@@ -194,13 +175,11 @@ const ChatInput = forwardRef<HTMLDivElement, ChatInputProps>(
 
 interface FooterProps {
   setMessages: React.Dispatch<React.SetStateAction<MessageTypeProps[]>>;
-  left: number;
-  width: number;
 }
 
 const Footer = forwardRef<HTMLDivElement, FooterProps>(
-  ({ setMessages, left, width }, ref: Ref<HTMLDivElement>) => {
-  // const [showFileUpload, setShowFileUpload] = useState(false);
+  ({ setMessages }, ref: Ref<HTMLDivElement>) => {
+  
   const {userId, username, userRoleId, isMobile, generateDatetimeId} = useUser();
   const [openPicker, setOpenPicker] = useState(false);
   const [inputValue, setInputValue] = useState('');
@@ -255,7 +234,7 @@ const Footer = forwardRef<HTMLDivElement, FooterProps>(
 
     if (socket.connected) {
       const timestamp = Date.now();
-      console.log("Username",  get_user_name());
+      // console.log("Username",  get_user_name());
       
       const data: MessageTypeProps = {
         // id: generateUniqueIntId(),
@@ -336,52 +315,47 @@ const Footer = forwardRef<HTMLDivElement, FooterProps>(
     setInputValue('');
   };
 
-  const parentRef = useRef<HTMLDivElement>(null);
+  // const parentRef = useRef<HTMLDivElement>(null);
   
   return (
     <>
-      {/* {showFileUpload && <FileUpload onUploadComplete={handleUploadComplete} />} */}
+      <Stack
+        direction='row'
+        alignItems='center'
+        spacing={0.5}
+        p={0.5}
+        sx={{
+          backgroundColor: "#00B4B6",
+          // left: left - (full ? (isMobile ? 7 : 25) : 0),
+          minWidth: 320,
+          zIndex: 1300, // đảm bảo nổi trên các phần tử khác
+        }}
+      >
+        <ChatInput
+          onEnterKey={() => sendMessage(inputValue)}
+          ref={ref}
+          inputValue={inputValue}
+          setInputValue={setInputValue}
+          setOpenPicker={setOpenPicker}
+          handleSendMessage={sendMessage}
+        />
+        
+        <Box sx={{ height: 48, width: 48, backgroundColor: '#ccc', borderRadius: 1.5 }} 
+          onClick={() => sendMessage(inputValue)}
+          >
+          <Stack sx={{ height: '100%', width: '100%', alignItems: 'center', justifyContent: 'center' }}>
+            <IconButton><SendIcon/></IconButton>
+          </Stack>
+        </Box>
 
-        <Stack
-          direction='row'
-          alignItems='center'
-          spacing={0.5}
-          p={0.5}
-          sx={{
-            backgroundColor: "#00B4B6",
-            position: 'absolute',
-            bottom: full ? (isMobile ? 670 : 25) : 0,
-            left: left - (full ? (isMobile ? 7 : 25) : 0),
-            width: width,
-            zIndex: 1300, // đảm bảo nổi trên các phần tử khác
-          }}
-        >
-          <ChatInput
-            onEnterKey={() => sendMessage(inputValue)}
-            ref={ref}
-            inputValue={inputValue}
-            setInputValue={setInputValue}
-            setOpenPicker={setOpenPicker}
-            handleSendMessage={sendMessage}
-          />
-          
-          <Box sx={{ height: 48, width: 48, backgroundColor: '#ccc', borderRadius: 1.5 }} 
-            onClick={() => sendMessage(inputValue)}
-            >
-            <Stack sx={{ height: '100%', width: '100%', alignItems: 'center', justifyContent: 'center' }}>
-              <IconButton><SendIcon/></IconButton>
-            </Stack>
-          </Box>
-
-          {full && <Box sx={{ height: 48, width: 48, backgroundColor: '#ccc', borderRadius: 1.5 }} 
-            onClick={() => sendRewardMessage()}
-            >
-            <Stack sx={{ height: '100%', width: '100%', alignItems: 'center', justifyContent: 'center' }}>
-              <IconButton><ThumbUpIcon sx={{color:'orange'}}/></IconButton>
-            </Stack>
-          </Box>}
-        </Stack>
-      
+        {full && <Box sx={{ height: 48, width: 48, backgroundColor: '#ccc', borderRadius: 1.5 }} 
+          onClick={() => sendRewardMessage()}
+          >
+          <Stack sx={{ height: '100%', width: '100%', alignItems: 'center', justifyContent: 'center' }}>
+            <IconButton><ThumbUpIcon sx={{color:'orange'}}/></IconButton>
+          </Stack>
+        </Box>}
+      </Stack>
     </>
   );
 });

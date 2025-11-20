@@ -211,19 +211,25 @@ def upload_a_file_to_vps(file):
     # Kiểm tra xem file có phải ảnh không (dựa trên extension đơn giản, bạn có thể dùng thêm kiểm tra MIME nếu cần)
     image_exts = ['.jpg', '.jpeg', '.png', '.gif', '.webp']
     if ext.lower() in image_exts:
-        # Tạo thumbnail 100x70
         try:
             img = Image.open(filepath)
             img.thumbnail((100, 70))
+            
+            # Nếu ảnh có alpha channel, chuyển sang RGBA để giữ alpha
+            if img.mode not in ("RGBA", "LA"):
+                img = img.convert("RGBA")
+            
             thumb_filename = f"thumb_{filename}"
             thumb_filepath = os.path.join(thumbs_folder, thumb_filename)
-            img.save(thumb_filepath, "JPEG")
-            thumb_url = f"thumbs/{thumb_filename}"  # Đường dẫn thumbnail theo cấu trúc server static files
+            
+            img.save(thumb_filepath, "PNG")  # Lưu định dạng PNG giữ alpha
+            thumb_url = f"thumbs/{thumb_filename}"
         except Exception as e:
             print("Thumbnail creation failed:", e)
             thumb_url = None
     else:
         thumb_url = None
+
 
     return filename, filepath, thumb_url
     

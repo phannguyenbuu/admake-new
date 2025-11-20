@@ -178,15 +178,27 @@ const ReplyMsg: React.FC<MsgTypeProps> = ({el, menu, onDelete}) => {
 const MediaMsg: React.FC<MsgTypeProps> = ({ el, menu,onDelete }) => {
   if(!el) return null;
   const theme = useTheme();
+  const {userRoleId} = useUser();
+  const full = userRoleId === -2;
+
+  const isCustomer = el.role === -1;
+
+  const bkColor = isCustomer
+  ? '#fff'
+  : el.status === 'sending'
+  ? '#b0b0b0'
+  : "#00B4B6";
+
+  const textColor = isCustomer ? '#000' : '#fff';
   
   const imageUrl = `${baseUrl}/${el.file_url}`;
 
   return (
-    <Stack direction="row" justifyContent={el.incoming ? 'start' : 'end'}>
+    <Stack direction="row" justifyContent={isCustomer ? 'start' : 'end'}>
       <Box
         p={0.2}
         sx={{
-          backgroundColor: el.incoming ? theme.palette.background.default : theme.palette.primary.main,
+          backgroundColor: isCustomer ? "#fff" : "#00B5B4",
           borderRadius: 1.5,
           width: 'max-content'
         }}
@@ -199,7 +211,7 @@ const MediaMsg: React.FC<MsgTypeProps> = ({ el, menu,onDelete }) => {
               style={{ maxHeight: 210, borderRadius: '10px', cursor: 'pointer' }} 
             />
           </a>
-          <Typography variant='body2'  fontStyle="italic" color={ el.incoming ? "#000" : '#fff'} 
+          <Typography variant='body2'  fontStyle="italic" color={ isCustomer ? "#000" : '#fff'} 
             fontSize='0.5rem' fontWeight={300}>
             {formatTime(el.createdAt)}-{el.user_id}
           </Typography>
@@ -218,13 +230,7 @@ const TextMsg: React.FC<MsgTypeProps> = ({el, menu, onDelete}) => {
     const {userRoleId} = useUser();
     const full = userRoleId === -2;
 
-    // const { userId, username } = useUser();
-    // const [incoming, setIncoming ] = useState(true);
-    // const [bkColor, setBkColor ] = useState("#fff");
-    // const [textColor, setTextColor ] = useState("#000");
-
-    const isCustomer = el.role === -1; //username !== el.user_role;
-    console.log('TextMsg',el.username, el.role);
+    const isCustomer = el.role === -1;
 
     const bkColor = isCustomer
     ? '#fff'
@@ -234,8 +240,6 @@ const TextMsg: React.FC<MsgTypeProps> = ({el, menu, onDelete}) => {
 
     const textColor = isCustomer ? '#000' : '#fff';
 
-    // console.log('icon', el.icon);
-    
     return (
         <Stack key={`DefaultMsg-${el.message_id}-Wrapper`} direction='row' justifyContent={isCustomer ? 'start' : 'end'}>
             <Box key={`DefaultMsg-${el.message_id}-Conatiner`} p={0.5} 
@@ -264,7 +268,7 @@ const TextMsg: React.FC<MsgTypeProps> = ({el, menu, onDelete}) => {
                     {formatTime(el.createdAt)}-{el.user_id}
                 </Typography>
             </Box>
-            {menu && <MessageOptions el={el} onDelete={()=>onDelete(el)}/>}
+            {menu && <MessageOptions el={el} onDelete={()=> onDelete(el)}/>}
         </Stack>
     )
 }

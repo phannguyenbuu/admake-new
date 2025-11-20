@@ -1215,8 +1215,18 @@ if __name__ == "__main__":
         # for user in User.query.all():
         #     if user.lead_id == lead_id and (user.role_id and user.role_id > 0):
         #         print(user.fullName, user.phone)
-        renameColumn("lead","isCheked", "isChecked")
+        # renameColumn("lead","isCheked", "isChecked")
 
         # db.session.commit()
+
+        # work = db.session.get(Workspace, '20251117063625486374bfaf86')
+        # print(work.owner_id, work.lead_id)
+
+        # task = Task.query.filter(Task.title == 'DỌN NHÀ ANH MINH').first()
+        # print(task.assign_ids)
+
+        for user_id in ['20251117060038619955d478a8', '202511170602106729691da38a', '20251118083457979214be0435', '20251117063809880300af6dbd']:
+            user = db.session.get(User,user_id)
+            print(user.fullName)
 
 
