@@ -65,10 +65,14 @@ export default function FooterMenuBar({
                       ? "bg-[#00B4B6] text-white shadow-lg active"
                       : "bg-gray-100 text-gray-600 hover:bg-gray-200"
                   }`}
+
+                  // onClick={()=>{
+                  //   console.log(item.path);
+                  // }}
                 >
                   <span className="text-lg">{item.icon}</span>
                 </div>
-                <span
+                <span 
                   className={`mobile-menu-label text-xs mt-1 font-medium block text-center ${
                     isActive ? "text-[#00B4B6] active" : "text-gray-600"
                   }`}
@@ -86,6 +90,7 @@ export default function FooterMenuBar({
         <div
           className="fixed inset-0 bg-black/50 z-[10000] flex items-end"
           onClick={(e) => {
+            console.log(e.target);
             if (e.target === e.currentTarget) {
               setShowMobileWorkspaceModal(false);
             }
@@ -124,7 +129,12 @@ export default function FooterMenuBar({
               ) : (
                 <div className="space-y-2">
                   {workspaces.map(workspace => 
-                    <div className="flex items-center gap-3 py-1 px-2 rounded-lg hover:bg-white/10 transition-all duration-200">
+                    <div className="flex items-center gap-3 py-1 px-2 rounded-lg hover:bg-white/10 transition-all duration-200"
+                      onClick={() => {
+                        navigate(`/dashboard/work-tables/${workspace.id}`);
+                        setShowMobileWorkspaceModal(false);
+                      }}
+                    >
                       <div style={{padding: 0, background:'none', border:'none', color: 'yellow'}}>
                         {/* {workspace.name?.charAt(0)?.toUpperCase() || "?"} */}
                         {workspace.pinned && <StarFilled/>}
@@ -138,19 +148,16 @@ export default function FooterMenuBar({
                     </div>
                   )}
 
-                  {/* Add new board button */}
-                  {/* {adminMode && ( */}
-                    <button
-                      onClick={() => {
-                        setShowMobileWorkspaceModal(false);
-                        setIsModalOpen(true);
-                      }}
-                      className="w-full p-3 border-2 border-dashed border-gray-300 rounded-lg text-gray-500 hover:border-[#00B4B6] hover:text-[#00B4B6] transition-colors cursor-pointer"
-                    >
-                      <PlusOutlined /> Tạo bảng mới
-                    </button>
-                  {/* )} */}
-                </div>
+                  <button
+                    onClick={() => {
+                      setShowMobileWorkspaceModal(false);
+                      setIsModalOpen(true);
+                    }}
+                    className="w-full p-3 border-2 border-dashed border-gray-300 rounded-lg text-gray-500 hover:border-[#00B4B6] hover:text-[#00B4B6] transition-colors cursor-pointer"
+                  >
+                    <PlusOutlined /> Tạo bảng mới
+                  </button>
+              </div>
               )}
             </div>
           </div>

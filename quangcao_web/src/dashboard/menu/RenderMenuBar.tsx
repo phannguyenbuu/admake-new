@@ -194,6 +194,7 @@ export default function RenderMenuBar({}) {
             children: [
               // @ts-ignore
               ...(workspaces || []).map((workspace: WorkSpace) => ({
+                id: workspace.id,
                 key: `/dashboard/work-tables/${workspace.id}`,
                 label: (
                   <div className="flex items-center gap-3 py-1 px-2 rounded-lg hover:bg-white/10 transition-all duration-200">
@@ -215,6 +216,7 @@ export default function RenderMenuBar({}) {
         } else {
           // Menu item thường
           return {
+            
             key: item.key,
             icon: item.icon,
             label: isTablet ? null : item.label, // Ẩn text trên tablet

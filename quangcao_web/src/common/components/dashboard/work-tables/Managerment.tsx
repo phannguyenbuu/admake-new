@@ -432,7 +432,7 @@ export default function ManagermentBoard() {
                       handleDeleteConfirm={handleDeleteConfirm}
                       deleteTaskMutation={deleteConfirmModal}
                       
-                      />
+                />
     </div>
   );
 }
