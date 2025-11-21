@@ -78,7 +78,7 @@ const JobAsset: React.FC<JobAssetProps> = ({ title, type, readOnly = false }) =>
     setMessageAssets(msgList);
   },[taskDetail]);
 
-  const handleSend = async (file: File) => {
+  const handleAssetSend = async (file: File) => {
     setThumbLoading(true);
     const now = new Date();
     const dateTimeStr = formatDate(now);
@@ -91,7 +91,7 @@ const JobAsset: React.FC<JobAssetProps> = ({ title, type, readOnly = false }) =>
     formData.append("type", type || '');
     formData.append("task_id", taskDetail?.id.toString() ?? '');
 
-    // console.log('Upload', type, Object.fromEntries(formData.entries()));
+    console.log('Upload', type, Object.fromEntries(formData.entries()));
 
     try {
       const response = await fetch(`${useApiHost()}/task/${taskDetail?.id}/upload`, {
@@ -130,7 +130,7 @@ const JobAsset: React.FC<JobAssetProps> = ({ title, type, readOnly = false }) =>
     if (e.target.files && e.target.files.length > 0) {
       const file = e.target.files[0];
       // setSelectedFile(file);
-      handleSend(file);
+      handleAssetSend(file);
     }
   };
 
@@ -286,7 +286,14 @@ const JobAsset: React.FC<JobAssetProps> = ({ title, type, readOnly = false }) =>
         <ChatInput onSend={handleMessageSend} 
                   title={title ?? ''} 
                   isCash={type?.includes('cash')}
-                  isChoose={false}/>
+                  isChoose={false}>
+                    <ImagePasteUpload 
+                      title={title} 
+                      onMessageSend={handleMessageSend} 
+                      // setMessageAssets={setMessageAssets} 
+                      // message={message} 
+                      onAssetSend={handleAssetSend}/>
+        </ChatInput>
       </Stack>}
 
       {messageAssets.map((el, index) => 
@@ -324,7 +331,7 @@ const JobAsset: React.FC<JobAssetProps> = ({ title, type, readOnly = false }) =>
 
             return (
               <Stack key={index} direction="column" alignItems="center" spacing={1} sx={{ width: 'calc(33.33% - 8px)' }}>
-                {url && <FileUploadWithPreview handleSend={handleSend} message={el}/>}
+                {url && <FileUploadWithPreview handleSend={handleAssetSend} message={el}/>}
 
                 <Stack direction="row" gap={0}>
                   {!readOnly && <DeleteConfirm elId={el.message_id} onDelete={handleDelete} text='tài liệu'/>}
@@ -361,18 +368,19 @@ const JobAsset: React.FC<JobAssetProps> = ({ title, type, readOnly = false }) =>
 export default JobAsset;
 
 interface ChatInputProps {
+  children?: React.ReactNode;
   title: string;
   onSend: (message: string) => void;
   isCash?: boolean;
   isChoose? : boolean;
 }
 
-const ChatInput: React.FC<ChatInputProps> = ({ title, onSend, isCash, isChoose }) => {
+const ChatInput: React.FC<ChatInputProps> = ({ children, title, onSend, isCash, isChoose }) => {
   const [formOpen, setFormOpen] = useState(false);
   const [message, setMessage] = useState('');
   const {userId, username, isMobile} = useUser();
 
-  const handleSend = () => {
+  const handleAssetSend = () => {
     if(isCash)
       setFormOpen(true);
     else {
@@ -382,12 +390,7 @@ const ChatInput: React.FC<ChatInputProps> = ({ title, onSend, isCash, isChoose }
     }
   };
 
-  const handleKeyPress = (event: React.KeyboardEvent) => {
-    if (event.key === 'Enter' && !event.shiftKey) {
-      event.preventDefault();
-      handleSend();
-    }
-  };
+  
 
   const handleDialogClose = (value: string | null) => {
     console.log('Send', value);
@@ -410,8 +413,8 @@ const ChatInput: React.FC<ChatInputProps> = ({ title, onSend, isCash, isChoose }
           sx={{ marginRight: 1, minWidth: isMobile ? 200: 300 }}
         /> */}
 
-        <ImagePasteUpload title={title} setMessage={setMessage} message={message} onSend={handleSend}/>
-        <IconButton key="send" color="primary" onClick={handleSend} aria-label="send message">
+        {children}
+        <IconButton key="send" color="primary" onClick={handleAssetSend} aria-label="send message">
           <SendIcon />
         </IconButton>
       </Box>
@@ -426,18 +429,34 @@ const ChatInput: React.FC<ChatInputProps> = ({ title, onSend, isCash, isChoose }
 
 
 interface ImagePasteUploadProps {
-  onSend: (file: File) => void;
-  setMessage: React.Dispatch<React.SetStateAction<string>>;
-  message: string;
+  onAssetSend: (file: File) => Promise<void>;
+  onMessageSend: (message: string) => Promise<void>;
+  // setMessageAssets: React.Dispatch<React.SetStateAction<MessageTypeProps>>;
+  // message: string;
   title?: string;
 }
 
 
-const ImagePasteUpload: React.FC<ImagePasteUploadProps> = ({ onSend, setMessage, message, title }) => {
+const ImagePasteUpload: React.FC<ImagePasteUploadProps> = ({ 
+  onMessageSend, 
+  onAssetSend, title }) => {
+    const [message, setMessage] = useState<string>('');
+
+  const handleKeyPress = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    if (event.key === 'Enter' && !event.shiftKey) {
+      event.preventDefault();
+      // const target = event.target as HTMLTextAreaElement;
+      
+      onMessageSend(message);
+      setMessage('');
+    }
+  };
+  
+  
   const handlePaste = (event: React.ClipboardEvent<HTMLDivElement>) => {
     
     const items = event.clipboardData?.items;
-    console.log("Paste!", items);
+    
     if (!items) return;
 
     let isImagePasted = false;
@@ -445,7 +464,8 @@ const ImagePasteUpload: React.FC<ImagePasteUploadProps> = ({ onSend, setMessage,
       if (item.type.startsWith('image/')) {
         const file = item.getAsFile();
         if (file) {
-          onSend(file); // Gửi file ảnh lên backend hoặc xử lý tiếp
+          console.log("Img:", item.type, file);
+          onAssetSend(file); // Gửi file ảnh lên backend hoặc xử lý tiếp
           isImagePasted = true;
         }
       }
@@ -456,7 +476,7 @@ const ImagePasteUpload: React.FC<ImagePasteUploadProps> = ({ onSend, setMessage,
     } else {
       // Paste nội dung text bình thường, ví dụ lấy nội dung text dán và setMessage
       const text = event.clipboardData?.getData('text');
-      if (text) setMessage(text);
+      if (text) onMessageSend(text);
     }
   };
 
@@ -471,6 +491,7 @@ const ImagePasteUpload: React.FC<ImagePasteUploadProps> = ({ onSend, setMessage,
       value={message}
       onChange={e => setMessage(e.target.value)}
       onPaste={handlePaste}
+      onKeyDown={handleKeyPress}
       sx={{ marginRight: 1, minWidth: 300 }}
     />
   );
