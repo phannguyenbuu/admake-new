@@ -103,7 +103,7 @@ def handle_message(data):
 
 @socketio.on('admake/chat/rate')
 def handle_message_rate(data):
-    print('Receive rate', data)
+    # print('Receive rate', data)
     message_id = data['message_id']
     rate = data['rate']
     workspace_id = data['workspace_id']
@@ -114,7 +114,7 @@ def handle_message_rate(data):
         print("Message not found", message_id)
         return
     
-    print('-message', msg, rate, msg.react)
+    # print('-message', msg, rate, msg.react)
     if not msg.react:
         msg.react = {}
 
@@ -130,13 +130,14 @@ def handle_message_rate(data):
         return
     
     tasks = Task.query.filter_by(workspace_id=work.id).all()
-    print('tasks',work, len(tasks))
+    # print('tasks',work, len(tasks))
 
     for task in tasks:
-        print('task', task.title)
+        # print('task', task.title)
         if task.status != "REWARD":
             task.status = "DONE"
             task.check_reward = True
+            task.rate = rate
     
     db.session.commit()
 

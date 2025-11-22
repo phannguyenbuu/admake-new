@@ -12,7 +12,7 @@ workpoint_bp = Blueprint('workpoint', __name__, url_prefix='/api/workpoint')
 @workpoint_bp.route("/all", methods=["GET"])
 def get_all_workpoints():
     workpoints = Workpoint.query.order_by(desc(Workpoint.createdAt)).all()
-    return jsonify([c.to_dict() for c in workpoints])
+    return jsonify([c.tdict() for c in workpoints])
 
 @workpoint_bp.route("/", methods=["GET"])
 def get_workpoints():
@@ -23,14 +23,14 @@ def get_workpoints():
         abort(404, description="Lead not found")
 
     workpoints = Workpoint.query.filter(Workpoint.user_id.in_([user.id for user in lead.users])).order_by(desc(Workpoint.createdAt)).all()
-    return jsonify([c.to_dict() for c in workpoints])
+    return jsonify([c.tdict() for c in workpoints])
 
 @workpoint_bp.route("/today/<string:user_id>", methods=["GET"])
 def get_workpoint_today_detail(user_id):
     workpoint, _, _ = get_workpoint_today(user_id)
     if not workpoint:
         abort(404, description="workpoint not found")
-    return jsonify(workpoint.to_dict())
+    return jsonify(workpoint.tdict())
 
 @workpoint_bp.route("/<string:user_id>", methods=["GET"])
 def get_workpoint_detail(user_id):
@@ -38,7 +38,7 @@ def get_workpoint_detail(user_id):
     if not workpoints:
         abort(404, description="workpoints not found")
 
-    return jsonify([c.to_dict() for c in workpoints])
+    return jsonify([c.tdict() for c in workpoints])
 
 @workpoint_bp.route("/<string:id>/", methods=["PUT"])
 def put_remove_workpoint(id):
@@ -58,14 +58,16 @@ def put_remove_workpoint(id):
     flag_modified(workpoint, "checklist")
     db.session.commit()
     
-    return jsonify([c.to_dict() for c in workpoint]), 200
+    return jsonify([c.tdict() for c in workpoint]), 200
 
 @workpoint_bp.route("/page", methods=["GET"])
 def get_batch_workpoint_detail():
     from collections import defaultdict
 
     page = request.args.get("page", 1, type=int)
-    lead_id = request.args.get("lead", 1, type=int)
+    lead_id = request.args.get("lead", 0, type=int)
+
+
 
     limit = request.args.get("limit", 10, type=int)
     search = request.args.get("search", "", type=str)
@@ -103,7 +105,7 @@ def get_batch_workpoint_detail():
 
         if user_id in workpoint_dict:
             workpoints_for_user = workpoint_dict[user_id]  # là list
-            wp_data_list = [wp.to_dict() for wp in workpoints_for_user]  # chuyển từng item thành dict
+            wp_data_list = [wp.tdict() for wp in workpoints_for_user]  # chuyển từng item thành dict
             # Nếu cần, bạn có thể thêm username, userrole cho từng đối tượng trong list
             for wp_data in wp_data_list:
                 wp_data["username"] = username
@@ -115,7 +117,7 @@ def get_batch_workpoint_detail():
 
         if user_id in leavepoint_dict:
             leavepoints_for_user = leavepoint_dict[user_id]  # là list
-            lp_data_list = [lp.to_dict() for lp in leavepoints_for_user]  # chuyển từng item thành dict
+            lp_data_list = [lp.tdict() for lp in leavepoints_for_user]  # chuyển từng item thành dict
             # Nếu cần, bạn có thể thêm username, userrole cho từng đối tượng trong list
             for lp_data in lp_data_list:
                 lp_data["username"] = username
@@ -191,13 +193,13 @@ def get_single_workpoint_detail(user_id):
     workpoints = Workpoint.query.filter_by(user_id=user_id).all()
     leavepoints = Leave.query.filter_by(user_id=user_id).all()
 
-    wp_data_list = [wp.to_dict() for wp in workpoints]
+    wp_data_list = [wp.tdict() for wp in workpoints]
     for wp_data in wp_data_list:
         wp_data["username"] = username
         # wp_data["userrole"] = user_role
         wp_data["salary"] = salary
 
-    lp_data_list = [lp.to_dict() for lp in leavepoints]
+    lp_data_list = [lp.tdict() for lp in leavepoints]
     for lp_data in lp_data_list:
         lp_data["username"] = username
         # lp_data["userrole"] = user_role
@@ -229,7 +231,7 @@ def get_workpoint_checkpoint(user_id):
     if not user:
         return jsonify({"error": "User not found"}), 405
     
-    result = user.to_dict()
+    result = user.tdict()
     
     return jsonify({"valid":True,"data":result})
 
@@ -272,7 +274,7 @@ def post_workpoint_by_user_and_date(user_id):
 
     workpoint, now, tz = get_workpoint_today(user_id)
     
-    print('work_point', workpoint, now)
+    # print('work_point', workpoint, now)
 
     if not workpoint:
         
@@ -324,7 +326,7 @@ def post_workpoint_by_user_and_date(user_id):
 
         workpoint.checklist[period]["workhour"] = work_hours
         flag_modified(workpoint, "checklist")
-        print(f"Work hours in {period}: {work_hours:.2f} hours", workpoint.checklist)
+        # print(f"Work hours in {period}: {work_hours:.2f} hours", workpoint.checklist)
     elif "in" not in workpoint.checklist[period]:
         workpoint.checklist[period]["in"] = {
             "time": now.isoformat(),
@@ -335,17 +337,17 @@ def post_workpoint_by_user_and_date(user_id):
 
         workpoint.checklist[period]["workhour"] = 0
         flag_modified(workpoint, "checklist")
-        print(f"Checked in for {period} at {now.isoformat()}")
+        # print(f"Checked in for {period} at {now.isoformat()}")
     else:
         return jsonify(
             message=f"Already checked out for {period}, skipping update",
-            data=workpoint.to_dict()
+            data=workpoint.tdict()
         ), 202
 
     db.session.add(workpoint)
     db.session.commit()
 
-    result = workpoint.to_dict()
+    result = workpoint.tdict()
     
     return jsonify(result), 201
 
@@ -355,10 +357,10 @@ def post_workpoint_by_user_and_date(user_id):
 def remove_workpoint_checklist(user_id):
     day = request.args.get("day")
 
-    print('Workday', day, user_id)
+    # print('Workday', day, user_id)
 
     ws = Workpoint.query.filter(Workpoint.user_id == user_id).all()
-    print('Workpoint query', len(ws))
+    # print('Workpoint query', len(ws))
 
     for w in ws:
         for k,v in w.checklist.items():
@@ -367,7 +369,7 @@ def remove_workpoint_checklist(user_id):
                     if (day + "T") in v_1.get('time'):
                         # print(k, k_1, v_1)
                         w.remove_checklist()
-                        # print(w.to_dict())
+                        # print(w.tdict())
                         return jsonify({f'message':'Remove workpoint done: {k} {k_1}'}), 200
     return jsonify({'message':'No workpoint found'}), 200
 
@@ -379,8 +381,8 @@ def get_workpoint_setting(lead_id):
         print("WorkpointSetting not found", lead_id)
         abort(404, description="WorkpointSetting not found")
     
-    print("WorkpointSetting found", workpoint_setting.to_dict())
-    return jsonify(workpoint_setting.to_dict()), 200
+    # print("WorkpointSetting found", workpoint_setting.tdict())
+    return jsonify(workpoint_setting.tdict()), 200
 
 
 @workpoint_bp.route('/setting/<string:lead_id>/', methods=['PUT'])
@@ -399,4 +401,4 @@ def update_workpoint_setting(lead_id):
             setattr(workpoint_setting, key, value)
 
     db.session.commit()
-    return jsonify(workpoint_setting.to_dict()), 200
+    return jsonify(workpoint_setting.tdict()), 200

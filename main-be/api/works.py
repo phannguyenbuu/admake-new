@@ -2,7 +2,7 @@ from flask import Blueprint, request, jsonify, abort
 from models import app, db, Workspace, Task, dateStr,Message, generate_datetime_id, User, create_workspace_method, get_model_columns, LeadPayload,get_lead_by_json, get_lead_by_arg
 import datetime
 from collections import defaultdict
-from sqlalchemy import desc
+from sqlalchemy import desc, asc
 from sqlalchemy.orm.attributes import flag_modified
 from sqlalchemy.sql import func
 
@@ -19,16 +19,14 @@ def get_workspaces():
     # if lead_id == 0 or not lead:
     #     abort(404, description="Unknown lead")
 
-    workspaces = Workspace.query.filter(Workspace.lead_id == lead_id).order_by(desc(Workspace.updatedAt)).all()
-    return jsonify([c.to_dict() for c in workspaces])
-
-
-@workspace_bp.route("/", methods=["POST"])
-def create_workspace_route():
-    # data = request.get_json()
-    # new_workspace = create_workspace(data)
-    # print("Create Workspace JSON", request.get_json())
-    return create_workspace_method(request.get_json())
+    workspaces = Workspace.query.filter(
+                    Workspace.lead_id == lead_id,
+                    Workspace.null_workspace == False
+                ).order_by(
+                    asc(Workspace.pinned),  # ưu tiên bản ghi có is_pin True
+                    desc(Workspace.updatedAt)  # sau đó mới theo thời gian cập nhật
+                ).all()
+    return jsonify([c.tdict() for c in workspaces])
 
 def get_role(user):
     s = user.update_role()
@@ -47,7 +45,7 @@ def get_all_users_by_lead_id(lead_id):
         "user_id": user.id,
         "role": get_role(user),
         "phone": user.phone
-        } for user in User.query.all() if user.lead_id == lead_id and (not user.role_id or user.role_id > 0)]
+        } for user in User.query.all() if user.lead_id == lead_id and user.role_id and user.role_id > 0]
 
     
     return users
@@ -68,7 +66,21 @@ def update_workspace(id):
 
     db.session.commit()
 
-    return jsonify(workspace.to_dict())
+    return jsonify(workspace.tdict())
+
+@workspace_bp.route("/<string:id>/pin", methods=["PUT"])
+def update_workspace_pin(id):
+    workspace = Workspace.query.get(id)
+    if not workspace:
+        abort(404, description="Workspace not found")
+
+    data = request.get_json()
+    pin = data.get('pin', False)
+
+    workspace.pinned = pin
+    db.session.commit()
+
+    return jsonify(workspace.tdict())
 
 @workspace_bp.route("/<string:id>/tasks", methods=["GET"])
 def get_workspace_task(id):
@@ -81,22 +93,54 @@ def get_workspace_task(id):
     grouped = defaultdict(lambda: {"count": 0, "tasks": []})
     for t in tasks:
         status = t.status or "UNKNOWN"
-        grouped[status]["tasks"].append(t.to_dict())
+        grouped[status]["tasks"].append(t.tdict())
         grouped[status]["count"] += 1
     
     # Chuyển defaultdict về dict bình thường
     tasks_response = dict(grouped)
+
+    # print('Task', id)
+    # print(tasks_response)
     
-    return jsonify({'data':tasks_response}),200
+    return jsonify({'data':tasks_response,
+                    'namelist':[]}),200
+
+@workspace_bp.route("/<string:workspace_id>/column_name", methods=["PUT"])
+def put_workspace_change_column_name(workspace_id):
+    data = request.get_json()
+    type = data.get('type')
+    name = data.get('name')
+
+    
+    workspace = db.session.get(Workspace, workspace_id)
+
+    # print(workspace, type, name)
+
+    if workspace and type and type != '' and name and name != '':
+        if type == "OPEN":
+            workspace.column_open_name = name
+        elif type == "IN_PROGRESS":
+            workspace.column_in_progress_name = name
+        elif type == "DONE":
+            workspace.column_done_name = name
+        elif type == "REWARD":
+            workspace.column_reward_name = name
+    
+    # "OPEN" | "IN_PROGRESS" | "DONE" | "CHECK_REWARD" | "REWARD"
+
+    
+    db.session.commit()
+    
+    return jsonify({"message":"OK"}), 200
 
 @workspace_bp.route("/<string:workspace_id>/reward", methods=["PUT"])
-def post_workspace_reward_task(workspace_id):
+def put_workspace_reward_task(workspace_id):
     data = request.get_json()
     message_id = data.get('message_id')
     rate = data.get('rate')
 
     msgs = Message.query.filter(Message.message_id == message_id).all()
-    print('msgs', len(msgs))
+    # print('msgs', len(msgs))
 
     if len(msgs) == 0:
         print("Message not found", message_id)
@@ -104,7 +148,7 @@ def post_workspace_reward_task(workspace_id):
     
     msg = msgs[0]
 
-    print('-message', msg, rate, msg.react)
+    # print('-message', msg, rate, msg.react)
     if not msg.react:
         msg.react = {}
 
@@ -115,10 +159,10 @@ def post_workspace_reward_task(workspace_id):
     work = Workspace.query.filter(Workspace.id == workspace_id).first()
     
     tasks = Task.query.filter_by(workspace_id=work.id).all()
-    print('tasks',work, len(tasks))
+    # print('tasks',work, len(tasks))
 
     for task in tasks:
-        print('task', task.title)
+        # print('task', task.title)
         if task.status != "REWARD":
             task.status = "DONE"
             task.check_reward = True
@@ -134,7 +178,7 @@ def post_workspace_reward_task(workspace_id):
 def get_workspace_detail(id):
     work = db.session.get(Workspace, id)
 
-    print('WSPACE', work)
+    # print('WSPACE', work)
     
     if not work:
         abort(404, description="Workspace not found")
@@ -142,14 +186,19 @@ def get_workspace_detail(id):
     # tasks = Task.query.filter_by(workspace_id=id).all()
     # print('TASK', tasks)
     
-    result = work.to_dict()
+    result = work.tdict()
     users = get_all_users_by_lead_id(work.lead_id)
     result["users"] = users
     result["customers"] = []
 
     return jsonify(result)
 
-
+@workspace_bp.route("/", methods=["POST"])
+def create_workspace():
+    data = request.get_json()
+    # print(data)
+    
+    return create_workspace_method(data, False)
 
 @workspace_bp.route("/<string:workspace_id>", methods=["DELETE"])
 def delete_workspace(workspace_id):
@@ -158,17 +207,10 @@ def delete_workspace(workspace_id):
         print('Cannot find workspace', workspace_id)
         return jsonify({"error": "Workspace not found"}), 404
     
-    print('Delete workspace', workspace.owner_id)
-    owner = db.session.get(User, workspace.owner_id)
+    workspace.null_workspace = True
 
-    if owner:
-        for customer in owner.customer:
-            db.session.delete(customer)
-        db.session.query(Message).filter(Message.user_id == owner.id).delete()
-        db.session.delete(owner)
-
-    db.session.delete(workspace)
     db.session.commit()
     return jsonify({"message": "Workspace deleted successfully"}), 200
+
 
 __all__ = ['workspace_bp']

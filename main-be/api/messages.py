@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify, abort
-from models import db, app, dateStr, Message
+from models import db, app, dateStr, Message, Task, generate_datetime_id
 from api.chat import socketio
 import os
 
@@ -12,7 +12,7 @@ def get_messages():
     search = request.args.get("search", "", type=str)
 
     if limit == 0:
-        messages = [c.to_dict() for c in Message.query.all()]
+        messages = [c.tdict() for c in Message.query.all()]
         total = len(messages)
         pages = 1
     else:
@@ -20,8 +20,10 @@ def get_messages():
         if search:
             query = query.filter(Message.text.ilike(f"%{search}%"))
 
+        query = query.order_by(Message.updatedAt.desc())
+
         pagination = query.paginate(page=page, per_page=limit, error_out=False)
-        messages = [c.to_dict() for c in pagination.items]
+        messages = [c.tdict() for c in pagination.items]
         total = pagination.total
         pages = pagination.pages
 
@@ -44,30 +46,27 @@ def create_message():
     db.session.add(new_message)
     db.session.commit()
 
-    return jsonify(new_message.to_dict()), 201
+    return jsonify(new_message.tdict()), 201
 
-@message_bp.route("/<int:id>", methods=["GET"])
+@message_bp.route("/<string:id>", methods=["GET"])
 def get_message_detail(id):
     message = db.session.get(Message, id)
     if not message:
         abort(404, description="Message not found")
-    return jsonify(message.to_dict())
+    return jsonify(message.tdict())
 
-@message_bp.route("/<int:id>/favourite", methods=["PUT"])
+@message_bp.route("/<string:id>/favourite", methods=["PUT"])
 def put_message_favourite(id):
     message = db.session.get(Message, id)
     if not message:
         abort(404, description="Message not found")
 
-    print('match', message, message.is_favourite)
-    # db.session.refresh(message)
-    message.is_favourite = True
-    # db.session.add(message)
+    message.is_favourite = request.get_json().get("favourite", False)
     db.session.commit()
     
     return jsonify({"message":"OK"}), 200
 
-@message_bp.route("/<int:id>", methods=["PUT"])
+@message_bp.route("/<string:id>", methods=["PUT"])
 def update_message(id):
     data = request.get_json()
     # print(data)
@@ -80,7 +79,56 @@ def update_message(id):
                 value = dateStr(value)
             setattr(role, key, value)
     db.session.commit()
-    return jsonify(role.to_dict()), 200
+    return jsonify(role.tdict()), 200
+
+
+
+@message_bp.route("/message", methods=["POST"])
+def update_task_message(id):
+    time = request.form.get("time")
+    role = request.form.get("role")
+    user_id = request.form.get("user_id")
+    task_id = request.form.get("task_id")
+    type = request.form.get("type")
+    text = request.form.get("text")
+
+    if not role:
+        role = ''
+
+    task = Task.query.get(id)
+    if not task:
+        abort(404, description="Task not found")
+
+    
+    ls = []
+
+    # task.assets có thể None hoặc list
+    if task.assets:
+        ls = task.assets  # trực tiếp lấy list
+
+    message = Message.create_item({"message_id": generate_datetime_id(),
+                                   "type": type,
+                                    "user_id":user_id, 
+                                    "task_id":task_id, 
+                                    "text":text, 
+                                    })
+    ls.append(message.message_id)
+
+    # gán lại trường assets là list Python
+    task.assets = ls
+
+    # print('Task_asset', ls)
+
+
+    flag_modified(task, "assets")
+    db.session.commit()
+
+    return jsonify({
+        'text': text,
+        'assets': ls,
+        'message': message.tdict(),
+        **task.tdict()})
+
 
 @message_bp.route("/<string:message_id>", methods=['DELETE'])
 def delete_message(message_id):
@@ -124,7 +172,7 @@ def upload_file():
         return jsonify({'error': 'Empty filename'}), 400
     
 
-    filename, filepath = upload_a_file_to_vps(file)
+    filename, filepath, thumb_url = upload_a_file_to_vps(file)
     
     data = {
         # 'id': msg.id,
@@ -132,6 +180,7 @@ def upload_file():
         'workspace_id': workspace_id,
         'username': '',
         # 'text': text,
+        'thumb_url': thumb_url,
         'file_url': filename,
         'link': filepath,
         'role': role,
@@ -141,19 +190,47 @@ def upload_file():
     }
 
     return jsonify({'message': 'File uploaded successfully', 'filename': filename, 'data': data})
-    
+
+from PIL import Image
 def upload_a_file_to_vps(file):
     name, ext = os.path.splitext(file.filename)
     filename = file.filename
-    filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+    upload_folder = app.config['UPLOAD_FOLDER']
+    thumbs_folder = os.path.join(upload_folder, "thumbs")
+    os.makedirs(thumbs_folder, exist_ok=True)
+
+    filepath = os.path.join(upload_folder, filename)
 
     if os.path.exists(filepath):
         filename = f"{name}_{uuid.uuid4().hex}{ext}"
-        filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        filepath = os.path.join(upload_folder, filename)
         print('New file name because file exists:', filename)
 
     file.save(filepath)
-    return filename, filepath
 
+    # Kiểm tra xem file có phải ảnh không (dựa trên extension đơn giản, bạn có thể dùng thêm kiểm tra MIME nếu cần)
+    image_exts = ['.jpg', '.jpeg', '.png', '.gif', '.webp']
+    if ext.lower() in image_exts:
+        try:
+            img = Image.open(filepath)
+            img.thumbnail((100, 70))
+            
+            # Nếu ảnh có alpha channel, chuyển sang RGBA để giữ alpha
+            if img.mode not in ("RGBA", "LA"):
+                img = img.convert("RGBA")
+            
+            thumb_filename = f"thumb_{filename}"
+            thumb_filepath = os.path.join(thumbs_folder, thumb_filename)
+            
+            img.save(thumb_filepath, "PNG")  # Lưu định dạng PNG giữ alpha
+            thumb_url = f"thumbs/{thumb_filename}"
+        except Exception as e:
+            print("Thumbnail creation failed:", e)
+            thumb_url = None
+    else:
+        thumb_url = None
+
+
+    return filename, filepath, thumb_url
     
 

@@ -13,7 +13,7 @@ import threading
 
 
 base_dir = os.path.abspath(os.path.dirname(__file__))
-print(base_dir)
+# print(base_dir)
 sys.path.append(base_dir)
 
 
@@ -31,6 +31,8 @@ from api.workpoints import workpoint_bp
 from api.supplier import supplier_bp
 from api.leave import leave_bp
 from api.leads import lead_bp
+from api.fureal import fureal_bp
+from api.notifys import notify_bp
 
 app.register_blueprint(customer_bp)
 app.register_blueprint(material_bp)
@@ -46,6 +48,8 @@ app.register_blueprint(workpoint_bp)
 app.register_blueprint(supplier_bp)
 app.register_blueprint(leave_bp)
 app.register_blueprint(lead_bp)
+app.register_blueprint(fureal_bp)
+app.register_blueprint(notify_bp)
 
 from api.chat import socketio
 

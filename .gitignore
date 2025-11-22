@@ -6,16 +6,8 @@ chat-be/static/
 chat-be/__pycache__/
 chat-be/__scripts/
 quangcao_web/node_modules/
-quangcao_web/quangcao_website.zip
-quangcao_be/quangcao_backend.zip
-admake_chat.dump
-att_20250918_011436_11.540890_107.826381_2082665486.jpg
-makesim.pem
-quangcao_backend-main.zip
-quangcao_website-main.zip
-react-chat-app-main.zip
-chat-be/requirements.txt
 Include/
 Lib/
 Scripts/
 landingpage/node_modules/
+.pm2

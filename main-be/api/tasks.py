@@ -1,9 +1,13 @@
 from flask import Blueprint, request, jsonify, abort
-from models import db, Task, dateStr, User, Customer, Role,get_lead_by_json, get_lead_by_arg, Workspace
+from models import db, Task, generate_datetime_id, dateStr, User, Customer, Message, Role,get_lead_by_json, get_lead_by_arg, Workspace
 import datetime
 from sqlalchemy.orm.attributes import flag_modified
 from api.messages import upload_a_file_to_vps
 from sqlalchemy import cast, Text
+from PIL import Image
+from sqlalchemy import func, cast
+from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy import text
 
 task_bp = Blueprint('task', __name__, url_prefix='/api/task')
 
@@ -11,7 +15,7 @@ task_bp = Blueprint('task', __name__, url_prefix='/api/task')
 @task_bp.route("/all", methods=["GET"])
 def get_all_tasks():
     
-    tasks = [t.to_dict() for t in Task.query.all()]
+    tasks = [t.tdict() for t in Task.query.all()]
     return jsonify(tasks)
 
 
@@ -20,13 +24,13 @@ def get_tasks(lead_id):
     if lead_id == 0:
         print("Zero lead")
         abort(404, "Zero lead")
-    workspaces = Workspace.query.filter(Workspace.lead_id == lead_id)
+    workspaces = Workspace.query.filter(Workspace.lead_id == lead_id, Workspace.null_workspace.is_(False))
     result = []
 
     for work in workspaces:
         result += Task.query.filter_by(workspace_id=work.id).all()
 
-    tasks = [t.to_dict() for t in result]
+    tasks = [t.tdict() for t in result]
 
     # print('Tak', tasks)
     return jsonify(tasks)
@@ -38,19 +42,7 @@ def get_task_by_id(id):
     if task is None:
         abort(404, description="Task not found")
 
-    result = task.to_dict()
-
-    if task.assign_ids:
-        ls = []
-        for id in task.assign_ids:
-            user = db.session.get(User, id)
-            if user:
-                ls.append({"id":id,"name": user.fullName})
-
-        result["assign_ids"] = ls
-
-    # print('CUS_ID', task.customer_id, db.session.get(Customer, task.customer_id))
-    # print('CUS_USER_ID', task.customer_id, db.session.get(User, task.customer_id))
+    result = task.tdict()
 
     if task.customer_id:
         customer = db.session.get(User, task.customer_id)
@@ -58,9 +50,8 @@ def get_task_by_id(id):
             result["customer_id"] = {"id":task.customer_id,"name": customer.fullName}
         else:
             result["customer_id"] = None
-    
 
-    # print(result)
+    # print('Task detail', result)
     
     return jsonify({"data": result,"message":"Success"}),200
 
@@ -95,8 +86,8 @@ def update_task(id):
     db.session.commit()
 
     task = Task.query.get(id)
-    print('F', task.to_dict())
-    return jsonify(task.to_dict())
+    # print('F', task.tdict())
+    return jsonify(task.tdict())
 
 @task_bp.route("/<string:user_id>/by_user", methods=["GET"])
 def get_task_by_user_id(user_id):
@@ -115,8 +106,9 @@ def get_task_by_user_id(user_id):
     result = {"data":[], "reward":[]}
     for t in tasks:
         workspace = db.session.get(Workspace, t.workspace_id)
-        if workspace:
-            result["data"].append(t.to_dict())
+        item = t.tdict()
+        if 'workspace' in item and item['workspace']:
+            result["data"].append(item)
 
             if t.status == "REWARD":
                 total_agent_salary = 0
@@ -124,13 +116,15 @@ def get_task_by_user_id(user_id):
                 for _user_id in t.assign_ids:
                     member_user = db.session.get(User, _user_id)
                     if member_user:
-                        total_agent_salary += member_user.salary
+                        salary = member_user.salary if member_user.salary is not None else 0
+                        total_agent_salary += salary
+
 
                 result["reward"].append({"title": t.title,
                                          "workspace": workspace.name,
                                          "start_time":t.start_time,
                                          "end_time":t.end_time,
-                                         "reward": t.reward * user.salary / total_agent_salary})
+                                         "reward":  t.reward * user.salary / total_agent_salary if total_agent_salary != 0 else 0})
             
     return jsonify(result), 200
 
@@ -148,7 +142,7 @@ def update_task_status(id):
         task.check_reward = False
         db.session.commit()
 
-    return jsonify(task.to_dict())
+    return jsonify(task.tdict())
 
 
 
@@ -157,6 +151,8 @@ def update_task_assets(id):
     time = request.form.get("time")
     role = request.form.get("role")
     user_id = request.form.get("user_id")
+    task_id = request.form.get("task_id")
+    type = request.form.get("type")
     file = request.files.get("file")
 
     if not role:
@@ -172,8 +168,8 @@ def update_task_assets(id):
     if file.filename == '':
         return jsonify({'error': 'Empty filename'}), 400
     
-    filename, filepath = upload_a_file_to_vps(file)
-    print('upload:', filename, filepath)
+    filename, filepath, thumb_url = upload_a_file_to_vps(file)
+    print('upload:', filename, filepath, thumb_url)
     ls = []
 
     # task.assets có thể None hoặc list
@@ -181,13 +177,23 @@ def update_task_assets(id):
         ls = task.assets  # trực tiếp lấy list
 
     # thêm file mới nếu có
-    if filename:
-        ls.append(f'{filename}#{role}')
+    if not filename:
+        abort(404, description="Error when upload")
+
+    message = Message.create_item({"message_id": generate_datetime_id(),
+                                   "type": type,
+                                    "user_id":user_id, 
+                                    "task_id":task_id, 
+                                    "file_url":filename, 
+                                    "thumb_url":thumb_url,
+                                    })
+    ls.append(message.message_id)
 
     # gán lại trường assets là list Python
     task.assets = ls
 
-    print('Task_asset', ls)
+    # print('Task_asset', ls)
+
 
     flag_modified(task, "assets")
     db.session.commit()
@@ -195,15 +201,62 @@ def update_task_assets(id):
     return jsonify({
         'filename': filename,
         'assets': ls,
-        **task.to_dict()})
+        'message': message.tdict(),
+        **task.tdict()})
 
+
+@task_bp.route("/<string:id>/message", methods=["PUT"])
+def update_task_message(id):
+    time = request.form.get("time")
+    role = request.form.get("role")
+    user_id = request.form.get("user_id")
+    task_id = request.form.get("task_id")
+    type = request.form.get("type")
+    text = request.form.get("text")
+
+    if not role:
+        role = ''
+
+    task = Task.query.get(id)
+    if not task:
+        abort(404, description="Task not found")
+
+    
+    ls = []
+
+    # task.assets có thể None hoặc list
+    if task.assets:
+        ls = task.assets  # trực tiếp lấy list
+
+    message = Message.create_item({"message_id": generate_datetime_id(),
+                                   "type": type,
+                                    "user_id":user_id, 
+                                    "task_id":task_id, 
+                                    "text":text, 
+                                    })
+    ls.append(message.message_id)
+
+    # gán lại trường assets là list Python
+    task.assets = ls
+
+    # print('Task_asset', ls)
+
+
+    flag_modified(task, "assets")
+    db.session.commit()
+
+    return jsonify({
+        'text': text,
+        'assets': ls,
+        'message': message.tdict(),
+        **task.tdict()})
 
 
 @task_bp.route("/", methods=["POST"])
 def create_task():
     data = request.get_json()
 
-    print('New task', data)
+    # print('New task', data)
 
     # Tạo Task mới từ data
     task = Task.parse(data)
@@ -211,12 +264,50 @@ def create_task():
     db.session.add(task)
     db.session.commit()
 
-    return jsonify(task.to_dict()), 201
+    return jsonify(task.tdict()), 201
+
+
+@task_bp.route("/<string:user_id>/salary", methods=["GET"])
+def get_user_salary_task(user_id):
+    user = db.session.get(User, user_id)
+    if not user:
+        print("User not found")
+        abort(404, description="User not found")
+
+    user_id_str = str(user_id)
+    
+    tasks = Task.query.filter(text(f"assign_ids::text LIKE '%\"{user_id_str}\"%'")).all()
+    if not tasks or len(tasks) == 0:
+        print("Tasks not found")
+        abort(404, description="Tasks not found")
+
+    ls = [0,0,0,0,0]
+
+    for t in tasks:
+        if t.workspace_id and t.rate and t.rate > 0:
+            ls[t.rate - 1] += 1
+
+    task = Task.query.filter(
+        text(f"assign_ids::text LIKE '%\"{user_id_str}\"%'"),
+        Task.type == "salary"
+    ).first()
+
+    if not task:
+        print("Task not found")
+        abort(404, description="Task not found")
+    
+    return jsonify({"infor":task.tdict(),
+                    "rates": ls,
+                    }), 200
+        
+        
+
 
 @task_bp.route("/<string:id>", methods=["DELETE"])
 def delete_task(id):
     task = Task.query.get(id)
     if not task:
+        print("Task not found", id)
         abort(404, description="Task not found")
 
     db.session.delete(task)

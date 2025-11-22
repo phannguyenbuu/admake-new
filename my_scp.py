@@ -187,20 +187,23 @@ def save_dump():
     ssh.close()
 
 
-append_preload_link()
+# append_preload_link()
 
 local_dirs = [
-    "main-be/templates",
+    # "main-be/templates",
+    
     "main-be/models.py",
     "main-be/app.py",
-    
-    # "main-be/.env",
+    "main-be/utils.py",
     "main-be/api",
+
+    # "main-be/.env",
+    
     # "main-be/procs.py",
-    # "lead-be/app.py",
-    # "lead-be/models.py",
+    "lead-be/app.py",
+    "lead-be/models.py",
     # "lead-be/.env",
-    # "lead-be/templates",
+    "lead-be/templates",
     # "dump.pm2"
 ]
 

@@ -1,6 +1,6 @@
 import json
 from api.tasks import get_task_by_user_id
-from models import db, app, User, LeadPayload, Workpoint,Leave, WorkpointSetting, Customer, Material, Role, Message, Task, Workspace, generate_datetime_id
+from models import db, app, User, LeadPayload, Notify, Workpoint,Leave, WorkpointSetting, Customer, Material, Role, Message, Task, Workspace, generate_datetime_id
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 import json
@@ -904,7 +904,7 @@ FOREIGN KEY (user_id) REFERENCES "user"(id);
     db.session.commit()
 
 def alter_data():
-    db.session.execute(text(f'''ALTER TABLE "user" RENAME COLUMN "zaloAccount" TO "bankAccount";'''))
+    db.session.execute(text(f'''SELECT pg_get_serial_sequence('lead', 'id');'''))
     db.session.commit()
 
 def delete_customer_user():
@@ -1070,7 +1070,7 @@ def remove_workpoint_checklist(user_id, day):
                     if (day + "T") in v_1.get('time'):
                         print(k, k_1, v_1)
                         w.remove_checklist()
-                        print(w.to_dict())
+                        print(w.tdict())
                         return True
     return False
 
@@ -1097,6 +1097,65 @@ def restore_checklist_data():
     flag_modified(w,"checklist")
     db.session.commit()
 
+def resizeThumb():
+    from PIL import Image
+    image_exts = ['.jpg', '.jpeg', '.png', '.gif', '.webp']
+    import re
+    for msg in Message.query.all():
+        if msg.task_id and msg.file_url:
+            filename, ext = os.path.splitext(msg.file_url)
+
+            if not msg.thumb_url:
+                if ext.lower() in image_exts:
+                    # Tạo thumbnail 100x70
+                    try:
+                        img = Image.open(r'/root/admake/main-be/static/' + msg.file_url)
+
+                        if img.mode == "RGBA":
+                            background = Image.new("RGB", img.size, (255, 255, 255))  # nền trắng
+                            background.paste(img, mask=img.split()[3])  # dán ảnh với mask kênh alpha
+                            img = background
+                        
+                        img.thumbnail((100, 70))
+                        
+                        thumb_filename = f"thumb_{filename}{ext}"
+                        thumb_filepath = os.path.join(r'/root/admake/main-be/static/thumbs', thumb_filename)
+                        
+                        img.save(thumb_filepath, "JPEG")
+                        thumb_url = f"thumbs/{thumb_filename}"  # Đường dẫn thumbnail theo cấu trúc server static files
+                        print('created_thumb', thumb_url)
+
+                        msg.thumb_url = thumb_url
+                    except Exception as e:
+                        print("Thumbnail creation failed:", e)
+                        thumb_url = None
+                else:
+                    thumb_url = None
+                    
+
+            # msg.file_url = os.path.basename(msg.file_url)
+
+    db.session.commit()
+
+
+def set_lead_user(lead_id, username):
+    lead = db.session.get(LeadPayload, lead_id)
+    lead.user_id = User.query.filter(User.username == username).first().id
+
+def get_all_users_by_lead_id(lead_id):
+
+    if lead_id == 0:
+        return []
+
+    users = [{
+        "fullName": user.fullName,
+        "user_id": user.id,
+        # "role": get_role(user),
+        "phone": user.phone
+        } for user in User.query.all() if user.lead_id == lead_id and (user.role_id or user.role_id > 0)]
+
+    
+    return users
 
 if __name__ == "__main__":
     with app.app_context():
@@ -1105,12 +1164,69 @@ if __name__ == "__main__":
         # print(remove_workpoint_checklist('20251104103416609650622d78','2025-11-07'))
         
         # restore_checklist_data()
-        task = Task.query.filter(Task.title== "Không xóa được công việc đã tạo").first()
+        # task = Task.query.filter(Task.title== "Không xóa được công việc đã tạo").first()
 
-        if task:
-            task.title = "Xây dựng chiến lược sản xuất"
+        # if task:
+        #     task.title = "Xây dựng chiến lược sản xuất"
         
-        db.session.commit()
+        # db.session.commit()
+        # renameColumn('notification','title','text')
+
+        # task = db.session.get(Task, "202511170308282171175cfbd0")
+        # task.assets = [task.assets[-1]]
+        # flag_modified(task,"assets")
+        # Task.query.filter(Task.type == "salary").delete(synchronize_session=False)
 
         
+        # users = User.query.filter(User.username == 'ad104').all()
+
+        # for user in users:
+        #     print(user.lead_id, user.password, user.fullName)
         
+        # for i in range(244, 290):
+        #     user = User(lead_id = i,
+        #                 id = generate_datetime_id(),
+        #                 username = "ad" + str(i),
+        #                 fullName = "Admake" + str(i),
+        #                 password = "Test@1234",
+        #                 role_id = -2
+        #             )
+        #     db.session.add(user)
+
+        # db.session.commit()
+
+        # add_new_columns("lead",["isActivated"],"BOOLEAN")
+
+        
+        # for i in range(290,720):
+        #     
+            
+        #     db.session.add(user)
+        #     lead = LeadPayload(
+        #         id = i,
+        #         user_id = user.id,
+        #         name = "Lead" + str(i),
+        #     )
+            
+        #     db.session.add(lead)
+
+        # db.session.commit()
+        # lead_id = 243
+        # for user in User.query.all():
+        #     if user.lead_id == lead_id and (user.role_id and user.role_id > 0):
+        #         print(user.fullName, user.phone)
+        renameColumn("lead","isChecked", "isInvited")
+
+        # db.session.commit()
+
+        # work = db.session.get(Workspace, '20251117063625486374bfaf86')
+        # print(work.owner_id, work.lead_id)
+
+        # task = Task.query.filter(Task.title == 'DỌN NHÀ ANH MINH').first()
+        # print(task.assign_ids)
+
+        # for user_id in ['20251117060038619955d478a8', '202511170602106729691da38a', '20251118083457979214be0435', '20251117063809880300af6dbd']:
+        #     user = db.session.get(User,user_id)
+        #     print(user.fullName)
+
+

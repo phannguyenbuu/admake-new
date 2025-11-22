@@ -8,11 +8,11 @@ group_bp = Blueprint('group', __name__, url_prefix='/api/group')
 # @group_bp.route("/", methods=["GET"])
 # def get_groups():
 #     groups = Workspace.query.order_by(desc(Workspace.createdAt)).all()
-#     return jsonify([c.to_dict() for c in groups])
+#     return jsonify([c.tdict() for c in groups])
 
 # @group_bp.route("/member/", methods=["GET"])
 # def get_group_members():
-#     group_members = [c.to_dict() for c in WorkspaceMember.query.all()]
+#     group_members = [c.tdict() for c in WorkspaceMember.query.all()]
 #     return jsonify(group_members)
 
 # @group_bp.route("/", methods=["POST"])
@@ -20,7 +20,7 @@ group_bp = Blueprint('group', __name__, url_prefix='/api/group')
 #     data = request.get_json()
 #     new_workspace = create_workspace(data)
 
-#     return jsonify(new_workspace.to_dict()), 201
+#     return jsonify(new_workspace.tdict()), 201
 
 
 
@@ -30,7 +30,7 @@ def get_group_detail(workspace_id):
     workspace = Workspace.get_by_id(workspace_id)
     if not workspace:
         abort(404, description="group not found")
-    return jsonify(workspace.to_dict())
+    return jsonify(workspace.tdict())
 
 @group_bp.route("/<string:workspace_id>", methods=["PUT"])
 def update_group(workspace_id):
@@ -44,7 +44,7 @@ def update_group(workspace_id):
         group[key] = value
 
     db.session.commit()
-    return jsonify(group.to_dict()), 200
+    return jsonify(group.tdict()), 200
 
 @group_bp.route('/<string:workspace_id>/status', methods=['PUT'])
 def change_group_status(workspace_id):
@@ -58,7 +58,7 @@ def change_group_status(workspace_id):
     workspace.status = status
     db.session.commit()
 
-    return jsonify(workspace.to_dict()), 201
+    return jsonify(workspace.tdict()), 201
 
 
 # Tạo Message
@@ -109,7 +109,7 @@ def get_messages(workspace_id):
         return jsonify({"error": "workspace not found"}), 404
     
     all_messages = Message.query.filter_by(workspace_id=workspace_id).order_by(Message.createdAt).all()
-    messages = [m.to_dict() for m in all_messages]
+    messages = [m.tdict() for m in all_messages]
     
     print('GET',workspace_id, len(messages))
 
@@ -128,7 +128,7 @@ def get_check_access(workspace_id):
     if not workspace:
         return jsonify({"error": "group not found"}), 404
     
-    result = workspace.to_dict()
+    result = workspace.tdict()
     result["role"] = role
 
     return jsonify({"valid":True,"data":result})

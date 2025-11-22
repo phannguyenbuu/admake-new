@@ -1,7 +1,5 @@
 {
   "dependencies": {
-    "@mui/material": "^7.3.4",
-    "@mui/x-charts": "^8.14.0",
-    "@mui/x-date-pickers": "^8.14.0"
+    "react-image-file-resizer": "^0.4.8"
   }
 }
