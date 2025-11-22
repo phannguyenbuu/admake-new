@@ -3,6 +3,8 @@ import { Form, Input, Tag, Typography } from "antd";
 import { ProjectOutlined } from "@ant-design/icons";
 import {Stack, Box} from "@mui/material";
 import type { Task } from "../../../../@types/work-space.type";
+import { useUser } from "../../../../common/hooks/useUser";
+
 const { Text } = Typography;
 
 export type StatusType = "OPEN" | "IN_PROGRESS" | "DONE" | "REWARD" | string;
@@ -19,6 +21,7 @@ interface JobInfoCardProps {
 }
 
 const JobInfoCard: React.FC<JobInfoCardProps> = ({ currentStatus, taskDetail, form }) => {
+  const {isMobile} = useUser();
   useEffect(() => {
     if (taskDetail) {
       form.setFieldsValue({
@@ -57,6 +60,7 @@ const JobInfoCard: React.FC<JobInfoCardProps> = ({ currentStatus, taskDetail, fo
           <Input
             placeholder="Nhập tên công việc..."
             className="w-full !h-9 sm:!h-10 !text-xs sm:!text-sm !rounded-lg !border !border-gray-300 focus:!border-cyan-500 focus:!shadow-lg hover:!border-cyan-500 !transition-all !duration-200 !shadow-sm"
+            style={{maxWidth:'80vw'}}
             size="middle"
           />
         </Form.Item>

@@ -130,7 +130,9 @@ const ChatGroupList = () => {
             onMouseEnter={() => setIsHover(true)}
             onMouseLeave={() => setIsHover(false)}
           >
-            <span style={spanStyle}>CHAT</span>
+            
+              <span style={spanStyle}>CHAT</span>
+            
           </Box>
         </Dropdown>
        </Stack>

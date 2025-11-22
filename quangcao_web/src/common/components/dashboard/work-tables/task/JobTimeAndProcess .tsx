@@ -92,7 +92,7 @@ const JobTimeAndProcess: React.FC<JobTimeAndProcessProps> = ({form}) => {
   const {isMobile} = useUser();
 
   return (
-    <Stack spacing={0.5} sx={{minWidth:400, overflowX:'hidden'}}>
+    <Stack spacing={1.5} sx={{minWidth:400, overflowX:'hidden'}}>
       <div className="flex items-center gap-2 mb-2 sm:mb-3">
         <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-md bg-gradient-to-r from-orange-100 to-orange-200 flex items-center justify-center">
           <CalendarOutlined className="!text-orange-600 !text-xs sm:!text-sm" />
@@ -103,12 +103,12 @@ const JobTimeAndProcess: React.FC<JobTimeAndProcessProps> = ({form}) => {
       </div>
 
       <TableContainer style={{overflowX:'hidden', padding: 5,
-        width: isMobile? 300 : '', 
+        maxWidth: isMobile?280 : '', 
         borderRadius:2 , background:'#ddd'}}>
           <Table sx={{ '& .MuiTableCell-root': { padding: 0 } }}>
           {form &&
-        <TableRow style={{maxWidth:150}}>
-          <TableCell>
+        <TableRow>
+          <TableCell style={{maxWidth:120}}>
             
               <DateFormPicker form={form} mode="start_time" title="Bắt đầu"
                 taskDetail={taskDetail}
@@ -120,7 +120,7 @@ const JobTimeAndProcess: React.FC<JobTimeAndProcessProps> = ({form}) => {
             
           </TableCell>
           
-          <TableCell>
+          <TableCell style={{maxWidth:120}}>
           <div className="flex items-center gap-1.5 sm:gap-2 mb-1.5">
             <div className="w-1 h-1 bg-orange-500 rounded-full"></div>
             <span className="text-gray-800 font-medium text-xs sm:text-sm">Tổng</span>
@@ -131,8 +131,8 @@ const JobTimeAndProcess: React.FC<JobTimeAndProcessProps> = ({form}) => {
           </TableCell>
         </TableRow>}
       
-          <TableRow style={{maxWidth:150}}>
-            <TableCell style={{maxWidth:150}}>
+          <TableRow>
+            <TableCell style={{maxWidth:120}}>
             {form ?
             <DateFormPicker form={form} mode="end_time" title="Kết thúc"
               taskDetail={taskDetail}
@@ -150,7 +150,7 @@ const JobTimeAndProcess: React.FC<JobTimeAndProcessProps> = ({form}) => {
 
           
         
-        <TableCell style={{maxWidth:150}}>
+        <TableCell style={{maxWidth:100}}>
           <div className="flex items-center gap-1.5 sm:gap-2 mb-1.5">
             <div className="w-1 h-1 bg-orange-500 rounded-full"></div>
             <span className="text-gray-800 font-medium text-xs sm:text-sm">Còn lại</span>
@@ -168,7 +168,7 @@ const JobTimeAndProcess: React.FC<JobTimeAndProcessProps> = ({form}) => {
        
         </TableRow>
 
-        <TableCell style={{maxWidth:150}}>
+        <TableCell style={{maxWidth:100}}>
             {form ? (
               <Form.Item
                 name="type"
@@ -202,7 +202,7 @@ const JobTimeAndProcess: React.FC<JobTimeAndProcessProps> = ({form}) => {
               )}
           </TableCell>
 
-          <TableCell style={{maxWidth:150}}>
+          <TableCell style={{maxWidth:100}}>
             {form ? (
               <Form.Item
                 name="reward"
@@ -340,6 +340,7 @@ export function DateFormPicker({
         value={value}
         size="middle"
         disabledDate={disabledDateFunc}
+        style={{maxWidth:120}}
       />
     </Form.Item>
   );

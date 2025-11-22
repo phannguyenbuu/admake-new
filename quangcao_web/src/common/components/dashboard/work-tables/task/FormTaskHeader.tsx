@@ -44,28 +44,28 @@ export default function TaskHeader({ onSuccess, onUpdate }: TaskHeaderProps) {
   };
 
   return (
-    <Stack direction="row" spacing={5}>
-      <div className="flex items-center gap-2 px-4 py-3">
+    <Stack direction="row" spacing={0}>
+      <div className="flex items-center gap-1 px-4 py-3">
         <div className="icon-container">
           {/* Icon component here */}
         </div>
-        <div>
-          <Title level={5}>{taskDetail ? "Cập nhật công việc" : "Tạo công việc mới"}</Title>
+        <div style={{marginTop: -8}}>
+          <Title level={5} style={{whiteSpace:'nowrap'}}>{taskDetail ? "Cập nhật công việc" : "Tạo công việc mới"}</Title>
         </div>
       </div>
 
-      <Stack direction="row" spacing={1}>
-        {!isReward && (taskDetail?.status !== "DONE" ? 
-          <Button type="primary" onClick={onUpdate}>
-            ✅ Cập nhật
-          </Button>
-          :
-          <Button type="primary" onClick={handleReward}>
-            🏆 Nghiệm Thu
-          </Button>)
-        }
-        
-      </Stack>
+      
+      {!isReward && (taskDetail?.status !== "DONE" ? 
+        <Button type="primary" onClick={onUpdate}>
+          ✅ Cập nhật
+        </Button>
+        :
+        <Button type="primary" onClick={handleReward}>
+          🏆 Nghiệm Thu
+        </Button>)
+      }
+      
+      
     </Stack>
   );
 }

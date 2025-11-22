@@ -60,7 +60,7 @@ export default function FormTask({ open, onCancel, onSuccess, users, currentColu
   const [userSearch, setUserSearch] = useState('');
   const [customerSelected, setCustomerSelected] = useState<UserSearchProps | null>(null);
   const [userSelected, setUserSelected] = useState<UserSearchProps | null>(null);
-
+  const {isMobile} = useUser();
   const [userList, setUserList] = useState<ZipUserSearchProps[]>([]);
   
 
@@ -68,7 +68,7 @@ export default function FormTask({ open, onCancel, onSuccess, users, currentColu
     if(!taskDetail || !taskDetail?.assign_ids)
       return;
 
-    console.log("IDS", taskDetail.id, taskDetail.assign_ids, users);
+    // console.log("IDS", taskDetail.id, taskDetail.assign_ids, users);
 
     // const selectedUsers = taskDetail?.assign_ids
     //   .map(id => users.find(user => user.user_id === id))
@@ -119,6 +119,8 @@ export default function FormTask({ open, onCancel, onSuccess, users, currentColu
   const [isUpdating, setIsUpdating] = useState(false);
 
   const handleUpdate = async () => {
+    const isCreateMethod = !taskDetail;
+
     try {
       setIsUpdating(true);
       const values = await form.validateFields();
@@ -130,8 +132,7 @@ export default function FormTask({ open, onCancel, onSuccess, users, currentColu
         start_time: values.start_time ? values.start_time.format('YYYY-MM-DD') : null,
         end_time: values.end_time ? values.end_time.format('YYYY-MM-DD') : null,
       };
-      
-      
+           
 
       // Gọi API PUT gửi dữ liệu cập nhật
       if(taskDetail)
@@ -151,6 +152,7 @@ export default function FormTask({ open, onCancel, onSuccess, users, currentColu
         else
         {
           const data = await response.json();
+
           console.log("Cập nhật công việc thành công!", taskDetail.id, data);
         }
     } else {
@@ -171,7 +173,7 @@ export default function FormTask({ open, onCancel, onSuccess, users, currentColu
     }
       
       // Xử lý thành công, có thể gọi onSuccess hoặc đóng modal
-      if(onSuccess)
+      if(!isCreateMethod && onSuccess)
         onSuccess();
     } catch (error) {
       console.error("Update error:", error);
@@ -201,18 +203,18 @@ export default function FormTask({ open, onCancel, onSuccess, users, currentColu
   },[taskDetail, workspaceId]);
 
   return (
-    <Modal open={open} onCancel={onCancel} footer={null} width={900} >
+    <Modal open={open} onCancel={onCancel} footer={null} width={900} style={{height: isMobile? '120vh':''}}>
         <TaskHeader onUpdate={handleUpdate} onSuccess={onSuccess}/>
       
         <Form form={form} style={{overflowX:'hidden', maxHeight:'90vh', overflowY:'auto'}}>
-          <Stack spacing={1}>
+          {/* <Stack spacing={1}> */}
             <Form.Item name="workspace_id" initialValue={workspaceId} hidden>
             </Form.Item>
 
             <Form.Item name="assign_ids" initialValue={userList?.map(user => user.id)} hidden>
             </Form.Item>
             
-            <Stack direction="row" spacing = {2}>
+            <Stack spacing = {2}  direction={isMobile ? "column": "row"}>
               <JobInfoCard taskDetail={taskDetail ?? null} currentStatus={taskDetail?.status ?? ''} form={form} />
 
               <Stack style={cellStyle}>
@@ -231,7 +233,7 @@ export default function FormTask({ open, onCancel, onSuccess, users, currentColu
               </Stack>
             </Stack>
 
-            <Stack direction="row" spacing = {5}>
+            <Stack direction={isMobile ? "column" : "row"} spacing = {5}>
               <JobDescription form={form}/>
               <JobTimeAndProcess form={form} />
             </Stack>
@@ -240,7 +242,7 @@ export default function FormTask({ open, onCancel, onSuccess, users, currentColu
             {/* <MaterialInfo taskDetail={taskDetail ?? null}/> */}
 
             
-          </Stack>
+          {/* </Stack> */}
           {/* Nhân sự */}
       </Form>
     </Modal>
