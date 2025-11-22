@@ -10,3 +10,4 @@ Include/
 Lib/
 Scripts/
 landingpage/node_modules/
+.pm2

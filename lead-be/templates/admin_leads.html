@@ -35,7 +35,10 @@
       <thead class="table-light" style="background-color: #00B4B6;">
         <tr>
           <th style="width: 30px;">
-            <input type="checkbox" id="select-all" />
+            Invited
+          </th>
+          <th style="width: 30px;">
+            Activated
           </th>
           <th>ID</th>
           <th style="width:200px">Họ và tên</th>
@@ -54,7 +57,10 @@
         {% for lead in leads %}
         <tr>
           <td>
-            <input type="checkbox" name="selected_leads" value="{{ lead.id }}" {% if lead.isChecked %}checked{% endif %} />
+            <input type="checkbox" name="selected_leads" value="{{ lead.id }}" {% if lead.isInvited %}checked{% endif %} />
+          </td>
+          <td>
+            <input type="checkbox" name="activated_leads" value="{{ lead.id }}" {% if lead.isActivated %}checked{% endif %} />
           </td>
           <td>{{ lead.id }}</td>
           <td>{{ lead.name }}</td>
@@ -83,6 +89,8 @@
             <p>{{ lead.updatedAt }}</p>
             <p style="color:red; font-weight:700">{{ lead.expiredAt }}</p>
           </td>
+
+          
         </tr>
         {% endfor %}
       </tbody>
@@ -127,15 +135,47 @@
       checkboxes.forEach(chk => {
         chk.addEventListener('change', function() {
           const leadId = this.value;
-          const isChecked = this.checked;
-
+          
           fetch(`https://admake.vn/api/lead/${leadId}/check`, {
             method: 'PUT',
             headers: {
               'Content-Type': 'application/json',
               // Nếu cần xác thực token bearer hoặc khác thì thêm ở đây
             },
-            body: JSON.stringify({ isChecked: isChecked })
+            body: JSON.stringify({ isInvited: this.checked })
+          })
+          .then(response => {
+            if (!response.ok) {
+              throw new Error('Lỗi khi gửi dữ liệu');
+            }
+            return response.json();
+          })
+          .then(data => {
+            console.log('Phản hồi từ server:', data);
+            // Có thể thêm thông báo thành công hoặc cập nhật UI
+          })
+          .catch(error => {
+            console.error('Lỗi:', error);
+            // Có thể thông báo lỗi người dùng
+          });
+        });
+      });
+
+
+
+      const ativatedCheckboxes = document.querySelectorAll("input[name='activated_leads']");
+
+      ativatedCheckboxes.forEach(chk => {
+        chk.addEventListener('change', function() {
+          const leadId = this.value;
+          
+          fetch(`https://admake.vn/api/lead/${leadId}/activate`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+              // Nếu cần xác thực token bearer hoặc khác thì thêm ở đây
+            },
+            body: JSON.stringify({ isActivated: this.checked })
           })
           .then(response => {
             if (!response.ok) {

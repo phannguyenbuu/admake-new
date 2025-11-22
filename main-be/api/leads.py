@@ -19,18 +19,33 @@ def create_lead():
     return jsonify(new_lead.tdict()), 201
 
 @lead_bp.route("/<int:lead_id>/check", methods=["PUT"])
-def check_lead(lead_id):
+def check_invite_lead(lead_id):
     data = request.get_json()
     print(data)
     lead = db.session.get(LeadPayload, lead_id)
 
     if not lead:
         abort(404, description="No lead")
-    lead.isChecked = data.get("isChecked", False)
+    lead.isInvited = data.get("isInvited", False)
 
     db.session.commit()
     
     return jsonify('Check done!'), 201
+
+
+@lead_bp.route("/<int:lead_id>/activate", methods=["PUT"])
+def check_activate_lead(lead_id):
+    data = request.get_json()
+    print(data)
+    lead = db.session.get(LeadPayload, lead_id)
+
+    if not lead:
+        abort(404, description="No lead")
+    lead.isActivated = data.get("isActivated", False)
+
+    db.session.commit()
+    
+    return jsonify('isActivated done!'), 201
 
 @lead_bp.route("/<int:lead_id>", methods=["DELETE"])
 def delete_lead(lead_id):

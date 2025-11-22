@@ -106,11 +106,11 @@ const JobAsset: React.FC<JobAssetProps> = ({ title, type, readOnly = false }) =>
       // console.log('success is image?',result.filename,isImageFile(result.filename));
       setFilteredAssets(prev => prev ? [...prev, result.message] : [result.message]);
       setTaskDetail(prev => {
-        if (!prev || !prev.assets) return null; // handle null case explicitly
-
+        if (!prev) return null; // handle null case explicitly
+        
         return {
           ...prev,
-          assets: [...prev.assets, result.message],
+          assets: prev.assets ? [...prev.assets, result.message] : [result.message],
           // ensure all required fields like title, description exist in prev,
           // or provide defaults here if needed to satisfy the type
         };
@@ -196,11 +196,13 @@ const JobAsset: React.FC<JobAssetProps> = ({ title, type, readOnly = false }) =>
       // console.log('success is image?',result.filename,isImageFile(result.filename));
       setMessageAssets(prev => prev ? [...prev, result.message] : [result.message]);
       setTaskDetail(prev => {
-        if (prev === null) return null; // handle null case explicitly
+        if (! prev ) return null; // handle null case explicitly
+        if (prev.assets === null) prev.assets = [];
 
         return {
           ...prev,
-          assets: [...prev.assets, result.message],
+          // assets: [...prev.assets, result.message],
+          assets: prev.assets ? [...prev.assets, result.message] : [result.message],
           // ensure all required fields like title, description exist in prev,
           // or provide defaults here if needed to satisfy the type
         };

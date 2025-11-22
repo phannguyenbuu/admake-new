@@ -633,7 +633,8 @@ class LeadPayload(BaseModel):
     expiredAt = db.Column(db.DateTime, default=datetime.datetime.utcnow)
     balance_amount = db.Column(db.Float)
 
-    isChecked = db.Column(db.Boolean, default = False)
+    isInvited = db.Column(db.Boolean, default = False)
+    isActivated = db.Column(db.Boolean, default = False)
 
     column_open_name = db.Column(db.String(255), default="Đơn hàng")
     column_in_progress_name = db.Column(db.String(255), default="Phân việc")
