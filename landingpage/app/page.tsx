@@ -25,16 +25,38 @@ import {
   Gift,
   FileCheck,
   Star,
+  Megaphone,
+  Calendar,
+  Sofa,
+  PanelsTopLeft, 
+  Zap,
+  Building,
+  Layers
 } from "lucide-react"
 import LeadForm from "@/components/lead-form"
+
+const categories = [
+  {label: "Quảng cáo", icon: 'qc.png'},
+  {label: "Sự kiện", icon: 'even.png'},
+  {label: "Nội thất", icon: 'nt.png'},
+  {label: "Nhôm kính", icon: 'nk.png'},
+  {label: "Cơ khí", icon: 'ck.png'},
+  {label: "Điện nước", icon: 'đn.png'},
+  {label: "Xây dựng", icon: 'xd.png'},
+  {label: "Thạch cao", icon: 'tc.png'},
+  {label: "Ngành cửa", icon: 'nc.png'},
+  {label: "Rèm màn", icon: 'rm.png'},
+  {label: "Đá hoa cương", icon: 'da.png'},
+  {label: "VSCN", icon: 'vs.png'}
+];
 
 export default function Page() {
 
 
   const handleClick = () => {
     const leadForm = document.getElementById('dang-ky');
-    if (leadForm) {
-      leadForm.scrollIntoView({ behavior: 'smooth' });
+      if (leadForm ) {
+        leadForm.scrollIntoView({ behavior: 'smooth' });
     }
   }
   return (
@@ -55,8 +77,8 @@ export default function Page() {
             <Link href="#phan-he" className="hover:text-brand-600">
               Phân hệ
             </Link>
-            <Link href="#giao-dien" className="hover:text-brand-600">
-              Giao diện mẫu
+            <Link href="#bang-gia" className="hover:text-brand-600">
+              Bảng giá
             </Link>
             <Link href="#ly-do" className="hover:text-brand-600">
               Lý do chọn
@@ -80,6 +102,14 @@ export default function Page() {
       </header>
       {/* Hero */}
       <section className="relative isolate">
+        <script data-name-bot="bot lộc"
+	        src="https://app.preny.ai/embed-global.js"
+	        data-button-style="width:300px;height:300px;"
+	        data-language="vi"
+	        async
+	        defer
+	        data-preny-bot-id="69016558d7775fd3ed4c5ed8"
+        ></script>
         <div className="absolute inset-0 -z-10">
           <Image
             src="/industrial-factory-workers-machinery.png"
@@ -102,7 +132,7 @@ export default function Page() {
             <p className="mt-4 max-w-2xl text-sm/6 md:text-base/7 text-white/90">
               ADMAKE không chỉ là một phần mềm quản lý, mà là giải pháp đột phá dành riêng cho các xưởng sản xuất và đội nhóm thi công. Sinh ra từ kinh nghiệm thực chiến trong ngành, ADMAKE giải quyết triệt để những bài toán kinh doanh, giúp bạn quản lý vững vàng, phát triển bền vững và thảnh thơi sáng tạo.
             </p>
-            <ul className="mt-6 grid max-w-2xl grid-cols-1 gap-3 text-sm md:grid-cols-2">
+            <ul className="mt-6 grid max-w-2xl grid-cols-1 gap-3 text-sm md:grid-cols-2 font-bold">
               {[
                 { title: "Quản lý công việc chuyên nghiệp", desc: "Sắp xếp, phân việc và theo dõi tiến độ khoa học" },
                 { title: "Chấm công linh hoạt & Tính lương tự động", desc: "Chấm công GPS, nhận diện khuôn mặt, tự động cập nhật lương" },
@@ -134,32 +164,24 @@ export default function Page() {
         </div>
 
         {/* Lĩnh vực áp dụng */}
+
         <div className="bg-neutral-800/80 py-10">
           <div className="container mx-auto px-4">
             <div className="mx-auto mb-6 flex h-32 w-32 items-center justify-center rounded-full border-4 border-brand-400 text-center text-[11px] font-semibold uppercase tracking-wide text-white">
               Lĩnh vực <br />
               áp dụng
             </div>
-            <div className="mx-auto grid max-w-3xl grid-cols-2 gap-3 text-xs sm:grid-cols-3 md:grid-cols-4 lg:text-sm">
-              {[
-    "Quảng cáo",
-    "Sự kiện",
-    "Nội thất",
-    "Nhôm kính",
-    "Cơ khí",
-    "Điện nước",
-    "Xây dựng",
-    "Thạch cao"
-  ].map(
-                (label) => (
+            <div className="mx-auto grid max-w-3xl grid-cols-2 gap-2 text-xs sm:grid-cols-3 md:grid-cols-4 lg:text-sm">
+              {categories.map(({ label, icon }) => (
                   <button
                     key={label}
-                    className="rounded-full bg-brand-500 px-4 py-2 font-medium text-white shadow hover:bg-brand-400"
-                  >
+                    className="flex items-center gap-3 rounded-full bg-brand-500 pl-2 pr-4 font-medium text-white shadow hover:bg-brand-400"
+                  > 
+                    <img src={icon} alt={label} className="h-10 w-10 rounded-full bg-white shadow-lg" />
                     {label}
                   </button>
-                ),
-              )}
+
+              ))}
             </div>
           </div>
         </div>
@@ -170,10 +192,10 @@ export default function Page() {
         <div className="container mx-auto px-4">
           <div className="mx-auto max-w-3xl text-center">
             <h2 className="text-2xl font-bold md:text-3xl">Tổng quan phần mềm ADMAKE</h2>
-            <p className="mt-2 text-white/80">Bộ giải pháp linh hoạt, đáp ứng đa dạng mô hình doanh nghiệp sản xuất.</p>
+            <p className="mt-2 font-bold text-white/80">Bộ giải pháp linh hoạt, đáp ứng đa dạng mô hình doanh nghiệp sản xuất.</p>
           </div>
 
-          <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 font-bold">
             {[
               {
                 icon: Cog,
@@ -233,7 +255,7 @@ export default function Page() {
           <h2 className="text-center text-2xl font-bold md:text-3xl">Tính năng đột phá của ADMAKE
           </h2>
          
-          <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 font-bold">
             {[
               { icon: ClipboardList, title: "Quản lý Công việc chuyên nghiệp", desc: "Sắp xếp, phân việc và theo dõi tiến độ theo từng cột riêng biệt, giúp công việc không bị trôi hay lẫn lộn trong các dòng tin nhắn." },
               { icon: Users, title: "Chấm công linh hoạt & Chính xác", desc: "Chấm công tức thì qua GPS và nhận diện khuôn mặt, ngay cả khi nhân viên ở công trình, không cần máy móc cồng kềnh." },
@@ -303,17 +325,17 @@ export default function Page() {
         </div>
       </section> */}
 
-      {/* Giao diện mẫu */}
-      <section id="giao-dien" className="bg-brand-300 py-14 text-white">
+      {/* Bảng giá */}
+      <section id="bang-gia" className="bg-brand-300 py-14 text-white">
         <div className="container mx-auto px-4">
-          <h2 className="text-center text-2xl font-bold md:text-3xl">Giao diện mẫu của ADMAKE</h2>
+          <h2 className="text-center text-2xl font-bold md:text-3xl">Bảng giá của ADMAKE</h2>
           <div className="mx-auto mt-8 aspect-[16/7] w-full max-w-5xl overflow-hidden rounded-xl border-4 border-black/10 bg-white shadow">
             <Image
-              src="/image.png"
+              src="/A1.png"
               alt="Ảnh chụp giao diện phần mềm"
               width={1040}
               height={420}
-              className="h-full w-full object-cover"
+              className=" w-full object-cover"
             />
           </div>
           <div className="mt-6 flex justify-center gap-3">
@@ -328,7 +350,7 @@ export default function Page() {
       <section id="ly-do" className="bg-white py-14">
         <div className="container mx-auto px-4">
           <h2 className="text-center text-2xl font-bold md:text-3xl">Tại sao nên lựa chọn giải pháp ADMAKE?</h2>
-          <div className="mt-8 grid gap-6 md:grid-cols-3">
+          <div className="mt-8 grid gap-6 md:grid-cols-3 font-bold">
             {[
               {
                 title: "Quản lý minh bạch toàn diện, từ A đến Z",
@@ -413,7 +435,7 @@ export default function Page() {
         </div>
       </section>
 
-      {/* Case studies */}
+      {/* Case studies
       <section id="case-study" className="bg-white py-14">
         <div className="container mx-auto px-4">
           <h2 className="text-center text-2xl font-bold md:text-3xl">CÂU CHUYỆN KHÁCH HÀNG</h2>
@@ -444,7 +466,7 @@ export default function Page() {
             <Button className="bg-brand-500 text-white hover:bg-brand-400" onClick={handleClick}>Đặt lịch tư vấn</Button>
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* Footer */}
       <footer id="lien-he" className="relative bg-neutral-900 py-14 text-neutral-200">
@@ -512,7 +534,7 @@ export default function Page() {
                 </Link>
               </Button>
               <Button variant="outline" asChild>
-                <Link href="#giao-dien" className="text-black hover:text-brand-400">Xem giao diện</Link>
+                <Link href="#bang-gia" className="text-black hover:text-brand-400">Xem bảng giá</Link>
               </Button>
             </div>
           </div>
