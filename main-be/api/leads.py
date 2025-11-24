@@ -32,7 +32,6 @@ def check_invite_lead(lead_id):
     
     return jsonify('Check done!'), 201
 
-
 @lead_bp.route("/<int:lead_id>/activate", methods=["PUT"])
 def check_activate_lead(lead_id):
     data = request.get_json()

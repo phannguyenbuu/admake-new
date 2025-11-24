@@ -244,7 +244,7 @@ export const CardItem: React.FC<CardItemProps> = ({
     </div>
 
      <Modal
-          title="Bạn có chắc muốn xóa công việc ?"
+          title="Bạn có chắc muốn xóa công việc?"
           open={showConfirm}
           onOk = {() => handleDelete(task.id)}
           onCancel={() => setShowConfirm(false)}

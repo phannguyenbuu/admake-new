@@ -8,6 +8,7 @@ import type { Task } from "../../../../@types/work-space.type";
 import { useTaskContext } from "../../../../common/hooks/useTask";
 import { useApiHost } from "../../../../common/hooks/useApiHost";
 import { Tabs } from 'antd';
+import { useUser } from "../../../../common/hooks/useUser";
 
 const { Text } = Typography;
 const { TextArea } = Input;
@@ -25,6 +26,7 @@ interface JobDescriptionProps {
 const JobDescription: React.FC<JobDescriptionProps> = ({ form }) => {
   const {taskDetail, setTaskDetail} = useTaskContext();
   const [activeKey, setActiveKey] = useState('task');
+  const {isMobile} = useUser();
 
   useEffect(() => {
   if (taskDetail) {
@@ -64,10 +66,12 @@ const JobDescription: React.FC<JobDescriptionProps> = ({ form }) => {
             maxLength={1000}
             placeholder="Mô tả chi tiết về công việc cần thực hiện..."
             className="!rounded-lg !border !border-gray-300 focus:!border-cyan-500 focus:!shadow-lg hover:!border-cyan-500 !transition-all !duration-200 !shadow-sm !resize-none !text-xs sm:!text-sm h-40"
+            style={{maxWidth:'80vw'}}
           />
         </Form.Item>
 
       {/* <JobAsset key="task-assets" title='Tài liệu' type="task" /> */}
+      {/* {taskDetail && */}
       <Tabs
         activeKey={activeKey}
         onChange={key => setActiveKey(key)}
@@ -75,7 +79,7 @@ const JobDescription: React.FC<JobDescriptionProps> = ({ form }) => {
           {
             key: 'task',
             label: 'Tài Liệu',
-            children: <JobAsset title="Thông tin admin đưa ra" type="task" />,
+            children: <JobAsset title="Thông tin từ admin" type="task" />,
           },
           {
             key: 'comments',

@@ -276,7 +276,7 @@ const JobAsset: React.FC<JobAssetProps> = ({ title, type, readOnly = false }) =>
     <>
     <Stack style={{maxWidth: isMobile? 300: '100%'}}>
       {!readOnly && 
-      <Stack direction="row" sx= {{width:'100%'}}>
+      <Stack direction="row" spacing={1} sx= {{width:'100%'}}>
         <label htmlFor={`upload-image-file-${type}`}>
           <IconButton color="primary" component="span"
             aria-label="upload picture" size="small"
@@ -285,22 +285,17 @@ const JobAsset: React.FC<JobAssetProps> = ({ title, type, readOnly = false }) =>
           </IconButton>
         </label>
 
-        <ChatInput onSend={handleMessageSend} 
-                  title={title ?? ''} 
-                  isCash={type?.includes('cash')}
-                  isChoose={false}>
-                    <ImagePasteUpload 
-                      title={title} 
-                      onMessageSend={handleMessageSend} 
-                      // setMessageAssets={setMessageAssets} 
-                      // message={message} 
-                      onAssetSend={handleAssetSend}/>
-        </ChatInput>
+         <ImagePasteUpload 
+                title={title} 
+                onMessageSend={handleMessageSend} 
+                onAssetSend={handleAssetSend}
+                isCash={type?.includes('cash')}
+            />
       </Stack>}
 
       {messageAssets.map((el, index) => 
         <Stack direction="row" key={index} spacing={1} alignItems="center">
-          {title === "Thông tin admin đưa ra" &&
+          {title === "Thông tin từ admin" &&
             <input
               type="checkbox"
               checked={el.is_favourite}
@@ -326,7 +321,7 @@ const JobAsset: React.FC<JobAssetProps> = ({ title, type, readOnly = false }) =>
           useFlexGap
           sx={{ flexWrap: 'wrap', overflowY: 'auto', height: 150, width: '100%', minHeight: 200 }} // Thêm thuộc tính flexWrap để xuống dòng
         >
-
+         
 
         {filteredAssets.map((el, index) => {
             const url = el.file_url ? getFilenameFromUrl(el.file_url) :  null;
@@ -371,18 +366,21 @@ export default JobAsset;
 
 interface ChatInputProps {
   children?: React.ReactNode;
-  title: string;
+  message: string;
+  setMessage: React.Dispatch<React.SetStateAction<string>>;
   onSend: (message: string) => void;
   isCash?: boolean;
   isChoose? : boolean;
 }
 
-const ChatInput: React.FC<ChatInputProps> = ({ children, title, onSend, isCash, isChoose }) => {
+const ChatInput: React.FC<ChatInputProps> = ({ children, onSend, message, setMessage, isCash, isChoose }) => {
   const [formOpen, setFormOpen] = useState(false);
-  const [message, setMessage] = useState('');
+  // const [message, setMessage] = useState('');
   const {userId, username, isMobile} = useUser();
 
-  const handleAssetSend = () => {
+  const handleMessageSend = () => {
+    console.log("S",message);
+
     if(isCash)
       setFormOpen(true);
     else {
@@ -391,8 +389,6 @@ const ChatInput: React.FC<ChatInputProps> = ({ children, title, onSend, isCash, 
       setMessage('');
     }
   };
-
-  
 
   const handleDialogClose = (value: string | null) => {
     console.log('Send', value);
@@ -403,20 +399,12 @@ const ChatInput: React.FC<ChatInputProps> = ({ children, title, onSend, isCash, 
   return (
     <>
       <Box display="flex" alignItems="center" padding={1} borderTop="1px solid #ccc">
-        {/* <TextField
-          placeholder={title}
-          multiline
-          maxRows={4}
-          fullWidth
-          variant="standard"
-          value={message}
-          onChange={e => setMessage(e.target.value)}
-          onKeyPress={handleKeyPress}
-          sx={{ marginRight: 1, minWidth: isMobile ? 200: 300 }}
-        /> */}
-
         {children}
-        <IconButton key="send" color="primary" onClick={handleAssetSend} aria-label="send message">
+        <IconButton key="send" color="primary" 
+          onClick={handleMessageSend} 
+          aria-label="send message"
+          style={{top:-10}}
+          >
           <SendIcon />
         </IconButton>
       </Box>
@@ -434,15 +422,16 @@ interface ImagePasteUploadProps {
   onAssetSend: (file: File) => Promise<void>;
   onMessageSend: (message: string) => Promise<void>;
   // setMessageAssets: React.Dispatch<React.SetStateAction<MessageTypeProps>>;
-  // message: string;
+  isCash?: boolean;
   title?: string;
 }
 
 
 const ImagePasteUpload: React.FC<ImagePasteUploadProps> = ({ 
-  onMessageSend, 
+  onMessageSend, isCash,
   onAssetSend, title }) => {
     const [message, setMessage] = useState<string>('');
+    const {isMobile} = useUser();
 
   const handleKeyPress = (event: React.KeyboardEvent<HTMLDivElement>) => {
     if (event.key === 'Enter' && !event.shiftKey) {
@@ -484,18 +473,27 @@ const ImagePasteUpload: React.FC<ImagePasteUploadProps> = ({
 
 
   return (
-    <TextField
-      placeholder={title}
-      multiline
-      maxRows={4}
-      fullWidth
-      variant="standard"
-      value={message}
-      onChange={e => setMessage(e.target.value)}
-      onPaste={handlePaste}
-      onKeyDown={handleKeyPress}
-      sx={{ marginRight: 1, minWidth: 300 }}
-    />
+    <Stack direction="row">
+      <TextField
+        placeholder={title}
+        multiline
+        maxRows={4}
+        fullWidth
+        variant="standard"
+        value={message}
+        onChange={e => setMessage(e.target.value)}
+        onPaste={handlePaste}
+        onKeyDown={handleKeyPress}
+        sx={{ marginRight: 1, minWidth: isMobile ? 200 : 300 }}
+      />
+
+      <ChatInput onSend={onMessageSend} 
+                    message={message} 
+                    setMessage={setMessage}
+                    isCash={isCash}
+                    isChoose={false}>
+      </ChatInput>
+    </Stack>
   );
 }
 
