@@ -75,7 +75,7 @@ const routes: TRoute = {
       isMainMenu: true,
       children: [
         {
-          path: "/dashboard",
+          // path: "/dashboard",
           index: true,
           element: <Navigate to="/dashboard/users" replace />,
           title: "Home",

@@ -132,7 +132,6 @@ export default function FormTask({ open, onCancel, onSuccess, users, currentColu
         start_time: values.start_time ? values.start_time.format('YYYY-MM-DD') : null,
         end_time: values.end_time ? values.end_time.format('YYYY-MM-DD') : null,
       };
-           
 
       // Gọi API PUT gửi dữ liệu cập nhật
       if(taskDetail)
@@ -145,14 +144,12 @@ export default function FormTask({ open, onCancel, onSuccess, users, currentColu
           headers: { "Content-Type": "application/json" },
           body: jsonString,
         });
-      
 
         if (!response.ok) 
           throw new Error("Cập nhật công việc thất bại");
         else
         {
           const data = await response.json();
-
           notification.success({"message":"Cập nhật công việc thành công!"});
         }
     } else {

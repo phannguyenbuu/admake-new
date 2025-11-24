@@ -36,30 +36,30 @@ export interface MessageTypeProps {
   isLoading?: boolean;
   workspace_id?: string;
 
-  file_url:string;
+  file_url?:string;
   thumb_url?: string;
   
   incoming?: boolean;
-  text: string;
-  message_id:string;
-  type:string;
-  user_id: string | null;
+  text?: string;
+  message_id?:string;
+  type?:string;
+  user_id?: string | null;
   
-  createdAt: Date;
-  updatedAt: Date;
-  deletedAt: Date | null;
+  createdAt?: Date;
+  updatedAt?: Date;
+  deletedAt?: Date | null;
 
-  preview: string;
-  reply: string;
-  role:number;
-  icon:string;
-  status:string;
-  is_favourite:boolean;
+  preview?: string;
+  reply?: string;
+  role?:number;
+  icon?:string;
+  status?:string;
+  is_favourite?:boolean;
   
-  username:string;
-  link:string;
+  username?:string;
+  link?:string;
   
-  react: ReactProps;
+  react?: ReactProps;
 }
 
 export function generateUniqueIntId(): number {

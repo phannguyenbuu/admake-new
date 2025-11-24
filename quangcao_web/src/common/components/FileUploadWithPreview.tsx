@@ -44,27 +44,40 @@ const FileUploadWithPreview: React.FC<FileUploadWithPreviewProps> = ({ message, 
     }
   }, [message]);
 
+
   return (
-    
-      <div style={{ position: 'relative', width: 100, height: 70 }}>
-        <a href={`${useApiStatic()}/${message.file_url}`} target="_blank" rel="noreferrer">
-          {loading && thumbnail && (
-            <>
-              <img src={`${useApiStatic()}/${message.thumb_url}`} alt="thumbnail" style={{ width: 100, height: 70, objectFit: 'cover', opacity: 0.5 }} />
-              <CircularProgress size={24} style={{ position: 'absolute', top: 'calc(50% - 12px)', left: 'calc(50% - 12px)' }} />
-            </>
-          )}
-          {!loading && isImage && thumbnail && (
-            <img src={`${useApiStatic()}/${message.thumb_url}`} alt="thumbnail" style={{ width: 100, height: 70, objectFit: 'cover' }} />
-          )}
-          {!isImage && !thumbnail && (
-            <DescriptionIcon fontSize="large" style={{ width: 100, height: 70 }} />
-          )}
-        
+    <div style={{ position: 'relative', width: 100, height: 70 }}>
+      <a href={`${useApiStatic()}/${message.file_url}`} target="_blank" rel="noreferrer">
+        {thumbnail ? (
+          <>
+            <ThumbImageObj thumb_url={message.thumb_url} />
+            {loading && (
+              <CircularProgress
+                size={24}
+                style={{
+                  position: 'absolute',
+                  top: 'calc(50% - 12px)',
+                  left: 'calc(50% - 12px)',
+                }}
+              />
+            )}
+          </>
+        ) : (
+          !isImage && <DescriptionIcon fontSize="large" style={{ width: 100, height: 70 }} />
+        )}
       </a>
     </div>
+
     
   );
 };
 
 export default FileUploadWithPreview;
+
+const ThumbImageObj = ({thumb_url}:{thumb_url?:string}) => {
+  return <img src={
+              thumb_url?.includes("data:image/jpeg") ?
+              thumb_url : `${useApiStatic()}/${thumb_url}`} 
+              alt="thumbnail" 
+              style={{ width: 100, height: 70, objectFit: 'cover', opacity: 0.5 }} />;
+}

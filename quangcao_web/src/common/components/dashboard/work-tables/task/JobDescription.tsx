@@ -71,7 +71,7 @@ const JobDescription: React.FC<JobDescriptionProps> = ({ form }) => {
         </Form.Item>
 
       {/* <JobAsset key="task-assets" title='Tài liệu' type="task" /> */}
-      {/* {taskDetail && */}
+      {taskDetail &&
       <Tabs
         activeKey={activeKey}
         onChange={key => setActiveKey(key)}
@@ -87,7 +87,7 @@ const JobDescription: React.FC<JobDescriptionProps> = ({ form }) => {
             children: <JobAsset title="Bình luận cho mọi người" type="comment" />,
           },
         ]}
-      />
+      />}
       
     </Stack>
   );

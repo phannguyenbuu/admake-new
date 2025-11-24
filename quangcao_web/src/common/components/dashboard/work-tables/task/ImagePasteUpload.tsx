@@ -25,41 +25,80 @@ import DeleteConfirm from "../../../DeleteConfirm";
 import { InputNumber } from 'antd';
 import bankList from "./banklist.json";
 
-function createThumbnail(file, maxWidth, maxHeight, callback) {
+function blobToBase64(blob: Blob): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      if (typeof reader.result === 'string') {
+        resolve(reader.result); // Chuỗi base64 dạng data URL
+      } else {
+        reject(new Error('Cannot convert blob to base64 string'));
+      }
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
+}
+
+
+export function createThumbnail(
+  file: File,
+  maxWidth: number,
+  maxHeight: number,
+  callback: (blob: string | null) => void
+): void {
   const reader = new FileReader();
-  reader.onload = function(event) {
+
+  reader.onload = (event: ProgressEvent<FileReader>) => {
     const img = new Image();
-    img.onload = function() {
-      const canvas = document.createElement('canvas');
+
+    img.onload = () => {
       let width = img.width;
       let height = img.height;
 
       // Tính kích thước thumbnail giữ tỉ lệ
-      if(width > height) {
-        if(width > maxWidth) {
-          height *= maxWidth / width;
+      if (width > height) {
+        if (width > maxWidth) {
+          height = (height * maxWidth) / width;
           width = maxWidth;
         }
       } else {
-        if(height > maxHeight) {
-          width *= maxHeight / height;
+        if (height > maxHeight) {
+          width = (width * maxHeight) / height;
           height = maxHeight;
         }
       }
 
+      const canvas = document.createElement('canvas');
       canvas.width = width;
       canvas.height = height;
 
       const ctx = canvas.getContext('2d');
+      if (!ctx) {
+        callback(null);
+        return;
+      }
       ctx.drawImage(img, 0, 0, width, height);
 
-      // Trả về ảnh thumbnail dưới dạng base64 hoặc blob
-      canvas.toBlob(function(blob) {
-        callback(blob);
+      // Trả về ảnh thumbnail dưới dạng blob
+      canvas.toBlob((blob) => {
+        if (blob) {
+          blobToBase64(blob).then(base64 => {
+            callback(base64);
+          }).catch(() => callback(null));
+        } else {
+          callback(null);
+        }
       }, 'image/jpeg', 0.8);
+    };
+
+    if (event.target?.result) {
+      img.src = event.target.result as string;
+    } else {
+      callback(null);
     }
-    img.src = event.target.result;
-  }
+  };
+
   reader.readAsDataURL(file);
 }
 

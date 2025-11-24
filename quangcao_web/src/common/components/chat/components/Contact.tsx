@@ -147,9 +147,9 @@ const Contact: React.FC<ContactProps> = ( { messages }) => {
                   <img 
                     key={idx}
                     src={`${useApiStatic()}/${workspaceEl.file_url}`} 
-                    alt={workspaceEl.file_url.split('_')[0]} 
+                    alt={workspaceEl?.file_url?.split('_')[0]} 
                     style={{ width: '100%', height: 'auto', marginBottom: 8, cursor: 'pointer' }}
-                    onClick={() => handlePhotoClick(workspaceEl.file_url)}
+                    onClick={() => handlePhotoClick(workspaceEl?.file_url ?? '')}
                   />
                 )) : 
               <Typography variant="body1">Chưa có tài liệu</Typography>

@@ -5,6 +5,7 @@ import WebFont from 'webfontloader';
 import { notification } from 'antd';
 import type { WorkSpace } from '../../@types/work-space.type';
 import type { NotifyProps } from '../../@types/notify.type';
+import type { MessageTypeProps } from '../../@types/chat.type';
 
 interface UserContextProps {
   isCurrentWorkspaceFree: boolean;
@@ -21,9 +22,13 @@ interface UserContextProps {
   notifyList: NotifyProps[];
   chatBoxHeight: number;
   isFullChatUI: boolean;
+  tmpCreateAssets: MessageTypeProps[],
+  tmpCreateMessages: MessageTypeProps[],
 
   currentWorkspace: WorkSpace | null;
 
+  setTmpCreateAssets:React.Dispatch<React.SetStateAction<MessageTypeProps[]>>,
+  setTmpCreateMessages:React.Dispatch<React.SetStateAction<MessageTypeProps[]>>,
   setIsFullChatUI: React.Dispatch<React.SetStateAction<boolean>>;
   setNotifyList: React.Dispatch<React.SetStateAction<NotifyProps[]>>;
   setUserId: React.Dispatch<React.SetStateAction<string | null>>;
@@ -69,6 +74,10 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isCurrentWorkspaceFree, setisCurrentWorkspaceFree] = useState<boolean>(false);
   const [chatBoxHeight, setChatBoxHeight] = useState<number>(0);
   const [isFullChatUI, setIsFullChatUI] = useState<boolean>(true);
+
+  const [tmpCreateAssets, setTmpCreateAssets] = useState<MessageTypeProps[]>([]);
+  const [tmpCreateMessages, setTmpCreateMessages] = useState<MessageTypeProps[]>([]);
+  
 
 
   function generateDatetimeId() {
@@ -369,6 +378,9 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       currentWorkspace,
       fullName, setFullName,notifyAdmin,setCurrentWorkspace,
       notifyDelete, notifyList, getNotifyList, setNotifyList,
+      tmpCreateAssets, setTmpCreateAssets,
+      tmpCreateMessages, setTmpCreateMessages,
+      
       userIcon, login, logout, checkAuthStatus }}>
       {children}
     </UserContext.Provider>

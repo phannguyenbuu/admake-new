@@ -109,9 +109,10 @@ const DocMsg:React.FC<MsgTypeProps> = ({ el, menu, onDelete }) => {
               <DownloadIcon fontSize="large" />
             </IconButton>
           </Stack>
+          {el?.createdAt && 
           <Typography variant="body2" sx={{ color: el.incoming ? "#000" : "#fff" }}>
-            {formatTime(el.createdAt)}
-          </Typography>
+            {formatTime(el?.createdAt)}
+          </Typography>}
           </a>
         </Stack>
       </Box>
@@ -211,10 +212,11 @@ const MediaMsg: React.FC<MsgTypeProps> = ({ el, menu,onDelete }) => {
               style={{ maxHeight: 210, borderRadius: '10px', cursor: 'pointer' }} 
             />
           </a>
+          {el?.createdAt &&
           <Typography variant='body2'  fontStyle="italic" color={ isCustomer ? "#000" : '#fff'} 
             fontSize='0.5rem' fontWeight={300}>
-            {formatTime(el.createdAt)}-{el.user_id}
-          </Typography>
+            {formatTime(el?.createdAt)}-{el.user_id}
+          </Typography>}
         </Stack>
       </Box>
       {menu && <MessageOptions el={el} onDelete={()=>onDelete(el)}/>}
@@ -263,10 +265,11 @@ const TextMsg: React.FC<MsgTypeProps> = ({el, menu, onDelete}) => {
                     {el.text}
                 </Typography>
                 
+                {el?.createdAt &&
                 <Typography key={`DefaultMsg-${el.message_id}-Time`} 
                   variant="body2" fontStyle="italic" fontSize='0.5rem' fontWeight={300} color={textColor}>
-                    {formatTime(el.createdAt)}-{el.user_id}
-                </Typography>
+                    {formatTime(el?.createdAt)}-{el.user_id}
+                </Typography>}
             </Box>
             {menu && <MessageOptions el={el} onDelete={()=> onDelete(el)}/>}
         </Stack>
@@ -387,9 +390,9 @@ const TimeLine: React.FC<MsgTypeProps> = ({ el, menu, onDelete }) => {
 }
 
 const MessageOptions: React.FC<MsgTypeProps> = ({el, onDelete }) => {
-  if(!el) return null;
+  if(!el || !el?.role) return null;
   // const { userId, username } = useUser();
-  const isCustomer = el.role < 0; // username !== el.user_role;
+  const isCustomer = el?.role < 0; // username !== el.user_role;
 
     // console.log('MessageOptions',username, el.user_role);
 

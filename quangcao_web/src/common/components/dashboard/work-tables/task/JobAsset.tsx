@@ -25,8 +25,7 @@ import DeleteConfirm from "../../../DeleteConfirm";
 import { InputNumber } from 'antd';
 import bankList from "./banklist.json";
 
-import ImagePasteUpload from "./ImagePasteUpload";
-
+import ImagePasteUpload,{createThumbnail} from "./ImagePasteUpload";
 
 dayjs.locale('vi'); // thiết lập locale
 
@@ -39,9 +38,13 @@ interface JobAssetProps {
 const JobAsset: React.FC<JobAssetProps> = ({ title, type, readOnly = false }) => {
   
   const {taskDetail, setTaskDetail} = useTaskContext();
-  const {userId, username, isMobile} = useUser();
-  const [messageAssets, setMessageAssets] = useState<MessageTypeProps[]>([]);
-  const [filteredAssets, setFilteredAssets] = useState<MessageTypeProps[]>([]);
+  const {userId, username, isMobile, fullName, generateDatetimeId} = useUser();
+
+  const [ListMessages, setListMessages] = useState<MessageTypeProps[]>([]);
+  const [Assets, setAssets] = useState<MessageTypeProps[]>([]);
+  const [tmpCreateAssets, setTmpCreateAssets] = useState<MessageTypeProps[]>([]);
+  const [tmpCreateMessages, setTmpCreateMessages] = useState<MessageTypeProps[]>([]);
+
   const [thumbLoading, setThumbLoading] = useState(false);
 
   const imageTypes = ["image/jpeg", "image/jpg", "image/png", "image/gif", "image/webp"];
@@ -62,8 +65,10 @@ const JobAsset: React.FC<JobAssetProps> = ({ title, type, readOnly = false }) =>
   useEffect(()=>{
     if(!taskDetail || !taskDetail.assets)
     {
-      setFilteredAssets([]);
-      setMessageAssets([]);
+      setTmpCreateAssets([]);
+      setTmpCreateMessages([]);
+      setAssets([]);
+      setListMessages([]);
       return;
     } 
 
@@ -74,11 +79,12 @@ const JobAsset: React.FC<JobAssetProps> = ({ title, type, readOnly = false }) =>
     // console.log('JobAsset taskdetail:', imgList.length, msgList.length);
     // console.log(msgList);
 
-    setFilteredAssets(imgList);
-    setMessageAssets(msgList);
+    setAssets(imgList);
+    setListMessages(msgList);
   },[taskDetail]);
 
   const handleAssetSend = async (file: File) => {
+    
     setThumbLoading(true);
     const now = new Date();
     const dateTimeStr = formatDate(now);
@@ -91,31 +97,49 @@ const JobAsset: React.FC<JobAssetProps> = ({ title, type, readOnly = false }) =>
     formData.append("type", type || '');
     formData.append("task_id", taskDetail?.id.toString() ?? '');
 
-    console.log('Upload', type, Object.fromEntries(formData.entries()));
+    // console.log('Upload', type, Object.fromEntries(formData.entries()));
 
     try {
-      const response = await fetch(`${useApiHost()}/task/${taskDetail?.id}/upload`, {
-        method: "PUT",
-        body: formData,
-      });
+      
+      if(taskDetail)
+      {
+        const response = await fetch(`${useApiHost()}/task/${taskDetail?.id}/upload`, {
+          method: "PUT",
+          body: formData,
+        });
 
-      if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
 
-      const result = await response.json();
-      notification.success({ message: "Đã upload thành công!", description: result });
-      // console.log('success is image?',result.filename,isImageFile(result.filename));
-      setFilteredAssets(prev => prev ? [...prev, result.message] : [result.message]);
-      setTaskDetail(prev => {
-        if (!prev) return null; // handle null case explicitly
-        
-        return {
-          ...prev,
-          assets: prev.assets ? [...prev.assets, result.message] : [result.message],
-          // ensure all required fields like title, description exist in prev,
-          // or provide defaults here if needed to satisfy the type
-        };
-      });
+        const result = await response.json();
+        notification.success({ message: "Đã upload thành công!", description: result });
+        // console.log('success is image?',result.filename,isImageFile(result.filename));
+        setAssets(prev => prev ? [...prev, result.message] : [result.message]);
+        setTaskDetail(prev => {
+          if (!prev) return null; // handle null case explicitly
+          
+          return {
+            ...prev,
+            assets: prev.assets ? [...prev.assets, result.message] : [result.message],
+            // ensure all required fields like title, description exist in prev,
+            // or provide defaults here if needed to satisfy the type
+          };
+        });
+      }else{
+        createThumbnail(file,100,70,(blobTxt) => {
+          if(blobTxt)
+          {
+            // console.log('Blob', blobTxt);
+            var tmp: MessageTypeProps = {
+                          message_id: generateDatetimeId(),
+                          user_id: userId,
+                          file_url:file.name, 
+                          username: fullName ?? '',
+                          thumb_url:blobTxt};
 
+            setTmpCreateAssets(prev => prev ? [...prev, tmp] : [tmp]);
+          }
+        });
+      }
 
     } catch (err: any) {
       notification.error({ message: "Lỗi upload ảnh:", description: err.message });
@@ -125,7 +149,7 @@ const JobAsset: React.FC<JobAssetProps> = ({ title, type, readOnly = false }) =>
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if(!taskDetail || !taskDetail?.id) return;
+    // if(!taskDetail || !taskDetail?.id) return;
 
     if (e.target.files && e.target.files.length > 0) {
       const file = e.target.files[0];
@@ -150,7 +174,7 @@ const JobAsset: React.FC<JobAssetProps> = ({ title, type, readOnly = false }) =>
       else
       {
         notification.success({message:'Message deleted successfully', description:message_id});
-        setFilteredAssets(prev => prev.filter(asset => asset.message_id !== message_id));
+        setAssets(prev => prev.filter(asset => asset.message_id !== message_id));
         setTaskDetail(prev => {
             if (prev === null) return null;
             
@@ -176,7 +200,6 @@ const JobAsset: React.FC<JobAssetProps> = ({ title, type, readOnly = false }) =>
     formData.append("type", type || '');
     formData.append("user_id", userId || '');
     formData.append("username", username || '');
-    formData.append("type", type || '');
     formData.append("text", text || '');
     formData.append("task_id", taskDetail?.id.toString() ?? '');
 
@@ -184,6 +207,8 @@ const JobAsset: React.FC<JobAssetProps> = ({ title, type, readOnly = false }) =>
     
 
     try {
+      if(taskDetail)
+      {
       const response = await fetch(`${useApiHost()}/task/${taskDetail?.id}/message`, {
         method: "PUT",
         body: formData,
@@ -194,7 +219,7 @@ const JobAsset: React.FC<JobAssetProps> = ({ title, type, readOnly = false }) =>
       const result = await response.json();
       notification.success({ message: "Đã gửi comment thành công!", description: result });
       // console.log('success is image?',result.filename,isImageFile(result.filename));
-      setMessageAssets(prev => prev ? [...prev, result.message] : [result.message]);
+      setListMessages(prev => prev ? [...prev, result.message] : [result.message]);
       setTaskDetail(prev => {
         if (! prev ) return null; // handle null case explicitly
         if (prev.assets === null) prev.assets = [];
@@ -207,6 +232,16 @@ const JobAsset: React.FC<JobAssetProps> = ({ title, type, readOnly = false }) =>
           // or provide defaults here if needed to satisfy the type
         };
       });
+    }else{
+      console.log("G",text);
+      var tmp: MessageTypeProps = {
+                    message_id: generateDatetimeId(),
+                    user_id: userId,
+                    username: fullName ?? '',
+                    text};
+                    
+      setTmpCreateMessages(prev => prev ? [...prev, tmp] : [tmp]);
+    }
 
     } catch (err: any) {
       notification.error({ message: "Lỗi gửi comment:", description: err.message });
@@ -217,9 +252,6 @@ const JobAsset: React.FC<JobAssetProps> = ({ title, type, readOnly = false }) =>
 
   
   const handleMessageDelete = (message_id: string) => {
-    
-
-
     fetch(`${useApiHost()}/message/${message_id}`, {
       method: 'DELETE',
     })
@@ -228,7 +260,7 @@ const JobAsset: React.FC<JobAssetProps> = ({ title, type, readOnly = false }) =>
         notification.error({message:'Failed to delete message', description:message_id});
       else
       {
-        setMessageAssets(prev => prev.filter(asset => asset.message_id !== message_id));
+        setListMessages(prev => prev.filter(asset => asset.message_id !== message_id));
         setTaskDetail(prev => {
             if (prev === null) return null;
             
@@ -239,6 +271,8 @@ const JobAsset: React.FC<JobAssetProps> = ({ title, type, readOnly = false }) =>
         });
         notification.success({message:'Message deleted successfully', description:message_id});
       }
+
+      setTmpCreateMessages(prev => prev.filter(asset => asset.message_id !== message_id));
     })
     .catch(error => {
       console.error('Error deleting message:', error);
@@ -246,7 +280,7 @@ const JobAsset: React.FC<JobAssetProps> = ({ title, type, readOnly = false }) =>
   };
 
   const handleChangeFavourite = (message_id: string, checked: boolean) => {
-    setMessageAssets(prevMessages =>
+    setListMessages(prevMessages =>
       prevMessages.map(m =>
         m.message_id === message_id
           ? { ...m, is_favourite: checked }
@@ -293,23 +327,27 @@ const JobAsset: React.FC<JobAssetProps> = ({ title, type, readOnly = false }) =>
             />
       </Stack>}
 
-      {messageAssets.map((el, index) => 
-        <Stack direction="row" key={index} spacing={1} alignItems="center">
+      {[...ListMessages,...tmpCreateMessages].map((el, index) => 
+      {
+        console.log("List", el);
+        return <Stack direction="row" key={index} spacing={1} alignItems="center">
           {title === "Thông tin từ admin" &&
             <input
               type="checkbox"
               checked={el.is_favourite}
-              onChange={(e) => handleChangeFavourite(el.message_id, e.target.checked)}/>}
+              onChange={(e) => handleChangeFavourite(el?.message_id ?? '', e.target.checked)}/>}
           
           <Typography style={{ fontSize: 12, fontWeight: 700 }}>
             {el.username}:
           </Typography>
           <Typography style={{ fontSize: 10, fontWeight: 500 }}>
-            { type?.includes("cash") ? `${el.text.split('/')[0]}[${el.text.split('/')[el.text.split('/').length - 1]}]` : el.text }
+            { type?.includes("cash") ? `${el?.text?.split('/')[0]}[${el.text?.split('/')[el.text.split('/').length - 1]}]` : el.text }
           </Typography>
 
-          {!readOnly && <DeleteConfirm elId={el.message_id} onDelete={handleMessageDelete} text='tin nhắn'/>}
+          {!readOnly && <DeleteConfirm elId={el?.message_id ?? ''} 
+            onDelete={handleMessageDelete} text='tin nhắn'/>}
         </Stack>
+      }
       )}
 
 
@@ -322,16 +360,16 @@ const JobAsset: React.FC<JobAssetProps> = ({ title, type, readOnly = false }) =>
           sx={{ flexWrap: 'wrap', overflowY: 'auto', height: 150, width: '100%', minHeight: 200 }} // Thêm thuộc tính flexWrap để xuống dòng
         >
          
-
-        {filteredAssets.map((el, index) => {
+        {[...Assets,...tmpCreateAssets].map((el, index) => {
             const url = el.file_url ? getFilenameFromUrl(el.file_url) :  null;
-
+            
             return (
               <Stack key={index} direction="column" alignItems="center" spacing={1} sx={{ width: 'calc(33.33% - 8px)' }}>
                 {url && <FileUploadWithPreview handleSend={handleAssetSend} message={el}/>}
 
                 <Stack direction="row" gap={0}>
-                  {!readOnly && <DeleteConfirm elId={el.message_id} onDelete={handleDelete} text='tài liệu'/>}
+                  {!readOnly && <DeleteConfirm elId={el?.message_id ?? ''} 
+                    onDelete={handleDelete} text='tài liệu'/>}
                   <Typography fontSize={12} sx={{ maxWidth: 100, whiteSpace: 'nowrap' }}>
                     {url && url.length > 9 ? `${url.substring(0, 9)}...` : url}
                   </Typography>
@@ -353,11 +391,6 @@ const JobAsset: React.FC<JobAssetProps> = ({ title, type, readOnly = false }) =>
         
       </Stack>
     </Stack>
-
-
-
-        
-        
     </>
   );
 };

@@ -53,8 +53,10 @@ export default function AllManagementModal() {
     if(!tasksData) return;
 
     const groupedTasks = tasksData.reduce((acc: any, task) => {
-      if (!acc[task.status]) acc[task.status] = [];
-      acc[task.status].push(task);
+      if(!task?.status) return [];
+        
+      if (!acc[task?.status]) acc[task?.status] = [];
+      acc[task?.status].push(task);
       return acc;
     }, {});
 
@@ -247,7 +249,7 @@ export const CardStaticItem: React.FC<CardStaticItemProps> = ({
           </div>
         )}
 
-         {task.rate > 0 &&
+         {task?.rate && task?.rate > 0 &&
           <div className="text-xs text-gray-400 font-mono flex-shrink-0">
             
             {[...Array(task.rate)].map((_, index) => (

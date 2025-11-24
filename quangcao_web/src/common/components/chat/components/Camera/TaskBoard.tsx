@@ -132,7 +132,7 @@ const TaskBoard = ({ userId,fullName, open, onCancel }: TaskBoardProps) => {
         <Stack direction="row" spacing={1}>
           <Button style={btnStyle} onClick={handleFinishWarning}>
             <ArrowForwardIcon />
-            {getTitleByStatus(el.status)}
+            {getTitleByStatus(el?.status ?? '')}
           </Button>
 
           {el.workspace &&
