@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useContext } from "react";
-import { Modal, Typography, Button } from "antd";
+import { Modal, Typography, Button, notification } from "antd";
 import type { Task, UserSearchProps } from "../../../@types/work-space.type";
 import JobInfoCard from "./task/JobInfoCard";
 import JobAgentInfo from "./task/JobAgentInfo";
@@ -153,7 +153,7 @@ export default function FormTask({ open, onCancel, onSuccess, users, currentColu
         {
           const data = await response.json();
 
-          console.log("Cập nhật công việc thành công!", taskDetail.id, data);
+          notification.success({"message":"Cập nhật công việc thành công!"});
         }
     } else {
         preparedValues["status"] = fixedColumns[currentColumn].type;
@@ -169,11 +169,11 @@ export default function FormTask({ open, onCancel, onSuccess, users, currentColu
         if (!response.ok) 
           throw new Error("Tạo công việc thất bại");
         else
-          console.log("Tạo công việc thành công!");
+          notification.success({"message":"Tạo công việc thành công!"});
     }
       
       // Xử lý thành công, có thể gọi onSuccess hoặc đóng modal
-      if(!isCreateMethod && onSuccess)
+      if(onSuccess)
         onSuccess();
     } catch (error) {
       console.error("Update error:", error);

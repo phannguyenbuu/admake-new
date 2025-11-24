@@ -231,7 +231,7 @@ export const CardItem: React.FC<CardItemProps> = ({
           >
             <CloseIcon />
           </IconButton>
-          {task.rate > 0 &&
+          {task?.rate && task.rate > 0 &&
           <div className="text-xs text-gray-400 font-mono flex-shrink-0">
             
             {[...Array(task.rate)].map((_, index) => (

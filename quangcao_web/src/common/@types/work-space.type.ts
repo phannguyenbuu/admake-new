@@ -80,23 +80,23 @@ export interface ZipUserSearchProps {
 }
 
 export interface Task extends BaseEntity {
-  title: string;
-  description: string;
-  status: string; // có thể thu hẹp thành "OPEN" | "DONE" | ...
+  title?: string;
+  description?: string;
+  status?: string; // có thể thu hẹp thành "OPEN" | "DONE" | ...
   // type: string; // có thể thu hẹp thành "REWARD" | ...
-  reward: number; // số tiền thưởng
-  amount: number;
-  type: "MONTHLY" | "REWARD" | string;
-  assign_ids: ZipUserSearchProps[]; // id của user
-  workspace_id: string; // id của workspace
-  workspace: string;
-  customer_id: string; // id của customer
-  materials: MaterialTask[]; // danh sách vật tư
+  reward?: number; // số tiền thưởng
+  amount?: number;
+  type?: "MONTHLY" | "REWARD" | string;
+  assign_ids?: ZipUserSearchProps[]; // id của user
+  workspace_id?: string; // id của workspace
+  workspace?: string;
+  customer_id?: string; // id của customer
+  materials?: MaterialTask[]; // danh sách vật tư
   start_time?: Dayjs | null; // Thời gian bắt đầu
   end_time?: Dayjs | null; // Thời gian kết thúc
-  assets: MessageTypeProps[];
-  check_reward: Boolean | false;
-  rate: number;
+  assets?: MessageTypeProps[];
+  check_reward?: Boolean | false;
+  rate?: number;
 }
 
 export interface TaskGroup {

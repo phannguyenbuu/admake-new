@@ -32,7 +32,6 @@ def create_user():
     data = request.get_json()
     # print('USER', data)
     new_user = User.create_item(data)
-        
     db.session.add(new_user)
     try:
         db.session.commit()
@@ -49,9 +48,9 @@ def create_user():
             assign_ids=[new_user.id]
         )
     db.session.add(task)
+    db.session.commit()
     
     return jsonify(new_user.tdict()), 201
-
 
 
 

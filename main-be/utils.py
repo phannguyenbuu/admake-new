@@ -1215,7 +1215,7 @@ if __name__ == "__main__":
         # for user in User.query.all():
         #     if user.lead_id == lead_id and (user.role_id and user.role_id > 0):
         #         print(user.fullName, user.phone)
-        renameColumn("lead","isChecked", "isInvited")
+        # renameColumn("lead","isChecked", "isInvited")
 
         # db.session.commit()
 
@@ -1229,4 +1229,31 @@ if __name__ == "__main__":
         #     user = db.session.get(User,user_id)
         #     print(user.fullName)
 
+        user_id_str = "20251124034941554665de97a7"
+        tasks = []
 
+        # for t in Task.query.all():
+        #     if t.assign_ids:
+        #         if user_id_str in t.assign_ids:
+        #             tasks.append(t)
+
+        # for t in Task.query.all():
+        #     if t.type == "salary":
+        #         tasks.append(t.assign_ids)
+        for user in User.query.all():
+            found = False
+            for t in Task.query.filter(Task.type == "salary").all():
+                if user.id in t.assign_ids:
+                    found = True
+                    break
+
+            if not found:
+                task = Task(
+                    id=generate_datetime_id(),
+                    type="salary",
+                    assign_ids=[user.id]
+                )
+                db.session.add(task)
+            
+        db.session.commit()
+        print(tasks)

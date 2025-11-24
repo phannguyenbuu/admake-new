@@ -278,7 +278,7 @@ def get_user_salary_task(user_id):
     
     tasks = Task.query.filter(text(f"assign_ids::text LIKE '%\"{user_id_str}\"%'")).all()
     if not tasks or len(tasks) == 0:
-        print("Tasks not found")
+        print("Tasks A not found")
         abort(404, description="Tasks not found")
 
     ls = [0,0,0,0,0]
@@ -293,7 +293,7 @@ def get_user_salary_task(user_id):
     ).first()
 
     if not task:
-        print("Task not found")
+        print("Task B not found")
         abort(404, description="Task not found")
     
     return jsonify({"infor":task.tdict(),

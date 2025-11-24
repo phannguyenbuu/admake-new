@@ -1,5 +1,6 @@
 from flask import Blueprint, request, jsonify, abort
 from models import db, app, dateStr, Message, Task, generate_datetime_id
+from sqlalchemy.orm.attributes import flag_modified
 from api.chat import socketio
 import os
 
