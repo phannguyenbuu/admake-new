@@ -38,13 +38,13 @@ interface JobAssetProps {
 const JobAsset: React.FC<JobAssetProps> = ({ title, type, readOnly = false }) => {
   
   const {taskDetail, setTaskDetail} = useTaskContext();
-  const {userId, username, isMobile, fullName, generateDatetimeId} = useUser();
+  const {userId, username, isMobile, 
+        fullName, generateDatetimeId,
+        tmpTaskCreatedAssets, setTmpTaskCreatedAssets,
+        tmpTaskCreatedMessages, setTmpTaskCreatedMessages} = useUser();
 
   const [ListMessages, setListMessages] = useState<MessageTypeProps[]>([]);
   const [Assets, setAssets] = useState<MessageTypeProps[]>([]);
-  const [tmpCreateAssets, setTmpCreateAssets] = useState<MessageTypeProps[]>([]);
-  const [tmpCreateMessages, setTmpCreateMessages] = useState<MessageTypeProps[]>([]);
-
   const [thumbLoading, setThumbLoading] = useState(false);
 
   const imageTypes = ["image/jpeg", "image/jpg", "image/png", "image/gif", "image/webp"];
@@ -65,8 +65,8 @@ const JobAsset: React.FC<JobAssetProps> = ({ title, type, readOnly = false }) =>
   useEffect(()=>{
     if(!taskDetail || !taskDetail.assets)
     {
-      setTmpCreateAssets([]);
-      setTmpCreateMessages([]);
+      setTmpTaskCreatedAssets([]);
+      setTmpTaskCreatedMessages([]);
       setAssets([]);
       setListMessages([]);
       return;
@@ -74,11 +74,8 @@ const JobAsset: React.FC<JobAssetProps> = ({ title, type, readOnly = false }) =>
 
     const imgList = taskDetail.assets.filter(el => el.type === type && el.file_url && el.file_url != '');
     const msgList = taskDetail.assets.filter(el => el.type === type && el.text && el.text != '');
-    
-    
-    // console.log('JobAsset taskdetail:', imgList.length, msgList.length);
-    // console.log(msgList);
 
+    
     setAssets(imgList);
     setListMessages(msgList);
   },[taskDetail]);
@@ -124,21 +121,32 @@ const JobAsset: React.FC<JobAssetProps> = ({ title, type, readOnly = false }) =>
             // or provide defaults here if needed to satisfy the type
           };
         });
-      }else{
-        createThumbnail(file,100,70,(blobTxt) => {
-          if(blobTxt)
-          {
-            // console.log('Blob', blobTxt);
-            var tmp: MessageTypeProps = {
-                          message_id: generateDatetimeId(),
-                          user_id: userId,
-                          file_url:file.name, 
-                          username: fullName ?? '',
-                          thumb_url:blobTxt};
-
-            setTmpCreateAssets(prev => prev ? [...prev, tmp] : [tmp]);
-          }
+      }else if (type === "task"){
+        const response = await fetch(`${useApiHost()}/task/new/upload`, {
+          method: "PUT",
+          body: formData,
         });
+
+        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+
+        const result = await response.json();
+        notification.success({ message: "Đã upload local thành công!", description: result });
+
+        setTmpTaskCreatedAssets(prev => prev ? [...prev, result.message] : [result.message]);
+      //   createThumbnail(file,100,70,(blobTxt) => {
+      //     if(blobTxt)
+      //     {
+      //       // console.log('Blob', blobTxt);
+      //       var tmp: MessageTypeProps = {
+      //                     message_id: generateDatetimeId(),
+      //                     user_id: userId,
+      //                     file_url:file.name, 
+      //                     username: fullName ?? '',
+      //                     thumb_url:blobTxt};
+
+      //       setTmpTaskCreatedAssets(prev => prev ? [...prev, tmp] : [tmp]);
+      //     }
+      //   });
       }
 
     } catch (err: any) {
@@ -165,6 +173,12 @@ const JobAsset: React.FC<JobAssetProps> = ({ title, type, readOnly = false }) =>
 
   
   const handleDelete = (message_id: string) => {
+    if(!taskDetail)
+    {
+      setTmpTaskCreatedAssets(prev => prev.filter(asset => asset.message_id !== message_id));
+      return;
+    }
+
     fetch(`${useApiHost()}/message/${message_id}`, {
       method: 'DELETE',
     })
@@ -224,23 +238,19 @@ const JobAsset: React.FC<JobAssetProps> = ({ title, type, readOnly = false }) =>
         if (! prev ) return null; // handle null case explicitly
         if (prev.assets === null) prev.assets = [];
 
-        return {
-          ...prev,
-          // assets: [...prev.assets, result.message],
-          assets: prev.assets ? [...prev.assets, result.message] : [result.message],
-          // ensure all required fields like title, description exist in prev,
-          // or provide defaults here if needed to satisfy the type
-        };
+        return {...prev,
+          assets: prev.assets ? [...prev.assets, result.message] : [result.message],};
       });
-    }else{
-      console.log("G",text);
+    }else if (type === "task"){
+      // console.log("G",text);
       var tmp: MessageTypeProps = {
+                    type,
                     message_id: generateDatetimeId(),
                     user_id: userId,
                     username: fullName ?? '',
                     text};
                     
-      setTmpCreateMessages(prev => prev ? [...prev, tmp] : [tmp]);
+      setTmpTaskCreatedMessages(prev => prev ? [...prev, tmp] : [tmp]);
     }
 
     } catch (err: any) {
@@ -252,6 +262,12 @@ const JobAsset: React.FC<JobAssetProps> = ({ title, type, readOnly = false }) =>
 
   
   const handleMessageDelete = (message_id: string) => {
+    if(!taskDetail)
+    {
+      setTmpTaskCreatedMessages(prev => prev.filter(asset => asset.message_id !== message_id));
+      return;
+    }
+
     fetch(`${useApiHost()}/message/${message_id}`, {
       method: 'DELETE',
     })
@@ -272,7 +288,7 @@ const JobAsset: React.FC<JobAssetProps> = ({ title, type, readOnly = false }) =>
         notification.success({message:'Message deleted successfully', description:message_id});
       }
 
-      setTmpCreateMessages(prev => prev.filter(asset => asset.message_id !== message_id));
+      
     })
     .catch(error => {
       console.error('Error deleting message:', error);
@@ -327,7 +343,7 @@ const JobAsset: React.FC<JobAssetProps> = ({ title, type, readOnly = false }) =>
             />
       </Stack>}
 
-      {[...ListMessages,...tmpCreateMessages].map((el, index) => 
+      {[...ListMessages,...tmpTaskCreatedMessages].map((el, index) => 
       {
         console.log("List", el);
         return <Stack direction="row" key={index} spacing={1} alignItems="center">
@@ -360,7 +376,7 @@ const JobAsset: React.FC<JobAssetProps> = ({ title, type, readOnly = false }) =>
           sx={{ flexWrap: 'wrap', overflowY: 'auto', height: 150, width: '100%', minHeight: 200 }} // Thêm thuộc tính flexWrap để xuống dòng
         >
          
-        {[...Assets,...tmpCreateAssets].map((el, index) => {
+        {[...Assets,...tmpTaskCreatedAssets].map((el, index) => {
             const url = el.file_url ? getFilenameFromUrl(el.file_url) :  null;
             
             return (

@@ -62,7 +62,7 @@ def update_task(id):
         abort(404, description="Task not found")
 
     data = request.get_json()
-    print('PUT task', id, data.get("customer_id"))
+    # print('PUT task', id, data.get("customer_id"))
 
     task.title = data.get("title", task.title)
     task.description = data.get("description", task.description)
@@ -158,9 +158,11 @@ def update_task_assets(id):
     if not role:
         role = ''
 
-    task = Task.query.get(id)
-    if not task:
-        abort(404, description="Task not found")
+    task = None
+    if id != 'new':
+        task = Task.query.get(id)
+        if not task:
+            abort(404, description="Task not found")
 
     if 'file' not in request.files:
         return jsonify({'error': 'No file provided'}), 400
@@ -172,37 +174,45 @@ def update_task_assets(id):
     print('upload:', filename, filepath, thumb_url)
     ls = []
 
-    # task.assets có thể None hoặc list
-    if task.assets:
-        ls = task.assets  # trực tiếp lấy list
-
     # thêm file mới nếu có
     if not filename:
-        abort(404, description="Error when upload")
+        abort(404, description="Error: cannot upload")
 
-    message = Message.create_item({"message_id": generate_datetime_id(),
-                                   "type": type,
-                                    "user_id":user_id, 
-                                    "task_id":task_id, 
-                                    "file_url":filename, 
-                                    "thumb_url":thumb_url,
-                                    })
-    ls.append(message.message_id)
+    json_data = {"type": type,
+                "user_id":user_id, 
+                "file_url":filename, 
+                "thumb_url":thumb_url,
+                }
 
-    # gán lại trường assets là list Python
-    task.assets = ls
+    if task:
+        if task.assets:
+            ls = task.assets
 
-    # print('Task_asset', ls)
+        json_data["message_id"] = generate_datetime_id()
+        json_data["task_id"] = task_id
+        message = Message.create_item(json_data)
+        
+        ls.append(message.message_id)
 
+        # gán lại trường assets là list Python
+        task.assets = ls
 
-    flag_modified(task, "assets")
-    db.session.commit()
+        # print('Task_asset', ls)
 
-    return jsonify({
-        'filename': filename,
-        'assets': ls,
-        'message': message.tdict(),
-        **task.tdict()})
+        flag_modified(task, "assets")
+        db.session.commit()
+
+        return jsonify({
+            # 'filename': filename,
+            # 'assets': ls,
+            'message': message.tdict(),
+            **task.tdict()})
+    else:
+        return jsonify({
+            # 'filename': filename,
+            # 'assets': ls,
+            'message': json_data,
+        })
 
 
 @task_bp.route("/<string:id>/message", methods=["PUT"])
@@ -259,7 +269,7 @@ def create_task():
     # print('New task', data)
 
     # Tạo Task mới từ data
-    task = Task.parse(data)
+    task = Task.create_item(data)
 
     db.session.add(task)
     db.session.commit()

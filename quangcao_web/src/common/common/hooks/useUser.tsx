@@ -22,13 +22,13 @@ interface UserContextProps {
   notifyList: NotifyProps[];
   chatBoxHeight: number;
   isFullChatUI: boolean;
-  tmpCreateAssets: MessageTypeProps[],
-  tmpCreateMessages: MessageTypeProps[],
+  tmpTaskCreatedAssets: MessageTypeProps[],
+  tmpTaskCreatedMessages: MessageTypeProps[],
 
   currentWorkspace: WorkSpace | null;
 
-  setTmpCreateAssets:React.Dispatch<React.SetStateAction<MessageTypeProps[]>>,
-  setTmpCreateMessages:React.Dispatch<React.SetStateAction<MessageTypeProps[]>>,
+  setTmpTaskCreatedAssets:React.Dispatch<React.SetStateAction<MessageTypeProps[]>>,
+  setTmpTaskCreatedMessages:React.Dispatch<React.SetStateAction<MessageTypeProps[]>>,
   setIsFullChatUI: React.Dispatch<React.SetStateAction<boolean>>;
   setNotifyList: React.Dispatch<React.SetStateAction<NotifyProps[]>>;
   setUserId: React.Dispatch<React.SetStateAction<string | null>>;
@@ -75,8 +75,8 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [chatBoxHeight, setChatBoxHeight] = useState<number>(0);
   const [isFullChatUI, setIsFullChatUI] = useState<boolean>(true);
 
-  const [tmpCreateAssets, setTmpCreateAssets] = useState<MessageTypeProps[]>([]);
-  const [tmpCreateMessages, setTmpCreateMessages] = useState<MessageTypeProps[]>([]);
+  const [tmpTaskCreatedAssets, setTmpTaskCreatedAssets] = useState<MessageTypeProps[]>([]);
+  const [tmpTaskCreatedMessages, setTmpTaskCreatedMessages] = useState<MessageTypeProps[]>([]);
   
 
 
@@ -378,8 +378,8 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       currentWorkspace,
       fullName, setFullName,notifyAdmin,setCurrentWorkspace,
       notifyDelete, notifyList, getNotifyList, setNotifyList,
-      tmpCreateAssets, setTmpCreateAssets,
-      tmpCreateMessages, setTmpCreateMessages,
+      tmpTaskCreatedAssets, setTmpTaskCreatedAssets,
+      tmpTaskCreatedMessages, setTmpTaskCreatedMessages,
       
       userIcon, login, logout, checkAuthStatus }}>
       {children}

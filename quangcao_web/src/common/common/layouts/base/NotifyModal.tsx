@@ -3,6 +3,7 @@ import { Button, Modal, IconButton, Stack } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import type { NotifyProps } from '../../../@types/notify.type';
 import { useUser } from "../../hooks/useUser";
+import { notification } from 'antd';
 
 const NotifyModal = () => {
   const [open, setOpen] = useState(false);
@@ -99,7 +100,10 @@ const NotifyModal = () => {
                 <a href={notify.target}>
                   <span>{notify.text}</span> <span style={{ fontWeight: 700, color: '#00B5B4' }}>{notify.description}</span>
                 </a>
-                <IconButton aria-label="close" size="small" onClick={() => handleDelete(notify.id ?? '')}>
+                <IconButton aria-label="close" size="small" onClick={() => {
+                  notification.success({message:"Xóa thông báo thành công !"});
+                  handleDelete(notify.id ?? '');
+                }}>
                   <CloseIcon fontSize="small" style={{ color: '#00B5B4' }} />
                 </IconButton>
               </li>

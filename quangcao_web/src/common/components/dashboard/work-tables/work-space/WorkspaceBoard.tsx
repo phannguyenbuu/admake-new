@@ -176,7 +176,9 @@ const WorkspaceBoard: React.FC<WorkspaceBoardProps> = ({
                             >
                                 {/* @ts-ignore */}
                                 {col.tasks.map((task, idx) => 
-                                <DragableTaskCard task = {task}
+                                <DragableTaskCard 
+                                                    key={`${idx}`}
+                                                    task = {task}
                                                     col = {col}
                                                     idx = {idx}
                                                     theme = {theme}

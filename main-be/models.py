@@ -25,6 +25,8 @@ from flask import Blueprint, request, jsonify, abort
 from sqlalchemy.orm.attributes import flag_modified
 from collections import namedtuple
 from sqlalchemy import desc, and_, func, select
+import uuid
+from PIL import Image
 
 app = Flask(__name__)
 app.logger.setLevel(logging.DEBUG)
@@ -47,6 +49,48 @@ jwt = JWTManager(app)
 
 CORS(app, supports_credentials=True, origins=['https://quanly.admake.vn','http://localhost:5173'])
 
+
+
+def upload_a_file_to_vps(file):
+    name, ext = os.path.splitext(file.filename)
+    filename = file.filename
+    upload_folder = app.config['UPLOAD_FOLDER']
+    thumbs_folder = os.path.join(upload_folder, "thumbs")
+    os.makedirs(thumbs_folder, exist_ok=True)
+
+    filepath = os.path.join(upload_folder, filename)
+
+    if os.path.exists(filepath):
+        filename = f"{name}_{uuid.uuid4().hex}{ext}"
+        filepath = os.path.join(upload_folder, filename)
+        print('New file name because file exists:', filename)
+
+    file.save(filepath)
+
+    # Kiểm tra xem file có phải ảnh không (dựa trên extension đơn giản, bạn có thể dùng thêm kiểm tra MIME nếu cần)
+    image_exts = ['.jpg', '.jpeg', '.png', '.gif', '.webp']
+    if ext.lower() in image_exts:
+        try:
+            img = Image.open(filepath)
+            img.thumbnail((100, 70))
+            
+            # Nếu ảnh có alpha channel, chuyển sang RGBA để giữ alpha
+            if img.mode not in ("RGBA", "LA"):
+                img = img.convert("RGBA")
+            
+            thumb_filename = f"thumb_{filename}"
+            thumb_filepath = os.path.join(thumbs_folder, thumb_filename)
+            
+            img.save(thumb_filepath, "PNG")  # Lưu định dạng PNG giữ alpha
+            thumb_url = f"thumbs/{thumb_filename}"
+        except Exception as e:
+            print("Thumbnail creation failed:", e)
+            thumb_url = None
+    else:
+        thumb_url = None
+
+
+    return filename, filepath, thumb_url
 
 class BaseModel(db.Model):
     __abstract__ = True
@@ -397,10 +441,11 @@ class Task(BaseModel):
         if self.assets:
             ls = []
             for asset_id in self.assets:
-                asset = db.session.get(Message, asset_id)
+                if isinstance(asset_id, str):
+                    asset = db.session.get(Message, asset_id)
 
-                if asset:
-                    ls.append(asset.tdict())
+                    if asset:
+                        ls.append(asset.tdict())
 
             result["assets"] = ls
 
@@ -411,7 +456,15 @@ class Task(BaseModel):
         return result
 
     @staticmethod
-    def parse(data):
+    def create_item(data):
+        ls = data.get("assets", [])
+        assets = []
+
+        for item in ls:
+            item["message_id"] = generate_datetime_id()
+            msg = Message.create_item(item)
+            assets.append(msg.message_id)
+
         return Task(
             id=generate_datetime_id(),
             workspace_id = data.get("workspace_id", ''),
@@ -425,19 +478,19 @@ class Task(BaseModel):
             end_time=data.get("end_time", None),
             start_time=data.get("start_time", None),
             amount = data.get("amount"),
-            salary_type = data.get("salary_type", '')
+            salary_type = data.get("salary_type", ''),
+            assets = assets
         )
-    @staticmethod
-    def create_item(params):
-        item = Task(**params)
-        db.session.add(item)
-        db.session.commit()
-        return item
+    # @staticmethod
+    # def create_item(params):
+    #     item = Task(**params)
+    #     db.session.add(item)
+    #     db.session.commit()
+    #     return item
 
 from sqlalchemy.exc import IntegrityError
 class Message(BaseModel):
     __tablename__ = 'message'
-
     
     workspace_id = db.Column(db.String(50))
     message_id = db.Column(db.String(80), primary_key=True)

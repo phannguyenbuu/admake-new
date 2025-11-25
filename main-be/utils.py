@@ -44,7 +44,7 @@ def load_tasks():
         data = json.load(f)
 
         for item in data:
-            task = Task.parse(item)
+            task = Task.create_item(item)
             db.session.add(task)
 
         db.session.commit()
@@ -1229,31 +1229,6 @@ if __name__ == "__main__":
         #     user = db.session.get(User,user_id)
         #     print(user.fullName)
 
-        user_id_str = "20251124034941554665de97a7"
-        tasks = []
-
-        # for t in Task.query.all():
-        #     if t.assign_ids:
-        #         if user_id_str in t.assign_ids:
-        #             tasks.append(t)
-
-        # for t in Task.query.all():
-        #     if t.type == "salary":
-        #         tasks.append(t.assign_ids)
-        for user in User.query.all():
-            found = False
-            for t in Task.query.filter(Task.type == "salary").all():
-                if user.id in t.assign_ids:
-                    found = True
-                    break
-
-            if not found:
-                task = Task(
-                    id=generate_datetime_id(),
-                    type="salary",
-                    assign_ids=[user.id]
-                )
-                db.session.add(task)
-            
-        db.session.commit()
-        print(tasks)
+        json_data = {"workspace_id":"20251125010127385636829dce","assign_ids":[],"title":"RKK","description":"","start_time":"2025-11-25","end_time":"2025-11-26","type":"","reward":0,"status":"OPEN","assets":[{"message_id":"20251125010841353c2b3aa","user_id":"202511030113120675991ece01","file_url":"34.png","username":"B-one academy","thumb_url":"data:image/jpeg;base64,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"},{"message_id":"2025112501083427074ecd8","user_id":"202511030113120675991ece01","username":"B-one academy","text":"VSF"}]}
+        task = Task.create_item(json_data)
+        print(task)

@@ -60,7 +60,10 @@ export default function FormTask({ open, onCancel, onSuccess, users, currentColu
   const [userSearch, setUserSearch] = useState('');
   const [customerSelected, setCustomerSelected] = useState<UserSearchProps | null>(null);
   const [userSelected, setUserSelected] = useState<UserSearchProps | null>(null);
-  const {isMobile} = useUser();
+  
+  const {isMobile, tmpTaskCreatedAssets, tmpTaskCreatedMessages,
+    setTmpTaskCreatedAssets, setTmpTaskCreatedMessages} = useUser();
+
   const [userList, setUserList] = useState<ZipUserSearchProps[]>([]);
   
 
@@ -68,13 +71,6 @@ export default function FormTask({ open, onCancel, onSuccess, users, currentColu
     if(!taskDetail || !taskDetail?.assign_ids)
       return;
 
-    // console.log("IDS", taskDetail.id, taskDetail.assign_ids, users);
-
-    // const selectedUsers = taskDetail?.assign_ids
-    //   .map(id => users.find(user => user.user_id === id))
-    //   .filter(user => user !== undefined); // lọc bỏ undefined nếu không tìm thấy
-
-    // console.log("TDS", selectedUsers);
     setUserList(taskDetail.assign_ids); // cast nếu cần
     
     if(taskDetail?.status === "DONE" && taskDetail?.check_reward)
@@ -154,7 +150,13 @@ export default function FormTask({ open, onCancel, onSuccess, users, currentColu
         }
     } else {
         preparedValues["status"] = fixedColumns[currentColumn].type;
+        preparedValues["assets"] = [...tmpTaskCreatedAssets, ...tmpTaskCreatedMessages];
+
+        setTmpTaskCreatedAssets([]);
+        setTmpTaskCreatedMessages([]);
+
         const jsonString = JSON.stringify(preparedValues);
+
         console.log("New_JSON_values", jsonString);
 
         const response = await fetch(`${useApiHost()}/task/`, {
@@ -166,7 +168,12 @@ export default function FormTask({ open, onCancel, onSuccess, users, currentColu
         if (!response.ok) 
           throw new Error("Tạo công việc thất bại");
         else
+        {
+          const data = await response.json();
+          console.log(data);
+          setTaskDetail(data);
           notification.success({"message":"Tạo công việc thành công!"});
+        }
     }
       
       // Xử lý thành công, có thể gọi onSuccess hoặc đóng modal

@@ -106,12 +106,13 @@ const JobTimeAndProcess: React.FC<JobTimeAndProcessProps> = ({form}) => {
         maxWidth: isMobile?280 : '', 
         borderRadius:2 , background:'#ddd'}}>
           <Table sx={{ '& .MuiTableCell-root': { padding: 0 } }}>
+            <TableBody>
           {form &&
         <TableRow>
           <TableCell style={{maxWidth:120}}>
             
               <DateFormPicker form={form} mode="start_time" title="Bắt đầu"
-                taskDetail={taskDetail}
+                // taskDetail={taskDetail}
                 // timeValue={taskDetail?.start_time ? dayjs(taskDetail?.start_time) : null}
                 timeValue={startDate}
                 onChange={(date) => setStartDate(date)}
@@ -135,7 +136,7 @@ const JobTimeAndProcess: React.FC<JobTimeAndProcessProps> = ({form}) => {
             <TableCell style={{maxWidth:120}}>
             {form ?
             <DateFormPicker form={form} mode="end_time" title="Kết thúc"
-              taskDetail={taskDetail}
+              // taskDetail={taskDetail}
               // timeValue={taskDetail?.end_time ? dayjs(taskDetail?.end_time) : null}
               timeValue={endDate}
               onChange={(date) => setEndDate(date)}
@@ -162,12 +163,6 @@ const JobTimeAndProcess: React.FC<JobTimeAndProcessProps> = ({form}) => {
       </TableRow>
       
       <TableRow>
-        
-          
-          
-       
-        </TableRow>
-
         <TableCell style={{maxWidth:100}}>
             {form ? (
               <Form.Item
@@ -249,7 +244,8 @@ const JobTimeAndProcess: React.FC<JobTimeAndProcessProps> = ({form}) => {
               </Typography>
             )}
           </TableCell>
-
+          </TableRow>
+          </TableBody>
         </Table>
       </TableContainer>
       
@@ -262,7 +258,7 @@ const JobTimeAndProcess: React.FC<JobTimeAndProcessProps> = ({form}) => {
 export default JobTimeAndProcess;
 
 export function DateFormPicker({
-  taskDetail,
+  // taskDetail,
   mode,
   title,
   timeValue,
@@ -270,7 +266,7 @@ export function DateFormPicker({
   form,
   onChange
 }: {
-  taskDetail:Task | null,
+  // taskDetail:Task | null,
   mode: string;
   title: string;
   timeValue: Dayjs | null;
@@ -278,11 +274,22 @@ export function DateFormPicker({
   form: any;
   onChange?: (date: Dayjs | null) => void
 }) {
+  const {taskDetail} = useTaskContext();
+
+  
+
   useEffect(() => {
-    if(!form) return;
-    // console.log("TIME", mode, timeValue);
-    form.setFieldsValue({ [mode]: timeValue });
+    if (!form) return;
+
+    if (timeValue) {
+      form.setFieldsValue({ [mode]: timeValue });
+    } else if (!taskDetail) {
+      form.setFieldsValue({ [mode]: dayjs() });
+    } else {
+      form.setFieldsValue({ [mode]: null });
+    }
   }, [timeValue]);
+
 
   const handleChange = (date: Dayjs | null) => {
     if (date) {
@@ -314,12 +321,11 @@ export function DateFormPicker({
       }
       if (onChange) onChange(null);
     }
-
-    
   };
 
 
-  const value = form ? form.getFieldValue(mode) : null;
+  // const value = form ? form.getFieldValue(mode) : null;
+  const value = form ? form.getFieldValue(mode) : (taskDetail ? null : dayjs());
 
   return (
     <Form.Item

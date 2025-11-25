@@ -42,7 +42,20 @@ const JobDescription: React.FC<JobDescriptionProps> = ({ form }) => {
   }
 }, [taskDetail, form]);
 
-
+  const job_assets = 
+    [
+          {
+            key: 'task',
+            label: 'Tài Liệu',
+            children: <JobAsset title="Thông tin từ admin" type="task" />,
+          },
+          {
+            key: 'comments',
+            label: 'Bình luận',
+            children: <JobAsset title="Bình luận cho mọi người" type="comment" />,
+          },
+        ]
+  
 
 
   return (
@@ -71,23 +84,12 @@ const JobDescription: React.FC<JobDescriptionProps> = ({ form }) => {
         </Form.Item>
 
       {/* <JobAsset key="task-assets" title='Tài liệu' type="task" /> */}
-      {taskDetail &&
+      {/* {taskDetail && */}
       <Tabs
         activeKey={activeKey}
         onChange={key => setActiveKey(key)}
-        items={[
-          {
-            key: 'task',
-            label: 'Tài Liệu',
-            children: <JobAsset title="Thông tin từ admin" type="task" />,
-          },
-          {
-            key: 'comments',
-            label: 'Bình luận',
-            children: <JobAsset title="Bình luận cho mọi người" type="comment" />,
-          },
-        ]}
-      />}
+        items={taskDetail ? job_assets : [job_assets[0]]}
+      />
       
     </Stack>
   );
