@@ -3,9 +3,12 @@ import {Stack, Box} from "@mui/material";
 import { Form, DatePicker, Select, InputNumber, Typography } from "antd";
 import { CalendarOutlined, ConsoleSqlOutlined } from "@ant-design/icons";
 import { Table, TableBody, TableCell, TableRow, TableContainer, Paper } from '@mui/material';
+
 import dayjs, { Dayjs } from "dayjs";
 import utc from 'dayjs/plugin/utc';
 import timezone from "dayjs/plugin/timezone";
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 import type { Mode, UserSearchProps } from "../../../../@types/work-space.type";
 import type { Task } from "../../../../@types/work-space.type";
@@ -13,8 +16,7 @@ import JobAsset from "./JobAsset";
 import { useUser } from "../../../../common/hooks/useUser";
 import { useTaskContext } from "../../../../common/hooks/useTask";
 
-dayjs.extend(utc);
-dayjs.extend(timezone);
+
 
 const { Text } = Typography;
 

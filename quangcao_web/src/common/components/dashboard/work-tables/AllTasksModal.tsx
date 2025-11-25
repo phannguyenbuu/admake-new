@@ -1,31 +1,78 @@
 import { useEffect, useState, useCallback, useContext } from "react";
 import { Modal, Dropdown, Card } from "antd";
-import { Stack, Box } from "@mui/material";
+import { Stack, Box, Typography } from "@mui/material";
 import { MoreOutlined, StarFilled } from "@ant-design/icons";
 import columnThemes from "./theme.json";
 import { UpdateButtonContext } from "../../../common/hooks/useUpdateButtonTask";
 import { useApiHost } from "../../../common/hooks/useApiHost";
 import { useUser } from "../../../common/hooks/useUser";
+import { SearchOutlined } from "@ant-design/icons";
+import { Input as AntdInput, Menu } from "antd";
 import type { ColumnType, Task, TasksResponse } from "../../../@types/work-space.type";
+import type { WorkSpace } from "../../../@types/work-space.type";
 import "./css/css.css";
 import "./work-space/workspace.css";
 import { fixedColumns } from "./Managerment";
+import { DateFormPicker } from "./task/JobTimeAndProcess ";
+import { Form } from "antd";
+import dayjs, { Dayjs } from "dayjs";
+import utc from 'dayjs/plugin/utc';
+import timezone from "dayjs/plugin/timezone";
+dayjs.extend(utc);
+dayjs.extend(timezone);
+
+import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
+import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
+dayjs.extend(isSameOrAfter);
+dayjs.extend(isSameOrBefore);
 
 const items = [
   { key: "status", label: "Tiến trình" },
   // { key: "role", label: "Phòng ban" },
 ];
 
-export default function AllManagementModal() {
+export default function AllTasksModal() {
   const [columns, setColumns] = useState<ColumnType[]>([]);
   const context = useContext(UpdateButtonContext);
-  const {userLeadId, isMobile} = useUser();
+  const {userLeadId, workspaces, isMobile} = useUser();
+  const [searchText, setSearchText] = useState("");
+
   if (!context) throw new Error("UpdateButtonContext not found");
 
   const [tasksData, setTasksData] = useState<Task[]>([]);
   const [statusVisible, setStatusVisible] = useState(false);
   const [roleVisible, setRoleVisible] = useState(false);
+  const [filteredItems, setFilteredItems] = useState<Task[]>([]);
   const [isHover, setIsHover] = useState(false);
+
+  const [startDate, setStartDate] = useState<Dayjs | null>(null);
+  const [endDate, setEndDate] = useState<Dayjs | null>(null);
+  const [form] = Form.useForm();
+
+
+  const handleSearch = (value: string, startDate?: Dayjs | null, endDate?: Dayjs | null) => {
+    setSearchText(value);
+    let filtered = tasksData;
+
+    if (value) {
+      filtered = filtered.filter((el) =>
+        el?.title?.toLowerCase().includes(value.toLowerCase()) 
+      ||el?.workspace?.toLowerCase().includes(value.toLowerCase())
+      ||el?.description?.toLowerCase().includes(value.toLowerCase())
+      );
+      setFilteredItems(filtered);
+    }
+
+    if (startDate) {
+      filtered = filtered.filter(el => el.start_time && dayjs(el.start_time).isSameOrAfter(startDate, 'day'));
+    }
+    
+    if (endDate) {
+      filtered = filtered.filter(el => el.end_time && dayjs(el.end_time).isSameOrBefore(endDate, 'day'));
+    }
+
+    setFilteredItems(filtered);
+  };
 
 
   async function fetchTasks() {
@@ -36,6 +83,7 @@ export default function AllManagementModal() {
       const data = await response.json();
       // console.log(data);
       setTasksData(data);
+      setFilteredItems(data);
     } catch (error) {
       console.error("Failed to fetch tasks data:", error);
     }
@@ -49,10 +97,10 @@ export default function AllManagementModal() {
 
 
   useEffect(() => {
-    console.log(tasksData);
-    if(!tasksData) return;
+    // console.log(filteredItems);
+    if(!filteredItems) return;
 
-    const groupedTasks = tasksData.reduce((acc: any, task) => {
+    const groupedTasks = filteredItems.reduce((acc: any, task) => {
       if(!task?.status) return [];
         
       if (!acc[task?.status]) acc[task?.status] = [];
@@ -66,7 +114,7 @@ export default function AllManagementModal() {
         tasks: groupedTasks[col.type] || [],
       }))
     );
-  }, [tasksData]);
+  }, [filteredItems]);
 
   const handleStatusOk = () => setStatusVisible(false);
 
@@ -86,6 +134,8 @@ export default function AllManagementModal() {
   return (
     <>
       <Dropdown menu={menu}>
+    
+       
         <Box
           sx={{
             width: 100,
@@ -120,6 +170,45 @@ export default function AllManagementModal() {
         footer={null}
         closable={false}
       >
+        <Form>
+          <Stack direction={isMobile ? "column" : "row"} spacing={2}
+            style={{paddingBottom: 2}}>
+            <AntdInput
+              allowClear  
+              placeholder="Tìm kiếm công việc"
+              value={searchText}
+              prefix={<SearchOutlined className="!text-cyan-500 !text-xs sm:!text-sm" />}  // Biểu tượng search
+              onChange={(e) => handleSearch(e.target.value)}
+              style={{ marginBottom: 8,width: 300 }}
+            />
+
+            { false &&
+            <Stack style={{marginTop:isMobile?0:-20}} direction="row" spacing={2}>
+              <DateFormPicker
+                mode="start_time"
+                title="Từ ngày"
+                timeValue={startDate}
+                onChange={(date) => {
+                  setStartDate(date);
+                  handleSearch(searchText, date, endDate);
+                }}
+                form={form}
+              />
+            
+              <DateFormPicker
+                mode="end_time"
+                title="Đến ngày"
+                timeValue={endDate}
+                onChange={(date) => {
+                  setEndDate(date);
+                  handleSearch(searchText, startDate, date);
+                }}
+                form={form}
+              />
+            </Stack>}
+          </Stack>
+        </Form>
+
         <button
           onClick={handleStatusOk}
           style={{

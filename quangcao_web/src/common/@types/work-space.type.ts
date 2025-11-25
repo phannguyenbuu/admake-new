@@ -83,7 +83,6 @@ export interface Task extends BaseEntity {
   title?: string;
   description?: string;
   status?: string; // có thể thu hẹp thành "OPEN" | "DONE" | ...
-  // type: string; // có thể thu hẹp thành "REWARD" | ...
   reward?: number; // số tiền thưởng
   amount?: number;
   type?: "MONTHLY" | "REWARD" | string;

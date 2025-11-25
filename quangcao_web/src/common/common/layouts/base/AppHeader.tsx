@@ -11,11 +11,12 @@ import { useWorkSpaceQueryAll } from "../../hooks/work-space.hook";
 import ChatGroupList from "./ChatGroupList";
 import { useUser } from "../../hooks/useUser";
 import { QuestionOutlined } from '@ant-design/icons';
-import AllManagementModal from "../../../components/dashboard/work-tables/AllManagementModal";
+import AllTasksModal from "../../../components/dashboard/work-tables/AllTasksModal";
 import { useLocation } from "react-router-dom";
 import { ChatGroupProvider } from "../../../components/chat/ProviderChat";
 import NoteWorkpointModal from "./NoteWorkpointModal";
 import NotifyModal from "./NotifyModal";
+import SearchIcon from '@mui/icons-material/Search';
 
 const { Header } = Layout;
 
@@ -105,15 +106,13 @@ export default function AppHeader() {
         {/* Menu Chat Group List */}
         <ChatGroupList/>
 
-        <AllManagementModal/>
-
-        
+        <AllTasksModal/>
+         
           <div onClick={handleQuestionClick}
             className="p-0 rounded-full hover:bg-gray-100 transition-all duration-200 flex items-center justify-center">
             <QuestionOutlined 
               className={`text-lg md:text-xl transition-colors duration-200`}
             />
-
           </div>
 
           {/* Admin role text */}
@@ -164,6 +163,8 @@ export default function AppHeader() {
               />
             </Dropdown>
           </div>
+
+          
         
       </Header>
 
