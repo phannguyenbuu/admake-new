@@ -17,13 +17,14 @@ export interface UserCanViewFormProps {
   view_customer?: boolean;
   view_workspace?: boolean;
   view_material?: boolean;
-  view_price?: boolean;
+  view_invoice?: boolean;
   view_accountant?: boolean;
   view_statistic?: boolean;
 
   [key: string]: any;
-  userName? : string;
-  users?: User[];        // Thay 'any[]' bằng kiểu mảng người dùng nếu biết rõ kiểu
+  username? : string;
+  users?: User[];
+  onDelete?: (ucvId:string | null) => Promise<void>;
 }
 
 const labels: { [key: string]: string } = {
@@ -33,7 +34,7 @@ const labels: { [key: string]: string } = {
   view_customer: "Khách hàng",
   view_workspace: "Công việc",
   view_material: "Vật liệu",
-  view_price: "Báo giá",
+  view_invoice: "Báo giá",
   view_accountant: "Kế toán",
   view_statistic: "Phân tích",
 }
@@ -67,7 +68,7 @@ const UserCanViewForm: React.FC<UserCanViewFormProps> = (props) => {
     view_customer: props.view_customer ?? false,
     view_workspace: props.view_workspace ?? false,
     view_material: props.view_material ?? false,
-    view_price: props.view_price ?? false,
+    view_invoice: props.view_invoice ?? false,
     view_accountant: props.view_accountant ?? false,
     view_statistic: props.view_statistic ?? false,
   });
@@ -105,25 +106,13 @@ const UserCanViewForm: React.FC<UserCanViewFormProps> = (props) => {
         body: JSON.stringify(jsonData),
       });
       if (!response.ok) throw new Error('Update failed');
+      
       notification.success({message:'Cập nhật quyền xem thành công'});
     } catch (error) {
       notification.error({message:'Lỗi khi cập nhật quyền xem'});
     }
   };
 
-  const handleDelete = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      const response = await fetch(`${useApiHost()}/user/${props.user_id}/can-view`, {
-        method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' }
-      });
-      if (!response.ok) throw new Error('Delete failed');
-      notification.success({message:'Xóa quyền xem thành công'});
-    } catch (error) {
-      notification.error({message:'Lỗi khi xóa quyền xem'});
-    }
-  };
 
   const checkboxOptions = Object.keys(formData)
   .filter(key => key !== 'id' && key !== 'user_id' && key !== 'password')
@@ -202,7 +191,7 @@ const UserCanViewForm: React.FC<UserCanViewFormProps> = (props) => {
               Cập nhật
             </Button>
 
-            <Button variant='outlined' onClick={handleDelete}>
+            <Button variant='outlined' onClick={() => { if(props.onDelete) props.onDelete(props.id ?? '')}}>
               Xóa
             </Button>
           </Stack>

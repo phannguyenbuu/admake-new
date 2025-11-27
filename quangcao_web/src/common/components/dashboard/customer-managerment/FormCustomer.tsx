@@ -291,6 +291,7 @@ export default function FormCustomer({
               </div>
 
               <div className="grid grid-cols-1 gap-3 sm:gap-4">
+                {false && 
                 <Form.Item
                   name="fullName"
                   label={
@@ -301,8 +302,9 @@ export default function FormCustomer({
                       <div className="w-1 h-1 bg-[#00B4B6] rounded-full"></div>
                     </div>
                   }
-                  rules={[{ required: true, message: "Nhập tên khách hàng" }]}
+                  rules={[{ required: false, message: "Nhập tên khách hàng" }]}
                   className="!mb-0"
+                  
                 >
                   <Input
                     placeholder="Nhập tên khách hàng"
@@ -310,19 +312,19 @@ export default function FormCustomer({
                     size="middle"
                     prefix={<UserOutlined className="text-[#00B4B6] mr-2" />}
                   />
-                </Form.Item>
+                </Form.Item>}
 
                 <Form.Item
                   name="name"
                   label={
                     <div className="flex items-center gap-1.5 sm:gap-2">
                       <span className="text-gray-800 font-medium text-xs sm:text-sm">
-                        Tên gợi nhớ
+                        Tên khách hàng
                       </span>
                       <div className="w-1 h-1 bg-[#00B4B6] rounded-full"></div>
                     </div>
                   }
-                  rules={[{ required: false, message: "Nhập tên gợi nhớ" }]}
+                  rules={[{ required: true, message: "Nhập tên khách hàng" }]}
                   className="!mb-0"
                 >
                   <Input

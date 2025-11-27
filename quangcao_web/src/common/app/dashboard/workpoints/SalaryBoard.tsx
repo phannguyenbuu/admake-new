@@ -162,7 +162,7 @@ const SalaryBoard: React.FC<SalaryBoardProps> = ({ selectedRecord, modalVisible,
     const response = await fetch(`${useApiHost()}/task/${selectedRecord?.user_id}/by_user`);
     
     if (!response.ok) {
-      console.log("Error in fetching");
+      // console.log("Error in fetching");
       throw new Error(`Error fetching tasks for user ${selectedRecord?.user_id}`);
     }
     

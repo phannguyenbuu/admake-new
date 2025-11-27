@@ -54,19 +54,25 @@ def login_user_form(username, password):
             
 
             # Query lọc UserCanView mà User tương ứng có cùng lead_id
-            can_views = {
-                "view_workpoint": True,
-                "view_user": True,
-                "view_supplier": True,
-                "view_customer": True,
-                "view_workspace": True,
-                "view_material": True,
-                "view_price": True,
-                "view_accountant": True,
-                "view_statistic": True,
-            }
+            # can_views = {
+            #     "view_workpoint": True,
+            #     "view_invoice": True,
+            #     "view_supplier": True,
+            #     "view_customer": True,
+            #     "view_workspace": True,
+            #     "view_material": True,
+            #     "view_invoice": True,
+            #     "view_accountant": True,
+            #     "view_statistic": True,
+            # }
 
-            
+            # if user.role_id != -2:
+            #     can_views = {key: False for key in can_views}
+            #     ucv = UserCanView.query.filter(UserCanView.user_id == user.id).first()
+
+            #     if ucv:
+            #         can_views = {key: getattr(ucv, key) for key in can_views}
+
             
             result = {
                     'access_token': access_token,
@@ -75,7 +81,7 @@ def login_user_form(username, password):
                     "role_id": user.role_id,
                     "role": user.update_role(),
                     "lead_id": user.lead_id,
-                    # "users_can_view": users_can_view,
+                    "can_views": get_user_can_view(user),
                 }
             
             print('JWT', result)
@@ -85,7 +91,29 @@ def login_user_form(username, password):
     else:
         print("Cannot find username", username)
         return jsonify({'status': 'fail', 'message': 'Invalid credentials wrong password'}), 401
+
+def get_user_can_view(user):
+    can_views = {
+        "view_workpoint": True,
+        "view_user": True,
+        "view_supplier": True,
+        "view_customer": True,
+        "view_workspace": True,
+        "view_material": True,
+        "view_invoice": True,
+        "view_accountant": True,
+        "view_statistic": True,
+    }
+
+    if user.role_id != -2:
+        can_views = {key: False for key in can_views}
+        ucv = UserCanView.query.filter(UserCanView.user_id == user.id).first()
+
+        if ucv:
+            can_views = {key: getattr(ucv, key) for key in can_views}
     
+    return can_views
+
 
 @auth_bp.route('/logout', methods=['POST'])
 def logout():
@@ -122,7 +150,8 @@ def me():
         'role_id': user.role_id,
         "role": user.update_role(),
         'icon': user.icon,
-        'lead_id': lead_id
+        'lead_id': lead_id,
+        "can_views": get_user_can_view(user),
     })
 
 

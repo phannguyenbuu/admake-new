@@ -4,10 +4,11 @@ import { useEffect } from "react";
 import ManagermentBoard from "../../../components/dashboard/work-tables/Managerment";
 import { useWorkSpaceQueryTaskById } from "../../../common/hooks/work-space.hook";
 import { useUser } from "../../../common/hooks/useUser";
+import UnPermissionBoard from "../unPermissionBoard";
 
 const WorkTableDetailPage: IPage["Component"] = () => {
   const { boardId } = useParams();
-  const { workspaceId, setWorkspaceId} = useUser();
+  const { workspaceId, setWorkspaceId, canViewPermission} = useUser();
 
   useEffect(()=>{
     setWorkspaceId(boardId ?? '');
@@ -63,7 +64,7 @@ const WorkTableDetailPage: IPage["Component"] = () => {
   }
 
   // @ts-ignore
-  return <ManagermentBoard/>;
+  return canViewPermission?.view_workspace ? <ManagermentBoard/> : <UnPermissionBoard/>;
 };
 
 export const loader = async () => {

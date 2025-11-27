@@ -1,0 +1,1 @@
+import{r as t,s as r}from"./index-DNMvp0xH.js";const a=t.createContext(void 0),p=({children:o})=>{const[e,s]=t.useState(0);return r.jsx(a.Provider,{value:{showUpdateButton:e,setShowUpdateButton:s},children:o})};export{a as U,p as a};

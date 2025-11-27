@@ -157,7 +157,7 @@ class UserCanView(BaseModel):
     view_customer = db.Column(db.Boolean, default=False)
     view_workspace = db.Column(db.Boolean, default=False)
     view_material = db.Column(db.Boolean, default=False)
-    view_price = db.Column(db.Boolean, default=False)
+    view_invoice = db.Column(db.Boolean, default=False)
     view_accountant = db.Column(db.Boolean, default=False)
     view_statistic = db.Column(db.Boolean, default=False)
 
@@ -169,7 +169,6 @@ class UserCanView(BaseModel):
             if isinstance(value, (datetime.datetime, datetime.date)):
                 value = value.isoformat()
             result[column.name] = value
-        
         
         user = db.session.get(User, self.user_id)
         if user:

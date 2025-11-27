@@ -121,8 +121,8 @@ def update_user_can_view(user_id):
     # Cập nhật các trường boolean từ dữ liệu gửi lên
     fields = [
         
-        "view_workpoint", "view_user", "view_supplier", "view_customer",
-        "view_workspace", "view_material", "view_price", "view_accountant", "view_statistic"
+        "view_workpoint", "view_supplier", "view_customer", "view_user",
+        "view_workspace", "view_material", "view_invoice", "view_accountant", "view_statistic"
     ]
 
     for field in fields:
@@ -172,12 +172,12 @@ def get_user_can_view(user_id):
 
 @user_bp.route("/<string:id>/can-view", methods=["DELETE"])
 def delete_user_can_view(id):
-    user = db.session.get(UserCanView, id)
-    if not user:
+    ucv = db.session.get(UserCanView, id)
+    if not ucv:
         print("Invalid UserCanView")
         abort(404, description="Invalid UserCanView")
 
-    db.session.delete(id)
+    db.session.delete(ucv)
     db.session.commit()
     
     return jsonify({"message": "DELETE successfully"}), 200

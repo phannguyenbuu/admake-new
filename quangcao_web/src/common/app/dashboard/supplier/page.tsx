@@ -12,9 +12,10 @@ import { useDebounce } from "../../../common/hooks/useDebounce";
 import { useUser } from "../../../common/hooks/useUser";
 import { QRColumn } from "../workpoints/WorkDays";
 import type { WorkDaysProps } from "../../../@types/workpoint";
+import UnPermissionBoard from "../unPermissionBoard";
 
 const SupplierDashboard: IPage["Component"] = () => {
-  const {userLeadId} = useUser();
+  const {userLeadId, canViewPermission} = useUser();
   const [config, setConfig] = useState({
     openCreate: false,
     openUpdate: false,
@@ -62,7 +63,9 @@ const SupplierDashboard: IPage["Component"] = () => {
     setQuery({ ...query, search: searchValue, page: 1 });
   };
 
-  return (
+  return canViewPermission?.view_supplier ?  (
+    <>
+    
     <div className="min-h-screen p-2 w-full">
       <ButtonComponent
         toggle={toggle("openCreate")}
@@ -164,8 +167,9 @@ const SupplierDashboard: IPage["Component"] = () => {
           </div>
         </div>
       )}
-    </div>
-  );
+    </div>  
+    </>
+  ):  <UnPermissionBoard/>;
 };
 
 export const loader = async () => {

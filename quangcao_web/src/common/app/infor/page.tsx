@@ -13,9 +13,10 @@ import { useDebounce } from "../../common/hooks/useDebounce";
 import AddIcon from "@mui/icons-material/Add";
 import UserCanViewForm from "./UserCanView";
 import type {UserCanViewFormProps} from "./UserCanView";
+import UnPermissionBoard from "../dashboard/unPermissionBoard";
 
 export const InforDashboard: IPage["Component"] = () => {
-  const {userId, username, userRole, userLeadId, fullName, setFullName} = useUser();
+  const {userId, username, userRole, userRoleId, userLeadId, fullName, setFullName, generateDatetimeId} = useUser();
   const [query, setQuery] = useState<Partial<PaginationDto>>({
       page: 1,
       limit: 1000,
@@ -65,7 +66,7 @@ export const InforDashboard: IPage["Component"] = () => {
           console.log('users_can_view',users_can_view);
           setFilteredUsersCanView(users_can_view.data);
         } catch (error) {
-          notification.error({message:'Error fetching users can view'});
+          console.error('Error fetching users can view');
         }
       }
 
@@ -148,26 +149,48 @@ export const InforDashboard: IPage["Component"] = () => {
     return Promise.resolve();
   };
 
-  const fetchApiPostUserCanView = async () => {
-    try {
-      const response = await fetch(`${useApiHost()}/user/${userId}/can-view`, {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'}
-      });
+  
+    const handleDelete = async (ucvId:string | null) => {
+      // e.preventDefault();
+      if(!ucvId) return;
 
-      if (!response.ok) throw new Error('Update failed');
+      try {
+        if(!ucvId.startsWith('tmp'))
+        {
+          const response = await fetch(`${useApiHost()}/user/${ucvId}/can-view`, {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' }
+          });
+          if (!response.ok) throw new Error('Delete failed');
+        }
 
-      const data = await response.json();
-      // console.log("DATA", data);
-      setFilteredUsersCanView(prev => [...prev, data.data]);
+        setFilteredUsersCanView(prev => prev.filter(el => el.id != ucvId));
+        notification.success({message:'Xóa quyền xem thành công'});
+      } catch (error) {
+        notification.error({message:'Lỗi khi xóa quyền xem'});
+      }
+    };
 
-      notification.success({ message: 'Tạo quyền xem mới thành công' });
-    } catch (error) {
-      notification.error({ message: 'Lỗi khi tạo quyền xem' });
-    }
-  };
+  // const fetchApiPostUserCanView = async () => {
+  //   try {
+  //     const response = await fetch(`${useApiHost()}/user/${userId}/can-view`, {
+  //       method: 'POST',
+  //       headers: {'Content-Type': 'application/json'}
+  //     });
 
-  return (
+  //     if (!response.ok) throw new Error('Update failed');
+
+  //     const data = await response.json();
+  //     // console.log("DATA", data);
+  //     setFilteredUsersCanView(prev => [...prev, data.data]);
+
+  //     notification.success({ message: 'Tạo quyền xem mới thành công' });
+  //   } catch (error) {
+  //     notification.error({ message: 'Lỗi khi tạo quyền xem' });
+  //   }
+  // };
+
+  return userRoleId === -2 ? (
     <>
     <div className="py-3 lg:pt-20 w-full flex items-center justify-center overflow-hidden">
       {/* Background */}
@@ -199,25 +222,42 @@ export const InforDashboard: IPage["Component"] = () => {
             </div>
           </div>
 
-          
-            <IconButton color="primary" component="span"
-              onClick={() => {
-                const item:UserCanViewFormProps = {};
-                setFilteredUsersCanView(prev => [...prev, item]);
-              }}
-              aria-label="upload picture" size="small"
-              sx={{ border: "1px dashed #3f51b5", width: 40, height: 40,}} >
-          
-              <AddIcon />
-              
-            </IconButton>
-            <Stack direction="column" spacing={1}>
+          <Stack direction="column" spacing={1}>
               {filteredUsersCanView.map((el, idx) => 
 
-                  <UserCanViewForm key={el.id} {...el} username={`${username}_${idx + 1}`} users={users ?? []}/>
+                  <UserCanViewForm key={el.id} {...el} onDelete={handleDelete} users={filterdUsers}/>
                 
               )}
             </Stack>
+          
+          <IconButton color="primary" component="span"
+            onClick={() => {
+              let usr_name = '';
+              for(let i = 0; i < 10000; i++) {
+                const candidate = `${username}_${i}`;
+                
+                // Tìm xem có username trùng không
+                const existing = filteredUsersCanView.find(el => el.username === candidate);
+                
+                if (!existing) {
+                  usr_name = candidate;
+                  break;
+                }
+              }
+
+
+              const item:UserCanViewFormProps = {id:'tmp' + generateDatetimeId(), 
+                  username: usr_name,
+                  onDelete:handleDelete};
+              setFilteredUsersCanView(prev => [...prev, item]);
+            }}
+            aria-label="upload picture" size="small"
+            sx={{ border: "1px dashed #3f51b5", width: 40, height: 40,}} >
+        
+            <AddIcon />
+            
+          </IconButton>
+          
         </Card>
       </div>
 
@@ -277,7 +317,7 @@ export const InforDashboard: IPage["Component"] = () => {
       </Modal>
     </>
 
-  );
+  ):<UnPermissionBoard/>;
 };
 
 export const loader = async () => {

@@ -1162,5 +1162,7 @@ if __name__ == "__main__":
         db.create_all()
         
         
-        user = User.query.filter(User.username == "ad205_1").first()
-        print(user.tdict())
+        usr = db.session.get(UserCanView, "202511270319022765669c59df")
+        print(usr.tdict())
+
+        

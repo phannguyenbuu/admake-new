@@ -90,7 +90,7 @@ export const columnsCustomer = [
      render: (text: string, record: WorkSpace) => (
       <div>
         <div>{text}</div>
-        <span className="!text-cyan-700" style={{fontSize:12,fontStyle:'italic'}}>{record?.fullName}</span>
+        {/* <span className="!text-cyan-700" style={{fontSize:12,fontStyle:'italic'}}>{record?.fullName}</span> */}
       </div>
     ),
   },

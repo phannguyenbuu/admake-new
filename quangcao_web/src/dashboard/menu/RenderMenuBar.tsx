@@ -22,6 +22,7 @@ import "./mobile-menu.css";
 import ModalManagerWorkSpace from "../../common/components/dashboard/work-tables/work-space/ModalManagerWorkSpace";
 import type { PaginationDto } from "../../common/@types/common.type";
 import { useUser } from "../../common/common/hooks/useUser";
+import UnPermissionBoard from "../../common/app/dashboard/unPermissionBoard";
 
 // Hook để theo dõi kích thước màn hình
 const useWindowSize = () => {
@@ -51,7 +52,7 @@ export default function RenderMenuBar({}) {
   const { pathname } = useLocation();
   const navigate = useNavigate();
   const { width } = useWindowSize();
-  const {userLeadId, workspaces, currentWorkspace} = useUser();
+  const {userLeadId, workspaces, currentWorkspace, canViewPermission} = useUser();
 
   const [query, setQuery] = useState<Partial<PaginationDto>>({
       page: 1,
@@ -170,7 +171,7 @@ export default function RenderMenuBar({}) {
       .map((item) => {
         const hasChildren = item.key === "/dashboard/work-tables";
 
-        if (hasChildren && !isTablet) {
+        if (hasChildren && !isTablet && canViewPermission?.view_workspace) {
           // Menu item có children (workspaces)
           return {
             key: item.key,
@@ -237,7 +238,7 @@ export default function RenderMenuBar({}) {
     }
   };
 
-  return (
+  return  (
     <>
       {/* Ant Design Menu với Custom Scrollbar */}
       <div className="h-full w-full overflow-y-auto overflow-x-hidden custom-scrollbar px-2">

@@ -10,6 +10,7 @@ import { EditOutlined } from "@ant-design/icons";
 import { columnsUser } from "../../../common/data";
 import { useDebounce } from "../../../common/hooks/useDebounce";
 import { useUser } from "../../../common/hooks/useUser";
+import UnPermissionBoard from "../unPermissionBoard";
 
 const UserDashboard: IPage["Component"] = () => {
   const [config, setConfig] = useState({
@@ -17,7 +18,7 @@ const UserDashboard: IPage["Component"] = () => {
     openUpdate: false,
   });
 
-  const {userId, username, userRoleId, userRole, userLeadId } = useUser();
+  const {userId, username, userRoleId, userRole, userLeadId, canViewPermission } = useUser();
   const [query, setQuery] = useState<Partial<PaginationDto>>({
     page: 1,
     limit: 10,
@@ -44,6 +45,11 @@ const UserDashboard: IPage["Component"] = () => {
     }
   };
 
+  useEffect(()=>
+  {
+    console.log('CVS', canViewPermission);
+  },[canViewPermission]);
+
   const [user, setUser] = useState<User | null>(null);
 
   const toggle = (key: keyof typeof config) => {
@@ -57,7 +63,7 @@ const UserDashboard: IPage["Component"] = () => {
     setQuery({ ...query, search: searchValue, page: 1 });
   };
 
-  return (
+  return canViewPermission?.view_user ? (
     <div className="min-h-screen p-2 w-full">
       <ButtonComponent
         toggle={toggle("openCreate")}
@@ -147,7 +153,7 @@ const UserDashboard: IPage["Component"] = () => {
         </div>
       )}
     </div>
-  );
+  ) : <UnPermissionBoard/>;
 };
 export const loader = async () => {
   // Simulate loading delay

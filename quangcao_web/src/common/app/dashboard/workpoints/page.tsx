@@ -15,6 +15,8 @@ import type { Workpoint, WorkDaysProps } from "../../../@types/workpoint";
 // import type { Leave } from "../../../@types/leave.type";
 
 import SalaryBoard from "./SalaryBoard";
+import { Typography } from "antd";
+import UnPermissionBoard from "../unPermissionBoard";
 
 const WorkPointPage: IPage["Component"] = () => {
   const [query, setQuery] = useState({
@@ -30,7 +32,7 @@ const WorkPointPage: IPage["Component"] = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedRecord, setSelectedRecord] = useState<WorkDaysProps | null>(null);
 
-  const {userLeadId} = useUser();
+  const {userLeadId, canViewPermission} = useUser();
 
   const handleOpenModal = (record: WorkDaysProps) => {
     setSelectedRecord(record);
@@ -72,14 +74,17 @@ const WorkPointPage: IPage["Component"] = () => {
     fetchUsers(query);
   }, [query]);
 
-  useEffect(() => {
-    console.log('Workpoints', workpoints);
-  },[workpoints]);
+  // useEffect(() => {
+  //   console.log('Workpoints', workpoints);
+  // },[workpoints]);
 
-  
+  useEffect(()=>{
+    console.log('canViewPermission', canViewPermission);
+  },[]);
 
-  return (
+  return canViewPermission?.view_workpoint ?(
     <>
+    
     <div className="min-h-screen p-2 w-full">
       <TableComponent<WorkDaysProps>
         columns={columnsWorkPoint(handleOpenModal)}
@@ -99,7 +104,7 @@ const WorkPointPage: IPage["Component"] = () => {
           },
           locale: { items_per_page: "/ Trang" },
         }}
-      />
+      /> 
     </div>
 
     {modalVisible && 
@@ -108,7 +113,7 @@ const WorkPointPage: IPage["Component"] = () => {
               modalVisible={modalVisible} 
               handleOk={handleCloseModal} />}
               </>
-  );
+  ): <UnPermissionBoard/>;
 };
 
 export default WorkPointPage;

@@ -7,6 +7,7 @@ import type { WorkSpace } from '../../@types/work-space.type';
 import type { NotifyProps } from '../../@types/notify.type';
 import type { MessageTypeProps } from '../../@types/chat.type';
 import type { User } from '../../@types/user.type';
+import type { UserCanViewFormProps } from '../../app/infor/UserCanView';
 
 interface UserContextProps {
   isCurrentWorkspaceFree: boolean;
@@ -26,9 +27,11 @@ interface UserContextProps {
   userCanViewList: User[];
   tmpTaskCreatedAssets: MessageTypeProps[],
   tmpTaskCreatedMessages: MessageTypeProps[],
+  canViewPermission: UserCanViewFormProps | null,
 
   currentWorkspace: WorkSpace | null;
 
+  setCanViewPermission:React.Dispatch<React.SetStateAction<UserCanViewFormProps | null>>,
   setTmpTaskCreatedAssets:React.Dispatch<React.SetStateAction<MessageTypeProps[]>>,
   setTmpTaskCreatedMessages:React.Dispatch<React.SetStateAction<MessageTypeProps[]>>,
   setIsFullChatUI: React.Dispatch<React.SetStateAction<boolean>>;
@@ -63,10 +66,12 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const [userCanViewList, setUserCanViewList] = useState<User[]>([]);
+  const [canViewPermission, setCanViewPermission] = useState<UserCanViewFormProps | null>(null);
   const [workspaces, setWorkspaces] = useState<WorkSpace[]>([]);
   const [currentWorkspace, setCurrentWorkspace] = useState<WorkSpace | null>(null);
   const [workspaceId, setWorkspaceId] = useState<string>("");
   const [userLeadId, setUserLeadId] = useState<number>(0);
+
   const [userId, setUserId] = useState<string | null>(null);
   const [fullName, setFullName] = useState<string | null>(null);
   // const [userPassword, setUserPasssword] = useState<string | null>(null);
@@ -220,13 +225,11 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const login = async ({ username, password }: { username: string; password: string }) => {
     try {
-      // console.log('LOGIN 1');
       const res = await fetch(`${API_HOST}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password }),
       });
-      // console.log('LOGIN 2');
 
       if (!res.ok) {
         const errorData = await res.json();
@@ -235,7 +238,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
 
       const data = await res.json();
-      // console.log('JWT:', data);
+      console.log('JWT:', data);
 
       if (!data.access_token) {
         throw new Error('No access token in response');
@@ -250,6 +253,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setUserRole(data.role);
       setUserIcon(data.icon ?? 'images/avatar.png');
       setUserLeadId(data.lead_id ?? null);
+      setCanViewPermission(data.can_views ?? null);
 
       // Sau khi đăng nhập thành công, bạn có thể redirect đến trang chính
       window.location.href = '/dashboard'; // hoặc route bạn muốn
@@ -306,6 +310,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setUserRole(null);
     setUserIcon(null);
     setUserLeadId(0);
+    setCanViewPermission(null);
 
     isLoggingOutRef.current = false;
     window.location.href = '/login';
@@ -346,6 +351,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setUserRole(data.role ?? null);
         setUserIcon(data.icon ?? 'images/avatar.png');
         setUserLeadId(data.lead_id ?? null);
+        setCanViewPermission(data.can_views ?? null);
       } else if (res.status === 401) {
         // Token hết hạn hoặc không hợp lệ, xóa token, chuyển về login
         console.warn("Access token expired or invalid, logging out.");
@@ -358,6 +364,8 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setUserRole(null);
         setUserIcon(null);
         setUserLeadId(0);
+        setCanViewPermission(null);
+        
       }
     } catch (error) {
       console.error("Failed to check auth status:", error);
@@ -384,6 +392,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       notifyDelete, notifyList, getNotifyList, setNotifyList,
       tmpTaskCreatedAssets, setTmpTaskCreatedAssets,
       tmpTaskCreatedMessages, setTmpTaskCreatedMessages,
+      canViewPermission, setCanViewPermission,
       userCanViewList, setUserCanViewList,
       userIcon, login, logout, checkAuthStatus }}>
       {children}

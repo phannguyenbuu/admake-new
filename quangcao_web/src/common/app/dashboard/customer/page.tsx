@@ -12,10 +12,11 @@ import { notification } from "antd";
 import { useApiHost } from "../../../common/hooks/useApiHost";
 import type { WorkSpace } from "../../../@types/work-space.type";
 import { useUser } from "../../../common/hooks/useUser";
+import UnPermissionBoard from "../unPermissionBoard";
 
 
 const CustomerDashboard: IPage["Component"] = () => {
-  const {userLeadId} = useUser();
+  const {userLeadId, canViewPermission} = useUser();
   const [query, setQuery] = useState<Partial<PaginationDto>>({
     page: 1,
     limit: 10,
@@ -78,7 +79,7 @@ const handleDeleteCustomer = () => {
 
 
 
-  return (
+  return canViewPermission?.view_customer ? (
     <div className="min-h-screen p-2 w-full">
       <ButtonComponent
         toggle={toggle("openCreate")}
@@ -138,7 +139,7 @@ const handleDeleteCustomer = () => {
         onRefresh={refetch}
       />
     </div>
-  );
+  ) : <UnPermissionBoard/>;
 };
 
 export const loader = async () => {
