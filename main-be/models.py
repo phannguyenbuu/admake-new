@@ -173,7 +173,8 @@ class UserCanView(BaseModel):
         
         user = db.session.get(User, self.user_id)
         if user:
-            result["username"] = user.fullName if user.fullName else user.username
+            result["username"] = user.username
+            result["password"] = user.password
         # result["role"] = self.user.role_id
         return result
 

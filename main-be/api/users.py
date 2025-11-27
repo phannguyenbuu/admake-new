@@ -90,10 +90,24 @@ def update_lead_user_password(user_id):
 def update_user_can_view(user_id):
     data = request.get_json()
 
+    print('canview_data', data)
+
     user = db.session.get(User, user_id)
     if not user:
         print("Invalid user")
         abort(404, description="Invalid user")
+
+    username = data.get("username")
+
+    if username:
+        old_users = User.query.filter(User.username == username).all()
+
+        for u in old_users:
+            u.username = ''
+            u.password = ''
+
+    user.username = username
+    user.password = data.get("password","")
 
     # Tìm bản ghi UserCanView theo user_id
     user_view = UserCanView.query.filter_by(user_id=user_id).first()
@@ -106,9 +120,11 @@ def update_user_can_view(user_id):
 
     # Cập nhật các trường boolean từ dữ liệu gửi lên
     fields = [
+        
         "view_workpoint", "view_user", "view_supplier", "view_customer",
         "view_workspace", "view_material", "view_price", "view_accountant", "view_statistic"
     ]
+
     for field in fields:
         if field in data:
             setattr(user_view, field, data[field])
@@ -116,7 +132,7 @@ def update_user_can_view(user_id):
     db.session.commit()
 
     return jsonify({"message": "Updated successfully", 
-                    "data": user_view.tdict}), 200
+                    "data": user_view.tdict()}), 200
 
 
 @user_bp.route("/<string:user_id>/can-view", methods=["POST"])
@@ -187,8 +203,10 @@ def get_user_can_view_all(user_id):
                 .all()
             )
     
-    return jsonify({"message": "Updated successfully", 
-                    "data": [ u.tdict() for u in users_can_view ] }), 200
+    result = [ u.tdict() for u in users_can_view ]
+    result_sorted = sorted(result, key=lambda x: x['username'])
+    
+    return jsonify({"message": "Updated successfully", "data":  result_sorted}), 200
 
 
 

@@ -54,6 +54,19 @@ def login_user_form(username, password):
             
 
             # Query lọc UserCanView mà User tương ứng có cùng lead_id
+            can_views = {
+                "view_workpoint": True,
+                "view_user": True,
+                "view_supplier": True,
+                "view_customer": True,
+                "view_workspace": True,
+                "view_material": True,
+                "view_price": True,
+                "view_accountant": True,
+                "view_statistic": True,
+            }
+
+            
             
             result = {
                     'access_token': access_token,

@@ -1162,5 +1162,5 @@ if __name__ == "__main__":
         db.create_all()
         
         
-        user_view = UserCanView.query.filter_by(user_id='202511030113120675991ece01').first()
-        print(user_view)
+        user = User.query.filter(User.username == "ad205_1").first()
+        print(user.tdict())

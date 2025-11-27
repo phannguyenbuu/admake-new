@@ -29,9 +29,15 @@ export const InforDashboard: IPage["Component"] = () => {
   
     // Debounce search value
   const debouncedSearch = useDebounce(query.search, 500);
-  const {data: users,isLoading: isLoadingUsers,refetch,
+  const {data: usersResponse,isLoading: isLoadingUsers,refetch,
     } = useUserQuery({ ...query, search: debouncedSearch });
 
+  const [users, setUsers] = useState<User[]>();
+  
+  useEffect(()=>{
+    setUsers(usersResponse?.data ?? []);
+  },[usersResponse]);
+  
   const [form] = Form.useForm();
   const [config, setConfig] = useState({
     openEdit: false,
@@ -195,21 +201,23 @@ export const InforDashboard: IPage["Component"] = () => {
 
           
             <IconButton color="primary" component="span"
-              onClick={fetchApiPostUserCanView}
+              onClick={() => {
+                const item:UserCanViewFormProps = {};
+                setFilteredUsersCanView(prev => [...prev, item]);
+              }}
               aria-label="upload picture" size="small"
               sx={{ border: "1px dashed #3f51b5", width: 40, height: 40,}} >
           
               <AddIcon />
               
             </IconButton>
+            <Stack direction="column" spacing={1}>
+              {filteredUsersCanView.map((el, idx) => 
 
-            {filteredUsersCanView.map((el, idx) => 
-              <Typography>
-                {idx + 1}
-              </Typography>
-              // <UserCanViewForm key={el.id} {...el} />
+                  <UserCanViewForm key={el.id} {...el} username={`${username}_${idx + 1}`} users={users ?? []}/>
+                
               )}
-
+            </Stack>
         </Card>
       </div>
 
