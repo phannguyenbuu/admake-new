@@ -60,9 +60,9 @@ export default function FormUser({
   }, []);
 
   // Get salary levels from settings
-  const salaryLevels =
-    (settings?.find((setting) => setting.key === "salary_level")
-      ?.value as Array<{ id: string; salary: number; index: number }>) || [];
+  // const salaryLevels =
+  //   (settings?.find((setting) => setting.key === "salary_level")
+  //     ?.value as Array<{ id: string; salary: number; index: number }>) || [];
 
   // @ts-ignore
   const role = roles?.find((role: Role) => role.id === user?.role?.id);
@@ -75,10 +75,10 @@ export default function FormUser({
     value: role.id,
   }));
 
-  const salaryOptions = salaryLevels.map((level) => ({
-    label: `Bậc ${level.index} - ${level.salary.toLocaleString("vi-VN")} VNĐ`,
-    value: level.index,
-  }));
+  // const salaryOptions = salaryLevels.map((level) => ({
+  //   label: `Bậc ${level.index} - ${level.salary.toLocaleString("vi-VN")} VNĐ`,
+  //   value: level.index,
+  // }));
 
   const getButtonText = () => {
     if (buttonText) return buttonText;

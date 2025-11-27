@@ -38,41 +38,41 @@ export const UserForm: React.FC<UserFormProps> = ({
   const { mutate: updateInfo, isPending: isUpdatingInfo } = useUpdateInfo();
   const { data: settings } = useSettingQuery();
 
-  const salaryLevelsData =
-    (settings?.find((setting) => setting.key === "salary_level")
-      ?.value as Array<SalaryLevelItem>) || [];
+  // const salaryLevelsData =
+  //   (settings?.find((setting) => setting.key === "salary_level")
+  //     ?.value as Array<SalaryLevelItem>) || [];
 
   // Reset form values when info changes
-  useEffect(() => {
-    if (info && salaryLevelsData.length > 0) {
-      // Tìm salary level tương ứng với info.salary
-      const salaryLevel = salaryLevelsData.find(
-        (level) => level.index === info.salary
-      );
+  // useEffect(() => {
+  //   if (info && salaryLevelsData.length > 0) {
+  //     // Tìm salary level tương ứng với info.salary
+  //     const salaryLevel = salaryLevelsData.find(
+  //       (level) => level.index === info.salary
+  //     );
 
-      const core: Omit<FormValues, "salary"> = {
-        fullName: info.fullName || "",
-        phone: info.phone || "",
-        role: info.role?.name || "",
-        username: info.username || "",
-        total_salary: `${formatCurrency(info.total_salary || 0)}đ`,
-      };
+  //     const core: Omit<FormValues, "salary"> = {
+  //       fullName: info.fullName || "",
+  //       phone: info.phone || "",
+  //       role: info.role?.name || "",
+  //       username: info.username || "",
+  //       total_salary: `${formatCurrency(info.total_salary || 0)}đ`,
+  //     };
 
-      const formValues = {
-        ...core,
-        salary: salaryLevel
-          ? `Bậc ${salaryLevel.index}: ${formatCurrency(salaryLevel.salary)}đ`
-          : `Bậc ${info.salary || "N/A"}`,
-      };
+  //     const formValues = {
+  //       ...core,
+  //       salary: salaryLevel
+  //         ? `Bậc ${salaryLevel.index}: ${formatCurrency(salaryLevel.salary)}đ`
+  //         : `Bậc ${info.salary || "N/A"}`,
+  //     };
 
-      // Chỉ set password nếu API trả về (thường thì API không trả về password vì bảo mật)
-      if (info.password) {
-        formValues.password = info.password;
-      }
+  //     // Chỉ set password nếu API trả về (thường thì API không trả về password vì bảo mật)
+  //     if (info.password) {
+  //       formValues.password = info.password;
+  //     }
 
-      form.setFieldsValue(formValues);
-    }
-  }, [info, salaryLevelsData, form]);
+  //     form.setFieldsValue(formValues);
+  //   }
+  // }, [info, salaryLevelsData, form]);
 
   const handleSave = async (values: FormValues) => {
     try {
@@ -110,34 +110,34 @@ export const UserForm: React.FC<UserFormProps> = ({
     toggle("openEdit")();
     // Xóa tất cả errors khi cancel
     form.resetFields();
-    if (info && salaryLevelsData.length > 0) {
-      // Tìm salary level tương ứng với info.salary
-      const salaryLevel = salaryLevelsData.find(
-        (level) => level.index === info.salary
-      );
+    // if (info && salaryLevelsData.length > 0) {
+    //   // Tìm salary level tương ứng với info.salary
+    //   const salaryLevel = salaryLevelsData.find(
+    //     (level) => level.index === info.salary
+    //   );
 
-      const core: Omit<FormValues, "salary"> = {
-        fullName: info.fullName || "",
-        phone: info.phone || "",
-        role: info.role?.name || "",
-        username: info.username || "",
-        total_salary: `${formatCurrency(info.total_salary || 0)}đ`,
-      };
-      const formValues = {
-        ...core,
-        salary: salaryLevel
-          ? `Bậc ${salaryLevel.index}: ${formatCurrency(salaryLevel.salary)}đ`
-          : `Bậc ${info.salary || "N/A"}`,
-        username: info.username,
-      };
+    //   const core: Omit<FormValues, "salary"> = {
+    //     fullName: info.fullName || "",
+    //     phone: info.phone || "",
+    //     role: info.role?.name || "",
+    //     username: info.username || "",
+    //     total_salary: `${formatCurrency(info.total_salary || 0)}đ`,
+    //   };
+    //   const formValues = {
+    //     ...core,
+    //     salary: salaryLevel
+    //       ? `Bậc ${salaryLevel.index}: ${formatCurrency(salaryLevel.salary)}đ`
+    //       : `Bậc ${info.salary || "N/A"}`,
+    //     username: info.username,
+    //   };
 
-      // Chỉ set password nếu API trả về
-      if (info.password) {
-        formValues.password = info.password;
-      }
+    //   // Chỉ set password nếu API trả về
+    //   if (info.password) {
+    //     formValues.password = info.password;
+    //   }
 
-      form.setFieldsValue(formValues);
-    }
+    //   form.setFieldsValue(formValues);
+    // }
   };
 
   const handleToggleShowPassword = () => {
@@ -145,41 +145,42 @@ export const UserForm: React.FC<UserFormProps> = ({
   };
 
   // Xóa errors khi tắt edit mode
-  useEffect(() => {
-    if (!config.openEdit) {
-      form.resetFields();
-      // Reset form values khi tắt edit
-      if (info && salaryLevelsData.length > 0) {
-        // Tìm salary level tương ứng với info.salary
-        const salaryLevel = salaryLevelsData.find(
-          (level) => level.index === info.salary
-        );
+  // useEffect(() => {
+  //   if (!config.openEdit) {
+  //     form.resetFields();
+  //     // Reset form values khi tắt edit
+  //     if (info && salaryLevelsData.length > 0) {
+  //       // Tìm salary level tương ứng với info.salary
+  //       const salaryLevel = salaryLevelsData.find(
+  //         (level) => level.index === info.salary
+  //       );
 
-        const core: Omit<FormValues, "salary"> = {
-          fullName: info.fullName || "",
-          phone: info.phone || "",
-          role: info.role?.name || "",
-          username: info.username || "",
-          total_salary: `${formatCurrency(info.total_salary || 0)}đ`,
-        };
-        const formValues = {
-          ...core,
-          phone: info.phone || "",
-          role: info.role?.name || "",
-          salary: salaryLevel
-            ? `Bậc ${salaryLevel.index}: ${formatCurrency(salaryLevel.salary)}đ`
-            : `Bậc ${info.salary || "N/A"}`,
-          username: info.username,
-        };
+  //       const core: Omit<FormValues, "salary"> = {
+  //         fullName: info.fullName || "",
+  //         phone: info.phone || "",
+  //         role: info.role?.name || "",
+  //         username: info.username || "",
+  //         total_salary: `${formatCurrency(info.total_salary || 0)}đ`,
+  //       };
+  //       const formValues = {
+  //         ...core,
+  //         phone: info.phone || "",
+  //         role: info.role?.name || "",
+  //         salary: salaryLevel
+  //           ? `Bậc ${salaryLevel.index}: ${formatCurrency(salaryLevel.salary)}đ`
+  //           : `Bậc ${info.salary || "N/A"}`,
+  //         username: info.username,
+  //       };
 
-        if (info.password) {
-          formValues.password = info.password;
-        }
+  //       if (info.password) {
+  //         formValues.password = info.password;
+  //       }
 
-        form.setFieldsValue(formValues);
-      }
-    }
-  }, [config.openEdit, info, salaryLevelsData, form]);
+  //       form.setFieldsValue(formValues);
+  //     }
+  //   }
+  // }, [config.openEdit, info, salaryLevelsData, form]);
+
   return (
     <div className="p-6">
       <Form
