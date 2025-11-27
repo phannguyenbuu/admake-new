@@ -1,6 +1,6 @@
 import json
 from api.tasks import get_task_by_user_id
-from models import db, app, User, LeadPayload, Notify, Workpoint,Leave, WorkpointSetting, Customer, Material, Role, Message, Task, Workspace, generate_datetime_id
+from models import db, app, User,UserCanView, LeadPayload, Notify, Workpoint,Leave, WorkpointSetting, Customer, Material, Role, Message, Task, Workspace, generate_datetime_id
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 import json
@@ -1161,74 +1161,6 @@ if __name__ == "__main__":
     with app.app_context():
         db.create_all()
         
-        # print(remove_workpoint_checklist('20251104103416609650622d78','2025-11-07'))
         
-        # restore_checklist_data()
-        # task = Task.query.filter(Task.title== "Không xóa được công việc đã tạo").first()
-
-        # if task:
-        #     task.title = "Xây dựng chiến lược sản xuất"
-        
-        # db.session.commit()
-        # renameColumn('notification','title','text')
-
-        # task = db.session.get(Task, "202511170308282171175cfbd0")
-        # task.assets = [task.assets[-1]]
-        # flag_modified(task,"assets")
-        # Task.query.filter(Task.type == "salary").delete(synchronize_session=False)
-
-        
-        # users = User.query.filter(User.username == 'ad104').all()
-
-        # for user in users:
-        #     print(user.lead_id, user.password, user.fullName)
-        
-        # for i in range(244, 290):
-        #     user = User(lead_id = i,
-        #                 id = generate_datetime_id(),
-        #                 username = "ad" + str(i),
-        #                 fullName = "Admake" + str(i),
-        #                 password = "Test@1234",
-        #                 role_id = -2
-        #             )
-        #     db.session.add(user)
-
-        # db.session.commit()
-
-        # add_new_columns("lead",["isActivated"],"BOOLEAN")
-
-        
-        # for i in range(290,720):
-        #     
-            
-        #     db.session.add(user)
-        #     lead = LeadPayload(
-        #         id = i,
-        #         user_id = user.id,
-        #         name = "Lead" + str(i),
-        #     )
-            
-        #     db.session.add(lead)
-
-        # db.session.commit()
-        # lead_id = 243
-        # for user in User.query.all():
-        #     if user.lead_id == lead_id and (user.role_id and user.role_id > 0):
-        #         print(user.fullName, user.phone)
-        # renameColumn("lead","isChecked", "isInvited")
-
-        # db.session.commit()
-
-        # work = db.session.get(Workspace, '20251117063625486374bfaf86')
-        # print(work.owner_id, work.lead_id)
-
-        # task = Task.query.filter(Task.title == 'DỌN NHÀ ANH MINH').first()
-        # print(task.assign_ids)
-
-        # for user_id in ['20251117060038619955d478a8', '202511170602106729691da38a', '20251118083457979214be0435', '20251117063809880300af6dbd']:
-        #     user = db.session.get(User,user_id)
-        #     print(user.fullName)
-
-        json_data = {"workspace_id":"20251125010127385636829dce","assign_ids":[],"title":"RKK","description":"","start_time":"2025-11-25","end_time":"2025-11-26","type":"","reward":0,"status":"OPEN","assets":[{"message_id":"20251125010841353c2b3aa","user_id":"202511030113120675991ece01","file_url":"34.png","username":"B-one academy","thumb_url":"data:image/jpeg;base64,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"},{"message_id":"2025112501083427074ecd8","user_id":"202511030113120675991ece01","username":"B-one academy","text":"VSF"}]}
-        task = Task.create_item(json_data)
-        print(task)
+        user_view = UserCanView.query.filter_by(user_id='202511030113120675991ece01').first()
+        print(user_view)

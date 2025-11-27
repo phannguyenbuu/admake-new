@@ -32,10 +32,6 @@ const UserDashboard: IPage["Component"] = () => {
   const {data: users,isLoading: isLoadingUsers,refetch,
   } = useUserQuery({ ...query, search: debouncedSearch });
 
-  // useEffect(()=>{
-  //   console.log('users', users);
-  // },[users]);
-
   const handleRefetch = async () => {
     setIsRefetching(true);
     try {

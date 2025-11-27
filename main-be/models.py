@@ -146,6 +146,45 @@ def generate_datetime_id():
     random_str = ''.join(random.choices('0123456789abcdef', k=6))  # thêm 6 ký tự hex ngẫu nhiên
     return timestamp_str + random_str
 
+class UserCanView(BaseModel):
+    __tablename__ = 'user_can_view'
+
+    id = db.Column(db.String(50), primary_key=True)    
+    user_id = db.Column(db.String(255), nullable=True)
+    view_workpoint = db.Column(db.Boolean, default=False)
+    view_user = db.Column(db.Boolean, default=False)
+    view_supplier = db.Column(db.Boolean, default=False)
+    view_customer = db.Column(db.Boolean, default=False)
+    view_workspace = db.Column(db.Boolean, default=False)
+    view_material = db.Column(db.Boolean, default=False)
+    view_price = db.Column(db.Boolean, default=False)
+    view_accountant = db.Column(db.Boolean, default=False)
+    view_statistic = db.Column(db.Boolean, default=False)
+
+    def tdict(self):
+        result = {}
+        for column in self.__table__.columns:
+            value = getattr(self, column.name)
+            # print(f"DEBUG: Column {column.name} value type: {type(value)}")
+            if isinstance(value, (datetime.datetime, datetime.date)):
+                value = value.isoformat()
+            result[column.name] = value
+        
+        
+        user = db.session.get(User, self.user_id)
+        if user:
+            result["username"] = user.fullName if user.fullName else user.username
+        # result["role"] = self.user.role_id
+        return result
+
+    @staticmethod
+    def create_item(params):
+        item = UserCanView(**params)
+        db.session.add(item)
+        db.session.commit()
+        return item
+    
+
 class User(BaseModel):
     __tablename__ = 'user'
 

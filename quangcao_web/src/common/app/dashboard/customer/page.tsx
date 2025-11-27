@@ -36,28 +36,10 @@ const CustomerDashboard: IPage["Component"] = () => {
     refetch,
     error,
   } = useCustomerQuery({ ...query, search: debouncedSearch });
-
-  useEffect(() => {
-    if (customers) {
-      console.log("Received new data:", customers);
-      // setWorkspaces(customers.data);
-    }
-  }, [customers]);
-
-  useEffect(() => {
-  if (error) {
-    console.error("Error fetching customers:", error);
-  }
-}, [error]);
   
 
   const [customer, setCustomer] = useState<WorkSpace | null>(null);
 
-  useEffect(() => {
-    
-      console.log("Current customer:", customer);
-    
-  }, [customer]);
 
   const toggle = (key: keyof typeof config) => {
     return () => {
@@ -72,7 +54,7 @@ const CustomerDashboard: IPage["Component"] = () => {
 
 
 const handleDeleteCustomer = () => {
-    console.log("DELETE", customer);
+    // console.log("DELETE", customer);
     if (!customer || !customer.owner_id) return;
 
     fetch(`${useApiHost()}/customer/${customer.id}`, {

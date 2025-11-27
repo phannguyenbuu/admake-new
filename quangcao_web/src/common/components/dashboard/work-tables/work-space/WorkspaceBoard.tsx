@@ -51,7 +51,7 @@ const WorkspaceBoard: React.FC<WorkspaceBoardProps> = ({
         setWorkspaces(prev =>
             prev.map(ws => {
             if (ws.id === workspaceId) {
-                console.log('SAME', workspaceId, names);
+                // console.log('SAME', workspaceId, names);
                 return {
                     ...ws,
                     column_open_name: names[0],
@@ -245,7 +245,7 @@ interface MoreOptionsModalProps {
 const MoreOptionsModal: React.FC<MoreOptionsModalProps> = ({ type, idx, setColNames }) => {
   const [open, setOpen] = useState(false);
   const [form] = Form.useForm();
-    const {workspaceId, workspaces, setWorkspaces} = useUser();
+    const {workspaceId} = useUser();
 
   // Mở modal
   const showModal = () => {

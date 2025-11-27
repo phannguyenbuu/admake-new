@@ -1,16 +1,94 @@
 import type { IPage } from "../../@types/common.type";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, Button, Modal, Form, Input, message, notification } from "antd";
 import { useUser } from "../../common/hooks/useUser";
 import { useApiHost } from "../../common/hooks/useApiHost";
+import { Typography, Stack, IconButton, Box, TextField, Switch } from "@mui/material";
+import { Select, MenuItem, InputLabel, FormControl } from "@mui/material";
+import { useUserQuery } from "../../common/hooks/user.hook";
+import type { PaginationDto } from "../../@types/common.type";
+import type { User } from "../../@types/user.type";
+import axios from "axios";
+import { useDebounce } from "../../common/hooks/useDebounce";
+import AddIcon from "@mui/icons-material/Add";
+import UserCanViewForm from "./UserCanView";
+import type {UserCanViewFormProps} from "./UserCanView";
 
 export const InforDashboard: IPage["Component"] = () => {
-  const {userId, username, userRole, fullName, setFullName} = useUser();
+  const {userId, username, userRole, userLeadId, fullName, setFullName} = useUser();
+  const [query, setQuery] = useState<Partial<PaginationDto>>({
+      page: 1,
+      limit: 1000,
+      lead: userLeadId,
+      search: "",
+    });
+  // const [isRefetching, setIsRefetching] = useState(false);
+
+  const [filterdUsers, setFilteredUsers] = useState<User[]>([]);
+  const [filteredUsersCanView, setFilteredUsersCanView] = useState<UserCanViewFormProps[]>([]);
+  
+    // Debounce search value
+  const debouncedSearch = useDebounce(query.search, 500);
+  const {data: users,isLoading: isLoadingUsers,refetch,
+    } = useUserQuery({ ...query, search: debouncedSearch });
 
   const [form] = Form.useForm();
   const [config, setConfig] = useState({
     openEdit: false,
   });
+
+  
+  useEffect(() => {
+      // Gán sự kiện hoặc thực hiện tác vụ khi component active
+      console.log("InforDashboard active");
+      // Ví dụ gọi API, cập nhật state, tạo event listener, ...
+      refetch();
+      // Nếu có event listener hoặc side-effect cần cleanup:
+      return () => {
+        console.log("InforDashboard unmount");
+        // Cleanup event listener hoặc tác vụ khác
+      };
+    }, []);
+
+
+    useEffect(() => {
+      async function fetchAllUsersCanView() {
+        try {
+          const response = await axios.get<{data:UserCanViewFormProps[]}>(`${useApiHost()}/user/${userId}/can-view-all`);
+          const users_can_view = response.data;
+          console.log('users_can_view',users_can_view);
+          setFilteredUsersCanView(users_can_view.data);
+        } catch (error) {
+          notification.error({message:'Error fetching users can view'});
+        }
+      }
+
+      fetchAllUsersCanView();
+    }, []);
+
+
+    useEffect(() => {
+      async function fetchUsers() {
+        try {
+          const response = await axios.get<{data:User[]}>(`${useApiHost()}/user/`, {
+            params: {
+              page: 1,
+              limit: 1000,
+              lead: userLeadId,
+              search: "",
+            },
+          });
+          const users = response.data.data;
+          setFilteredUsers(users.filter(u => u.role_id > 0 && u.role_id < 100));
+          notification.success({message:'Get users done!'});
+        } catch (error) {
+          notification.error({message:'Error fetching users', 
+            description: error instanceof Error ? error.message : String(error)});
+        }
+      }
+
+      fetchUsers();
+    }, []);
 
   const toggle = (key: keyof typeof config) => {
     return () => {
@@ -64,6 +142,25 @@ export const InforDashboard: IPage["Component"] = () => {
     return Promise.resolve();
   };
 
+  const fetchApiPostUserCanView = async () => {
+    try {
+      const response = await fetch(`${useApiHost()}/user/${userId}/can-view`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'}
+      });
+
+      if (!response.ok) throw new Error('Update failed');
+
+      const data = await response.json();
+      // console.log("DATA", data);
+      setFilteredUsersCanView(prev => [...prev, data.data]);
+
+      notification.success({ message: 'Tạo quyền xem mới thành công' });
+    } catch (error) {
+      notification.error({ message: 'Lỗi khi tạo quyền xem' });
+    }
+  };
+
   return (
     <>
     <div className="py-3 lg:pt-20 w-full flex items-center justify-center overflow-hidden">
@@ -90,14 +187,29 @@ export const InforDashboard: IPage["Component"] = () => {
                 </p>
               </div>
 
-
-              <Button type="primary" onClick={toggle("openEdit")} className="mt-4">
+              <Button type="default" onClick={toggle("openEdit")} className="mt-4">
                 THAY ĐỔI THÔNG TIN
               </Button>
             </div>
           </div>
 
           
+            <IconButton color="primary" component="span"
+              onClick={fetchApiPostUserCanView}
+              aria-label="upload picture" size="small"
+              sx={{ border: "1px dashed #3f51b5", width: 40, height: 40,}} >
+          
+              <AddIcon />
+              
+            </IconButton>
+
+            {filteredUsersCanView.map((el, idx) => 
+              <Typography>
+                {idx + 1}
+              </Typography>
+              // <UserCanViewForm key={el.id} {...el} />
+              )}
+
         </Card>
       </div>
 
@@ -204,3 +316,5 @@ const OldPasswordInput = ({ userId }: { userId: string }) => {
     </Form.Item>
   );
 };
+
+

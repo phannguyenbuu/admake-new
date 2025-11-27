@@ -1,7 +1,7 @@
 import React, { useState, useRef} from 'react';
 import { Button, Modal, IconButton, Stack } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
-import type { NotifyProps } from '../../../@types/notify.type';
+// import type { NotifyProps } from '../../../@types/notify.type';
 import { useUser } from "../../hooks/useUser";
 import { notification } from 'antd';
 

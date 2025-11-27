@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify, abort
-from models import db, User, dateStr, app
+from models import db, User, app, UserCanView
 from flask import Flask, request, jsonify, session
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 import datetime
@@ -51,13 +51,18 @@ def login_user_form(username, password):
             # access_token = create_access_token(identity={'user_id':user.id, 'lead_id': user.lead_id}, 
             #                                    expires_delta=datetime.timedelta(days=15))
 
+            
+
+            # Query lọc UserCanView mà User tương ứng có cùng lead_id
+            
             result = {
                     'access_token': access_token,
                     "id": user.id, 
                     "username": user.username, 
                     "role_id": user.role_id,
                     "role": user.update_role(),
-                    "lead_id": user.lead_id
+                    "lead_id": user.lead_id,
+                    # "users_can_view": users_can_view,
                 }
             
             print('JWT', result)

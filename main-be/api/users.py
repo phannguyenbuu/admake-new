@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify, abort
-from models import db, User, Task, dateStr, app,LeadPayload, Message, get_query_page_users, generate_datetime_id
+from models import db, User, Task, dateStr, app,UserCanView,LeadPayload, Message, get_query_page_users, generate_datetime_id
 from flask import Flask, request, jsonify, session
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 import datetime
@@ -79,36 +79,118 @@ def update_lead_user_password(user_id):
 
     if data.get("password"):
         user.password = data.get("password")
-        
+      
+    db.session.commit()
+    # db.session.refresh(user)
 
-    # if data.get("company"):
-    #     user.company = data.get("company")
+    return jsonify(user.tdict()), 201
 
-    # if data.get("address"):
-    #     user.address = data.get("address")
 
-    # if data.get("email"):
-    #     user.email = data.get("email")
+@user_bp.route("/<string:user_id>/can-view", methods=["PUT"])
+def update_user_can_view(user_id):
+    data = request.get_json()
 
-    # if data.get("phone"):
-    #     user.phone = data.get("phone")
+    user = db.session.get(User, user_id)
+    if not user:
+        print("Invalid user")
+        abort(404, description="Invalid user")
 
-    # if data.get("description"):
-    #     user.description = data.get("description")
+    # Tìm bản ghi UserCanView theo user_id
+    user_view = UserCanView.query.filter_by(user_id=user_id).first()
+    if not user_view:
+        # Nếu chưa có, tạo mới
+        user_view = UserCanView(
+            id = generate_datetime_id(),
+            user_id=user_id)
+        db.session.add(user_view)
 
-    # if data.get("industry"):
-    #     user.industry = data.get("industry")
+    # Cập nhật các trường boolean từ dữ liệu gửi lên
+    fields = [
+        "view_workpoint", "view_user", "view_supplier", "view_customer",
+        "view_workspace", "view_material", "view_price", "view_accountant", "view_statistic"
+    ]
+    for field in fields:
+        if field in data:
+            setattr(user_view, field, data[field])
 
     db.session.commit()
 
-    # companySize = db.Column(db.String(50), nullable=False)
-    # expiredAt = db.Column(db.DateTime, default=datetime.datetime.utcnow)
-    # balance_amount = db.Column(db.Float)
+    return jsonify({"message": "Updated successfully", 
+                    "data": user_view.tdict}), 200
 
-    # balance_amount = db.Column(db.Float)
 
-    db.session.refresh(user)
-    return jsonify(user.tdict()), 201
+@user_bp.route("/<string:user_id>/can-view", methods=["POST"])
+def post_user_can_view(user_id):
+    user = db.session.get(User, user_id)
+    if not user:
+        print("Invalid user")
+        abort(404, description="Invalid user")
+
+    # Tìm bản ghi UserCanView theo user_id
+    user_view = UserCanView.query.filter_by(user_id=user_id).first()
+    if not user_view:
+        # Nếu chưa có, tạo mới
+        user_view = UserCanView(
+            id = generate_datetime_id(),
+            user_id=user_id)
+        db.session.add(user_view)
+
+    db.session.commit()
+
+    return jsonify({"message": "Updated successfully", 
+                    "data": user_view.tdict()}), 200
+
+
+@user_bp.route("/<string:user_id>/can-view", methods=["GET"])
+def get_user_can_view(user_id):
+    user = db.session.get(User, user_id)
+    if not user:
+        print("Invalid user")
+        abort(404, description="Invalid user")
+
+    user_view = UserCanView.query.filter_by(user_id=user_id).first()
+    
+    return jsonify({"message": "Updated successfully", 
+                    "data": user_view.tdict() if user_view else []}), 200
+
+
+@user_bp.route("/<string:id>/can-view", methods=["DELETE"])
+def delete_user_can_view(id):
+    user = db.session.get(UserCanView, id)
+    if not user:
+        print("Invalid UserCanView")
+        abort(404, description="Invalid UserCanView")
+
+    db.session.delete(id)
+    db.session.commit()
+    
+    return jsonify({"message": "DELETE successfully"}), 200
+
+from sqlalchemy.orm import aliased
+@user_bp.route("/<string:user_id>/can-view-all", methods=["GET"])
+def get_user_can_view_all(user_id):
+    user = db.session.get(User, user_id)
+    if not user:
+        print("Invalid user")
+        abort(404, description="Invalid user")
+
+    user_view = UserCanView.query.filter_by(user_id=user_id).first()
+    if not user_view:
+        return jsonify({"message": "Updated successfully", "data": [] }), 200
+
+    UserAlias = aliased(User)
+
+    users_can_view = (
+                UserCanView.query
+                .join(UserAlias, UserAlias.id == UserCanView.user_id)
+                .filter(UserAlias.lead_id == user.lead_id, UserAlias.id != user.id)
+                .all()
+            )
+    
+    return jsonify({"message": "Updated successfully", 
+                    "data": [ u.tdict() for u in users_can_view ] }), 200
+
+
 
 @user_bp.route("/<string:user_id>/check-password", methods=["POST"])
 def check_password_lead(user_id):

@@ -36,9 +36,9 @@ const WorkspaceHeader: React.FC<WorkspaceHeaderProps> = ({ workspaceData }) => {
         }
         notification.success({message:'Ghim bảng công việc thành công!'});
 
-        setWorkspaces(prevWorkspaces => {
+        setWorkspaces(prev => {
           // Tạo mảng mới với item được cập nhật pinned
-          const updatedWorkspaces = prevWorkspaces.map(ws =>
+          const updatedWorkspaces = prev.map(ws =>
             ws.id === currentWorkspace?.id ? { ...ws, pinned: !pinned } : ws
           );
 

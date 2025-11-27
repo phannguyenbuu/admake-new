@@ -22,9 +22,8 @@ export default function ModalCreateSpace({
 }: ModalCreateSpaceProps) {
   const navigate = useNavigate();
   const [form] = Form.useForm();
-  const {userLeadId, setCurrentWorkspace, workspaces, setWorkspaces} = useUser();
-  // form.setFieldValue("status","FREE");
-
+  const {userLeadId} = useUser();
+  
   const handleCreate = async (values:{name: string} ) => {
     try {
       const response = await fetch(`${useApiHost()}/workspace/`, {
@@ -43,15 +42,7 @@ export default function ModalCreateSpace({
 
       notification.success({message:"Tạo bảng công việc thành công!", description: values.name});
       window.location.href = `${window.location.origin}/dashboard/work-tables/${wItem.id}`
-      // form.resetFields();
-            
-      // setWorkspaces(prev => [...prev, wItem]);
-      // setCurrentWorkspace(wItem);
-
-      // setIsModalOpen(false);
-
-
-
+      
     } catch (error) {
       notification.error({message:"Tạo bảng công việc thất bại"});
       console.error(error);

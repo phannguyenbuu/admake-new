@@ -121,12 +121,6 @@ export default function FormCustomer({
           form.resetFields();
           // onDelete();
           onRefresh();
-          // setWorkspaces((prev) => {
-          //   if (!workspaces || !workSpaceItem ) return prev;
-          //   // const newItems = workSpaces.filter(ws => !prev.some(p => p.id === ws.id));
-          //   return [...prev, ...workSpaceItem];
-          // });
-
         },
         onError: () => {
           message.error("Tạo khách hàng thất bại");
@@ -143,22 +137,6 @@ export default function FormCustomer({
       if (!formValues.fullName || !formValues.phone) {
         return false;
       }
-
-      // Kiểm tra nếu có thông tin thi công thì phải có đầy đủ thời gian
-      // if (
-      //   formValues.workInfo &&
-      //   (!formValues.workStart || !formValues.workEnd)
-      // ) {
-      //   return false;
-      // }
-
-      // // Kiểm tra nếu có địa điểm thì phải có đầy đủ thời gian
-      // if (
-      //   formValues.workAddress &&
-      //   (!formValues.workStart || !formValues.workEnd)
-      // ) {
-      //   return false;
-      // }
 
       return true;
     } catch (error) {

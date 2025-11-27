@@ -6,6 +6,7 @@ import { notification } from 'antd';
 import type { WorkSpace } from '../../@types/work-space.type';
 import type { NotifyProps } from '../../@types/notify.type';
 import type { MessageTypeProps } from '../../@types/chat.type';
+import type { User } from '../../@types/user.type';
 
 interface UserContextProps {
   isCurrentWorkspaceFree: boolean;
@@ -22,6 +23,7 @@ interface UserContextProps {
   notifyList: NotifyProps[];
   chatBoxHeight: number;
   isFullChatUI: boolean;
+  userCanViewList: User[];
   tmpTaskCreatedAssets: MessageTypeProps[],
   tmpTaskCreatedMessages: MessageTypeProps[],
 
@@ -38,6 +40,7 @@ interface UserContextProps {
   setWorkspaceId: React.Dispatch<React.SetStateAction<string>>;
   setUserRoleId: React.Dispatch<React.SetStateAction<number>>;
   setWorkspaces: React.Dispatch<React.SetStateAction<WorkSpace[]>>;
+  setUserCanViewList: React.Dispatch<React.SetStateAction<User[]>>;
   setCurrentWorkspace: React.Dispatch<React.SetStateAction<WorkSpace | null>>;
   login: (credentials: { username: string; password: string }) => Promise<void>;
   logout: () => Promise<void>;
@@ -59,6 +62,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
   }, []);
 
+  const [userCanViewList, setUserCanViewList] = useState<User[]>([]);
   const [workspaces, setWorkspaces] = useState<WorkSpace[]>([]);
   const [currentWorkspace, setCurrentWorkspace] = useState<WorkSpace | null>(null);
   const [workspaceId, setWorkspaceId] = useState<string>("");
@@ -380,7 +384,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       notifyDelete, notifyList, getNotifyList, setNotifyList,
       tmpTaskCreatedAssets, setTmpTaskCreatedAssets,
       tmpTaskCreatedMessages, setTmpTaskCreatedMessages,
-      
+      userCanViewList, setUserCanViewList,
       userIcon, login, logout, checkAuthStatus }}>
       {children}
     </UserContext.Provider>

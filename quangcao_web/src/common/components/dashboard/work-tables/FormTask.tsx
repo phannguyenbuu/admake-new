@@ -231,9 +231,9 @@ export default function FormTask({ open, onCancel, onSuccess, users, currentColu
                   selectedAgent={userSelected} 
                   setselectedAgent={setUserSelected} 
                 />
-                 
-                 {userList && userList.map((el)=> 
-                    <UserItem user={el} onDelete={onUserDelete}/>)}
+
+                {userList && userList.map((el)=> 
+                  <UserItem user={el} onDelete={onUserDelete}/>)}
               </Stack>
             </Stack>
 
