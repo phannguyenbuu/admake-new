@@ -35,10 +35,10 @@
       <thead class="table-light" style="background-color: #00B4B6;">
         <tr>
           <th style="width: 30px;">
-            Invited
+            Inv
           </th>
           <th style="width: 30px;">
-            Activated
+            Act
           </th>
           <th>ID</th>
           <th style="width:200px">Họ và tên</th>
@@ -51,6 +51,8 @@
           <!-- <th style="width:200px; font-size:10px">Quy mô công ty</th> -->
           <th style="width:100px">Số dư</th>
           <th style="width:200px; font-size:10px">Ngày đăng ký/gia hạn/hết hạn</th>
+          <th style="width:300px; font-size:10px">({{total_users}})</th>
+
         </tr>
       </thead>
       <tbody>
@@ -88,6 +90,27 @@
             <p>{{ lead.createdAt }}</p>
             <p>{{ lead.updatedAt }}</p>
             <p style="color:red; font-weight:700">{{ lead.expiredAt }}</p>
+          </td>
+
+          <!-- CỘT DROPDOWN -->
+          <td>
+            <div style="display: flex; flex-direction: row; gap:10px">
+                <select class="form-select form-select-sm" name="status_{{ lead.id }}" id="select-{{ lead.id }}" data-lead-id="{{ lead.id }}">
+                  {% for user in users %}
+                    <option value="{{ user.id }}" data-password="{{ user.password }}">
+                      {{ user.username }}
+                    </option>
+                  {% endfor %}
+                </select>
+
+                <p id="password-display-{{ lead.id }}" style="font-size:10px"></p>
+
+              <button>
+                ✓
+              </button>
+            </div>
+
+            
           </td>
 
           
@@ -196,5 +219,27 @@
     });
   </script>
 
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Lấy tất cả select elements
+        const selects = document.querySelectorAll('[id^="select-"]');
+        
+        selects.forEach(function(selectElem) {
+            const leadId = selectElem.id.replace('select-', '');
+            // const valueDisplay = document.getElementById('value-display-' + leadId);
+            const passwordDisplay = document.getElementById('password-display-' + leadId);
+            
+            selectElem.addEventListener('change', function() {
+                const selectedOption = this.options[this.selectedIndex];
+                // valueDisplay.textContent = selectedOption.value;
+                passwordDisplay.textContent = selectedOption.getAttribute('data-password');
+            });
+            
+            // Trigger initial display
+            selectElem.dispatchEvent(new Event('change'));
+        });
+    });
+  </script>
 </body>
 </html>

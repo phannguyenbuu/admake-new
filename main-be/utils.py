@@ -1162,7 +1162,12 @@ if __name__ == "__main__":
         db.create_all()
         
         
-        usr = db.session.get(UserCanView, "202511270319022765669c59df")
-        print(usr.tdict())
+        # usr = db.session.get(UserCanView, "202511270319022765669c59df")
+        # print(usr.tdict())
+
+        for user in User.query.filter(User.role_id == -2, User.username == 'admin111').all():
+            db.session.delete(user)
+        
+        db.session.commit()
 
         

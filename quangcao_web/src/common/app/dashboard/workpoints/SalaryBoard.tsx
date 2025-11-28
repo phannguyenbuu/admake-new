@@ -94,7 +94,7 @@ const SalaryBoard: React.FC<SalaryBoardProps> = ({ selectedRecord, modalVisible,
   const [earlyMinutes, setEarlyMinutes] = useState<number>(0);
 
   useEffect(() => {
-    if (!taskDetail) {
+    if (taskDetail) {
       const fetchData = async () => {
         try {
           const response = await fetch(`${useApiHost()}/task/${selectedRecord?.user_id}/salary`, {
