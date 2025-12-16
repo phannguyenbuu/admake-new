@@ -8,6 +8,7 @@ export interface Check {
 }
 
 export interface PeriodData {
+  id?: number;
   in?: Check;
   out?: Check;
   workhour?: number;

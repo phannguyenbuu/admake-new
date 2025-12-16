@@ -74,6 +74,7 @@ function LeaveDatePickerOneDay({
         value={value}
         onChange={handleChange}
         enableAccessibleFieldDOMStructure={false}
+        format="DD/MM/YYYY"
         slots={{ textField: TextField }} // Gán TextField cho slot textField
         slotProps={{
           textField: {

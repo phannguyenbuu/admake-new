@@ -79,18 +79,53 @@ const TaskBoard = ({ userId,fullName, open, onCancel }: TaskBoardProps) => {
     const [currentPage, setCurrentPage] = React.useState(1);
     const pageSize = 1; // mỗi trang 1 item
 
-    const paginatedData = data && data.length > 0
-      ? data.slice((currentPage - 1) * pageSize, currentPage * pageSize)
-      : [];
 
-    const totalPages = data ? Math.ceil(data.length / pageSize) : 1;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const filteredData = useMemo(() => {
+      if (!data) return [];
+      
+      return data.filter((task: Task) => {
+        // ✅ Kiểm tra end_time tồn tại
+        if (!task.end_time) return true; // Hiển thị nếu chưa có end_time
+        
+        const endTimeDate = new Date(task.end_time.toString()); // Dayjs → string → Date
+        endTimeDate.setHours(0, 0, 0, 0);
+        
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        
+        // Ẩn nếu: hết hạn HOẶC đã REWARD
+        return !(endTimeDate < today || task.status === "REWARD");
+      });
+    }, [data]);
+
+
+
+
+    // const paginatedData = data && data.length > 0
+    //   ? data.slice((currentPage - 1) * pageSize, currentPage * pageSize)
+    //   : [];
+
+    const paginatedData = filteredData.length > 0
+    ? filteredData.slice((currentPage - 1) * pageSize, currentPage * pageSize)
+    : [];
+
+    // const totalPages = data ? Math.ceil(data.length / pageSize) : 1;
+    const totalPages = filteredData.length > 0 ? Math.ceil(filteredData.length / pageSize) : 1;
 
     useEffect(()=>{
       // console.log('Data', data);
-      if (data && data.length > 0) {
-        setTaskDetail(data[currentPage - 1] || data[0]);
+      // if (data && data.length > 0) {
+      //   setTaskDetail(data[currentPage - 1] || data[0]);
+      // }
+
+      if (filteredData.length > 0) {
+        setTaskDetail(filteredData[currentPage - 1] || filteredData[0]);
       }
-    },[currentPage, data]);
+      
+    },[currentPage, filteredData]);
 
     const btnStyle = {color:"#fff", padding:10, 
       paddingLeft:30, paddingRight:30, 

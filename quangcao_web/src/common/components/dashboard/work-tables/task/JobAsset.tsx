@@ -172,7 +172,7 @@ const JobAsset: React.FC<JobAssetProps> = ({ title, type, readOnly = false }) =>
   }
 
   
-  const handleDelete = (message_id: string) => {
+  const handleDelete = (message_id: string | number| undefined) => {
     if(!taskDetail)
     {
       setTmpTaskCreatedAssets(prev => prev.filter(asset => asset.message_id !== message_id));
@@ -261,7 +261,7 @@ const JobAsset: React.FC<JobAssetProps> = ({ title, type, readOnly = false }) =>
   };
 
   
-  const handleMessageDelete = (message_id: string) => {
+  const handleMessageDelete = (message_id: string | number| undefined) => {
     if(!taskDetail)
     {
       setTmpTaskCreatedMessages(prev => prev.filter(asset => asset.message_id !== message_id));

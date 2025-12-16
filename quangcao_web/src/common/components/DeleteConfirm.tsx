@@ -1,14 +1,15 @@
 
 import React, {useState} from "react";
 import type { MessageTypeProps } from "../@types/chat.type";
-import { IconButton } from "@mui/material";
+import { IconButton, Button } from "@mui/material";
 import CloseIcon from '@mui/icons-material/Close';
+import DeleteIcon from '@mui/icons-material/Delete';
 import { Modal } from "antd";
 
 interface DeleteAssetButtonProps {
   text?: string;
-  elId: string;
-  onDelete: (id: string) => void;
+  elId?: string | number;
+  onDelete: (id: string | number | undefined) => void;
 }
 
 const DeleteConfirm: React.FC<DeleteAssetButtonProps> = ({ text, elId, onDelete }) => {
@@ -16,22 +17,18 @@ const DeleteConfirm: React.FC<DeleteAssetButtonProps> = ({ text, elId, onDelete 
 
   return (
       <>
-        <IconButton
-          key = {`delete-${elId}`}
-          size="small"
-          aria-label="delete"
-          color="error"
-          onClick={() => setShowConfirm(true)}
-          sx={{
-            color: '#777',
-            '&:hover': {
-              color: 'red',
-              backgroundColor: 'rgba(255, 0, 0, 0.1)',
-            },
-          }}
-        >
-          <CloseIcon />
-        </IconButton>
+        
+
+      <Button
+        variant="outlined"
+        color="error"
+        size="small"
+        startIcon={<DeleteIcon />}
+        onClick={() => setShowConfirm(true)}
+        sx={{ mt: 1 }}
+      >
+        Xóa nghỉ phép
+      </Button>
         
         <Modal
           title={`Bạn có chắc muốn xóa ${text}?`}

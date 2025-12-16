@@ -260,7 +260,6 @@ const JobTimeAndProcess: React.FC<JobTimeAndProcessProps> = ({form}) => {
 export default JobTimeAndProcess;
 
 export function DateFormPicker({
-  // taskDetail,
   mode,
   title,
   timeValue,
@@ -268,7 +267,6 @@ export function DateFormPicker({
   form,
   onChange
 }: {
-  // taskDetail:Task | null,
   mode: string;
   title: string;
   timeValue: Dayjs | null;
@@ -277,8 +275,6 @@ export function DateFormPicker({
   onChange?: (date: Dayjs | null) => void
 }) {
   const {taskDetail} = useTaskContext();
-
-  
 
   useEffect(() => {
     if (!form) return;
@@ -292,27 +288,21 @@ export function DateFormPicker({
     }
   }, [timeValue]);
 
-
   const handleChange = (date: Dayjs | null) => {
     if (date) {
-      // Đặt giờ = 0, phút = 0, giây = 0, mili giây = 0 để chỉ lấy ngày
-      const dateOnly = date.hour(0).minute(0).second(0).millisecond(0);
-
-      if(form)
-        form.setFieldsValue({ [mode]: dateOnly });
+      if(form) form.setFieldsValue({ [mode]: date });
 
       if (taskDetail) {
         if (mode === "end_time") {
-          taskDetail.end_time = dateOnly;
+          taskDetail.end_time = date;
         } else {
-          taskDetail.start_time = dateOnly;
+          taskDetail.start_time = date;
         }
       }
 
-      if (onChange) onChange(dateOnly);
+      if (onChange) onChange(date);
     } else {
-      if(form)
-        form.setFieldsValue({ [mode]: null });
+      if(form) form.setFieldsValue({ [mode]: null });
 
       if (taskDetail) {
         if (mode === "end_time") {
@@ -325,30 +315,37 @@ export function DateFormPicker({
     }
   };
 
-
-  // const value = form ? form.getFieldValue(mode) : null;
   const value = form ? form.getFieldValue(mode) : (taskDetail ? null : dayjs());
 
   return (
     <Form.Item
       name={mode}
-      rules={[{ required: true, message: "Chọn ngày" }]}
+      rules={[{ required: true, message: "Chọn ngày giờ" }]}
       className="!mb-0"
     >
       <div className="flex items-center gap-1.5 sm:gap-2">
-          <div className="w-1 h-1 bg-orange-500 rounded-full"></div>
-          <span className="text-gray-800 font-medium text-xs sm:text-sm">{title}</span>
-          <span className="text-red-500">*</span>
-        </div>
+        <div className="w-1 h-1 bg-orange-500 rounded-full"></div>
+        <span className="text-gray-800 font-medium text-xs sm:text-sm">{title}</span>
+        <span className="text-red-500">*</span>
+      </div>
       <DatePicker
         className="!flex-1 !h-9 sm:!h-10 !text-xs sm:!text-sm !rounded-lg !border !border-gray-300 focus:!border-cyan-500 focus:!shadow-lg hover:!border-cyan-500 !transition-all !duration-200 !shadow-sm"
-        format="DD/MM/YYYY"
-        placeholder="Chọn ngày"
+        value={value || dayjs().hour(8).minute(0)}
+        format="DD/MM/YYYY HH:mm"
+        placeholder="Chọn ngày giờ"
+        showTime={{
+          format: 'HH:mm',
+          use12Hours: false,
+          // ✅ CHỌN PHÚT CHẴN 15 PHÚT
+          minuteStep: 15,  // 0 → 15 → 30 → 45
+          hourStep: 1,
+          hideDisabledOptions: true
+        }}
         onChange={handleChange}
-        value={value}
+        // value={value}
         size="middle"
         disabledDate={disabledDateFunc}
-        style={{maxWidth:120}}
+        style={{ width: 180, minWidth: 160 }}
       />
     </Form.Item>
   );

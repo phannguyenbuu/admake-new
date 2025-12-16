@@ -10,6 +10,7 @@ import DownloadIcon from '@mui/icons-material/Download';
 import { CenterBox } from "../../../components/chat/components/commons/TitlePanel";
 import type { Workpoint, WorkDaysProps, PeriodData, Checklist } from "../../../@types/workpoint";
 import DeleteConfirm from "../../../components/DeleteConfirm";
+import { METHODS } from "http";
 // import SalaryBoard from "./SalaryBoard";
 
 interface QRColumnProps {
@@ -104,16 +105,16 @@ export default function WorkDays({record}: {record:WorkDaysProps}) {
       const startDay = startDate.getDate() - 1;
       const endDay = endDate.getDate() - 1;
 
-      // console.log('leaves >>>>', startDay, endDay);
+      console.log('leaves >>>>', data);
 
       if (startDay === endDay) {
-        if (data.morning) newStatuses[startDay][0] = 'off/' + data.reason;
-        if (data.noon) newStatuses[startDay][1] = 'off/' + data.reason;
+        if (data.morning) newStatuses[startDay][0] = 'off/' + data.reason + `/id:${data.id}`;
+        if (data.noon) newStatuses[startDay][1] = 'off/' + data.reason + `/id:${data.id}`;
       } else {
         for (let day = startDay; day <= endDay; day++) {
-          newStatuses[day][0] = 'off/' + data.reason; // morning
-          newStatuses[day][1] = 'off/' + data.reason; // noon
-          newStatuses[day][2] = 'off/' + data.reason; // evening
+          newStatuses[day][0] = 'off/' + data.reason + `/id:${data.id}`; // morning
+          newStatuses[day][1] = 'off/' + data.reason + `/id:${data.id}`; // noon
+          newStatuses[day][2] = 'off/' + data.reason + `/id:${data.id}`; // evening
         }
       }
     });
@@ -144,6 +145,31 @@ export default function WorkDays({record}: {record:WorkDaysProps}) {
   const handleOk = () => {
     setModalVisible(false);
     setModalImg(null);
+  };
+
+  const handleLeaveDelete = async (leave_id: string | number | undefined) => {
+    try {
+      const response = await fetch(
+        `${useApiHost()}/leave/${leave_id}`,
+        {
+          method: 'DELETE',  // ✅ DELETE thay vì GET
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      if (response.ok) {
+        notification.success({ message: "Xóa nghỉ phép thành công!" });
+        setModalVisible(false);
+        setModalImg(null);
+      } else {
+        throw new Error('Xóa thất bại');
+      }
+    } catch (error) {
+      console.error("Failed to delete leave:", error);
+      notification.error({ message: "Xóa nghỉ phép thất bại!" });
+    }
   };
 
 return (
@@ -191,7 +217,16 @@ return (
               if (status) {
                 if (status.startsWith('off'))
                 {
-                  imgUrl = {text:status.substring(4), status: 'off', day: date, period: periodIndex};
+                  
+                  imgUrl = {
+                    id: status.split("/").pop().replace("id:",""),
+                    text:status.substring(4).split("/")[0], 
+                    status: 'off', 
+                    day: date, 
+                    period: periodIndex
+                  };
+
+                  // console.log("GGG", imgUrl);
                 }else if (mainData?.length) {
                   // console.log('mainData', status);
                   const periodKey = ['morning', 'noon', 'evening'][periodIndex] as keyof Checklist;
@@ -318,19 +353,23 @@ return (
 
           {modalImg?.status === 'off' && 
           <>
-            <Stack>
+            <Stack direction="column">
               <Typography textAlign="center" style={{fontWeight: 700}}>XIN NGHỈ PHÉP</Typography>
               <Typography textAlign="center">
+                
                 {modalImg.day.getDate().toString().padStart(2, '0') + '-' +
-                      (modalImg.day.getMonth() + 1).toString().padStart(2, '0') + '-' +
-                      modalImg.day.getFullYear()}
+                  (modalImg.day.getMonth() + 1).toString().padStart(2, '0') + '-' +
+                  modalImg.day.getFullYear()}
+
               </Typography>
               <Typography textAlign="center">Buổi {modalImg.period  == 0 ? 'sáng' : (modalImg.period == 1 ? "chiều" : "tối")}</Typography>
               <Typography textAlign="center">Lý do: {modalImg.text}</Typography>
-              {/* <Typography textAlign="center">{r.id}</Typography> */}
               
+              <DeleteConfirm text="Bạn muốn xóa nghỉ phép này?" 
+                elId={modalImg.id} 
+                onDelete={() => handleLeaveDelete(modalImg.id)}/>
+
             </Stack>
-            {/* <DeleteConfirm text="Bạn muốn xóa nghỉ phép này?" elId={record}/> */}
             </>
           }
       
