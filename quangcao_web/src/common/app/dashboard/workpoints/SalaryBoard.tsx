@@ -58,6 +58,16 @@ const formatMoney: (n: number) => string = (n) => {
   return n.toLocaleString('en-US', { maximumFractionDigits: 0 });
 }
 
+function getLocalMonthFromISO(isoString: string): number {
+  const date = new Date(isoString);
+  // Tạo date string theo local timezone Việt Nam
+  const localDateStr = date.toLocaleDateString('sv-SE', { 
+    timeZone: 'Asia/Ho_Chi_Minh' 
+  }); // Format: "2025-12-04"
+  const [year, month] = localDateStr.split('-').map(Number);
+  return month - 1; // Convert về 0-11
+}
+
 interface RewardProps {
   title: string,
   workspace: string,
@@ -238,94 +248,84 @@ const SalaryBoard: React.FC<SalaryBoardProps> = ({ selectedRecord, modalVisible,
 
 
   useEffect(()=>{  
-    // console.log('selectedRecord', selectedRecord);
-    if (!selectedRecord) return;
+  if (!selectedRecord?.items?.length) return;
 
-    const expectedTimes = {
-        morning: { start: workpointSetting?.morning_in_hour, end: workpointSetting?.morning_out_hour },
-        noon:{ start: workpointSetting?.noon_in_hour, end: workpointSetting?.noon_in_hour },
-      };
+  const currentMonth = current_day.getMonth(); // 11 (Dec)
+  const currentYear = current_day.getFullYear(); // 2025
+  
+  console.log('Current month/year:', currentMonth, currentYear);
+
+  // ✅ Filter theo THÁNG từ time trong in/out
+  const monthItems = selectedRecord.items.filter(item => {
+    const checklist = item.checklist;
+    if (!checklist) return false;
+    
+    // Lấy ngày từ morning.in.time hoặc noon.in.time
+    const timeStr = checklist.morning?.in?.time || checklist.noon?.in?.time;
+    if (!timeStr) return false;
+    
+    const itemDate = new Date(timeStr);
+    const isCurrentMonth = itemDate.getMonth() === currentMonth && 
+                          itemDate.getFullYear() === currentYear;
+                          
+    
+    // console.log(`-> Item date: ${timeStr} -> Month: ${itemDate.getMonth()}, Current: ${isCurrentMonth}`);
+    return isCurrentMonth;
+  });
+
+  // if(selectedRecord?.username.includes("LỘC"))
+  //   console.log('✅ Filtered monthItems:',selectedRecord?.username, monthItems.length, monthItems);
+
+  let t = 0, over_t = 0, p = 0, late = 0, early = 0;
+
+  // Tính trên monthItems
+  monthItems.forEach(item => {
+    const checklist = item.checklist;
+    if (!checklist) return;
 
 
-    const total_hours = getMaxWorkingHours(current_day.getMonth() + 1, 
-      current_day.getFullYear());
+    if(selectedRecord?.username.includes("LỘC"))
+    {
+      if (!checklist.morning?.in)
+        console.log("No morning", item);
 
-    let t = 0;
-    let over_t = 0;
-    let p = 0;
+      if (!checklist.noon?.in)
+        console.log("No noon", item);
+    }  
 
-    let late = 0;
-let early = 0;
-
-selectedRecord.items && selectedRecord.items.forEach(item => {
-  const checklist = item.checklist;
-  if (!checklist) return;
-
-  if (checklist.morning) {
-    t += checkWorkhour(checklist.morning, 12);
-    p += checkWorkPeriod(checklist.morning);
-  }
-  if (checklist.noon) {
-    t += checkWorkhour(checklist.noon, 17);
-    p += checkWorkPeriod(checklist.noon);
-  }
-  if (checklist.evening) {
-    over_t += checkWorkhour(checklist.evening, 22);
-  }
-
-  ['morning', 'noon'].forEach(period => {
-    const pData = period === "morning" ? checklist.morning : checklist.noon;
-    if (!pData) return;
-
-    const expectedStart = parseTime( 
-      formatHourToTimeString(period === "morning" ?  
-        expectedTimes.morning.start 
-      : expectedTimes.noon.start), 
-      pData.day);
-    const expectedEnd = parseTime(
-      formatHourToTimeString(period === "morning" ?  
-      expectedTimes.morning.end 
-      :  expectedTimes.noon.end), 
-      pData.day);
-
-    if (pData.in && pData.in.time) {
-      const actualIn = parseTime(pData.in.time, pData.day);
-      if (actualIn > expectedStart) {
-        late += (actualIn.getTime() - expectedStart.getTime()) / 60000; // minutes
-      }
+    // Morning
+    if (checklist.morning?.in) {
+      t += checkWorkhour(checklist.morning, 12);
+      p += checkWorkPeriod(checklist.morning);
     }
-    if (pData.out && pData.out.time) {
-      const actualOut = parseTime(pData.out.time, pData.day);
-      if (actualOut < expectedEnd) {
-        early += (expectedEnd.getTime() - actualOut.getTime()) / 60000;
-      }
+    
+    // Noon
+    if (checklist.noon?.in) {
+      t += checkWorkhour(checklist.noon, 17);
+      p += checkWorkPeriod(checklist.noon);
+    }
+    
+    // Evening (overtime)
+    if (checklist.evening?.in) {
+      over_t += checkWorkhour(checklist.evening, 22);
     }
   });
-});
 
-// set or use late and early as needed, e.g.
-setLateMinutes(late);
-setEarlyMinutes(early);
+  console.log('✅ RESULTS:', { timeWork: t, periodWork: p, overTimeWork: over_t });
 
+  setTimeWork(t);
+  setPeriodWork(p);
+  setOverTimeWork(over_t);
+  setLateMinutes(late);
+  setEarlyMinutes(early);
+  
+  const total_hours = getMaxWorkingHours(currentMonth + 1, currentYear);
+  const salary_unit = selectedRecord.salary / total_hours;
+  setSalaryUnit(salary_unit);
+  
+  fetchTaskByUser();
+}, [selectedRecord, modalVisible, workpointSetting]);
 
-
-      setTimeWork(t);
-      setPeriodWork(p);
-      setOverTimeWork(over_t);
-      const salary_unit = selectedRecord.salary / total_hours;
-      setSalaryUnit(salary_unit);
-
-      // setTotalSalary((p * 4  + over_t * OVERTIME_RATIO) * salary_unit);
-
-      fetchTaskByUser();
-
-      
-
-
-      
-      
-      
-    },[selectedRecord, modalVisible]);
 
 
 
