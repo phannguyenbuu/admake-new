@@ -533,14 +533,14 @@ const SalaryBoard: React.FC<SalaryBoardProps> = ({ selectedRecord, modalVisible,
                 </TableRow>)
                 }
                 
-                {rewardList.map((el: any, idx: number) => (
+                {/* {rewardList.map((el: any, idx: number) => (
                   <TableRow key={idx}>
                     <TableCell style={highlightRow}>+ {el.workspace}</TableCell>
                     <TableCell style={highlightRow}>({el.title})</TableCell>
                     <TableCell style={highlightRow}>-</TableCell>
                     <TableCell style={highlightRow}>{formatMoney(el.reward)} ₫</TableCell>
                   </TableRow>
-                ))}
+                ))} */}
                 
               </TableBody>
             </Table>
