@@ -365,7 +365,9 @@ return (
               <Typography textAlign="center">Buổi {modalImg.period  == 0 ? 'sáng' : (modalImg.period == 1 ? "chiều" : "tối")}</Typography>
               <Typography textAlign="center">Lý do: {modalImg.text}</Typography>
               
-              <DeleteConfirm text="Bạn muốn xóa nghỉ phép này?" 
+              <DeleteConfirm 
+                caption = "XÓA NGHỈ PHÉP"
+                text="Bạn muốn xóa nghỉ phép này?" 
                 elId={modalImg.id} 
                 onDelete={() => handleLeaveDelete(modalImg.id)}/>
 

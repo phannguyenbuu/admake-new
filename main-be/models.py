@@ -451,7 +451,7 @@ class Task(BaseModel):
     workspace_id = db.Column(db.String(50))
     customer_id = db.Column(db.String(50))
     assets = db.Column(db.JSON)  # lưu JSON string của list dict {materialId, quantity}
-    create_by_id = db.Column(db.String(50))
+    icon = db.Column(db.String(255))
     end_time = db.Column(db.Date)
     start_time = db.Column(db.Date)
 

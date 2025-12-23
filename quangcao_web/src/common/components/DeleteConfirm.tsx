@@ -7,28 +7,39 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { Modal } from "antd";
 
 interface DeleteAssetButtonProps {
+  caption?: string;
   text?: string;
   elId?: string | number;
   onDelete: (id: string | number | undefined) => void;
 }
 
-const DeleteConfirm: React.FC<DeleteAssetButtonProps> = ({ text, elId, onDelete }) => {
+const DeleteConfirm: React.FC<DeleteAssetButtonProps> = ({ caption, text, elId, onDelete }) => {
   const [showConfirm, setShowConfirm] = useState<boolean>(false);
 
   return (
       <>
         
+       {caption ? (
+        <Button
+          variant="outlined"
+          color="error"
+          size="small"
+          startIcon={<DeleteIcon />}
+          onClick={() => setShowConfirm(true)}
+          sx={{ mt: 1 }}
+        >
+          Xóa nghỉ phép
+        </Button>
+      ) : (
+        <IconButton
+          onClick={() => setShowConfirm(true)}
+          sx={{ mt: 1 }}
+        >
+          <DeleteIcon />  {/* ✅ Icon TRONG IconButton */}
+        </IconButton>
+      )}
 
-      <Button
-        variant="outlined"
-        color="error"
-        size="small"
-        startIcon={<DeleteIcon />}
-        onClick={() => setShowConfirm(true)}
-        sx={{ mt: 1 }}
-      >
-        Xóa nghỉ phép
-      </Button>
+
         
         <Modal
           title={`Bạn có chắc muốn xóa ${text}?`}

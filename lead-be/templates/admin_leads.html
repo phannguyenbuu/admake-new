@@ -42,7 +42,7 @@
           </th>
           <th>ID</th>
           <th style="width:200px">Họ và tên</th>
-          <th style="width:200px">Username</th>
+          <th style="width:200px">Username ({{total_users}})</th>
           <th style="width:200px">Công ty</th>
           
           <th>Liên hệ</th>
@@ -51,8 +51,7 @@
           <!-- <th style="width:200px; font-size:10px">Quy mô công ty</th> -->
           <th style="width:100px">Số dư</th>
           <th style="width:200px; font-size:10px">Ngày đăng ký/gia hạn/hết hạn</th>
-          <th style="width:300px; font-size:10px">({{total_users}})</th>
-
+          
         </tr>
       </thead>
       <tbody>
@@ -66,10 +65,40 @@
           </td>
           <td>{{ lead.id }}</td>
           <td>{{ lead.name }}</td>
-          <td>
-            <p>{{ lead.username }}</p>
-            <p style="font-size:10px">{{ lead.password }}</p>
-          </td>
+
+         <td>
+          <div style="display: flex; flex-direction: column; gap: 10px; align-items: center;">
+              <!-- Hiển thị username ĐÃ GÁN - KHÔNG DÙNG BREAK -->
+              <!-- {% if lead.user_id_str %}
+                  {% for user in users %}
+                      {% if user.id|string == lead.user_id_str %}
+                      <p style="font-size: 10px; margin: 0; color: #00B4B6; font-weight: bold;">
+                          {{ user.username }}
+                      </p>
+                      {% endif %}
+                  {% endfor %}
+              {% endif %} -->
+              
+              <!-- DROPDOWN -->
+              <select class="form-select form-select-sm" name="status-{{ lead.id }}"
+                      id="select-{{ lead.id }}" data-lead-id="{{ lead.id }}">
+                  <option value="">-- Chọn user --</option>
+                  {% for user in users %}
+                  <option value="{{ user.id }}" 
+                          data-username="{{ user.username }}" 
+                          data-password="{{ user.password }}"
+                          {% if user.id|string == lead.user_id_str %}selected{% endif %}>
+                      {{ user.username }}
+                  </option>
+                  {% endfor %}
+              </select>
+              
+              <!-- ✅ CẢ 2 DISPLAY -->
+              <!-- <p id="username-display-{{ lead.id }}" style="font-size: 10px; margin: 0;"></p> -->
+              <p id="password-display-{{ lead.id }}" style="font-size: 10px; color:red; margin: 0;"></p>
+          </div>
+      </td>
+
           <td>
             <p>{{ lead.company }}</p>
             <p style="font-size:10px">{{ lead.companySize }}</p>
@@ -93,25 +122,15 @@
           </td>
 
           <!-- CỘT DROPDOWN -->
-          <td>
-            <div style="display: flex; flex-direction: row; gap:10px">
-                <select class="form-select form-select-sm" name="status_{{ lead.id }}" id="select-{{ lead.id }}" data-lead-id="{{ lead.id }}">
-                  {% for user in users %}
-                    <option value="{{ user.id }}" data-password="{{ user.password }}">
-                      {{ user.username }}
-                    </option>
-                  {% endfor %}
-                </select>
+          <!-- THẺ DROPDOWN (thay thế hoàn toàn td dropdown cũ) -->
+          <!-- THẺ DROPDOWN (thay thế hoàn toàn td dropdown cũ) -->
+         <!-- CỘT DROPDOWN - THAY THẾ HOÀN TOÀN -->
+      
 
-                <p id="password-display-{{ lead.id }}" style="font-size:10px"></p>
 
-              <button>
-                ✓
-              </button>
-            </div>
 
-            
-          </td>
+
+
 
           
         </tr>
@@ -221,25 +240,57 @@
 
 
   <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Lấy tất cả select elements
-        const selects = document.querySelectorAll('[id^="select-"]');
+document.addEventListener('DOMContentLoaded', function() {
+    const selects = document.querySelectorAll('select[id^="select-"]');
+    
+    selects.forEach(function(selectElem) {
+        const leadId = selectElem.dataset.leadId;
+        // const usernameDisplay = document.getElementById('username-display-' + leadId);
+        const passwordDisplay = document.getElementById('password-display-' + leadId);
         
-        selects.forEach(function(selectElem) {
-            const leadId = selectElem.id.replace('select-', '');
-            // const valueDisplay = document.getElementById('value-display-' + leadId);
-            const passwordDisplay = document.getElementById('password-display-' + leadId);
+        // ✅ CHECK CẢ 2 DISPLAY TỒN TẠI
+        if (!passwordDisplay) {
+            console.warn('❌ Missing display elements for lead:', leadId);
+            return;
+        }
+        
+        // Load ban đầu
+        if (selectElem.value) {
+            const selectedOption = selectElem.options[selectElem.selectedIndex];
+            // usernameDisplay.textContent = selectedOption.getAttribute('data-username');
+            passwordDisplay.textContent = selectedOption.getAttribute('data-password');
+        }
+        
+        // ✅ CHANGE → LƯU + DEBUG LOG
+        selectElem.addEventListener('change', function() {
+            const selectedOption = this.options[this.selectedIndex];
+            const userId = selectedOption.value;
+            console.log('🔄 CHANGE:', leadId, '→', userId);
             
-            selectElem.addEventListener('change', function() {
-                const selectedOption = this.options[this.selectedIndex];
-                // valueDisplay.textContent = selectedOption.value;
-                passwordDisplay.textContent = selectedOption.getAttribute('data-password');
+            // usernameDisplay.textContent = selectedOption.getAttribute('data-username') || '';
+            passwordDisplay.textContent = selectedOption.getAttribute('data-password') || '';
+            
+            fetch(`https://admake.vn/api/lead/${leadId}/assign-user`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ user_id: userId || null })
+            })
+            .then(response => {
+                console.log('📡 Status:', response.status);
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                return response.json();
+            })
+            .then(data => console.log('✅ Lưu OK:', data))
+            .catch(error => {
+                console.error('❌ Lỗi:', error);
+                this.value = '';
+                // usernameDisplay.textContent = '';
+                passwordDisplay.textContent = '';
             });
-            
-            // Trigger initial display
-            selectElem.dispatchEvent(new Event('change'));
         });
     });
-  </script>
+});
+</script>
+
 </body>
 </html>

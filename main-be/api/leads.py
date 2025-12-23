@@ -5,6 +5,17 @@ from sqlalchemy import desc
 
 lead_bp = Blueprint('lead', __name__, url_prefix='/api/lead')
 
+
+@lead_bp.route("/<int:lead_id>/assign-user", methods=["PUT"])
+def assign_user(lead_id):
+    data = request.get_json()
+    user_id = data.get("user_id")  # ✅ FIX tên field
+    print("assign_user", user_id)
+    lead = LeadPayload.query.get_or_404(lead_id)
+    lead.user_id = user_id         # ✅ FIX field name
+    db.session.commit()
+    return jsonify({"success": True})
+
 @lead_bp.route("/", methods=["GET"])
 def get_leads():
     leads = LeadPayload.query.order_by(desc(LeadPayload.createdAt)).all()

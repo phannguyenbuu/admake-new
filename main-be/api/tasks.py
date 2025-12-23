@@ -108,7 +108,7 @@ def get_task_by_user_id(user_id):
         workspace = db.session.get(Workspace, t.workspace_id)
         item = t.tdict()
         if 'workspace' in item and item['workspace']:
-            result["data"].append(item)
+            
 
             if t.status == "REWARD":
                 total_agent_salary = 0
@@ -125,7 +125,9 @@ def get_task_by_user_id(user_id):
                                          "start_time":t.start_time,
                                          "end_time":t.end_time,
                                          "reward":  t.reward * user.salary / total_agent_salary if total_agent_salary != 0 else 0})
-            
+            else:
+                result["data"].append(item)
+
     return jsonify(result), 200
 
 @task_bp.route("/<string:id>/status", methods=["PUT"])

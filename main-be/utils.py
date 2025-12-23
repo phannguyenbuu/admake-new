@@ -1165,9 +1165,12 @@ if __name__ == "__main__":
         # usr = db.session.get(UserCanView, "202511270319022765669c59df")
         # print(usr.tdict())
 
-        for user in User.query.filter(User.role_id == -2, User.username == 'admin111').all():
-            db.session.delete(user)
+        # for user in User.query.filter(User.role_id == -2, User.fullName == 'Trần Thái Hòa').all():
+        #     db.session.delete(user)
         
-        db.session.commit()
+        # db.session.commit()
 
+
+        lead = db.session.get(LeadPayload,1)
+        print(lead.id)
         

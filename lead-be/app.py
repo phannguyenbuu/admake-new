@@ -10,10 +10,11 @@ from sqlalchemy.orm import aliased
 from sqlalchemy import not_, exists, func, cast, Integer
 from flask import render_template
 
+
 @app.route('/admin/leads/')
 def admin_leads():
-    page = request.args.get('page', 1, type=int)  # Lấy số trang từ query param, mặc định 1
-    per_page = 50  # Số bản ghi trên mỗi trang
+    page = request.args.get('page', 1, type=int)
+    per_page = 50  
     
     users = User.query.filter(
         User.role_id == -2,
@@ -28,7 +29,7 @@ def admin_leads():
                         func.substring(User.username, 2), 
                         r'[^0-9]', '', 'g'
                     ), 
-                    ''  # nullif chuỗi rỗng thành NULL
+                    ''
                 ), 
                 Integer
             ), 
@@ -36,25 +37,26 @@ def admin_leads():
         )
     ).all()
 
-
-    # for user in users:
-    #     lead = db.session.get(LeadPayload, user.lead_id)
-    #     if lead.n
     print('Users', len(users))
 
-    # Dùng paginate của SQLAlchemy để lấy đúng trang
     pagination = LeadPayload.query.order_by(LeadPayload.id).paginate(page=page, per_page=per_page, error_out=False)
 
-    leads_data = [lead.tdict() for lead in pagination.items]  # Chỉ lấy bản ghi trong trang
+    leads_data = []
+    for lead in pagination.items:
+        lead_dict = lead.tdict()
+        # ✅ FIX: dùng user_id thay vì userid
+        lead_dict['user_id_str'] = str(lead.user_id) if lead.user_id else None
+        leads_data.append(lead_dict)
 
-    total_pages = pagination.pages  # Tổng số trang
+    total_pages = pagination.pages
 
     return render_template('admin_leads.html',
-                           total_users = len(users),
-                           users=[{'fullName':'None','id':''}] + users,
-                           leads=leads_data,
-                           page=page,
-                           total_pages=total_pages)
+                          total_users=len(users),
+                          users=[{'fullName':'None','id':u.id, 'username':u.username, 'password':u.password} for u in users],
+                          leads=leads_data,
+                          page=page,
+                          total_pages=total_pages)
+
 
 base_dir = os.path.abspath(os.path.dirname(__file__))
 # print(base_dir)
