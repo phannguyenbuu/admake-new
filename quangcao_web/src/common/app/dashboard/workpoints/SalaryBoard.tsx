@@ -500,8 +500,8 @@ const SalaryBoard: React.FC<SalaryBoardProps> = ({ selectedRecord, modalVisible,
                   </TableBody>
                 </Table>
               </TableContainer>
-            {taskDetail &&
-              <JobAsset key="cash-assets" title = 'Thưởng/Phạt' type="bonus-cash" readOnly={!isAdmin}/>}
+            {/* {taskDetail && */}
+              <JobAsset key="cash-assets" title = 'Thưởng/Phạt' type="bonus-cash" readOnly={!isAdmin}/>
       </TabPanel>
       <TabPanel value={tabIndex} index={2}>
         <TableContainer
@@ -547,8 +547,8 @@ const SalaryBoard: React.FC<SalaryBoardProps> = ({ selectedRecord, modalVisible,
           </TableContainer>
       </TabPanel>
       <TabPanel value={tabIndex} index={3}>
-        {taskDetail &&
-        <JobAsset key="cash-assets" title = 'Ứng tiền cho nhân viên' type="advance-salary-cash" readOnly={!isAdmin}/>}
+        
+        <JobAsset key="cash-assets" title = 'Ứng tiền cho nhân viên' type="advance-salary-cash" readOnly={!isAdmin}/>
       </TabPanel>
     </Box>
 
