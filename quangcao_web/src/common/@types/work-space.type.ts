@@ -89,6 +89,8 @@ export interface Task extends BaseEntity {
   assign_ids?: ZipUserSearchProps[]; // id của user
   workspace_id?: string; // id của workspace
   workspace?: string;
+  icon?: string;
+  tempIcon?: string;
   customer_id?: string; // id của customer
   materials?: MaterialTask[]; // danh sách vật tư
   start_time?: Dayjs | null; // Thời gian bắt đầu

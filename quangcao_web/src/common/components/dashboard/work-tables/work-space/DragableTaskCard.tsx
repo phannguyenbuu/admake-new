@@ -2,8 +2,8 @@ import { useEffect, useState, useCallback } from "react";
 import { Row, Col, Card, Button, message, Modal, notification } from "antd";
 import { StarOutlined, PlusOutlined, MoreOutlined, StarFilled } from "@ant-design/icons";
 import CloseIcon from '@mui/icons-material/Close';
-import { Typography, Stack, IconButton, Box, TextField } from "@mui/material";
-import { useApiHost } from "../../../../common/hooks/useApiHost";
+import { Typography, Stack, IconButton, Box, TextField, Avatar } from "@mui/material";
+import { useApiHost, useApiStatic } from "../../../../common/hooks/useApiHost";
 
 import FormTask from "../FormTask";
 import {
@@ -131,6 +131,7 @@ export const CardItem: React.FC<CardItemProps> = ({
 
     return (
       <>
+      
     <div
       ref={provided?.innerRef}
       {...provided?.draggableProps}
@@ -164,6 +165,8 @@ export const CardItem: React.FC<CardItemProps> = ({
         }
       }}
     >
+      
+
       {/* Task glow effect */}
       <div
         className="absolute inset-0 rounded-xl blur opacity-0 group-hover/task:opacity-20 transition-opacity duration-200"
@@ -187,61 +190,74 @@ export const CardItem: React.FC<CardItemProps> = ({
           </div>
         )}
 
-        <div className="space-y-1 sm:space-y-1.5">
-          <div className="flex items-start justify-between gap-2">
-            <h3
-              className={`font-bold text-xs sm:text-sm line-clamp-2 transition-colors duration-150 flex-1 min-w-0 ${
-                isRewardColumn ? "text-purple-800" : "text-gray-800 group-hover/task:text-gray-900"
-              }`}
-            >
-              {task.title}
-            </h3>
-          </div>
-          {task.description && (
-            <p className="text-gray-500 text-xs line-clamp-2 leading-relaxed">{task.description.length > 20 ? task.description.slice(0, 20) + '...' : task.description}</p>
-          )}
-          {task.reward && (
-            <div className="flex items-center gap-1 text-xs text-green-600 font-semibold">
-              <span>💰</span>
-              <span className="truncate">{task.reward.toLocaleString()} VNĐ</span>
+        <Stack direction="row">
+            {task?.icon && 
+            <Avatar
+                src={`${useApiStatic()}/${task.icon}`}
+                alt="Task icon"
+                sx={{ width: 100, height: 70, borderRadius: 0}}
+            />}
+
+            <div className="space-y-1 sm:space-y-1.5">
+              <div className="flex items-start justify-between gap-2">
+                <h3
+                  className={`font-bold text-xs sm:text-sm line-clamp-2 transition-colors duration-150 flex-1 min-w-0 ${
+                    isRewardColumn ? "text-purple-800" : "text-gray-800 group-hover/task:text-gray-900"
+                  }`}
+                >
+                  {task.title}
+                </h3>
+              </div>
+              {task.description && (
+                <p className="text-gray-500 text-xs line-clamp-2 leading-relaxed">{task.description.length > 20 ? task.description.slice(0, 20) + '...' : task.description}</p>
+              )}
+              {task.reward && (
+                <div className="flex items-center gap-1 text-xs text-green-600 font-semibold">
+                  <span>💰</span>
+                  <span className="truncate">{task.reward.toLocaleString()} VNĐ</span>
+                </div>
+              )}
             </div>
-          )}
-        </div>
 
-        {/* Task footer */}
-        <div className="flex items-center justify-between mt-2 pt-2 border-t border-gray-100/50">
-          <IconButton
-            size="small"
-            aria-label="delete"
-            color="error"
-            onClick={(event) => 
-              {
-                event.preventDefault();
-                event.stopPropagation();
-                setShowConfirm(true);
+          
+            {/* Task footer */}
+            <div className="flex items-center justify-between mt-2 pt-2 border-t border-gray-100/50">
+              
+
+              <IconButton
+                size="small"
+                aria-label="delete"
+                color="error"
+                onClick={(event) => 
+                  {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    setShowConfirm(true);
+                    
+                  }}
+                sx={{
+                  color: 'orange',
+                  '&:hover': {
+                    color: 'red',
+                    backgroundColor: 'rgba(255, 0, 0, 0.1)',
+                  },
+                }}
+              >
+                <CloseIcon />
+              </IconButton>
+              {task?.rate && task.rate > 0 &&
+              <div className="text-xs text-gray-400 font-mono flex-shrink-0">
                 
-              }}
-            sx={{
-              color: 'orange',
-              '&:hover': {
-                color: 'red',
-                backgroundColor: 'rgba(255, 0, 0, 0.1)',
-              },
-            }}
-          >
-            <CloseIcon />
-          </IconButton>
-          {task?.rate && task.rate > 0 &&
-          <div className="text-xs text-gray-400 font-mono flex-shrink-0">
-            
-            {[...Array(task.rate)].map((_, index) => (
-              <StarFilled key={index} style={{color:'orange'}}/>
-            ))}
-          </div>}
+                {[...Array(task.rate)].map((_, index) => (
+                  <StarFilled key={index} style={{color:'orange'}}/>
+                ))}
+              </div>}
 
-        </div>
+            </div>
+          </Stack>
       </div>
     </div>
+    
 
      <Modal
           title="Bạn có chắc muốn xóa công việc?"

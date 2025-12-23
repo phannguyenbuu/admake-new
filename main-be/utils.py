@@ -1170,7 +1170,6 @@ if __name__ == "__main__":
         
         # db.session.commit()
 
-
-        lead = db.session.get(LeadPayload,1)
-        print(lead.id)
+        change_value_type("task",["icon"],"VARCHAR(255)")
+        
         

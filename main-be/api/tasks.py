@@ -148,6 +148,51 @@ def update_task_status(id):
 
 
 
+
+@task_bp.route("/<string:id>/upload-icon", methods=["PUT"])
+def update_task_icon(id):
+    try:
+        # ✅ Lấy task_id từ param hoặc form
+        task_id = request.form.get("task_id", id)
+        
+        # ✅ Query task
+        task = Task.query.get(task_id)
+        if not task:
+            return jsonify({'error': f'Task {task_id} not found'}), 404
+
+        # ✅ Validate file
+        if 'file' not in request.files:
+            return jsonify({'error': 'No file provided'}), 400
+            
+        file = request.files['file']
+        if file.filename == '':
+            return jsonify({'error': 'Empty filename'}), 400
+
+        # ✅ Upload file
+        filename, filepath, thumb_url = upload_a_file_to_vps(file)
+        print(f'✅ Upload: {filename} | {filepath} | {thumb_url}')
+
+        if not filename:
+            return jsonify({'error': 'Upload failed'}), 500
+
+        # ✅ Update task
+        task.icon = thumb_url
+        db.session.commit()
+
+        return jsonify({
+            'success': True,
+            'filename': filename,
+            'thumb_url': thumb_url,
+            'task': task.tdict()
+        }), 200
+
+    except Exception as e:
+        print(f"❌ Error upload icon: {str(e)}")
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+
+
+
 @task_bp.route("/<string:id>/upload", methods=["PUT"])
 def update_task_assets(id):
     time = request.form.get("time")

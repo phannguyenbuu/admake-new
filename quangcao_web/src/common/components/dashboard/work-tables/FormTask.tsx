@@ -66,7 +66,11 @@ export default function FormTask({ open, onCancel, onSuccess, users, currentColu
 
   const [userList, setUserList] = useState<ZipUserSearchProps[]>([]);
   
-
+  
+  useEffect(()=>{
+    console.log("Open", taskDetail);
+  }, [open]);
+  
   useEffect(()=>{
     if(!taskDetail || !taskDetail?.assign_ids)
       return;

@@ -4,6 +4,10 @@ import { UpdateButtonContext } from "../../../../common/hooks/useUpdateButtonTas
 import type { Task } from "../../../../@types/work-space.type";
 import { Stack } from "@mui/material";
 import { useTaskContext } from "../../../../common/hooks/useTask";
+import UploadIconButton from "./UploadIconButton";
+import { useApiHost } from "../../../../common/hooks/useApiHost";
+import { useUser } from "../../../../common/hooks/useUser";
+
 const { Title, Text } = Typography;
 
 interface TaskHeaderProps {
@@ -14,11 +18,12 @@ interface TaskHeaderProps {
 // TaskHeader.tsx
 export default function TaskHeader({ onSuccess, onUpdate }: TaskHeaderProps) {
   const {taskDetail, isLoading, updateTaskStatus} = useTaskContext();
+  const {isMobile } = useUser();
 
   const context = useContext(UpdateButtonContext);
   if (!context) throw new Error("UpdateButtonContext not found");
   const [ isReward, setIsReward ] = useState<boolean>(false);
-  
+  const {setTaskDetail} = useTaskContext();
   
 
   useEffect(()=>{
@@ -44,7 +49,10 @@ export default function TaskHeader({ onSuccess, onUpdate }: TaskHeaderProps) {
   };
 
   return (
-    <Stack direction="row" spacing={0}>
+    <Stack direction={isMobile ? "column" : "row"} spacing={1}>
+      
+    
+    <Stack direction="column" spacing={0}>
       <div className="flex items-center gap-1 px-4 py-3">
         <div className="icon-container">
           {/* Icon component here */}
@@ -65,7 +73,17 @@ export default function TaskHeader({ onSuccess, onUpdate }: TaskHeaderProps) {
         </Button>)
       }
       
-      
+      </Stack>
+
+      <UploadIconButton taskDetail={taskDetail}
+        apiUrl={`${useApiHost()}/task/${taskDetail?.id}/upload-icon`}
+        onIconChange={(newIcon) => {
+            setTaskDetail(prev => prev ? {
+              ...prev,
+              icon: newIcon
+            } : null);
+          }}
+      />
     </Stack>
   );
 }
