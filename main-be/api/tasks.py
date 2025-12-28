@@ -8,6 +8,7 @@ from PIL import Image
 from sqlalchemy import func, cast
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy import text
+from dateutil.relativedelta import relativedelta
 
 task_bp = Blueprint('task', __name__, url_prefix='/api/task')
 
@@ -352,8 +353,23 @@ def get_user_salary_task(user_id):
     if not task:
         print("Task B not found")
         abort(404, description="Task not found")
+
+
+    now = datetime.now()
+    first_day = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+    last_day = (first_day + relativedelta(months=1) - relativedelta(days=1)).replace(hour=23, minute=59, second=59, microsecond=999999)
+
+    filtered_messages = Message.query.filter(
+        Message.user_id == user_id,
+        Message.createdAt >= first_day,
+        Message.createdAt <= last_day
+    ).all()
+
+    # message = Message.query.filter(Message.user_id == user_id, 
+    #                                message.createdAt in this month)
     
     return jsonify({"infor":task.tdict(),
+                    "messages": [m.tdict() for m in filtered_messages],
                     "rates": ls,
                     }), 200
         

@@ -130,7 +130,7 @@ const ChatInput: React.FC<ChatInputProps> = ({ children, onSend, message, setMes
   };
 
   const handleDialogClose = (value: string | null) => {
-    console.log('Send', value);
+    console.log('Send BankTransferModal', value);
     onSend(value ?? '');
     setMessage('');
   }

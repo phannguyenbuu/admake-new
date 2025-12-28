@@ -113,10 +113,10 @@ function BankTransferModal({ open, setOpen, onClose, rewardContent }: BankTransf
 
     // const rawAmount = parseInt(values.amount.replace(/\./g, ''), 10);
 
-    console.log("Form submitted with values:", {
-      ...values,
-      transferDate: values.transferDate?.format("YYYY-MM-DD"),
-    });
+    // console.log("Form submitted with values:", {
+    //   ...values,
+    //   transferDate: values.transferDate?.format("YYYY-MM-DD"),
+    // });
 
     
     let cleanStr = values.amount.replace(/[^\d.-]/g, '');

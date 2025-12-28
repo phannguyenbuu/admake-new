@@ -105,7 +105,7 @@ export default function WorkDays({record}: {record:WorkDaysProps}) {
       const startDay = startDate.getDate() - 1;
       const endDay = endDate.getDate() - 1;
 
-      console.log('leaves >>>>', data);
+      // console.log('leaves >>>>', data);
 
       if (startDay === endDay) {
         if (data.morning) newStatuses[startDay][0] = 'off/' + data.reason + `/id:${data.id}`;

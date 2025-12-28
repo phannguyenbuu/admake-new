@@ -1,5 +1,5 @@
 import React, {useEffect, useState, useRef} from 'react';
-import { Tag, Modal, notification } from "antd";
+import { Tag, Modal, notification, type MessageArgsProps } from "antd";
 import { Tabs, Tab, Stack, Box, Typography } from "@mui/material";
 import { CenterBox } from '../../../components/chat/components/commons/TitlePanel';
 import type { PeriodData, WorkDaysProps } from '../../../@types/workpoint';
@@ -12,6 +12,7 @@ import JobAsset from '../../../components/dashboard/work-tables/task/JobAsset';
 import { useTaskContext } from '../../../common/hooks/useTask';
 import dayjs from 'dayjs';
 import { number } from 'framer-motion';
+import type { MessageTypeProps } from '../../../@types/chat.type';
 
 interface SalaryBoardProps {
     selectedRecord: WorkDaysProps | null;
@@ -84,6 +85,7 @@ const SalaryBoard: React.FC<SalaryBoardProps> = ({ selectedRecord, modalVisible,
   const [overTimeWork, setOverTimeWork] = useState<number>(0);
   const [salaryUnit, setSalaryUnit] = useState<number>(0);
 
+  const [dataMessages, setDataMessages] = useState<MessageTypeProps[]>([]);
   const [totalSalary, setTotalSalary] = useState<number>(0);
   const [bonusSalary, setBonusSalary] = useState<number>(0);
   const [advanceSalary, setAdvanceSalary] = useState<number>(0);
@@ -104,6 +106,8 @@ const SalaryBoard: React.FC<SalaryBoardProps> = ({ selectedRecord, modalVisible,
   const [earlyMinutes, setEarlyMinutes] = useState<number>(0);
 
   useEffect(() => {
+    setDataMessages([]);
+
     if (taskDetail) {
       const fetchData = async () => {
         try {
@@ -119,7 +123,28 @@ const SalaryBoard: React.FC<SalaryBoardProps> = ({ selectedRecord, modalVisible,
           const data = await response.json();
           setTaskDetail(data.infor);
           setRateTasks(data.rates);
+          setDataMessages(data.messages);
           console.log("Salary tasks data:", data);
+        } catch (error) {
+          console.error("Fetch error:", error);
+        }
+      };
+      fetchData();
+    }else{
+      const fetchData = async () => {
+        try {
+          const response = await fetch(`${useApiHost()}/workpoint/${selectedRecord?.user_id}/salary`, {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json"
+            }
+          });
+          if (!response.ok) {
+            throw new Error("Network response was not ok " + response.statusText);
+          }
+          const data = await response.json();
+          setDataMessages(data.messages);
+          console.log("Salary tasks data:",selectedRecord?.user_id, data);
         } catch (error) {
           console.error("Fetch error:", error);
         }
@@ -231,29 +256,13 @@ const SalaryBoard: React.FC<SalaryBoardProps> = ({ selectedRecord, modalVisible,
     return totalHours;
   }
 
-  function parseTime(timeString: string, day: Date): Date {
-    const [hours, minutes] = timeString.split(':').map(Number);
-    // Create a new Date object copying the day date parts
-    const date = new Date(day);
-    date.setHours(hours, minutes, 0, 0); // set hours, minutes, seconds, ms
-    return date;
-  }
-
-  function formatHourToTimeString(hour?: number): string {
-    if (hour === undefined) return '00:00'; // or any default time string you want
-    const h = Math.floor(hour);
-    const m = Math.round((hour - h) * 60);
-    return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
-  }
-
-
   useEffect(()=>{  
   if (!selectedRecord?.items?.length) return;
 
   const currentMonth = current_day.getMonth(); // 11 (Dec)
   const currentYear = current_day.getFullYear(); // 2025
   
-  console.log('Current month/year:', currentMonth, currentYear);
+  // console.log('Current month/year:', currentMonth, currentYear);
 
   // ✅ Filter theo THÁNG từ time trong in/out
   const monthItems = selectedRecord.items.filter(item => {
@@ -311,7 +320,7 @@ const SalaryBoard: React.FC<SalaryBoardProps> = ({ selectedRecord, modalVisible,
     }
   });
 
-  console.log('✅ RESULTS:', { timeWork: t, periodWork: p, overTimeWork: over_t });
+  // console.log('✅ RESULTS:', { timeWork: t, periodWork: p, overTimeWork: over_t });
 
   setTimeWork(t);
   setPeriodWork(p);
@@ -501,7 +510,12 @@ const SalaryBoard: React.FC<SalaryBoardProps> = ({ selectedRecord, modalVisible,
                 </Table>
               </TableContainer>
             {/* {taskDetail && */}
-              <JobAsset key="cash-assets" title = 'Thưởng/Phạt' type="bonus-cash" readOnly={!isAdmin}/>
+              <JobAsset key="cash-assets" 
+                targetUserId = {selectedRecord?.user_id}
+                messages={dataMessages.filter(el => el.type === "bonus-cash")}
+                title = 'Thưởng/Phạt' 
+                type="bonus-cash" 
+                readOnly={!isAdmin}/>
       </TabPanel>
       <TabPanel value={tabIndex} index={2}>
         <TableContainer
@@ -548,7 +562,12 @@ const SalaryBoard: React.FC<SalaryBoardProps> = ({ selectedRecord, modalVisible,
       </TabPanel>
       <TabPanel value={tabIndex} index={3}>
         
-        <JobAsset key="cash-assets" title = 'Ứng tiền cho nhân viên' type="advance-salary-cash" readOnly={!isAdmin}/>
+        <JobAsset key="cash-assets" 
+          targetUserId = {selectedRecord?.user_id}
+          messages={dataMessages.filter(el => el.type === "advance-salary-cash")}
+          title = 'Ứng tiền cho nhân viên' 
+          type="advance-salary-cash" 
+          readOnly={!isAdmin}/>
       </TabPanel>
     </Box>
 

@@ -136,7 +136,8 @@ export const CardItem: React.FC<CardItemProps> = ({
       ref={provided?.innerRef}
       {...provided?.draggableProps}
       {...provided?.dragHandleProps}
-      className={`task-card group/task relative mb-3 transition-all duration-200 ${
+      className={`task-card group/task relative mb-3 transition-all duration-200 w-[260px]
+        ${
         isRewardColumn ? "cursor-not-allowed opacity-90" : "cursor-pointer"
       } ${
         snapshot?.isDragging
@@ -201,7 +202,7 @@ export const CardItem: React.FC<CardItemProps> = ({
             <div className="space-y-1 sm:space-y-1.5">
               <div className="flex items-start justify-between gap-2">
                 <h3
-                  className={`font-bold text-xs sm:text-sm line-clamp-2 transition-colors duration-150 flex-1 min-w-0 ${
+                  className={`font-bold text-xs sm:text-sm break-words line-clamp-2 transition-colors duration-150 flex-1 min-w-0 ${
                     isRewardColumn ? "text-purple-800" : "text-gray-800 group-hover/task:text-gray-900"
                   }`}
                 >

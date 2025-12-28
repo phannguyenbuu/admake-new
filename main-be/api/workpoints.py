@@ -6,6 +6,8 @@ from datetime import datetime, time, date
 from sqlalchemy.orm.attributes import flag_modified
 from api.users import get_query_page_users
 from collections import defaultdict
+from dateutil.relativedelta import relativedelta
+from sqlalchemy import and_, or_
 
 workpoint_bp = Blueprint('workpoint', __name__, url_prefix='/api/workpoint')
 
@@ -59,6 +61,58 @@ def put_remove_workpoint(id):
     db.session.commit()
     
     return jsonify([c.tdict() for c in workpoint]), 200
+
+@workpoint_bp.route("/message", methods=["POST"])
+def post_workpoint_message():
+    user_id = request.form.get("user_id")
+    type = request.form.get("type")
+    text = request.form.get("text")
+
+    message = Message.create_item({"message_id": generate_datetime_id(),
+                                   "type": type,
+                                    "user_id":user_id, 
+                                    "text":text, 
+                                    })
+    
+    print("Workpoint message", message.tdict())
+
+    return jsonify({
+        'text': text,
+        'message': message.tdict()
+        })
+
+
+
+@workpoint_bp.route("/<string:user_id>/salary", methods=["GET"])
+def get_user_workpoint_salary_task(user_id):
+    user = db.session.get(User, user_id)
+    if not user:
+        print("User not found")
+        abort(404, description="User not found")
+
+    now = datetime.now()
+    first_day = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+    last_day = (first_day + relativedelta(months=1) - relativedelta(days=1)).replace(hour=23, minute=59, second=59, microsecond=999999)
+
+
+
+    
+
+    filtered_messages = Message.query.filter(
+        Message.user_id == user_id,
+        Message.createdAt >= first_day,
+        Message.createdAt <= last_day,
+        or_(
+            Message.type.like("%cash:%"),
+            Message.type.like("%cash"),     # ✅ "bonus-cash"
+            Message.type.like("bonus-cash"),
+            Message.type.like("advance-salary-cash")
+        )
+    ).all()
+
+    
+    return jsonify({"messages": [m.tdict() for m in filtered_messages],}), 200
+
 
 @workpoint_bp.route("/page", methods=["GET"])
 def get_batch_workpoint_detail():

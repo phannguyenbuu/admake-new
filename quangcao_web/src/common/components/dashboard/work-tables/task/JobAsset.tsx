@@ -33,9 +33,13 @@ interface JobAssetProps {
   title?: string;
   type?: string; // là ứng tiền hay hình ảnh tham khảo công trình
   readOnly?: boolean;
+  messages?: MessageTypeProps[];
+
+
+  targetUserId? : string;
 }
 
-const JobAsset: React.FC<JobAssetProps> = ({ title, type, readOnly = false }) => {
+const JobAsset: React.FC<JobAssetProps> = ({ title, type, messages, targetUserId, readOnly = false }) => {
   
   const {taskDetail, setTaskDetail} = useTaskContext();
   const {userId, username, isMobile, 
@@ -63,12 +67,17 @@ const JobAsset: React.FC<JobAssetProps> = ({ title, type, readOnly = false }) =>
   };
 
   useEffect(()=>{
+    if(messages)
+      setListMessages(messages);
+  }, [messages, targetUserId]);
+
+  useEffect(()=>{
     if(!taskDetail || !taskDetail.assets)
     {
       setTmpTaskCreatedAssets([]);
       setTmpTaskCreatedMessages([]);
-      setAssets([]);
-      setListMessages([]);
+      // setAssets([]);
+      // setListMessages([]);
       return;
     } 
 
@@ -94,7 +103,7 @@ const JobAsset: React.FC<JobAssetProps> = ({ title, type, readOnly = false }) =>
     formData.append("type", type || '');
     formData.append("task_id", taskDetail?.id.toString() ?? '');
 
-    // console.log('Upload', type, Object.fromEntries(formData.entries()));
+    console.log('handleAssetSend Upload', type, Object.fromEntries(formData.entries()));
 
     try {
       
@@ -213,44 +222,67 @@ const JobAsset: React.FC<JobAssetProps> = ({ title, type, readOnly = false }) =>
     formData.append("time", dateTimeStr);
     formData.append("type", type || '');
     formData.append("user_id", userId || '');
+
     formData.append("username", username || '');
     formData.append("text", text || '');
     formData.append("task_id", taskDetail?.id.toString() ?? '');
 
-    // console.log('Upload', type, Object.fromEntries(formData.entries()));
+    console.log('handleMessageSend Upload', type, Object.fromEntries(formData.entries()));
     
 
     try {
       if(taskDetail)
       {
-      const response = await fetch(`${useApiHost()}/task/${taskDetail?.id}/message`, {
-        method: "PUT",
-        body: formData,
-      });
+        const response = await fetch(`${useApiHost()}/task/${taskDetail?.id}/message`, {
+          method: "PUT",
+          body: formData,
+        });
 
-      if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
 
-      const result = await response.json();
-      notification.success({ message: "Đã gửi comment thành công!", description: result });
-      // console.log('success is image?',result.filename,isImageFile(result.filename));
-      setListMessages(prev => prev ? [...prev, result.message] : [result.message]);
-      setTaskDetail(prev => {
-        if (! prev ) return null; // handle null case explicitly
-        if (prev.assets === null) prev.assets = [];
+        const result = await response.json();
+        notification.success({ message: "Đã gửi comment thành công!", description: result });
+        // console.log('success is image?',result.filename,isImageFile(result.filename));
+        setListMessages(prev => prev ? [...prev, result.message] : [result.message]);
+        setTaskDetail(prev => {
+          if (! prev ) return null; // handle null case explicitly
+          if (prev.assets === null) prev.assets = [];
 
-        return {...prev,
-          assets: prev.assets ? [...prev.assets, result.message] : [result.message],};
-      });
-    }else if (type === "task"){
-      // console.log("G",text);
-      var tmp: MessageTypeProps = {
-                    type,
-                    message_id: generateDatetimeId(),
-                    user_id: userId,
-                    username: fullName ?? '',
-                    text};
-                    
-      setTmpTaskCreatedMessages(prev => prev ? [...prev, tmp] : [tmp]);
+          return {...prev,
+            assets: prev.assets ? [...prev.assets, result.message] : [result.message],};
+        });
+    }else 
+    {
+        if (type === "task"){
+          // console.log("G",text);
+          var tmp: MessageTypeProps = {
+                        type,
+                        message_id: generateDatetimeId(),
+                        user_id: targetUserId,
+                        username: fullName ?? '',
+                        text};
+                        
+          setTmpTaskCreatedMessages(prev => prev ? [...prev, tmp] : [tmp]);
+        } else if (type?.includes("cash"))  {
+          const response = await fetch(`${useApiHost()}/workpoint/message`, {
+            method: "POST",
+            body: formData,
+          });
+
+          if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+
+          const result = await response.json();
+          notification.success({ message: "Đã lưu thành công!", description: result });
+          // console.log('success is image?',result.filename,isImageFile(result.filename));
+          setListMessages(prev => prev ? [...prev, result.message] : [result.message]);
+          // setTaskDetail(prev => {
+          //   if (! prev ) return null; // handle null case explicitly
+          //   if (prev.assets === null) prev.assets = [];
+
+          //   return {...prev,
+          //     assets: prev.assets ? [...prev.assets, result.message] : [result.message],};
+          // });
+        }
     }
 
     } catch (err: any) {
@@ -345,7 +377,7 @@ const JobAsset: React.FC<JobAssetProps> = ({ title, type, readOnly = false }) =>
 
       {[...ListMessages,...tmpTaskCreatedMessages].map((el, index) => 
       {
-        console.log("List", el);
+        // console.log("List", el);
         return <Stack direction="row" key={index} spacing={1} alignItems="center">
           {title === "Thông tin từ admin" &&
             <input

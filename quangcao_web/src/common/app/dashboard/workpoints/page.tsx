@@ -13,7 +13,7 @@ import { useApiHost } from "../../../common/hooks/useApiHost";
 import { useUser } from "../../../common/hooks/useUser";
 import type { Workpoint, WorkDaysProps } from "../../../@types/workpoint";
 // import type { Leave } from "../../../@types/leave.type";
-
+import { useTaskContext } from "../../../common/hooks/useTask";
 import SalaryBoard from "./SalaryBoard";
 import { Typography } from "antd";
 import UnPermissionBoard from "../unPermissionBoard";
@@ -24,6 +24,8 @@ const WorkPointPage: IPage["Component"] = () => {
     limit: 10,
     search: "",
   });
+
+  const { setTaskDetail } = useTaskContext();
 
   const [workpoints, setWorkpoints] = useState<WorkDaysProps[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -80,6 +82,7 @@ const WorkPointPage: IPage["Component"] = () => {
 
   useEffect(()=>{
     console.log('canViewPermission', canViewPermission);
+    setTaskDetail(null);
   },[]);
 
   return canViewPermission?.view_workpoint ?(
