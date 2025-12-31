@@ -1,0 +1,506 @@
+    1  sudo apt-get update
+    2  sudo apt-get upgrade -y
+    3  git --version
+    4  cd admake-new
+    5  mkdir admake-new
+    6  git init
+    7  git remote add origin https://github.com/phannguyenbuu/admake-new.git
+    8  git pull origin main
+    9  cd admke-new
+   10  cd admake-new
+   11  ls
+   12  cd ..
+   13  ls
+   14  rm -rf *.*
+   15  ls
+   16  rm -rf admake-new
+   17  rm -rf main-be
+   18  rm -rf quangcao_web
+   19  ls
+   20  ls -a
+   21  rm -rf .bashrc
+   22  rm -rf .cache
+   23  rm -rf .git
+   24  rm -rf .gitignore
+   25  rm -rf .profile
+   26  rm -rf .ss
+   27  ls
+   28  ls -a
+   29  rm -rf .
+   30  cmkdir admake
+   31  mkdir admke
+   32  rm -rf admke
+   33  mkdir admake
+   34  cd admake
+   35  ls
+   36  git init
+   37  git remote add origin [200~https://github.com/phannguyenbuu/schoo
+   38  git pull origin main
+   39  ls
+   40  npm install
+   41  apt install npm
+   42  cd ..
+   43  mkdir school
+   44  cd school
+   45  git init
+   46  git remote add origin https://github.com/phannguyenbuu/school-3D.git
+   47  git pull origin main
+   48  ls
+   49  npm install
+   50  cd ..
+   51  mkdir keysim
+   52  cd keysim
+   53  git nit
+   54  git init
+   55  git remote add origin https://github.com/phannguyenbuu/keysim.git
+   56  git pull origin main
+   57  npm install
+   58  cd ..
+   59  mkdir luxlife
+   60  cd luxlife
+   61  git init
+   62  git remote add origin https://github.com/phannguyenbuu/dlux-website.git
+   63  npm pull origin main
+   64  git pull origin main
+   65  git pull origin master
+   66  git branch -m master main
+   67  git push -u origin main
+   68  cd ..
+   69  cd school-3D
+   70  cd school
+   71  git pull orgin main
+   72  git pull origin main
+   73  npm start
+   74  ls
+   75  nanao .gitignore
+   76  nano .gitignore
+   77  git pull origin main
+   78  npm start
+   79  ls
+   80  nano .gitignore
+   81  git add .
+   82  git commit -y "ReUp"
+   83  git commit -m "ReUp"
+   84  git pull origin main
+   85  git fetch origin
+   86  git reset --hard origin/main
+   87  git fetch origin && git reset --hard origin/main
+   88  git pull
+   89  git pull origin main
+   90  ls
+   91  cd public
+   92  ls
+   93  cd ..
+   94  npm start
+   95  sudo ufw allow 3006
+   96  npm start
+   97  sudo apt update
+   98  sudo apt install nodejs
+   99  sudo apt install npm
+  100  npm install pm2 -g
+  101  pm2 -v
+  102  pm2 start npm --name "schoolcis" -- start
+  103  pm2 logs 0
+  104  sudo apt install nginx
+  105  sudo systemctl status nginx
+  106  sudo ufw allow 'Nginx Full'
+  107  sudo ufw reload
+  108  sudo apt install certbot python3-certbot-nginx
+  109  sudo certbot --nginx -d 3dmap.cis.edu.vn
+  110  sudo certbot renew --dry-run
+  111  sudo certbot --nginx -d 3dmap.sedbergh.edu.vn
+  112  cd /etc/letenscrypt
+  113  cd /etc/letsenscrypt
+  114  cd /etc/letsencrypt
+  115  cd live
+  116  ls
+  117  cd 3dmap.cis.edu.vn
+  118  ls
+  119  cd /var/www/
+  120  ls
+  121  mkdir /html
+  122  ls
+  123  mkdir 3dmap.cis.edu.vn/html
+  124  mkdir 3dmap.cis.edu.vn
+  125  cd 3dmap.cis.edu.vn
+  126  mkdir html
+  127  sudo chown -R $USER:$USER /var/www/3dmap.cis.edu.vn/html
+  128  sudo chmod -R 755 /var/www/3dmap.cis.edu.vn
+  129  echo '<html><body><h1>Welcome to 3dmap.cis.edu.vn!/h1></body></html>' | sudo tee /var/www/3dmap.cis.edu.vn/html/index.html
+  130  ls
+  131  cd html
+  132  ls
+  133  cd ..
+  134  mkdir 3dmap.sedbergh.edu.vn
+  135  cd 3dmap.sedbergh.edu.vn
+  136  mkdir html
+  137  echo '<html><body><h1>Welcome to 3dmap.sedbergh.edu.vn!/h1></body></html>' | sudo tee /var/www/3dmap.sedbergh.edu.vn/html/index.html
+  138  cd hmtl
+  139  cd html
+  140  ls
+  141  nano index.html
+  142  cd /etc/nginx
+  143  sudo nginx -t
+  144  grep -r "server_name 3dmap.cis.edu.vn" /etc/nginx/
+  145  cd site-enabled
+  146  cd sites-enabled
+  147  ls
+  148  rm -rf default
+  149  sodu nginx -t
+  150  sudo nginx -t
+  151  sudo systemctl restart nginx
+  152  cd /root/school
+  153  pm2 kill
+  154  options
+  155  cd..
+  156  cd ..
+  157  options
+  158  rm -rf ~/.pm2
+  159  cd school
+
+
+
+
+# env $(cat .env.dev3006) pm2 start npm --name "school3D" -- start
+# env $(cat .env.dev3007) pm2 start npm --name "school3D-SEQ" -- start
+
+
+
+# env $(cat .env.dev3006) pm2 start serve --name "school3D" -- -s build -l 3006
+# env $(cat .env.dev3007) pm2 start serve --name "school3D-SEQ" -- -s build -l 3007
+
+pm2 start app.py --name "school-Admin"
+pm2 start ./start-serve-3006.sh --name "school3D"
+pm2 start ./start-serve-3007.sh --name "school3D-SEQ"
+
+
+  163  pm2 logs 1
+  164  sudo nginx -t
+  165  sudo systemctl restart nginx
+  166  sudo nginx -t
+  167  sudo systemctl restart nginx
+  168  cd ..
+  169  python -m venv venv
+  170  python3 -m venv venv
+  171  apt install python3.12-venv
+  172  python3 -m venv venv
+  173  source venv/bin/activate
+  174  pip install Flask
+  175  cd school
+  176  cd src
+  177  cd admin
+  178  
+  179  pm2 logs 2
+  180  sudo ufw allow 5006
+  181  cd ..
+  182  git pull origin main
+  183  sudo nginx -t
+  184  sudo systemctl restart nginx
+  185  git pull origin main
+  186  cd src
+  187  src admin
+  188  cd admin
+  189  ls
+  190  cd static
+  191  ls
+  192  cd images
+  193  ls
+  194  sudo nginx -t
+  195  sudo systemctl restart nginx
+  196  sudo nginx -t
+  197  sudo systemctl restart nginx
+  198  pm2 ls
+  199  pm2 logs 2
+  200  git pull origin main
+  201  pm2 logs 4
+  202  pm2 logs 2
+  203  cd ..
+  204  git pull origin main
+  205  pm2 logs 2
+  206  git pull origin main
+  207  sudo apt update
+  208  sudo apt upgrade
+  209  sudo apt install postgresql postgresql-contrib
+  210  sudo systemctl start postgresql
+  211  sudo systemctl status postgresql
+  212  psql -U postgres -d
+  213  psql -U postgres -
+  214  psql -U postgres 
+  215  psql -U postgres
+  216  nano /etc/postgresql/<version>/main/pg_hba.conf
+  217  cd /etc/postgresql
+  218  ls
+  219  cd 16
+  220  cd main
+  221  nano pg_hba.conf
+  222  not
+  223  sudo systemctl restart postgresql
+  224  sudo -u postgres psql
+  225  nano pg_hba.conf
+  226  sudo -u postgres psql
+  227  sudo systemctl restart postgresql
+  228  sudo -u postgres psql
+  229  pg_restore -U postgres -d admake_chat --clean /root/admake_chat_20251043_1.dump
+  230  sudo -u postgres createdb admake_chat
+  231  pg_restore -U postgres -d admake_chat --clean /root/admake_chat_20251043_1.dump
+  232  pg_restore -U postgres -d admake_chat /root/admake_chat_20251043_1.dump
+  233  sudo -u postgres psql
+  234  sudo -u postgres psql -d postgres
+  235  pg_restore -U postgres -d admake_chat /root/admake_chat_20251043_1.dump
+  236  sudo -u postgres psql -d postgres
+  237  sudo -u postgres psql -d admake_chat
+  238  cd /root/admake
+  239  cd quangcao_web
+  240  npm run dev
+  241  npm install vite
+  242  npm install vite --legacy-peer-deps
+  243  npm run dev
+  244  rm -rf node_modules
+  245  npm install --legacy-peer-deps
+  246  npm run dev
+  247  rm -rf node_modules
+  248  rm -rf package-lock.json
+  249  npm install --legacy-peer-deps
+  250  npm run dev
+  251  pm2 start npm --name "quangcao_web" -- run dev
+  252  cd ..
+  253  cd main-be
+  254  pm2 start app.py --name "main-be"
+  255  pm2 logs 4
+  256  pip install Flask-SQLAlchemy
+  257  pm2 logs 4
+  258  pm2 restart 4
+  259  pm2 logs 4
+  260  pip install flask-cors
+  261  pm2 restart 4
+  262  pm2 logs 4
+  263  pip install pytz
+  264  pm2 restart 4
+  265  pm2 logs 4
+  266  pip install psycopg2-binary
+  267  pm2 restart 4
+  268  pm2 logs 4
+  269  4|main-be  |   File "/root/admake/main-be/models.py", line 17, in <module>
+  270  pip install flask-jwt-extended
+  271  pm2 restart 4
+  272  pm2 logs 4
+  273  pip install python-dotenv
+  274  pm2 restart 4
+  275  pm2 logs 4
+  276  pip install flask-socketio
+  277  pm2 restart 4
+  278  pm2 logs 4
+  279  pip install flask-login
+  280  pm2 restart 4
+  281  pm2 logs 4
+  282  cd ..
+  283  git pull origin 
+  284  git pull origin main
+  285  git commit -m "K"
+  286  git add .
+  287  git commit -m "K"
+  288  git pull origin main
+  289  pm2 restart 4
+  290  pm2 logs 4
+  291  nano main-be/app.py
+  292  git pull origin main
+  293  git config --global pull.rebase true
+  294  git config pull.rebase false
+  295  git pull origin main
+  296  nano main-be/app.py
+  297  pm2 restart 4
+  298  pm2 logs 4
+  299  git pull origin main
+  300  git status
+  301  git add .
+  302  git pull origin main
+  303  git commit -m "KLL"
+  304  git config --global user.email phannguyenbuu@gmail.com
+  305  git commit -m "KLL"
+  306  git checkout main
+  307  git commit -m "KLL"
+  308  git pull origin main
+  309  sudo certbot certonly --manual --preferred-challenges=dns -d "admake.vn" -d "*.admake.vn"
+  310  sudo certbot certonly --manual --preferred-challenges=dns -d "archbox.pw" -d "*.archbox.pw"
+  311  sudo certbot certonly --manual --preferred-challenges=dns -d "archbox.pw" -d "*.archbox.pw"
+  312  sudo certbot certonly --manual --preferred-challenges=dns -d "archbox.pw" -d "*.archbox.pw"
+  313  sudo certbot certonly --manual --preferred-challenges=dns -d "archbox.pw" -d "*.archbox.pw"
+  314  cd /etc/nginx
+  315  cd sites-enbled
+  316  cd sites-enabled
+  317  ls
+  318  rm -rf admake.vn
+  319  ls
+  320  sudo nginx -t
+  321  sudo nginx -t
+  322  sudo systemctl restart nginx
+  323  pm2 ls
+  324  pm2 logs 3
+  325  pm2 logs 3
+  326  pm2 logs 4
+  327  sudo certbot certonly --manual --preferred-challenges=dns -d "admake.vn" -d "*.admake.vn"
+  328  sudo certbot certonly --manual --preferred-challenges=dns -d "admake.vn" -d "*.admake.vn"
+  329  sudo certbot certonly --manual --preferred-challenges=dns -d "admake.vn" -d "*.admake.vn"
+  330  sudo certbot certonly --manual --preferred-challenges=dns -d "admake.vn" -d "*.admake.vn"
+  331  sudo certbot certonly --manual --preferred-challenges=dns -d "admake.vn" -d "*.admake.vn"
+  332  sudo certbot certonly --manual --preferred-challenges=dns -d "admake.vn" -d "*.admake.vn"
+  333  sudo certbot certonly --manual --preferred-challenges=dns -d "admake.vn" -d "*.admake.vn"
+  334  rm -rf archbox.pw
+  335  rm -rf b-one.archbox.pw
+  336  ls
+  337  sudo nginx -t
+  338  sudo systemctl restart nginx
+  339  sudo ufw allow 5432
+  340  sudo netstat -tulnp | grep 5432
+  341  sudo systemctl status postgresql
+  342  nano /etc/postgresql/16/main/postgresql.conf
+  343  nano /etc/postgresql/16/main/pg_hba.conf
+  344  sudo systemctl restart postgresql
+  345  rm -rf b-one.admake.vn
+  346  sudo nginx -t
+  347  sudo systemctl restart postgresql
+  348  sudo systemctl restart nginx
+  349  ls
+  350  sudo nginx -t
+  351  sudo systemctl restart nginx
+  352  certificate
+  353  sudo tail -n 50 /var/log/nginx/error.log
+  354  cd /var/www
+  355  ls
+  356  mkdir admake.vn
+  357  cd admake.vn
+  358  mkdir html
+  359  cd hmtl
+  360  cd html
+  361  ls
+  362  sudo mkdir -p /var/www/admake.vn/html/.well-known/acme-challenge
+  363  sudo chown -R www-data:www-data /var/www/admake.vn/html/.well-known
+  364  sudo chmod -R 755 /var/www/admake.vn/html/.well-known
+  365  ls
+  366  ls
+  367  ls -a
+  368  cd .well-known
+  369  ls
+  370  sudo nginx -t
+  371  sudo systemctl restart nginx
+  372  sudo tail -n 50 /var/log/nginx/error.log
+  373  sudo ss -tulnp | grep 5170
+  374  sudo ufw allow 5170/tcp
+  375  sudo nginx -t
+  376  sudo systemctl restart nginx
+  377  sudo tail -n 50 /var/log/nginx/error.log
+  378  sudo ss -tulnp | grep 5170
+  379  sudo ss -tulnp | grep 5170
+  380  sudo nginx -t
+  381  sudo systemctl restart nginx
+  382  sudo tail -n 50 /var/log/nginx/error.log
+  383  sudo tail -n 50 /var/log/nginx/error.log
+  384  sudo ss -tulnp | grep 5007
+  385  sudo nginx -t
+  386  sudo systemctl restart nginx
+  387  sudo ufw allow 5007
+  388  sudo tail -n 50 /var/log/nginx/error.log
+  389  ls
+  390  sudo chown -R www-data:www-data /var/www/admake.vn/html/.well-known
+  391  sudo chmod -R 755 /var/www/admake.vn/html/.well-known
+  392  sudo nginx -t
+  393  sudo systemctl restart nginx
+  394  sudo tail -n 50 /var/log/nginx/error.log
+  395  sudo tail -n 50 /var/log/nginx/error.log
+  396  sudo tail -n 50 /var/log/nginx/access.log
+  397  sudo tail -n 50 /var/log/nginx/access.log
+  398  sudo nginx -t
+  399  sudo systemctl restart nginx
+  400  sudo tail -n 50 /var/log/nginx/access.log
+  401  sudo tail -n 50 /var/log/nginx/access.log
+  402  sudo tail -n 50 /var/log/nginx/access.log
+  403  sudo ln -s /etc/nginx/sites-available/bone.admake.vn.conf /etc/nginx/sites-enabled/
+  404  ls -l /etc/nginx/sites-enabled/
+  405  nano /etc/nginx/sites-enabled/bone.admake.vn.conf
+  406  nslookup bone.admake.vn
+  407  ping bone.admake.vn
+  408  cd /etc/nginx
+  409  cd sites-enabled
+  410  rm -rf bone.admake.vn
+  411  ls
+  412  rm -rf bone.admake.vn.conf
+  413  nslookup quanly.admake.vn
+  414  sudo nginx -t
+  415  nano /etc/nginx/sites-enabled/bone.admake.vn.conf
+  416  rm -rf bone.admake.vn.conf
+  417  sudo systemctl restart nginx
+  418  cd /root/admake
+  419  git pull origin main
+  420  git pull origin main
+  421  git pull origin main
+  422  pm2 logs 4
+  423  pm2 logs 4
+  424  cd school
+  425  cd /root/school
+  426  git pull origin main
+  427  pm2 logs 0
+  428  sudo tail -n 50 /var/log/nginx/error.log
+  429  sudo ss -tulpn | grep 5006
+  430  sudo nginx -t
+  431  sudo systemctl restart nginx
+  432  cd ..
+  433  cd admake
+  434  git pull origin main
+  435  cd landingpage
+  436  ls
+  437  git pull origin main
+  438  sudo nginx -t
+  439  sudo systemctl restart nginx
+  440  rm -rf main-be/__pycache__/models.cpython-312.pyc
+  441  git pull origin main
+  442  cd landing_page
+  443  ls
+  444  cd landingpage
+  445  npm install --legacy-peer-deps
+  446  npm run dev
+  447  pm2 start npm --name "admake landing page" -- start
+  448  pm2 logs 5
+  449  pm2 kill 5
+  450  pm2 delete 5
+  451  pm2 start npm --name "admake landing page" run dev
+  452  pm2 start npm --name "admake landing page" -- run dev
+  453  pm2 delete 6
+  454  pm2 logs 7
+  455  pm2 logs 0
+  456  pm2 logs 4
+  457  git pull origin main
+  458  cd admake
+  459  cd admake
+  460  git pull origin main
+  461  pm2 logs 4
+  462  pm2 logs 4
+  463  top
+  464  ps -p 30739 -o pid,cmd
+  465  ps -p 43629 -o pid,cmd
+  466  cd admake_chat
+  467  cd admak
+  468  cd admake
+  469  git pull orgion main
+  470  git pull origin main
+  471  git reset --hard HEAD
+  472  git pull origin main
+  473  pm2 logs 4
+  474  pm2 logs 4
+  475  pm2 logs 4
+  476  pm2 logs 4
+  477  cd main-be
+  478  ls
+  479  cd static
+  480  ls
+  481  git reset --hard HEAD
+  482  git pull origin main
+  483  cd ..
+  484  cd ..
+  485  git pull origin main
+  486  pm2 logs 4
+  487  git pull origin main
+  488  pm2 logs 4
+  489  pm2 logs 4
+  490  git pull origin main
+  491  pm2 logs 4
+  492  history > history_output.txt

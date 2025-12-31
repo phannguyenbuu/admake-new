@@ -1,0 +1,2 @@
+# Trong Git Bash (ở folder Admake)
+tar -czf quangcao_web.tar.gz --exclude=node_modules --exclude=.git --exclude=build --exclude=dist --exclude=.env.local --exclude=.next --exclude=out quangcao_web/ && sshpass -p '@baoLong0511' scp quangcao_web.tar.gz root@148.230.100.33:admake && rm quangcao_web.tar.gz

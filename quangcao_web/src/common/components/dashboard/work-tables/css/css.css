@@ -1,0 +1,376 @@
+/* CSS cải tiến để fix vấn đề component bị đơ sau khi drag */
+
+/* Reset mạnh mẽ cho Ant Design Card */
+.ant-card {
+  border: none !important;
+  box-shadow: none !important;
+  transition: all 0.2s ease-out !important;
+}
+
+.ant-card-head {
+  border-bottom: none !important;
+  border: none !important;
+}
+
+.ant-card-body {
+  border: none !important;
+}
+
+/* Đảm bảo không có border khi hover hoặc focus */
+.ant-card:hover,
+.ant-card:focus,
+.ant-card:active {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Override mạnh mẽ hơn cho Ant Design Card */
+.ant-card.ant-card {
+  border: none !important;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05) !important;
+}
+
+/* Khi dragging over thì mới có border với animation mượt - Giống Trello */
+.ant-card.dragging-over {
+  border: 2px solid #00b4b6 !important;
+  box-shadow: 0 8px 16px rgba(0, 180, 182, 0.3),
+    0 4px 8px rgba(0, 180, 182, 0.2), inset 0 0 20px rgba(255, 255, 255, 0.1) !important;
+  animation: trello-pulse 1s ease-in-out infinite alternate;
+  transform: scale(1.02) !important;
+}
+
+/* Animation cho dragging over effect - Giống Trello */
+@keyframes trello-pulse {
+  0% {
+    box-shadow: 0 8px 16px rgba(0, 180, 182, 0.2),
+      0 4px 8px rgba(0, 180, 182, 0.1), inset 0 0 20px rgba(255, 255, 255, 0.05);
+    transform: scale(1.01);
+  }
+  100% {
+    box-shadow: 0 12px 24px rgba(0, 180, 182, 0.25),
+      0 6px 12px rgba(0, 180, 182, 0.15),
+      inset 0 0 25px rgba(255, 255, 255, 0.08);
+    transform: scale(1.015);
+  }
+}
+
+/* QUAN TRỌNG: CSS cho element đang được drag - Giống Trello */
+[data-rbd-draggable-context-id] {
+  cursor: grabbing !important;
+  user-select: none !important;
+  z-index: 99999 !important;
+  pointer-events: none !important;
+  transform-origin: center center !important;
+  /* LOẠI BỎ transition khi đang drag để tránh conflict */
+  transition: none !important;
+  /* Đảm bảo smooth rendering */
+  will-change: transform !important;
+  backface-visibility: hidden !important;
+  -webkit-backface-visibility: hidden !important;
+  /* QUAN TRỌNG: Đảm bảo phần tử theo sát con trỏ chuột */
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  margin: 0 !important;
+  /* Đảm bảo phần tử luôn ở trên cùng */
+  z-index: 99999 !important;
+  /* Tối ưu performance cho việc kéo */
+  transform: translateZ(0) !important;
+  -webkit-transform: translateZ(0) !important;
+  /* Thêm hiệu ứng shadow giống Trello */
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.06), 0 3px 6px rgba(0, 0, 0, 0.04) !important;
+  /* Thêm hiệu ứng rotate nhẹ giống Trello */
+  transform: rotate(1deg) scale(1.01) !important;
+  -webkit-transform: rotate(1deg) scale(1.01) !important;
+}
+
+/* QUAN TRỌNG: CSS để PHỤC HỒI element sau khi drag xong */
+[data-rbd-draggable-id]:not([data-rbd-draggable-context-id]) {
+  /* Transition mượt mà khi KHÔNG drag */
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  transform-origin: center center !important;
+  will-change: auto !important; /* Reset will-change */
+  backface-visibility: visible !important;
+  -webkit-backface-visibility: visible !important;
+  /* Đảm bảo pointer events được khôi phục */
+  pointer-events: auto !important;
+  cursor: pointer !important;
+}
+
+/* Mobile Date Picker - Ẩn datepicker gốc trên mobile */
+@media (max-width: 768px) {
+  .ant-picker-panel-container {
+    display: none !important;
+  }
+  .ant-picker-dropdown {
+    display: none !important;
+  }
+  .ant-picker-panel {
+    display: none !important;
+  }
+}
+
+/* Drag handle styles */
+[data-rbd-drag-handle-context-id] {
+  cursor: grab !important;
+  user-select: none !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  transform-origin: center center !important;
+}
+
+[data-rbd-drag-handle-context-id]:hover {
+  cursor: grab !important;
+  transform: translateY(-0.5px) !important;
+}
+
+[data-rbd-drag-handle-context-id]:active {
+  cursor: grabbing !important;
+  transform: translateY(0) !important;
+}
+
+/* THÊM: Force reset sau khi drag kết thúc */
+.drag-item-reset {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  transform: none !important;
+  pointer-events: auto !important;
+  cursor: pointer !important;
+  will-change: auto !important;
+  z-index: auto !important;
+}
+
+/* Placeholder animation */
+[data-rbd-placeholder] {
+  transition: all 0.2s ease-out !important;
+  border-radius: 8px !important;
+  background: rgba(255, 255, 255, 0.1) !important;
+  margin: 4px 0 !important;
+}
+
+/* Column transitions */
+[data-rbd-droppable-id] {
+  transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
+}
+
+/* THÊM: CSS để đảm bảo component phục hồi hoàn toàn - Giống Trello */
+.task-card {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  transform-origin: center center !important;
+  backface-visibility: hidden !important;
+  -webkit-backface-visibility: hidden !important;
+  /* Hiệu ứng Trello: border và shadow */
+  outline: none !important;
+  border: none !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.12) !important;
+  border-radius: 20px !important;
+}
+
+.task-card:hover {
+  transform: translateY(-1px) scale(1.01) !important;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08), 0 2px 4px rgba(0, 0, 0, 0.06) !important;
+  border-color: #00b4b6 !important;
+}
+
+.task-card:active {
+  transform: translateY(0) scale(0.98) !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05) !important;
+}
+
+/* THÊM: Force GPU acceleration để tránh lag */
+.task-card,
+[data-rbd-draggable-id],
+[data-rbd-droppable-id] {
+  transform: translateZ(0) !important;
+  -webkit-transform: translateZ(0) !important;
+}
+
+/* QUAN TRỌNG: CSS để đảm bảo phần tử kéo luôn theo sát con trỏ - Giống Trello */
+[data-rbd-draggable-context-id] {
+  /* Đảm bảo phần tử không bị giới hạn bởi container */
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  margin: 0 !important;
+  /* Sử dụng transform để di chuyển thay vì position */
+  transform-origin: center center !important;
+  /* Tắt tất cả transition khi đang kéo */
+  transition: none !important;
+  /* Đảm bảo phần tử luôn ở trên cùng */
+  z-index: 99999 !important;
+  /* Tối ưu performance */
+  will-change: transform !important;
+  backface-visibility: hidden !important;
+  -webkit-backface-visibility: hidden !important;
+  /* Đảm bảo không có pointer events conflict */
+  pointer-events: none !important;
+  /* Đảm bảo phần tử luôn theo sát con trỏ chuột */
+  transform: translateZ(0) !important;
+  -webkit-transform: translateZ(0) !important;
+  /* Hiệu ứng Trello: shadow và rotate */
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.06), 0 3px 6px rgba(0, 0, 0, 0.04) !important;
+  transform: rotate(1deg) scale(1.01) translateZ(0) !important;
+  -webkit-transform: rotate(1deg) scale(1.01) translateZ(0) !important;
+}
+
+/* THÊM: CSS để đảm bảo phần tử kéo luôn ở vị trí con trỏ chuột - Giống Trello */
+[data-rbd-draggable-context-id] .task-card {
+  /* Đảm bảo phần tử con cũng theo sát con trỏ */
+  transform: none !important;
+  transition: none !important;
+  pointer-events: none !important;
+  /* Hiệu ứng Trello: border và background */
+  border: 2px solid #00b4b6 !important;
+  background: rgba(255, 255, 255, 0.95) !important;
+  backdrop-filter: blur(4px) !important;
+  -webkit-backdrop-filter: blur(4px) !important;
+}
+
+/* Anti-aliasing cho smooth rendering */
+* {
+  -webkit-font-smoothing: antialiased !important;
+  -moz-osx-font-smoothing: grayscale !important;
+}
+
+/* THÊM: CSS đặc biệt để force reset sau animation */
+@keyframes reset-transform {
+  from {
+    transform: none;
+  }
+  to {
+    transform: none;
+  }
+}
+
+.force-reset {
+  animation: reset-transform 0.1s ease-out forwards !important;
+}
+
+/* Mobile touch optimization */
+@media (hover: none) and (pointer: coarse) {
+  [data-rbd-drag-handle-context-id] {
+    touch-action: none !important;
+  }
+
+  .task-card:hover {
+    transform: none !important;
+  }
+}
+
+[data-rbd-draggable-id]:not([data-rbd-draggable-context-id]) .task-card,
+.drag-item-reset .task-card {
+  border: none !important; /* QUAN TRỌNG: Reset về không có border */
+  outline: none !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06) !important;
+  transform: none !important;
+  background: white !important;
+  backdrop-filter: none !important;
+}
+
+/* 8. Force reset cho tất cả trạng thái bình thường */
+.task-card:not([data-rbd-draggable-context-id]):not(.dragging-over) {
+  border: none !important;
+  outline: none !important;
+}
+
+/* 9. Override mạnh cho Ant Design components */
+.ant-card.ant-card.ant-card {
+  border: none !important;
+  outline: none !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06) !important;
+}
+
+[data-rbd-draggable-context-id],
+[data-rbd-draggable-id],
+[data-rbd-droppable-context-id],
+[data-rbd-droppable-id],
+[data-rbd-drag-handle-context-id],
+[data-rbd-drag-handle-draggable-id] {
+  outline: none !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* Override khi đang drag */
+[data-rbd-draggable-context-id][style*="position: fixed"],
+[data-rbd-draggable-id][style*="position: fixed"] {
+  outline: none !important;
+  border: none !important;
+}
+
+/* Override focus states */
+*:focus,
+*:focus-visible,
+*:focus-within {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Đặc biệt cho task cards */
+.task-card,
+.task-card *,
+.task-card:focus,
+.task-card:focus-visible,
+.task-card:focus-within {
+  outline: none !important;
+  border: initial !important;
+}
+
+/* Override Ant Design focus states */
+.ant-card,
+.ant-card *,
+.ant-card:focus,
+.ant-card:focus-within,
+.ant-btn,
+.ant-btn *,
+.ant-btn:focus,
+.ant-btn:focus-within {
+  outline: none !important;
+}
+
+/* Force override cho tất cả elements khi drag */
+[data-rbd-draggable-id] * {
+  outline: none !important;
+  border: inherit !important;
+}
+
+/* Đặc biệt override cho draggable wrapper */
+[data-rbd-draggable-id] > div {
+  outline: none !important;
+}
+
+/* Reset cho force-reset class */
+.force-reset,
+.force-reset * {
+  outline: none !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* Override accessibility outline */
+[role="button"]:focus,
+[tabindex]:focus,
+div[draggable="true"]:focus {
+  outline: none !important;
+}
+
+/* Loại bỏ outline từ browser default */
+:focus {
+  outline: none !important;
+}
+
+/* Đặc biệt cho Chrome/Edge */
+*:focus-visible {
+  outline: none !important;
+}
+
+/* Override cho tất cả pseudo states */
+*:hover,
+*:active,
+*:focus,
+*:visited {
+  outline: none !important;
+}
+
+.ant-modal-content {
+  margin-top: -50px !important;
+}

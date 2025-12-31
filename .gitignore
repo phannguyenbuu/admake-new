@@ -1,0 +1,8 @@
+backup/
+quangcao_web/node_modules/
+Include/
+Lib/
+Scripts/
+.pm2
+server_full_backup_*.tar.gz
+quangcao_web.tar.gz

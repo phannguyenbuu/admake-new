@@ -1,0 +1,22 @@
+.ant-layout {
+  background-image: url(/backGround.png) !important;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  background: none;
+}
+
+.custom-font-size {
+  font-size: 12px !important;
+  color: #999;
+}
+
+.ant-dropdown {
+  max-height: unset !important;
+  overflow: unset !important;
+}
+
+.rc-virtual-list {
+  max-height: 80vh !important;
+  overflow-y: auto !important;
+}
