@@ -77,7 +77,7 @@ export default function WorkDays({record}: {record:WorkDaysProps}) {
       const dateObj = new Date(data.createdAt);
       const localTime = new Date(dateObj.getTime() + 7 * 60 * 60 * 1000);
 
-      if (data.checklist && localTime.getFullYear() === year && localTime.getMonth() === month) 
+      if (data.checklist) // && localTime.getFullYear() === year && localTime.getMonth() === month) 
       {
         const dayIndex = localTime.getDate() - 1;
         (Object.keys(data.checklist) as (keyof Checklist)[]).forEach(

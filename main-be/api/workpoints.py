@@ -129,19 +129,52 @@ def get_batch_workpoint_detail():
     users, pagination = get_query_page_users(lead_id, page, limit, search)
     user_id_list = [user["id"] for user in users]
 
+    month_str = request.args.get("month", None)
+    # month_param  = request.args.get("month", None, type=int)
+
     # print(f"Requested page: {page}", user_id_list)
 
-    workpoints = Workpoint.query.filter(Workpoint.user_id.in_(user_id_list)).all()
+    # Lấy TẤT CẢ workpoints trước (giống leavepoints)
+    all_workpoints = Workpoint.query.filter(Workpoint.user_id.in_(user_id_list)).all()
 
-    # Tạo dict để lookup nhanh workpoint theo user_id
-    # workpoint_dict = {wp.user_id: wp for wp in workpoints}
+    if month_str:
+        target_date = datetime.strptime(month_str, "%Y-%m")  # "2025-11" → datetime
+        target_month = target_date.month  # 11
+        target_year = target_date.year    # 2025
+        
+        workpoints = [
+            wp for wp in all_workpoints
+            if wp.createdAt.month == target_month 
+            and wp.createdAt.year == target_year
+        ]
+        print(f"✅ Filtered {len(workpoints)} workpoints: {month_str}")
+    else:
+        workpoints = all_workpoints
+
+    # Tạo dict lookup
     workpoint_dict = defaultdict(list)
     for wp in workpoints:
         workpoint_dict[wp.user_id].append(wp)
 
+    # ✅ Leavepoints (giữ nguyên)
+    all_leavepoints = Leave.query.filter(Leave.user_id.in_(user_id_list)).all()
 
-    leavepoints = Leave.query.filter(Leave.user_id.in_(user_id_list)).all()
-    # leavepoint_dict = {lp.user_id: lp for lp in leavepoints}
+    if month_str:
+        target_date = datetime.strptime(month_str, "%Y-%m")
+        leavepoints = [
+            lp for lp in all_leavepoints
+            if lp.start_time and lp.start_time.month == target_date.month 
+            and lp.start_time.year == target_date.year
+        ]
+    else:
+        leavepoints = all_leavepoints
+
+    leavepoint_dict = defaultdict(list)
+    for lp in leavepoints:
+        leavepoint_dict[lp.user_id].append(lp)
+
+
+
 
     leavepoint_dict = defaultdict(list)
     for lp in leavepoints:
