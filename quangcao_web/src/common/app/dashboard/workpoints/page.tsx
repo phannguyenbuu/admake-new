@@ -143,7 +143,7 @@ const WorkPointPage: IPage["Component"] = () => {
           selectedRecord={selectedRecord}
           modalVisible={modalVisible} 
           handleOk={handleCloseModal} 
-          // month={query.month} // ← Truyền tháng cho SalaryBoard
+          month={query.month} // ← Truyền tháng cho SalaryBoard
         />
       }
     </>

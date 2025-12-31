@@ -15,9 +15,10 @@ import { number } from 'framer-motion';
 import type { MessageTypeProps } from '../../../@types/chat.type';
 
 interface SalaryBoardProps {
-    selectedRecord: WorkDaysProps | null;
-    modalVisible: boolean;
-    handleOk: () => void;
+  selectedRecord: WorkDaysProps | null;
+  modalVisible: boolean;
+  handleOk: () => void;
+  month?: string;  // ✅ "2025-11"
 }
 
 
@@ -77,8 +78,12 @@ interface RewardProps {
   reward: number
 }
 
-const SalaryBoard: React.FC<SalaryBoardProps> = ({ selectedRecord, modalVisible, handleOk }) => {
-  // const {workpointSetting, setWorkpointSetting} = useWorkpointSetting();
+const SalaryBoard: React.FC<SalaryBoardProps> = ({ 
+  selectedRecord, 
+  modalVisible, 
+  handleOk, 
+  month = dayjs().format("YYYY-MM")  // ✅ Default hiện tại
+}) => {
 
   const [timeWork, setTimeWork] = useState<number>(0);
   const [periodWork, setPeriodWork] = useState<number>(0);
@@ -104,6 +109,12 @@ const SalaryBoard: React.FC<SalaryBoardProps> = ({ selectedRecord, modalVisible,
 
   const [lateMinutes, setLateMinutes] = useState<number>(0);
   const [earlyMinutes, setEarlyMinutes] = useState<number>(0);
+
+
+  const selectedDate = dayjs(month, "YYYY-MM");
+  const selectedYear = selectedDate.year();
+  const selectedMonthIndex = selectedDate.month();  // 0-11
+  
 
   useEffect(() => {
     setDataMessages([]);
@@ -256,85 +267,68 @@ const SalaryBoard: React.FC<SalaryBoardProps> = ({ selectedRecord, modalVisible,
     return totalHours;
   }
 
-  useEffect(()=>{  
-  if (!selectedRecord?.items?.length) return;
-
-  const currentMonth = current_day.getMonth(); // 11 (Dec)
-  const currentYear = current_day.getFullYear(); // 2025
-  
-  // console.log('Current month/year:', currentMonth, currentYear);
-
-  // ✅ Filter theo THÁNG từ time trong in/out
-  const monthItems = selectedRecord.items.filter(item => {
-    const checklist = item.checklist;
-    if (!checklist) return false;
-    
-    // Lấy ngày từ morning.in.time hoặc noon.in.time
-    const timeStr = checklist.morning?.in?.time || checklist.noon?.in?.time;
-    if (!timeStr) return false;
-    
-    const itemDate = new Date(timeStr);
-    const isCurrentMonth = itemDate.getMonth() === currentMonth && 
-                          itemDate.getFullYear() === currentYear;
-                          
-    
-    // console.log(`-> Item date: ${timeStr} -> Month: ${itemDate.getMonth()}, Current: ${isCurrentMonth}`);
-    return isCurrentMonth;
-  });
-
-  // if(selectedRecord?.username.includes("LỘC"))
-  //   console.log('✅ Filtered monthItems:',selectedRecord?.username, monthItems.length, monthItems);
-
-  let t = 0, over_t = 0, p = 0, late = 0, early = 0;
-
-  // Tính trên monthItems
-  monthItems.forEach(item => {
-    const checklist = item.checklist;
-    if (!checklist) return;
 
 
-    if(selectedRecord?.username.includes("LỘC"))
-    {
-      if (!checklist.morning?.in)
-        console.log("No morning", item);
+    useEffect(() => {
+      if (!selectedRecord?.items?.length) return;
 
-      if (!checklist.noon?.in)
-        console.log("No noon", item);
-    }  
+      // ✅ DÙNG selectedMonthIndex, selectedYear từ props
+      const monthItems = selectedRecord.items.filter(item => {
+        const checklist = item.checklist;
+        if (!checklist) return false;
+        
+        const timeStr = checklist.morning?.in?.time || checklist.noon?.in?.time;
+        if (!timeStr) return false;
+        
+        const itemDate = new Date(timeStr);
+        return itemDate.getMonth() === selectedMonthIndex && 
+              itemDate.getFullYear() === selectedYear;
+      });
 
-    // Morning
-    if (checklist.morning?.in) {
-      t += checkWorkhour(checklist.morning, 12);
-      p += checkWorkPeriod(checklist.morning);
-    }
-    
-    // Noon
-    if (checklist.noon?.in) {
-      t += checkWorkhour(checklist.noon, 17);
-      p += checkWorkPeriod(checklist.noon);
-    }
-    
-    // Evening (overtime)
-    if (checklist.evening?.in) {
-      over_t += checkWorkhour(checklist.evening, 22);
-    }
-  });
+      let t = 0, over_t = 0, p = 0, late = 0, early = 0;
 
-  // console.log('✅ RESULTS:', { timeWork: t, periodWork: p, overTimeWork: over_t });
+      // Tính trên monthItems
+      monthItems.forEach(item => {
+        const checklist = item.checklist;
+        if (!checklist) return;
 
-  setTimeWork(t);
-  setPeriodWork(p);
-  setOverTimeWork(over_t);
-  setLateMinutes(late);
-  setEarlyMinutes(early);
-  
-  const total_hours = getMaxWorkingHours(currentMonth + 1, currentYear);
-  const salary_unit = selectedRecord.salary / total_hours;
-  setSalaryUnit(salary_unit);
-  
-  fetchTaskByUser();
-}, [selectedRecord, modalVisible, workpointSetting]);
+        // Debug LỘC
+        if (selectedRecord?.username.includes("LỘC")) {
+          if (!checklist.morning?.in) console.log("No morning", item);
+          if (!checklist.noon?.in) console.log("No noon", item);
+        }
 
+        // Morning
+        if (checklist.morning?.in) {
+          t += checkWorkhour(checklist.morning, 12);
+          p += checkWorkPeriod(checklist.morning);
+        }
+        
+        // Noon
+        if (checklist.noon?.in) {
+          t += checkWorkhour(checklist.noon, 17);
+          p += checkWorkPeriod(checklist.noon);
+        }
+        
+        // Evening (overtime)
+        if (checklist.evening?.in) {
+          over_t += checkWorkhour(checklist.evening, 22);
+        }
+      });
+
+      // ✅ FIX: DÙNG selectedMonthIndex + 1, selectedYear
+      const total_hours = getMaxWorkingHours(selectedMonthIndex + 1, selectedYear);
+      const salary_unit = selectedRecord.salary / total_hours;
+      
+      setTimeWork(t);
+      setPeriodWork(p);
+      setOverTimeWork(over_t);
+      setLateMinutes(late);
+      setEarlyMinutes(early);
+      setSalaryUnit(salary_unit);
+      
+      fetchTaskByUser();
+    }, [selectedRecord, modalVisible, workpointSetting, selectedMonthIndex, selectedYear]);  // ✅ Dependencies đúng
 
 
 
@@ -374,7 +368,7 @@ const SalaryBoard: React.FC<SalaryBoardProps> = ({ selectedRecord, modalVisible,
               },
              }}>
               <Typography sx={{ textTransform: "uppercase", color: "#ccc", fontSize:12,  fontWeight: 500 }}>
-                BẢNG LƯƠNG THÁNG {current_day.getMonth() + 1}
+                BẢNG LƯƠNG THÁNG {selectedDate.format("MM/YYYY")}
               </Typography>
 
               <Typography sx={{ textTransform: "uppercase", color: "#fff"}}>{selectedRecord?.username.toUpperCase()}</Typography>
