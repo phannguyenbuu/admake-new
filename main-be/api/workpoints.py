@@ -8,8 +8,6 @@ from api.users import get_query_page_users
 from collections import defaultdict
 from dateutil.relativedelta import relativedelta
 from sqlalchemy import and_, or_
-from collections import defaultdict
-from datetime import datetime
 
 workpoint_bp = Blueprint('workpoint', __name__, url_prefix='/api/workpoint')
 
@@ -116,92 +114,35 @@ def get_user_workpoint_salary_task(user_id):
     return jsonify({"messages": [m.tdict() for m in filtered_messages],}), 200
 
 
-
-from dateutil import parser
-
-def get_month(created_at: str) -> int:
-    """
-    Lấy tháng (1-12) từ createdAt Workpoint
-    
-    Args:
-        created_at: "2025-11-27 00:32:45.285907"
-    
-    Returns:
-        int: 11
-    """
-    dt = parser.parse(created_at)
-    return dt.month
-
-
-
 @workpoint_bp.route("/page", methods=["GET"])
 def get_batch_workpoint_detail():
     from collections import defaultdict
 
     page = request.args.get("page", 1, type=int)
     lead_id = request.args.get("lead", 0, type=int)
+
+
+
     limit = request.args.get("limit", 10, type=int)
     search = request.args.get("search", "", type=str)
-    month_param = request.args.get("month", None, type=int)
 
     users, pagination = get_query_page_users(lead_id, page, limit, search)
     user_id_list = [user["id"] for user in users]
 
-    # print(f"Current month", month_param)
+    # print(f"Requested page: {page}", user_id_list)
 
-    # workpoints = Workpoint.query.filter(Workpoint.user_id.in_(user_id_list)).all()
+    workpoints = Workpoint.query.filter(Workpoint.user_id.in_(user_id_list)).all()
 
-   # Lấy TẤT CẢ workpoints trước
-    all_workpoints = Workpoint.query.filter(Workpoint.user_id.in_(user_id_list)).all()
-
-    if month_param is not None:
-        target_month = month_param + 1
-        current_year = datetime.now().year
-        
-        print(f"DEBUG - Filtering month {target_month}/{current_year}")
-        
-        # ✅ Filter từ all_workpoints
-        workpoints = [
-            wp for wp in all_workpoints  # ✅ DÙNG all_workpoints
-            if wp.createdAt.month == target_month 
-            and wp.createdAt.year == current_year
-        ]
-        print(f"✅ Found {len(workpoints)} workpoints")
-    else:
-        workpoints = all_workpoints
-
-    
-        
-    # workpoints = workpoints_query.all()
-
-    
-
-
+    # Tạo dict để lookup nhanh workpoint theo user_id
+    # workpoint_dict = {wp.user_id: wp for wp in workpoints}
     workpoint_dict = defaultdict(list)
     for wp in workpoints:
         workpoint_dict[wp.user_id].append(wp)
 
-    # print('workpoint_dict', workpoint_dict)
 
+    leavepoints = Leave.query.filter(Leave.user_id.in_(user_id_list)).all()
+    # leavepoint_dict = {lp.user_id: lp for lp in leavepoints}
 
-    all_leavepoints = Leave.query.filter(Leave.user_id.in_(user_id_list)).all()
-
-    if month_param is not None:
-        target_month = month_param + 1
-        current_year = datetime.now().year
-        
-        # ✅ Filter leavepoints theo start_time
-        leavepoints = [
-            lp for lp in all_leavepoints
-            if lp.start_time and lp.start_time.month == target_month 
-            and lp.start_time.year == current_year
-        ]
-        print(f"✅ Filtered {len(leavepoints)} leavepoints")
-    else:
-        leavepoints = all_leavepoints
-
-        
-        
     leavepoint_dict = defaultdict(list)
     for lp in leavepoints:
         leavepoint_dict[lp.user_id].append(lp)
@@ -238,8 +179,6 @@ def get_batch_workpoint_detail():
                 lp_data["salary"] = salary
             # Thêm toàn bộ list wp_data_list vào leave_result, hoặc theo cách bạn muốn
             leave_result.extend(lp_data_list)
-
-    # print('result', result)
 
     grouped_result = {}
 

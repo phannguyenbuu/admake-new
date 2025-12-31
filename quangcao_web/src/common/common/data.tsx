@@ -479,11 +479,8 @@ const today = new Date();
 const month = today.getMonth();
 
 
-export const columnsWorkPoint = (
-  handleOpenModal: (record: WorkDaysProps) => void,
-  selectedMonth: number // Thêm param month
-): ColumnsType<WorkDaysProps> => [
-
+export const columnsWorkPoint = (handleOpenModal: (record: WorkDaysProps) => void): ColumnsType<WorkDaysProps> => [
+// export const columnsWorkPoint: ColumnsType<WorkDaysProps> = [
   {
     title: `QR`,
     dataIndex: "userrole",
@@ -514,7 +511,7 @@ export const columnsWorkPoint = (
   },
 
   {
-    title: `Ngày công tác trong tháng ${selectedMonth + 1}`,
+    title: `Ngày công tác trong tháng ${month + 1}`,
     dataIndex: "workpoint",
     key: "workpoint",
     width: 800,

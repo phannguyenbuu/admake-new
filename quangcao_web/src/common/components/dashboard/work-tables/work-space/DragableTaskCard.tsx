@@ -128,8 +128,6 @@ export const CardItem: React.FC<CardItemProps> = ({
     }
   };
 
-  const card_w = Math.round((window.innerWidth - 450 - 12 * 3) / 4);
-  console.log("W", window.innerWidth , card_w);
 
     return (
       <>
@@ -138,7 +136,7 @@ export const CardItem: React.FC<CardItemProps> = ({
       ref={provided?.innerRef}
       {...provided?.draggableProps}
       {...provided?.dragHandleProps}
-      className={`task-card group/task relative mb-3 transition-all duration-200
+      className={`task-card group/task relative mb-3 transition-all duration-200 w-[260px]
         ${
         isRewardColumn ? "cursor-not-allowed opacity-90" : "cursor-pointer"
       } ${
@@ -147,7 +145,6 @@ export const CardItem: React.FC<CardItemProps> = ({
           : "shadow-md hover:shadow-lg hover:scale-[1.01] hover:-translate-y-0.5"
       } ${!snapshot?.isDragging ? "drag-item-reset" : ""}`}
       style={{
-        width: `${card_w}px`,
         ...provided?.draggableProps.style,
         ...(snapshot?.isDragging
           ? {
