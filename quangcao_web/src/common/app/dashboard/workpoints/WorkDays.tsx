@@ -237,11 +237,11 @@ return (
                     const itemDate = new Date(itemCreateDate.getTime() + 7 * 60 * 60 * 1000);
                     // console.log('itemDate', itemDate);
 
-                    // if (
-                    //   itemDate.getDate() === date.getDate() &&
-                    //   itemDate.getMonth() === date.getMonth() &&
-                    //   itemDate.getFullYear() === date.getFullYear()
-                    // ) 
+                    if (
+                      itemDate.getDate() === date.getDate() &&
+                      itemDate.getMonth() === date.getMonth() &&
+                      itemDate.getFullYear() === date.getFullYear()
+                    ) 
                     {
                       const periodData = item.checklist[periodKey];
                       // console.log('periodData', periodData);

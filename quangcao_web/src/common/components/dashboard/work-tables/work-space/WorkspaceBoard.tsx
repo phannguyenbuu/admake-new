@@ -94,7 +94,7 @@ const WorkspaceBoard: React.FC<WorkspaceBoardProps> = ({
        
     },[colNames]);
 
-
+    const card_width = Math.round((window.innerWidth - 360)/4);
 
     return (
     <div className="relative z-10 px-4 sm:px-6 pt-3">
@@ -112,7 +112,8 @@ const WorkspaceBoard: React.FC<WorkspaceBoardProps> = ({
                 return (
                     <Col
                     key={col.id}
-                    className="flex-shrink-0 min-w-[380px] sm:min-w-[260px] max-w-[420px] sm:max-w-[280px]"
+                    style={{minWidth: card_width}}
+                    // className="flex-shrink-0 min-w-[480px] sm:min-w-[460px] max-w-[620px] sm:max-w-[680px]"
                     >
                     <Droppable droppableId={col.id}>
                         {(provided, snapshot) => (

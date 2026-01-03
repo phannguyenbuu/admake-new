@@ -128,6 +128,8 @@ export const CardItem: React.FC<CardItemProps> = ({
     }
   };
 
+  const card_width = Math.round((window.innerWidth - 360)/4);
+
 
     return (
       <>
@@ -136,7 +138,7 @@ export const CardItem: React.FC<CardItemProps> = ({
       ref={provided?.innerRef}
       {...provided?.draggableProps}
       {...provided?.dragHandleProps}
-      className={`task-card group/task relative mb-3 transition-all duration-200 w-[260px]
+      className={`task-card group/task relative mb-3 transition-all duration-200]
         ${
         isRewardColumn ? "cursor-not-allowed opacity-90" : "cursor-pointer"
       } ${
@@ -155,6 +157,7 @@ export const CardItem: React.FC<CardItemProps> = ({
               top: 0,
               left: 0,
               margin: 0,
+              minWidth: card_width,
               transform: provided?.draggableProps.style?.transform || "none",
             }
           : {}),
