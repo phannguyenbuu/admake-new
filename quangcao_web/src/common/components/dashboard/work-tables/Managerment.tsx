@@ -335,7 +335,7 @@ export default function ManagermentBoard() {
           
           // const newStatus = fixedColumns[destColIdx].type;
           if (movedTask.id) {
-            updateTaskStatus(movedTask.id, fixedColumns[destColIdx].type, fixedColumns[destColIdx].title);
+            updateTaskStatus(movedTask.id, fixedColumns[destColIdx].type);
           }
         }
 

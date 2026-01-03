@@ -145,7 +145,22 @@ def update_task_status(id):
         task.check_reward = False
         db.session.commit()
 
-    return jsonify(task.tdict())
+    work = db.session.get(Workspace, task.workspace_id)
+    new_status = ''
+
+    print('Work', task.workspace_id, work, task.status)
+
+    if work:
+        if task.status == "OPEN":
+            new_status = work.column_open_name
+        elif task.status == "IN_PROGRESS":
+            new_status = work.column_in_progress_name
+        elif task.status == "DONE":
+            new_status = work.column_done_name
+        elif task.status == "REWARD":
+            new_status = work.column_reward_name
+
+    return jsonify({**task.tdict(), "new_status": new_status})
 
 
 
