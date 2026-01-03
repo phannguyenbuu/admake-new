@@ -12,7 +12,7 @@ interface TaskContextType {
   isLoading: boolean;
   tasksData: TasksResponse | undefined;
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
-  updateTaskStatus: (taskId: string, newStatus: string) => Promise<void>;
+  updateTaskStatus: (taskId: string, newType: string, newTitle:string) => Promise<void>;
   refetchTasks: (options?: RefetchOptions) => Promise<QueryObserverResult<TasksResponse, Error>>;
 }
 
@@ -33,21 +33,21 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const { data: tasksData, refetch: refetchTasks } = useWorkSpaceQueryTaskById(workspaceId ?? '');
 
   // Hàm cập nhật trạng thái task không dùng mutation
-  const updateTaskStatus = async (taskId: string, newStatus: string) => {
+  const updateTaskStatus = async (taskId: string, newType: string, newTitle:string) => {
     setIsLoading(true);
     try {
       const response = await fetch(`${useApiHost()}/task/${taskId}/status`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: newStatus }),
+        body: JSON.stringify({ status: newType }),
       });
       if (!response.ok) throw new Error('Update failed');
 
-      notification.success({ message: 'Cập nhật trạng thái thành công!', description: newStatus });
+      notification.success({ message: `Sang ${newTitle} thành công!`, description: "Cập nhật" });
 
       await refetchTasks(); // làm mới lại dữ liệu query
     } catch (error) {
-      notification.error({ message: 'Có lỗi xảy ra khi cập nhật trạng thái!', description: newStatus });
+      notification.error({ message: 'Có lỗi xảy ra khi cập nhật trạng thái!', description: newTitle });
     } finally {
       setIsLoading(false);
     }

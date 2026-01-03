@@ -64,7 +64,7 @@ export default function ManagermentBoard() {
   // Chuyển đổi board data thành columns structure
   const convertBoardToColumns = useCallback(
     (boardData: TasksResponse): ColumnType[] => {
-      // console.log('OK1', boardData);
+      console.log('OK1', fixedColumns);
       return fixedColumns.map((col) => ({
         ...col,
         tasks: boardData[col.type]?.tasks || [],
@@ -332,9 +332,10 @@ export default function ManagermentBoard() {
           };
 
           // Cập nhật status của task qua API
-          const newStatus = fixedColumns[destColIdx].type;
+          
+          // const newStatus = fixedColumns[destColIdx].type;
           if (movedTask.id) {
-            updateTaskStatus(movedTask.id, newStatus);
+            updateTaskStatus(movedTask.id, fixedColumns[destColIdx].type, fixedColumns[destColIdx].title);
           }
         }
 
