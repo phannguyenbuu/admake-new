@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useMemo } from "react";
 import Modal from "antd/es/modal/Modal";
 import JobTimeAndProcess from "../../../dashboard/work-tables/task/JobTimeAndProcess ";
-import { Stack, Box, Button, Checkbox, Typography } from "@mui/material";
+import { Stack, Box, Button, Checkbox, Typography, Avatar } from "@mui/material";
 import { useMutation } from '@tanstack/react-query';
 import { useUser } from "../../../../common/hooks/useUser";
 import type { Task } from "../../../../@types/work-space.type";
-import { useApiHost } from "../../../../common/hooks/useApiHost";
+import { useApiHost, useApiStatic } from "../../../../common/hooks/useApiHost";
 import Divider from '@mui/material/Divider';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import CommentIcon from '@mui/icons-material/Comment';
@@ -146,6 +146,7 @@ const TaskBoard = ({ userId,fullName, open, onCancel }: TaskBoardProps) => {
             }}>
               {el?.workspace}
             </Typography>
+
             <Typography style={{
             marginTop: 8,
             fontStyle: 'italic',
@@ -155,6 +156,13 @@ const TaskBoard = ({ userId,fullName, open, onCancel }: TaskBoardProps) => {
           }}>
             {taskDetail?.title}
           </Typography>
+
+
+
+            
+
+
+          
           </Stack>
           }
         </Stack>
@@ -167,6 +175,14 @@ const TaskBoard = ({ userId,fullName, open, onCancel }: TaskBoardProps) => {
           placeholder="Mô tả chi tiết về công việc cần thực hiện..."
           className="!rounded-lg !border !border-gray-300 focus:!border-cyan-500 focus:!shadow-lg hover:!border-cyan-500 !transition-all !duration-200 !shadow-sm !resize-none !text-xs sm:!text-sm h-40"
         />
+
+        {taskDetail?.icon && 
+            <Avatar
+                src={`${useApiStatic()}/${taskDetail.icon}`}
+                alt="Task icon"
+                sx={{ width: 100, height: 70, borderRadius: 0}}
+            />}
+            
         <JobTimeAndProcess key={el.id} form={null}/>
 
         <Tabs

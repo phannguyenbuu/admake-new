@@ -1,10 +1,10 @@
 import { useEffect, useState, useCallback, useContext } from "react";
 import { Modal, Dropdown, Card } from "antd";
-import { Stack, Box, Typography } from "@mui/material";
+import { Stack, Box, Typography, Avatar } from "@mui/material";
 import { MoreOutlined, StarFilled } from "@ant-design/icons";
 import columnThemes from "./theme.json";
 import { UpdateButtonContext } from "../../../common/hooks/useUpdateButtonTask";
-import { useApiHost } from "../../../common/hooks/useApiHost";
+import { useApiHost, useApiStatic } from "../../../common/hooks/useApiHost";
 import { useUser } from "../../../common/hooks/useUser";
 import { SearchOutlined } from "@ant-design/icons";
 import { Input as AntdInput, Menu } from "antd";
@@ -318,34 +318,44 @@ export const CardStaticItem: React.FC<CardStaticItemProps> = ({
         </div>
       )}
 
-      <div className="space-y-1 sm:space-y-1.5">
-        <h3
-          className={`font-bold text-xs sm:text-sm line-clamp-2 transition-colors duration-150 flex-1 min-w-0 ${
-            isRewardColumn ? "text-purple-800" : "text-gray-800 group-hover/task:text-gray-900"
-          }`}
-        >
-          {task.title}
-        </h3>
-        <p>:: {task.workspace} ::</p>
 
-        {task.description && (
-          <p className="text-gray-500 text-xs line-clamp-2 leading-relaxed">{task.description}</p>
-        )}
-        {task.reward && task.reward !== 0 && (
-          <div className="flex items-center gap-1 text-xs text-green-600 font-semibold">
-            <span>💰</span>
-            <span className="truncate">{task.reward.toLocaleString()} VNĐ</span>
-          </div>
-        )}
+      <Stack direction="row">
+                  {task?.icon && 
+                  <Avatar
+                      src={`${useApiStatic()}/${task.icon}`}
+                      alt="Task icon"
+                      sx={{ width: 100, height: 70, borderRadius: 0}}
+                  />}
 
-         {task?.rate && task?.rate > 0 &&
-          <div className="text-xs text-gray-400 font-mono flex-shrink-0">
-            
-            {[...Array(task.rate)].map((_, index) => (
-              <StarFilled key={index} style={{color:'orange'}}/>
-            ))}
-          </div>}
-      </div>
+        <div className="space-y-1 sm:space-y-1.5">
+          <h3
+            className={`font-bold text-xs sm:text-sm line-clamp-2 transition-colors duration-150 flex-1 min-w-0 ${
+              isRewardColumn ? "text-purple-800" : "text-gray-800 group-hover/task:text-gray-900"
+            }`}
+          >
+            {task.title}
+          </h3>
+          <p>:: {task.workspace} ::</p>
+
+          {task.description && (
+            <p className="text-gray-500 text-xs line-clamp-2 leading-relaxed">{task.description}</p>
+          )}
+          {task.reward && task.reward !== 0 && (
+            <div className="flex items-center gap-1 text-xs text-green-600 font-semibold">
+              <span>💰</span>
+              <span className="truncate">{task.reward.toLocaleString()} VNĐ</span>
+            </div>
+          )}
+
+          {task?.rate && task?.rate > 0 &&
+            <div className="text-xs text-gray-400 font-mono flex-shrink-0">
+              
+              {[...Array(task.rate)].map((_, index) => (
+                <StarFilled key={index} style={{color:'orange'}}/>
+              ))}
+            </div>}
+        </div>
+      </Stack>
     </div>
   </div>
 );
