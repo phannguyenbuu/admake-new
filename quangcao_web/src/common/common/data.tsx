@@ -479,7 +479,7 @@ const today = new Date();
 const month = today.getMonth();
 
 
-export const columnsWorkPoint = (handleOpenModal: (record: WorkDaysProps) => void): ColumnsType<WorkDaysProps> => [
+export const columnsWorkPoint = (handleOpenModal: (record: WorkDaysProps) => void,  selectedMonth: string): ColumnsType<WorkDaysProps> => [
 // export const columnsWorkPoint: ColumnsType<WorkDaysProps> = [
   {
     title: `QR`,
@@ -517,7 +517,7 @@ export const columnsWorkPoint = (handleOpenModal: (record: WorkDaysProps) => voi
     width: 800,
     render:  (text: string, record: WorkDaysProps)  => (
       <div>
-        <WorkDays record = {record}/>
+        <WorkDays record = {record}  selectedMonth={selectedMonth}/>
       </div>
     )
   },

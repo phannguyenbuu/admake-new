@@ -459,6 +459,9 @@ class Task(BaseModel):
     lead_id = db.Column(db.Integer, db.ForeignKey('lead.id'))
     lead = db.relationship('LeadPayload', backref='tasks')
 
+    isDelete = db.Column(db.Boolean, default = False)
+    
+
     def tdict(self):
         result = {}
         for column in self.__table__.columns:

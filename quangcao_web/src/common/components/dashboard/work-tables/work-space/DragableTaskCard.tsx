@@ -269,7 +269,7 @@ export const CardItem: React.FC<CardItemProps> = ({
           onOk = {() => handleDelete(task.id)}
           onCancel={() => setShowConfirm(false)}
           >
-          </Modal>
-          </>
+      </Modal>
+    </>
   );
 }

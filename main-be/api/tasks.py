@@ -16,7 +16,7 @@ task_bp = Blueprint('task', __name__, url_prefix='/api/task')
 @task_bp.route("/all", methods=["GET"])
 def get_all_tasks():
     
-    tasks = [t.tdict() for t in Task.query.all()]
+    tasks = [t.tdict() for t in Task.query.filter(Task.isDelete.is_(False))]
     return jsonify(tasks)
 
 
@@ -29,7 +29,12 @@ def get_tasks(lead_id):
     result = []
 
     for work in workspaces:
-        result += Task.query.filter_by(workspace_id=work.id).all()
+        # result += Task.query.filter_by(workspace_id=work.id).all()
+        result += Task.query.filter(
+            Task.workspace_id == work.id,
+            Task.isDelete.is_(False)
+        ).all()
+
 
     tasks = [t.tdict() for t in result]
 
@@ -97,8 +102,13 @@ def get_task_by_user_id(user_id):
     if not user:
         abort(404, "No user")
 
+    # tasks = Task.query.filter(
+    #     cast(Task.assign_ids, Text).like(f'%"{user_id}"%')
+    # ).order_by(Task.start_time).all()
+
     tasks = Task.query.filter(
-        cast(Task.assign_ids, Text).like(f'%"{user_id}"%')
+        cast(Task.assign_ids, Text).like(f'%"{user_id}"%'),
+        Task.isDelete.is_(False)
     ).order_by(Task.start_time).all()
 
     if not tasks:
@@ -324,6 +334,11 @@ def update_task_message(id):
         'message': message.tdict(),
         **task.tdict()})
 
+# @task_bp.route("/trash", methods=["GET"])
+# def get_trash_tasks():
+#     tasks = Task.query.filter(Task.isDelete.is_(True)).all()
+#     return jsonify([t.tdict() for t in tasks])
+
 
 @task_bp.route("/", methods=["POST"])
 def create_task():
@@ -398,7 +413,53 @@ def delete_task(id):
         print("Task not found", id)
         abort(404, description="Task not found")
 
+    task.isDelete = True
+
+    # db.session.delete(task)
+    db.session.commit()
+
+    return jsonify({"message": "Task deleted successfully"})
+
+@task_bp.route("/restore/<string:id>", methods=["PUT"])
+def restore_task(id):
+    task = Task.query.get(id)
+    if not task:
+        print("Task not found", id)
+        abort(404, description="Task not found")
+
+    task.isDelete = False
+
+    # db.session.delete(task)
+    db.session.commit()
+
+    return jsonify({"message": "Task restore successfully"})
+
+
+@task_bp.route("/<string:id>/forever", methods=["DELETE"])
+def delete_task_forever(id):
+    task = Task.query.get(id)
+    if not task:
+        print("Task not found", id)
+        abort(404, description="Task not found")
+
     db.session.delete(task)
     db.session.commit()
 
     return jsonify({"message": "Task deleted successfully"})
+
+
+@task_bp.route("/trash/inlead/<string:lead_id>", methods=["GET"])
+def get_trash_tasks(lead_id):
+    workspaces = Workspace.query.filter(
+        Workspace.lead_id == lead_id,
+        Workspace.null_workspace.is_(False)
+    )
+
+    result = []
+    for work in workspaces:
+        result += Task.query.filter(
+            Task.workspace_id == work.id,
+            Task.isDelete == True
+        ).all()
+
+    return jsonify([t.tdict() for t in result])

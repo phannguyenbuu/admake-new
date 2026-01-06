@@ -11,7 +11,7 @@ import { CenterBox } from "../../../components/chat/components/commons/TitlePane
 import type { Workpoint, WorkDaysProps, PeriodData, Checklist } from "../../../@types/workpoint";
 import DeleteConfirm from "../../../components/DeleteConfirm";
 import { METHODS } from "http";
-// import SalaryBoard from "./SalaryBoard";
+import dayjs from "dayjs";
 
 interface QRColumnProps {
   record: WorkDaysProps;
@@ -51,7 +51,13 @@ export const QRColumn: React.FC<QRColumnProps> = ({ record }) => {
 
 const periodMap: Record<keyof Checklist, number> = {morning: 0,noon: 1,evening: 2,};
 
-export default function WorkDays({record}: {record:WorkDaysProps}) {
+
+interface ParamWorkDaysProps {
+  record: WorkDaysProps;
+  selectedMonth?: string;  // "2025-11"
+}
+
+export default function WorkDays({ record, selectedMonth }: ParamWorkDaysProps) {
   const {items, leaves, user_id, username} = record;
 
   const today = new Date();
@@ -64,6 +70,19 @@ export default function WorkDays({record}: {record:WorkDaysProps}) {
   const [currentPeriodModalIndex, setCurrentPeriodModalIndex] = useState<number>(0);
   const [modalImg, setModalImg] = useState<PeriodData | null>(null);
   const todayDate = new Date().getDate();
+
+
+
+  const [viewDate, setViewDate] = useState(
+    selectedMonth ? dayjs(selectedMonth + '-01').toDate() : new Date()
+  );
+  
+  // ✅ Title động
+  const monthDisplay = selectedMonth ? 
+    `${selectedMonth.split('-')[1]}/${selectedMonth.split('-')[0]}` : 
+    dayjs().format('MM/YYYY');
+
+
 
   useEffect(() => {
     setData(record.items);

@@ -5,6 +5,7 @@ from collections import defaultdict
 from sqlalchemy import desc, asc
 from sqlalchemy.orm.attributes import flag_modified
 from sqlalchemy.sql import func
+from sqlalchemy import or_
 
 workspace_bp = Blueprint('workspace', __name__, url_prefix='/api/workspace')
 
@@ -89,7 +90,12 @@ def get_workspace_task(id):
     if not work:
         abort(404, description="Workspace not found")
 
-    tasks = Task.query.filter_by(workspace_id=id).all()
+    # tasks = Task.query.filter_by(workspace_id=id).all()
+    tasks = Task.query.filter(
+        Task.workspace_id == id,
+        or_(Task.isDelete == False, Task.isDelete.is_(None))
+    ).all()
+
     grouped = defaultdict(lambda: {"count": 0, "tasks": []})
     for t in tasks:
         status = t.status or "UNKNOWN"
@@ -158,8 +164,12 @@ def put_workspace_reward_task(workspace_id):
     # db.session.commit()
     work = Workspace.query.filter(Workspace.id == workspace_id).first()
     
-    tasks = Task.query.filter_by(workspace_id=work.id).all()
-    # print('tasks',work, len(tasks))
+    # tasks = Task.query.filter_by(workspace_id=work.id).all()
+    tasks = Task.query.filter(
+        Task.workspace_id == work.id,
+        Task.isDelete == False
+    ).all()
+
 
     for task in tasks:
         # print('task', task.title)

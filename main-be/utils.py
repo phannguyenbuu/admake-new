@@ -903,8 +903,8 @@ FOREIGN KEY (user_id) REFERENCES "user"(id);
     
     db.session.commit()
 
-def alter_data():
-    db.session.execute(text(f'''SELECT pg_get_serial_sequence('lead', 'id');'''))
+def alter_data(cmd):
+    db.session.execute(text(cmd))
     db.session.commit()
 
 def delete_customer_user():
@@ -1173,15 +1173,16 @@ if __name__ == "__main__":
 
         # change_value_type("task",["icon"],"VARCHAR(255)")
 
-        filtered_messages = Message.query.filter(
-            and_(
-                Message.user_id == '202511030113120675991ece01',
-                Message.type == "bonus-cash"
-            )
-        ).all()
+        # filtered_messages = Message.query.filter(
+        #     and_(
+        #         Message.user_id == '202511030113120675991ece01',
+        #         Message.type == "bonus-cash"
+        #     )
+        # ).all()
 
-        for m in filtered_messages:
-            print(m.tdict())
+        # for m in filtered_messages:
+        #     print(m.tdict())
 
         
+                        
         

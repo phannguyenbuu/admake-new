@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback, useContext } from "react";
-import { Modal, Dropdown, Card } from "antd";
+import { Modal, Dropdown, Card, notification } from "antd";
 import { Stack, Box, Typography, Avatar } from "@mui/material";
 import { MoreOutlined, StarFilled } from "@ant-design/icons";
 import columnThemes from "./theme.json";
@@ -10,6 +10,7 @@ import { SearchOutlined } from "@ant-design/icons";
 import { Input as AntdInput, Menu } from "antd";
 import type { ColumnType, Task, TasksResponse } from "../../../@types/work-space.type";
 import type { WorkSpace } from "../../../@types/work-space.type";
+import { useTaskContext } from "../../../common/hooks/useTask";
 import "./css/css.css";
 import "./work-space/workspace.css";
 import { fixedColumns } from "./Managerment";
@@ -28,10 +29,12 @@ dayjs.extend(isSameOrBefore);
 
 const items = [
   { key: "status", label: "Tiến trình" },
-  // { key: "role", label: "Phòng ban" },
+  { key: "role", label: "Thùng rác" },
 ];
 
 export default function AllTasksModal() {
+  const [mode, setMode] = useState<"status" | "trash">("status");
+
   const [columns, setColumns] = useState<ColumnType[]>([]);
   const context = useContext(UpdateButtonContext);
   const {userLeadId, workspaces, isMobile} = useUser();
@@ -40,14 +43,39 @@ export default function AllTasksModal() {
   if (!context) throw new Error("UpdateButtonContext not found");
 
   const [tasksData, setTasksData] = useState<Task[]>([]);
-  const [statusVisible, setStatusVisible] = useState(false);
-  const [roleVisible, setRoleVisible] = useState(false);
+  // const [statusVisible, setStatusVisible] = useState(false);
+  // const [roleVisible, setRoleVisible] = useState(false);
+  const { refetchTasks } = useTaskContext();
+
+  const [visible, setVisible] = useState(false);
+  
+
   const [filteredItems, setFilteredItems] = useState<Task[]>([]);
   const [isHover, setIsHover] = useState(false);
 
   const [startDate, setStartDate] = useState<Dayjs | null>(null);
   const [endDate, setEndDate] = useState<Dayjs | null>(null);
   const [form] = Form.useForm();
+  
+  const restoreTask = async (taskId: string) => {
+    try {
+      const res = await fetch(
+        `${useApiHost()}/task/restore/${taskId}`,
+        { method: "PUT" }
+      );
+
+      if (!res.ok) throw new Error("Restore failed");
+
+      notification.success({message:"Khôi phục công việc thành công"});
+
+      refetchTasks();
+      fetchTasks("trash");
+      
+    } catch (err) {
+      console.error(err);
+      notification.error({message:"Khôi phục công việc thất bại"});
+    }
+  };
 
 
   const handleSearch = (value: string, startDate?: Dayjs | null, endDate?: Dayjs | null) => {
@@ -75,8 +103,12 @@ export default function AllTasksModal() {
   };
 
 
-  async function fetchTasks() {
-    const apiUrl = `${useApiHost()}/task/inlead/${userLeadId}`;
+  async function fetchTasks(type: "status" | "trash") {
+    const apiUrl =
+      type === "trash"
+      ? `${useApiHost()}/task/trash/inlead/${userLeadId}`
+      : `${useApiHost()}/task/inlead/${userLeadId}`;
+
     try {
       const response = await fetch(apiUrl, {method: "GET"});
       if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
@@ -90,10 +122,10 @@ export default function AllTasksModal() {
   }
 
   useEffect(() => {
-    if(!statusVisible) return;
-    
-    fetchTasks();
-  }, [statusVisible]);
+    if (!visible) return;
+    fetchTasks(mode);
+  }, [visible, mode]);
+
 
 
   useEffect(() => {
@@ -116,20 +148,20 @@ export default function AllTasksModal() {
     );
   }, [filteredItems]);
 
-  const handleStatusOk = () => setStatusVisible(false);
+  const handleStatusOk = () => setVisible(false);
 
   const menu = {
     items,
     onClick: ({ key }: { key: string }) => {
       if (key === "status") {
-        setStatusVisible(true);
-        setRoleVisible(false);
+        setMode("status");
       } else {
-        setRoleVisible(true);
-        setStatusVisible(false);
+        setMode("trash");
       }
+      setVisible(true);
     },
   };
+
 
   return (
     <>
@@ -163,8 +195,8 @@ export default function AllTasksModal() {
       </Dropdown>
 
       <Modal
-        title="BẢNG CÔNG VIỆC TỔNG HỢP"
-        open={statusVisible}
+        title={mode === "trash" ? "THÙNG RÁC CÔNG VIỆC" : "BẢNG CÔNG VIỆC TỔNG HỢP"}
+        open={visible}
         onCancel={handleStatusOk}
         style={{ minWidth: isMobile ? "320vw" : "95vw", padding: 0 }}
         footer={null}
@@ -244,14 +276,15 @@ export default function AllTasksModal() {
                 }}
                 
               >
-                <CardTitle title={col.title} length={col?.tasks?.length ?? 0} />
+                <CardTitle title={col.title} length={col?.tasks?.length ?? 0} mode={mode}/>
                 {col?.tasks?.map((task) => (
                   <CardStaticItem
                     key={task.id}
                     theme={theme}
                     isRewardColumn={isRewardColumn}
                     task={task}
-                    
+                    mode={mode}
+                    restoreTask={restoreTask}
                   />
                 ))}
               </Card>
@@ -268,9 +301,10 @@ export default function AllTasksModal() {
 interface CardTitleProps {
   title: string;
   length: number;
+  mode:string;
 }
 
-export const CardTitle: React.FC<CardTitleProps> = ({ title, length }) => (
+export const CardTitle: React.FC<CardTitleProps> = ({ title, length, mode }) => (
   <div className="flex items-center justify-between !text-white !text-sm font-semibold" style={{ padding: 8 }}>
     <div className="flex items-center gap-2 min-w-0">
       <div className="w-2 h-2 bg-white/30 rounded-full flex-shrink-0" />
@@ -287,17 +321,33 @@ interface CardStaticItemProps {
   isRewardColumn: boolean;
   task: Task;
   theme: any;
+  mode:string;
+  restoreTask: (id:string) => void;
 }
 
 export const CardStaticItem: React.FC<CardStaticItemProps> = ({
   isRewardColumn,
   task,
   theme,
-}) => (
+  mode,
+  restoreTask
+}) => 
+  (
   <div
     className="task-card group/task relative mb-3 transition-all duration-200"
     style={{ transition: "none", cursor: "pointer", padding: 1 }}
     onClick={() => {
+      if (mode === "trash") {
+        Modal.confirm({
+          title: "Khôi phục công việc",
+          content: "Bạn có chắc muốn khôi phục task này không?",
+          okText: "Khôi phục",
+          cancelText: "Hủy",
+          okButtonProps: { danger: false },
+          onOk: () => restoreTask(task.id),
+        });
+        return;
+      }
       window.location.href = `/dashboard/work-tables/${task.workspace_id}`;
     }}
   >

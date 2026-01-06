@@ -120,7 +120,7 @@ const WorkPointPage: IPage["Component"] = () => {
         </Row>
 
         <TableComponent<WorkDaysProps>
-          columns={columnsWorkPoint(handleOpenModal)}
+          columns={columnsWorkPoint(handleOpenModal, query.month)}
           dataSource={workpoints}
           loading={isLoading}
           pagination={{
