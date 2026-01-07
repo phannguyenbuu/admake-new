@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback, useContext } from "react";
-import { Modal, Dropdown, Card, notification } from "antd";
+import { Modal, Dropdown, Card, Button, notification } from "antd";
 import { Stack, Box, Typography, Avatar } from "@mui/material";
 import { MoreOutlined, StarFilled } from "@ant-design/icons";
 import columnThemes from "./theme.json";
@@ -33,6 +33,8 @@ const items = [
 ];
 
 export default function AllTasksModal() {
+  const [clearTrashVisible, setClearTrashVisible] = useState(false);
+
   const [mode, setMode] = useState<"status" | "trash">("status");
 
   const [columns, setColumns] = useState<ColumnType[]>([]);
@@ -121,6 +123,34 @@ export default function AllTasksModal() {
     }
   }
 
+  const handleClearTrash = async () => {
+    try {
+      const res = await fetch(
+        `${useApiHost()}/task/trash/clear/inlead/${userLeadId}`,
+        { method: "DELETE" }
+      );
+
+      if (!res.ok) throw new Error("Clear trash failed");
+
+      notification.success({
+        message: "Đã xóa trống thùng rác",
+      });
+
+      setClearTrashVisible(false);
+
+      // 🔥 reload UI
+      fetchTasks("trash");
+      refetchTasks(); // cập nhật workspace board
+
+    } catch (err) {
+      notification.error({
+        message: "Xóa thất bại",
+        description: String(err),
+      });
+    }
+  };
+
+
   useEffect(() => {
     if (!visible) return;
     fetchTasks(mode);
@@ -202,7 +232,21 @@ export default function AllTasksModal() {
         footer={null}
         closable={false}
       >
+         {mode === "trash" ?
+            <Button
+              danger
+              type="primary"
+              style={{ marginLeft: 8 }}
+              onClick={() => setClearTrashVisible(true)}
+            >
+              Xóa trống thùng rác
+            </Button>
+          :
+
         <Form>
+
+         
+
           <Stack direction={isMobile ? "column" : "row"} spacing={2}
             style={{paddingBottom: 2}}>
             <AntdInput
@@ -240,6 +284,7 @@ export default function AllTasksModal() {
             </Stack>}
           </Stack>
         </Form>
+        }
 
         <button
           onClick={handleStatusOk}
@@ -292,6 +337,24 @@ export default function AllTasksModal() {
           })}
         </Stack>
       </Modal>
+
+      <Modal
+  open={clearTrashVisible}
+  title="⚠️ XÓA VĨNH VIỄN"
+  okText="Xóa vĩnh viễn"
+  okButtonProps={{ danger: true }}
+  cancelText="Hủy"
+  onCancel={() => setClearTrashVisible(false)}
+  onOk={handleClearTrash}
+>
+  <p>
+    Tất cả công việc trong <b>Thùng rác</b> sẽ bị{" "}
+    <b style={{ color: "red" }}>xóa vĩnh viễn</b> và{" "}
+    <b>không thể khôi phục</b>.
+  </p>
+  <p>Bạn có chắc chắn không?</p>
+</Modal>
+
     </>
   );
 }

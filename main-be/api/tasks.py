@@ -463,3 +463,23 @@ def get_trash_tasks(lead_id):
         ).all()
 
     return jsonify([t.tdict() for t in result])
+
+@task_bp.route("/trash/clear/inlead/<int:lead_id>", methods=["DELETE"])
+def clear_trash_by_lead(lead_id):
+    if not lead_id:
+        abort(400, "Invalid lead_id")
+
+    tasks = Task.query.filter(
+        Task.lead_id == lead_id,
+        Task.isDelete == True
+    ).all()
+
+    for task in tasks:
+        db.session.delete(task)
+
+    db.session.commit()
+
+    return jsonify({
+        "message": "Trash cleared",
+        "deleted": len(tasks)
+    }), 200

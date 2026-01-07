@@ -118,7 +118,7 @@ export const CardItem: React.FC<CardItemProps> = ({
         notification.error({"message":`Xóa task không thành công:`, description:response.statusText});
       }else
       {
-        notification.success({"message":"Xóa task thành công!"});
+        notification.success({"message":"Task đã đưa vào thùng rác!"});
         refetchTasks();
       }
       // Bạn có thể gọi lại mutate hoặc cập nhật UI sau khi xóa thành công
