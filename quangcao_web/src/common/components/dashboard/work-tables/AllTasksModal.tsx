@@ -302,7 +302,7 @@ export default function AllTasksModal() {
           ×
         </button>
         
-        <Stack direction="row" spacing={1}>
+        <Stack direction="row" spacing={1} style={{marginTop: 5}}>
           {columns.map((col, colIdx) => {
             const theme = columnThemes[colIdx];
             const isRewardColumn = col.type === "REWARD";
