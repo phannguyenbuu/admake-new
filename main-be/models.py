@@ -47,7 +47,7 @@ db = SQLAlchemy(app)
 
 jwt = JWTManager(app)
 
-CORS(app, supports_credentials=True, origins=['https://quanly.admake.vn','http://localhost:5173'])
+CORS(app, supports_credentials=True, origins=['https://quanly.admake.vn','https://www.n-lux.com','http://localhost:5173'])
 
 
 
