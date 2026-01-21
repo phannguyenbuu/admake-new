@@ -932,7 +932,24 @@ def save_dump():
     # Kết nối SSH tới server Linux
     ssh = SSHClient()
     ssh.set_missing_host_key_policy(AutoAddPolicy())
-    ssh.connect('31.97.76.62', username='root', password='@baoLong0511')
+    try:
+        ssh.connect(
+            '31.97.76.62',
+            username='root',
+            password='@baoLong0511',
+            timeout=60,
+            banner_timeout=60,
+            auth_timeout=60,
+        )
+        transport = ssh.get_transport()
+        if transport is not None:
+            transport.set_keepalive(30)
+    except Exception as e:
+        print("SSH connect failed:", e)
+        try:
+            ssh.close()
+        finally:
+            return
 
     now = datetime.datetime.now()
     timestamp = now.strftime("%y_%m_%d_%H_%M")
@@ -972,7 +989,10 @@ def periodic_save_dump(interval_minutes=30, sleep_fn=None):
         sleep_fn = time.sleep
     while True:
         # Gọi hàm save_dump hoặc tác vụ của bạn ở đây
-        save_dump()
+        try:
+            save_dump()
+        except Exception as e:
+            print("Periodic dump failed:", e)
         sleep_fn(interval_minutes * 60)  # nghỉ theo khoảng thời gian quy định
 
 def get_query_page_users(lead_id, page, limit, search, role_id = 0):
