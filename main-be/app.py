@@ -8,7 +8,6 @@ from models import app, db, periodic_save_dump, User
 from api.auth import login_user_form
 from flask import render_template, request, redirect, url_for
 from dotenv import load_dotenv
-import threading
 
 
 
@@ -55,6 +54,9 @@ app.register_blueprint(notify_bp)
 
 from api.chat import socketio
 
+def _start_periodic_dump():
+    periodic_save_dump(sleep_fn=socketio.sleep)
+
 @app.route('/login', methods=['GET'])
 def login_page():
     return render_template('login.html')
@@ -77,8 +79,7 @@ load_dotenv()  # load biến môi trường trong file .env vào process.env
 # VITE_API_HOST = os.getenv("VITE_API_HOST")
 
 if __name__ == "__main__":
-    t = threading.Thread(target=periodic_save_dump, daemon=True)
-    t.start()
+    socketio.start_background_task(_start_periodic_dump)
 
     port = int(os.environ.get('PORT', 6000))  # Lấy biến môi trường PORT hoặc mặc định 5000
     socketio.run(app, host='0.0.0.0', debug=True, port=port, allow_unsafe_werkzeug=True)

@@ -967,11 +967,13 @@ def save_dump():
     scp.close()
     ssh.close()
 
-def periodic_save_dump(interval_minutes=30):
+def periodic_save_dump(interval_minutes=30, sleep_fn=None):
+    if sleep_fn is None:
+        sleep_fn = time.sleep
     while True:
         # Gọi hàm save_dump hoặc tác vụ của bạn ở đây
         save_dump()
-        time.sleep(interval_minutes * 60)  # nghỉ theo khoảng thời gian quy định
+        sleep_fn(interval_minutes * 60)  # nghỉ theo khoảng thời gian quy định
 
 def get_query_page_users(lead_id, page, limit, search, role_id = 0):
     if lead_id == 0:
