@@ -36,7 +36,7 @@ export function PointerProvider({ children }) {
   const [rotationIndex, setRotationIndex] = useState(0);
   const [directionAxis, setDirectionAxis] = useState(0);
   const [personAge, setPersonAge] = useState("Kim");
-  const [addedHighlights, setAddedHighlights] = useState(def_funitures.models);
+  const [addedHighlights, setAddedHighlights] = useState([]);
   // const [releaseMouse, setReleaseMouse] = useState(false);
   const [roomWidth, setRoomWidth] = useState(def_funitures.room.width);
   const [roomLength, setRoomLength] = useState(def_funitures.room.length);
@@ -56,6 +56,27 @@ export function PointerProvider({ children }) {
     setWallMtl02(materials.find((el) => el.material === "granular_concrete"));
     setFloorMtl(materials.find((el) => el.material === "laminate_floor_02"));
   }, []);
+
+  const [defaultsLoaded, setDefaultsLoaded] = useState(false);
+
+  useEffect(() => {
+    if (defaultsLoaded) return;
+    if (!def_funitures?.models?.length) return;
+
+    const timer = setTimeout(() => {
+      const defaults = def_funitures.models
+        .filter(Boolean)
+        .map((item) => ({
+          ...item,
+          position: Array.isArray(item.position) ? item.position : [0, 0, 0],
+          preload: true,
+        }));
+      setAddedHighlights(defaults);
+      setDefaultsLoaded(true);
+    }, 800);
+
+    return () => clearTimeout(timer);
+  }, [defaultsLoaded]);
 
   const getResult = () => {
     const i = addedHighlights.findIndex(item => item.data.type === "bed");

@@ -88,5 +88,3 @@ export default function Model(props) {
     </group>
   );
 }
-
-useGLTF.preload("/models/Dark Room/Dark_Targets.glb");

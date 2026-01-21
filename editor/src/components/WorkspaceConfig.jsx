@@ -54,8 +54,8 @@ const WorkspaceConfig = () => {
   // const activeRoom = libraryData.activeRoom || 'living';
 
   // Callback add furniture
-  const addFurniture = (model, roomId) => {
-    setSelectedModels(prev => ({ ...prev, [roomId]: model }));
+  const addFurniture = (model, roomKey) => {
+    setSelectedModels(prev => ({ ...prev, [roomKey]: model }));
     // Logic thêm vào scene/store
   };
 
@@ -100,11 +100,11 @@ const WorkspaceConfig = () => {
         }}>
           {rooms.map(room => (
             <ModelSelectSwatch
-              key={room.id}
+              key={room.activeRoom}
               label={room.label}
               models={room.models}
-              selectedModel={selectedModels[room.id]}
-              onSelectModel={(model) => addFurniture(model, room.id)}
+              selectedModel={selectedModels[room.activeRoom]}
+              onSelectModel={(model) => addFurniture(model, room.activeRoom)}
               gradient={room.gradient}
             />
           ))}

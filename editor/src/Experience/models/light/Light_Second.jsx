@@ -23,5 +23,3 @@ export default function Model(props) {
     </group>
   );
 }
-
-useGLTF.preload("/models/Light Room/Light_Second.glb");

@@ -1,107 +1,122 @@
-import { useSelection, usePointer } from "../stores/selectionStore";
 import * as THREE from "three";
+import React, { useEffect, useRef, useState } from "react";
+import { useFrame } from "@react-three/fiber";
+import { useSelection, usePointer } from "../stores/selectionStore";
+import { useGLTFWithKTX2 } from "./utils/useGLTFWithKTX2";
 
-import React, { useMemo, useState, useRef, useEffect } from "react";
+const PointerHighlight = React.forwardRef(
+  ({ data, isMoving, setMovingId, isSelected }, ref) => {
+    const meshRef = ref || useRef();
+    const [isHovered, setIsHovered] = useState(false);
+    const [shouldLoad, setShouldLoad] = useState(false);
+    const { setCurrentSelection } = useSelection();
+    const { setAddedHighlights, setMessage } = usePointer();
 
-import { useFrame, useThree } from "@react-three/fiber";
-import { OrthographicCamera, Box, useGLTF, ContactShadows, useTexture, Decal } from '@react-three/drei';
+    if (!data) return null;
 
-const PointerHighlight = React.forwardRef(({data, isMoving, setMovingId, isSelected}, ref) => {
-  
-    // {data.id, , pointer,  data.modelFile, data.rotationIndex }
+    const onClickHighlight = () => {
+      if (isMoving) {
+        setMovingId(null); // Stop moving if already in move mode.
+      } else {
+        setMovingId(data.id);
+        setMessage(
+          `You are selecting ${data.name}. Click again to place the item.`
+        );
+        setCurrentSelection(data.id);
+      }
+    };
 
-  const meshRef = ref || React.useRef();
-  const [isHovered, setIsHovered] = React.useState(false);
-  const {currentSelection, setCurrentSelection} = useSelection();
-  // const { setPointer } = usePointer();
-  // const [isMoving, setIsMoving] = useState(false);
-  const {addedHighlights, setAddedHighlights, setMessage} = usePointer();
-  // console.log('model', data);
-  const model = data.modelFile ? useGLTF(data.modelFile) : null;
-  
-  const onClickHighlight = () => {
-    if (isMoving) {
-      setMovingId(null);    // dừng di chuyển nếu đang moving
-    } else {
-      setMovingId(data.id);
-      setMessage(`Bạn đang chọn ${data.name} click tiếp để đặt vật dụng`)
-      setCurrentSelection(data.id);
-    }
-  };
+    useEffect(() => {
+      if (data?.preload || isSelected || isMoving) {
+        setShouldLoad(true);
+      }
+    }, [data?.preload, isMoving, isSelected]);
 
-  const [bboxSize, setBboxSize] = React.useState([1, 1]);
-
-  useEffect(() => {
-    if (meshRef.current) {
+    useEffect(() => {
+      if (!meshRef.current || !shouldLoad) return;
       const box = new THREE.Box3().setFromObject(meshRef.current);
       const size = new THREE.Vector3();
       box.getSize(size);
-      setBboxSize([size.x, size.y]); // Lưu kích thước width, height của group
-    }
-  }, [model]);
+    }, [shouldLoad]);
 
-  useFrame(({ pointer, raycaster, camera }) => {
-    if (isMoving && meshRef.current) {
-      raycaster.setFromCamera(pointer, camera);
-      const planeZ = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
-      const intersectPoint = new THREE.Vector3();
-      raycaster.ray.intersectPlane(planeZ, intersectPoint);
+    useFrame(({ pointer, raycaster, camera }) => {
+      if (isMoving && meshRef.current?.position) {
+        raycaster.setFromCamera(pointer, camera);
+        const planeZ = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
+        const intersectPoint = new THREE.Vector3();
+        raycaster.ray.intersectPlane(planeZ, intersectPoint);
 
-      meshRef.current.position.x = intersectPoint.x;
-      meshRef.current.position.z = intersectPoint.z;
+        meshRef.current.position.x = intersectPoint.x;
+        meshRef.current.position.z = intersectPoint.z;
 
-      
-      setCurrentSelection(data.id);
-    }
-  });
+        setCurrentSelection(data.id);
+      }
+    });
 
+    useEffect(() => {
+      const current = meshRef.current;
+      if (!current || !current.position) return;
+      if (!data?.id) return;
 
-  useEffect(()=>{
-    if (!meshRef.current) return;
+      setAddedHighlights((prevHighlights) =>
+        prevHighlights.map((item) => {
+          if (!item || item.id !== data?.id) return item;
+          const y = Array.isArray(item.position) ? item.position[1] : 0;
+          return {
+            ...item,
+            position: [
+              current.position.x,
+              y,
+              current.position.z,
+            ],
+          };
+        })
+      );
+    }, [isMoving, data?.id, setAddedHighlights]);
 
-    setAddedHighlights(prevHighlights => 
-      prevHighlights.map(item => 
-        item.id === data.id // điều kiện xác định item cần update
-          ? { ...item, position: [meshRef.current.position.x, item.position[1], meshRef.current.position.z] }
-          : item
-      )
-    );
-
-  },[isMoving]);
-
-
-  return (
-    <group ref={meshRef} rotation={[0, data.rotationIndex * Math.PI / 2, 0]} 
-      onPointerOver={() => setIsHovered(true)}
-      onPointerOut={() => setIsHovered(false)}
-      onClick={onClickHighlight}
-      position={data.position}
-      // raycast={(...args) => THREE.Mesh.prototype.raycast.apply(this, args)} // đảm bảo raycast
+    return (
+      <group
+        ref={meshRef}
+        rotation={[0, (data.rotationIndex || 0) * Math.PI / 2, 0]}
+        onPointerOver={() => {
+          setIsHovered(true);
+          setShouldLoad(true);
+        }}
+        onPointerOut={() => setIsHovered(false)}
+        onClick={onClickHighlight}
+        position={Array.isArray(data.position) ? data.position : [0, 0, 0]}
       >
-      
-      {model ? (
-        Object.values(model.nodes).map((node, index) => (
-          node.geometry && (
-            <mesh
-              key={index}
-              geometry={node.geometry}
-              material={model.materials[node.material?.name] || model.materials.default}
-              position={node.position}
-              rotation={node.rotation}
-              scale={isHovered ? node.scale.clone().multiplyScalar(1.1) : node.scale}
-              material-transparent={true}
-              material-opacity={isHovered ? 0.7 : 1}
-            />
-          )
-        ))
-      ) : (
-        <mesh>
-          <boxGeometry args={[0.1, 0.1, 0.1]} />
-          <meshStandardMaterial color="orange" />
-        </mesh>
-      )}
-    </group>
-  );
-});
+        {shouldLoad && data.modelFile ? (
+          <ModelMesh modelFile={data.modelFile} isHovered={isHovered} />
+        ) : (
+          <mesh>
+            <boxGeometry args={[0.1, 0.1, 0.1]} />
+            <meshStandardMaterial color="orange" />
+          </mesh>
+        )}
+      </group>
+    );
+  }
+);
 
 export default PointerHighlight;
+
+function ModelMesh({ modelFile, isHovered }) {
+  const model = useGLTFWithKTX2(modelFile);
+
+  return Object.values(model.nodes).map((node, index) => {
+    if (!node.geometry) return null;
+    return (
+      <mesh
+        key={index}
+        geometry={node.geometry}
+        material={model.materials[node.material?.name] || model.materials.default}
+        position={node.position}
+        rotation={node.rotation}
+        scale={isHovered ? node.scale.clone().multiplyScalar(1.1) : node.scale}
+        material-transparent={true}
+        material-opacity={isHovered ? 0.7 : 1}
+      />
+    );
+  });
+}

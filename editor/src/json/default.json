@@ -6,7 +6,7 @@
                 "color": "bw",
                 "cost": 12000000,
                 "file": "/models/Bed_11/002.glb",
-                "name": "Giường",
+                "name": "Giuong",
                 "preview": "/models/Light Room/preview/kingbed-001.jpg",
                 "type": "bed",
                 "zone": [
@@ -16,9 +16,13 @@
                     17
                 ]
             },
-            "id": "Giường-1763110007636",
+            "id": "Giuong-1763110007636",
             "modelFile": "/models/Bed_11/002.glb",
-            "position": [1.07,0,-2.05],
+            "position": [
+                1.07,
+                0,
+                -2.05
+            ],
             "rotationIndex": 1
         },
         {
@@ -27,11 +31,11 @@
                 "color": "bw",
                 "cost": 2000000,
                 "file": "/models/Light Room/obj/Bedtab.glb",
-                "name": "Tủ đầu giường",
+                "name": "Tu dau giuong",
                 "preview": "/models/Light Room/preview/bedtab-001.jpg",
                 "type": "tab"
             },
-            "id": "Tủ đầu giường-1763110018838",
+            "id": "Tu dau giuong-1763110018838",
             "modelFile": "/models/Light Room/obj/Bedtab.glb",
             "position": [
                 -0.16994418853218818,
@@ -46,11 +50,11 @@
                 "color": "bw",
                 "cost": 2000000,
                 "file": "/models/Light Room/obj/Bedtab.glb",
-                "name": "Tủ đầu giường",
+                "name": "Tu dau giuong",
                 "preview": "/models/Light Room/preview/bedtab-001.jpg",
                 "type": "tab"
             },
-            "id": "Tủ đầu giường-1763110028047",
+            "id": "Tu dau giuong-1763110028047",
             "modelFile": "/models/Light Room/obj/Bedtab.glb",
             "position": [
                 -0.12845416006983257,
@@ -65,11 +69,11 @@
                 "color": "bw",
                 "cost": 1200000,
                 "file": "/models/Light Room/obj/Bench.glb",
-                "name": "Băng ngồi",
+                "name": "Bang ngoi",
                 "preview": "/models/Light Room/preview/bench.jpg",
                 "type": "bench"
             },
-            "id": "Băng ngồi-1763110039863",
+            "id": "Bang ngoi-1763110039863",
             "modelFile": "/models/Light Room/obj/Bench.glb",
             "position": [
                 2.6525080183461434,
@@ -84,11 +88,11 @@
                 "color": "bw",
                 "cost": 6000000,
                 "file": "/models/Light Room/obj/Wardrobe2m4.glb",
-                "name": "Tủ âm tường 2m4",
+                "name": "Tu am tuong 2m4",
                 "preview": "/models/Light Room/preview/wardrobe2m4.jpg",
                 "type": "wardrobe"
             },
-            "id": "Tủ âm tường 2m4-1763110047953",
+            "id": "Tu am tuong 2m4-1763110047953",
             "modelFile": "/models/Light Room/obj/Wardrobe2m4.glb",
             "position": [
                 3.6825328627409153,
@@ -103,11 +107,11 @@
                 "color": "bw",
                 "cost": 4000000,
                 "file": "/models/Light Room/obj/Wardrobe1m2.glb",
-                "name": "Tủ âm tường 1m2",
+                "name": "Tu am tuong 1m2",
                 "preview": "/models/Light Room/preview/wardrobe1m2.jpg",
                 "type": "wardrobe"
             },
-            "id": "Tủ âm tường 1m2-1763110054534",
+            "id": "Tu am tuong 1m2-1763110054534",
             "modelFile": "/models/Light Room/obj/Wardrobe1m2.glb",
             "position": [
                 5.120373364688271,
@@ -122,11 +126,11 @@
                 "color": "bw",
                 "cost": 1000000,
                 "file": "/models/Light Room/obj/Readchair.glb",
-                "name": "Ghế đọc sách",
+                "name": "Ghe doc sach",
                 "preview": "/models/Light Room/preview/readchair.jpg",
                 "type": "chair"
             },
-            "id": "Ghế đọc sách-1763110071649",
+            "id": "Ghe doc sach-1763110071649",
             "modelFile": "/models/Light Room/obj/Readchair.glb",
             "position": [
                 4.907543688826283,
@@ -141,11 +145,11 @@
                 "color": "bw",
                 "cost": 8000000,
                 "file": "/models/Light Room/obj/WorkTable.glb",
-                "name": "Bàn làm việc",
+                "name": "Ban lam viec",
                 "preview": "/models/Light Room/preview/worktable.jpg",
                 "type": "table"
             },
-            "id": "Bàn làm việc-1763113030836",
+            "id": "Ban lam viec-1763113030836",
             "modelFile": "/models/Light Room/obj/WorkTable.glb",
             "position": [
                 1.5780822802068428,

@@ -98,7 +98,6 @@ export default function Model() {
   // Gán lightmap cho từng mesh còn lại
   scene.traverse((child) => {
     if (child.isMesh) {
-      console.log(child);
       // child.material.map = lightMap;
       // child.material.lightMap = lightMap;
       // child.material.lightMapIntensity = 1;

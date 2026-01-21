@@ -53,4 +53,3 @@ export default function Model(props) {
   );
 }
 
-useGLTF.preload("/models/Light Room/Light_First.glb");
