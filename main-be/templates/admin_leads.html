@@ -177,7 +177,7 @@
         chk.addEventListener('change', function() {
           const leadId = this.value;
           
-          fetch(`https://admake.vn/api/lead/${leadId}/check`, {
+          fetch(`https://go.admake.vn/api/lead/${leadId}/check`, {
             method: 'PUT',
             headers: {
               'Content-Type': 'application/json',
@@ -210,7 +210,7 @@
         chk.addEventListener('change', function() {
           const leadId = this.value;
           
-          fetch(`https://admake.vn/api/lead/${leadId}/activate`, {
+          fetch(`https://go.admake.vn/api/lead/${leadId}/activate`, {
             method: 'PUT',
             headers: {
               'Content-Type': 'application/json',
@@ -269,7 +269,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // usernameDisplay.textContent = selectedOption.getAttribute('data-username') || '';
             passwordDisplay.textContent = selectedOption.getAttribute('data-password') || '';
             
-            fetch(`https://admake.vn/api/lead/${leadId}/assign-user`, {
+            fetch(`https://go.admake.vn/api/lead/${leadId}/assign-user`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ user_id: userId || null })

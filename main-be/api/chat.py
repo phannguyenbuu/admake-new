@@ -6,7 +6,7 @@ import datetime
 from sqlalchemy.orm.attributes import flag_modified
 
 socketio = SocketIO(app, cors_allowed_origins=["http://localhost:5173",
-                                                "https://admake.vn",
+                                                "https://go.admake.vn",
                                                 "https://quanly.admake.vn",
                                                 "https://archbox.pw", 
                                                 "https://dashboard.archbox.pw"],

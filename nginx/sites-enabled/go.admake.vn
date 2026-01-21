@@ -4,7 +4,7 @@ server {
 
     listen 443 ssl http2;
     listen [::]:443 ssl http2;
-    server_name admake.vn www.admake.vn;
+    server_name go.admake.vn;
 
     client_max_body_size 100M;
 
