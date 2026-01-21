@@ -1,0 +1,14 @@
+version: "3.9"
+
+services:
+  main-be:
+    build: ./main-be
+    env_file:
+      - ./main-be/.env
+    environment:
+      - DATABASE_URL=postgresql://postgres:myPass@host.docker.internal:5432/admake_chat
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    ports:
+      - "6000:6000"
+    restart: unless-stopped

@@ -1,0 +1,41 @@
+.model-editor {
+  display: flex;
+  height: 100vh;
+  background: #1e1e1e;
+  color: #fff;
+}
+
+.editor-left,
+.editor-right {
+  width: 240px;
+  padding: 12px;
+  background: #2b2b2b;
+  overflow-y: auto;
+}
+
+.editor-center {
+  flex: 1;
+}
+
+.slot {
+  padding: 6px 8px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.slot:hover {
+  background: #3a3a3a;
+}
+
+.slot.active {
+  background: #007acc;
+}
+
+label {
+  display: block;
+  margin-bottom: 12px;
+}
+
+input[type="range"] {
+  width: 100%;
+}

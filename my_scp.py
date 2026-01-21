@@ -200,10 +200,6 @@ local_dirs = [
     # "main-be/.env",
     
     # "main-be/procs.py",
-    "lead-be/app.py",
-    "lead-be/models.py",
-    # "lead-be/.env",
-    "lead-be/templates",
     # "dump.pm2"
 ]
 
