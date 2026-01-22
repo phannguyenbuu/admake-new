@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request
-from sqlalchemy import cast, func, Integer
+from sqlalchemy import cast, func, Integer, or_
 
 from models import (
     LeadPayload,
@@ -23,6 +23,7 @@ lead_manage_bp = Blueprint("lead_manage", __name__, url_prefix="/lead-manage")
 @lead_manage_bp.route("/", methods=["GET"])
 def admin_leads():
     page = request.args.get("page", 1, type=int)
+    query_text = request.args.get("q", "").strip()
     per_page = 50
 
     assignable_users = User.query.filter(
@@ -45,7 +46,18 @@ def admin_leads():
         )
     ).all()
 
-    pagination = LeadPayload.query.order_by(LeadPayload.id).paginate(
+    lead_query = LeadPayload.query
+    if query_text:
+        like = f"%{query_text}%"
+        lead_query = lead_query.filter(
+            or_(
+                LeadPayload.name.ilike(like),
+                LeadPayload.company.ilike(like),
+                LeadPayload.phone.ilike(like),
+            )
+        )
+
+    pagination = lead_query.order_by(LeadPayload.id).paginate(
         page=page, per_page=per_page, error_out=False
     )
 
@@ -158,4 +170,5 @@ def admin_leads():
         leads=leads_data,
         page=page,
         total_pages=pagination.pages,
+        query_text=query_text,
     )

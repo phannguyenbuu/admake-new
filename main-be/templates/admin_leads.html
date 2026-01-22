@@ -60,7 +60,7 @@
       align-items: center;
       justify-content: space-between;
       gap: 16px;
-      margin-bottom: 12px;
+      margin-bottom: 10px;
     }
 
     .hero h2 {
@@ -69,9 +69,20 @@
       margin: 0;
     }
 
+    .search-box {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .search-box input {
+      min-width: 260px;
+    }
+
     .stats {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
       gap: 12px;
       margin-bottom: 14px;
     }
@@ -96,6 +107,13 @@
       font-family: "Space Grotesk", "Trebuchet MS", sans-serif;
       font-size: 20px;
       margin: 0;
+    }
+
+    .stat-card small {
+      display: block;
+      font-size: 12px;
+      color: var(--ink-500);
+      margin-top: 4px;
     }
 
     .lead-list {
@@ -184,12 +202,12 @@
     }
 
     .level-star.is-selected {
-      border-color: var(--accent);
-      background: rgba(10, 163, 166, 0.12);
+      border-color: #f5b301;
+      background: rgba(245, 179, 1, 0.15);
     }
 
     .level-star.is-selected svg {
-      fill: var(--accent);
+      fill: #f5b301;
     }
 
     .lead-details {
@@ -266,7 +284,7 @@
     }
 
     .pagination {
-      margin: 18px 0 24px;
+      margin: 12px 0 18px;
     }
 
     .detail-meta {
@@ -313,56 +331,39 @@
         <h2>Lead Overview</h2>
         <p class="text-muted mb-0">Compact rows with expand-on-demand details.</p>
       </div>
+      <form class="search-box" method="get">
+        <input class="form-control" type="text" name="q" value="{{ query_text }}"
+               placeholder="Search by lead name, company, or mobile" />
+        <button class="btn btn-primary btn-sm" type="submit">Search</button>
+      </form>
     </section>
 
     <section class="stats">
       <div class="stat-card">
         <h3>Total Leads</h3>
-        <p>{{ total_users }}</p>
+        <p data-count="{{ totals.leads }}">0</p>
       </div>
       <div class="stat-card">
-        <h3>Assignable Users</h3>
-        <p>{{ total_users_all }}</p>
+        <h3>Assignable + Customers</h3>
+        <p data-count="{{ total_users_all }}">0</p>
+        <small>Customers: <span data-count="{{ totals.customers }}">0</span></small>
       </div>
       <div class="stat-card">
-        <h3>Workspaces</h3>
-        <p>{{ totals.workspaces }}</p>
-      </div>
-      <div class="stat-card">
-        <h3>Tasks</h3>
-        <p>{{ totals.tasks }}</p>
+        <h3>Workspaces + Tasks</h3>
+        <p data-count="{{ totals.workspaces }}">0</p>
+        <small>Tasks: <span data-count="{{ totals.tasks }}">0</span></small>
       </div>
       <div class="stat-card">
         <h3>Messages</h3>
-        <p>{{ totals.messages }}</p>
+        <p data-count="{{ totals.messages }}">0</p>
       </div>
       <div class="stat-card">
         <h3>Workpoints</h3>
-        <p>{{ totals.workpoints }}</p>
+        <p data-count="{{ totals.workpoints }}">0</p>
       </div>
       <div class="stat-card">
         <h3>Leaves</h3>
-        <p>{{ totals.leaves }}</p>
-      </div>
-      <div class="stat-card">
-        <h3>Notifies</h3>
-        <p>{{ totals.notifies }}</p>
-      </div>
-      <div class="stat-card">
-        <h3>Customers</h3>
-        <p>{{ totals.customers }}</p>
-      </div>
-      <div class="stat-card">
-        <h3>Materials</h3>
-        <p>{{ totals.materials }}</p>
-      </div>
-      <div class="stat-card">
-        <h3>Roles</h3>
-        <p>{{ totals.roles }}</p>
-      </div>
-      <div class="stat-card">
-        <h3>Using History</h3>
-        <p>{{ totals.using_history }}</p>
+        <p data-count="{{ totals.leaves }}">0</p>
       </div>
     </section>
 
@@ -370,7 +371,7 @@
       <ul class="pagination justify-content-center">
         {% if page > 1 %}
         <li class="page-item">
-          <a class="page-link" href="?page={{ page - 1 }}" aria-label="Previous">
+          <a class="page-link" href="?page={{ page - 1 }}&q={{ query_text }}" aria-label="Previous">
             <span aria-hidden="true">&laquo;</span>
           </a>
         </li>
@@ -378,13 +379,13 @@
 
         {% for p in range(1, total_pages + 1) %}
         <li class="page-item {% if p == page %}active{% endif %}">
-          <a class="page-link" href="?page={{ p }}">{{ p }}</a>
+          <a class="page-link" href="?page={{ p }}&q={{ query_text }}">{{ p }}</a>
         </li>
         {% endfor %}
 
         {% if page < total_pages %}
         <li class="page-item">
-          <a class="page-link" href="?page={{ page + 1 }}" aria-label="Next">
+          <a class="page-link" href="?page={{ page + 1 }}&q={{ query_text }}" aria-label="Next">
             <span aria-hidden="true">&raquo;</span>
           </a>
         </li>
@@ -443,7 +444,7 @@
               <div class="value">{{ lead.name or 'N/A' }}</div>
             </div>
             <div class="lead-block select-user">
-              <div class="label">Assigned User ({{ total_users }})</div>
+              <div class="label">Assigned User + Customer</div>
               <select class="form-select form-select-sm" name="status-{{ lead.id }}"
                       id="select-{{ lead.id }}" data-lead-id="{{ lead.id }}">
                 <option value="">-- Select user --</option>
@@ -458,6 +459,7 @@
               </select>
               <p id="username-display-{{ lead.id }}" class="username-display"></p>
               <p id="password-display-{{ lead.id }}" class="password-display"></p>
+              <div class="lead-meta">Customers: <span class="value">{{ lead.stats.customers }}</span></div>
             </div>
             <div class="lead-block">
               <div class="label">Company</div>
@@ -470,9 +472,15 @@
               <div class="lead-meta">Email: <span class="value">{{ lead.email or 'N/A' }}</span></div>
             </div>
             <div class="lead-block">
-              <div class="label">Industry</div>
-              <div class="value">{{ lead.industry or 'N/A' }}</div>
-              <div class="lead-meta">Need: <span class="value">{{ lead.description or 'N/A' }}</span></div>
+              <div class="label">Workspaces + Tasks</div>
+              <div class="lead-meta">Workspaces: <span class="value">{{ lead.stats.workspaces }}</span></div>
+              <div class="lead-meta">Tasks: <span class="value">{{ lead.stats.tasks }}</span></div>
+            </div>
+            <div class="lead-block">
+              <div class="label">Activity</div>
+              <div class="lead-meta">Messages: <span class="value">{{ lead.stats.messages }}</span></div>
+              <div class="lead-meta">Workpoints: <span class="value">{{ lead.stats.workpoints }}</span></div>
+              <div class="lead-meta">Leaves: <span class="value">{{ lead.stats.leaves }}</span></div>
             </div>
             <div class="lead-block">
               <div class="label">Balance</div>
@@ -552,6 +560,26 @@
 
   <script>
     document.addEventListener("DOMContentLoaded", function() {
+      const animatedCounters = document.querySelectorAll('[data-count]');
+      animatedCounters.forEach(el => {
+        const target = Number(el.dataset.count || 0);
+        const duration = 900;
+        const start = performance.now();
+
+        function tick(now) {
+          const progress = Math.min((now - start) / duration, 1);
+          const value = Math.floor(progress * target);
+          el.textContent = value.toLocaleString();
+          if (progress < 1) {
+            requestAnimationFrame(tick);
+          } else {
+            el.textContent = target.toLocaleString();
+          }
+        }
+
+        requestAnimationFrame(tick);
+      });
+
       const checkboxes = document.querySelectorAll("input[name='selected_leads']");
 
       checkboxes.forEach(chk => {
