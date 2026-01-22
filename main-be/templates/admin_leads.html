@@ -72,12 +72,29 @@
     .search-box {
       display: flex;
       gap: 10px;
-      flex-wrap: wrap;
+      flex-wrap: nowrap;
       align-items: center;
     }
 
     .search-box input {
-      min-width: 260px;
+      flex: 1 1 260px;
+      min-width: 0;
+    }
+    .search-box .btn {
+      white-space: nowrap;
+    }
+
+    .search-clear {
+      border: 1px solid rgba(15, 23, 42, 0.2);
+      background: #ffffff;
+      color: var(--ink-700);
+      border-radius: 8px;
+      padding: 6px 10px;
+      font-weight: 600;
+    }
+
+    .search-clear.is-hidden {
+      display: none;
     }
 
     .stats {
@@ -202,11 +219,20 @@
     }
 
     .level-star.is-selected {
+      border-color: var(--accent);
+      background: rgba(10, 163, 166, 0.12);
+    }
+
+    .level-star.is-selected svg {
+      fill: var(--accent);
+    }
+
+    .level-star.is-selected.is-first {
       border-color: #f5b301;
       background: rgba(245, 179, 1, 0.15);
     }
 
-    .level-star.is-selected svg {
+    .level-star.is-selected.is-first svg {
       fill: #f5b301;
     }
 
@@ -294,9 +320,26 @@
       color: var(--ink-500);
     }
 
+    .detail-meta .big-number {
+      font-family: "Space Grotesk", "Trebuchet MS", sans-serif;
+      font-size: 20px;
+      color: var(--ink-900);
+    }
+
     .detail-meta strong {
       color: var(--ink-900);
       font-weight: 600;
+    }
+
+    .toggle-icon {
+      display: inline-flex;
+      font-size: 14px;
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    .lead-card.is-expanded .toggle-icon {
+      transform: rotate(180deg);
     }
 
     @keyframes fadeUp {
@@ -331,9 +374,10 @@
         <h2>Lead Overview</h2>
         <p class="text-muted mb-0">Compact rows with expand-on-demand details.</p>
       </div>
-      <form class="search-box" method="get">
-        <input class="form-control" type="text" name="q" value="{{ query_text }}"
+      <form class="search-box" method="get" style="flex-wrap: nowrap;">
+        <input class="form-control" type="text" name="q" id="leadSearchInput" value="{{ query_text }}"
                placeholder="Search by lead name, company, or mobile" />
+        <button class="search-clear {% if not query_text %}is-hidden{% endif %}" type="button" id="leadSearchClear">x</button>
         <button class="btn btn-primary btn-sm" type="submit">Search</button>
       </form>
     </section>
@@ -417,7 +461,7 @@
             <div class="level-control" data-lead-id="{{ lead.id }}" data-level="{{ lead.level or 0 }}">
               <div class="level-stars">
                 {% for lvl in range(0, 4) %}
-                <button type="button" class="level-star {% if (lead.level or 0) == lvl %}is-selected{% endif %}"
+                <button type="button" class="level-star {% if lvl == 0 %}is-first{% endif %} {% if (lead.level or 0) == lvl %}is-selected{% endif %}"
                         data-level="{{ lvl }}" aria-label="Level {{ lvl }}">
                   <svg viewBox="0 0 24 24" aria-hidden="true">
                     <path d="M12 2.6l2.6 5.3 5.9.9-4.3 4.2 1 5.9-5.2-2.8-5.2 2.8 1-5.9-4.3-4.2 5.9-.9L12 2.6z" />
@@ -426,7 +470,9 @@
                 {% endfor %}
               </div>
             </div>
-            <button class="btn btn-sm btn-outline-secondary toggle-details" type="button">Expand</button>
+            <button class="btn btn-sm btn-outline-secondary toggle-details" type="button" aria-label="Toggle details">
+              <span class="toggle-icon">v</span>
+            </button>
             <button class="btn btn-sm btn-outline-dark detail-btn" type="button"
                     data-lead-id="{{ lead.id }}"
                     data-lead-name="{{ lead.name or 'N/A' }}"
@@ -516,7 +562,8 @@
               <div class="lead-block">
                 <div class="label">User Counts</div>
                 <div class="detail-meta">
-                  <div>Total Users: <strong id="detailUsersTotal">0</strong></div>
+                  <div class="big-number" id="detailUsersTotal">0</div>
+                  <div>Total Users</div>
                   <div>Staff Users: <strong id="detailUsersStaff">0</strong></div>
                   <div>Customer Role: <strong id="detailUsersCustomerRole">0</strong></div>
                   <div>Customer Table: <strong id="detailCustomers">0</strong></div>
@@ -527,7 +574,8 @@
               <div class="lead-block">
                 <div class="label">Lead Records</div>
                 <div class="detail-meta">
-                  <div>Workspaces: <strong id="detailWorkspaces">0</strong></div>
+                  <div class="big-number" id="detailWorkspaces">0</div>
+                  <div>Workspaces</div>
                   <div>Tasks: <strong id="detailTasks">0</strong></div>
                   <div>Messages: <strong id="detailMessages">0</strong></div>
                   <div>Workpoints: <strong id="detailWorkpoints">0</strong></div>
@@ -751,6 +799,23 @@
           detailModal.show();
         });
       });
+
+      const searchInput = document.getElementById('leadSearchInput');
+      const clearButton = document.getElementById('leadSearchClear');
+      const searchForm = searchInput ? searchInput.closest('form') : null;
+
+      if (searchInput && clearButton && searchForm) {
+        const toggleClear = () => {
+          clearButton.classList.toggle('is-hidden', !searchInput.value.trim());
+        };
+
+        searchInput.addEventListener('input', toggleClear);
+        clearButton.addEventListener('click', () => {
+          searchInput.value = '';
+          toggleClear();
+          searchForm.submit();
+        });
+      }
     });
   </script>
 </body>
