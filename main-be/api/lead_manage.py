@@ -168,6 +168,18 @@ def admin_leads():
                 continue
             message_images_by_lead.setdefault(lead_id, []).append(thumb_url or file_url)
 
+    task_icon_by_lead = {}
+    if lead_ids:
+        task_icon_rows = (
+            db.session.query(Task.lead_id, Task.icon)
+            .filter(Task.lead_id.in_(lead_ids), Task.icon.isnot(None))
+            .all()
+        )
+        for lead_id, icon in task_icon_rows:
+            if not _is_image(icon):
+                continue
+            task_icon_by_lead.setdefault(lead_id, []).append(icon)
+
     task_asset_map = {}
     if lead_ids:
         task_rows = (
@@ -228,7 +240,11 @@ def admin_leads():
             "last_user_at": last_user_at.get(lead.id),
             "last_workpoint_at": last_workpoint_at.get(lead.id),
             "preview_images": _unique_keep_order(
-                (message_images_by_lead.get(lead.id, []) + asset_images_by_lead.get(lead.id, []))
+                (
+                    message_images_by_lead.get(lead.id, [])
+                    + asset_images_by_lead.get(lead.id, [])
+                    + task_icon_by_lead.get(lead.id, [])
+                )
             )[:5],
         }
         leads_data.append(lead_dict)

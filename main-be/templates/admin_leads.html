@@ -846,7 +846,12 @@
             } else {
               images.forEach(src => {
                 const img = document.createElement('img');
-                img.src = src;
+                const normalized = String(src || '');
+                if (normalized.startsWith('http') || normalized.startsWith('/')) {
+                  img.src = normalized;
+                } else {
+                  img.src = `${window.location.origin}/static/${normalized}`;
+                }
                 img.alt = 'asset';
                 detailImages.appendChild(img);
               });
