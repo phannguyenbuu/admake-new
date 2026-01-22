@@ -973,6 +973,44 @@ def save_dump():
     except subprocess.CalledProcessError as e:
         print("Upload dump to Drive failed:", e.stderr or e)
 
+    # Sync static assets to Drive
+    static_src = "/root/admake/main-be/static"
+    static_dst = "drive:backup/static"
+    filelist_path = "/root/backup/static_filelist.txt"
+    new_files_path = "/root/backup/static_new_files.txt"
+    current_files = []
+    for root, _, files in os.walk(static_src):
+        for name in files:
+            full_path = os.path.join(root, name)
+            rel_path = os.path.relpath(full_path, static_src)
+            current_files.append(rel_path.replace("\\", "/"))
+    current_set = set(current_files)
+    previous_set = set()
+    if os.path.exists(filelist_path):
+        with open(filelist_path, "r", encoding="utf-8") as f:
+            previous_set = set(line.strip() for line in f if line.strip())
+
+    new_files = sorted(current_set - previous_set)
+    if new_files:
+        os.makedirs(os.path.dirname(filelist_path), exist_ok=True)
+        with open(new_files_path, "w", encoding="utf-8") as f:
+            f.write("\n".join(new_files) + "\n")
+        try:
+            subprocess.run(
+                ["rclone", "copy", static_src, static_dst, "--files-from", new_files_path, "-v", "--stats=10s"],
+                check=True,
+                capture_output=True,
+                text=True,
+            )
+            print(f"Copied {len(new_files)} new static files to Drive.")
+        except subprocess.CalledProcessError as e:
+            print("Copy new static files to Drive failed:", e.stderr or e)
+    else:
+        print("No new static files to copy.")
+
+    with open(filelist_path, "w", encoding="utf-8") as f:
+        f.write("\n".join(sorted(current_set)) + "\n")
+
 def periodic_save_dump(interval_minutes=15, sleep_fn=None):
     if sleep_fn is None:
         sleep_fn = time.sleep
