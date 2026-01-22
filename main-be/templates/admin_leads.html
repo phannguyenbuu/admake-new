@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Lead Management Dashboard</title>
+  <title>{{ labels.header_title or "Lead Management Dashboard" }}</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
 
@@ -82,6 +82,7 @@
       flex: 1 1 auto;
       min-width: 0;
     }
+
     .search-box .btn {
       white-space: nowrap;
     }
@@ -322,15 +323,29 @@
       color: var(--ink-500);
     }
 
+    .detail-meta strong {
+      color: var(--ink-900);
+      font-weight: 600;
+    }
+
     .detail-meta .big-number {
       font-family: "Space Grotesk", "Trebuchet MS", sans-serif;
       font-size: 20px;
       color: var(--ink-900);
     }
 
-    .detail-meta strong {
-      color: var(--ink-900);
-      font-weight: 600;
+    .detail-images {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .detail-images img {
+      width: 84px;
+      height: 84px;
+      object-fit: cover;
+      border-radius: 10px;
+      border: 1px solid rgba(15, 23, 42, 0.08);
     }
 
     .toggle-icon {
@@ -371,54 +386,59 @@
         align-items: flex-start;
         gap: 8px;
       }
+
+      .search-box {
+        max-width: 100%;
+        flex: 1 1 100%;
+      }
     }
   </style>
 </head>
 <body>
   <header class="topbar">
-    <h1>ADMAKE Lead Management</h1>
-    <span class="badge">Admin View</span>
+    <h1>{{ labels.header_title or "ADMAKE Lead Management" }}</h1>
+    <span class="badge">{{ labels.header_badge or "Admin View" }}</span>
   </header>
 
   <main class="page">
     <section class="hero">
       <div>
-        <h2>Lead Overview</h2>
-        <p class="text-muted mb-0">Compact rows with expand-on-demand details.</p>
+        <h2>{{ labels.hero_title or "Lead Overview" }}</h2>
+        <p class="text-muted mb-0">{{ labels.hero_subtitle or "Compact rows with expand-on-demand details." }}</p>
       </div>
       <form class="search-box" method="get" style="flex-wrap: nowrap;">
         <input class="form-control" type="text" name="q" id="leadSearchInput" value="{{ query_text }}"
-               placeholder="Search by lead name, company, or mobile" />
+               placeholder="{{ labels.search_placeholder or "Search by lead name, company, or mobile" }}" />
         <button class="search-clear {% if not query_text %}is-hidden{% endif %}" type="button" id="leadSearchClear">x</button>
-        <button class="btn btn-primary btn-sm" type="submit">Search</button>
+        <button class="btn btn-primary btn-sm" type="submit">{{ labels.search_button or "Search" }}</button>
       </form>
     </section>
 
     <section class="stats">
       <div class="stat-card">
-        <h3>Total Leads</h3>
+        <h3>{{ labels.stats_total_leads or "Total Leads" }}</h3>
         <p data-count="{{ totals.leads }}">0</p>
       </div>
       <div class="stat-card">
-        <h3>Assignable + Customers</h3>
+        <h3>{{ labels.stats_assignable_customers or "Assignable + Customers" }}</h3>
         <p data-count="{{ total_users_all }}">0</p>
-        <small>Customers: <span data-count="{{ totals.customers }}">0</span></small>
+        <small>{{ labels.stats_customers_label or "Customers" }}: <span data-count="{{ totals.customers }}">0</span></small>
       </div>
       <div class="stat-card">
-        <h3>Workspaces + Tasks</h3>
+        <h3>{{ labels.stats_workspaces_tasks or "Workspaces + Tasks" }}</h3>
         <p data-count="{{ totals.workspaces }}">0</p>
-        <small>Tasks: <span data-count="{{ totals.tasks }}">0</span></small>
+        <small>{{ labels.stats_tasks_label or "Tasks" }}: <span data-count="{{ totals.tasks }}">0</span></small>
       </div>
       <div class="stat-card">
-        <h3>Messages</h3>
+        <h3>{{ labels.stats_messages or "Messages" }}</h3>
         <p data-count="{{ totals.messages }}">0</p>
       </div>
       <div class="stat-card">
-        <h3>Workpoints</h3>
+        <h3>{{ labels.stats_workpoints or "Workpoints" }}</h3>
         <p data-count="{{ totals.workpoints }}">0</p>
       </div>
       <div class="stat-card">
-        <h3>Leaves</h3>
+        <h3>{{ labels.stats_leaves or "Leaves" }}</h3>
         <p data-count="{{ totals.leaves }}">0</p>
       </div>
     </section>
@@ -454,7 +474,7 @@
       <article class="lead-card" data-lead-id="{{ lead.id }}" style="--i: {{ loop.index0 }};">
         <div class="lead-row">
           <div class="lead-row-main">
-            <span class="lead-id">Lead #{{ lead.id }}</span>
+            <span class="lead-id">{{ labels.lead_prefix or "Lead" }} #{{ lead.id }}</span>
             <span>{{ lead.company or 'N/A' }}</span>
             <span>{{ lead.phone or 'N/A' }}</span>
             <span>{{ lead.email or 'N/A' }}</span>
@@ -463,11 +483,11 @@
             <div class="lead-status">
               <label>
                 <input type="checkbox" name="selected_leads" value="{{ lead.id }}" {% if lead.isInvited %}checked{% endif %} />
-                Invited
+                {{ labels.status_invited or "Invited" }}
               </label>
               <label>
                 <input type="checkbox" name="activated_leads" value="{{ lead.id }}" {% if lead.isActivated %}checked{% endif %} />
-                Active
+                {{ labels.status_active or "Active" }}
               </label>
             </div>
             <div class="level-control" data-lead-id="{{ lead.id }}" data-level="{{ lead.level or 0 }}">
@@ -494,7 +514,7 @@
                     data-lead-name="{{ lead.name or 'N/A' }}"
                     data-company="{{ lead.company or 'N/A' }}"
                     data-stats='{{ lead.stats | tojson }}'>
-              Details
+              {{ labels.button_details or "Details" }}
             </button>
           </div>
         </div>
@@ -502,14 +522,14 @@
         <div class="lead-details">
           <div class="lead-grid">
             <div class="lead-block">
-              <div class="label">Lead Name</div>
+              <div class="label">{{ labels.section_lead_name or "Lead Name" }}</div>
               <div class="value">{{ lead.name or 'N/A' }}</div>
             </div>
             <div class="lead-block select-user">
-              <div class="label">Assigned User + Customer</div>
+              <div class="label">{{ labels.section_assigned_user_customer or "Assigned User + Customer" }}</div>
               <select class="form-select form-select-sm" name="status-{{ lead.id }}"
                       id="select-{{ lead.id }}" data-lead-id="{{ lead.id }}">
-                <option value="">-- Select user --</option>
+                <option value="">{{ labels.select_user_placeholder or "-- Select user --" }}</option>
                 {% for user in users %}
                 <option value="{{ user.id }}"
                         data-username="{{ user.username }}"
@@ -521,38 +541,38 @@
               </select>
               <p id="username-display-{{ lead.id }}" class="username-display"></p>
               <p id="password-display-{{ lead.id }}" class="password-display"></p>
-              <div class="lead-meta">Customers: <span class="value">{{ lead.stats.customers }}</span></div>
+              <div class="lead-meta">{{ labels.label_customers or "Customers" }}: <span class="value">{{ lead.stats.customers }}</span></div>
             </div>
             <div class="lead-block">
-              <div class="label">Company</div>
+              <div class="label">{{ labels.section_company or "Company" }}</div>
               <div class="value">{{ lead.company or 'N/A' }}</div>
-              <div class="lead-meta">Size: <span class="value">{{ lead.companySize or 'N/A' }}</span></div>
+              <div class="lead-meta">{{ labels.label_company_size or "Size" }}: <span class="value">{{ lead.companySize or 'N/A' }}</span></div>
             </div>
             <div class="lead-block">
-              <div class="label">Contact</div>
+              <div class="label">{{ labels.section_contact or "Contact" }}</div>
               <div class="value">{{ lead.phone or 'N/A' }}</div>
-              <div class="lead-meta">Email: <span class="value">{{ lead.email or 'N/A' }}</span></div>
+              <div class="lead-meta">{{ labels.label_email or "Email" }}: <span class="value">{{ lead.email or 'N/A' }}</span></div>
             </div>
             <div class="lead-block">
-              <div class="label">Workspaces + Tasks</div>
-              <div class="lead-meta">Workspaces: <span class="value">{{ lead.stats.workspaces }}</span></div>
-              <div class="lead-meta">Tasks: <span class="value">{{ lead.stats.tasks }}</span></div>
+              <div class="label">{{ labels.section_workspaces_tasks or "Workspaces + Tasks" }}</div>
+              <div class="lead-meta">{{ labels.label_workspaces or "Workspaces" }}: <span class="value">{{ lead.stats.workspaces }}</span></div>
+              <div class="lead-meta">{{ labels.label_tasks or "Tasks" }}: <span class="value">{{ lead.stats.tasks }}</span></div>
             </div>
             <div class="lead-block">
-              <div class="label">Activity</div>
-              <div class="lead-meta">Messages: <span class="value">{{ lead.stats.messages }}</span></div>
-              <div class="lead-meta">Workpoints: <span class="value">{{ lead.stats.workpoints }}</span></div>
-              <div class="lead-meta">Leaves: <span class="value">{{ lead.stats.leaves }}</span></div>
+              <div class="label">{{ labels.section_activity or "Activity" }}</div>
+              <div class="lead-meta">{{ labels.label_messages or "Messages" }}: <span class="value">{{ lead.stats.messages }}</span></div>
+              <div class="lead-meta">{{ labels.label_workpoints or "Workpoints" }}: <span class="value">{{ lead.stats.workpoints }}</span></div>
+              <div class="lead-meta">{{ labels.label_leaves or "Leaves" }}: <span class="value">{{ lead.stats.leaves }}</span></div>
             </div>
             <div class="lead-block">
-              <div class="label">Balance</div>
+              <div class="label">{{ labels.section_balance or "Balance" }}</div>
               <div class="value">{{ lead.balance_amount or '0' }}</div>
             </div>
             <div class="lead-block">
-              <div class="label">Dates</div>
-              <div class="lead-meta">Created: <span class="value">{{ lead.createdAt }}</span></div>
-              <div class="lead-meta">Updated: <span class="value">{{ lead.updatedAt }}</span></div>
-              <div class="lead-meta">Expires: <span class="value" style="color: #c0392b;">{{ lead.expiredAt }}</span></div>
+              <div class="label">{{ labels.section_dates or "Dates" }}</div>
+              <div class="lead-meta">{{ labels.label_created or "Created" }}: <span class="value">{{ lead.createdAt }}</span></div>
+              <div class="lead-meta">{{ labels.label_updated or "Updated" }}: <span class="value">{{ lead.updatedAt }}</span></div>
+              <div class="lead-meta">{{ labels.label_expires or "Expires" }}: <span class="value" style="color: #c0392b;">{{ lead.expiredAt }}</span></div>
             </div>
           </div>
         </div>
@@ -565,56 +585,62 @@
     <div class="modal-dialog modal-lg modal-dialog-centered">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title">Lead Details</h5>
+          <h5 class="modal-title">{{ labels.modal_title or "Lead Details" }}</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
           <div class="detail-meta mb-3">
-            <div>Lead: <strong id="detailLeadName">N/A</strong></div>
-            <div>Company: <strong id="detailLeadCompany">N/A</strong></div>
+            <div>{{ labels.modal_lead or "Lead" }}: <strong id="detailLeadName">N/A</strong></div>
+            <div>{{ labels.modal_company or "Company" }}: <strong id="detailLeadCompany">N/A</strong></div>
           </div>
           <div class="row g-3">
             <div class="col-md-6">
               <div class="lead-block">
-                <div class="label">User Counts</div>
+                <div class="label">{{ labels.modal_user_counts or "User Counts" }}</div>
                 <div class="detail-meta">
                   <div class="big-number" id="detailUsersTotal">0</div>
-                  <div>Total Users</div>
-                  <div>Staff Users: <strong id="detailUsersStaff">0</strong></div>
-                  <div>Customer Role: <strong id="detailUsersCustomerRole">0</strong></div>
-                  <div>Customer Table: <strong id="detailCustomers">0</strong></div>
+                  <div>{{ labels.modal_total_users or "Total Users" }}</div>
+                  <div>{{ labels.modal_staff_users or "Staff Users" }}: <strong id="detailUsersStaff">0</strong></div>
+                  <div>{{ labels.modal_customer_role or "Customer Role" }}: <strong id="detailUsersCustomerRole">0</strong></div>
+                  <div>{{ labels.modal_customer_table or "Customer Table" }}: <strong id="detailCustomers">0</strong></div>
                 </div>
               </div>
             </div>
             <div class="col-md-6">
               <div class="lead-block">
-                <div class="label">Lead Records</div>
+                <div class="label">{{ labels.modal_lead_records or "Lead Records" }}</div>
                 <div class="detail-meta">
                   <div class="big-number" id="detailWorkspaces">0</div>
-                  <div>Workspaces</div>
-                  <div>Tasks: <strong id="detailTasks">0</strong></div>
-                  <div>Messages: <strong id="detailMessages">0</strong></div>
-                  <div>Workpoints: <strong id="detailWorkpoints">0</strong></div>
-                  <div>Leaves: <strong id="detailLeaves">0</strong></div>
+                  <div>{{ labels.label_workspaces or "Workspaces" }}</div>
+                  <div>{{ labels.label_tasks or "Tasks" }}: <strong id="detailTasks">0</strong></div>
+                  <div>{{ labels.label_messages or "Messages" }}: <strong id="detailMessages">0</strong></div>
+                  <div>{{ labels.label_workpoints or "Workpoints" }}: <strong id="detailWorkpoints">0</strong></div>
+                  <div>{{ labels.label_leaves or "Leaves" }}: <strong id="detailLeaves">0</strong></div>
                 </div>
               </div>
             </div>
             <div class="col-12">
               <div class="lead-block">
-                <div class="label">Last Activity</div>
+                <div class="label">{{ labels.modal_last_activity or "Last Activity" }}</div>
                 <div class="detail-meta">
-                  <div>Last Chat Message: <strong id="detailLastMessage">N/A</strong></div>
-                  <div>Last Workspace Update: <strong id="detailLastWorkspace">N/A</strong></div>
-                  <div>Last Task Update: <strong id="detailLastTask">N/A</strong></div>
-                  <div>Last User Update: <strong id="detailLastUser">N/A</strong></div>
-                  <div>Last Workpoint Update: <strong id="detailLastWorkpoint">N/A</strong></div>
+                  <div>{{ labels.modal_last_message or "Last Chat Message" }}: <strong id="detailLastMessage">N/A</strong></div>
+                  <div>{{ labels.modal_last_workspace or "Last Workspace Update" }}: <strong id="detailLastWorkspace">N/A</strong></div>
+                  <div>{{ labels.modal_last_task or "Last Task Update" }}: <strong id="detailLastTask">N/A</strong></div>
+                  <div>{{ labels.modal_last_user or "Last User Update" }}: <strong id="detailLastUser">N/A</strong></div>
+                  <div>{{ labels.modal_last_workpoint or "Last Workpoint Update" }}: <strong id="detailLastWorkpoint">N/A</strong></div>
                 </div>
+              </div>
+            </div>
+            <div class="col-12">
+              <div class="lead-block">
+                <div class="label">{{ labels.modal_asset_images or "Recent Assets" }}</div>
+                <div class="detail-images" id="detailAssetImages"></div>
               </div>
             </div>
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ labels.modal_close or "Close" }}</button>
         </div>
       </div>
     </div>
@@ -810,6 +836,22 @@
           document.getElementById('detailLastTask').textContent = formatDate(stats.last_task_at);
           document.getElementById('detailLastUser').textContent = formatDate(stats.last_user_at);
           document.getElementById('detailLastWorkpoint').textContent = formatDate(stats.last_workpoint_at);
+
+          const detailImages = document.getElementById('detailAssetImages');
+          if (detailImages) {
+            detailImages.innerHTML = '';
+            const images = Array.isArray(stats.preview_images) ? stats.preview_images : [];
+            if (images.length === 0) {
+              detailImages.textContent = 'N/A';
+            } else {
+              images.forEach(src => {
+                const img = document.createElement('img');
+                img.src = src;
+                img.alt = 'asset';
+                detailImages.appendChild(img);
+              });
+            }
+          }
 
           detailModal.show();
         });

@@ -1,4 +1,6 @@
 from flask import Blueprint, render_template, request
+import json
+import os
 from sqlalchemy import cast, func, Integer, or_
 
 from models import (
@@ -25,6 +27,13 @@ def admin_leads():
     page = request.args.get("page", 1, type=int)
     query_text = request.args.get("q", "").strip()
     per_page = 50
+
+    labels_path = os.path.join(os.path.dirname(__file__), "..", "config", "lead_dashboard_labels.json")
+    try:
+        with open(labels_path, "r", encoding="utf-8") as handle:
+            labels = json.load(handle)
+    except (OSError, json.JSONDecodeError):
+        labels = {}
 
     assignable_users = User.query.filter(
         User.role_id == -2,
@@ -98,6 +107,22 @@ def admin_leads():
             .all()
         )
 
+    def _is_image(path_value):
+        if not path_value:
+            return False
+        lower = path_value.lower()
+        return lower.endswith((".png", ".jpg", ".jpeg", ".gif", ".webp"))
+
+    def _unique_keep_order(items):
+        seen = set()
+        result = []
+        for item in items:
+            if item in seen:
+                continue
+            seen.add(item)
+            result.append(item)
+        return result
+
     total_users_by_lead = _count_by_lead(User)
     employee_users_by_lead = dict(
         db.session.query(User.lead_id, func.count())
@@ -131,6 +156,58 @@ def admin_leads():
     last_user_at = _max_by_lead(User, User.updatedAt)
     last_workpoint_at = _max_by_lead(Workpoint, Workpoint.updatedAt)
 
+    message_images_by_lead = {}
+    if lead_ids:
+        message_rows = (
+            db.session.query(Message.lead_id, Message.file_url, Message.thumb_url)
+            .filter(Message.lead_id.in_(lead_ids))
+            .all()
+        )
+        for lead_id, file_url, thumb_url in message_rows:
+            if not _is_image(file_url):
+                continue
+            message_images_by_lead.setdefault(lead_id, []).append(thumb_url or file_url)
+
+    task_asset_map = {}
+    if lead_ids:
+        task_rows = (
+            db.session.query(Task.lead_id, Task.assets)
+            .filter(Task.lead_id.in_(lead_ids))
+            .all()
+        )
+        asset_ids = set()
+        for lead_id, assets in task_rows:
+            if not assets:
+                continue
+            if isinstance(assets, list):
+                for asset_id in assets:
+                    if isinstance(asset_id, str):
+                        task_asset_map.setdefault(lead_id, []).append(asset_id)
+                        asset_ids.add(asset_id)
+        asset_images_by_message = {}
+        if asset_ids:
+            asset_rows = (
+                db.session.query(Message.message_id, Message.file_url, Message.thumb_url)
+                .filter(Message.message_id.in_(asset_ids))
+                .all()
+            )
+            for message_id, file_url, thumb_url in asset_rows:
+                if not _is_image(file_url):
+                    continue
+                asset_images_by_message[message_id] = thumb_url or file_url
+
+        asset_images_by_lead = {}
+        for lead_id, message_ids in task_asset_map.items():
+            urls = []
+            for message_id in message_ids:
+                url = asset_images_by_message.get(message_id)
+                if url:
+                    urls.append(url)
+            if urls:
+                asset_images_by_lead[lead_id] = urls
+    else:
+        asset_images_by_lead = {}
+
     leads_data = []
     for lead in pagination.items:
         lead_dict = lead.tdict()
@@ -150,6 +227,9 @@ def admin_leads():
             "last_task_at": last_task_at.get(lead.id),
             "last_user_at": last_user_at.get(lead.id),
             "last_workpoint_at": last_workpoint_at.get(lead.id),
+            "preview_images": _unique_keep_order(
+                (message_images_by_lead.get(lead.id, []) + asset_images_by_lead.get(lead.id, []))
+            )[:5],
         }
         leads_data.append(lead_dict)
 
@@ -171,4 +251,5 @@ def admin_leads():
         page=page,
         total_pages=pagination.pages,
         query_text=query_text,
+        labels=labels,
     )
