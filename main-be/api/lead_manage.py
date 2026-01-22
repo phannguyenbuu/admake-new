@@ -127,26 +127,21 @@ def admin_leads():
         seen = set()
         result = []
         for item in items:
-            key = (item.get("thumb"), item.get("full"))
-            if key in seen:
+            if item in seen:
                 continue
-            seen.add(key)
+            seen.add(item)
             result.append(item)
         return result
 
     def _add_image(target_map, lead_id, thumb_url, full_url):
         if not lead_id:
             return
-        thumb_ok = _is_image(thumb_url)
         full_ok = _is_image(full_url)
-        if not thumb_ok and not full_ok:
+        if not full_ok:
             return
-        target_map.setdefault(lead_id, []).append(
-            {
-                "thumb": thumb_url if thumb_ok else None,
-                "full": full_url if full_ok else None,
-            }
-        )
+        if full_url and os.path.basename(full_url).lower().startswith("thumb_"):
+            return
+        target_map.setdefault(lead_id, []).append(full_url)
 
     total_users_by_lead = _count_by_lead(User)
     employee_users_by_lead = dict(
@@ -218,7 +213,7 @@ def admin_leads():
             )
             if lead_id not in lead_ids:
                 continue
-            _add_image(message_images_by_lead, lead_id, thumb_url, file_url)
+            _add_image(message_images_by_lead, lead_id, None, file_url)
 
     task_icon_by_lead = {}
     if lead_ids:
@@ -231,7 +226,7 @@ def admin_leads():
             resolved_lead_id = lead_id or workspace_lead_map.get(workspace_id)
             if resolved_lead_id not in lead_ids:
                 continue
-            _add_image(task_icon_by_lead, resolved_lead_id, icon, icon)
+            _add_image(task_icon_by_lead, resolved_lead_id, None, icon)
 
     task_asset_map = {}
     if lead_ids:
@@ -259,20 +254,19 @@ def admin_leads():
                 .all()
             )
             for message_id, file_url, thumb_url in asset_rows:
-                if not (_is_image(file_url) or _is_image(thumb_url)):
+                if not _is_image(file_url):
                     continue
-                asset_images_by_message[message_id] = {
-                    "thumb": thumb_url if _is_image(thumb_url) else None,
-                    "full": file_url if _is_image(file_url) else None,
-                }
+                if file_url and os.path.basename(file_url).lower().startswith("thumb_"):
+                    continue
+                asset_images_by_message[message_id] = file_url
 
         asset_images_by_lead = {}
         for lead_id, message_ids in task_asset_map.items():
             urls = []
             for message_id in message_ids:
-                payload = asset_images_by_message.get(message_id)
-                if payload:
-                    urls.append(payload)
+                url = asset_images_by_message.get(message_id)
+                if url:
+                    urls.append(url)
             if urls:
                 asset_images_by_lead[lead_id] = urls
     else:
@@ -303,7 +297,7 @@ def admin_leads():
                     + asset_images_by_lead.get(lead.id, [])
                     + task_icon_by_lead.get(lead.id, [])
                 )
-            ),
+            )[:8],
         }
         leads_data.append(lead_dict)
 
