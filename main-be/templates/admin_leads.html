@@ -336,16 +336,24 @@
 
     .detail-images {
       display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
+      gap: 10px;
+      overflow-x: auto;
+      padding-bottom: 6px;
+      scrollbar-width: thin;
+    }
+
+    .detail-images a {
+      flex: 0 0 auto;
+      display: inline-flex;
     }
 
     .detail-images img {
-      width: 84px;
+      width: 110px;
       height: 84px;
       object-fit: cover;
       border-radius: 10px;
       border: 1px solid rgba(15, 23, 42, 0.08);
+      background: #ffffff;
     }
 
     .toggle-icon {
@@ -845,15 +853,19 @@
               detailImages.textContent = 'N/A';
             } else {
               images.forEach(src => {
-                const img = document.createElement('img');
                 const normalized = String(src || '');
-                if (normalized.startsWith('http') || normalized.startsWith('/')) {
-                  img.src = normalized;
-                } else {
-                  img.src = `${window.location.origin}/static/${normalized}`;
-                }
+                const url = normalized.startsWith('http') || normalized.startsWith('/')
+                  ? normalized
+                  : `${window.location.origin}/static/${normalized}`;
+                const link = document.createElement('a');
+                link.href = url;
+                link.target = '_blank';
+                link.rel = 'noopener noreferrer';
+                const img = document.createElement('img');
+                img.src = url;
                 img.alt = 'asset';
-                detailImages.appendChild(img);
+                link.appendChild(img);
+                detailImages.appendChild(link);
               });
             }
           }

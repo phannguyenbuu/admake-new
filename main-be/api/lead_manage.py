@@ -279,7 +279,7 @@ def admin_leads():
                     + asset_images_by_lead.get(lead.id, [])
                     + task_icon_by_lead.get(lead.id, [])
                 )
-            )[:5],
+            ),
         }
         leads_data.append(lead_dict)
 
