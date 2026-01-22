@@ -736,6 +736,7 @@ class LeadPayload(BaseModel):
     companySize = db.Column(db.String(50), nullable=True)
     expiredAt = db.Column(db.DateTime, default=datetime.datetime.utcnow)
     balance_amount = db.Column(db.Float)
+    level = db.Column(db.Integer, default=0)
 
     isInvited = db.Column(db.Boolean, default = False)
     isActivated = db.Column(db.Boolean, default = False)

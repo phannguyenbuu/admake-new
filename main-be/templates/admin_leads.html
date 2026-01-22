@@ -3,293 +3,543 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Admin Leads</title>
+  <title>Lead Management Dashboard</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
 
+  <style>
+    :root {
+      --ink-900: #111217;
+      --ink-700: #2c2f3a;
+      --ink-500: #5b6270;
+      --paper: #f7f2ea;
+      --accent: #0aa3a6;
+      --accent-deep: #0b7f86;
+      --card: #ffffff;
+      --shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
+    }
 
-    <style>
-        table.table-striped.table-bordered tbody tr {
-            max-height: 30px; /* gi §œm chi ¯?u cao hAÿng */
-        }
-        table.table-striped.table-bordered tbody tr td,
-        table.table-striped.table-bordered tbody tr th {
-            padding-top: 0px;
-            padding-bottom: 0px;
-            vertical-align: middle;
-        }
-        table.table-striped.table-bordered tbody tr td p {
-            margin: 0;
-            font-size: 12px; /* gi §œm c ¯­ ch ¯_ trong th §¯ p */
-        }
-    </style>
+    body {
+      font-family: "IBM Plex Sans", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background: radial-gradient(circle at top left, #f3efe5 0%, #f7f2ea 45%, #f0f6f5 100%);
+      color: var(--ink-900);
+      min-height: 100vh;
+    }
+
+    .topbar {
+      background: linear-gradient(110deg, #0aa3a6, #0dc2b3 45%, #0e8a92 100%);
+      color: #ffffff;
+      padding: 18px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 8px 22px rgba(10, 163, 166, 0.25);
+    }
+
+    .topbar h1 {
+      font-family: "Space Grotesk", "Trebuchet MS", sans-serif;
+      font-size: 22px;
+      margin: 0;
+      letter-spacing: 0.5px;
+    }
+
+    .topbar .badge {
+      background: rgba(255, 255, 255, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      font-weight: 500;
+      padding: 6px 12px;
+    }
+
+    .page {
+      padding: 24px 24px 40px;
+    }
+
+    .hero {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .hero h2 {
+      font-family: "Space Grotesk", "Trebuchet MS", sans-serif;
+      font-size: 28px;
+      margin: 0;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .stat-card {
+      background: var(--card);
+      border-radius: 16px;
+      padding: 16px 18px;
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(15, 23, 42, 0.06);
+    }
+
+    .stat-card h3 {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1.4px;
+      color: var(--ink-500);
+      margin: 0 0 10px;
+    }
+
+    .stat-card p {
+      font-family: "Space Grotesk", "Trebuchet MS", sans-serif;
+      font-size: 22px;
+      margin: 0;
+    }
+
+    .lead-list {
+      display: grid;
+      gap: 18px;
+    }
+
+    .lead-card {
+      background: var(--card);
+      border-radius: 18px;
+      padding: 18px 20px;
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(15, 23, 42, 0.06);
+      display: grid;
+      gap: 16px;
+      animation: fadeUp 0.6s ease both;
+      animation-delay: calc(var(--i, 0) * 40ms);
+    }
+
+    .lead-header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .lead-id {
+      font-family: "Space Grotesk", "Trebuchet MS", sans-serif;
+      font-size: 16px;
+      color: var(--ink-700);
+    }
+
+    .lead-status {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      font-size: 13px;
+      color: var(--ink-500);
+    }
+
+    .lead-status label {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .lead-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 14px 20px;
+    }
+
+    .lead-block {
+      background: #f6f8f9;
+      border-radius: 14px;
+      padding: 12px 14px;
+      border: 1px solid rgba(12, 74, 110, 0.08);
+    }
+
+    .lead-block .label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: var(--ink-500);
+      margin-bottom: 6px;
+    }
+
+    .lead-block .value {
+      font-size: 14px;
+      color: var(--ink-900);
+      font-weight: 500;
+      word-break: break-word;
+    }
+
+    .lead-meta {
+      display: grid;
+      gap: 6px;
+      font-size: 12px;
+      color: var(--ink-500);
+    }
+
+    .lead-meta .value {
+      color: var(--ink-900);
+      font-weight: 500;
+    }
+
+    .select-user {
+      display: grid;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .select-user select {
+      font-size: 13px;
+    }
+
+    .password-display {
+      font-size: 12px;
+      color: #c0392b;
+      margin: 0;
+      min-height: 14px;
+    }
+
+    .level-stars {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .level-star {
+      border: 1px solid rgba(15, 23, 42, 0.2);
+      border-radius: 10px;
+      width: 30px;
+      height: 30px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      background: #ffffff;
+    }
+
+    .level-star svg {
+      width: 16px;
+      height: 16px;
+      fill: #cbd5e1;
+    }
+
+    .level-star.is-selected {
+      border-color: var(--accent);
+      background: rgba(10, 163, 166, 0.12);
+    }
+
+    .level-star.is-selected svg {
+      fill: var(--accent);
+    }
+
+    .level-value {
+      font-size: 12px;
+      color: var(--ink-500);
+      margin-left: 6px;
+    }
+
+    .pagination {
+      margin-top: 28px;
+    }
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(12px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (max-width: 720px) {
+      .topbar {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+      }
+
+      .lead-status {
+        flex-wrap: wrap;
+      }
+    }
+  </style>
 </head>
 <body>
-  
-    <div class="container-fluid" style="padding: 20px;background-color: #00B4B6;color:#fff">
-      <a class="navbar-brand" href="#">ADMAKE ADMIN</a>
-    </div>
-  
-  <div class="container mt-4">
-    <h1 class="mb-4">Danh sA­ch khA­ch hAÿng</h1>
-            <table class="table table-striped table-bordered table-sm">
-      <thead class="table-light" style="background-color: #00B4B6;">
-        <tr>
-          <th style="width: 30px;">
-            Inv
-          </th>
-          <th style="width: 30px;">
-            Act
-          </th>
-          <th>ID</th>
-          <th style="width:200px">H ¯? vAÿ tA¦n</th>
-          <th style="width:200px">Username ({{total_users}})</th>
-          <th style="width:200px">CA'ng ty</th>
-          
-          <th>LiA¦n h ¯Ø</th>
-          <th style="width:200px">Nhu c §u</th>
-          
-          <!-- <th style="width:200px; font-size:10px">Quy mA' cA'ng ty</th> -->
-          <th style="width:100px">S ¯` d’ø</th>
-          <th style="width:200px; font-size:10px">NgAÿy Ž`ŽŸng kA«/gia h §­n/h §¨t h §­n</th>
-          
-        </tr>
-      </thead>
-      <tbody>
-        {% for lead in leads %}
-        <tr>
-          <td>
-            <input type="checkbox" name="selected_leads" value="{{ lead.id }}" {% if lead.isInvited %}checked{% endif %} />
-          </td>
-          <td>
-            <input type="checkbox" name="activated_leads" value="{{ lead.id }}" {% if lead.isActivated %}checked{% endif %} />
-          </td>
-          <td>{{ lead.id }}</td>
-          <td>{{ lead.name }}</td>
+  <header class="topbar">
+    <h1>ADMAKE Lead Management</h1>
+    <span class="badge">Admin View</span>
+  </header>
 
-         <td>
-          <div style="display: flex; flex-direction: column; gap: 10px; align-items: center;">
-              <!-- Hi ¯Ÿn th ¯< username Ž?AŸ GA?N - KHA"NG DATNG BREAK -->
-              <!-- {% if lead.user_id_str %}
-                  {% for user in users %}
-                      {% if user.id|string == lead.user_id_str %}
-                      <p style="font-size: 10px; margin: 0; color: #00B4B6; font-weight: bold;">
-                          {{ user.username }}
-                      </p>
-                      {% endif %}
-                  {% endfor %}
-              {% endif %} -->
-              
-              <!-- DROPDOWN -->
-              <select class="form-select form-select-sm" name="status-{{ lead.id }}"
-                      id="select-{{ lead.id }}" data-lead-id="{{ lead.id }}">
-                  <option value="">-- Ch ¯?n user --</option>
-                  {% for user in users %}
-                  <option value="{{ user.id }}" 
-                          data-username="{{ user.username }}" 
-                          data-password="{{ user.password }}"
-                          {% if user.id|string == lead.user_id_str %}selected{% endif %}>
-                      {{ user.username }}
-                  </option>
-                  {% endfor %}
-              </select>
-              
-              <!-- ƒo. C §› 2 DISPLAY -->
-              <!-- <p id="username-display-{{ lead.id }}" style="font-size: 10px; margin: 0;"></p> -->
-              <p id="password-display-{{ lead.id }}" style="font-size: 10px; color:red; margin: 0;"></p>
+  <main class="page">
+    <section class="hero">
+      <div>
+        <h2>Lead Overview</h2>
+        <p class="text-muted mb-0">Compact dashboard view with live assignments and status flags.</p>
+      </div>
+    </section>
+
+    <section class="stats">
+      <div class="stat-card">
+        <h3>Total Leads</h3>
+        <p>{{ leads|length }}</p>
+      </div>
+      <div class="stat-card">
+        <h3>Assignable Users</h3>
+        <p>{{ total_users }}</p>
+      </div>
+    </section>
+
+    <section class="lead-list">
+      {% for lead in leads %}
+      <article class="lead-card" style="--i: {{ loop.index0 }};">
+        <div class="lead-header">
+          <div class="lead-id">Lead #{{ lead.id }}</div>
+          <div class="lead-status">
+            <label>
+              <input type="checkbox" name="selected_leads" value="{{ lead.id }}" {% if lead.isInvited %}checked{% endif %} />
+              Invited
+            </label>
+            <label>
+              <input type="checkbox" name="activated_leads" value="{{ lead.id }}" {% if lead.isActivated %}checked{% endif %} />
+              Active
+            </label>
           </div>
-      </td>
+        </div>
 
-          <td>
-            <p>{{ lead.company }}</p>
-            <p style="font-size:10px">{{ lead.companySize }}</p>
-          </td>
-          
-          <td>
-            <p>{{ lead.phone }}</p>
-            <p style="font-size:10px;text-transform: lowercase;">{{ lead.email }}</p>
-          </td>
-          
-          <td>
-            <p>{{ lead.industry }}</p>
-            <p style="font-size:10px">{{ lead.description }}</p>
-          </td>
-          
-          <td>{{ lead.balance_amount }}</td>
-          <td>
-            <p>{{ lead.createdAt }}</p>
-            <p>{{ lead.updatedAt }}</p>
-            <p style="color:red; font-weight:700">{{ lead.expiredAt }}</p>
-          </td>
+        <div class="lead-grid">
+          <div class="lead-block">
+            <div class="label">Lead Name</div>
+            <div class="value">{{ lead.name or 'N/A' }}</div>
+          </div>
+          <div class="lead-block select-user">
+            <div class="label">Assigned User ({{ total_users }})</div>
+            <select class="form-select form-select-sm" name="status-{{ lead.id }}"
+                    id="select-{{ lead.id }}" data-lead-id="{{ lead.id }}">
+              <option value="">-- Select user --</option>
+              {% for user in users %}
+              <option value="{{ user.id }}"
+                      data-username="{{ user.username }}"
+                      data-password="{{ user.password }}"
+                      {% if user.id|string == lead.user_id_str %}selected{% endif %}>
+                {{ user.username }}
+              </option>
+              {% endfor %}
+            </select>
+            <p id="password-display-{{ lead.id }}" class="password-display"></p>
+          </div>
+          <div class="lead-block">
+            <div class="label">Lead Level</div>
+            <div class="level-control" data-lead-id="{{ lead.id }}" data-level="{{ lead.level or 0 }}">
+              <div class="level-stars">
+                {% for lvl in range(0, 4) %}
+                <button type="button" class="level-star {% if (lead.level or 0) == lvl %}is-selected{% endif %}"
+                        data-level="{{ lvl }}" aria-label="Level {{ lvl }}">
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M12 2.6l2.6 5.3 5.9.9-4.3 4.2 1 5.9-5.2-2.8-5.2 2.8 1-5.9-4.3-4.2 5.9-.9L12 2.6z" />
+                  </svg>
+                </button>
+                {% endfor %}
+                <span class="level-value">Level {{ lead.level or 0 }}</span>
+              </div>
+            </div>
+          </div>
+          <div class="lead-block">
+            <div class="label">Company</div>
+            <div class="value">{{ lead.company or 'N/A' }}</div>
+            <div class="lead-meta">Size: <span class="value">{{ lead.companySize or 'N/A' }}</span></div>
+          </div>
+          <div class="lead-block">
+            <div class="label">Contact</div>
+            <div class="value">{{ lead.phone or 'N/A' }}</div>
+            <div class="lead-meta">Email: <span class="value">{{ lead.email or 'N/A' }}</span></div>
+          </div>
+          <div class="lead-block">
+            <div class="label">Industry</div>
+            <div class="value">{{ lead.industry or 'N/A' }}</div>
+            <div class="lead-meta">Need: <span class="value">{{ lead.description or 'N/A' }}</span></div>
+          </div>
+          <div class="lead-block">
+            <div class="label">Balance</div>
+            <div class="value">{{ lead.balance_amount or '0' }}</div>
+          </div>
+          <div class="lead-block">
+            <div class="label">Dates</div>
+            <div class="lead-meta">Created: <span class="value">{{ lead.createdAt }}</span></div>
+            <div class="lead-meta">Updated: <span class="value">{{ lead.updatedAt }}</span></div>
+            <div class="lead-meta">Expires: <span class="value" style="color: #c0392b;">{{ lead.expiredAt }}</span></div>
+          </div>
+        </div>
+      </article>
+      {% endfor %}
+    </section>
 
-          <!-- C ¯~T DROPDOWN -->
-          <!-- TH §§ DROPDOWN (thay th §¨ hoAÿn toAÿn td dropdown cc) -->
-          <!-- TH §§ DROPDOWN (thay th §¨ hoAÿn toAÿn td dropdown cc) -->
-         <!-- C ¯~T DROPDOWN - THAY TH §_ HOA?N TOA?N -->
-      
+    <nav aria-label="Page navigation">
+      <ul class="pagination justify-content-center">
+        {% if page > 1 %}
+        <li class="page-item">
+          <a class="page-link" href="?page={{ page - 1 }}" aria-label="Previous">
+            <span aria-hidden="true">&laquo;</span>
+          </a>
+        </li>
+        {% endif %}
 
-
-
-
-
-          
-        </tr>
+        {% for p in range(1, total_pages + 1) %}
+        <li class="page-item {% if p == page %}active{% endif %}">
+          <a class="page-link" href="?page={{ p }}">{{ p }}</a>
+        </li>
         {% endfor %}
-      </tbody>
-    </table>
 
-    <!-- PhA›n trang -->
-    <nav aria-label="Page navigation example">
-     <ul class="pagination justify-content-center">
-      {% if page > 1 %}
-       <li class="page-item">
-        <a class="page-link" href="?page={{ page - 1 }}" aria-label="Previous">
-         <span aria-hidden="true">&laquo;</span>
-        </a>
-       </li>
-      {% endif %}
-
-      {% for p in range(1, total_pages + 1) %}
-            <li class="page-item {% if p == page %}active{% endif %}">
-                <a class="page-link" href="?page={{ p }}">{{ p }}</a>
-            </li>
-            {% endfor %}
-
-
-      {% if page < total_pages %}
-       <li class="page-item">
-        <a class="page-link" href="?page={{ page + 1 }}" aria-label="Next">
-         <span aria-hidden="true">&raquo;</span>
-        </a>
-       </li>
-      {% endif %}
-     </ul>
+        {% if page < total_pages %}
+        <li class="page-item">
+          <a class="page-link" href="?page={{ page + 1 }}" aria-label="Next">
+            <span aria-hidden="true">&raquo;</span>
+          </a>
+        </li>
+        {% endif %}
+      </ul>
     </nav>
-  </div>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  </main>
 
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
   <script>
     document.addEventListener("DOMContentLoaded", function() {
-      // L §y t §t c §œ checkbox trong b §œng
       const checkboxes = document.querySelectorAll("input[name='selected_leads']");
 
       checkboxes.forEach(chk => {
         chk.addEventListener('change', function() {
           const leadId = this.value;
-          
+
           fetch(`https://go.admake.vn/api/lead/${leadId}/check`, {
             method: 'PUT',
             headers: {
               'Content-Type': 'application/json',
-              // N §¨u c §n xA­c th ¯ñc token bearer ho §úc khA­c thAª thA¦m  ¯Y Ž`A›y
             },
             body: JSON.stringify({ isInvited: this.checked })
           })
           .then(response => {
             if (!response.ok) {
-              throw new Error('L ¯-i khi g ¯-i d ¯_ li ¯Øu');
+              throw new Error('Update failed');
             }
             return response.json();
           })
           .then(data => {
-            console.log('Ph §œn h ¯"i t ¯® server:', data);
-            // CA3 th ¯Ÿ thA¦m thA'ng bA­o thAÿnh cA'ng ho §úc c §-p nh §-t UI
+            console.log('Updated invited status:', data);
           })
           .catch(error => {
-            console.error('L ¯-i:', error);
-            // CA3 th ¯Ÿ thA'ng bA­o l ¯-i ng’ø ¯?i dA1ng
+            console.error('Update error:', error);
           });
         });
       });
 
+      const activatedCheckboxes = document.querySelectorAll("input[name='activated_leads']");
 
-
-      const ativatedCheckboxes = document.querySelectorAll("input[name='activated_leads']");
-
-      ativatedCheckboxes.forEach(chk => {
+      activatedCheckboxes.forEach(chk => {
         chk.addEventListener('change', function() {
           const leadId = this.value;
-          
+
           fetch(`https://go.admake.vn/api/lead/${leadId}/activate`, {
             method: 'PUT',
             headers: {
               'Content-Type': 'application/json',
-              // N §¨u c §n xA­c th ¯ñc token bearer ho §úc khA­c thAª thA¦m  ¯Y Ž`A›y
             },
             body: JSON.stringify({ isActivated: this.checked })
           })
           .then(response => {
             if (!response.ok) {
-              throw new Error('L ¯-i khi g ¯-i d ¯_ li ¯Øu');
+              throw new Error('Update failed');
             }
             return response.json();
           })
           .then(data => {
-            console.log('Ph §œn h ¯"i t ¯® server:', data);
-            // CA3 th ¯Ÿ thA¦m thA'ng bA­o thAÿnh cA'ng ho §úc c §-p nh §-t UI
+            console.log('Updated activation status:', data);
           })
           .catch(error => {
-            console.error('L ¯-i:', error);
-            // CA3 th ¯Ÿ thA'ng bA­o l ¯-i ng’ø ¯?i dA1ng
+            console.error('Update error:', error);
+          });
+        });
+      });
+
+      const levelControls = document.querySelectorAll('.level-control');
+
+      levelControls.forEach(control => {
+        const leadId = control.dataset.leadId;
+        const valueLabel = control.querySelector('.level-value');
+        const buttons = control.querySelectorAll('.level-star');
+
+        buttons.forEach(button => {
+          button.addEventListener('click', function() {
+            const level = Number(this.dataset.level);
+
+            fetch(`https://go.admake.vn/api/lead/${leadId}/level`, {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ level: level })
+            })
+            .then(response => {
+              if (!response.ok) throw new Error('Update failed');
+              return response.json();
+            })
+            .then(() => {
+              buttons.forEach(btn => btn.classList.remove('is-selected'));
+              this.classList.add('is-selected');
+              if (valueLabel) {
+                valueLabel.textContent = `Level ${level}`;
+              }
+            })
+            .catch(error => {
+              console.error('Level update failed:', error);
+            });
           });
         });
       });
     });
   </script>
 
-
   <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const selects = document.querySelectorAll('select[id^="select-"]');
-    
-    selects.forEach(function(selectElem) {
-        const leadId = selectElem.dataset.leadId;
-        // const usernameDisplay = document.getElementById('username-display-' + leadId);
-        const passwordDisplay = document.getElementById('password-display-' + leadId);
-        
-        // ƒo. CHECK C §› 2 DISPLAY T ¯'N T §ÿI
-        if (!passwordDisplay) {
-            console.warn('ƒ?O Missing display elements for lead:', leadId);
-            return;
-        }
-        
-        // Load ban Ž` §u
-        if (selectElem.value) {
-            const selectedOption = selectElem.options[selectElem.selectedIndex];
-            // usernameDisplay.textContent = selectedOption.getAttribute('data-username');
-            passwordDisplay.textContent = selectedOption.getAttribute('data-password');
-        }
-        
-        // ƒo. CHANGE ƒ+' L’_U + DEBUG LOG
-        selectElem.addEventListener('change', function() {
-            const selectedOption = this.options[this.selectedIndex];
-            const userId = selectedOption.value;
-            console.log('dY", CHANGE:', leadId, 'ƒ+'', userId);
-            
-            // usernameDisplay.textContent = selectedOption.getAttribute('data-username') || '';
-            passwordDisplay.textContent = selectedOption.getAttribute('data-password') || '';
-            
-            fetch(`https://go.admake.vn/api/lead/${leadId}/assign-user`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ user_id: userId || null })
-            })
-            .then(response => {
-                console.log('dY"­ Status:', response.status);
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                return response.json();
-            })
-            .then(data => console.log('ƒo. L’øu OK:', data))
-            .catch(error => {
-                console.error('ƒ?O L ¯-i:', error);
-                this.value = '';
-                // usernameDisplay.textContent = '';
-                passwordDisplay.textContent = '';
-            });
-        });
-    });
-});
-</script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const selects = document.querySelectorAll('select[id^="select-"]');
 
+      selects.forEach(function(selectElem) {
+        const leadId = selectElem.dataset.leadId;
+        const passwordDisplay = document.getElementById('password-display-' + leadId);
+
+        if (!passwordDisplay) {
+          console.warn('Missing display elements for lead:', leadId);
+          return;
+        }
+
+        if (selectElem.value) {
+          const selectedOption = selectElem.options[selectElem.selectedIndex];
+          passwordDisplay.textContent = selectedOption.getAttribute('data-password');
+        }
+
+        selectElem.addEventListener('change', function() {
+          const selectedOption = this.options[this.selectedIndex];
+          const userId = selectedOption.value;
+          passwordDisplay.textContent = selectedOption.getAttribute('data-password') || '';
+
+          fetch(`https://go.admake.vn/api/lead/${leadId}/assign-user`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ user_id: userId || null })
+          })
+          .then(response => {
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            return response.json();
+          })
+          .then(data => console.log('Assigned user OK:', data))
+          .catch(error => {
+            console.error('Assign user failed:', error);
+            this.value = '';
+            passwordDisplay.textContent = '';
+          });
+        });
+      });
+    });
+  </script>
 </body>
 </html>

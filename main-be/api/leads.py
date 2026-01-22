@@ -57,6 +57,24 @@ def check_activate_lead(lead_id):
     
     return jsonify('isActivated done!'), 201
 
+@lead_bp.route("/<int:lead_id>/level", methods=["PUT"])
+def update_lead_level(lead_id):
+    data = request.get_json() or {}
+    level = data.get("level")
+    try:
+        level = int(level)
+    except (TypeError, ValueError):
+        return jsonify({"error": "Invalid level"}), 400
+    if level < 0 or level > 3:
+        return jsonify({"error": "Level must be between 0 and 3"}), 400
+
+    lead = db.session.get(LeadPayload, lead_id)
+    if not lead:
+        abort(404, description="No lead")
+    lead.level = level
+    db.session.commit()
+    return jsonify({"success": True, "level": level})
+
 @lead_bp.route("/<int:lead_id>", methods=["DELETE"])
 def delete_lead(lead_id):
     lead = LeadPayload.query.get(lead_id)

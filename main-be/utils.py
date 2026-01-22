@@ -2,21 +2,12 @@ import json
 from api.tasks import get_task_by_user_id
 from models import db, app, User,UserCanView, LeadPayload, Notify, Workpoint,Leave, WorkpointSetting, Customer, Material, Role, Message, Task, Workspace, generate_datetime_id
 from flask import Flask, request, jsonify
-from flask_sqlalchemy import SQLAlchemy
 import json
 # from datetime import datetime, date
 import datetime
 import os
 from flask_cors import CORS
 import random
-from sqlalchemy.types import JSON
-from sqlalchemy import inspect
-
-from sqlalchemy import create_engine, MetaData, Table, select, insert
-from sqlalchemy.sql import func, text
-from psycopg2.extras import Json
-from sqlalchemy import create_engine, inspect
-from sqlalchemy.orm.attributes import flag_modified
 
 def load_users():
     with open("json/users.json", "r", encoding="utf-8") as f:
@@ -1161,27 +1152,7 @@ if __name__ == "__main__":
     with app.app_context():
         db.create_all()
         
-        from sqlalchemy import and_
-        
-        # usr = db.session.get(UserCanView, "202511270319022765669c59df")
-        # print(usr.tdict())
-
-        # for user in User.query.filter(User.role_id == -2, User.fullName == 'Trần Thái Hòa').all():
-        #     db.session.delete(user)
-        
-        # db.session.commit()
-
-        # change_value_type("task",["icon"],"VARCHAR(255)")
-
-        # filtered_messages = Message.query.filter(
-        #     and_(
-        #         Message.user_id == '202511030113120675991ece01',
-        #         Message.type == "bonus-cash"
-        #     )
-        # ).all()
-
-        # for m in filtered_messages:
-        #     print(m.tdict())
+        alter_data("ALTER TABLE lead ADD COLUMN level INTEGER DEFAULT 0;")
 
         
                         
