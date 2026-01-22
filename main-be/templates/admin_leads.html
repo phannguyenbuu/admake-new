@@ -356,11 +356,22 @@
     .detail-gallery-controls {
       display: flex;
       align-items: center;
-      justify-content: flex-end;
+      justify-content: space-between;
       gap: 10px;
       margin-top: 10px;
       font-size: 12px;
       color: var(--ink-500);
+      width: 100%;
+    }
+
+    .detail-gallery-controls nav {
+      flex: 1 1 auto;
+    }
+
+    .detail-gallery-controls .pagination {
+      justify-content: center;
+      flex-wrap: wrap;
+      width: 100%;
     }
 
     .gallery-arrow {
@@ -917,6 +928,9 @@
             const img = document.createElement('img');
             img.src = url;
             img.alt = 'asset';
+            img.onerror = () => {
+              link.remove();
+            };
             link.appendChild(img);
             detailImages.appendChild(link);
           });
