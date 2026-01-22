@@ -1,7 +1,21 @@
 from flask import Blueprint, render_template, request
 from sqlalchemy import cast, func, Integer
 
-from models import LeadPayload, User
+from models import (
+    LeadPayload,
+    db,
+    User,
+    Workspace,
+    Task,
+    Message,
+    Workpoint,
+    Leave,
+    Notify,
+    Customer,
+    Material,
+    Role,
+    UsingHistoryData,
+)
 
 lead_manage_bp = Blueprint("lead_manage", __name__, url_prefix="/lead-manage")
 
@@ -11,7 +25,7 @@ def admin_leads():
     page = request.args.get("page", 1, type=int)
     per_page = 50
 
-    users = User.query.filter(
+    assignable_users = User.query.filter(
         User.role_id == -2,
         User.fullName.isnot(None),
         User.fullName != "",
@@ -35,15 +49,103 @@ def admin_leads():
         page=page, per_page=per_page, error_out=False
     )
 
+    lead_ids = [lead.id for lead in pagination.items]
+
+    totals = {
+        "leads": LeadPayload.query.count(),
+        "users": User.query.count(),
+        "workspaces": Workspace.query.count(),
+        "tasks": Task.query.count(),
+        "messages": Message.query.count(),
+        "workpoints": Workpoint.query.count(),
+        "leaves": Leave.query.count(),
+        "notifies": Notify.query.count(),
+        "customers": Customer.query.count(),
+        "materials": Material.query.count(),
+        "roles": Role.query.count(),
+        "using_history": UsingHistoryData.query.count(),
+    }
+
+    def _count_by_lead(model):
+        if not lead_ids:
+            return {}
+        return dict(
+            db.session.query(model.lead_id, func.count())
+            .filter(model.lead_id.in_(lead_ids))
+            .group_by(model.lead_id)
+            .all()
+        )
+
+    def _max_by_lead(model, column):
+        if not lead_ids:
+            return {}
+        return dict(
+            db.session.query(model.lead_id, func.max(column))
+            .filter(model.lead_id.in_(lead_ids))
+            .group_by(model.lead_id)
+            .all()
+        )
+
+    total_users_by_lead = _count_by_lead(User)
+    employee_users_by_lead = dict(
+        db.session.query(User.lead_id, func.count())
+        .filter(User.lead_id.in_(lead_ids), User.role_id > 0, User.role_id < 100)
+        .group_by(User.lead_id)
+        .all()
+    )
+    customer_role_by_lead = dict(
+        db.session.query(User.lead_id, func.count())
+        .filter(User.lead_id.in_(lead_ids), User.role_id == -1)
+        .group_by(User.lead_id)
+        .all()
+    )
+    customer_table_by_lead = dict(
+        db.session.query(User.lead_id, func.count(Customer.id))
+        .join(Customer, Customer.user_id == User.id)
+        .filter(User.lead_id.in_(lead_ids))
+        .group_by(User.lead_id)
+        .all()
+    )
+
+    workspace_by_lead = _count_by_lead(Workspace)
+    task_by_lead = _count_by_lead(Task)
+    message_by_lead = _count_by_lead(Message)
+    workpoint_by_lead = _count_by_lead(Workpoint)
+    leave_by_lead = _count_by_lead(Leave)
+
+    last_message_at = _max_by_lead(Message, Message.updatedAt)
+    last_workspace_at = _max_by_lead(Workspace, Workspace.updatedAt)
+    last_task_at = _max_by_lead(Task, Task.updatedAt)
+    last_user_at = _max_by_lead(User, User.updatedAt)
+    last_workpoint_at = _max_by_lead(Workpoint, Workpoint.updatedAt)
+
     leads_data = []
     for lead in pagination.items:
         lead_dict = lead.tdict()
         lead_dict["user_id_str"] = str(lead.user_id) if lead.user_id else None
+        lead_dict["stats"] = {
+            "users_total": total_users_by_lead.get(lead.id, 0),
+            "users_staff": employee_users_by_lead.get(lead.id, 0),
+            "users_customer_role": customer_role_by_lead.get(lead.id, 0),
+            "customers": customer_table_by_lead.get(lead.id, 0),
+            "workspaces": workspace_by_lead.get(lead.id, 0),
+            "tasks": task_by_lead.get(lead.id, 0),
+            "messages": message_by_lead.get(lead.id, 0),
+            "workpoints": workpoint_by_lead.get(lead.id, 0),
+            "leaves": leave_by_lead.get(lead.id, 0),
+            "last_message_at": last_message_at.get(lead.id),
+            "last_workspace_at": last_workspace_at.get(lead.id),
+            "last_task_at": last_task_at.get(lead.id),
+            "last_user_at": last_user_at.get(lead.id),
+            "last_workpoint_at": last_workpoint_at.get(lead.id),
+        }
         leads_data.append(lead_dict)
 
     return render_template(
         "admin_leads.html",
-        total_users=len(users),
+        total_users=len(assignable_users),
+        total_users_all=totals["users"],
+        totals=totals,
         users=[
             {
                 "fullName": "None",
@@ -51,7 +153,7 @@ def admin_leads():
                 "username": u.username,
                 "password": u.password,
             }
-            for u in users
+            for u in assignable_users
         ],
         leads=leads_data,
         page=page,

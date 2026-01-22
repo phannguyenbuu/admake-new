@@ -77,7 +77,7 @@ load_dotenv()  # load biến môi trường trong file .env vào process.env
 
 if __name__ == "__main__":
     port = int(os.environ.get('PORT', 6000))  # Lấy biến môi trường PORT hoặc mặc định 5000
-    debug = os.environ.get("FLASK_DEBUG", "0") == "1"
+    debug = True
     socketio.run(
         app,
         host="0.0.0.0",
