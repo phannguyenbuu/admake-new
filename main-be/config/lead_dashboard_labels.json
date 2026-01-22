@@ -53,5 +53,7 @@
   "modal_last_user": "Last User Update",
   "modal_last_workpoint": "Last Workpoint Update",
   "modal_asset_images": "Recent Assets",
+  "modal_gallery_prev": "Prev",
+  "modal_gallery_next": "Next",
   "modal_close": "Close"
 }

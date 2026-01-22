@@ -353,6 +353,16 @@
       background: #ffffff;
     }
 
+    .detail-gallery-controls {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 10px;
+      font-size: 12px;
+      color: var(--ink-500);
+    }
+
     .toggle-icon {
       display: inline-flex;
       width: 16px;
@@ -640,6 +650,15 @@
               <div class="lead-block">
                 <div class="label">{{ labels.modal_asset_images or "Recent Assets" }}</div>
                 <div class="detail-images" id="detailAssetImages"></div>
+                <div class="detail-gallery-controls">
+                  <span id="detailGalleryPage">1 / 1</span>
+                  <button type="button" class="btn btn-sm btn-outline-secondary" id="detailGalleryPrev">
+                    {{ labels.modal_gallery_prev or "Prev" }}
+                  </button>
+                  <button type="button" class="btn btn-sm btn-outline-secondary" id="detailGalleryNext">
+                    {{ labels.modal_gallery_next or "Next" }}
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -817,6 +836,77 @@
         return date.toLocaleString();
       }
 
+      let galleryImages = [];
+      let galleryPage = 1;
+      const galleryPageSize = 10;
+      const galleryPrev = document.getElementById('detailGalleryPrev');
+      const galleryNext = document.getElementById('detailGalleryNext');
+      const galleryPageLabel = document.getElementById('detailGalleryPage');
+
+      const normalizeUrl = (value) => {
+        if (!value) return '';
+        if (value.startsWith('http') || value.startsWith('/')) return value;
+        return `${window.location.origin}/static/${value}`;
+      };
+
+      const renderGallery = () => {
+        const detailImages = document.getElementById('detailAssetImages');
+        if (!detailImages) return;
+        detailImages.innerHTML = '';
+        const totalPages = Math.max(1, Math.ceil(galleryImages.length / galleryPageSize));
+        galleryPage = Math.min(galleryPage, totalPages);
+        const start = (galleryPage - 1) * galleryPageSize;
+        const end = start + galleryPageSize;
+        const slice = galleryImages.slice(start, end);
+
+        if (slice.length === 0) {
+          detailImages.textContent = 'N/A';
+        } else {
+          slice.forEach(entry => {
+            const url = normalizeUrl(String(entry || ''));
+            if (!url) return;
+            const link = document.createElement('a');
+            link.href = url;
+            link.target = '_blank';
+            link.rel = 'noopener noreferrer';
+            const img = document.createElement('img');
+            img.src = url;
+            img.alt = 'asset';
+            link.appendChild(img);
+            detailImages.appendChild(link);
+          });
+        }
+
+        if (galleryPageLabel) {
+          galleryPageLabel.textContent = `${galleryPage} / ${totalPages}`;
+        }
+        if (galleryPrev) {
+          galleryPrev.disabled = galleryPage <= 1;
+        }
+        if (galleryNext) {
+          galleryNext.disabled = galleryPage >= totalPages;
+        }
+      };
+
+      if (galleryPrev) {
+        galleryPrev.addEventListener('click', () => {
+          if (galleryPage > 1) {
+            galleryPage -= 1;
+            renderGallery();
+          }
+        });
+      }
+
+      if (galleryNext) {
+        galleryNext.addEventListener('click', () => {
+          const totalPages = Math.max(1, Math.ceil(galleryImages.length / galleryPageSize));
+          if (galleryPage < totalPages) {
+            galleryPage += 1;
+            renderGallery();
+          }
+        });
+      }
+
       detailButtons.forEach(btn => {
         btn.addEventListener('click', function() {
           if (!detailModal) return;
@@ -842,35 +932,9 @@
           document.getElementById('detailLastUser').textContent = formatDate(stats.last_user_at);
           document.getElementById('detailLastWorkpoint').textContent = formatDate(stats.last_workpoint_at);
 
-          const detailImages = document.getElementById('detailAssetImages');
-          if (detailImages) {
-            detailImages.innerHTML = '';
-            const images = Array.isArray(stats.preview_images) ? stats.preview_images : [];
-
-            const normalizeUrl = (value) => {
-              if (!value) return '';
-              if (value.startsWith('http') || value.startsWith('/')) return value;
-              return `${window.location.origin}/static/${value}`;
-            };
-
-            if (images.length === 0) {
-              detailImages.textContent = 'N/A';
-            } else {
-              images.forEach(entry => {
-                const url = normalizeUrl(String(entry || ''));
-                if (!url) return;
-                const link = document.createElement('a');
-                link.href = url;
-                link.target = '_blank';
-                link.rel = 'noopener noreferrer';
-                const img = document.createElement('img');
-                img.src = url;
-                img.alt = 'asset';
-                link.appendChild(img);
-                detailImages.appendChild(link);
-              });
-            }
-          }
+          galleryImages = Array.isArray(stats.preview_images) ? stats.preview_images : [];
+          galleryPage = 1;
+          renderGallery();
 
           detailModal.show();
         });

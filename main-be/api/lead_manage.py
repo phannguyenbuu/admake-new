@@ -5,6 +5,7 @@ from sqlalchemy import cast, func, Integer, or_
 
 from models import (
     LeadPayload,
+    app,
     db,
     User,
     Workspace,
@@ -133,6 +134,27 @@ def admin_leads():
             result.append(item)
         return result
 
+    def _is_remote_url(path_value):
+        if not path_value:
+            return False
+        return path_value.startswith("http://") or path_value.startswith("https://")
+
+    def _resolve_local_path(path_value):
+        if not path_value or _is_remote_url(path_value):
+            return None
+        upload_folder = app.config.get("UPLOAD_FOLDER", "")
+        if path_value.startswith("/static/"):
+            return os.path.join(upload_folder, path_value[len("/static/"):])
+        if path_value.startswith("/"):
+            return path_value
+        return os.path.join(upload_folder, path_value)
+
+    def _file_exists(path_value):
+        local_path = _resolve_local_path(path_value)
+        if not local_path:
+            return False
+        return os.path.exists(local_path)
+
     def _add_image(target_map, lead_id, thumb_url, full_url):
         if not lead_id:
             return
@@ -140,6 +162,8 @@ def admin_leads():
         if not full_ok:
             return
         if full_url and os.path.basename(full_url).lower().startswith("thumb_"):
+            return
+        if not (_is_remote_url(full_url) or _file_exists(full_url)):
             return
         target_map.setdefault(lead_id, []).append(full_url)
 
