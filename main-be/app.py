@@ -57,6 +57,15 @@ from api.chat import socketio
 def _start_periodic_dump():
     periodic_save_dump(sleep_fn=socketio.sleep)
 
+def _maybe_start_periodic_dump():
+    if os.environ.get("RUN_PERIODIC_DUMP", "1") != "1":
+        return
+    # Avoid duplicate start with the Flask reloader.
+    if os.environ.get("WERKZEUG_RUN_MAIN") == "true" or not app.debug:
+        socketio.start_background_task(_start_periodic_dump)
+
+_maybe_start_periodic_dump()
+
 @app.route('/login', methods=['GET'])
 def login_page():
     return render_template('login.html')
@@ -79,8 +88,6 @@ load_dotenv()  # load biến môi trường trong file .env vào process.env
 # VITE_API_HOST = os.getenv("VITE_API_HOST")
 
 if __name__ == "__main__":
-    socketio.start_background_task(_start_periodic_dump)
-
     port = int(os.environ.get('PORT', 6000))  # Lấy biến môi trường PORT hoặc mặc định 5000
     socketio.run(app, host='0.0.0.0', debug=True, port=port, allow_unsafe_werkzeug=True)
 

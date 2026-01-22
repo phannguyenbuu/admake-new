@@ -1,10 +1,15 @@
 
 server {
     listen 80;
+    server_name admake.vn;
 
+    return 301 https://$host$request_uri;
+}
+
+server {
     listen 443 ssl http2;
     listen [::]:443 ssl http2;
-    server_name go.admake.vn;
+    server_name admake.vn;
 
     client_max_body_size 100M;
 

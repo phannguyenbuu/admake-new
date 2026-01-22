@@ -1,3 +1,7 @@
+npm --prefix quangcao_web run build
+scp -r nginx root@31.97.76.62:/etc
+scp -r quangcao_web/dist/* root@31.97.76.62:/var/www/admake
+
 # React + TypeScript + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.

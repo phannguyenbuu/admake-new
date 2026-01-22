@@ -47,7 +47,16 @@ db = SQLAlchemy(app)
 
 jwt = JWTManager(app)
 
-CORS(app, supports_credentials=True, origins=['https://quanly.admake.vn','https://www.n-lux.com','http://localhost:5173'])
+CORS(
+    app,
+    supports_credentials=True,
+    origins=[
+        'https://quanly.admake.vn',
+        'https://www.n-lux.com',
+        'http://localhost:5173',
+        'http://localhost:5174',
+    ],
+)
 
 
 
@@ -924,67 +933,47 @@ class WorkpointSetting(db.Model):
 
 
 
-from paramiko import SSHClient, AutoAddPolicy
-from scp import SCPClient
 import time
+import subprocess
 
 def save_dump():
-    # Kết nối SSH tới server Linux
-    ssh = SSHClient()
-    ssh.set_missing_host_key_policy(AutoAddPolicy())
-    try:
-        ssh.connect(
-            '31.97.76.62',
-            username='root',
-            password='@baoLong0511',
-            timeout=60,
-            banner_timeout=60,
-            auth_timeout=60,
-        )
-        transport = ssh.get_transport()
-        if transport is not None:
-            transport.set_keepalive(30)
-    except Exception as e:
-        print("SSH connect failed:", e)
-        try:
-            ssh.close()
-        finally:
-            return
-
     now = datetime.datetime.now()
     timestamp = now.strftime("%y_%m_%d_%H_%M")
 
-    remote_dump_path = f"/root/backup/admake_chat_{timestamp}.dump"
-    print("Dump file remote:", remote_dump_path)
-
-    # Thực thi lệnh pg_dump trên server Linux
-    pg_dump_cmd = f"pg_dump -U postgres -d admake_chat -F c -f {remote_dump_path}"
-    env_cmd = f"PGPASSWORD=myPass {pg_dump_cmd}"
-    stdin, stdout, stderr = ssh.exec_command(env_cmd)
-
-    # Đợi lệnh hoàn thành
-    exit_status = stdout.channel.recv_exit_status()
-    if exit_status == 0:
-        print("Dump database thành công trên server.")
-    else:
-        error = stderr.read().decode()
-        print("Lỗi khi dump database:", error)
-        ssh.close()
-        return
-
-    # Tải file dump về local Windows
-    local_folder = "./backup"
+    local_folder = "/root/backup"
     os.makedirs(local_folder, exist_ok=True)
     local_dump_path = os.path.join(local_folder, f"admake_chat_{timestamp}.dump")
+    print("Dump file local:", local_dump_path)
 
-    scp = SCPClient(ssh.get_transport())
-    scp.get(remote_dump_path, local_dump_path)
-    print(f"Đã tải file dump về: {local_dump_path}")
+    env = os.environ.copy()
+    env["PGPASSWORD"] = "myPass"
+    try:
+        subprocess.run(
+            ["pg_dump", "-U", "postgres", "-d", "admake_chat", "-F", "c", "-f", local_dump_path],
+            check=True,
+            capture_output=True,
+            text=True,
+            env=env,
+        )
+        print("Dump database success on VPS.")
+    except subprocess.CalledProcessError as e:
+        print("Dump database failed:", e.stderr or e)
+        return
 
-    scp.close()
-    ssh.close()
+    # Upload dump to Google Drive via rclone
+    drive_dump_path = f"drive:backup/admake_chat_{timestamp}.dump"
+    try:
+        subprocess.run(
+            ["rclone", "copyto", local_dump_path, drive_dump_path],
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+        print(f"Uploaded dump to Drive: {drive_dump_path}")
+    except subprocess.CalledProcessError as e:
+        print("Upload dump to Drive failed:", e.stderr or e)
 
-def periodic_save_dump(interval_minutes=30, sleep_fn=None):
+def periodic_save_dump(interval_minutes=15, sleep_fn=None):
     if sleep_fn is None:
         sleep_fn = time.sleep
     while True:
@@ -994,6 +983,18 @@ def periodic_save_dump(interval_minutes=30, sleep_fn=None):
         except Exception as e:
             print("Periodic dump failed:", e)
         sleep_fn(interval_minutes * 60)  # nghỉ theo khoảng thời gian quy định
+
+def test_sync_backup_to_drive(dry_run=True):
+    src = "/root/backup"
+    dst = "drive:backup"
+    cmd = ["rclone", "sync", src, dst, "-v", "--stats=10s"]
+    if dry_run:
+        cmd.append("--dry-run")
+    try:
+        subprocess.run(cmd, check=True, capture_output=True, text=True)
+        print(f"Sync backup to Drive OK (dry_run={dry_run})")
+    except subprocess.CalledProcessError as e:
+        print("Sync backup to Drive failed:", e.stderr or e)
 
 def get_query_page_users(lead_id, page, limit, search, role_id = 0):
     if lead_id == 0:
