@@ -849,20 +849,28 @@
           if (detailImages) {
             detailImages.innerHTML = '';
             const images = Array.isArray(stats.preview_images) ? stats.preview_images : [];
+
+            const normalizeUrl = (value) => {
+              if (!value) return '';
+              if (value.startsWith('http') || value.startsWith('/')) return value;
+              return `${window.location.origin}/static/${value}`;
+            };
+
             if (images.length === 0) {
               detailImages.textContent = 'N/A';
             } else {
-              images.forEach(src => {
-                const normalized = String(src || '');
-                const url = normalized.startsWith('http') || normalized.startsWith('/')
-                  ? normalized
-                  : `${window.location.origin}/static/${normalized}`;
+              images.forEach(entry => {
+                const thumb = entry && typeof entry === 'object' ? entry.thumb : entry;
+                const full = entry && typeof entry === 'object' ? entry.full : entry;
+                const thumbUrl = normalizeUrl(String(thumb || full || ''));
+                const fullUrl = normalizeUrl(String(full || thumb || ''));
+                if (!thumbUrl) return;
                 const link = document.createElement('a');
-                link.href = url;
+                link.href = fullUrl || thumbUrl;
                 link.target = '_blank';
                 link.rel = 'noopener noreferrer';
                 const img = document.createElement('img');
-                img.src = url;
+                img.src = thumbUrl;
                 img.alt = 'asset';
                 link.appendChild(img);
                 detailImages.appendChild(link);
