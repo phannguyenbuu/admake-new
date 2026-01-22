@@ -156,45 +156,79 @@ def admin_leads():
     last_user_at = _max_by_lead(User, User.updatedAt)
     last_workpoint_at = _max_by_lead(Workpoint, Workpoint.updatedAt)
 
+    workspace_lead_map = {}
+    if lead_ids:
+        workspace_lead_map = dict(
+            db.session.query(Workspace.id, Workspace.lead_id)
+            .filter(Workspace.lead_id.in_(lead_ids))
+            .all()
+        )
+
     message_images_by_lead = {}
     if lead_ids:
         message_rows = (
-            db.session.query(Message.lead_id, Message.file_url, Message.thumb_url)
-            .filter(Message.lead_id.in_(lead_ids))
+            db.session.query(
+                Message.workspace_id,
+                Message.user_id,
+                Message.lead_id,
+                Message.file_url,
+                Message.thumb_url,
+            )
+            .filter(
+                Message.file_url.isnot(None),
+                Message.file_url != "",
+            )
             .all()
         )
-        for lead_id, file_url, thumb_url in message_rows:
-            if not _is_image(file_url):
+        user_lead_map = dict(
+            db.session.query(User.id, User.lead_id)
+            .filter(User.lead_id.in_(lead_ids))
+            .all()
+        )
+        for workspace_id, user_id, message_lead_id, file_url, thumb_url in message_rows:
+            lead_id = (
+                workspace_lead_map.get(workspace_id)
+                or user_lead_map.get(user_id)
+                or message_lead_id
+            )
+            if lead_id not in lead_ids:
+                continue
+            if not (_is_image(file_url) or _is_image(thumb_url)):
                 continue
             message_images_by_lead.setdefault(lead_id, []).append(thumb_url or file_url)
 
     task_icon_by_lead = {}
     if lead_ids:
         task_icon_rows = (
-            db.session.query(Task.lead_id, Task.icon)
-            .filter(Task.lead_id.in_(lead_ids), Task.icon.isnot(None))
+            db.session.query(Task.lead_id, Task.workspace_id, Task.icon)
+            .filter(Task.icon.isnot(None), Task.icon != "")
             .all()
         )
-        for lead_id, icon in task_icon_rows:
+        for lead_id, workspace_id, icon in task_icon_rows:
+            resolved_lead_id = lead_id or workspace_lead_map.get(workspace_id)
+            if resolved_lead_id not in lead_ids:
+                continue
             if not _is_image(icon):
                 continue
-            task_icon_by_lead.setdefault(lead_id, []).append(icon)
+            task_icon_by_lead.setdefault(resolved_lead_id, []).append(icon)
 
     task_asset_map = {}
     if lead_ids:
         task_rows = (
-            db.session.query(Task.lead_id, Task.assets)
-            .filter(Task.lead_id.in_(lead_ids))
+            db.session.query(Task.lead_id, Task.workspace_id, Task.assets)
             .all()
         )
         asset_ids = set()
-        for lead_id, assets in task_rows:
+        for lead_id, workspace_id, assets in task_rows:
+            resolved_lead_id = lead_id or workspace_lead_map.get(workspace_id)
+            if resolved_lead_id not in lead_ids:
+                continue
             if not assets:
                 continue
             if isinstance(assets, list):
                 for asset_id in assets:
                     if isinstance(asset_id, str):
-                        task_asset_map.setdefault(lead_id, []).append(asset_id)
+                        task_asset_map.setdefault(resolved_lead_id, []).append(asset_id)
                         asset_ids.add(asset_id)
         asset_images_by_message = {}
         if asset_ids:
@@ -204,7 +238,7 @@ def admin_leads():
                 .all()
             )
             for message_id, file_url, thumb_url in asset_rows:
-                if not _is_image(file_url):
+                if not (_is_image(file_url) or _is_image(thumb_url)):
                     continue
                 asset_images_by_message[message_id] = thumb_url or file_url
 
