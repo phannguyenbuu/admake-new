@@ -4,7 +4,7 @@ import json
 import datetime
 import os
 import sys
-from models import app, db, periodic_save_dump, User
+from models import app, db, User
 from api.auth import login_user_form
 from flask import render_template, request, redirect, url_for
 from dotenv import load_dotenv
@@ -54,18 +54,6 @@ app.register_blueprint(notify_bp)
 
 from api.chat import socketio
 
-def _start_periodic_dump():
-    periodic_save_dump(sleep_fn=socketio.sleep)
-
-def _maybe_start_periodic_dump():
-    if os.environ.get("RUN_PERIODIC_DUMP", "1") != "1":
-        return
-    # Avoid duplicate start with the Flask reloader.
-    if os.environ.get("WERKZEUG_RUN_MAIN") == "true" or not app.debug:
-        socketio.start_background_task(_start_periodic_dump)
-
-_maybe_start_periodic_dump()
-
 @app.route('/login', methods=['GET'])
 def login_page():
     return render_template('login.html')
@@ -98,4 +86,3 @@ if __name__ == "__main__":
         port=port,
         allow_unsafe_werkzeug=debug,
     )
-
