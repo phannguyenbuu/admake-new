@@ -333,13 +333,23 @@
 
     .toggle-icon {
       display: inline-flex;
-      font-size: 14px;
-      font-weight: 800;
+      width: 16px;
+      height: 16px;
       line-height: 1;
     }
 
     .lead-card.is-expanded .toggle-icon {
       transform: rotate(180deg);
+    }
+
+    .toggle-icon svg {
+      width: 100%;
+      height: 100%;
+      stroke: #111111;
+      stroke-width: 3.2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: none;
     }
 
     @keyframes fadeUp {
@@ -471,7 +481,11 @@
               </div>
             </div>
             <button class="btn btn-sm btn-outline-secondary toggle-details" type="button" aria-label="Toggle details">
-              <span class="toggle-icon">v</span>
+              <span class="toggle-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" role="img">
+                  <path d="M4 8 L12 16 L20 8" />
+                </svg>
+              </span>
             </button>
             <button class="btn btn-sm btn-outline-dark detail-btn" type="button"
                     data-lead-id="{{ lead.id }}"
