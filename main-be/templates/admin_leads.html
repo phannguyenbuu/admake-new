@@ -651,12 +651,14 @@
                 <div class="label">{{ labels.modal_asset_images or "Recent Assets" }}</div>
                 <div class="detail-images" id="detailAssetImages"></div>
                 <div class="detail-gallery-controls">
-                  <span id="detailGalleryPage">1 / 1</span>
-                  <button type="button" class="btn btn-sm btn-outline-secondary" id="detailGalleryPrev">
-                    {{ labels.modal_gallery_prev or "Prev" }}
+                  <button type="button" class="btn btn-sm btn-outline-secondary" id="detailGalleryPrev" aria-label="Previous">
+                    <span aria-hidden="true">&#8592;</span>
                   </button>
-                  <button type="button" class="btn btn-sm btn-outline-secondary" id="detailGalleryNext">
-                    {{ labels.modal_gallery_next or "Next" }}
+                  <nav aria-label="Gallery pagination">
+                    <ul class="pagination pagination-sm mb-0" id="detailGalleryPager"></ul>
+                  </nav>
+                  <button type="button" class="btn btn-sm btn-outline-secondary" id="detailGalleryNext" aria-label="Next">
+                    <span aria-hidden="true">&#8594;</span>
                   </button>
                 </div>
               </div>
@@ -838,15 +840,52 @@
 
       let galleryImages = [];
       let galleryPage = 1;
-      const galleryPageSize = 8;
+      const galleryPageSize = 10;
       const galleryPrev = document.getElementById('detailGalleryPrev');
       const galleryNext = document.getElementById('detailGalleryNext');
-      const galleryPageLabel = document.getElementById('detailGalleryPage');
+      const galleryPager = document.getElementById('detailGalleryPager');
 
       const normalizeUrl = (value) => {
         if (!value) return '';
         if (value.startsWith('http') || value.startsWith('/')) return value;
         return `${window.location.origin}/static/${value}`;
+      };
+
+      const buildGalleryPager = (totalPages) => {
+        if (!galleryPager) return;
+        galleryPager.innerHTML = '';
+        const maxVisible = 7;
+        const pages = [];
+        if (totalPages <= maxVisible) {
+          for (let i = 1; i <= totalPages; i += 1) pages.push(i);
+        } else {
+          pages.push(1);
+          const start = Math.max(2, galleryPage - 2);
+          const end = Math.min(totalPages - 1, galleryPage + 2);
+          if (start > 2) pages.push('...');
+          for (let i = start; i <= end; i += 1) pages.push(i);
+          if (end < totalPages - 1) pages.push('...');
+          pages.push(totalPages);
+        }
+
+        pages.forEach((page) => {
+          const li = document.createElement('li');
+          li.className = 'page-item' + (page === galleryPage ? ' active' : '');
+          const link = document.createElement('button');
+          link.type = 'button';
+          link.className = 'page-link';
+          link.textContent = String(page);
+          if (page === '...') {
+            link.disabled = true;
+          } else {
+            link.addEventListener('click', () => {
+              galleryPage = page;
+              renderGallery();
+            });
+          }
+          li.appendChild(link);
+          galleryPager.appendChild(li);
+        });
       };
 
       const renderGallery = () => {
@@ -877,9 +916,7 @@
           });
         }
 
-        if (galleryPageLabel) {
-          galleryPageLabel.textContent = `${galleryPage} / ${totalPages}`;
-        }
+        buildGalleryPager(totalPages);
         if (galleryPrev) {
           galleryPrev.disabled = galleryPage <= 1;
         }

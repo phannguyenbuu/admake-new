@@ -163,7 +163,9 @@ def admin_leads():
             return
         if full_url and os.path.basename(full_url).lower().startswith("thumb_"):
             return
-        if not (_is_remote_url(full_url) or _file_exists(full_url)):
+        if _is_remote_url(full_url):
+            return
+        if not _file_exists(full_url):
             return
         target_map.setdefault(lead_id, []).append(full_url)
 
