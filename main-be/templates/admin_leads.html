@@ -336,7 +336,7 @@
 
     .detail-images {
       display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-template-columns: repeat(5, minmax(0, 1fr));
       gap: 10px;
     }
 
@@ -361,6 +361,12 @@
       margin-top: 10px;
       font-size: 12px;
       color: var(--ink-500);
+    }
+
+    .gallery-arrow {
+      font-size: 18px;
+      font-weight: 700;
+      line-height: 1;
     }
 
     .toggle-icon {
@@ -652,13 +658,13 @@
                 <div class="detail-images" id="detailAssetImages"></div>
                 <div class="detail-gallery-controls">
                   <button type="button" class="btn btn-sm btn-outline-secondary" id="detailGalleryPrev" aria-label="Previous">
-                    <span aria-hidden="true">&#8592;</span>
+                    <span class="gallery-arrow" aria-hidden="true">←</span>
                   </button>
                   <nav aria-label="Gallery pagination">
                     <ul class="pagination pagination-sm mb-0" id="detailGalleryPager"></ul>
                   </nav>
                   <button type="button" class="btn btn-sm btn-outline-secondary" id="detailGalleryNext" aria-label="Next">
-                    <span aria-hidden="true">&#8594;</span>
+                    <span class="gallery-arrow" aria-hidden="true">→</span>
                   </button>
                 </div>
               </div>
