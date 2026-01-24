@@ -536,14 +536,22 @@
     .landing-editor {
       display: grid;
       gap: 4px;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
     .landing-section {
-      background: var(--card);
+      background: #fbf7f0;
       border-radius: 16px;
       padding: 16px;
-      border: 1px solid rgba(15, 23, 42, 0.06);
+      border: 1px solid rgba(15, 23, 42, 0.08);
       box-shadow: var(--shadow);
+      grid-column: span 2;
+    }
+
+    .landing-section[data-section="hero"],
+    .landing-section[data-section="categories"],
+    .landing-section[data-section="pricing"] {
+      grid-column: span 1;
     }
 
     .landing-section-title {
@@ -561,12 +569,17 @@
 
     .landing-block {
       grid-column: 1 / -1;
-      background: #f6f8f9;
+      background: #f4f1ea;
       border-radius: 14px;
       padding: 12px 14px;
       border: 1px solid rgba(12, 74, 110, 0.08);
       display: grid;
       gap: 3px;
+    }
+
+    .landing-section[data-section="hero"] .landing-fields,
+    .landing-section[data-section="categories"] .landing-fields {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
     .landing-block-title {
@@ -1176,9 +1189,29 @@
         return field;
       };
 
+      const isEmptyContentValue = (contentValue) => {
+        if (contentValue === null || contentValue === undefined) {
+          return true;
+        }
+        if (typeof contentValue === 'string') {
+          return contentValue.trim() === '';
+        }
+        return false;
+      };
+
       const renderNode = (container, key, value, path, depth) => {
         if (shouldSkipKey(key)) {
           return;
+        }
+        if (key === 'content') {
+          if (isLangObject(value)) {
+            const langValue = value[currentLang] ?? '';
+            if (isEmptyContentValue(langValue)) {
+              return;
+            }
+          } else if (isEmptyContentValue(value)) {
+            return;
+          }
         }
         if (isLangObject(value)) {
           const langValue = value[currentLang] ?? '';
@@ -1275,6 +1308,7 @@
           }
           const section = document.createElement('div');
           section.className = 'landing-section';
+          section.dataset.section = sectionKey;
           const title = document.createElement('div');
           title.className = 'landing-section-title';
           title.textContent = humanizeLabel(sectionKey);
