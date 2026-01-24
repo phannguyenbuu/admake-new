@@ -26,6 +26,86 @@
       min-height: 100vh;
     }
 
+    .shell {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      width: 220px;
+      background: linear-gradient(180deg, #111217 0%, #1b1d26 100%);
+      color: #f8fafc;
+      padding: 20px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+    }
+
+    .sidebar-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-family: "Space Grotesk", "Trebuchet MS", sans-serif;
+    }
+
+    .sidebar-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: linear-gradient(130deg, #0aa3a6, #0dc2b3);
+      box-shadow: 0 0 0 6px rgba(13, 194, 179, 0.2);
+    }
+
+    .sidebar-title {
+      font-size: 18px;
+      letter-spacing: 1px;
+    }
+
+    .sidebar-subtitle {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: rgba(248, 250, 252, 0.6);
+    }
+
+    .sidebar-nav {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .sidebar-link {
+      border: 1px solid rgba(248, 250, 252, 0.15);
+      background: rgba(248, 250, 252, 0.08);
+      color: #f8fafc;
+      border-radius: 12px;
+      padding: 10px 14px;
+      text-align: left;
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+
+    .sidebar-link:hover {
+      background: rgba(248, 250, 252, 0.18);
+    }
+
+    .sidebar-link.is-active {
+      background: linear-gradient(130deg, #0aa3a6, #0dc2b3);
+      border-color: transparent;
+      color: #0b1d1e;
+      font-weight: 600;
+    }
+
+    .content {
+      flex: 1 1 auto;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
     .topbar {
       background: linear-gradient(110deg, #0aa3a6, #0dc2b3 45%, #0e8a92 100%);
       color: #ffffff;
@@ -52,6 +132,14 @@
 
     .page {
       padding: 24px 24px 40px;
+    }
+
+    .tab-panel {
+      display: none;
+    }
+
+    .tab-panel.is-active {
+      display: block;
     }
 
     .hero {
@@ -401,6 +489,143 @@
       fill: none;
     }
 
+    .landing-header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .landing-header h2 {
+      font-family: "Space Grotesk", "Trebuchet MS", sans-serif;
+      margin: 0;
+      font-size: 24px;
+    }
+
+    .landing-controls {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .landing-controls select {
+      border-radius: 10px;
+      border: 1px solid rgba(15, 23, 42, 0.2);
+      padding: 6px 10px;
+      font-size: 13px;
+    }
+
+    .landing-save-status {
+      font-size: 12px;
+      color: var(--ink-500);
+      margin-bottom: 12px;
+      min-height: 16px;
+    }
+
+    .landing-save-status.is-success {
+      color: var(--accent-deep);
+    }
+
+    .landing-save-status.is-error {
+      color: #c0392b;
+    }
+
+    .landing-editor {
+      display: grid;
+      gap: 16px;
+    }
+
+    .landing-section {
+      background: var(--card);
+      border-radius: 16px;
+      padding: 16px;
+      border: 1px solid rgba(15, 23, 42, 0.06);
+      box-shadow: var(--shadow);
+    }
+
+    .landing-section-title {
+      font-family: "Space Grotesk", "Trebuchet MS", sans-serif;
+      font-size: 18px;
+      margin: 0 0 12px;
+    }
+
+    .landing-fields {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+    }
+
+    .landing-block {
+      grid-column: 1 / -1;
+      background: #f6f8f9;
+      border-radius: 14px;
+      padding: 12px 14px;
+      border: 1px solid rgba(12, 74, 110, 0.08);
+      display: grid;
+      gap: 12px;
+    }
+
+    .landing-block-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--ink-700);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+
+    .landing-array-item {
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 12px;
+      border: 1px solid rgba(12, 74, 110, 0.08);
+      display: grid;
+      gap: 10px;
+    }
+
+    .landing-item-title {
+      font-size: 12px;
+      color: var(--ink-500);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .landing-field {
+      display: grid;
+      gap: 6px;
+    }
+
+    .landing-field.is-checkbox {
+      grid-template-columns: auto 1fr;
+      align-items: center;
+    }
+
+    .landing-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--ink-700);
+    }
+
+    .landing-path {
+      font-size: 11px;
+      color: var(--ink-500);
+    }
+
+    .landing-input input,
+    .landing-input textarea {
+      width: 100%;
+      border-radius: 10px;
+      border: 1px solid rgba(15, 23, 42, 0.2);
+      padding: 8px 10px;
+      font-size: 13px;
+    }
+
+    .landing-input textarea {
+      min-height: 90px;
+      resize: vertical;
+    }
+
     @keyframes fadeUp {
       from {
         opacity: 0;
@@ -424,194 +649,254 @@
         flex: 1 1 100%;
       }
     }
+
+    @media (max-width: 960px) {
+      .shell {
+        flex-direction: column;
+      }
+
+      .sidebar {
+        width: 100%;
+        height: auto;
+        position: static;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .sidebar-nav {
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+      }
+    }
   </style>
 </head>
 <body>
-  <header class="topbar">
-    <h1>{{ labels.header_title or "ADMAKE Lead Management" }}</h1>
-    <span class="badge">{{ labels.header_badge or "Admin View" }}</span>
-  </header>
+  <div class="shell">
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <span class="sidebar-dot"></span>
+        <div>
+          <div class="sidebar-title">ADMAKE</div>
+          <div class="sidebar-subtitle">Admin Console</div>
+        </div>
+      </div>
+      <div class="sidebar-nav">
+        <button class="sidebar-link is-active" type="button" data-tab-target="leadManageTab">Lead manage</button>
+        <button class="sidebar-link" type="button" data-tab-target="landingPageTab">Landing page</button>
+      </div>
+    </aside>
 
-  <main class="page">
-    <section class="hero">
-      <div>
-        <h2>{{ labels.hero_title or "Lead Overview" }}</h2>
-        <p class="text-muted mb-0">{{ labels.hero_subtitle or "Compact rows with expand-on-demand details." }}</p>
-      </div>
-      <form class="search-box" method="get" style="flex-wrap: nowrap;">
-        <input class="form-control" type="text" name="q" id="leadSearchInput" value="{{ query_text }}"
-               placeholder="{{ labels.search_placeholder or "Search by lead name, company, or mobile" }}" />
-        <button class="search-clear {% if not query_text %}is-hidden{% endif %}" type="button" id="leadSearchClear">x</button>
-        <button class="btn btn-primary btn-sm" type="submit">{{ labels.search_button or "Search" }}</button>
-      </form>
-    </section>
+    <div class="content">
+      <header class="topbar">
+        <h1>{{ labels.header_title or "ADMAKE Lead Management" }}</h1>
+        <span class="badge">{{ labels.header_badge or "Admin View" }}</span>
+      </header>
 
-    <section class="stats">
-      <div class="stat-card">
-        <h3>{{ labels.stats_total_leads or "Total Leads" }}</h3>
-        <p data-count="{{ totals.leads }}">0</p>
-      </div>
-      <div class="stat-card">
-        <h3>{{ labels.stats_assignable_customers or "Assignable + Customers" }}</h3>
-        <p data-count="{{ total_users_all }}">0</p>
-        <small>{{ labels.stats_customers_label or "Customers" }}: <span data-count="{{ totals.customers }}">0</span></small>
-      </div>
-      <div class="stat-card">
-        <h3>{{ labels.stats_workspaces_tasks or "Workspaces + Tasks" }}</h3>
-        <p data-count="{{ totals.workspaces }}">0</p>
-        <small>{{ labels.stats_tasks_label or "Tasks" }}: <span data-count="{{ totals.tasks }}">0</span></small>
-      </div>
-      <div class="stat-card">
-        <h3>{{ labels.stats_messages or "Messages" }}</h3>
-        <p data-count="{{ totals.messages }}">0</p>
-      </div>
-      <div class="stat-card">
-        <h3>{{ labels.stats_workpoints or "Workpoints" }}</h3>
-        <p data-count="{{ totals.workpoints }}">0</p>
-      </div>
-      <div class="stat-card">
-        <h3>{{ labels.stats_leaves or "Leaves" }}</h3>
-        <p data-count="{{ totals.leaves }}">0</p>
-      </div>
-    </section>
-
-    <nav aria-label="Page navigation">
-      <ul class="pagination justify-content-center">
-        {% if page > 1 %}
-        <li class="page-item">
-          <a class="page-link" href="?page={{ page - 1 }}&q={{ query_text }}" aria-label="Previous">
-            <span aria-hidden="true">&laquo;</span>
-          </a>
-        </li>
-        {% endif %}
-
-        {% for p in range(1, total_pages + 1) %}
-        <li class="page-item {% if p == page %}active{% endif %}">
-          <a class="page-link" href="?page={{ p }}&q={{ query_text }}">{{ p }}</a>
-        </li>
-        {% endfor %}
-
-        {% if page < total_pages %}
-        <li class="page-item">
-          <a class="page-link" href="?page={{ page + 1 }}&q={{ query_text }}" aria-label="Next">
-            <span aria-hidden="true">&raquo;</span>
-          </a>
-        </li>
-        {% endif %}
-      </ul>
-    </nav>
-
-    <section class="lead-list">
-      {% for lead in leads %}
-      <article class="lead-card" data-lead-id="{{ lead.id }}" style="--i: {{ loop.index0 }};">
-        <div class="lead-row">
-          <div class="lead-row-main">
-            <span class="lead-id">{{ labels.lead_prefix or "Lead" }} #{{ lead.id }}</span>
-            <span>{{ lead.company or 'N/A' }}</span>
-            <span>{{ lead.phone or 'N/A' }}</span>
-            <span>{{ lead.email or 'N/A' }}</span>
-          </div>
-          <div class="lead-row-actions">
-            <div class="lead-status">
-              <label>
-                <input type="checkbox" name="selected_leads" value="{{ lead.id }}" {% if lead.isInvited %}checked{% endif %} />
-                {{ labels.status_invited or "Invited" }}
-              </label>
-              <label>
-                <input type="checkbox" name="activated_leads" value="{{ lead.id }}" {% if lead.isActivated %}checked{% endif %} />
-                {{ labels.status_active or "Active" }}
-              </label>
+      <main class="page">
+        <section class="tab-panel is-active" id="leadManageTab">
+          <section class="hero">
+            <div>
+              <h2>{{ labels.hero_title or "Lead Overview" }}</h2>
+              <p class="text-muted mb-0">{{ labels.hero_subtitle or "Compact rows with expand-on-demand details." }}</p>
             </div>
-            <div class="level-control" data-lead-id="{{ lead.id }}" data-level="{{ lead.level or 0 }}">
-              <div class="level-stars">
-                {% for lvl in range(0, 4) %}
-                <button type="button" class="level-star {% if lvl == 0 %}is-first{% endif %} {% if (lead.level or 0) == lvl %}is-selected{% endif %}"
-                        data-level="{{ lvl }}" aria-label="Level {{ lvl }}">
-                  <svg viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="M12 2.6l2.6 5.3 5.9.9-4.3 4.2 1 5.9-5.2-2.8-5.2 2.8 1-5.9-4.3-4.2 5.9-.9L12 2.6z" />
-                  </svg>
-                </button>
-                {% endfor %}
+            <form class="search-box" method="get" style="flex-wrap: nowrap;">
+              <input class="form-control" type="text" name="q" id="leadSearchInput" value="{{ query_text }}"
+                     placeholder="{{ labels.search_placeholder or "Search by lead name, company, or mobile" }}" />
+              <button class="search-clear {% if not query_text %}is-hidden{% endif %}" type="button" id="leadSearchClear">x</button>
+              <button class="btn btn-primary btn-sm" type="submit">{{ labels.search_button or "Search" }}</button>
+            </form>
+          </section>
+
+          <section class="stats">
+            <div class="stat-card">
+              <h3>{{ labels.stats_total_leads or "Total Leads" }}</h3>
+              <p data-count="{{ totals.leads }}">0</p>
+            </div>
+            <div class="stat-card">
+              <h3>{{ labels.stats_assignable_customers or "Assignable + Customers" }}</h3>
+              <p data-count="{{ total_users_all }}">0</p>
+              <small>{{ labels.stats_customers_label or "Customers" }}: <span data-count="{{ totals.customers }}">0</span></small>
+            </div>
+            <div class="stat-card">
+              <h3>{{ labels.stats_workspaces_tasks or "Workspaces + Tasks" }}</h3>
+              <p data-count="{{ totals.workspaces }}">0</p>
+              <small>{{ labels.stats_tasks_label or "Tasks" }}: <span data-count="{{ totals.tasks }}">0</span></small>
+            </div>
+            <div class="stat-card">
+              <h3>{{ labels.stats_messages or "Messages" }}</h3>
+              <p data-count="{{ totals.messages }}">0</p>
+            </div>
+            <div class="stat-card">
+              <h3>{{ labels.stats_workpoints or "Workpoints" }}</h3>
+              <p data-count="{{ totals.workpoints }}">0</p>
+            </div>
+            <div class="stat-card">
+              <h3>{{ labels.stats_leaves or "Leaves" }}</h3>
+              <p data-count="{{ totals.leaves }}">0</p>
+            </div>
+          </section>
+
+          <nav aria-label="Page navigation">
+            <ul class="pagination justify-content-center">
+              {% if page > 1 %}
+              <li class="page-item">
+                <a class="page-link" href="?page={{ page - 1 }}&q={{ query_text }}" aria-label="Previous">
+                  <span aria-hidden="true">&laquo;</span>
+                </a>
+              </li>
+              {% endif %}
+
+              {% for p in range(1, total_pages + 1) %}
+              <li class="page-item {% if p == page %}active{% endif %}">
+                <a class="page-link" href="?page={{ p }}&q={{ query_text }}">{{ p }}</a>
+              </li>
+              {% endfor %}
+
+              {% if page < total_pages %}
+              <li class="page-item">
+                <a class="page-link" href="?page={{ page + 1 }}&q={{ query_text }}" aria-label="Next">
+                  <span aria-hidden="true">&raquo;</span>
+                </a>
+              </li>
+              {% endif %}
+            </ul>
+          </nav>
+
+          <section class="lead-list">
+            {% for lead in leads %}
+            <article class="lead-card" data-lead-id="{{ lead.id }}" style="--i: {{ loop.index0 }};">
+              <div class="lead-row">
+                <div class="lead-row-main">
+                  <span class="lead-id">{{ labels.lead_prefix or "Lead" }} #{{ lead.id }}</span>
+                  <span>{{ lead.company or 'N/A' }}</span>
+                  <span>{{ lead.phone or 'N/A' }}</span>
+                  <span>{{ lead.email or 'N/A' }}</span>
+                </div>
+                <div class="lead-row-actions">
+                  <div class="lead-status">
+                    <label>
+                      <input type="checkbox" name="selected_leads" value="{{ lead.id }}" {% if lead.isInvited %}checked{% endif %} />
+                      {{ labels.status_invited or "Invited" }}
+                    </label>
+                    <label>
+                      <input type="checkbox" name="activated_leads" value="{{ lead.id }}" {% if lead.isActivated %}checked{% endif %} />
+                      {{ labels.status_active or "Active" }}
+                    </label>
+                  </div>
+                  <div class="level-control" data-lead-id="{{ lead.id }}" data-level="{{ lead.level or 0 }}">
+                    <div class="level-stars">
+                      {% for lvl in range(0, 4) %}
+                      <button type="button" class="level-star {% if lvl == 0 %}is-first{% endif %} {% if (lead.level or 0) == lvl %}is-selected{% endif %}"
+                              data-level="{{ lvl }}" aria-label="Level {{ lvl }}">
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                          <path d="M12 2.6l2.6 5.3 5.9.9-4.3 4.2 1 5.9-5.2-2.8-5.2 2.8 1-5.9-4.3-4.2 5.9-.9L12 2.6z" />
+                        </svg>
+                      </button>
+                      {% endfor %}
+                    </div>
+                  </div>
+                  <button class="btn btn-sm btn-outline-secondary toggle-details" type="button" aria-label="Toggle details">
+                    <span class="toggle-icon" aria-hidden="true">
+                      <svg viewBox="0 0 24 24" role="img">
+                        <path d="M4 8 L12 16 L20 8" />
+                      </svg>
+                    </span>
+                  </button>
+                  <button class="btn btn-sm btn-outline-dark detail-btn" type="button"
+                          data-lead-id="{{ lead.id }}"
+                          data-lead-name="{{ lead.name or 'N/A' }}"
+                          data-company="{{ lead.company or 'N/A' }}"
+                          data-stats='{{ lead.stats | tojson }}'>
+                    {{ labels.button_details or "Details" }}
+                  </button>
+                </div>
               </div>
-            </div>
-            <button class="btn btn-sm btn-outline-secondary toggle-details" type="button" aria-label="Toggle details">
-              <span class="toggle-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24" role="img">
-                  <path d="M4 8 L12 16 L20 8" />
-                </svg>
-              </span>
-            </button>
-            <button class="btn btn-sm btn-outline-dark detail-btn" type="button"
-                    data-lead-id="{{ lead.id }}"
-                    data-lead-name="{{ lead.name or 'N/A' }}"
-                    data-company="{{ lead.company or 'N/A' }}"
-                    data-stats='{{ lead.stats | tojson }}'>
-              {{ labels.button_details or "Details" }}
-            </button>
-          </div>
-        </div>
 
-        <div class="lead-details">
-          <div class="lead-grid">
-            <div class="lead-block">
-              <div class="label">{{ labels.section_lead_name or "Lead Name" }}</div>
-              <div class="value">{{ lead.name or 'N/A' }}</div>
+              <div class="lead-details">
+                <div class="lead-grid">
+                  <div class="lead-block">
+                    <div class="label">{{ labels.section_lead_name or "Lead Name" }}</div>
+                    <div class="value">{{ lead.name or 'N/A' }}</div>
+                  </div>
+                  <div class="lead-block select-user">
+                    <div class="label">{{ labels.section_assigned_user_customer or "Assigned User + Customer" }}</div>
+                    <select class="form-select form-select-sm" name="status-{{ lead.id }}"
+                            id="select-{{ lead.id }}" data-lead-id="{{ lead.id }}">
+                      <option value="">{{ labels.select_user_placeholder or "-- Select user --" }}</option>
+                      {% for user in users %}
+                      <option value="{{ user.id }}"
+                              data-username="{{ user.username }}"
+                              data-password="{{ user.password }}"
+                              {% if user.id|string == lead.user_id_str %}selected{% endif %}>
+                        {{ user.username }}
+                      </option>
+                      {% endfor %}
+                    </select>
+                    <p id="username-display-{{ lead.id }}" class="username-display"></p>
+                    <p id="password-display-{{ lead.id }}" class="password-display"></p>
+                    <div class="lead-meta">{{ labels.label_customers or "Customers" }}: <span class="value">{{ lead.stats.customers }}</span></div>
+                  </div>
+                  <div class="lead-block">
+                    <div class="label">{{ labels.section_company or "Company" }}</div>
+                    <div class="value">{{ lead.company or 'N/A' }}</div>
+                    <div class="lead-meta">{{ labels.label_company_size or "Size" }}: <span class="value">{{ lead.companySize or 'N/A' }}</span></div>
+                  </div>
+                  <div class="lead-block">
+                    <div class="label">{{ labels.section_contact or "Contact" }}</div>
+                    <div class="value">{{ lead.phone or 'N/A' }}</div>
+                    <div class="lead-meta">{{ labels.label_email or "Email" }}: <span class="value">{{ lead.email or 'N/A' }}</span></div>
+                  </div>
+                  <div class="lead-block">
+                    <div class="label">{{ labels.section_workspaces_tasks or "Workspaces + Tasks" }}</div>
+                    <div class="lead-meta">{{ labels.label_workspaces or "Workspaces" }}: <span class="value">{{ lead.stats.workspaces }}</span></div>
+                    <div class="lead-meta">{{ labels.label_tasks or "Tasks" }}: <span class="value">{{ lead.stats.tasks }}</span></div>
+                  </div>
+                  <div class="lead-block">
+                    <div class="label">{{ labels.section_activity or "Activity" }}</div>
+                    <div class="lead-meta">{{ labels.label_messages or "Messages" }}: <span class="value">{{ lead.stats.messages }}</span></div>
+                    <div class="lead-meta">{{ labels.label_workpoints or "Workpoints" }}: <span class="value">{{ lead.stats.workpoints }}</span></div>
+                    <div class="lead-meta">{{ labels.label_leaves or "Leaves" }}: <span class="value">{{ lead.stats.leaves }}</span></div>
+                  </div>
+                  <div class="lead-block">
+                    <div class="label">{{ labels.section_balance or "Balance" }}</div>
+                    <div class="value">{{ lead.balance_amount or '0' }}</div>
+                  </div>
+                  <div class="lead-block">
+                    <div class="label">{{ labels.section_dates or "Dates" }}</div>
+                    <div class="lead-meta">{{ labels.label_created or "Created" }}: <span class="value">{{ lead.createdAt }}</span></div>
+                    <div class="lead-meta">{{ labels.label_updated or "Updated" }}: <span class="value">{{ lead.updatedAt }}</span></div>
+                    <div class="lead-meta">{{ labels.label_expires or "Expires" }}: <span class="value" style="color: #c0392b;">{{ lead.expiredAt }}</span></div>
+                  </div>
+                </div>
+              </div>
+            </article>
+            {% endfor %}
+          </section>
+        </section>
+
+        <section class="tab-panel" id="landingPageTab">
+          <div class="landing-header">
+            <div>
+              <h2>Landing page content</h2>
+              <p class="text-muted mb-0">Edit sections and save to content.json.</p>
             </div>
-            <div class="lead-block select-user">
-              <div class="label">{{ labels.section_assigned_user_customer or "Assigned User + Customer" }}</div>
-              <select class="form-select form-select-sm" name="status-{{ lead.id }}"
-                      id="select-{{ lead.id }}" data-lead-id="{{ lead.id }}">
-                <option value="">{{ labels.select_user_placeholder or "-- Select user --" }}</option>
-                {% for user in users %}
-                <option value="{{ user.id }}"
-                        data-username="{{ user.username }}"
-                        data-password="{{ user.password }}"
-                        {% if user.id|string == lead.user_id_str %}selected{% endif %}>
-                  {{ user.username }}
-                </option>
-                {% endfor %}
+            <div class="landing-controls">
+              <select id="landingLangSelect" aria-label="Language">
+                <option value="vi">Vietnamese</option>
+                <option value="en">English</option>
+                <option value="zh">Chinese</option>
               </select>
-              <p id="username-display-{{ lead.id }}" class="username-display"></p>
-              <p id="password-display-{{ lead.id }}" class="password-display"></p>
-              <div class="lead-meta">{{ labels.label_customers or "Customers" }}: <span class="value">{{ lead.stats.customers }}</span></div>
-            </div>
-            <div class="lead-block">
-              <div class="label">{{ labels.section_company or "Company" }}</div>
-              <div class="value">{{ lead.company or 'N/A' }}</div>
-              <div class="lead-meta">{{ labels.label_company_size or "Size" }}: <span class="value">{{ lead.companySize or 'N/A' }}</span></div>
-            </div>
-            <div class="lead-block">
-              <div class="label">{{ labels.section_contact or "Contact" }}</div>
-              <div class="value">{{ lead.phone or 'N/A' }}</div>
-              <div class="lead-meta">{{ labels.label_email or "Email" }}: <span class="value">{{ lead.email or 'N/A' }}</span></div>
-            </div>
-            <div class="lead-block">
-              <div class="label">{{ labels.section_workspaces_tasks or "Workspaces + Tasks" }}</div>
-              <div class="lead-meta">{{ labels.label_workspaces or "Workspaces" }}: <span class="value">{{ lead.stats.workspaces }}</span></div>
-              <div class="lead-meta">{{ labels.label_tasks or "Tasks" }}: <span class="value">{{ lead.stats.tasks }}</span></div>
-            </div>
-            <div class="lead-block">
-              <div class="label">{{ labels.section_activity or "Activity" }}</div>
-              <div class="lead-meta">{{ labels.label_messages or "Messages" }}: <span class="value">{{ lead.stats.messages }}</span></div>
-              <div class="lead-meta">{{ labels.label_workpoints or "Workpoints" }}: <span class="value">{{ lead.stats.workpoints }}</span></div>
-              <div class="lead-meta">{{ labels.label_leaves or "Leaves" }}: <span class="value">{{ lead.stats.leaves }}</span></div>
-            </div>
-            <div class="lead-block">
-              <div class="label">{{ labels.section_balance or "Balance" }}</div>
-              <div class="value">{{ lead.balance_amount or '0' }}</div>
-            </div>
-            <div class="lead-block">
-              <div class="label">{{ labels.section_dates or "Dates" }}</div>
-              <div class="lead-meta">{{ labels.label_created or "Created" }}: <span class="value">{{ lead.createdAt }}</span></div>
-              <div class="lead-meta">{{ labels.label_updated or "Updated" }}: <span class="value">{{ lead.updatedAt }}</span></div>
-              <div class="lead-meta">{{ labels.label_expires or "Expires" }}: <span class="value" style="color: #c0392b;">{{ lead.expiredAt }}</span></div>
+              <button class="btn btn-primary btn-sm" type="button" id="landingSaveBtn">Save</button>
             </div>
           </div>
-        </div>
-      </article>
-      {% endfor %}
-    </section>
-  </main>
+          <div class="landing-save-status" id="landingSaveStatus"></div>
+          <div class="landing-editor" id="landingContentEditor"></div>
+        </section>
+      </main>
+    </div>
+  </div>
 
   <div class="modal fade" id="leadDetailModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
@@ -693,6 +978,335 @@
 
   <script>
     document.addEventListener("DOMContentLoaded", function() {
+      const tabButtons = document.querySelectorAll('.sidebar-link');
+      const tabPanels = document.querySelectorAll('.tab-panel');
+
+      const setActiveTab = (targetId) => {
+        tabPanels.forEach(panel => {
+          panel.classList.toggle('is-active', panel.id === targetId);
+        });
+        tabButtons.forEach(btn => {
+          btn.classList.toggle('is-active', btn.dataset.tabTarget === targetId);
+        });
+      };
+
+      tabButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+          setActiveTab(btn.dataset.tabTarget);
+        });
+      });
+
+      const landingEditor = document.getElementById('landingContentEditor');
+      const landingSaveBtn = document.getElementById('landingSaveBtn');
+      const landingLangSelect = document.getElementById('landingLangSelect');
+      const landingSaveStatus = document.getElementById('landingSaveStatus');
+
+      const LANGS = ['vi', 'en', 'zh'];
+      let currentLang = landingLangSelect ? landingLangSelect.value : 'vi';
+      let landingContent = null;
+
+      const isLangObject = (value) => {
+        if (!value || typeof value !== 'object' || Array.isArray(value)) {
+          return false;
+        }
+        const keys = Object.keys(value);
+        return keys.length > 0 && keys.every(key => LANGS.includes(key));
+      };
+
+      const humanizeLabel = (value) => {
+        return String(value || '')
+          .replace(/[_-]+/g, ' ')
+          .replace(/\s+/g, ' ')
+          .trim();
+      };
+
+      const getPathValue = (obj, path) => {
+        return path.reduce((acc, key) => {
+          if (acc === null || acc === undefined) {
+            return undefined;
+          }
+          return acc[key];
+        }, obj);
+      };
+
+      const setPathValue = (obj, path, value) => {
+        let ref = obj;
+        for (let i = 0; i < path.length - 1; i += 1) {
+          if (ref === null || ref === undefined) {
+            return;
+          }
+          ref = ref[path[i]];
+        }
+        if (ref === null || ref === undefined) {
+          return;
+        }
+        ref[path[path.length - 1]] = value;
+      };
+
+      const setSaveStatus = (message, tone) => {
+        if (!landingSaveStatus) return;
+        landingSaveStatus.textContent = message;
+        landingSaveStatus.className = 'landing-save-status' + (tone ? ` is-${tone}` : '');
+      };
+
+      const createField = ({
+        label,
+        path,
+        value,
+        valueType,
+        isLang,
+        basePath,
+      }) => {
+        const field = document.createElement('div');
+        field.className = 'landing-field';
+
+        const labelEl = document.createElement('div');
+        labelEl.className = 'landing-label';
+        labelEl.textContent = label;
+
+        const pathEl = document.createElement('div');
+        pathEl.className = 'landing-path';
+        pathEl.textContent = path.join('.');
+
+        const inputWrap = document.createElement('div');
+        inputWrap.className = 'landing-input';
+
+        let input;
+        const stringValue = value === null || value === undefined ? '' : String(value);
+        const useTextarea = valueType === 'string' && (stringValue.length > 80 || stringValue.includes('\n') || stringValue.includes('<'));
+
+        if (valueType === 'boolean') {
+          input = document.createElement('input');
+          input.type = 'checkbox';
+          input.checked = Boolean(value);
+          field.classList.add('is-checkbox');
+        } else if (useTextarea) {
+          input = document.createElement('textarea');
+          input.value = stringValue;
+        } else {
+          input = document.createElement('input');
+          input.type = valueType === 'number' ? 'number' : 'text';
+          input.value = stringValue;
+        }
+
+        if (isLang) {
+          input.dataset.langBase = JSON.stringify(basePath);
+        } else {
+          input.dataset.path = JSON.stringify(path);
+        }
+
+        const updateValue = (rawValue) => {
+          if (!landingContent) return;
+          let nextValue = rawValue;
+          if (valueType === 'number') {
+            nextValue = rawValue === '' ? '' : Number(rawValue);
+          }
+          if (valueType === 'boolean') {
+            nextValue = Boolean(rawValue);
+          }
+          if (isLang) {
+            setPathValue(landingContent, basePath.concat([currentLang]), nextValue);
+          } else {
+            setPathValue(landingContent, path, nextValue);
+          }
+        };
+
+        const handler = () => {
+          if (valueType === 'boolean') {
+            updateValue(input.checked);
+          } else {
+            updateValue(input.value);
+          }
+        };
+
+        input.addEventListener(valueType === 'boolean' ? 'change' : 'input', handler);
+
+        inputWrap.appendChild(input);
+        field.appendChild(labelEl);
+        field.appendChild(pathEl);
+        field.appendChild(inputWrap);
+        return field;
+      };
+
+      const renderNode = (container, key, value, path, depth) => {
+        if (isLangObject(value)) {
+          const langValue = value[currentLang] ?? '';
+          const field = createField({
+            label: humanizeLabel(key),
+            path,
+            value: langValue,
+            valueType: 'string',
+            isLang: true,
+            basePath: path,
+          });
+          container.appendChild(field);
+          return;
+        }
+
+        if (Array.isArray(value)) {
+          const block = document.createElement('div');
+          block.className = 'landing-block';
+          const title = document.createElement('div');
+          title.className = 'landing-block-title';
+          title.textContent = humanizeLabel(key);
+          block.appendChild(title);
+
+          value.forEach((item, index) => {
+            const itemWrap = document.createElement('div');
+            itemWrap.className = 'landing-array-item';
+            const itemTitle = document.createElement('div');
+            itemTitle.className = 'landing-item-title';
+            let itemLabel = `Item ${index + 1}`;
+            if (item && typeof item === 'object') {
+              if (item.id) {
+                itemLabel += ` - ${item.id}`;
+              } else if (item.name) {
+                itemLabel += ` - ${item.name}`;
+              }
+            }
+            itemTitle.textContent = itemLabel;
+            itemWrap.appendChild(itemTitle);
+            const itemFields = document.createElement('div');
+            itemFields.className = 'landing-fields';
+            if (item && typeof item === 'object' && !Array.isArray(item)) {
+              Object.entries(item).forEach(([childKey, childValue]) => {
+                renderNode(itemFields, childKey, childValue, path.concat([index, childKey]), depth + 1);
+              });
+            } else {
+              renderNode(itemFields, key, item, path.concat([index]), depth + 1);
+            }
+            itemWrap.appendChild(itemFields);
+            block.appendChild(itemWrap);
+          });
+
+          container.appendChild(block);
+          return;
+        }
+
+        if (value && typeof value === 'object') {
+          const block = document.createElement('div');
+          block.className = 'landing-block';
+          const title = document.createElement('div');
+          title.className = 'landing-block-title';
+          title.textContent = humanizeLabel(key);
+          block.appendChild(title);
+          const fields = document.createElement('div');
+          fields.className = 'landing-fields';
+          Object.entries(value).forEach(([childKey, childValue]) => {
+            renderNode(fields, childKey, childValue, path.concat([childKey]), depth + 1);
+          });
+          block.appendChild(fields);
+          container.appendChild(block);
+          return;
+        }
+
+        const valueType = typeof value === 'number' ? 'number' : typeof value === 'boolean' ? 'boolean' : 'string';
+        const field = createField({
+          label: humanizeLabel(key),
+          path,
+          value,
+          valueType,
+          isLang: false,
+        });
+        container.appendChild(field);
+      };
+
+      const renderLandingEditor = () => {
+        if (!landingEditor || !landingContent) return;
+        landingEditor.innerHTML = '';
+        Object.entries(landingContent).forEach(([sectionKey, sectionValue]) => {
+          const section = document.createElement('div');
+          section.className = 'landing-section';
+          const title = document.createElement('div');
+          title.className = 'landing-section-title';
+          title.textContent = humanizeLabel(sectionKey);
+          section.appendChild(title);
+          const fields = document.createElement('div');
+          fields.className = 'landing-fields';
+          if (sectionValue && typeof sectionValue === 'object' && !Array.isArray(sectionValue)) {
+            Object.entries(sectionValue).forEach(([childKey, childValue]) => {
+              renderNode(fields, childKey, childValue, [sectionKey, childKey], 0);
+            });
+          } else {
+            renderNode(fields, sectionKey, sectionValue, [sectionKey], 0);
+          }
+          section.appendChild(fields);
+          landingEditor.appendChild(section);
+        });
+      };
+
+      const updateLanguageInputs = () => {
+        const inputs = document.querySelectorAll('[data-lang-base]');
+        inputs.forEach(input => {
+          const basePath = JSON.parse(input.dataset.langBase);
+          const nextValue = getPathValue(landingContent, basePath.concat([currentLang]));
+          const normalized = nextValue === null || nextValue === undefined ? '' : nextValue;
+          if (input.tagName === 'TEXTAREA' || input.type === 'text' || input.type === 'number') {
+            input.value = String(normalized);
+          } else if (input.type === 'checkbox') {
+            input.checked = Boolean(normalized);
+          }
+        });
+      };
+
+      const loadLandingContent = () => {
+        if (!landingEditor) return;
+        landingEditor.textContent = 'Loading...';
+        fetch('/api/lead/content/')
+          .then(response => {
+            if (!response.ok) {
+              throw new Error('Failed to load content');
+            }
+            return response.json();
+          })
+          .then(data => {
+            landingContent = data;
+            renderLandingEditor();
+          })
+          .catch(() => {
+            landingEditor.textContent = 'Unable to load content.';
+          });
+      };
+
+      if (landingLangSelect) {
+        landingLangSelect.addEventListener('change', () => {
+          currentLang = landingLangSelect.value;
+          if (landingContent) {
+            updateLanguageInputs();
+          }
+        });
+      }
+
+      if (landingSaveBtn) {
+        landingSaveBtn.addEventListener('click', () => {
+          if (!landingContent) return;
+          setSaveStatus('Saving...', null);
+          landingSaveBtn.disabled = true;
+          fetch('/api/lead/content/', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(landingContent),
+          })
+          .then(response => {
+            if (!response.ok) {
+              throw new Error('Save failed');
+            }
+            return response.json();
+          })
+          .then(() => {
+            setSaveStatus('Saved successfully.', 'success');
+          })
+          .catch(() => {
+            setSaveStatus('Save failed. Please retry.', 'error');
+          })
+          .finally(() => {
+            landingSaveBtn.disabled = false;
+          });
+        });
+      }
+
+      loadLandingContent();
+
       const animatedCounters = document.querySelectorAll('[data-count]');
       animatedCounters.forEach(el => {
         const target = Number(el.dataset.count || 0);

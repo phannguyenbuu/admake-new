@@ -42,7 +42,30 @@ def get_landing_content():
     response.headers["Pragma"] = "no-cache"
     response.headers["Expires"] = "0"
     response.headers["Access-Control-Allow-Origin"] = "*"
-    response.headers["Access-Control-Allow-Methods"] = "GET, OPTIONS"
+    response.headers["Access-Control-Allow-Methods"] = "GET, PUT, OPTIONS"
+    response.headers["Access-Control-Allow-Headers"] = "Content-Type"
+    return response
+
+@lead_bp.route("/content/", methods=["PUT"])
+def update_landing_content():
+    data = request.get_json()
+    if data is None:
+        return jsonify({"error": "Invalid payload"}), 400
+
+    content_path = os.path.join(os.path.dirname(__file__), "..", "content.json")
+    try:
+        with open(content_path, "w", encoding="utf-8") as handle:
+            json.dump(data, handle, ensure_ascii=False, indent=2)
+            handle.write("\n")
+    except OSError:
+        return jsonify({"error": "Failed to write content"}), 500
+
+    response = make_response(jsonify({"success": True}))
+    response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
+    response.headers["Pragma"] = "no-cache"
+    response.headers["Expires"] = "0"
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    response.headers["Access-Control-Allow-Methods"] = "GET, PUT, OPTIONS"
     response.headers["Access-Control-Allow-Headers"] = "Content-Type"
     return response
 
@@ -50,7 +73,7 @@ def get_landing_content():
 def landing_content_options():
     response = make_response("", 204)
     response.headers["Access-Control-Allow-Origin"] = "*"
-    response.headers["Access-Control-Allow-Methods"] = "GET, OPTIONS"
+    response.headers["Access-Control-Allow-Methods"] = "GET, PUT, OPTIONS"
     response.headers["Access-Control-Allow-Headers"] = "Content-Type"
     response.headers["Cache-Control"] = "no-store"
     return response
