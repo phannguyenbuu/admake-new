@@ -1,0 +1,303 @@
+{
+  "meta": {
+    "title": {
+      "vi": "ADMAKE Landing Page",
+      "en": "ADMAKE Landing Page",
+      "zh": "ADMAKE 落地页"
+    }
+  },
+  "header": {
+    "brand": {
+      "logo": "public/logo.png",
+      "logoAlt": {
+        "vi": "Logo ADMAKE",
+        "en": "ADMAKE Logo",
+        "zh": "ADMAKE 标志"
+      },
+      "wordmark": "public/ADMAKE.svg",
+      "wordmarkAlt": {
+        "vi": "ADMAKE",
+        "en": "ADMAKE",
+        "zh": "ADMAKE"
+      }
+    },
+    "nav": [
+      { "id": "tong-quan", "title": { "vi": "Tổng quan", "en": "Overview", "zh": "概览" }, "content": "" },
+      { "id": "phan-he", "title": { "vi": "Phân hệ", "en": "Modules", "zh": "模块" }, "content": "" },
+      { "id": "bang-gia", "title": { "vi": "Bảng giá", "en": "Pricing", "zh": "价格" }, "content": "" },
+      { "id": "ly-do", "title": { "vi": "Lý do chọn", "en": "Why ADMAKE", "zh": "为什么选择" }, "content": "" },
+      { "id": "hieu-qua", "title": { "vi": "Hiệu quả", "en": "Impact", "zh": "成效" }, "content": "" },
+      { "id": "lien-he", "title": { "vi": "Liên hệ", "en": "Contact", "zh": "联系" }, "content": "" }
+    ],
+    "cta": {
+      "title": { "vi": "DÙNG THỬ", "en": "TRY NOW", "zh": "立即试用" },
+      "content": "",
+      "href": "#dang-ky"
+    }
+  },
+  "hero": {
+    "backgroundImage": "public/industrial-factory-workers-machinery.png",
+    "backgroundAlt": {
+      "vi": "Ảnh nền nhà máy công nghiệp",
+      "en": "Industrial factory background",
+      "zh": "工业工厂背景"
+    },
+    "badge": {
+      "vi": "Giải pháp cho người làm nghề thời đại số",
+      "en": "A solution for modern makers and workshops",
+      "zh": "面向数字时代从业者的解决方案"
+    },
+    "title": {
+      "vi": "ADMAKE - Giải pháp quản lý cho xưởng sản xuất và đội thi công",
+      "en": "ADMAKE - Management solution for workshops and field teams",
+      "zh": "ADMAKE - 面向生产车间与施工团队的管理方案"
+    },
+    "content": {
+      "vi": "ADMAKE không chỉ là một phần mềm quản lý, mà là giải pháp đột phá dành riêng cho các xưởng sản xuất và đội nhóm thi công. Sinh ra từ kinh nghiệm thực chiến trong ngành, ADMAKE giải quyết triệt để những bài toán kinh doanh, giúp bạn quản lý vững vàng, phát triển bền vững và thảnh thơi sáng tạo.",
+      "en": "ADMAKE is not just a management app, but a breakthrough solution for workshops and field teams. Built from real industry experience, ADMAKE solves core business pain points so you can manage steadily, grow sustainably, and focus on creativity.",
+      "zh": "ADMAKE 不只是管理软件，更是为生产车间与施工团队打造的突破性解决方案。源自行业实战经验，ADMAKE 直击核心经营问题，帮助您稳健管理、持续成长，并专注创新。"
+    },
+    "features": [
+      {
+        "title": { "vi": "Quản lý công việc chuyên nghiệp", "en": "Professional task management", "zh": "专业任务管理" },
+        "content": { "vi": "Sắp xếp, phân việc và theo dõi tiến độ khoa học", "en": "Organize, assign, and track progress clearly", "zh": "科学安排、分派并跟踪进度" }
+      },
+      {
+        "title": { "vi": "Chấm công linh hoạt & Tính lương tự động", "en": "Flexible timekeeping & auto payroll", "zh": "灵活考勤与自动薪资" },
+        "content": { "vi": "Chấm công GPS, nhận diện khuôn mặt, tự động cập nhật lương", "en": "GPS check-in, face recognition, auto payroll updates", "zh": "GPS 打卡、人脸识别、自动更新薪资" }
+      },
+      {
+        "title": { "vi": "Báo giá 3D & Tối ưu vật tư", "en": "3D quoting & materials optimization", "zh": "3D 报价与物料优化" },
+        "content": { "vi": "Bóc tách định mức vật tư từ bản vẽ 2D/3D, tối ưu chi phí", "en": "Extract quantities from 2D/3D drawings to reduce cost", "zh": "从 2D/3D 图纸提取用量，优化成本" }
+      },
+      {
+        "title": { "vi": "Chat nhóm chuyên nghiệp", "en": "Team chat built for work", "zh": "专业团队沟通" },
+        "content": { "vi": "Giao tiếp nội bộ, phối hợp chăm sóc khách hàng hiệu quả", "en": "Internal coordination and customer handling", "zh": "高效内部联系与客户协作" }
+      },
+      {
+        "title": { "vi": "Minh bạch từ Chấm sao khách hàng", "en": "Transparent customer ratings", "zh": "客户评分透明化" },
+        "content": { "vi": "Khách hàng đánh giá trực tiếp, tích hợp vào lương thưởng", "en": "Customer ratings feed directly into rewards", "zh": "客户直接评分并纳入薪酬奖励" }
+      },
+      {
+        "title": { "vi": "Quản lý giấy tờ thuế quan", "en": "Tax document management", "zh": "税务文件管理" },
+        "content": { "vi": "Lưu trữ giấy tờ pháp lý, báo cáo thuế chuẩn xác", "en": "Store legal docs and report taxes accurately", "zh": "存档法律文件，精准税务申报" }
+      }
+    ]
+  },
+  "form": {
+    "endpoint": "https://admake.vn/api/lead/",
+    "title": { "vi": "Đăng ký DÙNG THỬ miễn phí", "en": "Register for a free trial", "zh": "免费试用登记" },
+    "content": { "vi": "Nhập thông tin để nhận tư vấn trong 24h", "en": "Fill in details to get consultation within 24h", "zh": "填写信息，24 小时内联系" },
+    "fields": [
+      {
+        "name": "name",
+        "type": "text",
+        "required": true,
+        "title": { "vi": "Họ và tên", "en": "Full name", "zh": "姓名" },
+        "placeholder": { "vi": "Nguyễn Văn A", "en": "John Doe", "zh": "张三" },
+        "content": ""
+      },
+      {
+        "name": "phone",
+        "type": "text",
+        "required": true,
+        "title": { "vi": "Số điện thoại", "en": "Phone number", "zh": "电话" },
+        "placeholder": { "vi": "09xx xxx xxx", "en": "+84 ...", "zh": "+86 ..." },
+        "content": ""
+      },
+      {
+        "name": "email",
+        "type": "email",
+        "required": false,
+        "title": { "vi": "Email", "en": "Email", "zh": "邮箱" },
+        "placeholder": { "vi": "email@congty.vn", "en": "name@company.com", "zh": "name@company.com" },
+        "content": ""
+      },
+      {
+        "name": "company",
+        "type": "text",
+        "required": false,
+        "title": { "vi": "Tên công ty", "en": "Company name", "zh": "公司名称" },
+        "placeholder": { "vi": "Công ty ABC", "en": "ABC Company", "zh": "ABC 公司" },
+        "content": ""
+      },
+      {
+        "name": "industry",
+        "type": "text",
+        "required": false,
+        "title": { "vi": "Ngành nghề", "en": "Industry", "zh": "行业" },
+        "placeholder": { "vi": "Quảng cáo, Nội thất...", "en": "Advertising, Interiors...", "zh": "广告、室内..." },
+        "content": ""
+      },
+      {
+        "name": "companySize",
+        "type": "select",
+        "required": false,
+        "title": { "vi": "Quy mô", "en": "Company size", "zh": "公司规模" },
+        "content": "",
+        "options": [
+          { "value": "", "title": { "vi": "Chọn quy mô", "en": "Select size", "zh": "选择规模" } },
+          { "value": "1-5", "title": { "vi": "1-5 người", "en": "1-5 people", "zh": "1-5 人" } },
+          { "value": "6-20", "title": { "vi": "6-20 người", "en": "6-20 people", "zh": "6-20 人" } },
+          { "value": "21-50", "title": { "vi": "21-50 người", "en": "21-50 people", "zh": "21-50 人" } },
+          { "value": "51-100", "title": { "vi": "51-100 người", "en": "51-100 people", "zh": "51-100 人" } },
+          { "value": "100+", "title": { "vi": "100+ người", "en": "100+ people", "zh": "100+ 人" } }
+        ]
+      },
+      {
+        "name": "address",
+        "type": "text",
+        "required": false,
+        "title": { "vi": "Địa chỉ", "en": "Address", "zh": "地址" },
+        "placeholder": { "vi": "Địa chỉ doanh nghiệp", "en": "Business address", "zh": "企业地址" },
+        "content": ""
+      },
+      {
+        "name": "description",
+        "type": "textarea",
+        "required": false,
+        "title": { "vi": "Ghi chú", "en": "Notes", "zh": "备注" },
+        "placeholder": { "vi": "Nhu cầu, vấn đề đang gặp...", "en": "Needs, challenges...", "zh": "需求或问题..." },
+        "content": ""
+      }
+    ],
+    "submit": { "vi": "Gửi đăng ký", "en": "Submit registration", "zh": "提交登记" },
+    "status": {
+      "sending": { "vi": "Đang gửi thông tin...", "en": "Sending your info...", "zh": "正在提交..." },
+      "success": { "vi": "Đã gửi thành công. ADMAKE sẽ liên hệ trong 24h.", "en": "Submitted successfully. ADMAKE will contact you within 24h.", "zh": "提交成功，ADMAKE 将在 24 小时内联系您。" },
+      "error": { "vi": "Gửi thất bại. Vui lòng thử lại hoặc gọi hotline.", "en": "Submission failed. Please try again or call the hotline.", "zh": "提交失败，请重试或拨打热线。" }
+    },
+    "contacts": [
+      { "title": { "vi": "Hotline", "en": "Hotline", "zh": "热线" }, "content": { "vi": "19000047", "en": "19000047", "zh": "19000047" }, "href": "tel:19000047" },
+      { "title": { "vi": "Email", "en": "Email", "zh": "邮箱" }, "content": { "vi": "admakeapp@gmail.com", "en": "admakeapp@gmail.com", "zh": "admakeapp@gmail.com" }, "href": "mailto:admakeapp@gmail.com" }
+    ]
+  },
+  "categories": {
+    "title": {
+      "vi": "Lĩnh vực <br /> áp dụng",
+      "en": "Industries <br /> served",
+      "zh": "适用领域<br />"
+    },
+    "content": "",
+    "items": [
+      { "title": { "vi": "Quảng cáo", "en": "Advertising", "zh": "广告" }, "content": "", "icon": "public/qc.png" },
+      { "title": { "vi": "Sự kiện", "en": "Events", "zh": "活动" }, "content": "", "icon": "public/even.png" },
+      { "title": { "vi": "Nội thất", "en": "Interiors", "zh": "室内装饰" }, "content": "", "icon": "public/nt.png" },
+      { "title": { "vi": "Nhôm kính", "en": "Aluminum & glass", "zh": "铝玻璃" }, "content": "", "icon": "public/nk.png" },
+      { "title": { "vi": "Cơ khí", "en": "Mechanical", "zh": "机械" }, "content": "", "icon": "public/ck.png" },
+      { "title": { "vi": "Điện nước", "en": "MEP", "zh": "水电" }, "content": "", "icon": "public/đn.png" },
+      { "title": { "vi": "Xây dựng", "en": "Construction", "zh": "建筑" }, "content": "", "icon": "public/xd.png" },
+      { "title": { "vi": "Thạch cao", "en": "Drywall", "zh": "石膏板" }, "content": "", "icon": "public/tc.png" },
+      { "title": { "vi": "Ngành cửa", "en": "Doors", "zh": "门窗" }, "content": "", "icon": "public/nc.png" },
+      { "title": { "vi": "Rèm màn", "en": "Curtains", "zh": "窗帘" }, "content": "", "icon": "public/rm.png" },
+      { "title": { "vi": "Đá hoa cương", "en": "Granite", "zh": "花岗岩" }, "content": "", "icon": "public/da.png" },
+      { "title": { "vi": "VSCN", "en": "Industrial cleaning", "zh": "工业清洁" }, "content": "", "icon": "public/vs.png" }
+    ]
+  },
+  "overview": {
+    "title": { "vi": "Tổng quan phần mềm ADMAKE", "en": "ADMAKE overview", "zh": "ADMAKE 概览" },
+    "content": { "vi": "Bộ giải pháp linh hoạt, đáp ứng đa dạng mô hình doanh nghiệp sản xuất.", "en": "Flexible solutions for many manufacturing models.", "zh": "灵活方案，适配多种生产企业模式。" },
+    "items": [
+      { "title": { "vi": "Quản lý & Vận hành", "en": "Management & Operations", "zh": "管理与运营" }, "content": { "vi": "Điều phối và sắp xếp công việc một cách khoa học.", "en": "Coordinate and organize tasks scientifically.", "zh": "科学调度与组织工作。" } },
+      { "title": { "vi": "Nhân sự & Lương bổng", "en": "HR & Payroll", "zh": "人力与薪酬" }, "content": { "vi": "Quản lý đội ngũ và tính toán lương thưởng minh bạch.", "en": "Manage teams and payroll transparently.", "zh": "透明管理团队与薪酬。" } },
+      { "title": { "vi": "Báo giá & Vật tư", "en": "Quoting & Materials", "zh": "报价与物料" }, "content": { "vi": "Tối ưu chi phí và quản lý vật liệu hiệu quả.", "en": "Optimize cost and manage materials effectively.", "zh": "优化成本与物料管理。" } },
+      { "title": { "vi": "Kế toán & Pháp lý", "en": "Accounting & Legal", "zh": "会计与法务" }, "content": { "vi": "Đơn giản hóa các thủ tục giấy tờ và tuân thủ pháp luật.", "en": "Simplify paperwork and legal compliance.", "zh": "简化流程并符合法规。" } },
+      { "title": { "vi": "Giao tiếp nội bộ", "en": "Internal communication", "zh": "内部沟通" }, "content": { "vi": "Tăng cường sự phối hợp và giao tiếp trong đội ngũ.", "en": "Improve coordination across teams.", "zh": "加强团队协作。" } },
+      { "title": { "vi": "Khách hàng", "en": "Customers", "zh": "客户" }, "content": { "vi": "Quản lý thông tin và nâng cao sự hài lòng của khách hàng.", "en": "Manage customer data and satisfaction.", "zh": "提升客户信息管理与满意度。" } }
+    ],
+    "cta": { "title": { "vi": "Tôi muốn được tư vấn", "en": "I want consultation", "zh": "我要咨询" }, "content": "", "href": "#dang-ky" }
+  },
+  "features": {
+    "title": { "vi": "Tính năng đột phá của ADMAKE", "en": "Breakthrough features", "zh": "ADMAKE 关键功能" },
+    "content": "",
+    "items": [
+      { "title": { "vi": "Quản lý Công việc chuyên nghiệp", "en": "Professional task management", "zh": "专业任务管理" }, "content": { "vi": "Sắp xếp, phân việc và theo dõi tiến độ theo từng cột riêng biệt, giúp công việc không bị trôi hay lẫn lộn trong các dòng tin nhắn.", "en": "Organize tasks by columns to avoid confusion in message threads.", "zh": "按列管理任务，避免消息流中混乱。" } },
+      { "title": { "vi": "Chấm công linh hoạt & Chính xác", "en": "Accurate timekeeping", "zh": "灵活准确考勤" }, "content": { "vi": "Chấm công tức thì qua GPS và nhận diện khuôn mặt, ngay cả khi nhân viên ở công trình, không cần máy móc cồng kềnh.", "en": "GPS and face recognition check-in, even on site.", "zh": "GPS 与人脸识别打卡，即使在工地也无需复杂设备。" } },
+      { "title": { "vi": "Tự động tính lương & Minh bạch", "en": "Auto payroll & transparency", "zh": "自动薪资与透明化" }, "content": { "vi": "Dữ liệu chấm công và các khoản thưởng phạt sẽ tự động cập nhật vào bảng lương theo thời gian thực, đảm bảo sự chính xác tuyệt đối.", "en": "Timekeeping and rewards update payroll in real time.", "zh": "考勤与奖惩实时更新薪资，确保准确。" } },
+      { "title": { "vi": "Báo giá thông minh & Sát thực", "en": "Smart quoting", "zh": "智能报价" }, "content": { "vi": "Dựa trên những công thức được đúc kết từ kinh nghiệm thực tiễn, giúp bạn lập báo giá chuẩn xác, hạn chế rủi ro thất thoát.", "en": "Formulas built from real experience reduce quoting risk.", "zh": "基于实战经验公式，提升报价准确性，降低损耗风险。" } },
+      { "title": { "vi": "Bóc tách vật tư 3D", "en": "3D material takeoff", "zh": "3D 物料拆分" }, "content": { "vi": "Tự động bóc tách định mức vật tư chính xác từ bản vẽ 2D được diễn họa 3D, loại bỏ sai sót thủ công.", "en": "Auto takeoff from 2D/3D drawings to avoid manual errors.", "zh": "从 2D/3D 图纸自动提取用量，减少人工错误。" } },
+      { "title": { "vi": "Cơ chế Khoán đơn hàng", "en": "Order-based incentives", "zh": "订单激励机制" }, "content": { "vi": "Tự động thưởng thêm cho nhân viên khi hoàn thành công việc sớm hơn dự kiến, tạo động lực mạnh mẽ để nâng cao hiệu suất làm việc.", "en": "Auto bonuses for early completion boost productivity.", "zh": "提前完成自动奖励，显著提升效率。" } },
+      { "title": { "vi": "Quản lý giấy tờ thuế quan", "en": "Tax document management", "zh": "税务文件管理" }, "content": { "vi": "Hỗ trợ lưu trữ đầy đủ các giấy tờ pháp lý như hợp đồng, hóa đơn điện tử, giúp việc báo cáo thuế trở nên dễ dàng và chuẩn xác.", "en": "Store legal docs and e-invoices for accurate tax reporting.", "zh": "完整存档合同与电子发票，税务申报更轻松准确。" } },
+      { "title": { "vi": "Chat nhóm chuyên nghiệp", "en": "Team chat", "zh": "专业团队聊天" }, "content": { "vi": "Nền tảng giao tiếp nội bộ giúp toàn đội ngũ cùng phối hợp chăm sóc khách hàng và phân chia nhiệm vụ theo từng chuyên môn một cách gọn gàng.", "en": "Internal chat helps coordinate tasks by expertise.", "zh": "内部沟通平台，按专业高效协作与分工。" } },
+      { "title": { "vi": "Minh bạch từ Chấm sao khách hàng", "en": "Customer rating transparency", "zh": "客户评分透明化" }, "content": { "vi": "Hệ thống độc quyền cho phép khách hàng trực tiếp đánh giá. Phần mềm sẽ tự động tích hợp điểm đánh giá vào lương thưởng của nhân viên, tạo động lực làm việc bứt phá.", "en": "Customer ratings feed directly into staff rewards.", "zh": "客户直接评价并自动计入薪酬奖励，激发动力。" } }
+    ],
+    "cta": { "title": { "vi": "Tôi muốn được tư vấn", "en": "I want consultation", "zh": "我要咨询" }, "content": "", "href": "#dang-ky" }
+  },
+  "pricing": {
+    "title": { "vi": "Bảng giá của ADMAKE", "en": "ADMAKE pricing", "zh": "ADMAKE 价格" },
+    "content": "",
+    "image": "public/price.webp",
+    "imageAlt": { "vi": "Ảnh chụp giao diện phần mềm", "en": "Pricing screenshot", "zh": "价格截图" },
+    "cta": { "title": { "vi": "Tôi muốn được tư vấn", "en": "I want consultation", "zh": "我要咨询" }, "content": "", "href": "#dang-ky" }
+  },
+  "reasons": {
+    "title": { "vi": "Tại sao nên lựa chọn giải pháp ADMAKE?", "en": "Why choose ADMAKE?", "zh": "为什么选择 ADMAKE？" },
+    "content": "",
+    "columns": [
+      {
+        "title": { "vi": "Quản lý minh bạch toàn diện, từ A đến Z", "en": "Transparent management from A to Z", "zh": "从 A 到 Z 的全面透明管理" },
+        "content": "",
+        "items": [
+          { "title": { "vi": "Hệ sinh thái tích hợp giải quyết triệt để các vấn đề cốt lõi", "en": "Integrated ecosystem solves core issues", "zh": "一体化生态解决核心问题" }, "content": "" },
+          { "title": { "vi": "Chấm công linh hoạt qua GPS cho nhân viên đi công trình", "en": "GPS check-in for field staff", "zh": "工地员工 GPS 考勤" }, "content": "" },
+          { "title": { "vi": "Tự động cập nhật vào bảng lương và tích hợp đánh giá khách hàng", "en": "Auto payroll updates with customer ratings", "zh": "客户评价自动计入薪酬" }, "content": "" },
+          { "title": { "vi": "Tạo sự tin tưởng và động lực làm việc mạnh mẽ", "en": "Build trust and strong motivation", "zh": "建立信任并提升动力" }, "content": "" }
+        ]
+      },
+      {
+        "title": { "vi": "Tối ưu chi phí và hạn chế rủi ro thất thoát", "en": "Optimize cost and reduce loss risk", "zh": "优化成本并降低损耗风险" },
+        "content": "",
+        "items": [
+          { "title": { "vi": "Báo giá thông minh dựa trên các công thức thực tế", "en": "Smart quotes from real formulas", "zh": "基于真实公式的智能报价" }, "content": "" },
+          { "title": { "vi": "Bóc tách vật tư 3D giúp tính toán chính xác nguyên vật liệu", "en": "3D takeoff for accurate materials", "zh": "3D 物料拆分更准确" }, "content": "" },
+          { "title": { "vi": "Loại bỏ sai sót thủ công, nâng cao tính chuyên nghiệp", "en": "Eliminate manual errors, improve professionalism", "zh": "减少人工错误，提升专业度" }, "content": "" },
+          { "title": { "vi": "Tiết kiệm chi phí và phát triển bền vững", "en": "Save cost and grow sustainably", "zh": "降本增效，持续发展" }, "content": "" }
+        ]
+      },
+      {
+        "title": { "vi": "Nâng cao hiệu suất và phát triển đội ngũ", "en": "Boost productivity and team growth", "zh": "提升效率并发展团队" },
+        "content": "",
+        "items": [
+          { "title": { "vi": "Chuyển đổi từ làm việc thủ công sang quy trình hiện đại", "en": "Move from manual work to modern workflows", "zh": "从手工走向现代化流程" }, "content": "" },
+          { "title": { "vi": "Phân công và theo dõi tiến độ gọn gàng trên một nền tảng", "en": "Assign and track progress on one platform", "zh": "在同一平台分工与跟进" }, "content": "" },
+          { "title": { "vi": "Cơ chế tự động thưởng thêm khi hoàn thành công việc sớm", "en": "Auto rewards for early completion", "zh": "提前完成自动奖励" }, "content": "" },
+          { "title": { "vi": "Nền tảng chat nhóm chuyên nghiệp giúp phối hợp ăn ý", "en": "Professional team chat for smooth coordination", "zh": "专业团队聊天更协同" }, "content": "" }
+        ]
+      }
+    ]
+  },
+  "kpis": {
+    "title": { "vi": "Hiệu quả sau triển khai", "en": "Results after implementation", "zh": "实施后的成效" },
+    "content": "",
+    "items": [
+      { "title": { "vi": "75%", "en": "75%", "zh": "75%" }, "content": { "vi": "Giảm thời gian lập báo cáo", "en": "Less reporting time", "zh": "报表时间减少" } },
+      { "title": { "vi": "29%", "en": "29%", "zh": "29%" }, "content": { "vi": "Tối ưu tồn kho bình quân", "en": "Optimized inventory", "zh": "库存更优" } },
+      { "title": { "vi": "16%", "en": "16%", "zh": "16%" }, "content": { "vi": "Giảm chi phí vận hành", "en": "Lower operating costs", "zh": "运营成本降低" } },
+      { "title": { "vi": "14%", "en": "14%", "zh": "14%" }, "content": { "vi": "Tăng năng suất lao động", "en": "Higher productivity", "zh": "生产率提升" } },
+      { "title": { "vi": "x2.9", "en": "x2.9", "zh": "x2.9" }, "content": { "vi": "Tốc độ truy xuất số liệu", "en": "Faster data access", "zh": "数据访问更快" } },
+      { "title": { "vi": "22%", "en": "22%", "zh": "22%" }, "content": { "vi": "Tăng tỷ lệ hoàn thành đúng hạn", "en": "On-time completion up", "zh": "准时完成率提升" } }
+    ],
+    "cta": { "title": { "vi": "Tôi muốn được tư vấn", "en": "I want consultation", "zh": "我要咨询" }, "content": "", "href": "#dang-ky" }
+  },
+  "footer": {
+    "backgroundImage": "public/industrial-city-night.png",
+    "backgroundAlt": { "vi": "Thành phố công nghiệp", "en": "Industrial city", "zh": "工业城市" },
+    "title": { "vi": "Liên hệ ADMAKE Việt Nam", "en": "Contact ADMAKE Vietnam", "zh": "联系 ADMAKE 越南" },
+    "content": { "vi": "Tư vấn giải pháp phù hợp với mô hình của bạn. Đội ngũ chuyên gia triển khai nhiều dự án sản xuất đa ngành.", "en": "Get solutions tailored to your model. Experts with multi-industry experience.", "zh": "提供适配业务模式的解决方案。拥有多行业实施经验的专家团队。" },
+    "contacts": [
+      { "title": { "vi": "Hotline", "en": "Hotline", "zh": "热线" }, "content": { "vi": "19000047", "en": "19000047", "zh": "19000047" }, "href": "tel:19000047" },
+      { "title": { "vi": "Tư Vấn", "en": "Consulting", "zh": "咨询" }, "content": { "vi": "0837 884477", "en": "0837 884477", "zh": "0837 884477" }, "href": "tel:0837884477" },
+      { "title": { "vi": "Kỹ thuật", "en": "Technical", "zh": "技术" }, "content": { "vi": "0852 884477", "en": "0852 884477", "zh": "0852 884477" }, "href": "tel:0852884477" },
+      { "title": { "vi": "Kinh Doanh", "en": "Sales", "zh": "商务" }, "content": { "vi": "0877 884477", "en": "0877 884477", "zh": "0877 884477" }, "href": "tel:0877884477" },
+      { "title": { "vi": "Email", "en": "Email", "zh": "邮箱" }, "content": { "vi": "admakeapp@gmail.com", "en": "admakeapp@gmail.com", "zh": "admakeapp@gmail.com" }, "href": "mailto:admakeapp@gmail.com" },
+      { "title": { "vi": "Địa chỉ", "en": "Address", "zh": "地址" }, "content": { "vi": "45 Đặng Thái Thân – Phường Buôn Ma Thuột – Tỉnh Đắk Lắk", "en": "45 Dang Thai Than – Buon Ma Thuot – Dak Lak", "zh": "45 Dang Thai Than – Buon Ma Thuot – Dak Lak" }, "href": "" }
+    ],
+    "ctaPrimary": { "title": { "vi": "Nhận tư vấn", "en": "Get consultation", "zh": "获取咨询" }, "content": "", "href": "#dang-ky" },
+    "ctaSecondary": { "title": { "vi": "Xem bảng giá", "en": "See pricing", "zh": "查看价格" }, "content": "", "href": "#bang-gia" },
+    "copyright": {
+      "vi": "© <span id=\"year\"></span> ADMAKE Việt Nam. A Product of B-One Viet Nam",
+      "en": "© <span id=\"year\"></span> ADMAKE Vietnam. A Product of B-One Viet Nam",
+      "zh": "© <span id=\"year\"></span> ADMAKE Vietnam. A Product of B-One Viet Nam"
+    }
+  }
+}

@@ -1,4 +1,6 @@
-from flask import Blueprint, request, jsonify, abort
+from flask import Blueprint, request, jsonify, abort, make_response
+import json
+import os
 from models import db, app, LeadPayload, Message,User
 from api.chat import socketio
 from sqlalchemy import desc
@@ -28,6 +30,18 @@ def create_lead():
     new_lead = LeadPayload.create_item(data)
     
     return jsonify(new_lead.tdict()), 201
+
+@lead_bp.route("/content/", methods=["GET"])
+def get_landing_content():
+    content_path = os.path.join(os.path.dirname(__file__), "..", "content.json")
+    with open(content_path, "r", encoding="utf-8") as handle:
+        data = json.load(handle)
+
+    response = make_response(jsonify(data))
+    response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
+    response.headers["Pragma"] = "no-cache"
+    response.headers["Expires"] = "0"
+    return response
 
 @lead_bp.route("/<int:lead_id>/check", methods=["PUT"])
 def check_invite_lead(lead_id):
