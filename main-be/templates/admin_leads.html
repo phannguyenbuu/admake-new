@@ -33,6 +33,8 @@
 
     .sidebar {
       width: 220px;
+      min-width: 220px;
+      flex: 0 0 220px;
       background: linear-gradient(180deg, #111217 0%, #1b1d26 100%);
       color: #f8fafc;
       padding: 20px 16px;
@@ -86,6 +88,7 @@
       text-align: left;
       font-weight: 500;
       transition: all 0.2s ease;
+      white-space: nowrap;
     }
 
     .sidebar-link:hover {
@@ -548,9 +551,20 @@
       grid-column: span 2;
     }
 
-    .landing-section[data-section="hero"],
-    .landing-section[data-section="categories"],
     .landing-section[data-section="pricing"] {
+      grid-column: span 1;
+    }
+
+    .landing-section[data-section="categories"] {
+      grid-column: 1 / -1;
+    }
+
+    .landing-section[data-section="hero"] {
+      grid-column: 1 / -1;
+    }
+
+    .landing-section[data-section="pricing"],
+    .landing-section[data-section="pricing-image"] {
       grid-column: span 1;
     }
 
@@ -639,6 +653,20 @@
       grid-column: 1 / -1;
     }
 
+    .landing-array-grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 6px;
+    }
+
+    .landing-array-grid-2 > .landing-block-title {
+      grid-column: 1 / -1;
+    }
+
+    .landing-array-grid-2 > .landing-array-actions {
+      grid-column: 1 / -1;
+    }
+
     .landing-item-title {
       font-size: 12px;
       color: var(--ink-500);
@@ -694,9 +722,20 @@
         grid-column: span 3;
       }
 
-      .landing-section[data-section="hero"],
-      .landing-section[data-section="categories"],
       .landing-section[data-section="pricing"] {
+        grid-column: span 1;
+      }
+
+      .landing-section[data-section="categories"] {
+        grid-column: 1 / -1;
+      }
+
+      .landing-section[data-section="hero"] {
+        grid-column: 1 / -1;
+      }
+
+      .landing-section[data-section="pricing"],
+      .landing-section[data-section="pricing-image"] {
         grid-column: span 1;
       }
     }
@@ -1362,8 +1401,12 @@
           title.className = 'landing-block-title';
           title.textContent = humanizeLabel(key);
           block.appendChild(title);
-          if (path.join('.') === 'categories.items') {
+          const pathKey = path.join('.');
+          if (pathKey === 'categories.items') {
             block.classList.add('landing-array-grid');
+          }
+          if (pathKey.startsWith('reasons.columns.') && pathKey.endsWith('.items')) {
+            block.classList.add('landing-array-grid-2');
           }
 
           value.forEach((item, index) => {
@@ -1379,7 +1422,7 @@
                 itemLabel += ` - ${item.name}`;
               }
             }
-            if (path.join('.') === 'categories.items') {
+            if (pathKey === 'categories.items') {
               const actions = document.createElement('div');
               actions.className = 'landing-array-actions';
               itemTitle.textContent = itemLabel;
@@ -1412,7 +1455,7 @@
             block.appendChild(itemWrap);
           });
 
-          if (path.join('.') === 'categories.items') {
+          if (pathKey === 'categories.items') {
             const addWrap = document.createElement('div');
             addWrap.className = 'landing-array-actions';
             const addLabel = document.createElement('div');
