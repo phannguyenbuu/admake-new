@@ -563,7 +563,11 @@
     }
 
     .landing-section[data-section="reasons"] .landing-fields {
-      grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .landing-section[data-section="footer"] .landing-fields {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
     .landing-section-title {
@@ -621,6 +625,20 @@
       padding: 2px 8px;
     }
 
+    .landing-array-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 6px;
+    }
+
+    .landing-array-grid > .landing-block-title {
+      grid-column: 1 / -1;
+    }
+
+    .landing-array-grid > .landing-array-actions {
+      grid-column: 1 / -1;
+    }
+
     .landing-item-title {
       font-size: 12px;
       color: var(--ink-500);
@@ -635,6 +653,10 @@
     .landing-field.is-checkbox {
       grid-template-columns: auto 1fr;
       align-items: center;
+    }
+
+    .landing-field.is-full {
+      grid-column: 1 / -1;
     }
 
     .landing-label {
@@ -1137,9 +1159,24 @@
         };
       };
 
-      const createPricingUploadBlock = () => {
+      const createPricingUploadSection = () => {
+        const section = document.createElement('div');
+        section.className = 'landing-section';
+        section.dataset.section = 'pricing-image';
+
+        const title = document.createElement('div');
+        title.className = 'landing-section-title';
+        title.textContent = 'Pricing image';
+        section.appendChild(title);
+
+        const fields = document.createElement('div');
+        fields.className = 'landing-fields';
+
         const field = document.createElement('div');
         field.className = 'landing-field';
+        if (path[0] === 'reasons' && (path[1] === 'title' || path[1] === 'content')) {
+          field.classList.add('is-full');
+        }
 
         const label = document.createElement('div');
         label.className = 'landing-label';
@@ -1175,7 +1212,9 @@
         field.appendChild(path);
         field.appendChild(inputWrap);
         field.appendChild(status);
-        return field;
+        fields.appendChild(field);
+        section.appendChild(fields);
+        return section;
       };
 
       const createField = ({
@@ -1326,6 +1365,9 @@
           title.className = 'landing-block-title';
           title.textContent = humanizeLabel(key);
           block.appendChild(title);
+          if (path.join('.') === 'categories.items') {
+            block.classList.add('landing-array-grid');
+          }
 
           value.forEach((item, index) => {
             const itemWrap = document.createElement('div');
@@ -1454,11 +1496,11 @@
           } else {
             renderNode(fields, sectionKey, sectionValue, [sectionKey], 0);
           }
-          if (sectionKey === 'pricing') {
-            fields.appendChild(createPricingUploadBlock());
-          }
           section.appendChild(fields);
           landingEditor.appendChild(section);
+          if (sectionKey === 'pricing') {
+            landingEditor.appendChild(createPricingUploadSection());
+          }
         });
       };
 
