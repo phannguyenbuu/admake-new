@@ -69,6 +69,57 @@ def update_landing_content():
     response.headers["Access-Control-Allow-Headers"] = "Content-Type"
     return response
 
+@lead_bp.route("/content/pricing-image", methods=["PUT"])
+def update_pricing_image():
+    if "file" not in request.files:
+        return jsonify({"error": "No file provided"}), 400
+
+    file = request.files["file"]
+    if not file or file.filename == "":
+        return jsonify({"error": "Empty filename"}), 400
+
+    _, ext = os.path.splitext(file.filename)
+    ext = ext.lower()
+    if ext not in [".jpg", ".jpeg", ".png", ".webp", ".gif"]:
+        return jsonify({"error": "Unsupported file type"}), 400
+
+    content_path = os.path.join(os.path.dirname(__file__), "..", "content.json")
+    try:
+        with open(content_path, "r", encoding="utf-8") as handle:
+            data = json.load(handle)
+    except (OSError, json.JSONDecodeError):
+        return jsonify({"error": "Failed to load content"}), 500
+
+    image_path = (data.get("pricing") or {}).get("image")
+    if not image_path:
+        return jsonify({"error": "Missing pricing image path"}), 400
+
+    upload_root = app.config.get("UPLOAD_FOLDER", "")
+    if os.path.isabs(image_path):
+        target_path = image_path
+    else:
+        relative_path = image_path
+        if relative_path.startswith("/static/"):
+            relative_path = relative_path[len("/static/"):]
+        elif relative_path.startswith("/"):
+            relative_path = relative_path[1:]
+        target_path = os.path.join(upload_root, relative_path)
+
+    os.makedirs(os.path.dirname(target_path), exist_ok=True)
+    try:
+        file.save(target_path)
+    except OSError:
+        return jsonify({"error": "Failed to write file"}), 500
+
+    response = make_response(jsonify({"success": True, "path": image_path}))
+    response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
+    response.headers["Pragma"] = "no-cache"
+    response.headers["Expires"] = "0"
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    response.headers["Access-Control-Allow-Methods"] = "GET, PUT, OPTIONS"
+    response.headers["Access-Control-Allow-Headers"] = "Content-Type"
+    return response
+
 @lead_bp.route("/content/", methods=["OPTIONS"])
 def landing_content_options():
     response = make_response("", 204)
