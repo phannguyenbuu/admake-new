@@ -1524,22 +1524,29 @@
         fetch('/api/lead/content/')
           .then(response => {
             if (!response.ok) {
-              throw new Error('Failed to load content');
+              return response.text().then(text => {
+                const detail = text ? text.trim() : response.statusText;
+                throw new Error(`HTTP ${response.status}: ${detail}`);
+              });
             }
             return response.json();
           })
           .then(data => {
-            landingContent = data;
-            renderLandingEditor();
-            bindPricingUpload();
-            const { pricingImagePath } = getPricingElements();
-            if (pricingImagePath) {
-              const imageValue = landingContent?.pricing?.image;
-              pricingImagePath.textContent = imageValue ? `pricing.image (${imageValue})` : 'pricing.image';
+            try {
+              landingContent = data;
+              renderLandingEditor();
+              bindPricingUpload();
+              const { pricingImagePath } = getPricingElements();
+              if (pricingImagePath) {
+                const imageValue = landingContent?.pricing?.image;
+                pricingImagePath.textContent = imageValue ? `pricing.image (${imageValue})` : 'pricing.image';
+              }
+            } catch (error) {
+              throw new Error(`Render failed: ${error.message}`);
             }
           })
-          .catch(() => {
-            landingEditor.textContent = 'Unable to load content.';
+          .catch((error) => {
+            landingEditor.textContent = `Unable to load content. ${error.message}`;
           });
       };
 
