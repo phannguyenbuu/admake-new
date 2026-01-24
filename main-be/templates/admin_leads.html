@@ -540,7 +540,7 @@
     }
 
     .landing-section {
-      background: #fdfaf5;
+      background: #ddd;
       border-radius: 14px;
       padding: 12px;
       border: 1px solid rgba(15, 23, 42, 0.14);
@@ -552,6 +552,18 @@
     .landing-section[data-section="categories"],
     .landing-section[data-section="pricing"] {
       grid-column: span 1;
+    }
+
+    .landing-section[data-section="categories"] .landing-fields {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    .landing-section[data-section="categories"] .landing-array-item .landing-fields {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    .landing-section[data-section="reasons"] .landing-fields {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
     }
 
     .landing-section-title {
@@ -596,6 +608,17 @@
       border: 1px solid rgba(12, 74, 110, 0.12);
       display: grid;
       gap: 3px;
+    }
+
+    .landing-array-actions {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+    }
+
+    .landing-array-actions .btn {
+      padding: 2px 8px;
     }
 
     .landing-item-title {
@@ -943,20 +966,6 @@
             </div>
           </div>
           <div class="landing-save-status" id="landingSaveStatus"></div>
-          <div class="landing-section">
-            <div class="landing-section-title">Pricing image</div>
-            <div class="landing-fields">
-              <div class="landing-field">
-                <div class="landing-label">File</div>
-                <div class="landing-path" id="pricingImagePath">pricing.image</div>
-                <div class="landing-input landing-upload-row">
-                  <input type="file" id="pricingImageFile" accept="image/*">
-                  <button class="btn btn-outline-dark btn-sm" type="button" id="pricingImageUploadBtn">Upload</button>
-                </div>
-                <div class="landing-upload-status" id="pricingImageStatus"></div>
-              </div>
-            </div>
-          </div>
           <div class="landing-editor" id="landingContentEditor"></div>
         </section>
       </main>
@@ -1065,10 +1074,6 @@
       const landingSaveBtn = document.getElementById('landingSaveBtn');
       const landingLangSelect = document.getElementById('landingLangSelect');
       const landingSaveStatus = document.getElementById('landingSaveStatus');
-      const pricingImagePath = document.getElementById('pricingImagePath');
-      const pricingImageFile = document.getElementById('pricingImageFile');
-      const pricingImageUploadBtn = document.getElementById('pricingImageUploadBtn');
-      const pricingImageStatus = document.getElementById('pricingImageStatus');
 
       const LANGS = ['vi', 'en', 'zh'];
       const IMAGE_FIELD_KEYS = ['image', 'backgroundImage', 'logo', 'wordmark', 'icon'];
@@ -1121,6 +1126,56 @@
         if (!landingSaveStatus) return;
         landingSaveStatus.textContent = message;
         landingSaveStatus.className = 'landing-save-status' + (tone ? ` is-${tone}` : '');
+      };
+
+      const getPricingElements = () => {
+        return {
+          pricingImagePath: document.getElementById('pricingImagePath'),
+          pricingImageFile: document.getElementById('pricingImageFile'),
+          pricingImageUploadBtn: document.getElementById('pricingImageUploadBtn'),
+          pricingImageStatus: document.getElementById('pricingImageStatus'),
+        };
+      };
+
+      const createPricingUploadBlock = () => {
+        const field = document.createElement('div');
+        field.className = 'landing-field';
+
+        const label = document.createElement('div');
+        label.className = 'landing-label';
+        label.textContent = 'File';
+
+        const path = document.createElement('div');
+        path.className = 'landing-path';
+        path.id = 'pricingImagePath';
+        path.textContent = 'pricing.image';
+
+        const inputWrap = document.createElement('div');
+        inputWrap.className = 'landing-input landing-upload-row';
+
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.id = 'pricingImageFile';
+        input.accept = 'image/*';
+
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.id = 'pricingImageUploadBtn';
+        button.className = 'btn btn-outline-dark btn-sm';
+        button.textContent = 'Upload (Replace)';
+
+        inputWrap.appendChild(input);
+        inputWrap.appendChild(button);
+
+        const status = document.createElement('div');
+        status.className = 'landing-upload-status';
+        status.id = 'pricingImageStatus';
+
+        field.appendChild(label);
+        field.appendChild(path);
+        field.appendChild(inputWrap);
+        field.appendChild(status);
+        return field;
       };
 
       const createField = ({
@@ -1215,6 +1270,25 @@
         return false;
       };
 
+      const cloneForCategory = (template) => {
+        const next = JSON.parse(JSON.stringify(template || {}));
+        const clearLang = (obj) => {
+          if (!obj || typeof obj !== 'object') return;
+          if (isLangObject(obj)) {
+            LANGS.forEach(lang => {
+              obj[lang] = '';
+            });
+            return;
+          }
+          Object.values(obj).forEach(child => clearLang(child));
+        };
+        clearLang(next);
+        if (next.content !== undefined && typeof next.content === 'string') {
+          next.content = '';
+        }
+        return next;
+      };
+
       const renderNode = (container, key, value, path, depth) => {
         if (shouldSkipKey(key)) {
           return;
@@ -1266,8 +1340,26 @@
                 itemLabel += ` - ${item.name}`;
               }
             }
-            itemTitle.textContent = itemLabel;
-            itemWrap.appendChild(itemTitle);
+            if (path.join('.') === 'categories.items') {
+              const actions = document.createElement('div');
+              actions.className = 'landing-array-actions';
+              itemTitle.textContent = itemLabel;
+              const removeBtn = document.createElement('button');
+              removeBtn.type = 'button';
+              removeBtn.className = 'btn btn-outline-danger btn-sm';
+              removeBtn.textContent = 'Remove';
+              removeBtn.addEventListener('click', () => {
+                if (!landingContent?.categories?.items) return;
+                landingContent.categories.items.splice(index, 1);
+                renderLandingEditor();
+              });
+              actions.appendChild(itemTitle);
+              actions.appendChild(removeBtn);
+              itemWrap.appendChild(actions);
+            } else {
+              itemTitle.textContent = itemLabel;
+              itemWrap.appendChild(itemTitle);
+            }
             const itemFields = document.createElement('div');
             itemFields.className = 'landing-fields';
             if (item && typeof item === 'object' && !Array.isArray(item)) {
@@ -1280,6 +1372,30 @@
             itemWrap.appendChild(itemFields);
             block.appendChild(itemWrap);
           });
+
+          if (path.join('.') === 'categories.items') {
+            const addWrap = document.createElement('div');
+            addWrap.className = 'landing-array-actions';
+            const addLabel = document.createElement('div');
+            addLabel.className = 'landing-item-title';
+            addLabel.textContent = 'Add new item';
+            const addBtn = document.createElement('button');
+            addBtn.type = 'button';
+            addBtn.className = 'btn btn-outline-dark btn-sm';
+            addBtn.textContent = 'Add';
+            addBtn.addEventListener('click', () => {
+              if (!landingContent?.categories) return;
+              if (!Array.isArray(landingContent.categories.items)) {
+                landingContent.categories.items = [];
+              }
+              const template = landingContent.categories.items[landingContent.categories.items.length - 1] || {};
+              landingContent.categories.items.push(cloneForCategory(template));
+              renderLandingEditor();
+            });
+            addWrap.appendChild(addLabel);
+            addWrap.appendChild(addBtn);
+            block.appendChild(addWrap);
+          }
 
           container.appendChild(block);
           return;
@@ -1338,6 +1454,9 @@
           } else {
             renderNode(fields, sectionKey, sectionValue, [sectionKey], 0);
           }
+          if (sectionKey === 'pricing') {
+            fields.appendChild(createPricingUploadBlock());
+          }
           section.appendChild(fields);
           landingEditor.appendChild(section);
         });
@@ -1369,11 +1488,13 @@
           })
           .then(data => {
             landingContent = data;
+            renderLandingEditor();
+            bindPricingUpload();
+            const { pricingImagePath } = getPricingElements();
             if (pricingImagePath) {
               const imageValue = landingContent?.pricing?.image;
               pricingImagePath.textContent = imageValue ? `pricing.image (${imageValue})` : 'pricing.image';
             }
-            renderLandingEditor();
           })
           .catch(() => {
             landingEditor.textContent = 'Unable to load content.';
@@ -1418,12 +1539,15 @@
       }
 
       const setPricingImageStatus = (message, tone) => {
+        const { pricingImageStatus } = getPricingElements();
         if (!pricingImageStatus) return;
         pricingImageStatus.textContent = message;
         pricingImageStatus.className = 'landing-upload-status' + (tone ? ` is-${tone}` : '');
       };
 
-      if (pricingImageUploadBtn && pricingImageFile) {
+      const bindPricingUpload = () => {
+        const { pricingImageUploadBtn, pricingImageFile } = getPricingElements();
+        if (!pricingImageUploadBtn || !pricingImageFile) return;
         pricingImageUploadBtn.addEventListener('click', () => {
           if (!pricingImageFile.files || !pricingImageFile.files[0]) {
             setPricingImageStatus('Choose a file first.', 'error');
@@ -1444,9 +1568,14 @@
             }
             return response.json();
           })
-          .then(() => {
+          .then((data) => {
             setPricingImageStatus('Uploaded successfully.', 'success');
             pricingImageFile.value = '';
+            const { pricingImagePath } = getPricingElements();
+            if (pricingImagePath) {
+              const imageValue = data?.path || landingContent?.pricing?.image;
+              pricingImagePath.textContent = imageValue ? `pricing.image (${imageValue})` : 'pricing.image';
+            }
           })
           .catch(() => {
             setPricingImageStatus('Upload failed. Please retry.', 'error');
@@ -1455,7 +1584,7 @@
             pricingImageUploadBtn.disabled = false;
           });
         });
-      }
+      };
 
       loadLandingContent();
 
