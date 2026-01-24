@@ -708,6 +708,10 @@
       font-size: 13px;
     }
 
+    .landing-input input[type="file"] {
+      width: 100%;
+    }
+
     .landing-input textarea {
       min-height: 72px;
       resize: vertical;
@@ -1213,6 +1217,12 @@
 
         const field = document.createElement('div');
         field.className = 'landing-field';
+        if (
+          (path[0] === 'reasons' && (path[1] === 'title' || path[1] === 'content')) ||
+          (path[0] === 'overview' && path[1] === 'content')
+        ) {
+          field.classList.add('is-full');
+        }
 
         const label = document.createElement('div');
         label.className = 'landing-label';
@@ -1261,7 +1271,22 @@
         isLang,
         basePath,
       }) => {
+        const pathKey = path.join('.');
         if (path.length && shouldSkipKey(path[path.length - 1])) {
+          return null;
+        }
+        if (
+          pathKey === 'categories.title' ||
+          pathKey === 'features.cta.href' ||
+          pathKey === 'footer.contacts.5.href' ||
+          pathKey === 'footer.copyright' ||
+          pathKey === 'hero.backgroundAlt' ||
+          pathKey === 'header.brand.logoAlt' ||
+          pathKey === 'header.brand.wordmarkAlt' ||
+          pathKey === 'header.cta.href' ||
+          (pathKey.startsWith('header.nav.') && pathKey.endsWith('.id')) ||
+          pathKey === 'overview.cta.href'
+        ) {
           return null;
         }
         const field = document.createElement('div');
@@ -1516,9 +1541,24 @@
       const renderLandingEditor = () => {
         if (!landingEditor || !landingContent) return;
         landingEditor.innerHTML = '';
-        Object.entries(landingContent).forEach(([sectionKey, sectionValue]) => {
+        const entries = Object.entries(landingContent);
+        entries.sort((a, b) => {
+          if (a[0] === 'meta') return -1;
+          if (b[0] === 'meta') return 1;
+          return 0;
+        });
+        entries.forEach(([sectionKey, sectionValue]) => {
           if (sectionKey === 'form') {
             return;
+          }
+          if (sectionKey === 'reasons' && sectionValue && typeof sectionValue === 'object' && !Array.isArray(sectionValue)) {
+            const reasonsEntries = Object.entries(sectionValue);
+            reasonsEntries.sort((a, b) => {
+              if (a[0] === 'title') return -1;
+              if (b[0] === 'title') return 1;
+              return 0;
+            });
+            sectionValue = Object.fromEntries(reasonsEntries);
           }
           const section = document.createElement('div');
           section.className = 'landing-section';
