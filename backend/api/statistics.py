@@ -53,6 +53,14 @@ def _format_date(value):
         return ""
 
 
+def _normalize_dt(dt: datetime | None) -> datetime | None:
+    if not dt:
+        return None
+    if dt.tzinfo is not None:
+        return dt.replace(tzinfo=None)
+    return dt
+
+
 def _is_staff(user: User) -> bool:
     role_id = user.role_id or 0
     return role_id > 0 and role_id < 100
@@ -236,7 +244,8 @@ def _build_payroll_analytics(
             month_overtime_hours = 0.0
 
             for wp in by_user_workpoints.get(user.id, []):
-                if not wp.createdAt or wp.createdAt < month_start or wp.createdAt > month_end:
+                wp_created = _normalize_dt(wp.createdAt)
+                if not wp_created or wp_created < month_start or wp_created > month_end:
                     continue
                 checklist = wp.checklist or {}
                 if not isinstance(checklist, dict):
@@ -259,7 +268,8 @@ def _build_payroll_analytics(
             punish = 0.0
             advance = 0.0
             for msg in by_user_messages.get(user.id, []):
-                if not msg.createdAt or msg.createdAt < month_start or msg.createdAt > month_end:
+                msg_created = _normalize_dt(msg.createdAt)
+                if not msg_created or msg_created < month_start or msg_created > month_end:
                     continue
                 amount = float(_extract_cash_amount(msg.text))
                 msg_type = (msg.type or "").strip()
