@@ -1001,14 +1001,13 @@ def test_sync_backup_to_drive(dry_run=True):
         print("Sync backup to Drive failed:", e.stderr or e)
 
 def get_query_page_users(lead_id, page, limit, search, role_id = 0):
-    Pagination = namedtuple('Pagination', ['total', 'pages'])
-    empty_pagination = Pagination(total=0, pages=0)
-
     if lead_id == 0:
         return [], empty_pagination
     
     lead = db.session.get(LeadPayload, lead_id)
     if not lead:
+        Pagination = namedtuple('Pagination', ['total', 'pages'])
+        empty_pagination = Pagination(total=0, pages=0)
         return [], empty_pagination
     
     if role_id == 0:

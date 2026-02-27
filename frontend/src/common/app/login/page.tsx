@@ -6,11 +6,11 @@ export const Login = () => {
   const navigate = useNavigate();
   
   useEffect(() => {
-    const accessToken = sessionStorage.getItem("accessToken");
+    const accessToken = localStorage.getItem("accessToken");
     if (accessToken) {
-      navigate("/dashboard", { replace: true });
+      navigate("/", { replace: true });
     } else {
-      sessionStorage.removeItem("accessToken");
+      localStorage.removeItem("accessToken");
     }
   }, [navigate]);
 
@@ -34,8 +34,8 @@ export const Login = () => {
 
 // Loader vẫn có thể dùng để redirect nếu cần
 export const loader = async () => {
-  if (sessionStorage.getItem("accessToken")) {
-    return redirect("/dashboard");
+  if (localStorage.getItem("accessToken")) {
+    return redirect("/");
   }
   return null;
 };

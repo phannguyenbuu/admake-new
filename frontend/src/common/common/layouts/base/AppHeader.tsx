@@ -134,7 +134,7 @@ export default function AppHeader() {
                     label: "Thông tin",
                     icon: <UserOutlined />,
                     onClick: () => {
-                      navigate("/dashboard/infor");
+                      navigate("/infor");
                     },
                   },
                   {
@@ -168,7 +168,7 @@ export default function AppHeader() {
         
       </Header>
 
-      {location === '/dashboard/workpoints'
+      {location === '/workpoints'
         && <NoteWorkpointModal questionOpen={questionOpen} onCancel={handleCancel} />}
     </ChatGroupProvider>
     

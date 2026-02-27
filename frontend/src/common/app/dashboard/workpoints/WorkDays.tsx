@@ -35,12 +35,12 @@ export const QRColumn: React.FC<QRColumnProps> = ({ record }) => {
         onCancel={() => setShowModal(false)}
         footer={null}
         width={300}
-        title={`Mã QR c?a ${record.username}`}
+        title={`Mã QR của ${record.username}`}
       >
         {selectedRecord && (
           <Box display="flex" justifyContent="center">
             <QRCode
-              title="Download và g?i cho nhân s?"
+              title="Download và gửi cho nhân sự"
               filename={`qrcode-admake-${record.user_id}.png`}
               url={`${window.location.origin}/point/${selectedRecord.user_id}/`}
             />
@@ -115,15 +115,15 @@ export default function WorkDays({ record, selectedMonth }: ParamWorkDaysProps) 
       });
 
       if (response.ok) {
-        notification.success({ message: "Xóa ngh? phép thành công!" });
+        notification.success({ message: "Xóa nghỉ phép thành công!" });
         setModalVisible(false);
         setModalImg(null);
       } else {
-        throw new Error("Xóa th?t b?i");
+        throw new Error("Xóa thất bại");
       }
     } catch (error) {
       console.error("Failed to delete leave:", error);
-      notification.error({ message: "Xóa ngh? phép th?t b?i!" });
+      notification.error({ message: "Xóa nghỉ phép thất bại!" });
     }
   };
 
@@ -251,14 +251,14 @@ export default function WorkDays({ record, selectedMonth }: ParamWorkDaysProps) 
             </Typography>
             {modalImg?.out?.img && (
               <Typography sx={{ color: "#fff", textAlign: "center", fontSize: 10 }}>
-                S? gi? làm trong bu?i: {modalImg.workhour?.toFixed(2)}
+                Số giờ làm trong buổi: {modalImg.workhour?.toFixed(2)}
               </Typography>
             )}
           </Box>
 
           {modalImg?.status !== "off" && (
             <Typography fontSize={10} color="#00B4B6" fontStyle="italic">
-              Nh?p vào hình d? xem v? trí trên Google Maps
+              Nhấp vào hình để xem vị trí trên Google Maps
             </Typography>
           )}
 
@@ -289,7 +289,7 @@ export default function WorkDays({ record, selectedMonth }: ParamWorkDaysProps) 
                       const url = `https://www.google.com/maps?q=${modalImg.in.lat},${modalImg.in.long}`;
                       window.open(url, "_blank");
                     } else {
-                      notification.error({ message: "Không có t?a d? d? m? b?n d?" });
+                      notification.error({ message: "Không có tọa độ để mở bản đồ" });
                     }
                   }}
                 />
@@ -314,7 +314,7 @@ export default function WorkDays({ record, selectedMonth }: ParamWorkDaysProps) 
                       const url = `https://www.google.com/maps?q=${modalImg.out.lat},${modalImg.out.long}`;
                       window.open(url, "_blank");
                     } else {
-                      notification.error({ message: "Không có t?a d? d? m? b?n d?" });
+                      notification.error({ message: "Không có tọa độ để mở bản đồ" });
                     }
                   }}
                 />
@@ -324,7 +324,7 @@ export default function WorkDays({ record, selectedMonth }: ParamWorkDaysProps) 
             {modalImg?.status === "off" && (
               <Stack direction="column">
                 <Typography textAlign="center" style={{ fontWeight: 700 }}>
-                  XIN NGH? PHÉP
+                  XIN NGHỈ PHÉP
                 </Typography>
                 <Typography textAlign="center">
                   {modalImg.day.getDate().toString().padStart(2, "0") + "-" +
@@ -332,13 +332,13 @@ export default function WorkDays({ record, selectedMonth }: ParamWorkDaysProps) 
                     modalImg.day.getFullYear()}
                 </Typography>
                 <Typography textAlign="center">
-                  Bu?i {modalImg.period === 0 ? "sáng" : modalImg.period === 1 ? "chi?u" : "t?i"}
+                  Buổi {modalImg.period === 0 ? "sáng" : modalImg.period === 1 ? "chiều" : "tối"}
                 </Typography>
                 <Typography textAlign="center">Lý do: {modalImg.text}</Typography>
 
                 <DeleteConfirm
-                  caption="XÓA NGH? PHÉP"
-                  text="B?n mu?n xóa ngh? phép này?"
+                  caption="XÓA NGHỈ PHÉP"
+                  text="Bạn muốn xóa nghỉ phép này?"
                   elId={modalImg.id}
                   onDelete={() => handleLeaveDelete(modalImg.id)}
                 />

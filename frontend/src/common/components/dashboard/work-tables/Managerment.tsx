@@ -395,7 +395,7 @@ export default function ManagermentBoard() {
   }, []);
 
   return (
-    <div className="relative min-h-screen overflow-hidden">
+    <div className="relative w-full">
       <WorkspaceHeader workspaceData={workspaceData}/>
       
       {/* Board */}

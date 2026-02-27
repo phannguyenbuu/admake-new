@@ -96,7 +96,7 @@ const WorkspaceBoard: React.FC<WorkspaceBoardProps> = ({
 
     const cardWidth = isMobile
       ? 320
-      : Math.max(220, Math.round((window.innerWidth - 360) / 4));
+      : Math.min(320, Math.max(220, Math.round((window.innerWidth - 360) / 4)));
 
     return (
     <div className="relative z-10 px-4 sm:px-6 pt-3">

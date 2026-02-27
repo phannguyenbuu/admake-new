@@ -244,7 +244,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         throw new Error('No access token in response');
       }
 
-      sessionStorage.setItem('accessToken', data.access_token);
+      localStorage.setItem('accessToken', data.access_token);
 
       setUserId(data.id);
       setUsername(data.username);
@@ -256,7 +256,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setCanViewPermission(data.can_views ?? null);
 
       // Sau khi đăng nhập thành công, bạn có thể redirect đến trang chính
-      window.location.href = '/dashboard'; // hoặc route bạn muốn
+      window.location.href = '/'; // hoặc route bạn muốn
     } catch (error) {
       notification.error({message:'Login error:', description: `${error}` || ''});
       // alert(error instanceof Error ? error.message : 'Login failed');
@@ -269,7 +269,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       || window.location.href.includes('/chat/')
       || window.location.href.includes('/point/'))
     {
-      sessionStorage.removeItem('accessToken');
+      localStorage.removeItem('accessToken');
       setUserId(null);
       setUsername(null);
 
@@ -292,7 +292,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
 
     try {
-      const accessToken = sessionStorage.getItem('accessToken');
+      const accessToken = localStorage.getItem('accessToken');
       await fetch(`${API_HOST}/auth/logout`, {
         method: 'POST',
         headers: {
@@ -302,7 +302,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } catch (error) {
       console.error('Logout request failed', error);
     }
-    sessionStorage.removeItem('accessToken');
+    localStorage.removeItem('accessToken');
     setUserId(null);
     setUsername(null);
     setFullName(null);
@@ -318,7 +318,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
 
   const checkAuthStatus = async () => {
-    const accessToken = sessionStorage.getItem("accessToken");
+    const accessToken = localStorage.getItem("accessToken");
 
     if (!accessToken) {
       if (!isLoggingOutRef.current) {

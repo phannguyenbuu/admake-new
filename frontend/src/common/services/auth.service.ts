@@ -13,7 +13,7 @@ export const AuthService = {
       if (!access_token) throw new Error("No access token");
 
 
-      sessionStorage.setItem("accessToken", access_token);
+      localStorage.setItem("accessToken", access_token);
       
       return (response as any);
     } catch (error) {
@@ -22,7 +22,7 @@ export const AuthService = {
     }
   },
   me: (): Promise<User | null> => {
-    const accessToken = sessionStorage.getItem("accessToken") || "";
+    const accessToken = localStorage.getItem("accessToken") || "";
     // console.log("AS_ME", accessToken);
     return axiosClient.get(`${API_HOST}/auth/me`, {
       headers: {
@@ -35,7 +35,7 @@ export const AuthService = {
     body: Partial<Pick<User, "username" | "password" | "fullName">>
   ): Promise<Pick<User, "username" | "password" | "fullName">> => {
     
-    const accessToken = sessionStorage.getItem("accessToken") || "";
+    const accessToken = localStorage.getItem("accessToken") || "";
     // console.log("AS_ME_UPDATE", accessToken);
     return axiosClient.put(`${API_HOST}/auth/me`, body, {
       headers: {
@@ -45,7 +45,7 @@ export const AuthService = {
   },
 
   updateAvatar: (body: FormData): Promise<User> => {
-    const accessToken = sessionStorage.getItem("accessToken") || "";
+    const accessToken = localStorage.getItem("accessToken") || "";
     return axiosClient.putForm(`${API_HOST}/auth/me/avatar`, body, {
       headers: {
         "Content-Type": "multipart/form-data",

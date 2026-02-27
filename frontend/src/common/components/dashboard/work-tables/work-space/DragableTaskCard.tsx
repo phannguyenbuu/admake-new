@@ -128,7 +128,7 @@ export const CardItem: React.FC<CardItemProps> = ({
     }
   };
 
-  const card_width = Math.round((window.innerWidth - 360)/4);
+  const card_width = Math.min(300, Math.round((window.innerWidth - 360)/4));
 
 
     return (
@@ -148,6 +148,7 @@ export const CardItem: React.FC<CardItemProps> = ({
       } ${!snapshot?.isDragging ? "drag-item-reset" : ""}`}
       style={{
         ...provided?.draggableProps.style,
+        maxWidth: 300,
         ...(snapshot?.isDragging
           ? {
               transition: "none",
@@ -157,6 +158,7 @@ export const CardItem: React.FC<CardItemProps> = ({
               top: 0,
               left: 0,
               margin: 0,
+              width: card_width,
               minWidth: card_width,
               transform: provided?.draggableProps.style?.transform || "none",
             }
@@ -202,10 +204,10 @@ export const CardItem: React.FC<CardItemProps> = ({
                 sx={{ width: 100, height: 70, borderRadius: 0}}
             />}
 
-            <div className="space-y-1 sm:space-y-1.5">
+            <div className="space-y-1 sm:space-y-1.5 flex-1 min-w-0">
               <div className="flex items-start justify-between gap-2">
                 <h3
-                  className={`font-bold text-xs sm:text-sm break-words line-clamp-2 transition-colors duration-150 flex-1 min-w-0 ${
+                  className={`font-bold text-xs sm:text-sm break-words whitespace-normal transition-colors duration-150 flex-1 min-w-0 ${
                     isRewardColumn ? "text-purple-800" : "text-gray-800 group-hover/task:text-gray-900"
                   }`}
                 >
@@ -213,7 +215,7 @@ export const CardItem: React.FC<CardItemProps> = ({
                 </h3>
               </div>
               {task.description && (
-                <p className="text-gray-500 text-xs line-clamp-2 leading-relaxed">{task.description.length > 20 ? task.description.slice(0, 20) + '...' : task.description}</p>
+                <p className="text-gray-500 text-xs whitespace-normal leading-relaxed">{task.description}</p>
               )}
               {task.reward && (
                 <div className="flex items-center gap-1 text-xs text-green-600 font-semibold">

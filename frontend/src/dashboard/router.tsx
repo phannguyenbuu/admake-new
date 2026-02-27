@@ -77,7 +77,7 @@ const routes: TRoute = {
   errorElement: <Error404 />,
   children: [
     {
-      path: "/dashboard",
+      path: "/",
       element: (
         <Suspense fallback={<div>Loading...</div>}>
           <DashboardPage />
@@ -88,13 +88,13 @@ const routes: TRoute = {
       children: [
         {
           index: true,
-          element: <Navigate to="/dashboard/users" replace />,
+          element: <Navigate to="/users" replace />,
           title: "Home",
           icon: <HomeOutlined />,
           ignoreInMenu: true,
         },
         {
-          path: "/dashboard/workpoints",
+          path: "/workpoints",
           element: (
             <Suspense fallback={<div>Loading...</div>}>
               <WorkPointPage />
@@ -104,7 +104,7 @@ const routes: TRoute = {
           icon: <CheckOutlined />,
         },
         {
-          path: "/dashboard/users",
+          path: "/users",
           element: (
             <Suspense fallback={<div>Loading...</div>}>
               <UserDashboard />
@@ -115,7 +115,7 @@ const routes: TRoute = {
           icon: <LineChartOutlined />,
         },
         {
-          path: "/dashboard/supplier",
+          path: "/supplier",
           element: (
             <Suspense fallback={<div>Loading...</div>}>
               <SupplierDashboard />
@@ -126,7 +126,7 @@ const routes: TRoute = {
           icon: <FormOutlined />,
         },
         {
-          path: "/dashboard/customers",
+          path: "/customers",
           element: (
             <Suspense fallback={<div>Loading...</div>}>
               <CustomerDashboard />
@@ -138,7 +138,7 @@ const routes: TRoute = {
           isDevelope: false,
         },
         {
-          path: "/dashboard/work-tables",
+          path: "/work-tables",
           element: (
             <Suspense fallback={<div>Loading...</div>}>
               <WorkTableDetailPage />
@@ -148,7 +148,7 @@ const routes: TRoute = {
           icon: <BarChartOutlined />,
           children: [
             {
-              path: "/dashboard/work-tables/:boardId",
+              path: "/work-tables/:boardId",
               element: <WorkTableDetailPage />,
             },
           ],
@@ -160,7 +160,7 @@ const routes: TRoute = {
           ignoreInMenu: false,
         },
         {
-          path: "/dashboard/statistics",
+          path: "/statistics",
           element: (
             <Suspense fallback={<div>Loading...</div>}>
               <StatisticDashboard />
@@ -170,7 +170,7 @@ const routes: TRoute = {
           icon: <PieChartOutlined />,
         },
         {
-          path: "/dashboard/accounting",
+          path: "/accounting",
           element: (
             <Suspense fallback={<div>Loading...</div>}>
               <AccountingDashboard />
@@ -181,7 +181,7 @@ const routes: TRoute = {
           icon: <AccountBookOutlined />,
         },
         {
-          path: "/dashboard/materials",
+          path: "/materials",
           element: (
             <Suspense fallback={<div>Loading...</div>}>
               <MaterialsDashboard />
@@ -193,7 +193,7 @@ const routes: TRoute = {
           isDevelope: false,
         },
         {
-          path: "/dashboard/invoices",
+          path: "/invoices",
           element: (
             <Suspense fallback={<div>Loading...</div>}>
               <InvoiceDashboard />
@@ -204,7 +204,7 @@ const routes: TRoute = {
           icon: <FileTextOutlined />,
         },
         {
-          path: "/dashboard/infor",
+          path: "/infor",
           element: <InforDashboard />,
           title: "Hồ sơ",
           icon: <UserOutlined />,

@@ -4,6 +4,7 @@ import tailwindcss from "@tailwindcss/vite";
 import { fileURLToPath, URL } from 'url';
 // import react from '@vitejs/plugin-react';
 import path from 'path';
+import fs from 'fs';
 
 // import { fileURLToPath } from 'url';
 import { dirname } from 'path';
@@ -27,18 +28,43 @@ export default defineConfig({
     {
       name: 'rewrite-fallback',
       configureServer(server) {
-        server.middlewares.use((req, res, next) => {
-          if (req.url?.startsWith('/dashboard')) {
-            req.url = '/dashboard.html'; // rewrite về file entry chính của dashboard
-          } else if (req.url?.startsWith('/point')) {
-            req.url = '/point.html'; // rewrite về file entry chính của dashboard
-          } else if (req.url?.startsWith('/chat')) {
-            req.url = '/chat.html'; // rewrite về file entry chính của dashboard
-          } else if (req.url?.startsWith('/login')) {
-            req.url = '/login.html'; // rewrite về file entry chính của dashboard
-          }else if (req.url === '/' || req.url === '') {
-            req.url = '/dashboard.html';
+        server.middlewares.use(async (req, res, next) => {
+          const url = req.url || '';
+          
+          // Chỉ xử lý các request không phải file (không có dấu chấm) và không phải API
+          if (url.includes('.') || url.startsWith('/api') || url.startsWith('/@') || url.startsWith('/src') || url.startsWith('/node_modules')) {
+            return next();
           }
+
+          let targetHtml = '';
+          if (url.startsWith('/point')) {
+            targetHtml = 'point.html';
+          } else if (url.startsWith('/chat')) {
+            targetHtml = 'chat.html';
+          } else if (url.startsWith('/login')) {
+            targetHtml = 'login.html';
+          } else {
+            // Tất cả các route khác (/, /users, /work-tables, v.v.)
+            targetHtml = 'dashboard.html';
+          }
+
+          if (targetHtml) {
+            try {
+              const htmlPath = path.resolve(__dirname, targetHtml);
+              if (fs.existsSync(htmlPath)) {
+                let html = fs.readFileSync(htmlPath, 'utf-8');
+                // Quan trọng: Sử dụng transformIndexHtml để Vite chèn các script/style cần thiết cho dev mode
+                html = await server.transformIndexHtml(url, html);
+                res.statusCode = 200;
+                res.setHeader('Content-Type', 'text/html');
+                res.end(html);
+                return;
+              }
+            } catch (e) {
+              console.error('Error serving HTML:', e);
+            }
+          }
+          
           next();
         });
       }

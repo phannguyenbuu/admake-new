@@ -81,9 +81,9 @@ export default function RenderMenuBar() {
 
   const createMenuItems = () => {
     return getMainMenuItems(pathname)
-      .filter((item) => item.key !== "/dashboard/infor")
+      .filter((item) => item.key !== "/infor")
       .map((item) => {
-        const hasChildren = item.key === "/dashboard/work-tables";
+        const hasChildren = item.key === "/work-tables";
 
         if (hasChildren && !isTablet && canViewPermission?.view_workspace) {
           return {
@@ -105,7 +105,7 @@ export default function RenderMenuBar() {
             ),
             children: (workspaces || []).map((workspace: WorkSpace) => ({
               id: workspace.id,
-              key: `/dashboard/work-tables/${workspace.id}`,
+              key: `/work-tables/${workspace.id}`,
               label: (
                 <div className="flex items-center gap-3 py-1 px-2 rounded-lg hover:bg-white/10 transition-all duration-200">
                   <div style={{ padding: 0, background: "none", border: "none", color: "yellow" }}>
@@ -134,7 +134,7 @@ export default function RenderMenuBar() {
   const handleMenuClick = ({ key }: { key: string }) => {
     if (key === "create-workspace") {
       setIsTabletWorkspaceModalOpen(true);
-    } else if (key === "/dashboard/work-tables" && isTablet) {
+    } else if (key === "/work-tables" && isTablet) {
       setIsTabletWorkspaceModalOpen(true);
     } else {
       navigate(key);
