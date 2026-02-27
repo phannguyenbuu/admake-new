@@ -91,10 +91,6 @@ export default function WorkDays({ record, selectedMonth }: ParamWorkDaysProps) 
     setStatuses(monthlyStatuses);
   }, [items, leaves, year, month, daysInMonth]);
 
-  useEffect(() => {
-    setStatuses(createEmptyStatuses(daysInMonth));
-  }, [daysInMonth]);
-
   type StatusKey = "in" | "out" | "off" | "null";
 
   const colors: Record<StatusKey, string> = {

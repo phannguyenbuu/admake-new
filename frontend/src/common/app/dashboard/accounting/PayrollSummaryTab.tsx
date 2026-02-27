@@ -37,9 +37,23 @@ type PayrollSummary = {
   total_net_salary: number;
 };
 
+type GroupSummary = {
+  total_people: number;
+  total_base_salary: number;
+  total_overtime_salary: number;
+  total_bonus: number;
+  total_punish: number;
+  total_advance: number;
+  total_net_salary: number;
+};
+
 type PayrollResponse = {
-  rows: PayrollRow[];
-  summary: PayrollSummary;
+  rows?: PayrollRow[];
+  staff_rows?: PayrollRow[];
+  supplier_rows?: PayrollRow[];
+  summary?: PayrollSummary;
+  staff_summary?: GroupSummary;
+  supplier_summary?: GroupSummary;
 };
 
 const formatMoney = (value: number) =>
@@ -63,6 +77,143 @@ const emptySummary: PayrollSummary = {
   total_net_salary: 0,
 };
 
+const emptyGroupSummary: GroupSummary = {
+  total_people: 0,
+  total_base_salary: 0,
+  total_overtime_salary: 0,
+  total_bonus: 0,
+  total_punish: 0,
+  total_advance: 0,
+  total_net_salary: 0,
+};
+
+const normalizeNamePart = (value: string) => value.trim().replace(/\s+/g, " ");
+
+const getVietnameseGivenName = (fullName: string) => {
+  const normalized = normalizeNamePart(fullName || "");
+  if (!normalized) return "";
+  const parts = normalized.split(" ");
+  return parts[parts.length - 1] || "";
+};
+
+function buildGroupSummary(rows: PayrollRow[]): GroupSummary {
+  return {
+    total_people: rows.length,
+    total_base_salary: rows.reduce((sum, row) => sum + Number(row.salary_base_total || 0), 0),
+    total_overtime_salary: rows.reduce((sum, row) => sum + Number(row.salary_overtime_total || 0), 0),
+    total_bonus: rows.reduce((sum, row) => sum + Number(row.bonus_total || 0), 0),
+    total_punish: rows.reduce((sum, row) => sum + Number(row.punish_total || 0), 0),
+    total_advance: rows.reduce((sum, row) => sum + Number(row.advance_total || 0), 0),
+    total_net_salary: rows.reduce((sum, row) => sum + Number(row.net_salary || 0), 0),
+  };
+}
+
+function PayrollTable({
+  title,
+  rows,
+  summary,
+  isLoading,
+}: {
+  title: string;
+  rows: PayrollRow[];
+  summary: GroupSummary;
+  isLoading: boolean;
+}) {
+  return (
+    <div className="overflow-x-auto bg-white rounded-2xl border border-slate-100 shadow-sm">
+      <div className="px-4 py-3 border-b bg-slate-50 flex flex-col gap-2 lg:flex-row lg:items-center lg:justify-between">
+        <div className="text-sm font-semibold text-slate-700">{title}</div>
+        <div className="flex flex-wrap items-center gap-2 text-xs">
+          <span className="px-2 py-1 rounded-md bg-white border border-slate-200 text-slate-600">
+            {"L\u01b0\u01a1ng: "}<b>{formatMoney(summary.total_base_salary)} {"\u0111"}</b>
+          </span>
+          <span className="px-2 py-1 rounded-md bg-white border border-slate-200 text-slate-600">
+            {"T\u0103ng ca: "}<b>{formatMoney(summary.total_overtime_salary)} {"\u0111"}</b>
+          </span>
+          <span className="px-2 py-1 rounded-md bg-white border border-slate-200 text-emerald-700">
+            {"Th\u01b0\u1edfng: "}<b>{formatMoney(summary.total_bonus)} {"\u0111"}</b>
+          </span>
+          <span className="px-2 py-1 rounded-md bg-white border border-slate-200 text-rose-700">
+            {"Ph\u1ea1t: "}<b>{formatMoney(summary.total_punish)} {"\u0111"}</b>
+          </span>
+          <span className="px-2 py-1 rounded-md bg-teal-50 border border-teal-200 text-teal-700">
+            {"Th\u1ef1c nh\u1eadn: "}<b>{formatMoney(summary.total_net_salary)} {"\u0111"}</b>
+          </span>
+        </div>
+      </div>
+      <table className="w-full text-sm text-left border-collapse min-w-[1450px]">
+        <thead>
+          <tr className="text-slate-500 text-xs border-b bg-slate-50">
+            <th className="py-3 px-3">STT</th>
+            <th className="py-3 px-3">Họ tên</th>
+            <th className="py-3 px-3">SĐT</th>
+            <th className="py-3 px-3">Bộ phận</th>
+            <th className="py-3 px-3">Lương cơ bản</th>
+            <th className="py-3 px-3">Số buổi</th>
+            <th className="py-3 px-3">Số giờ</th>
+            <th className="py-3 px-3">Tăng ca (giờ)</th>
+            <th className="py-3 px-3">Tiền lương</th>
+            <th className="py-3 px-3">Tiền tăng ca</th>
+            <th className="py-3 px-3">Thưởng</th>
+            <th className="py-3 px-3">Phạt</th>
+            <th className="py-3 px-3">Tạm ứng</th>
+            <th className="py-3 px-3">Thực nhận</th>
+          </tr>
+        </thead>
+        <tbody>
+          {isLoading ? (
+            <tr>
+              <td className="py-8 px-3 text-center text-slate-500" colSpan={14}>
+                Đang tải dữ liệu bảng lương...
+              </td>
+            </tr>
+          ) : rows.length === 0 ? (
+            <tr>
+              <td className="py-8 px-3 text-center text-slate-500" colSpan={14}>
+                Không có dữ liệu cho kỳ đã chọn.
+              </td>
+            </tr>
+          ) : (
+            rows.map((row, index) => (
+              <tr key={row.user_id} className="border-b last:border-0 hover:bg-slate-50/70">
+                <td className="py-3 px-3 text-slate-600">{index + 1}</td>
+                <td className="py-3 px-3 text-slate-700 font-medium">{row.full_name}</td>
+                <td className="py-3 px-3 text-slate-600">{row.phone || "-"}</td>
+                <td className="py-3 px-3 text-slate-600">{row.department || "-"}</td>
+                <td className="py-3 px-3 text-slate-700">{formatMoney(row.salary_base)} đ</td>
+                <td className="py-3 px-3 text-slate-600">{row.period_work}</td>
+                <td className="py-3 px-3 text-slate-600">{row.work_hours}</td>
+                <td className="py-3 px-3 text-slate-600">{row.overtime_hours}</td>
+                <td className="py-3 px-3 text-slate-700">{formatMoney(row.salary_base_total)} đ</td>
+                <td className="py-3 px-3 text-slate-700">{formatMoney(row.salary_overtime_total)} đ</td>
+                <td className="py-3 px-3 text-emerald-600 font-semibold">{formatMoney(row.bonus_total)} đ</td>
+                <td className="py-3 px-3 text-rose-600 font-semibold">{formatMoney(row.punish_total)} đ</td>
+                <td className="py-3 px-3 text-amber-700 font-semibold">{formatMoney(row.advance_total)} đ</td>
+                <td className="py-3 px-3 text-teal-700 font-semibold">{formatMoney(row.net_salary)} đ</td>
+              </tr>
+            ))
+          )}
+        </tbody>
+        {!isLoading && rows.length > 0 && (
+          <tfoot>
+            <tr className="border-t bg-slate-50 font-semibold text-slate-700">
+              <td className="py-3 px-3" colSpan={8}>
+                Tổng cộng
+              </td>
+              <td className="py-3 px-3">{formatMoney(summary.total_base_salary)} đ</td>
+              <td className="py-3 px-3">{formatMoney(summary.total_overtime_salary)} đ</td>
+              <td className="py-3 px-3 text-emerald-700">{formatMoney(summary.total_bonus)} đ</td>
+              <td className="py-3 px-3 text-rose-700">{formatMoney(summary.total_punish)} đ</td>
+              <td className="py-3 px-3 text-amber-700">{formatMoney(summary.total_advance)} đ</td>
+              <td className="py-3 px-3 text-teal-700">{formatMoney(summary.total_net_salary)} đ</td>
+            </tr>
+          </tfoot>
+        )}
+      </table>
+    </div>
+  );
+}
+
 export default function PayrollSummaryTab() {
   const { userLeadId } = useUser();
   const [filterMode, setFilterMode] = useState<FilterMode>("single");
@@ -70,8 +221,11 @@ export default function PayrollSummaryTab() {
   const [fromMonth, setFromMonth] = useState(thisMonth);
   const [toMonth, setToMonth] = useState(thisMonth);
   const [isLoading, setIsLoading] = useState(false);
-  const [rows, setRows] = useState<PayrollRow[]>([]);
   const [summary, setSummary] = useState<PayrollSummary>(emptySummary);
+  const [staffRows, setStaffRows] = useState<PayrollRow[]>([]);
+  const [supplierRows, setSupplierRows] = useState<PayrollRow[]>([]);
+  const [staffSummary, setStaffSummary] = useState<GroupSummary>(emptyGroupSummary);
+  const [supplierSummary, setSupplierSummary] = useState<GroupSummary>(emptyGroupSummary);
 
   const durationLabel = useMemo(() => {
     if (!summary.from_month || !summary.to_month) return "Không xác định";
@@ -102,12 +256,38 @@ export default function PayrollSummaryTab() {
       if (!response.ok) throw new Error(`Cannot fetch payroll summary: ${response.status}`);
       const data: PayrollResponse = await response.json();
 
-      setRows(data.rows || []);
+      const fallbackRows = data.rows || [];
+      const collator = new Intl.Collator("vi", {
+        sensitivity: "base",
+        usage: "sort",
+        numeric: true,
+      });
+
+      const compareByVietnameseName = (a: PayrollRow, b: PayrollRow) => {
+        const aFull = normalizeNamePart(a.full_name || "");
+        const bFull = normalizeNamePart(b.full_name || "");
+        const byGivenName = collator.compare(getVietnameseGivenName(aFull), getVietnameseGivenName(bFull));
+        if (byGivenName !== 0) return byGivenName;
+        return collator.compare(aFull, bFull);
+      };
+
+      const nextStaffRows = [...(data.staff_rows || fallbackRows.filter((row) => row.group_type === "staff"))]
+        .sort(compareByVietnameseName);
+      const nextSupplierRows = [...(data.supplier_rows || fallbackRows.filter((row) => row.group_type === "supplier"))]
+        .sort(compareByVietnameseName);
+
+      setStaffRows(nextStaffRows);
+      setSupplierRows(nextSupplierRows);
       setSummary(data.summary || emptySummary);
+      setStaffSummary(data.staff_summary || buildGroupSummary(nextStaffRows));
+      setSupplierSummary(data.supplier_summary || buildGroupSummary(nextSupplierRows));
     } catch (error) {
       console.error("Failed to fetch payroll summary", error);
-      setRows([]);
       setSummary(emptySummary);
+      setStaffRows([]);
+      setSupplierRows([]);
+      setStaffSummary(emptyGroupSummary);
+      setSupplierSummary(emptyGroupSummary);
     } finally {
       setIsLoading(false);
     }
@@ -120,8 +300,7 @@ export default function PayrollSummaryTab() {
   return (
     <div className="flex flex-col gap-4">
       <div className="text-sm text-slate-500">
-        Tổng hợp bảng lương nhân sự và thầu phụ theo kỳ, bao gồm lương cơ bản, tăng ca, thưởng/phạt, tạm ứng
-        và thực nhận.
+        Tổng hợp bảng lương nhân sự và thầu phụ theo kỳ, bao gồm lương cơ bản, tăng ca, thưởng/phạt, tạm ứng và thực nhận.
       </div>
 
       <div className="flex flex-wrap items-center gap-3">
@@ -200,90 +379,8 @@ export default function PayrollSummaryTab() {
         </div>
       </div>
 
-      <div className="overflow-x-auto bg-white rounded-2xl border border-slate-100 shadow-sm">
-        <table className="w-full text-sm text-left border-collapse min-w-[1500px]">
-          <thead>
-            <tr className="text-slate-500 text-xs border-b bg-slate-50">
-              <th className="py-3 px-3">STT</th>
-              <th className="py-3 px-3">Họ tên</th>
-              <th className="py-3 px-3">SĐT</th>
-              <th className="py-3 px-3">Bộ phận</th>
-              <th className="py-3 px-3">Nhóm</th>
-              <th className="py-3 px-3">Lương cơ bản</th>
-              <th className="py-3 px-3">Số buổi</th>
-              <th className="py-3 px-3">Số giờ</th>
-              <th className="py-3 px-3">Tăng ca (giờ)</th>
-              <th className="py-3 px-3">Tiền lương</th>
-              <th className="py-3 px-3">Tiền tăng ca</th>
-              <th className="py-3 px-3">Thưởng</th>
-              <th className="py-3 px-3">Phạt</th>
-              <th className="py-3 px-3">Tạm ứng</th>
-              <th className="py-3 px-3">Thực nhận</th>
-            </tr>
-          </thead>
-          <tbody>
-            {isLoading ? (
-              <tr>
-                <td className="py-8 px-3 text-center text-slate-500" colSpan={15}>
-                  Đang tải dữ liệu bảng lương...
-                </td>
-              </tr>
-            ) : rows.length === 0 ? (
-              <tr>
-                <td className="py-8 px-3 text-center text-slate-500" colSpan={15}>
-                  Không có dữ liệu cho kỳ đã chọn.
-                </td>
-              </tr>
-            ) : (
-              rows.map((row, index) => (
-                <tr key={row.user_id} className="border-b last:border-0 hover:bg-slate-50/70">
-                  <td className="py-3 px-3 text-slate-600">{index + 1}</td>
-                  <td className="py-3 px-3 text-slate-700 font-medium">{row.full_name}</td>
-                  <td className="py-3 px-3 text-slate-600">{row.phone || "-"}</td>
-                  <td className="py-3 px-3 text-slate-600">{row.department || "-"}</td>
-                  <td className="py-3 px-3">
-                    <span
-                      className={`px-2 py-1 rounded-full text-xs font-semibold ${
-                        row.group_type === "supplier"
-                          ? "bg-indigo-50 text-indigo-600"
-                          : "bg-cyan-50 text-cyan-700"
-                      }`}
-                    >
-                      {row.group_type === "supplier" ? "Thầu phụ" : "Nhân sự"}
-                    </span>
-                  </td>
-                  <td className="py-3 px-3 text-slate-700">{formatMoney(row.salary_base)} đ</td>
-                  <td className="py-3 px-3 text-slate-600">{row.period_work}</td>
-                  <td className="py-3 px-3 text-slate-600">{row.work_hours}</td>
-                  <td className="py-3 px-3 text-slate-600">{row.overtime_hours}</td>
-                  <td className="py-3 px-3 text-slate-700">{formatMoney(row.salary_base_total)} đ</td>
-                  <td className="py-3 px-3 text-slate-700">{formatMoney(row.salary_overtime_total)} đ</td>
-                  <td className="py-3 px-3 text-emerald-600 font-semibold">{formatMoney(row.bonus_total)} đ</td>
-                  <td className="py-3 px-3 text-rose-600 font-semibold">{formatMoney(row.punish_total)} đ</td>
-                  <td className="py-3 px-3 text-amber-700 font-semibold">{formatMoney(row.advance_total)} đ</td>
-                  <td className="py-3 px-3 text-teal-700 font-semibold">{formatMoney(row.net_salary)} đ</td>
-                </tr>
-              ))
-            )}
-          </tbody>
-          {!isLoading && rows.length > 0 && (
-            <tfoot>
-              <tr className="border-t bg-slate-50 font-semibold text-slate-700">
-                <td className="py-3 px-3" colSpan={9}>
-                  Tổng cộng
-                </td>
-                <td className="py-3 px-3">{formatMoney(summary.total_base_salary)} đ</td>
-                <td className="py-3 px-3">{formatMoney(summary.total_overtime_salary)} đ</td>
-                <td className="py-3 px-3 text-emerald-700">{formatMoney(summary.total_bonus)} đ</td>
-                <td className="py-3 px-3 text-rose-700">{formatMoney(summary.total_punish)} đ</td>
-                <td className="py-3 px-3 text-amber-700">{formatMoney(summary.total_advance)} đ</td>
-                <td className="py-3 px-3 text-teal-700">{formatMoney(summary.total_net_salary)} đ</td>
-              </tr>
-            </tfoot>
-          )}
-        </table>
-      </div>
+      <PayrollTable title="Bảng lương Nhân sự" rows={staffRows} summary={staffSummary} isLoading={isLoading} />
+      <PayrollTable title="Bảng lương Thầu phụ" rows={supplierRows} summary={supplierSummary} isLoading={isLoading} />
     </div>
   );
 }
-

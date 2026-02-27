@@ -63,6 +63,11 @@ const WorkPointPage: IPage["Component"] = () => {
   };
 
   const fetchUsers = async ({ page, limit, search, month }: typeof query) => {
+    if (!userLeadId || userLeadId <= 0) {
+      setWorkpoints([]);
+      setTotal(0);
+      return;
+    }
     setIsLoading(true);
     try {
       const response = await fetch(
@@ -89,7 +94,7 @@ const WorkPointPage: IPage["Component"] = () => {
 
   useEffect(() => {
     fetchUsers(query);
-  }, [query]);
+  }, [query, userLeadId]);
 
   useEffect(() => {
     setTaskDetail(null);
@@ -157,4 +162,3 @@ const WorkPointPage: IPage["Component"] = () => {
 };
 
 export default WorkPointPage;
-

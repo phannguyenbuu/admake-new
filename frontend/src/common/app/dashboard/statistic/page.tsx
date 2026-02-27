@@ -75,6 +75,11 @@ const fmtCurrency = (value: number) =>
   `${Math.round(value || 0).toLocaleString("vi-VN")} đ`;
 
 const getCurrentMonth = () => new Date().toISOString().slice(0, 7);
+const fmtPercent2 = (value: number) => `${(value || 0).toFixed(2)}%`;
+const toPercentByTotal = (value: number, total: number) => {
+  if (!total) return "0.00%";
+  return `${((value / total) * 100).toFixed(2)}%`;
+};
 
 const StatisticDashboard: IPage["Component"] = () => {
   const { userLeadId } = useUser();
@@ -87,6 +92,7 @@ const StatisticDashboard: IPage["Component"] = () => {
   });
   const [toMonth, setToMonth] = React.useState<string>(getCurrentMonth());
   const [search, setSearch] = React.useState("");
+  const [taskNameSearch, setTaskNameSearch] = React.useState("");
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<string>("");
   const [data, setData] = React.useState<StatsResponse | null>(null);
@@ -121,15 +127,10 @@ const StatisticDashboard: IPage["Component"] = () => {
 
   const jobRows = React.useMemo(() => {
     const rows = data?.job.detail_rows ?? [];
-    if (!search.trim()) return rows;
-    const keyword = search.trim().toLowerCase();
-    return rows.filter(
-      (row) =>
-        row.title.toLowerCase().includes(keyword) ||
-        row.workspace.toLowerCase().includes(keyword) ||
-        row.type.toLowerCase().includes(keyword),
-    );
-  }, [data?.job.detail_rows, search]);
+    if (!taskNameSearch.trim()) return rows;
+    const keyword = taskNameSearch.trim().toLowerCase();
+    return rows.filter((row) => row.title.toLowerCase().includes(keyword));
+  }, [data?.job.detail_rows, taskNameSearch]);
 
   const staffRows = React.useMemo(() => {
     const rows = data?.cost.staff_rows ?? [];
@@ -137,6 +138,21 @@ const StatisticDashboard: IPage["Component"] = () => {
     const keyword = search.trim().toLowerCase();
     return rows.filter((row) => row.name.toLowerCase().includes(keyword));
   }, [data?.cost.staff_rows, search]);
+
+  const jobStatusTotal = React.useMemo(
+    () => (data?.job.status_pie ?? []).reduce((sum, item) => sum + (item.value || 0), 0),
+    [data?.job.status_pie],
+  );
+
+  const costStructureTotal = React.useMemo(
+    () => (data?.cost.staff_structure ?? []).reduce((sum, item) => sum + (item.value || 0), 0),
+    [data?.cost.staff_structure],
+  );
+
+  const departmentRatioTotal = React.useMemo(
+    () => (data?.people_customer.department_ratio ?? []).reduce((sum, item) => sum + (item.value || 0), 0),
+    [data?.people_customer.department_ratio],
+  );
 
   return (
     <div className="w-full flex flex-col gap-6 pb-10">
@@ -211,7 +227,7 @@ const StatisticDashboard: IPage["Component"] = () => {
                 {
                   label: "Đã hoàn thiện",
                   value: data.job.cards.completed_tasks.toLocaleString("vi-VN"),
-                  delta: `${data.job.cards.completion_rate}%`,
+                  delta: fmtPercent2(data.job.cards.completion_rate),
                   accent: "text-purple-600",
                   up: true,
                 },
@@ -224,7 +240,7 @@ const StatisticDashboard: IPage["Component"] = () => {
                 },
                 {
                   label: "Tỉ lệ hoàn thành",
-                  value: `${data.job.cards.completion_rate}%`,
+                  value: fmtPercent2(data.job.cards.completion_rate),
                   delta: `${data.job.cards.completed_tasks}/${data.job.cards.total_tasks}`,
                   accent: "text-teal-600",
                   up: true,
@@ -257,6 +273,8 @@ const StatisticDashboard: IPage["Component"] = () => {
                       })),
                       innerRadius: 35,
                       outerRadius: 80,
+                      arcLabel: (item) => toPercentByTotal(item.value, jobStatusTotal),
+                      arcLabelMinAngle: 12,
                     },
                   ]}
                 />
@@ -294,11 +312,13 @@ const StatisticDashboard: IPage["Component"] = () => {
                         ],
                         innerRadius: 70,
                         outerRadius: 95,
+                        arcLabel: (item) => `${(item.value || 0).toFixed(2)}%`,
+                        arcLabelMinAngle: 12,
                       },
                     ]}
                   />
                   <div className="absolute text-center">
-                    <div className="text-2xl font-semibold text-teal-600">{data.job.cards.completion_rate}%</div>
+                    <div className="text-2xl font-semibold text-teal-600">{fmtPercent2(data.job.cards.completion_rate)}</div>
                     <div className="text-xs text-slate-400">Tỉ lệ hoàn thành</div>
                   </div>
                 </div>
@@ -306,7 +326,15 @@ const StatisticDashboard: IPage["Component"] = () => {
             </div>
 
             <div className="mt-6 bg-white rounded-2xl border border-slate-100 shadow-sm p-4">
-              <h3 className="text-sm font-semibold text-slate-600 mb-3">Chi tiết công việc</h3>
+              <div className="mb-3 flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+                <h3 className="text-sm font-semibold text-slate-600">Chi tiết công việc</h3>
+                <input
+                  value={taskNameSearch}
+                  onChange={(event) => setTaskNameSearch(event.target.value)}
+                  placeholder="Tìm theo tên công việc..."
+                  className="border border-slate-200 rounded-full px-4 py-2 text-sm min-w-[260px]"
+                />
+              </div>
               <div className="overflow-x-auto">
                 <table className="w-full text-sm text-left border-collapse">
                   <thead>
@@ -379,6 +407,8 @@ const StatisticDashboard: IPage["Component"] = () => {
                       })),
                       innerRadius: 35,
                       outerRadius: 90,
+                      arcLabel: (item) => toPercentByTotal(item.value, costStructureTotal),
+                      arcLabelMinAngle: 12,
                     },
                   ]}
                 />
@@ -541,6 +571,8 @@ const StatisticDashboard: IPage["Component"] = () => {
                       })),
                       innerRadius: 30,
                       outerRadius: 80,
+                      arcLabel: (item) => toPercentByTotal(item.value, departmentRatioTotal),
+                      arcLabelMinAngle: 12,
                     },
                   ]}
                 />

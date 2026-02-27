@@ -1,13 +1,22 @@
-import { createBrowserRouter, type NonIndexRouteObject,} from "react-router-dom";
+﻿import { createBrowserRouter, type NonIndexRouteObject } from "react-router-dom";
 import { Navigate } from "react-router-dom";
 import BaseLayout from "../common/common/layouts/base.layout";
 import type { UserRole } from "../common/@types/user.type";
 import Error404 from "../common/app/404";
 import React, { Suspense, lazy } from "react";
 import {
-  AccountBookOutlined, BookOutlined, CheckOutlined, FileTextOutlined, FormOutlined,
-  HomeOutlined, InboxOutlined, TeamOutlined, UserOutlined, PieChartOutlined,
-  BarChartOutlined,LineChartOutlined,
+  AccountBookOutlined,
+  BookOutlined,
+  CheckOutlined,
+  FileTextOutlined,
+  FormOutlined,
+  HomeOutlined,
+  InboxOutlined,
+  TeamOutlined,
+  UserOutlined,
+  PieChartOutlined,
+  BarChartOutlined,
+  LineChartOutlined,
 } from "@ant-design/icons";
 import { InforDashboard } from "../common/app/infor/page";
 
@@ -34,14 +43,14 @@ const DevelopeDashboard = () => {
   return (
     <CenterBox spacing={5}>
       <Typography color="#00B4B6" fontSize={16} fontStyle="italic" mt={25} textAlign="center">
-        Cám ơn quý khách đã quan tâm. Tính năng này đang phát triển ...
+        Cảm ơn quý khách đã quan tâm. Tính năng này đang phát triển ...
       </Typography>
       <Typography color="#00B4B6" fontSize={16} fontStyle="italic" textAlign="center">
         Vui lòng quay lại sau!
       </Typography>
     </CenterBox>
-  )
-}
+  );
+};
 
 const DashboardPage = lazy(() => import("../common/app/dashboard/page"));
 const WorkPointPage = lazy(() => import("../common/app/dashboard/workpoints/page"));
@@ -56,41 +65,39 @@ const AccountingDashboard = lazy(() => import("../common/app/dashboard/accountin
 
 const routes: TRoute = {
   path: "/",
-  element: 
-  <WorkpointInforProvider>
-            <WorkpointSettingProvider>
-              <TaskProvider>
-              <BaseLayout />
-              </TaskProvider>
-            </WorkpointSettingProvider>
-          </WorkpointInforProvider>
-          ,
+  element: (
+    <WorkpointInforProvider>
+      <WorkpointSettingProvider>
+        <TaskProvider>
+          <BaseLayout />
+        </TaskProvider>
+      </WorkpointSettingProvider>
+    </WorkpointInforProvider>
+  ),
   errorElement: <Error404 />,
   children: [
     {
       path: "/dashboard",
       element: (
         <Suspense fallback={<div>Loading...</div>}>
-          <DashboardPage/>
+          <DashboardPage />
         </Suspense>
       ),
       title: "Bảng điều khiển",
       isMainMenu: true,
       children: [
         {
-          // path: "/dashboard",
           index: true,
           element: <Navigate to="/dashboard/users" replace />,
           title: "Home",
           icon: <HomeOutlined />,
           ignoreInMenu: true,
         },
-        
         {
           path: "/dashboard/workpoints",
           element: (
             <Suspense fallback={<div>Loading...</div>}>
-                <WorkPointPage />
+              <WorkPointPage />
             </Suspense>
           ),
           title: "Chấm công",
@@ -98,7 +105,7 @@ const routes: TRoute = {
         },
         {
           path: "/dashboard/users",
-         element: (
+          element: (
             <Suspense fallback={<div>Loading...</div>}>
               <UserDashboard />
             </Suspense>
@@ -112,18 +119,19 @@ const routes: TRoute = {
           element: (
             <Suspense fallback={<div>Loading...</div>}>
               <SupplierDashboard />
-          </Suspense>),
+            </Suspense>
+          ),
           roles: ["user:management"],
           title: "Quản lý thầu phụ",
           icon: <FormOutlined />,
         },
-       
         {
           path: "/dashboard/customers",
           element: (
-          <Suspense fallback={<div>Loading...</div>}>
-            <CustomerDashboard />
-          </Suspense>),
+            <Suspense fallback={<div>Loading...</div>}>
+              <CustomerDashboard />
+            </Suspense>
+          ),
           roles: ["customer:management"],
           title: "Quản lý khách hàng",
           icon: <TeamOutlined />,
@@ -131,11 +139,11 @@ const routes: TRoute = {
         },
         {
           path: "/dashboard/work-tables",
-          element: (<Suspense fallback={<div>Loading...</div>}>
-              
-                <WorkTableDetailPage />
-              
-            </Suspense>),
+          element: (
+            <Suspense fallback={<div>Loading...</div>}>
+              <WorkTableDetailPage />
+            </Suspense>
+          ),
           title: "Bảng công việc",
           icon: <BarChartOutlined />,
           children: [
@@ -148,8 +156,29 @@ const routes: TRoute = {
         {
           path: "divider-1",
           title: "divider",
-          isDivider: true,  // lÃ¡ cá» nháº­n biáº¿t Ä‘Ã¢y lÃ  divider
+          isDivider: true,
           ignoreInMenu: false,
+        },
+        {
+          path: "/dashboard/statistics",
+          element: (
+            <Suspense fallback={<div>Loading...</div>}>
+              <StatisticDashboard />
+            </Suspense>
+          ),
+          title: "Phân tích",
+          icon: <PieChartOutlined />,
+        },
+        {
+          path: "/dashboard/accounting",
+          element: (
+            <Suspense fallback={<div>Loading...</div>}>
+              <AccountingDashboard />
+            </Suspense>
+          ),
+          roles: ["accounting:management"],
+          title: "Kế toán",
+          icon: <AccountBookOutlined />,
         },
         {
           path: "/dashboard/materials",
@@ -164,16 +193,6 @@ const routes: TRoute = {
           isDevelope: false,
         },
         {
-          path: "/dashboard/statistics",
-          element: (
-            <Suspense fallback={<div>Loading...</div>}>
-              <StatisticDashboard />
-            </Suspense>
-          ),
-          title: "Phân tích",
-          icon: <PieChartOutlined  />,
-        },
-        {
           path: "/dashboard/invoices",
           element: (
             <Suspense fallback={<div>Loading...</div>}>
@@ -184,26 +203,13 @@ const routes: TRoute = {
           title: "Báo giá",
           icon: <FileTextOutlined />,
         },
-
-        {
-          path: "/dashboard/accounting",
-          element: (
-            <Suspense fallback={<div>Loading...</div>}>
-              <AccountingDashboard />
-            </Suspense>
-          ),
-          
-          roles: ["accounting:management"],
-          title: "Kế toán",
-          icon: <AccountBookOutlined />,
-        },
         {
           path: "/dashboard/infor",
           element: <InforDashboard />,
           title: "Hồ sơ",
           icon: <UserOutlined />,
           ignoreInMenu: false,
-        }
+        },
       ],
     },
   ],
@@ -215,9 +221,9 @@ type MenuItem = {
   label: string;
   active?: boolean;
   children?: MenuItem[];
-  isDevelope: boolean,
-  tooltip: string,
-  style:any,
+  isDevelope: boolean;
+  tooltip: string;
+  style: any;
 };
 
 export function getMainMenuItems(pathname?: string): MenuItem[] {
@@ -232,7 +238,7 @@ export function getMainMenuItems(pathname?: string): MenuItem[] {
     return routes.reduce((acc: MenuItem[], route) => {
       if (!route) return acc;
 
-      const hasPermission = true; // Gá»™p check quyá»n náº¿u cáº§n
+      const hasPermission = true; // Gộp check quyền nếu cần.
 
       if (!route.ignoreInMenu && hasPermission) {
         if (route.isDivider) {
@@ -240,7 +246,7 @@ export function getMainMenuItems(pathname?: string): MenuItem[] {
             key: route.path || Math.random().toString(),
             icon: null,
             label: "---",
-            //@ts-ignore
+            // @ts-ignore
             isDivider: true,
           });
         } else {
@@ -250,12 +256,10 @@ export function getMainMenuItems(pathname?: string): MenuItem[] {
             key: route.path || "",
             icon: route.icon || <BookOutlined />,
             label: route.title || "Menu",
-            active: !isDeveloping, //pathname?.includes(route.path || ""),
+            active: !isDeveloping,
             isDevelope: isDeveloping,
             tooltip: isDeveloping ? "Tính năng đang phát triển" : "",
-            style: isDeveloping
-              ? { opacity: 0.5, cursor: "not-allowed" }
-              : {},
+            style: isDeveloping ? { opacity: 0.5, cursor: "not-allowed" } : {},
           };
 
           if (!route.children?.length) {
@@ -284,14 +288,3 @@ export function getMainMenuItems(pathname?: string): MenuItem[] {
 
 export const router = createBrowserRouter([routes as NonIndexRouteObject], {});
 export type Router = typeof router;
-
-
-
-
-
-
-
-
-
-
-
