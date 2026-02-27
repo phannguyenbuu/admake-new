@@ -144,7 +144,8 @@ def get_payroll_summary():
     date_start, _ = _month_start_end(from_month_dt)
     _, date_end = _month_start_end(to_month_dt)
 
-    users = [u for u in lead.users if u.role_id not in (-2, 0)]
+    # Payroll tab only includes staff and supplier, excludes LEAD/system/customer roles.
+    users = [u for u in lead.users if (u.role_id or 0) > 0]
     user_ids = [u.id for u in users]
     if not user_ids:
         return jsonify(
@@ -247,7 +248,7 @@ def get_payroll_summary():
 
     for user in users:
         role_name = (user.update_role() or {}).get("name", "")
-        is_supplier = (user.role_id and user.role_id > 100) or user.role_id == -1
+        is_supplier = (user.role_id or 0) > 100
         salary = float(user.salary or 0)
         period_work = 0
         work_hours = 0.0
@@ -337,7 +338,7 @@ def get_payroll_summary():
         summary["total_advance"] += row["advance_total"]
         summary["total_net_salary"] += row["net_salary"]
 
-    rows.sort(key=lambda r: (r["group_type"], r["full_name"]))
+    rows.sort(key=lambda r: (r.get("group_type") or "", (r.get("full_name") or "")))
 
     for key in (
         "total_base_salary",
@@ -349,7 +350,30 @@ def get_payroll_summary():
     ):
         summary[key] = round(float(summary[key]), 0)
 
-    return jsonify({"rows": rows, "summary": summary}), 200
+    staff_rows = [r for r in rows if r.get("group_type") == "staff"]
+    supplier_rows = [r for r in rows if r.get("group_type") == "supplier"]
+
+    def build_group_summary(group_rows):
+        return {
+            "total_people": len(group_rows),
+            "total_base_salary": round(sum(float(r.get("salary_base_total", 0) or 0) for r in group_rows), 0),
+            "total_overtime_salary": round(sum(float(r.get("salary_overtime_total", 0) or 0) for r in group_rows), 0),
+            "total_bonus": round(sum(float(r.get("bonus_total", 0) or 0) for r in group_rows), 0),
+            "total_punish": round(sum(float(r.get("punish_total", 0) or 0) for r in group_rows), 0),
+            "total_advance": round(sum(float(r.get("advance_total", 0) or 0) for r in group_rows), 0),
+            "total_net_salary": round(sum(float(r.get("net_salary", 0) or 0) for r in group_rows), 0),
+        }
+
+    return jsonify(
+        {
+            "rows": rows,
+            "staff_rows": staff_rows,
+            "supplier_rows": supplier_rows,
+            "summary": summary,
+            "staff_summary": build_group_summary(staff_rows),
+            "supplier_summary": build_group_summary(supplier_rows),
+        }
+    ), 200
 
 @workpoint_bp.route("/all", methods=["GET"])
 def get_all_workpoints():
