@@ -7,6 +7,7 @@ from dateutil.relativedelta import relativedelta
 from flask import Blueprint, abort, jsonify, request
 
 from models import LeadPayload, Task, User, Workspace, db
+from sqlalchemy import or_
 
 statistics_bp = Blueprint("statistics", __name__, url_prefix="/api/statistics")
 
@@ -100,13 +101,25 @@ def get_statistics_dashboard():
         Workspace.owner_id.isnot(None),
     ).all()
     workspace_by_id = {w.id: w for w in workspaces}
+    workspace_ids = [w.id for w in workspaces]
 
-    tasks = Task.query.filter(
-        Task.lead_id == lead_id,
-        Task.isDelete.is_(False),
+    task_query = Task.query.filter(Task.isDelete.is_(False))
+    if workspace_ids:
+        task_query = task_query.filter(
+            or_(
+                Task.workspace_id.in_(workspace_ids),
+                Task.lead_id == lead_id,
+            )
+        )
+    else:
+        task_query = task_query.filter(Task.lead_id == lead_id)
+
+    task_query = task_query.filter(
         Task.createdAt >= period_start,
         Task.createdAt <= period_end,
-    ).all()
+    )
+
+    tasks = task_query.all()
 
     status_counts: dict[str, int] = {
         "OPEN": 0,
