@@ -8,6 +8,7 @@ from models import app, db, User
 from api.auth import login_user_form
 from flask import render_template, request, redirect, url_for
 from dotenv import load_dotenv
+from flask_cors import CORS
 
 
 
@@ -33,6 +34,7 @@ from api.leads import lead_bp
 from api.lead_manage import lead_manage_bp
 from api.fureal import fureal_bp
 from api.notifys import notify_bp
+from api.statistics import statistics_bp
 
 app.register_blueprint(customer_bp)
 app.register_blueprint(material_bp)
@@ -51,8 +53,22 @@ app.register_blueprint(lead_bp)
 app.register_blueprint(lead_manage_bp)
 app.register_blueprint(fureal_bp)
 app.register_blueprint(notify_bp)
+app.register_blueprint(statistics_bp)
 
 from api.chat import socketio
+
+CORS(
+    app,
+    resources={r"/api/*": {"origins": [
+        "https://quanly.admake.vn",
+        "https://admake.vn",
+        "http://localhost:5173",
+        "http://localhost:3000",
+    ]}},
+    supports_credentials=True,
+    methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+    allow_headers=["Content-Type", "Authorization"],
+)
 
 @app.route('/login', methods=['GET'])
 def login_page():
