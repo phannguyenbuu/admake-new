@@ -481,6 +481,41 @@ const month = today.getMonth();
 
 export const columnsWorkPoint = (handleOpenModal: (record: WorkDaysProps) => void,  selectedMonth: string): ColumnsType<WorkDaysProps> => [
 // export const columnsWorkPoint: ColumnsType<WorkDaysProps> = [
+  ...(typeof window !== "undefined" && window.innerWidth < 768
+    ? [
+        {
+          title: `QR`,
+          dataIndex: "userrole",
+          key: "userrole",
+          width: 32,
+          render: (text: string, record: WorkDaysProps) => <QRColumn record={record} />,
+        },
+        {
+          title: "Họ Và Tên",
+          dataIndex: "username",
+          key: "username",
+          width: 140,
+          render: (text: string, record: WorkDaysProps) => (
+            <div style={{ cursor: "pointer" }} onClick={() => handleOpenModal(record)}>
+              <div>{text}</div>
+              <span style={{ fontSize: 12, fontStyle: "italic" }}>{record.userrole}</span>
+              <p style={{ fontSize: 8, color: "red", fontStyle: "italic" }}>Click để xem bảng lương</p>
+            </div>
+          ),
+        },
+        {
+          title: `Ngày công tác trong tháng ${month + 1}`,
+          dataIndex: "workpoint",
+          key: "workpoint",
+          width: 460,
+          render: (text: string, record: WorkDaysProps) => (
+            <div>
+              <WorkDays record={record} selectedMonth={selectedMonth} />
+            </div>
+          ),
+        },
+      ]
+    : [
   {
     title: `QR`,
     dataIndex: "userrole",
@@ -514,11 +549,13 @@ export const columnsWorkPoint = (handleOpenModal: (record: WorkDaysProps) => voi
     title: `Ngày công tác trong tháng ${month + 1}`,
     dataIndex: "workpoint",
     key: "workpoint",
-    width: 800,
+    width: 620,
     render:  (text: string, record: WorkDaysProps)  => (
       <div>
         <WorkDays record = {record}  selectedMonth={selectedMonth}/>
       </div>
     )
   },
+]
+  ),
 ];

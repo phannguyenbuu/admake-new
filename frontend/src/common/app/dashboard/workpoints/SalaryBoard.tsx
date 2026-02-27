@@ -122,7 +122,7 @@ const SalaryBoard: React.FC<SalaryBoardProps> = ({
     if (taskDetail) {
       const fetchData = async () => {
         try {
-          const response = await fetch(`${useApiHost()}/task/${selectedRecord?.user_id}/salary`, {
+          const response = await fetch(`${useApiHost()}/task/${selectedRecord?.user_id}/salary?month=${month}`, {
             method: "GET",
             headers: {
               "Content-Type": "application/json"
@@ -144,7 +144,7 @@ const SalaryBoard: React.FC<SalaryBoardProps> = ({
     }else{
       const fetchData = async () => {
         try {
-          const response = await fetch(`${useApiHost()}/workpoint/${selectedRecord?.user_id}/salary`, {
+          const response = await fetch(`${useApiHost()}/workpoint/${selectedRecord?.user_id}/salary?month=${month}`, {
             method: "GET",
             headers: {
               "Content-Type": "application/json"
@@ -162,7 +162,7 @@ const SalaryBoard: React.FC<SalaryBoardProps> = ({
       };
       fetchData();
     }
-  }, [selectedRecord, modalVisible]);
+  }, [selectedRecord, modalVisible, month]);
 
   useEffect(()=>{
     if(!taskDetail || ! taskDetail.assets) 
@@ -205,7 +205,7 @@ const SalaryBoard: React.FC<SalaryBoardProps> = ({
   const isAdmin = !window.location.href.includes('/point/');
 
   const fetchTaskByUser = async (): Promise<Task[]> => {
-    const response = await fetch(`${useApiHost()}/task/${selectedRecord?.user_id}/by_user`);
+    const response = await fetch(`${useApiHost()}/task/${selectedRecord?.user_id}/by_user?month=${month}`);
     
     if (!response.ok) {
       // console.log("Error in fetching");
@@ -224,10 +224,8 @@ const SalaryBoard: React.FC<SalaryBoardProps> = ({
       if (item.status !== "REWARD") return false;
 
       const endDate = dayjs(item.end_time).toDate();
-      const now = new Date();
-
-      return endDate.getMonth() === now.getMonth() &&
-            endDate.getFullYear() === now.getFullYear();
+      return endDate.getMonth() === selectedMonthIndex &&
+            endDate.getFullYear() === selectedYear;
     });
 
     // console.log('response json', json);

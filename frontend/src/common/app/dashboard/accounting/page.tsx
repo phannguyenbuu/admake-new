@@ -1,8 +1,10 @@
 ﻿
 import type { IPage } from "../../../@types/common.type";
 import React, { useState } from "react";
+import PayrollSummaryTab from "./PayrollSummaryTab";
 
 const tabs = [
+  { key: "bang-luong", label: "Bảng lương nhân sự" },
   { key: "tai-khoan", label: "Tài khoản kế toán" },
   { key: "chung-tu", label: "Chứng từ kế toán" },
   { key: "quy-tac", label: "Quy tắc chỉnh sửa & Kiểm soát dữ liệu" },
@@ -57,6 +59,8 @@ const AccountingDashboard: IPage["Component"] = () => {
             </button>
           ))}
         </div>
+
+        {activeTab === "bang-luong" && <PayrollSummaryTab />}
 
         {activeTab === "tai-khoan" && (
           <>
@@ -530,7 +534,8 @@ const AccountingDashboard: IPage["Component"] = () => {
           </div>
         )}
 
-        {activeTab !== "tai-khoan" &&
+        {activeTab !== "bang-luong" &&
+          activeTab !== "tai-khoan" &&
           activeTab !== "chung-tu" &&
           activeTab !== "quy-tac" &&
           activeTab !== "kiem-tra" &&

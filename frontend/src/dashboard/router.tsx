@@ -10,7 +10,6 @@ import {
   BarChartOutlined,LineChartOutlined,
 } from "@ant-design/icons";
 import { InforDashboard } from "../common/app/infor/page";
-import { useInfo } from "../common/common/hooks/info.hook";
 
 import { CenterBox } from "../common/components/chat/components/commons/TitlePanel";
 import { Typography } from "@mui/material";
@@ -149,7 +148,7 @@ const routes: TRoute = {
         {
           path: "divider-1",
           title: "divider",
-          isDivider: true,  // lá cờ nhận biết đây là divider
+          isDivider: true,  // lÃ¡ cá» nháº­n biáº¿t Ä‘Ã¢y lÃ  divider
           ignoreInMenu: false,
         },
         {
@@ -222,7 +221,6 @@ type MenuItem = {
 };
 
 export function getMainMenuItems(pathname?: string): MenuItem[] {
-  const { data: user } = useInfo();
   if (!pathname) {
     pathname = window.location.pathname;
   }
@@ -234,7 +232,7 @@ export function getMainMenuItems(pathname?: string): MenuItem[] {
     return routes.reduce((acc: MenuItem[], route) => {
       if (!route) return acc;
 
-      const hasPermission = true; // Gộp check quyền nếu cần
+      const hasPermission = true; // Gá»™p check quyá»n náº¿u cáº§n
 
       if (!route.ignoreInMenu && hasPermission) {
         if (route.isDivider) {

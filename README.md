@@ -280,7 +280,10 @@ Xem chi tiết tại `editor/docs/asset-compression.md`. Quy trình gợi ý:
 
 Ví dụ triển khai:
 ```bash
-npm --prefix quangcao_web run build
+npm --prefix frontend run build
 scp -r nginx root@31.97.76.62:/etc
-scp -r quangcao_web/dist/* root@31.97.76.62:/var/www/admake
+scp -r frontend/dist/* root@31.97.76.62:/var/www/admake
 ```
+
+
+

@@ -4,10 +4,10 @@ import { columnsWorkPoint } from "../../../common/data";
 import { useState, useEffect } from "react";
 import { useApiHost } from "../../../common/hooks/useApiHost";
 import { useUser } from "../../../common/hooks/useUser";
-import type { Workpoint, WorkDaysProps } from "../../../@types/workpoint";
+import type { WorkDaysProps } from "../../../@types/workpoint";
 import { useTaskContext } from "../../../common/hooks/useTask";
 import SalaryBoard from "./SalaryBoard";
-import { Typography, Select, Row, Col } from "antd";
+import { Typography, Select } from "antd";
 import UnPermissionBoard from "../unPermissionBoard";
 import dayjs from "dayjs";
 
@@ -18,7 +18,7 @@ const WorkPointPage: IPage["Component"] = () => {
     page: 1,
     limit: 10,
     search: "",
-    month: dayjs().format("YYYY-MM"), // Tháng hiện tại mặc định
+    month: dayjs().format("YYYY-MM"),
   });
 
   const { setTaskDetail } = useTaskContext();
@@ -33,15 +33,15 @@ const WorkPointPage: IPage["Component"] = () => {
   const generateMonthOptions = () => {
     const options: { value: string; label: string }[] = [];
     const now = dayjs();
-    const startDate = dayjs('2025-11-01');
-    
+    const startDate = dayjs("2025-11-01");
+
     let current = startDate;
-    while (current.isBefore(now) || current.isSame(now, 'month')) {
+    while (current.isBefore(now) || current.isSame(now, "month")) {
       options.unshift({
         value: current.format("YYYY-MM"),
-        label: current.format("MM/YYYY")
+        label: current.format("MM/YYYY"),
       });
-      current = current.add(1, 'month');
+      current = current.add(1, "month");
     }
     return options;
   };
@@ -58,9 +58,8 @@ const WorkPointPage: IPage["Component"] = () => {
     setSelectedRecord(null);
   };
 
-  // Reset về page 1 khi đổi tháng/search
   const handleQueryChange = (newQuery: Partial<typeof query>) => {
-    setQuery(prev => ({ ...prev, ...newQuery, page: 1 }));
+    setQuery((prev) => ({ ...prev, ...newQuery, page: 1 }));
   };
 
   const fetchUsers = async ({ page, limit, search, month }: typeof query) => {
@@ -68,17 +67,17 @@ const WorkPointPage: IPage["Component"] = () => {
     try {
       const response = await fetch(
         `${useApiHost()}/workpoint/page?` +
-        new URLSearchParams({
-          lead: userLeadId.toString(),
-          page: String(page),
-          limit: String(limit),
-          search,
-          month, // ← THÊM PARAM THÁNG
-        })
+          new URLSearchParams({
+            lead: userLeadId.toString(),
+            page: String(page),
+            limit: String(limit),
+            search,
+            month,
+          })
       );
-      
+
       const result = await response.json();
-      
+
       setWorkpoints(result.data);
       setTotal(result.pagination.total);
     } catch (error) {
@@ -93,31 +92,36 @@ const WorkPointPage: IPage["Component"] = () => {
   }, [query]);
 
   useEffect(() => {
-    console.log('canViewPermission', canViewPermission);
     setTaskDetail(null);
   }, []);
 
   return canViewPermission?.view_workpoint ? (
     <>
       <div className="min-h-screen p-2 w-full">
-        {/* DROPDOWN CHỌN THÁNG */}
-        <Row gutter={16} style={{ marginBottom: 16 }}>
-          <Col span={6}>
-            <Typography.Text strong>Chọn tháng:</Typography.Text>
-            <Select
-              value={query.month}
-              onChange={(value) => handleQueryChange({ month: value })}
-              style={{ width: '100%' }}
-              placeholder="Chọn tháng"
-            >
-              {monthOptions.map(option => (
-                <Option key={option.value} value={option.value}>
-                  {option.label}
-                </Option>
-              ))}
-            </Select>
-          </Col>
-        </Row>
+        <div
+          style={{
+            marginBottom: 16,
+            display: "flex",
+            alignItems: "center",
+            gap: 8,
+          }}
+        >
+          <Typography.Text strong style={{ whiteSpace: "nowrap" }}>
+            Chọn tháng:
+          </Typography.Text>
+          <Select
+            value={query.month}
+            onChange={(value) => handleQueryChange({ month: value })}
+            style={{ width: "50vw" }}
+            placeholder="Chọn tháng"
+          >
+            {monthOptions.map((option) => (
+              <Option key={option.value} value={option.value}>
+                {option.label}
+              </Option>
+            ))}
+          </Select>
+        </div>
 
         <TableComponent<WorkDaysProps>
           columns={columnsWorkPoint(handleOpenModal, query.month)}
@@ -126,28 +130,31 @@ const WorkPointPage: IPage["Component"] = () => {
           pagination={{
             pageSize: query.limit,
             current: query.page,
-            total: total,
+            total,
             onChange: (page, pageSize) => {
               setQuery({ ...query, page, limit: pageSize });
             },
             showSizeChanger: true,
-            showTotal: (total, range) => `${range[0]}-${range[1]} của ${total} nhân sự`,
+            showTotal: (totalItems, range) => `${range[0]}-${range[1]} của ${totalItems} nhân sự`,
             style: { paddingRight: "15px" },
             locale: { items_per_page: "/ Trang" },
           }}
-        /> 
+        />
       </div>
 
-      {modalVisible && 
-        <SalaryBoard 
+      {modalVisible && (
+        <SalaryBoard
           selectedRecord={selectedRecord}
-          modalVisible={modalVisible} 
-          handleOk={handleCloseModal} 
-          month={query.month} // ← Truyền tháng cho SalaryBoard
+          modalVisible={modalVisible}
+          handleOk={handleCloseModal}
+          month={query.month}
         />
-      }
+      )}
     </>
-  ) : <UnPermissionBoard/>;
+  ) : (
+    <UnPermissionBoard />
+  );
 };
 
 export default WorkPointPage;
+

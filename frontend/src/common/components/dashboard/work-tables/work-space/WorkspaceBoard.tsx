@@ -41,7 +41,7 @@ const WorkspaceBoard: React.FC<WorkspaceBoardProps> = ({
     
     const {taskDetail, setTaskDetail} = useTaskContext();
     // const {currentColumn, setCurrentColumn} = useState<number>(0);
-    const {workspaces, workspaceId, setWorkspaces, currentWorkspace, isCurrentWorkspaceFree} = useUser();
+    const {workspaces, workspaceId, setWorkspaces, currentWorkspace, isCurrentWorkspaceFree, isMobile} = useUser();
     
     const [colNames, setColNames] = useState<string[]>(fixedColumns.map(col => col.title));
 
@@ -94,7 +94,9 @@ const WorkspaceBoard: React.FC<WorkspaceBoardProps> = ({
        
     },[colNames]);
 
-    const card_width = Math.round((window.innerWidth - 360)/4);
+    const cardWidth = isMobile
+      ? 320
+      : Math.max(220, Math.round((window.innerWidth - 360) / 4));
 
     return (
     <div className="relative z-10 px-4 sm:px-6 pt-3">
@@ -104,7 +106,12 @@ const WorkspaceBoard: React.FC<WorkspaceBoardProps> = ({
             onDragEnd={onDragEnd}
             // sensors={adminMode ? undefined : []}
             >
-            <Row gutter={[12, 12]} wrap={false} className="pb-6 overflow-x-auto">
+            <div className="pb-6 overflow-x-auto workspace-board-scroll">
+            <Row
+              gutter={[12, 12]}
+              wrap={false}
+              style={{ width: "max-content", minWidth: "100%" }}
+            >
                 {columns.map((col, colIdx) => {
                 // Column color themes
                 const theme = columnThemes[colIdx];
@@ -112,7 +119,7 @@ const WorkspaceBoard: React.FC<WorkspaceBoardProps> = ({
                 return (
                     <Col
                     key={col.id}
-                    style={{minWidth: card_width}}
+                    style={{ minWidth: cardWidth }}
                     // className="flex-shrink-0 min-w-[480px] sm:min-w-[460px] max-w-[620px] sm:max-w-[680px]"
                     >
                     <Droppable droppableId={col.id}>
@@ -227,6 +234,7 @@ const WorkspaceBoard: React.FC<WorkspaceBoardProps> = ({
                 );
                 })}
             </Row>
+            </div>
             </DragDropContext>
         </div>
 )}

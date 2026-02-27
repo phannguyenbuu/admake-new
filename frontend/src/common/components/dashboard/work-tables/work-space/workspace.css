@@ -76,3 +76,8 @@
 .overflow-x-auto::-webkit-scrollbar {
     display: none;
 }
+
+.workspace-board-scroll {
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-x;
+}
