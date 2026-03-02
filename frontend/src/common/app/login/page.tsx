@@ -1,18 +1,39 @@
-import { redirect, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import LoginForm from "./login.form";
 import { useEffect } from "react";
+import { useApiHost } from "../../common/hooks/useApiHost";
 
 export const Login = () => {
   const navigate = useNavigate();
+  const API_HOST = useApiHost();
   
   useEffect(() => {
     const accessToken = localStorage.getItem("accessToken");
-    if (accessToken) {
-      navigate("/", { replace: true });
-    } else {
+    if (!accessToken) {
       localStorage.removeItem("accessToken");
+      return;
     }
-  }, [navigate]);
+
+    const validate = async () => {
+      try {
+        const res = await fetch(`${API_HOST}/auth/me`, {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
+
+        if (res.ok) {
+          navigate("/users", { replace: true });
+        } else {
+          localStorage.removeItem("accessToken");
+        }
+      } catch {
+        localStorage.removeItem("accessToken");
+      }
+    };
+
+    validate();
+  }, [navigate, API_HOST]);
 
   return (
     <div className="flex items-center justify-center min-h-screen">
@@ -34,9 +55,6 @@ export const Login = () => {
 
 // Loader vẫn có thể dùng để redirect nếu cần
 export const loader = async () => {
-  if (localStorage.getItem("accessToken")) {
-    return redirect("/");
-  }
   return null;
 };
 

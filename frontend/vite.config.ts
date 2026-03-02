@@ -74,6 +74,7 @@ export default defineConfig({
 
   define: { global: "window" },
   server: {
+    port: 5174,
     allowedHosts: ['localhost', 'archbox.pw','dashboard.archbox.pw','admake.vn','quanly.admake.vn'],
     host: '0.0.0.0',
     watch: {

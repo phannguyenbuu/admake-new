@@ -44,7 +44,9 @@ export default function AppHeader() {
     receiveWorkSpaces.sort((a, b) => {
       if (a.pinned === b.pinned) {
         // Nếu cùng pinned, so sánh updatedAt giảm dần
-        return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
+        const bTime = b.updatedAt ? new Date(b.updatedAt).getTime() : 0;
+        const aTime = a.updatedAt ? new Date(a.updatedAt).getTime() : 0;
+        return bTime - aTime;
       }
       // Ưu tiên pinned true lên trước
       return a.pinned ? -1 : 1;
@@ -73,18 +75,15 @@ export default function AppHeader() {
   }, [getNotifyList]);
 
   const handleLogout = () => {
-    // Xóa token
+    localStorage.removeItem("accessToken");
     localStorage.removeItem("Admake-User-Access");
     sessionStorage.removeItem("accessToken");
 
-    // Invalidate tất cả queries để xóa cache data cũ
     queryClient.clear();
-
-    // Reset info
     refetchInfo();
 
-    notification.success({message:"Đăng xuất thành công"});
-    window.location.href = "https://quanly.admake.vn/login";  // chuyển trang theo URL tuyệt đối
+    notification.success({message:"Logout successful"});
+    window.location.href = "/login";
   };
 
   return (
@@ -175,3 +174,4 @@ export default function AppHeader() {
     </>
   );
 }
+

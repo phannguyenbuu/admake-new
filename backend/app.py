@@ -63,6 +63,7 @@ CORS(
         "https://quanly.admake.vn",
         "https://admake.vn",
         "http://localhost:5173",
+        "http://localhost:5174",
         "http://localhost:3000",
     ]}},
     supports_credentials=True,

@@ -37,6 +37,12 @@ const CustomerDashboard: IPage["Component"] = () => {
     refetch,
     error,
   } = useCustomerQuery({ ...query, search: debouncedSearch });
+  const customerRows = Array.isArray((customers as any)?.data?.data)
+    ? (customers as any).data.data
+    : Array.isArray((customers as any)?.data)
+      ? (customers as any).data
+      : [];
+  const customerTotal = Number((customers as any)?.data?.total ?? (customers as any)?.total ?? customerRows.length);
   
 
   const [customer, setCustomer] = useState<WorkSpace | null>(null);
@@ -89,7 +95,7 @@ const handleDeleteCustomer = () => {
       />
       <TableComponent<WorkSpace>
         columns={columnsCustomer}
-        dataSource={customers?.data}
+        dataSource={customerRows}
         loading={isLoading}
         rowSelection={{
           type: "radio",
@@ -112,7 +118,7 @@ const handleDeleteCustomer = () => {
         pagination={{
           pageSize: query.limit,
           current: query.page,
-          total: (customers as any)?.total || 0,
+          total: customerTotal,
           onChange: (page, pageSize) => {
             setQuery({ ...query, page, limit: pageSize });
           },

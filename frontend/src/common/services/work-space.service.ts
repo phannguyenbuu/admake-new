@@ -1,25 +1,23 @@
 import type { WorkSpace } from "../@types/work-space.type";
+import type { AxiosResponse } from "axios";
 import axiosClient from "./axiosClient";
 import type { PaginationDto } from "../@types/common.type";
 
 export const WorkSpaceService = {
   getAll: (dto: Partial<PaginationDto> = {}) => {
-    return axiosClient.get("/workspace/", { params: dto });
+    return axiosClient.get<WorkSpace[]>("/workspace/", { params: dto });
   },
-  // getAll: (lead_id:number) => {
-  //   return axiosClient.get(`/workspace/inlead/${lead_id}`);
-  // },
   getTaskById: (id: string) => {
-    return axiosClient.get(`/workspace/${id}/tasks`);
+    return axiosClient.get<{ data: object; namelist: string[] }>(`/workspace/${id}/tasks`);
   },
   getById: (id: string) => {
-    return axiosClient.get(`/workspace/${id}`);
+    return axiosClient.get<WorkSpace>(`/workspace/${id}`);
   },
   create: (dto: WorkSpace) => {
-    return axiosClient.post("/workspace/", dto);
+    return axiosClient.post<WorkSpace>("/workspace/", dto);
   },
   update: (id: string, dto: Omit<WorkSpace, "id" | "cover">) => {
-    return axiosClient.put(`/workspace/${id}`, dto);
+    return axiosClient.put<WorkSpace>(`/workspace/${id}`, dto);
   },
   delete: (id: string) => {
     return axiosClient.delete(`/workspace/${id}`);

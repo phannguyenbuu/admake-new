@@ -11,14 +11,14 @@ export const WORK_SPACE_DETAIL_QUERY_KEY = "workspace/queryDetail";
 export function useWorkSpaceQueryAll(dto: Partial<PaginationDto> = {}) {
   return useQuery({
     queryKey: [WORK_SPACE_DETAIL_QUERY_KEY, dto],
-    queryFn: () => WorkSpaceService.getAll(dto),
+    queryFn: () => WorkSpaceService.getAll(dto).then((res) => res?.data ?? []),
   });
 }
 
 export function useWorkSpaceQueryById(id: string) {
   return useQuery({
     queryKey: [WORK_SPACE_DETAIL_QUERY_KEY, "workspace", id],
-    queryFn: () => WorkSpaceService.getById(id),
+    queryFn: () => WorkSpaceService.getById(id).then((res) => res?.data ?? null),
     enabled: !!id,
   });
 }
@@ -26,10 +26,10 @@ export function useWorkSpaceQueryById(id: string) {
 export function useWorkSpaceQueryTaskById(id: string) {
   return useQuery<TasksResponse>({
     queryKey: [WORK_SPACE_DETAIL_QUERY_KEY, "tasks", id],
-    queryFn: () => WorkSpaceService.getTaskById(id).then(response => {
-      console.log('Response data:', response.data);
-      return response.data ?? {} as TasksResponse;
-    }),
+    queryFn: () =>
+      WorkSpaceService.getTaskById(id).then((response) => {
+        return (response?.data?.data ?? {}) as TasksResponse;
+      }),
     initialData: {} as TasksResponse,
     enabled: !!id,
     staleTime: 0, // Always consider data stale to refetch when id changes

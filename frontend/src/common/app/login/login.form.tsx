@@ -1,18 +1,13 @@
-import { Button, Form, Input, notification } from "antd";
+﻿import { Button, Form, Input, notification } from "antd";
 import { LockOutlined, UserOutlined } from "@ant-design/icons";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useLoading } from "../../common/hooks/useLoading";
 import type { User } from "../../@types/user.type";
 import { AuthService } from "../../services/auth.service";
-// import { useNavigate } from "react-router-dom";
-import { useUser } from "../../common/hooks/useUser";
-import { TOKEN_LABEL } from "../../common/config";
 
 const LoginForm = () => {
   const { loading, toggle } = useLoading();
-  // const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const { login } = useUser();  // lấy hàm login từ context
 
   const { mutate } = useMutation({
     mutationFn: async (values: Pick<User, "username" | "password">) => {
@@ -20,7 +15,7 @@ const LoginForm = () => {
         ...values,
         username: values.username,
       };
-      return AuthService.login(normalizedValues); // gọi API login backend
+      return AuthService.login(normalizedValues);
     },
     onError: (error) => {
       notification.error({
@@ -29,26 +24,15 @@ const LoginForm = () => {
           error instanceof Error ? error.message : "Đã xảy ra lỗi khi đăng nhập",
       });
     },
-    onSuccess: async (data) => {
+    onSuccess: async () => {
       queryClient.clear();
-      // localStorage.setItem(TOKEN_LABEL, data.access_token);
-
-      // Sau khi login backend trả về, gọi login context truyền credentials để cập nhật trạng thái
-      try {
-        await login({
-          username: data.username,
-          password: "" // hoặc để "" nếu backend không yêu cầu password ở đây
-        });
-      } catch (e) {
-        notification.error({ message: "Lỗi cập nhật trạng thái người dùng" });
-      }
 
       notification.success({
         message: "Đăng nhập thành công",
-        description: `Chào mừng bạn quay trở lại!`,
+        description: "Chào mừng bạn quay trở lại!",
       });
 
-      window.location.href = "/";
+      window.location.href = "/users";
     },
     onMutate: toggle,
     onSettled: toggle,

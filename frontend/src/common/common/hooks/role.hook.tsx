@@ -7,7 +7,7 @@ export const ROLE_DETAIL_QUERY_KEY = "role/queryDetail";
 export function useRoleQuery() {
   return useQuery({
     queryKey: [ROLE_QUERY_KEY],
-    queryFn: () => RoleService.getAll(),
+    queryFn: () => RoleService.getAll().then((res) => res?.data ?? []),
   });
 }
 

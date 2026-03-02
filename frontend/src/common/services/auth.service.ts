@@ -1,21 +1,17 @@
 import type { JwtResponse, User } from "../@types/user.type";
 import axiosClient from "./axiosClient";
-import { useApiHost } from "../common/hooks/useApiHost";
-
-const API_HOST = useApiHost();
 
 export const AuthService = {
   login: async (body: Pick<User, "username" | "password">): Promise<JwtResponse> => {
     try {
-      const response = await axiosClient.post<JwtResponse>(`${API_HOST}/auth/login`, body);
-      console.log("response", response);
-      const access_token = (response as any).access_token;
+      const response = await axiosClient.post<JwtResponse>("/auth/login", body);
+      const payload = response.data as JwtResponse;
+      const access_token = payload.access_token;
       if (!access_token) throw new Error("No access token");
-
 
       localStorage.setItem("accessToken", access_token);
       
-      return (response as any);
+      return payload;
     } catch (error) {
       console.error("Login error: ", error);
       throw error;
@@ -24,7 +20,7 @@ export const AuthService = {
   me: (): Promise<User | null> => {
     const accessToken = localStorage.getItem("accessToken") || "";
     // console.log("AS_ME", accessToken);
-    return axiosClient.get(`${API_HOST}/auth/me`, {
+    return axiosClient.get("/auth/me", {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
@@ -37,7 +33,7 @@ export const AuthService = {
     
     const accessToken = localStorage.getItem("accessToken") || "";
     // console.log("AS_ME_UPDATE", accessToken);
-    return axiosClient.put(`${API_HOST}/auth/me`, body, {
+    return axiosClient.put("/auth/me", body, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
@@ -46,7 +42,7 @@ export const AuthService = {
 
   updateAvatar: (body: FormData): Promise<User> => {
     const accessToken = localStorage.getItem("accessToken") || "";
-    return axiosClient.putForm(`${API_HOST}/auth/me/avatar`, body, {
+    return axiosClient.putForm("/auth/me/avatar", body, {
       headers: {
         "Content-Type": "multipart/form-data",
         Authorization: `Bearer ${accessToken}`,

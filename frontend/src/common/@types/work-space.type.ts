@@ -36,6 +36,9 @@ export interface SelectedUser {
 export interface WorkSpace {
   id: string;
   name: string;
+  createdAt?: string | Date;
+  updatedAt?: string | Date;
+  deletedAt?: string | Date | null;
   // cover?: string;
   
   users: UserSearchProps[],

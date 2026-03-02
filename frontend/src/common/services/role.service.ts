@@ -1,23 +1,24 @@
 import type { Role } from "../@types/role.type";
+import type { AxiosResponse } from "axios";
 import axiosClient from "./axiosClient";
 
 export const RoleService = {
-  getAll: () => {
+  getAll: (): Promise<AxiosResponse<Role[]>> => {
     return axiosClient.get("/role/");
   },
-  getId: (id: number) => {
+  getId: (id: number): Promise<AxiosResponse<Role>> => {
     return axiosClient.get(`/role/${id}`);
   },
-  getPermission: () => {
+  getPermission: (): Promise<AxiosResponse<Role[]>> => {
     return axiosClient.get("/role/list/permission/");
   },
-  create: (dto: Role) => {
+  create: (dto: Role): Promise<AxiosResponse<Role>> => {
     return axiosClient.post("/role/", dto);
   },
-  update: (id: number, dto: Role) => {
+  update: (id: number, dto: Role): Promise<AxiosResponse<Role>> => {
     return axiosClient.put(`/role/${id}`, dto);
   },
-  delete: (id: number) => {
+  delete: (id: number): Promise<AxiosResponse<void>> => {
     return axiosClient.delete(`/role/${id}`);
   },
 } as const;

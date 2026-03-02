@@ -32,6 +32,12 @@ const UserDashboard: IPage["Component"] = () => {
 
   const {data: users,isLoading: isLoadingUsers,refetch,
   } = useUserQuery({ ...query, search: debouncedSearch });
+  const userRows = Array.isArray((users as any)?.data?.data)
+    ? (users as any).data.data
+    : Array.isArray((users as any)?.data)
+      ? (users as any).data
+      : [];
+  const userTotal = Number((users as any)?.data?.total ?? (users as any)?.total ?? userRows.length);
 
   const handleRefetch = async () => {
     setIsRefetching(true);
@@ -74,7 +80,7 @@ const UserDashboard: IPage["Component"] = () => {
       />
       <TableComponent<User>
         columns={columnsUser}
-        dataSource={users?.data}
+        dataSource={userRows}
         loading={isLoadingUsers}
         rowSelection={{
           type: "radio",
@@ -96,7 +102,7 @@ const UserDashboard: IPage["Component"] = () => {
         pagination={{
           pageSize: query.limit,
           current: query.page,
-          total: (users as any)?.total || 0,
+          total: userTotal,
           onChange: (page, pageSize) => {
             setQuery({ ...query, page, limit: pageSize });
           },

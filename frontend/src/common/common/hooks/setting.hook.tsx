@@ -11,7 +11,7 @@ export const SETTING_DETAIL_QUERY_KEY = "setting/queryDetail";
 export function useSettingQuery() {
   return useQuery({
     queryKey: [SETTING_QUERY_KEY],
-    queryFn: () => SettingService.getAll(),
+    queryFn: () => SettingService.getAll().then((res) => res?.data ?? []),
   });
 }
 
