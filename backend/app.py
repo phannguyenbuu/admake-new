@@ -35,6 +35,11 @@ from api.lead_manage import lead_manage_bp
 from api.fureal import fureal_bp
 from api.notifys import notify_bp
 from api.statistics import statistics_bp
+from api.accounting import accounting_bp
+from api.accounting_erp import accounting_erp_bp
+from api.inventory import inventory_bp
+from api.document_center import document_center_bp
+from api.attachments import attachments_bp
 
 app.register_blueprint(customer_bp)
 app.register_blueprint(material_bp)
@@ -54,6 +59,11 @@ app.register_blueprint(lead_manage_bp)
 app.register_blueprint(fureal_bp)
 app.register_blueprint(notify_bp)
 app.register_blueprint(statistics_bp)
+app.register_blueprint(accounting_bp)
+app.register_blueprint(accounting_erp_bp)
+app.register_blueprint(inventory_bp)
+app.register_blueprint(document_center_bp)
+app.register_blueprint(attachments_bp)
 
 from api.chat import socketio
 
@@ -64,6 +74,8 @@ CORS(
         "https://admake.vn",
         "http://localhost:5173",
         "http://localhost:5174",
+        "http://localhost:5175",
+        "http://127.0.0.1:5175",
         "http://localhost:3000",
     ]}},
     supports_credentials=True,

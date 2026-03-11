@@ -7,9 +7,12 @@ export const USER_QUERY_KEY = "user/queryPagination";
 export const USER_DETAIL_QUERY_KEY = "user/queryDetail";
 
 export function useUserQuery(dto: Partial<PaginationDto> = {}) {
+  const hasLeadParam = Object.prototype.hasOwnProperty.call(dto, "lead");
+  const leadValue = Number((dto as any).lead ?? 0);
   return useQuery({
     queryKey: [USER_QUERY_KEY, dto],
     queryFn: () => UserService.getAll(dto),
+    enabled: hasLeadParam ? leadValue > 0 : true,
   });
 }
 

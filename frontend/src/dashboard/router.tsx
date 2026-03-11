@@ -104,6 +104,12 @@ const routes: TRoute = {
           icon: <CheckOutlined />,
         },
         {
+          path: "/user",
+          element: <Navigate to="/users" replace />,
+          title: "Quản lý nhân sự",
+          ignoreInMenu: true,
+        },
+        {
           path: "/users",
           element: (
             <Suspense fallback={<div>Loading...</div>}>

@@ -39,7 +39,7 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [taskDetail, setTaskDetail] = useState<Task | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [selectedMonth, setSelectedMonth] = useState<string | null>('all');
-  const [filterDateType, setFilterDateType] = useState<'start' | 'end' | 'all'>('all');
+  const [filterDateType, setFilterDateType] = useState<'start' | 'end' | 'all'>('end');
 
   const {workspaceId} = useUser();
   const { data: originalTasksData, refetch: refetchTasks } = useWorkSpaceQueryTaskById(workspaceId ?? '');
@@ -52,26 +52,25 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
     Object.keys(originalTasksData).forEach((status) => {
       const group = originalTasksData[status];
       const filteredTasks = group.tasks.filter((task) => {
-        // If filtering by end date, only show tasks that actually have an end date
-        if (filterDateType === 'end' && !task.end_time) {
+        const isCompletedTask = task.status === 'REWARD';
+
+        // Keep unfinished tasks always visible, regardless of month filter.
+        if (!isCompletedTask) {
+          return true;
+        }
+
+        // Reward tasks must have completion date to be matched by month.
+        if (!task.end_time) {
           return false;
         }
 
-        // If "All months" is selected, we only apply the end-date filter constraint if applicable
+        // If "All months" is selected, keep all completed tasks.
         if (!selectedMonth || selectedMonth === 'all') {
           return true;
         }
 
-        if (filterDateType === 'all') {
-          const taskStart = task.start_time ? dayjs(task.start_time).format('YYYY-MM') : null;
-          const taskEnd = task.end_time ? dayjs(task.end_time).format('YYYY-MM') : null;
-          return (taskStart === selectedMonth) || (taskEnd === selectedMonth);
-        }
-
-        const dateToCompare = filterDateType === 'start' ? task.start_time : task.end_time;
-        if (!dateToCompare) return false;
-
-        const taskMonth = dayjs(dateToCompare).format('YYYY-MM');
+        // Completed tasks are filtered by completion month.
+        const taskMonth = dayjs(task.end_time).format('YYYY-MM');
         return taskMonth === selectedMonth;
       });
 

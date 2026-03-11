@@ -219,6 +219,49 @@ Dashboard (`quangcao_web/.env`) thường có:
 - `GET /<id>`
 - `PUT /<id>`
 
+## Document Center (PR #1)
+
+Chuẩn hóa bước đầu đã được thêm song song với API kế toán cũ (không phá tương thích):
+
+- Model mới:
+  - `document_center_document`
+  - `document_center_attachment`
+  - `document_center_link`
+  - `document_center_audit_log`
+- API mới:
+  - `GET /api/documents`
+  - `GET /api/documents/<id>`
+  - `GET /api/documents/metadata`
+  - `POST /api/documents`
+  - `PATCH /api/documents/<id>`
+  - `POST /api/documents/<id>/attachments`
+  - `DELETE /api/documents/<id>/attachments/<attachmentId>`
+  - `POST /api/documents/<id>/links`
+  - `POST /api/documents/<id>/submit`
+  - `POST /api/documents/<id>/approve`
+  - `POST /api/documents/<id>/cancel`
+
+- Attachment API tách riêng:
+  - `POST /api/attachments/upload`
+  - `GET /api/attachments/<id>/download`
+  - `GET /api/attachments/<id>/preview`
+
+### Migration PR #1
+
+```bash
+cd backend
+python migrations/run_sql_migration.py migrations/20260304_document_center_pr1.sql
+```
+
+Migration này tạo bảng/index và backfill dữ liệu từ `accounting_document` sang `document_center_document`.
+
+Migration PR #3 (attachment flow + backfill attachment):
+
+```bash
+cd backend
+python migrations/run_sql_migration.py migrations/20260304_document_center_pr3.sql
+```
+
 ### Supplier (`/api/supplier`)
 - `GET /`
 - `POST /`

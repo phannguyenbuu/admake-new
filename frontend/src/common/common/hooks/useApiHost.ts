@@ -1,30 +1,30 @@
-// src/hooks/useApiHost.ts
-export function useApiHost(): string {
-  // Lấy biến môi trường, fallback về chuỗi rỗng nếu không có
-  const apiHost = import.meta.env.VITE_APP_API_HOST || "";
-  return apiHost;
+function normalizePathLikeUrl(value: string, fallback: string): string {
+  const raw = (value || fallback).trim();
+  if (!raw) return fallback;
+  if (raw.startsWith("http://") || raw.startsWith("https://")) {
+    return raw.replace(/\/+$/, "");
+  }
+  return raw.startsWith("/") ? raw : `/${raw}`;
 }
 
+// src/hooks/useApiHost.ts
+export function useApiHost(): string {
+  return normalizePathLikeUrl(String(import.meta.env.VITE_APP_API_HOST || ""), "/api");
+}
 
 export function useApiSocket(): string {
-  // Lấy biến môi trường, fallback về chuỗi rỗng nếu không có
-  const apiHost = import.meta.env.VITE_APP_SOCKET || "";
-  return apiHost;
+  const raw = String(import.meta.env.VITE_APP_SOCKET || "").trim();
+  if (!raw) return "";
+  return normalizePathLikeUrl(raw, "");
 }
 
 export function useApiStatic(): string {
-  // Lấy biến môi trường, fallback về chuỗi rỗng nếu không có
-  const apiHost = import.meta.env.VITE_APP_STATIC || "";
-  return apiHost;
+  return normalizePathLikeUrl(String(import.meta.env.VITE_APP_STATIC || ""), "/static");
 }
 
 export function useAdminIndex(): string {
-  // Lấy biến môi trường, fallback về chuỗi rỗng nếu không có
-  const apiHost = import.meta.env.VITE_APP_SOCKET || "";
-  
-  // Xóa dấu "/" ở cuối nếu có, rồi tách phần cuối cùng
+  const apiHost = String(import.meta.env.VITE_APP_SOCKET || "");
   const key = apiHost.replace(/\/+$/, "").split("/").pop() || "";
-
-  // Kiểm tra nếu key bắt đầu bằng 'ad' thì trả về '/adX', ngược lại rỗng
   return key.startsWith("ad") ? `/${key}` : "";
 }
+

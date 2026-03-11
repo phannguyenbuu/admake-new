@@ -265,7 +265,8 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
 
   const logout = async () => {
-    if(window.location.href.endsWith('/login') 
+    if(window.location.href.endsWith('/login')
+      || window.location.href.endsWith('/login/')
       || window.location.href.includes('/chat/')
       || window.location.href.includes('/point/'))
     {

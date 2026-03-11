@@ -1,5 +1,5 @@
-import { useEffect, useState, useCallback, useContext } from "react";
-import { Row, Col, Card, Button, message, Modal, notification } from "antd";
+﻿import { useEffect, useState, useCallback, useContext } from "react";
+import { Row, Col, Card, Button, message, Modal, notification, Select } from "antd";
 import { StarOutlined, PlusOutlined, MoreOutlined } from "@ant-design/icons";
 import type { ColumnType } from "../../../../@types/work-space.type";
 import DragableTaskCard from "./DragableTaskCard";
@@ -16,6 +16,7 @@ import columnThemes from "../theme.json";
 import type { Task } from "../../../../@types/work-space.type";
 import { UpdateButtonContext } from "../../../../common/hooks/useUpdateButtonTask";
 import { useTaskContext } from "../../../../common/hooks/useTask";
+import dayjs from "dayjs";
 
 interface WorkspaceBoardProps {
   columns: ColumnType[];
@@ -39,7 +40,7 @@ const WorkspaceBoard: React.FC<WorkspaceBoardProps> = ({
   setShowFormTask
 }) => {
     
-    const {taskDetail, setTaskDetail} = useTaskContext();
+    const {taskDetail, setTaskDetail, selectedMonth, setSelectedMonth} = useTaskContext();
     // const {currentColumn, setCurrentColumn} = useState<number>(0);
     const {workspaces, workspaceId, setWorkspaces, currentWorkspace, isCurrentWorkspaceFree, isMobile} = useUser();
     
@@ -98,6 +99,21 @@ const WorkspaceBoard: React.FC<WorkspaceBoardProps> = ({
       ? 320
       : Math.min(320, Math.max(220, Math.round((window.innerWidth - 360) / 4)));
 
+    const monthOptions = (() => {
+      const options: { value: string; label: string }[] = [];
+      const now = dayjs();
+      const startDateLimit = dayjs("2025-11-01");
+      let current = startDateLimit;
+      while (current.isBefore(now) || current.isSame(now, "month")) {
+        options.unshift({
+          value: current.format("YYYY-MM"),
+          label: current.format("MM/YYYY"),
+        });
+        current = current.add(1, "month");
+      }
+      return options;
+    })();
+
     return (
     <div className="relative z-10 px-4 sm:px-6 pt-3">
             <DragDropContext
@@ -128,7 +144,7 @@ const WorkspaceBoard: React.FC<WorkspaceBoardProps> = ({
                             {/* Enhanced Column Card */}
                             <Card
                             title={
-                                <div className="flex items-center justify-between !text-white !text-sm font-semibold">
+                                <div className="flex items-center justify-between !text-white !text-sm font-semibold gap-2">
                                     <div className="flex items-center gap-2 min-w-0">
                                         <div
                                         className="w-2 h-2 bg-white/30 rounded-full flex-shrink-0"
@@ -141,6 +157,19 @@ const WorkspaceBoard: React.FC<WorkspaceBoardProps> = ({
                                         {/* @ts-ignore */}
                                         {col.tasks.length}
                                         </div>
+                                        {col.type === "REWARD" && (
+                                          <Select
+                                            value={selectedMonth || "all"}
+                                            onChange={(value) => setSelectedMonth(value)}
+                                            size="small"
+                                            className="w-[120px] reward-month-select"
+                                            popupClassName="reward-month-select-dropdown"
+                                            options={[
+                                              { value: "all", label: "Tất cả tháng" },
+                                              ...monthOptions,
+                                            ]}
+                                          />
+                                        )}
                                     </div>
                                     {/* <MoreOutlined className="cursor-pointer hover:bg-white/20 rounded-md p-1.5 transition-all duration-200 flex-shrink-0" /> */}
                                     <MoreOptionsModal type={col.type} setColNames={setColNames} idx={colIdx}/>
@@ -325,7 +354,7 @@ const MoreOptionsModal: React.FC<MoreOptionsModalProps> = ({ type, idx, setColNa
         open={open}
         onOk={handleOk}
         onCancel={handleCancel}
-        okText="Xác nhận"
+        okText="XÃ¡c nháº­n"
         cancelText="Hủy"
       >
         <Form form={form} layout="vertical" name="form_in_modal">
@@ -341,3 +370,7 @@ const MoreOptionsModal: React.FC<MoreOptionsModalProps> = ({ type, idx, setColNa
     </>
   );
 };
+
+
+
+

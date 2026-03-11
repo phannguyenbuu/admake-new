@@ -24,7 +24,7 @@ from flask_cors import CORS
 from flask import Blueprint, request, jsonify, abort
 from sqlalchemy.orm.attributes import flag_modified
 from collections import namedtuple
-from sqlalchemy import desc, and_, func, select
+from sqlalchemy import desc, and_, func, select, Index
 import uuid
 from PIL import Image
 
@@ -55,6 +55,8 @@ CORS(
         'https://www.n-lux.com',
         'http://localhost:5173',
         'http://localhost:5174',
+        'http://localhost:5175',
+        'http://127.0.0.1:5175',
         'http://localhost:5500',
     ],
 )
@@ -149,6 +151,32 @@ class Material(BaseModel):
         db.session.add(item)
         db.session.commit()
         return item
+
+
+class MaterialTransaction(BaseModel):
+    __tablename__ = "material_transaction"
+
+    id = db.Column(db.String(50), primary_key=True)
+    material_id = db.Column(db.String(50), db.ForeignKey("material.id"), nullable=False)
+    movement_type = db.Column(db.String(20), nullable=False)  # IN, OUT, ADJUST
+    quantity = db.Column(db.Float, nullable=False)
+    unit_cost = db.Column(db.Float, nullable=True)
+    task_id = db.Column(db.String(50), nullable=True)
+    note = db.Column(db.Text, nullable=True)
+
+    lead_id = db.Column(db.Integer, db.ForeignKey("lead.id"), nullable=True)
+    lead = db.relationship("LeadPayload", backref="material_transactions")
+
+    material = db.relationship("Material", backref="transactions")
+
+    def tdict(self):
+        result = {}
+        for column in self.__table__.columns:
+            value = getattr(self, column.name)
+            if isinstance(value, (datetime.datetime, datetime.date)):
+                value = value.isoformat()
+            result[column.name] = value
+        return result
 
 def generate_datetime_id():
     now = datetime.datetime.utcnow()
@@ -588,6 +616,1001 @@ class Message(BaseModel):
         db.session.commit()
         return item
 
+
+class AccountingDailyCash(BaseModel):
+    __tablename__ = "accounting_daily_cash"
+
+    id = db.Column(db.String(50), primary_key=True)
+    lead_id = db.Column(db.Integer, db.ForeignKey("lead.id"), nullable=False)
+    user_id = db.Column(db.String(80), db.ForeignKey("user.id"), nullable=True)
+
+    txn_date = db.Column(db.Date, nullable=False)
+    voucher_no = db.Column(db.String(80))
+    direction = db.Column(db.String(20), default="expense")  # income | expense
+    amount = db.Column(db.Float, default=0)
+
+    description = db.Column(db.String(255))
+    counterparty_name = db.Column(db.String(255))
+    material_name = db.Column(db.String(255))
+    unit = db.Column(db.String(50))
+    quantity = db.Column(db.Float)
+    status = db.Column(db.String(30), default="draft")
+    payment_method = db.Column(db.String(30), default="cash")
+    doc_ref = db.Column(db.String(80))
+    source_type = db.Column(db.String(40), nullable=True)
+    source_id = db.Column(db.String(80), nullable=True)
+    account_code = db.Column(db.String(20), nullable=True)
+    journal_entry_id = db.Column(db.String(50), nullable=True)
+    note = db.Column(db.Text)
+    attachments = db.Column(db.JSON, default=[])
+
+    lead = db.relationship("LeadPayload", backref="daily_cash_rows")
+    user = db.relationship("User", foreign_keys=[user_id])
+
+    def tdict(self):
+        result = {}
+        for column in self.__table__.columns:
+            value = getattr(self, column.name)
+            if isinstance(value, (datetime.datetime, datetime.date)):
+                value = value.isoformat()
+            result[column.name] = value
+
+        if self.user:
+            result["user_name"] = self.user.fullName or self.user.username
+        else:
+            result["user_name"] = ""
+        return result
+
+    @staticmethod
+    def create_item(params):
+        payload = dict(params or {})
+        if not payload.get("id"):
+            payload["id"] = generate_datetime_id()
+        item = AccountingDailyCash(**payload)
+        db.session.add(item)
+        db.session.commit()
+        return item
+
+
+class AccountingDocument(BaseModel):
+    __tablename__ = "accounting_document"
+
+    id = db.Column(db.String(50), primary_key=True)
+    lead_id = db.Column(db.Integer, db.ForeignKey("lead.id"), nullable=False)
+
+    doc_no = db.Column(db.String(80))
+    doc_type = db.Column(db.String(80), nullable=False)
+    doc_date = db.Column(db.Date, nullable=False)
+    signed_date = db.Column(db.Date, nullable=True)
+    due_date = db.Column(db.Date, nullable=True)
+
+    partner_name = db.Column(db.String(255))
+    project_name = db.Column(db.String(255))
+    material_name = db.Column(db.String(255))
+    amount = db.Column(db.Float, default=0)  # total amount (backward compatible)
+    subtotal_amount = db.Column(db.Float, default=0)
+    tax_amount = db.Column(db.Float, default=0)
+    payment_status = db.Column(db.String(30), default="unpaid")
+    payment_method = db.Column(db.String(30), default="cash")
+    currency = db.Column(db.String(10), default="VND")
+    status = db.Column(db.String(30), default="draft")
+    content = db.Column(db.Text)
+    attachments = db.Column(db.JSON, default=[])
+    tags = db.Column(db.JSON, default=[])
+
+    lead = db.relationship("LeadPayload", backref="accounting_documents")
+
+    def tdict(self):
+        result = {}
+        for column in self.__table__.columns:
+            value = getattr(self, column.name)
+            if isinstance(value, (datetime.datetime, datetime.date)):
+                value = value.isoformat()
+            result[column.name] = value
+        return result
+
+    @staticmethod
+    def create_item(params):
+        payload = dict(params or {})
+        if not payload.get("id"):
+            payload["id"] = generate_datetime_id()
+        item = AccountingDocument(**payload)
+        db.session.add(item)
+        db.session.commit()
+        return item
+
+
+class ChartOfAccount(BaseModel):
+    __tablename__ = "chart_of_accounts"
+
+    id = db.Column(db.String(50), primary_key=True)
+    lead_id = db.Column(db.Integer, db.ForeignKey("lead.id"), nullable=True)
+    code = db.Column(db.String(20), nullable=False)
+    name = db.Column(db.String(255), nullable=False)
+    account_type = db.Column(db.String(30), nullable=False)
+    parent_code = db.Column(db.String(20), nullable=True)
+    allow_posting = db.Column(db.Boolean, default=True)
+    status = db.Column(db.String(30), default="active")
+    created_by = db.Column(db.String(50), nullable=True)
+    updated_by = db.Column(db.String(50), nullable=True)
+
+    lead = db.relationship("LeadPayload", backref="chart_of_accounts")
+
+    __table_args__ = (
+        Index("ix_chart_of_accounts_lead_code", "lead_id", "code", unique=True),
+        Index("ix_chart_of_accounts_lead_type", "lead_id", "account_type"),
+        Index("ix_chart_of_accounts_status", "status"),
+    )
+
+    def tdict(self):
+        result = {}
+        for column in self.__table__.columns:
+            value = getattr(self, column.name)
+            if isinstance(value, (datetime.datetime, datetime.date)):
+                value = value.isoformat()
+            result[column.name] = value
+        return result
+
+
+class TaxCode(BaseModel):
+    __tablename__ = "tax_codes"
+
+    id = db.Column(db.String(50), primary_key=True)
+    lead_id = db.Column(db.Integer, db.ForeignKey("lead.id"), nullable=True)
+    code = db.Column(db.String(30), nullable=False)
+    name = db.Column(db.String(255), nullable=False)
+    rate = db.Column(db.Float, default=0)
+    direction = db.Column(db.String(20), default="both")
+    status = db.Column(db.String(30), default="active")
+    is_default = db.Column(db.Boolean, default=False)
+    created_by = db.Column(db.String(50), nullable=True)
+    updated_by = db.Column(db.String(50), nullable=True)
+
+    lead = db.relationship("LeadPayload", backref="tax_codes")
+
+    __table_args__ = (
+        Index("ix_tax_codes_lead_code", "lead_id", "code", unique=True),
+        Index("ix_tax_codes_direction", "direction"),
+    )
+
+    def tdict(self):
+        result = {}
+        for column in self.__table__.columns:
+            value = getattr(self, column.name)
+            if isinstance(value, (datetime.datetime, datetime.date)):
+                value = value.isoformat()
+            result[column.name] = value
+        return result
+
+
+class AccountingPeriod(BaseModel):
+    __tablename__ = "accounting_periods"
+
+    id = db.Column(db.String(50), primary_key=True)
+    lead_id = db.Column(db.Integer, db.ForeignKey("lead.id"), nullable=False)
+    period_key = db.Column(db.String(7), nullable=False)
+    start_date = db.Column(db.Date, nullable=False)
+    end_date = db.Column(db.Date, nullable=False)
+    status = db.Column(db.String(30), default="open")
+    closed_by = db.Column(db.String(50), nullable=True)
+    created_by = db.Column(db.String(50), nullable=True)
+    updated_by = db.Column(db.String(50), nullable=True)
+
+    lead = db.relationship("LeadPayload", backref="accounting_periods")
+
+    __table_args__ = (
+        Index("ix_accounting_periods_lead_period", "lead_id", "period_key", unique=True),
+        Index("ix_accounting_periods_lead_status", "lead_id", "status"),
+    )
+
+    def tdict(self):
+        result = {}
+        for column in self.__table__.columns:
+            value = getattr(self, column.name)
+            if isinstance(value, (datetime.datetime, datetime.date)):
+                value = value.isoformat()
+            result[column.name] = value
+        return result
+
+
+class JournalEntry(BaseModel):
+    __tablename__ = "journal_entries"
+
+    id = db.Column(db.String(50), primary_key=True)
+    lead_id = db.Column(db.Integer, db.ForeignKey("lead.id"), nullable=False)
+    entry_no = db.Column(db.String(80), nullable=False)
+    entry_date = db.Column(db.Date, nullable=False)
+    doc_date = db.Column(db.Date, nullable=True)
+    description = db.Column(db.Text, nullable=True)
+    source_type = db.Column(db.String(40), nullable=True)
+    source_id = db.Column(db.String(80), nullable=True)
+    reference_no = db.Column(db.String(120), nullable=True)
+    status = db.Column(db.String(30), default="draft")
+    posted_at = db.Column(db.DateTime, nullable=True)
+    reversed_entry_id = db.Column(db.String(50), db.ForeignKey("journal_entries.id"), nullable=True)
+    created_by = db.Column(db.String(50), nullable=True)
+    updated_by = db.Column(db.String(50), nullable=True)
+
+    lead = db.relationship("LeadPayload", backref="journal_entries")
+    reversed_entry = db.relationship("JournalEntry", remote_side=[id], uselist=False)
+
+    __table_args__ = (
+        Index("ix_journal_entries_lead_entry_no", "lead_id", "entry_no", unique=True),
+        Index("ix_journal_entries_lead_date", "lead_id", "entry_date"),
+        Index("ix_journal_entries_lead_status", "lead_id", "status"),
+        Index("ix_journal_entries_source", "source_type", "source_id"),
+    )
+
+    def tdict(self, include_lines=False):
+        result = {}
+        for column in self.__table__.columns:
+            value = getattr(self, column.name)
+            if isinstance(value, (datetime.datetime, datetime.date)):
+                value = value.isoformat()
+            result[column.name] = value
+        if include_lines:
+            result["lines"] = [line.tdict() for line in self.lines if not line.deletedAt]
+        return result
+
+
+class JournalEntryLine(BaseModel):
+    __tablename__ = "journal_entry_lines"
+
+    id = db.Column(db.String(50), primary_key=True)
+    journal_entry_id = db.Column(
+        db.String(50), db.ForeignKey("journal_entries.id", ondelete="CASCADE"), nullable=False
+    )
+    lead_id = db.Column(db.Integer, db.ForeignKey("lead.id"), nullable=False)
+    line_no = db.Column(db.Integer, default=1)
+    account_id = db.Column(db.String(50), db.ForeignKey("chart_of_accounts.id"), nullable=True)
+    account_code = db.Column(db.String(20), nullable=False)
+    account_name = db.Column(db.String(255), nullable=True)
+    partner_type = db.Column(db.String(30), nullable=True)
+    partner_id = db.Column(db.String(80), nullable=True)
+    partner_name = db.Column(db.String(255), nullable=True)
+    description = db.Column(db.String(255), nullable=True)
+    debit = db.Column(db.Float, default=0)
+    credit = db.Column(db.Float, default=0)
+
+    journal_entry = db.relationship("JournalEntry", backref="lines")
+    lead = db.relationship("LeadPayload", backref="journal_entry_lines")
+    account = db.relationship("ChartOfAccount", backref="journal_entry_lines")
+
+    __table_args__ = (
+        Index("ix_journal_entry_lines_entry", "journal_entry_id"),
+        Index("ix_journal_entry_lines_lead_account", "lead_id", "account_code"),
+        Index("ix_journal_entry_lines_partner", "partner_type", "partner_id"),
+    )
+
+    def tdict(self):
+        result = {}
+        for column in self.__table__.columns:
+            value = getattr(self, column.name)
+            if isinstance(value, (datetime.datetime, datetime.date)):
+                value = value.isoformat()
+            result[column.name] = value
+        return result
+
+
+class ARInvoice(BaseModel):
+    __tablename__ = "ar_invoices"
+
+    id = db.Column(db.String(50), primary_key=True)
+    lead_id = db.Column(db.Integer, db.ForeignKey("lead.id"), nullable=False)
+    code = db.Column(db.String(80), nullable=False)
+    customer_id = db.Column(db.String(80), nullable=True)
+    customer_name = db.Column(db.String(255), nullable=False)
+    invoice_date = db.Column(db.Date, nullable=False)
+    due_date = db.Column(db.Date, nullable=True)
+    document_id = db.Column(db.String(50), db.ForeignKey("document_center_document.id"), nullable=True)
+    tax_code_id = db.Column(db.String(50), db.ForeignKey("tax_codes.id"), nullable=True)
+    base_amount = db.Column(db.Float, default=0)
+    tax_rate = db.Column(db.Float, default=0)
+    tax_amount = db.Column(db.Float, default=0)
+    total_amount = db.Column(db.Float, default=0)
+    paid_amount = db.Column(db.Float, default=0)
+    balance_amount = db.Column(db.Float, default=0)
+    currency = db.Column(db.String(10), default="VND")
+    status = db.Column(db.String(30), default="draft")
+    description = db.Column(db.Text, nullable=True)
+    journal_entry_id = db.Column(db.String(50), db.ForeignKey("journal_entries.id"), nullable=True)
+    confirmed_at = db.Column(db.DateTime, nullable=True)
+    cancelled_at = db.Column(db.DateTime, nullable=True)
+    created_by = db.Column(db.String(50), nullable=True)
+    updated_by = db.Column(db.String(50), nullable=True)
+
+    lead = db.relationship("LeadPayload", backref="ar_invoices")
+    document = db.relationship("DocumentCenterDocument", backref="ar_invoices")
+    tax_code = db.relationship("TaxCode", backref="ar_invoices")
+    journal_entry = db.relationship("JournalEntry", foreign_keys=[journal_entry_id])
+
+    __table_args__ = (
+        Index("ix_ar_invoices_lead_code", "lead_id", "code", unique=True),
+        Index("ix_ar_invoices_lead_date", "lead_id", "invoice_date"),
+        Index("ix_ar_invoices_lead_due", "lead_id", "due_date"),
+        Index("ix_ar_invoices_lead_status", "lead_id", "status"),
+        Index("ix_ar_invoices_customer", "customer_id"),
+    )
+
+    def tdict(self, include_payments=False):
+        result = {}
+        for column in self.__table__.columns:
+            value = getattr(self, column.name)
+            if isinstance(value, (datetime.datetime, datetime.date)):
+                value = value.isoformat()
+            result[column.name] = value
+        if include_payments:
+            result["payments"] = [item.tdict() for item in self.payments if not item.deletedAt]
+        return result
+
+
+class ARInvoicePayment(BaseModel):
+    __tablename__ = "ar_invoice_payments"
+
+    id = db.Column(db.String(50), primary_key=True)
+    invoice_id = db.Column(db.String(50), db.ForeignKey("ar_invoices.id", ondelete="CASCADE"), nullable=False)
+    lead_id = db.Column(db.Integer, db.ForeignKey("lead.id"), nullable=False)
+    payment_date = db.Column(db.Date, nullable=False)
+    amount = db.Column(db.Float, default=0)
+    payment_method = db.Column(db.String(30), default="cash")
+    daily_cash_id = db.Column(db.String(50), db.ForeignKey("accounting_daily_cash.id"), nullable=True)
+    journal_entry_id = db.Column(db.String(50), db.ForeignKey("journal_entries.id"), nullable=True)
+    note = db.Column(db.Text, nullable=True)
+    created_by = db.Column(db.String(50), nullable=True)
+    updated_by = db.Column(db.String(50), nullable=True)
+
+    invoice = db.relationship("ARInvoice", backref="payments")
+    lead = db.relationship("LeadPayload", backref="ar_invoice_payments")
+    daily_cash = db.relationship("AccountingDailyCash", foreign_keys=[daily_cash_id])
+    journal_entry = db.relationship("JournalEntry", foreign_keys=[journal_entry_id])
+
+    __table_args__ = (
+        Index("ix_ar_invoice_payments_invoice", "invoice_id"),
+        Index("ix_ar_invoice_payments_cash", "daily_cash_id"),
+    )
+
+    def tdict(self):
+        result = {}
+        for column in self.__table__.columns:
+            value = getattr(self, column.name)
+            if isinstance(value, (datetime.datetime, datetime.date)):
+                value = value.isoformat()
+            result[column.name] = value
+        return result
+
+
+class APBill(BaseModel):
+    __tablename__ = "ap_bills"
+
+    id = db.Column(db.String(50), primary_key=True)
+    lead_id = db.Column(db.Integer, db.ForeignKey("lead.id"), nullable=False)
+    code = db.Column(db.String(80), nullable=False)
+    supplier_id = db.Column(db.String(80), nullable=True)
+    supplier_name = db.Column(db.String(255), nullable=False)
+    bill_date = db.Column(db.Date, nullable=False)
+    due_date = db.Column(db.Date, nullable=True)
+    document_id = db.Column(db.String(50), db.ForeignKey("document_center_document.id"), nullable=True)
+    tax_code_id = db.Column(db.String(50), db.ForeignKey("tax_codes.id"), nullable=True)
+    expense_account_code = db.Column(db.String(20), nullable=False, default="642")
+    base_amount = db.Column(db.Float, default=0)
+    tax_rate = db.Column(db.Float, default=0)
+    tax_amount = db.Column(db.Float, default=0)
+    total_amount = db.Column(db.Float, default=0)
+    paid_amount = db.Column(db.Float, default=0)
+    balance_amount = db.Column(db.Float, default=0)
+    currency = db.Column(db.String(10), default="VND")
+    status = db.Column(db.String(30), default="draft")
+    description = db.Column(db.Text, nullable=True)
+    journal_entry_id = db.Column(db.String(50), db.ForeignKey("journal_entries.id"), nullable=True)
+    confirmed_at = db.Column(db.DateTime, nullable=True)
+    cancelled_at = db.Column(db.DateTime, nullable=True)
+    created_by = db.Column(db.String(50), nullable=True)
+    updated_by = db.Column(db.String(50), nullable=True)
+
+    lead = db.relationship("LeadPayload", backref="ap_bills")
+    document = db.relationship("DocumentCenterDocument", backref="ap_bills")
+    tax_code = db.relationship("TaxCode", backref="ap_bills")
+    journal_entry = db.relationship("JournalEntry", foreign_keys=[journal_entry_id])
+
+    __table_args__ = (
+        Index("ix_ap_bills_lead_code", "lead_id", "code", unique=True),
+        Index("ix_ap_bills_lead_date", "lead_id", "bill_date"),
+        Index("ix_ap_bills_lead_due", "lead_id", "due_date"),
+        Index("ix_ap_bills_lead_status", "lead_id", "status"),
+        Index("ix_ap_bills_supplier", "supplier_id"),
+    )
+
+    def tdict(self, include_payments=False):
+        result = {}
+        for column in self.__table__.columns:
+            value = getattr(self, column.name)
+            if isinstance(value, (datetime.datetime, datetime.date)):
+                value = value.isoformat()
+            result[column.name] = value
+        if include_payments:
+            result["payments"] = [item.tdict() for item in self.payments if not item.deletedAt]
+        return result
+
+
+class APBillPayment(BaseModel):
+    __tablename__ = "ap_bill_payments"
+
+    id = db.Column(db.String(50), primary_key=True)
+    bill_id = db.Column(db.String(50), db.ForeignKey("ap_bills.id", ondelete="CASCADE"), nullable=False)
+    lead_id = db.Column(db.Integer, db.ForeignKey("lead.id"), nullable=False)
+    payment_date = db.Column(db.Date, nullable=False)
+    amount = db.Column(db.Float, default=0)
+    payment_method = db.Column(db.String(30), default="cash")
+    daily_cash_id = db.Column(db.String(50), db.ForeignKey("accounting_daily_cash.id"), nullable=True)
+    journal_entry_id = db.Column(db.String(50), db.ForeignKey("journal_entries.id"), nullable=True)
+    note = db.Column(db.Text, nullable=True)
+    created_by = db.Column(db.String(50), nullable=True)
+    updated_by = db.Column(db.String(50), nullable=True)
+
+    bill = db.relationship("APBill", backref="payments")
+    lead = db.relationship("LeadPayload", backref="ap_bill_payments")
+    daily_cash = db.relationship("AccountingDailyCash", foreign_keys=[daily_cash_id])
+    journal_entry = db.relationship("JournalEntry", foreign_keys=[journal_entry_id])
+
+    __table_args__ = (
+        Index("ix_ap_bill_payments_bill", "bill_id"),
+        Index("ix_ap_bill_payments_cash", "daily_cash_id"),
+    )
+
+    def tdict(self):
+        result = {}
+        for column in self.__table__.columns:
+            value = getattr(self, column.name)
+            if isinstance(value, (datetime.datetime, datetime.date)):
+                value = value.isoformat()
+            result[column.name] = value
+        return result
+
+
+class FixedAsset(BaseModel):
+    __tablename__ = "fixed_assets"
+
+    id = db.Column(db.String(50), primary_key=True)
+    lead_id = db.Column(db.Integer, db.ForeignKey("lead.id"), nullable=False)
+    code = db.Column(db.String(80), nullable=False)
+    name = db.Column(db.String(255), nullable=False)
+    purchase_date = db.Column(db.Date, nullable=False)
+    capitalized_date = db.Column(db.Date, nullable=True)
+    cost = db.Column(db.Float, default=0)
+    salvage_value = db.Column(db.Float, default=0)
+    useful_life_months = db.Column(db.Integer, nullable=False)
+    monthly_depreciation = db.Column(db.Float, default=0)
+    accumulated_depreciation = db.Column(db.Float, default=0)
+    department = db.Column(db.String(100), nullable=True)
+    asset_account_code = db.Column(db.String(20), default="211")
+    accumulated_account_code = db.Column(db.String(20), default="214")
+    expense_account_code = db.Column(db.String(20), default="642")
+    status = db.Column(db.String(30), default="active")
+    source_document_id = db.Column(db.String(50), db.ForeignKey("document_center_document.id"), nullable=True)
+    created_by = db.Column(db.String(50), nullable=True)
+    updated_by = db.Column(db.String(50), nullable=True)
+
+    lead = db.relationship("LeadPayload", backref="fixed_assets")
+    source_document = db.relationship("DocumentCenterDocument", backref="fixed_assets")
+
+    __table_args__ = (
+        Index("ix_fixed_assets_lead_code", "lead_id", "code", unique=True),
+        Index("ix_fixed_assets_lead_status", "lead_id", "status"),
+        Index("ix_fixed_assets_lead_department", "lead_id", "department"),
+    )
+
+    def tdict(self, include_depreciations=False):
+        result = {}
+        for column in self.__table__.columns:
+            value = getattr(self, column.name)
+            if isinstance(value, (datetime.datetime, datetime.date)):
+                value = value.isoformat()
+            result[column.name] = value
+        if include_depreciations:
+            result["depreciations"] = [item.tdict() for item in self.depreciations if not item.deletedAt]
+        return result
+
+
+class FixedAssetDepreciation(BaseModel):
+    __tablename__ = "fixed_asset_depreciations"
+
+    id = db.Column(db.String(50), primary_key=True)
+    asset_id = db.Column(db.String(50), db.ForeignKey("fixed_assets.id", ondelete="CASCADE"), nullable=False)
+    lead_id = db.Column(db.Integer, db.ForeignKey("lead.id"), nullable=False)
+    period_key = db.Column(db.String(7), nullable=False)
+    depreciation_date = db.Column(db.Date, nullable=False)
+    amount = db.Column(db.Float, default=0)
+    status = db.Column(db.String(30), default="draft")
+    journal_entry_id = db.Column(db.String(50), db.ForeignKey("journal_entries.id"), nullable=True)
+    created_by = db.Column(db.String(50), nullable=True)
+    updated_by = db.Column(db.String(50), nullable=True)
+
+    asset = db.relationship("FixedAsset", backref="depreciations")
+    lead = db.relationship("LeadPayload", backref="fixed_asset_depreciations")
+    journal_entry = db.relationship("JournalEntry", foreign_keys=[journal_entry_id])
+
+    __table_args__ = (
+        Index("ix_fixed_asset_depreciations_asset_period", "asset_id", "period_key", unique=True),
+        Index("ix_fixed_asset_depreciations_lead_period", "lead_id", "period_key"),
+    )
+
+    def tdict(self):
+        result = {}
+        for column in self.__table__.columns:
+            value = getattr(self, column.name)
+            if isinstance(value, (datetime.datetime, datetime.date)):
+                value = value.isoformat()
+            result[column.name] = value
+        return result
+
+
+class AccountingLink(BaseModel):
+    __tablename__ = "accounting_links"
+
+    id = db.Column(db.String(50), primary_key=True)
+    lead_id = db.Column(db.Integer, db.ForeignKey("lead.id"), nullable=False)
+    source_type = db.Column(db.String(40), nullable=False)
+    source_id = db.Column(db.String(80), nullable=False)
+    target_type = db.Column(db.String(40), nullable=False)
+    target_id = db.Column(db.String(80), nullable=False)
+    note = db.Column(db.String(255), nullable=True)
+    created_by = db.Column(db.String(50), nullable=True)
+    updated_by = db.Column(db.String(50), nullable=True)
+
+    lead = db.relationship("LeadPayload", backref="accounting_links")
+
+    __table_args__ = (
+        Index("ix_accounting_links_source", "lead_id", "source_type", "source_id"),
+        Index("ix_accounting_links_target", "lead_id", "target_type", "target_id"),
+        Index("ix_accounting_links_unique", "lead_id", "source_type", "source_id", "target_type", "target_id", unique=True),
+    )
+
+    def tdict(self):
+        result = {}
+        for column in self.__table__.columns:
+            value = getattr(self, column.name)
+            if isinstance(value, (datetime.datetime, datetime.date)):
+                value = value.isoformat()
+            result[column.name] = value
+        return result
+
+
+class ItemCategory(BaseModel):
+    __tablename__ = "item_categories"
+
+    id = db.Column(db.String(50), primary_key=True)
+    lead_id = db.Column(db.Integer, db.ForeignKey("lead.id"), nullable=False)
+    code = db.Column(db.String(80), nullable=False)
+    name = db.Column(db.String(255), nullable=False)
+    description = db.Column(db.Text, nullable=True)
+    status = db.Column(db.String(30), default="active")
+    created_by = db.Column(db.String(50), nullable=True)
+    updated_by = db.Column(db.String(50), nullable=True)
+
+    lead = db.relationship("LeadPayload", backref="item_categories")
+
+    __table_args__ = (
+        Index("ix_item_categories_lead_code", "lead_id", "code", unique=True),
+        Index("ix_item_categories_lead_status", "lead_id", "status"),
+    )
+
+    def tdict(self):
+        result = {}
+        for column in self.__table__.columns:
+            value = getattr(self, column.name)
+            if isinstance(value, (datetime.datetime, datetime.date)):
+                value = value.isoformat()
+            result[column.name] = value
+        return result
+
+
+class Warehouse(BaseModel):
+    __tablename__ = "warehouses"
+
+    id = db.Column(db.String(50), primary_key=True)
+    lead_id = db.Column(db.Integer, db.ForeignKey("lead.id"), nullable=False)
+    code = db.Column(db.String(80), nullable=False)
+    name = db.Column(db.String(255), nullable=False)
+    location = db.Column(db.String(255), nullable=True)
+    description = db.Column(db.Text, nullable=True)
+    status = db.Column(db.String(30), default="active")
+    is_default = db.Column(db.Boolean, default=False)
+    created_by = db.Column(db.String(50), nullable=True)
+    updated_by = db.Column(db.String(50), nullable=True)
+
+    lead = db.relationship("LeadPayload", backref="warehouses")
+
+    __table_args__ = (
+        Index("ix_warehouses_lead_code", "lead_id", "code", unique=True),
+        Index("ix_warehouses_lead_status", "lead_id", "status"),
+    )
+
+    def tdict(self):
+        result = {}
+        for column in self.__table__.columns:
+            value = getattr(self, column.name)
+            if isinstance(value, (datetime.datetime, datetime.date)):
+                value = value.isoformat()
+            result[column.name] = value
+        return result
+
+
+class InventoryItem(BaseModel):
+    __tablename__ = "inventory_items"
+
+    id = db.Column(db.String(50), primary_key=True)
+    lead_id = db.Column(db.Integer, db.ForeignKey("lead.id"), nullable=False)
+    code = db.Column(db.String(80), nullable=False)
+    name = db.Column(db.String(255), nullable=False)
+    sku = db.Column(db.String(120), nullable=True)
+    category_id = db.Column(db.String(50), db.ForeignKey("item_categories.id"), nullable=True)
+    item_type = db.Column(db.String(30), nullable=False, default="raw_material")
+    unit = db.Column(db.String(50), nullable=False, default="cái")
+    default_supplier_id = db.Column(db.String(80), nullable=True)
+    default_supplier_name = db.Column(db.String(255), nullable=True)
+    default_warehouse_id = db.Column(db.String(50), db.ForeignKey("warehouses.id"), nullable=True)
+    standard_cost = db.Column(db.Float, default=0)
+    average_cost = db.Column(db.Float, default=0)
+    min_stock_level = db.Column(db.Float, default=0)
+    is_active = db.Column(db.Boolean, default=True)
+    note = db.Column(db.Text, nullable=True)
+    created_by = db.Column(db.String(50), nullable=True)
+    updated_by = db.Column(db.String(50), nullable=True)
+
+    lead = db.relationship("LeadPayload", backref="inventory_items")
+    category = db.relationship("ItemCategory", backref="items")
+    default_warehouse = db.relationship("Warehouse", foreign_keys=[default_warehouse_id])
+
+    __table_args__ = (
+        Index("ix_inventory_items_lead_code", "lead_id", "code", unique=True),
+        Index("ix_inventory_items_lead_sku", "lead_id", "sku", unique=True),
+        Index("ix_inventory_items_lead_category", "lead_id", "category_id"),
+        Index("ix_inventory_items_lead_active", "lead_id", "is_active"),
+    )
+
+    def tdict(self):
+        result = {}
+        for column in self.__table__.columns:
+            value = getattr(self, column.name)
+            if isinstance(value, (datetime.datetime, datetime.date)):
+                value = value.isoformat()
+            result[column.name] = value
+        if self.category:
+            result["category_name"] = self.category.name
+        if self.default_warehouse:
+            result["default_warehouse_name"] = self.default_warehouse.name
+        return result
+
+
+class StockAdjustmentReason(BaseModel):
+    __tablename__ = "stock_adjustment_reasons"
+
+    id = db.Column(db.String(50), primary_key=True)
+    lead_id = db.Column(db.Integer, db.ForeignKey("lead.id"), nullable=False)
+    code = db.Column(db.String(80), nullable=False)
+    name = db.Column(db.String(255), nullable=False)
+    effect_type = db.Column(db.String(20), nullable=False, default="decrease")
+    accounting_mapping = db.Column(db.JSON, default={})
+    status = db.Column(db.String(30), default="active")
+    created_by = db.Column(db.String(50), nullable=True)
+    updated_by = db.Column(db.String(50), nullable=True)
+
+    lead = db.relationship("LeadPayload", backref="stock_adjustment_reasons")
+
+    __table_args__ = (
+        Index("ix_stock_adjustment_reasons_lead_code", "lead_id", "code", unique=True),
+        Index("ix_stock_adjustment_reasons_lead_status", "lead_id", "status"),
+    )
+
+    def tdict(self):
+        result = {}
+        for column in self.__table__.columns:
+            value = getattr(self, column.name)
+            if isinstance(value, (datetime.datetime, datetime.date)):
+                value = value.isoformat()
+            result[column.name] = value
+        return result
+
+
+class InventoryAccountMapping(BaseModel):
+    __tablename__ = "inventory_account_mappings"
+
+    id = db.Column(db.String(50), primary_key=True)
+    lead_id = db.Column(db.Integer, db.ForeignKey("lead.id"), nullable=False)
+    item_type = db.Column(db.String(30), nullable=True)
+    category_id = db.Column(db.String(50), db.ForeignKey("item_categories.id"), nullable=True)
+    inventory_account_code = db.Column(db.String(20), nullable=False)
+    cogs_account_code = db.Column(db.String(20), nullable=True)
+    expense_account_code = db.Column(db.String(20), nullable=True)
+    adjustment_gain_account_code = db.Column(db.String(20), nullable=True)
+    adjustment_loss_account_code = db.Column(db.String(20), nullable=True)
+    ap_account_code = db.Column(db.String(20), nullable=True, default="331")
+    cash_account_code = db.Column(db.String(20), nullable=True, default="111")
+    vat_account_code = db.Column(db.String(20), nullable=True, default="133")
+    wip_account_code = db.Column(db.String(20), nullable=True)
+    status = db.Column(db.String(30), default="active")
+    created_by = db.Column(db.String(50), nullable=True)
+    updated_by = db.Column(db.String(50), nullable=True)
+
+    lead = db.relationship("LeadPayload", backref="inventory_account_mappings")
+    category = db.relationship("ItemCategory", backref="inventory_account_mappings")
+
+    __table_args__ = (
+        Index("ix_inventory_account_mappings_lead_type", "lead_id", "item_type"),
+        Index("ix_inventory_account_mappings_lead_category", "lead_id", "category_id"),
+    )
+
+    def tdict(self):
+        result = {}
+        for column in self.__table__.columns:
+            value = getattr(self, column.name)
+            if isinstance(value, (datetime.datetime, datetime.date)):
+                value = value.isoformat()
+            result[column.name] = value
+        return result
+
+
+class InventoryBalance(BaseModel):
+    __tablename__ = "inventory_balances"
+
+    id = db.Column(db.String(50), primary_key=True)
+    lead_id = db.Column(db.Integer, db.ForeignKey("lead.id"), nullable=False)
+    item_id = db.Column(db.String(50), db.ForeignKey("inventory_items.id"), nullable=False)
+    warehouse_id = db.Column(db.String(50), db.ForeignKey("warehouses.id"), nullable=False)
+    quantity_on_hand = db.Column(db.Float, default=0)
+    average_cost = db.Column(db.Float, default=0)
+    inventory_value = db.Column(db.Float, default=0)
+    created_by = db.Column(db.String(50), nullable=True)
+    updated_by = db.Column(db.String(50), nullable=True)
+
+    lead = db.relationship("LeadPayload", backref="inventory_balances")
+    item = db.relationship("InventoryItem", backref="balances")
+    warehouse = db.relationship("Warehouse", backref="balances")
+
+    __table_args__ = (
+        Index("ix_inventory_balances_item_warehouse", "item_id", "warehouse_id", unique=True),
+        Index("ix_inventory_balances_lead_item", "lead_id", "item_id"),
+        Index("ix_inventory_balances_lead_warehouse", "lead_id", "warehouse_id"),
+    )
+
+    def tdict(self):
+        result = {}
+        for column in self.__table__.columns:
+            value = getattr(self, column.name)
+            if isinstance(value, (datetime.datetime, datetime.date)):
+                value = value.isoformat()
+            result[column.name] = value
+        return result
+
+
+class StockTransaction(BaseModel):
+    __tablename__ = "stock_transactions"
+
+    id = db.Column(db.String(50), primary_key=True)
+    lead_id = db.Column(db.Integer, db.ForeignKey("lead.id"), nullable=False)
+    transaction_code = db.Column(db.String(80), nullable=False)
+    transaction_date = db.Column(db.Date, nullable=False)
+    transaction_type = db.Column(db.String(40), nullable=False)
+    status = db.Column(db.String(30), default="draft")
+    warehouse_id = db.Column(db.String(50), db.ForeignKey("warehouses.id"), nullable=False)
+    destination_warehouse_id = db.Column(db.String(50), db.ForeignKey("warehouses.id"), nullable=True)
+    item_id = db.Column(db.String(50), db.ForeignKey("inventory_items.id"), nullable=False)
+    quantity = db.Column(db.Float, nullable=False, default=0)
+    unit_cost = db.Column(db.Float, default=0)
+    total_cost = db.Column(db.Float, default=0)
+    direction = db.Column(db.String(10), nullable=False)
+    balance_after = db.Column(db.Float, nullable=True)
+    partner_id = db.Column(db.String(80), nullable=True)
+    partner_name = db.Column(db.String(255), nullable=True)
+    task_id = db.Column(db.String(80), nullable=True)
+    project_id = db.Column(db.String(80), nullable=True)
+    note = db.Column(db.Text, nullable=True)
+    reference_type = db.Column(db.String(40), nullable=True)
+    reference_id = db.Column(db.String(80), nullable=True)
+    reference_code = db.Column(db.String(120), nullable=True)
+    source_type = db.Column(db.String(40), nullable=True)
+    source_id = db.Column(db.String(80), nullable=True)
+    adjustment_reason_id = db.Column(db.String(50), db.ForeignKey("stock_adjustment_reasons.id"), nullable=True)
+    accounting_entry_id = db.Column(db.String(50), db.ForeignKey("journal_entries.id"), nullable=True)
+    reversal_transaction_id = db.Column(db.String(50), db.ForeignKey("stock_transactions.id"), nullable=True)
+    confirmed_at = db.Column(db.DateTime, nullable=True)
+    cancelled_at = db.Column(db.DateTime, nullable=True)
+    created_by = db.Column(db.String(50), nullable=True)
+    approved_by = db.Column(db.String(50), nullable=True)
+    updated_by = db.Column(db.String(50), nullable=True)
+
+    lead = db.relationship("LeadPayload", backref="stock_transactions")
+    item = db.relationship("InventoryItem", backref="transactions")
+    warehouse = db.relationship("Warehouse", foreign_keys=[warehouse_id], backref="stock_transactions")
+    destination_warehouse = db.relationship("Warehouse", foreign_keys=[destination_warehouse_id])
+    adjustment_reason = db.relationship("StockAdjustmentReason", backref="transactions")
+    accounting_entry = db.relationship("JournalEntry", foreign_keys=[accounting_entry_id])
+    reversal_transaction = db.relationship("StockTransaction", remote_side=[id], uselist=False)
+
+    __table_args__ = (
+        Index("ix_stock_transactions_lead_code", "lead_id", "transaction_code", unique=True),
+        Index("ix_stock_transactions_lead_date", "lead_id", "transaction_date"),
+        Index("ix_stock_transactions_lead_status", "lead_id", "status"),
+        Index("ix_stock_transactions_item_warehouse", "item_id", "warehouse_id"),
+        Index("ix_stock_transactions_reference", "reference_type", "reference_id"),
+        Index("ix_stock_transactions_source", "source_type", "source_id"),
+    )
+
+    def tdict(self):
+        result = {}
+        for column in self.__table__.columns:
+            value = getattr(self, column.name)
+            if isinstance(value, (datetime.datetime, datetime.date)):
+                value = value.isoformat()
+            result[column.name] = value
+        if self.item:
+            result["item_name"] = self.item.name
+            result["item_code"] = self.item.code
+            result["unit"] = self.item.unit
+        if self.warehouse:
+            result["warehouse_name"] = self.warehouse.name
+        if self.destination_warehouse:
+            result["destination_warehouse_name"] = self.destination_warehouse.name
+        return result
+
+
+class DocumentCenterDocument(BaseModel):
+    __tablename__ = "document_center_document"
+
+    id = db.Column(db.String(50), primary_key=True)
+    lead_id = db.Column(db.Integer, db.ForeignKey("lead.id"), nullable=False)
+
+    code = db.Column(db.String(120), nullable=False)
+    type = db.Column(db.String(60), nullable=False)
+    docDate = db.Column(db.Date, nullable=False)
+
+    partnerId = db.Column(db.String(80), nullable=True)
+    partnerName = db.Column(db.String(255), nullable=True)
+    projectId = db.Column(db.String(80), nullable=True)
+    projectName = db.Column(db.String(255), nullable=True)
+    taskId = db.Column(db.String(80), nullable=True)
+
+    amount = db.Column(db.Float, default=0)
+    currency = db.Column(db.String(10), default="VND")
+    status = db.Column(db.String(30), default="draft")
+
+    description = db.Column(db.Text, nullable=True)
+    note = db.Column(db.Text, nullable=True)
+    tags = db.Column(db.JSON, default=[])
+
+    createdBy = db.Column(db.String(80), nullable=True)
+    approvedBy = db.Column(db.String(80), nullable=True)
+
+    legacy_document_id = db.Column(db.String(50), nullable=True)
+
+    lead = db.relationship("LeadPayload", backref="document_center_documents")
+
+    __table_args__ = (
+        Index("ix_doc_center_doc_lead_docDate", "lead_id", "docDate"),
+        Index("ix_doc_center_doc_lead_type", "lead_id", "type"),
+        Index("ix_doc_center_doc_lead_status", "lead_id", "status"),
+        Index("ix_doc_center_doc_lead_partnerId", "lead_id", "partnerId"),
+        Index("ix_doc_center_doc_lead_projectId", "lead_id", "projectId"),
+        Index("ix_doc_center_doc_lead_code", "lead_id", "code", unique=True),
+    )
+
+    def tdict(self, include_attachments=False, include_links=False, include_audit=False):
+        result = {}
+        for column in self.__table__.columns:
+            value = getattr(self, column.name)
+            if isinstance(value, (datetime.datetime, datetime.date)):
+                value = value.isoformat()
+            result[column.name] = value
+
+        if include_attachments:
+            result["attachments"] = [a.tdict() for a in self.attachments if not a.deletedAt]
+        if include_links:
+            result["links"] = [x.tdict() for x in self.links if not x.deletedAt]
+        if include_audit:
+            result["auditLog"] = [x.tdict() for x in self.audit_logs if not x.deletedAt]
+        return result
+
+    @staticmethod
+    def create_item(params):
+        payload = dict(params or {})
+        if not payload.get("id"):
+            payload["id"] = generate_datetime_id()
+        item = DocumentCenterDocument(**payload)
+        db.session.add(item)
+        db.session.commit()
+        return item
+
+
+class DocumentCenterAttachment(BaseModel):
+    __tablename__ = "document_center_attachment"
+
+    id = db.Column(db.String(50), primary_key=True)
+    document_id = db.Column(
+        db.String(50), db.ForeignKey("document_center_document.id", ondelete="CASCADE"), nullable=True
+    )
+    filename = db.Column(db.String(255), nullable=False)
+    mimeType = db.Column(db.String(120), nullable=True)
+    size = db.Column(db.BigInteger, nullable=True)
+    storageKey = db.Column(db.String(255), nullable=True)
+    url = db.Column(db.String(255), nullable=True)
+    uploadedBy = db.Column(db.String(80), nullable=True)
+    uploadedAt = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+
+    document = db.relationship("DocumentCenterDocument", backref="attachments")
+
+    __table_args__ = (
+        Index("ix_doc_center_attachment_document", "document_id"),
+    )
+
+    def tdict(self):
+        result = {}
+        for column in self.__table__.columns:
+            value = getattr(self, column.name)
+            if isinstance(value, (datetime.datetime, datetime.date)):
+                value = value.isoformat()
+            result[column.name] = value
+        return result
+
+
+class DocumentCenterLink(BaseModel):
+    __tablename__ = "document_center_link"
+
+    id = db.Column(db.String(50), primary_key=True)
+    document_id = db.Column(
+        db.String(50), db.ForeignKey("document_center_document.id", ondelete="CASCADE"), nullable=False
+    )
+    linked_document_id = db.Column(db.String(50), nullable=True)
+    link_type = db.Column(db.String(80), nullable=True)
+    note = db.Column(db.String(255), nullable=True)
+
+    document = db.relationship("DocumentCenterDocument", backref="links")
+
+    __table_args__ = (
+        Index("ix_doc_center_link_document", "document_id"),
+        Index("ix_doc_center_link_linked_document", "linked_document_id"),
+    )
+
+    def tdict(self):
+        result = {}
+        for column in self.__table__.columns:
+            value = getattr(self, column.name)
+            if isinstance(value, (datetime.datetime, datetime.date)):
+                value = value.isoformat()
+            result[column.name] = value
+        return result
+
+
+class DocumentCenterAuditLog(BaseModel):
+    __tablename__ = "document_center_audit_log"
+
+    id = db.Column(db.String(50), primary_key=True)
+    document_id = db.Column(
+        db.String(50), db.ForeignKey("document_center_document.id", ondelete="CASCADE"), nullable=False
+    )
+    action = db.Column(db.String(50), nullable=False)
+    from_status = db.Column(db.String(30), nullable=True)
+    to_status = db.Column(db.String(30), nullable=True)
+    actor_id = db.Column(db.String(80), nullable=True)
+    actor_name = db.Column(db.String(255), nullable=True)
+    payload = db.Column(db.JSON, default={})
+    actedAt = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+
+    document = db.relationship("DocumentCenterDocument", backref="audit_logs")
+
+    __table_args__ = (
+        Index("ix_doc_center_audit_document", "document_id"),
+        Index("ix_doc_center_audit_actedAt", "actedAt"),
+    )
+
+    def tdict(self):
+        result = {}
+        for column in self.__table__.columns:
+            value = getattr(self, column.name)
+            if isinstance(value, (datetime.datetime, datetime.date)):
+                value = value.isoformat()
+            result[column.name] = value
+        return result
+
 class Workpoint(BaseModel):
     __tablename__ = 'workpoint'
     id = db.Column(db.String(80), primary_key=True)
@@ -1001,13 +2024,14 @@ def test_sync_backup_to_drive(dry_run=True):
         print("Sync backup to Drive failed:", e.stderr or e)
 
 def get_query_page_users(lead_id, page, limit, search, role_id = 0):
-    if lead_id == 0:
+    Pagination = namedtuple('Pagination', ['total', 'pages'])
+    empty_pagination = Pagination(total=0, pages=0)
+
+    if not lead_id or lead_id == 0:
         return [], empty_pagination
     
     lead = db.session.get(LeadPayload, lead_id)
     if not lead:
-        Pagination = namedtuple('Pagination', ['total', 'pages'])
-        empty_pagination = Pagination(total=0, pages=0)
         return [], empty_pagination
     
     if role_id == 0:

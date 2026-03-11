@@ -1,10 +1,8 @@
-import { useNavigate } from "react-router-dom";
 import LoginForm from "./login.form";
 import { useEffect } from "react";
 import { useApiHost } from "../../common/hooks/useApiHost";
 
 export const Login = () => {
-  const navigate = useNavigate();
   const API_HOST = useApiHost();
   
   useEffect(() => {
@@ -23,7 +21,8 @@ export const Login = () => {
         });
 
         if (res.ok) {
-          navigate("/users", { replace: true });
+          // Must hard-redirect to switch from login.html entry to dashboard.html entry.
+          window.location.replace("/users");
         } else {
           localStorage.removeItem("accessToken");
         }
@@ -33,7 +32,7 @@ export const Login = () => {
     };
 
     validate();
-  }, [navigate, API_HOST]);
+  }, [API_HOST]);
 
   return (
     <div className="flex items-center justify-center min-h-screen">

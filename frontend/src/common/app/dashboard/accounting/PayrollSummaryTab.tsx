@@ -1,60 +1,16 @@
 import React, { useEffect, useMemo, useState } from "react";
 import dayjs from "dayjs";
-import { useApiHost } from "../../../common/hooks/useApiHost";
+import { notification } from "antd";
 import { useUser } from "../../../common/hooks/useUser";
+import {
+  AccountingService,
+  type PayrollGroupSummary as GroupSummary,
+  type PayrollRow,
+  type PayrollSummary,
+  type PayrollSummaryResponse,
+} from "../../../services/accounting.service";
 
 type FilterMode = "single" | "range";
-
-type PayrollRow = {
-  user_id: string;
-  full_name: string;
-  phone: string;
-  department: string;
-  group_type: "staff" | "supplier";
-  salary_base: number;
-  period_work: number;
-  work_hours: number;
-  overtime_hours: number;
-  salary_base_total: number;
-  salary_overtime_total: number;
-  bonus_total: number;
-  punish_total: number;
-  advance_total: number;
-  net_salary: number;
-};
-
-type PayrollSummary = {
-  from_month: string;
-  to_month: string;
-  total_people: number;
-  total_staff: number;
-  total_supplier: number;
-  total_base_salary: number;
-  total_overtime_salary: number;
-  total_bonus: number;
-  total_punish: number;
-  total_advance: number;
-  total_net_salary: number;
-};
-
-type GroupSummary = {
-  total_people: number;
-  total_base_salary: number;
-  total_overtime_salary: number;
-  total_bonus: number;
-  total_punish: number;
-  total_advance: number;
-  total_net_salary: number;
-};
-
-type PayrollResponse = {
-  rows?: PayrollRow[];
-  staff_rows?: PayrollRow[];
-  supplier_rows?: PayrollRow[];
-  summary?: PayrollSummary;
-  staff_summary?: GroupSummary;
-  supplier_summary?: GroupSummary;
-};
 
 const formatMoney = (value: number) =>
   Number(value || 0).toLocaleString("vi-VN", {
@@ -239,22 +195,25 @@ export default function PayrollSummaryTab() {
 
   const fetchPayrollSummary = async () => {
     if (!userLeadId) return;
+    if (filterMode === "range" && fromMonth > toMonth) {
+      notification.warning({ message: "Tháng bắt đầu phải nhỏ hơn hoặc bằng tháng kết thúc" });
+      return;
+    }
     setIsLoading(true);
     try {
-      const params = new URLSearchParams({
+      const params: Record<string, string> = {
         lead: String(userLeadId),
-      });
+      };
 
       if (filterMode === "single") {
-        params.set("month", month);
+        params.month = month;
       } else {
-        params.set("from_month", fromMonth);
-        params.set("to_month", toMonth);
+        params.from_month = fromMonth;
+        params.to_month = toMonth;
       }
 
-      const response = await fetch(`${useApiHost()}/workpoint/payroll-summary?${params.toString()}`);
-      if (!response.ok) throw new Error(`Cannot fetch payroll summary: ${response.status}`);
-      const data: PayrollResponse = await response.json();
+      const response = await AccountingService.getPayrollSummary(params);
+      const data: PayrollSummaryResponse = response.data || {};
 
       const fallbackRows = data.rows || [];
       const collator = new Intl.Collator("vi", {
@@ -283,6 +242,7 @@ export default function PayrollSummaryTab() {
       setSupplierSummary(data.supplier_summary || buildGroupSummary(nextSupplierRows));
     } catch (error) {
       console.error("Failed to fetch payroll summary", error);
+      notification.error({ message: "Không tải được bảng lương" });
       setSummary(emptySummary);
       setStaffRows([]);
       setSupplierRows([]);

@@ -40,6 +40,7 @@ const UserDashboard: IPage["Component"] = () => {
   const userTotal = Number((users as any)?.data?.total ?? (users as any)?.total ?? userRows.length);
 
   const handleRefetch = async () => {
+    if (!query.lead || Number(query.lead) <= 0) return;
     setIsRefetching(true);
     try {
       await refetch();
@@ -55,6 +56,15 @@ const UserDashboard: IPage["Component"] = () => {
   {
     console.log('CVS', canViewPermission);
   },[canViewPermission]);
+
+  useEffect(() => {
+    if (!userLeadId || userLeadId <= 0) return;
+    setQuery((prev) => ({
+      ...prev,
+      lead: userLeadId,
+      page: 1,
+    }));
+  }, [userLeadId]);
 
   const [user, setUser] = useState<User | null>(null);
 

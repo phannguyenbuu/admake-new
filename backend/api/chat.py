@@ -7,6 +7,8 @@ from sqlalchemy.orm.attributes import flag_modified
 
 socketio = SocketIO(app, cors_allowed_origins=["http://localhost:5173",
                                                 "http://localhost:5174",
+                                                "http://localhost:5175",
+                                                "http://127.0.0.1:5175",
                                                 "https://admake.vn",
                                                 "https://quanly.admake.vn",
                                                 "https://archbox.pw", 
@@ -170,4 +172,3 @@ def handle_message_delete(data):
         emit('admake/chat/delete', {'message_id': message_id}, room=str(workspace_id), skip_sid=request.sid)
     else:
         print("Message not found to delete", message_id)
-
