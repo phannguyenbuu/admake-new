@@ -8,9 +8,9 @@ import type { UserSearchProps } from "../../../../@types/work-space.type";
 const { Text } = Typography;
 
 interface JobAgentInfoProps {
-  mode: "customer"|"user"|string;
-  
-  users: UserSearchProps[] ,
+  mode: "customer" | "user" | string;
+
+  users: UserSearchProps[],
   form: any; // Form instance AntD
   searchValue: string;
   setSearchValue: React.Dispatch<React.SetStateAction<string>>;
@@ -22,7 +22,7 @@ interface JobAgentInfoProps {
 //   return (obj as Customer).workAddress !== undefined;
 // }
 
-const JobAgentInfo: React.FC<JobAgentInfoProps> = ({ 
+const JobAgentInfo: React.FC<JobAgentInfoProps> = ({
   form,
   users,
   mode,
@@ -95,7 +95,7 @@ const JobAgentInfo: React.FC<JobAgentInfoProps> = ({
     setSearchValue('');
   };
 
-  function removeVietnameseTones(str:string) {
+  function removeVietnameseTones(str: string) {
     if (!str) return "";
     str = String(str).toLowerCase();
     str = str.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
@@ -107,47 +107,41 @@ const JobAgentInfo: React.FC<JobAgentInfoProps> = ({
   return (
     <>
       <Form.Item
-        label={`Tìm ${rolename}`}
         name={mode}
-        className="mb-3"
+        className="!mb-0 w-full"
       >
         <AutoComplete
-          style={{ minWidth: 200, maxWidth:300 }}
+          className="w-full !rounded-lg !border-slate-200 hover:!border-cyan-400 focus:!border-cyan-500 focus:!ring-1 focus:!ring-cyan-200 transition-all !shadow-sm"
+          style={{ height: 38 }}
           options={options}
-          // filterOption={(inputValue, option) => {
-          //   const label = (option as { label?: string; value?: string }).label || (option as { value?: string }).value || '';
-          //   return removeVietnameseTones(label).includes(removeVietnameseTones(inputValue));
-          // }}
           value={searchValue}
           onChange={val => setSearchValue(val)}
           onSearch={handleSearch}
           onSelect={handleSelect}
-          placeholder={`Nhập tên hoặc số điện thoại ${rolename}`}
+          placeholder={`Nhập tên hoặc SĐT để tìm ${rolename}...`}
           allowClear
-          // filterOption={(inputValue, option) => {
-          //   const label = option?.label || option?.value || '';
-          //   const normalizedLabel = removeVietnameseTones(label || '').toLowerCase();
-          //   const normalizedInput = removeVietnameseTones(inputValue || '').toLowerCase();
-          //   return normalizedLabel.includes(normalizedInput);
-          // }}
-
         />
       </Form.Item>
 
       {selectedAgent && (
-        <div>
-          <Text strong>Tên {rolename}:</Text> {selectedAgent.fullName || "-"} <br />
-          <Text strong>Số điện thoại:</Text>{" "}
-          {selectedAgent.phone ? (
-            <a href={`tel:${selectedAgent.phone.replace(/\s/g, "")}`}>{selectedAgent.phone}</a>
-          ) : (
-            "-"
-          )}{" "}
-          <br />
+        <div className="mt-3 bg-slate-50 border border-slate-200 rounded-lg p-3 text-[13px] text-slate-700 space-y-1.5 shadow-sm">
+          <div className="flex justify-between">
+            <span className="text-slate-500">Tên {rolename}:</span>
+            <span className="font-semibold text-slate-800">{selectedAgent.fullName || "-"}</span>
+          </div>
+          <div className="flex justify-between">
+            <span className="text-slate-500">SĐT:</span>
+            {selectedAgent.phone ? (
+              <a className="font-semibold text-cyan-600 hover:text-cyan-700" href={`tel:${selectedAgent.phone.replace(/\s/g, "")}`}>{selectedAgent.phone}</a>
+            ) : (
+              <span className="font-semibold text-slate-800">-</span>
+            )}
+          </div>
           {selectedAgent.workAddress && (
-            <>
-              <Text strong>Địa chỉ làm việc:</Text> {selectedAgent.workAddress}
-            </>
+            <div className="flex justify-between border-t border-slate-200 pt-1.5 mt-1">
+              <span className="text-slate-500 whitespace-nowrap mr-2">Địa chỉ:</span>
+              <span className="font-medium text-slate-800 text-right">{selectedAgent.workAddress}</span>
+            </div>
           )}
         </div>
       )}

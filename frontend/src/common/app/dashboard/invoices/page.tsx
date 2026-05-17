@@ -1,7 +1,10 @@
 import type { IPage } from "../../../@types/common.type";
 import React from "react";
+import { useUser } from "../../../common/hooks/useUser";
+import UnPermissionBoard from "../unPermissionBoard";
 
 const InvoiceDashboard: IPage["Component"] = () => {
+  const { canViewPermission } = useUser();
   const productCards = [
     {
       title: "BẢNG QUẢNG CÁO",
@@ -33,7 +36,7 @@ const InvoiceDashboard: IPage["Component"] = () => {
     { label: "Sản xuất tại", value: "Xưởng" },
   ];
 
-  return (
+  return canViewPermission?.view_invoice ? (
     <div className="w-full flex flex-col gap-6 pb-10">
       <section className="bg-white/90 rounded-2xl shadow-md border border-slate-100 p-6">
         <div className="flex items-center justify-between mb-6">
@@ -120,7 +123,7 @@ const InvoiceDashboard: IPage["Component"] = () => {
         </div>
       </section>
     </div>
-  );
+  ) : <UnPermissionBoard />;
 };
 
 export default InvoiceDashboard;

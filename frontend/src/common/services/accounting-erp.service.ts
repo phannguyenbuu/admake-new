@@ -11,11 +11,25 @@ export type ArInvoice = {
   tax_rate: number;
   tax_amount: number;
   total_amount: number;
+  effective_total_amount?: number;
   paid_amount: number;
   balance_amount: number;
   currency?: string;
   status: string;
   description?: string | null;
+  payments?: ArInvoicePayment[];
+  phat_sinh_amount?: number; // từ list endpoint: tổng phát sinh
+  tam_ung_amount?: number;   // từ list endpoint: tổng tạm ứng
+};
+
+export type ArInvoicePayment = {
+  id: string;
+  invoice_id: string;
+  payment_date: string;
+  amount: number;
+  payment_method: string;
+  payment_type: string; // "tam_ung" | "phat_sinh"
+  note?: string | null;
 };
 
 export type ApBill = {
@@ -35,7 +49,10 @@ export type ApBill = {
   currency?: string;
   status: string;
   description?: string | null;
+  phat_sinh_amount?: number;
+  tam_ung_amount?: number;
 };
+
 
 export type JournalEntry = {
   id: string;
@@ -79,11 +96,30 @@ export type FixedAsset = {
   useful_life_months: number;
   monthly_depreciation: number;
   accumulated_depreciation: number;
+  quantity?: number;
   department?: string | null;
   asset_account_code: string;
   accumulated_account_code: string;
   expense_account_code: string;
   status: string;
+  events?: FixedAssetEvent[];
+};
+
+export type FixedAssetEvent = {
+  id: string;
+  asset_id: string;
+  event_type: "purchase" | "maintenance" | "responsible" | string;
+  event_date?: string | null;
+  person_name?: string | null;
+  person_phone?: string | null;
+  note?: string | null;
+};
+
+export type AssetPerson = {
+  id: string;
+  name: string;
+  phone: string;
+  user_type: "employee" | "subcontractor" | string;
 };
 
 export const AccountingErpService = {
@@ -96,7 +132,12 @@ export const AccountingErpService = {
   confirmArInvoice: (id: string) => axiosClient.post(`/accounting/ar-invoices/${id}/confirm`, {}),
   cancelArInvoice: (id: string) => axiosClient.post(`/accounting/ar-invoices/${id}/cancel`, {}),
   recordArPayment: (id: string, payload: Record<string, any>) => axiosClient.post(`/accounting/ar-invoices/${id}/payments`, payload),
+  updateArPayment: (invoiceId: string, paymentId: string, payload: Record<string, any>) => axiosClient.patch(`/accounting/ar-invoices/${invoiceId}/payments/${paymentId}`, payload),
+  deleteArPayment: (invoiceId: string, paymentId: string) => axiosClient.delete(`/accounting/ar-invoices/${invoiceId}/payments/${paymentId}`),
+  listTasksForAccounting: (lead: number) => axiosClient.get("/accounting/tasks", { params: { lead } }),
   getArAging: (params: Record<string, any>) => axiosClient.get("/accounting/ar-aging", { params }),
+
+
 
   listApBills: (params: Record<string, any>) => axiosClient.get("/accounting/ap-bills", { params }),
   createApBill: (payload: Record<string, any>) => axiosClient.post("/accounting/ap-bills", payload),
@@ -105,6 +146,8 @@ export const AccountingErpService = {
   confirmApBill: (id: string) => axiosClient.post(`/accounting/ap-bills/${id}/confirm`, {}),
   cancelApBill: (id: string) => axiosClient.post(`/accounting/ap-bills/${id}/cancel`, {}),
   recordApPayment: (id: string, payload: Record<string, any>) => axiosClient.post(`/accounting/ap-bills/${id}/payments`, payload),
+  updateApPayment: (billId: string, paymentId: string, payload: Record<string, any>) => axiosClient.patch(`/accounting/ap-bills/${billId}/payments/${paymentId}`, payload),
+  deleteApPayment: (billId: string, paymentId: string) => axiosClient.delete(`/accounting/ap-bills/${billId}/payments/${paymentId}`),
   getApAging: (params: Record<string, any>) => axiosClient.get("/accounting/ap-aging", { params }),
 
   listAccounts: (params: Record<string, any>) => axiosClient.get("/accounting/accounts", { params }),
@@ -125,11 +168,36 @@ export const AccountingErpService = {
   getVatReport: (params: Record<string, any>) => axiosClient.get("/accounting/vat-report", { params }),
   listFixedAssets: (params: Record<string, any>) => axiosClient.get("/accounting/fixed-assets", { params }),
   createFixedAsset: (payload: Record<string, any>) => axiosClient.post("/accounting/fixed-assets", payload),
+  updateFixedAsset: (id: string, payload: Record<string, any>) => axiosClient.patch(`/accounting/fixed-assets/${id}`, payload),
+  deleteFixedAsset: (id: string) => axiosClient.delete(`/accounting/fixed-assets/${id}`),
   runDepreciation: (payload: Record<string, any>) => axiosClient.post("/accounting/fixed-assets/run-depreciation", payload),
   getAssetDepreciations: (id: string) => axiosClient.get(`/accounting/fixed-assets/${id}/depreciations`),
+  listAssetEvents: (assetId: string) => axiosClient.get(`/accounting/fixed-assets/${assetId}/events`),
+  createAssetEvent: (assetId: string, payload: Record<string, any>) => axiosClient.post(`/accounting/fixed-assets/${assetId}/events`, payload),
+  updateAssetEvent: (assetId: string, eventId: string, payload: Record<string, any>) => axiosClient.patch(`/accounting/fixed-assets/${assetId}/events/${eventId}`, payload),
+  deleteAssetEvent: (assetId: string, eventId: string) => axiosClient.delete(`/accounting/fixed-assets/${assetId}/events/${eventId}`),
+  listPeopleForAsset: (lead: number) => axiosClient.get("/accounting/people-list", { params: { lead } }),
 
   getProfitLoss: (params: Record<string, any>) => axiosClient.get("/accounting/reports/profit-loss", { params }),
   getBalanceSheet: (params: Record<string, any>) => axiosClient.get("/accounting/reports/balance-sheet", { params }),
   getCashflow: (params: Record<string, any>) => axiosClient.get("/accounting/reports/cashflow", { params }),
   trace: (params: Record<string, any>) => axiosClient.get("/accounting/trace", { params }),
+
+  // ─── Hồ sơ kế toán ───────────────────────────────────────────────────────
+  listRecords: (lead: number, sub_tab?: string) =>
+    axiosClient.get("/accounting/records", { params: { lead, ...(sub_tab ? { sub_tab } : {}) } }),
+  createRecord: (payload: Record<string, any>) => axiosClient.post("/accounting/records", payload),
+  updateRecord: (id: string, payload: Record<string, any>) => axiosClient.put(`/accounting/records/${id}`, payload),
+  deleteRecord: (id: string) => axiosClient.delete(`/accounting/records/${id}`),
+  /** Upload file .doc / .docx → server convert → trả về HTML */
+  convertDoc: (file: File) => {
+    const form = new FormData();
+    form.append("file", file);
+    return axiosClient.post<{ html: string; error?: string }>(
+      "/accounting/records/convert-doc",
+      form,
+      { headers: { "Content-Type": "multipart/form-data" } }
+    );
+  },
 };
+

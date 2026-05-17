@@ -4,14 +4,32 @@ from flask import Flask, request, jsonify, session
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 import datetime
 from sqlalchemy import desc, and_, func, select
+from permission_utils import ensure_resource_lead, require_can_view, require_lead_user, require_self_or_lead
 
 user_bp = Blueprint('user', __name__, url_prefix='/api/user')
 
+
+def _get_target_user_or_404(user_id, message="User not found"):
+    user = db.session.get(User, user_id)
+    if not user:
+        abort(404, description=message)
+    return user
+
+
+def _require_user_resource_access(target_user: User | None = None, role_id: int | None = None):
+    resolved_role_id = role_id if role_id is not None else (target_user.role_id if target_user else None)
+    permission = "view_supplier" if (resolved_role_id or 0) > 100 else "view_user"
+    actor, _ = require_can_view(permission)
+    if target_user:
+        ensure_resource_lead(target_user, actor, "user")
+    return actor
+
 @user_bp.route("/", methods=["GET"])
 def get_users():
+    actor = _require_user_resource_access(role_id=1)
     page = request.args.get("page", 1, type=int)
     limit = request.args.get("limit", 10, type=int)
-    lead_id = request.args.get("lead", 0, type=int)
+    lead_id = request.args.get("lead", 0, type=int) or int(actor.lead_id or 0)
     search = request.args.get("search", "", type=str)
         
     users, pagination = get_query_page_users(lead_id,page,limit,search)
@@ -30,6 +48,9 @@ def get_users():
 @user_bp.route("/", methods=["POST"])
 def create_user():
     data = request.get_json()
+    actor = _require_user_resource_access(role_id=int((data or {}).get("role_id") or 0))
+    if isinstance(data, dict) and not data.get("lead_id"):
+        data["lead_id"] = actor.lead_id
     # print('USER', data)
     new_user = User.create_item(data)
     db.session.add(new_user)
@@ -56,14 +77,11 @@ def create_user():
 
 @user_bp.route("/<string:user_id>/password", methods=["PUT"])
 def update_lead_user_password(user_id):
+    require_self_or_lead(user_id)
     data = request.get_json()
     print(data)
 
-    user = db.session.get(User, user_id)
-
-    if not user:
-        print("Lead not found")
-        abort(404, description="Lead not found")
+    user = _get_target_user_or_404(user_id, "Lead not found")
 
     if data.get("old_password") != user.password:
         print("Mật khẩu cũ không đúng")
@@ -88,14 +106,12 @@ def update_lead_user_password(user_id):
 
 @user_bp.route("/<string:user_id>/can-view", methods=["PUT"])
 def update_user_can_view(user_id):
+    require_lead_user(user_id)
     data = request.get_json()
 
     print('canview_data', data)
 
-    user = db.session.get(User, user_id)
-    if not user:
-        print("Invalid user")
-        abort(404, description="Invalid user")
+    user = _get_target_user_or_404(user_id, "Invalid user")
 
     username = data.get("username")
 
@@ -120,9 +136,12 @@ def update_user_can_view(user_id):
 
     # Cập nhật các trường boolean từ dữ liệu gửi lên
     fields = [
-        
         "view_workpoint", "view_supplier", "view_customer", "view_user",
-        "view_workspace", "view_material", "view_invoice", "view_accountant", "view_statistic"
+        "view_workspace", "view_material", "view_invoice", "view_accountant", "view_statistic",
+        # Kế toán sub-modules
+        "view_acc_payroll", "view_acc_cashflow", "view_acc_ar", "view_acc_ap",
+        "view_acc_docs", "view_acc_ledger", "view_acc_tax", "view_acc_assets",
+        "view_acc_records", "view_acc_reports",
     ]
 
     for field in fields:
@@ -137,10 +156,8 @@ def update_user_can_view(user_id):
 
 @user_bp.route("/<string:user_id>/can-view", methods=["POST"])
 def post_user_can_view(user_id):
-    user = db.session.get(User, user_id)
-    if not user:
-        print("Invalid user")
-        abort(404, description="Invalid user")
+    require_lead_user(user_id)
+    user = _get_target_user_or_404(user_id, "Invalid user")
 
     # Tìm bản ghi UserCanView theo user_id
     user_view = UserCanView.query.filter_by(user_id=user_id).first()
@@ -159,10 +176,8 @@ def post_user_can_view(user_id):
 
 @user_bp.route("/<string:user_id>/can-view", methods=["GET"])
 def get_user_can_view(user_id):
-    user = db.session.get(User, user_id)
-    if not user:
-        print("Invalid user")
-        abort(404, description="Invalid user")
+    require_lead_user(user_id)
+    user = _get_target_user_or_404(user_id, "Invalid user")
 
     user_view = UserCanView.query.filter_by(user_id=user_id).first()
     
@@ -176,6 +191,7 @@ def delete_user_can_view(id):
     if not ucv:
         print("Invalid UserCanView")
         abort(404, description="Invalid UserCanView")
+    require_lead_user(ucv.user_id)
 
     db.session.delete(ucv)
     db.session.commit()
@@ -185,10 +201,8 @@ def delete_user_can_view(id):
 from sqlalchemy.orm import aliased
 @user_bp.route("/<string:user_id>/can-view-all", methods=["GET"])
 def get_user_can_view_all(user_id):
-    user = db.session.get(User, user_id)
-    if not user:
-        print("Invalid user")
-        abort(404, description="Invalid user")
+    require_lead_user(user_id)
+    user = _get_target_user_or_404(user_id, "Invalid user")
 
     user_view = UserCanView.query.filter_by(user_id=user_id).first()
     if not user_view:
@@ -212,13 +226,10 @@ def get_user_can_view_all(user_id):
 
 @user_bp.route("/<string:user_id>/check-password", methods=["POST"])
 def check_password_lead(user_id):
+    require_self_or_lead(user_id)
     data = request.get_json()
 
-    user = db.session.get(User, user_id)
-
-    if not user:
-        print("Lead-user not found")
-        abort(404, description="Lead-user not found")
+    user = _get_target_user_or_404(user_id, "Lead-user not found")
 
     if data.get("old_password") != user.password:
         print("Mật khẩu cũ không đúng")
@@ -231,18 +242,16 @@ def check_password_lead(user_id):
 
 @user_bp.route("/<string:id>", methods=["GET"])
 def get_user_detail(id):
-    user = db.session.get(User, id)
-    if not user:
-        abort(404, description="user not found")
+    user = _get_target_user_or_404(id, "user not found")
+    _require_user_resource_access(user)
     return jsonify(user.tdict())
 
 @user_bp.route("/<string:id>", methods=["PUT"])
 def update_user(id):
     data = request.get_json()
     # print('PUT user', data)
-    user = db.session.get(User, id)
-    if not user:
-        return jsonify({"error": "user not found"}), 404
+    user = _get_target_user_or_404(id, "user not found")
+    _require_user_resource_access(user)
     
     for key, value in data.items():
         if hasattr(user, key):
@@ -280,7 +289,8 @@ def update_user(id):
 
 @user_bp.route("/<string:id>", methods=["DELETE"])
 def delete_user(id):
-    user = db.session.get(User, id)
+    user = _get_target_user_or_404(id, "No user")
+    _require_user_resource_access(user)
     
     if not user:
         print("No user", id)

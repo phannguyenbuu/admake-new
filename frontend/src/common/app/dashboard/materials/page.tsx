@@ -1,5 +1,6 @@
 import type { IPage } from "../../../@types/common.type";
 import React, { useEffect, useMemo, useState } from "react";
+import { Pencil, Trash2, Plus, X, Check, ChevronDown, ChevronRight } from "lucide-react";
 import { Modal, notification } from "antd";
 import dayjs from "dayjs";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -14,6 +15,10 @@ import {
   type Warehouse,
 } from "../../../services/inventory.service";
 import MaterialSphereViewer from "../../../components/dashboard/materials/MaterialSphereViewer";
+import StorageLocationsTab from "./StorageLocationsTab";
+import ItemConfigTab, { useItemStatuses, useItemUnits } from "./ItemConfigTab";
+import type { ItemStatus } from "./ItemConfigTab";
+import UnPermissionBoard from "../unPermissionBoard";
 
 const ITEM_TYPE_LABEL: Record<string, string> = {
   raw_material: "Nguyên vật liệu",
@@ -83,6 +88,88 @@ const PREVIEW_MATERIAL_BY_TYPE: Record<
   },
 };
 
+interface SpecRow { id: string; color: string; spec: string; unit: string; price: number | ""; _editing?: boolean; }
+const emptySpec = (): SpecRow => ({ id: Math.random().toString(36).slice(2), color: "", spec: "", unit: "", price: "" });
+const emptySpecDraft = () => ({ color: "", spec: "", unit: "", price: "" as number | "" });
+
+// ─── SpecGrid helpers ─────────────────────────────────────────────────────────
+function PriceCell({ value, placeholder, isHeader, onCommit }: {
+  value?: number | "";
+  placeholder?: string;
+  isHeader?: boolean;
+  onCommit: (v: number | "") => void;
+}) {
+  const hasValue = value !== undefined && value !== "" && value !== 0;
+  const [editing, setEditing] = React.useState(false);
+  const [local, setLocal] = React.useState(hasValue ? String(value) : "");
+
+  if (editing) {
+    return (
+      <div className="flex items-center gap-0.5 mt-1">
+        <input
+          autoFocus type="number" min="0"
+          value={local}
+          onChange={e => setLocal(e.target.value)}
+          onBlur={() => { onCommit(local === "" ? "" : Number(local)); setEditing(false); }}
+          onKeyDown={e => {
+            if (e.key === "Enter") { onCommit(local === "" ? "" : Number(local)); setEditing(false); }
+            if (e.key === "Escape") setEditing(false);
+          }}
+          className="w-20 border border-teal-300 rounded px-1.5 py-0.5 text-[10px] outline-none bg-white"
+          placeholder="giá..."
+        />
+        <span className="text-[9px] text-slate-400">Ä'</span>
+      </div>
+    );
+  }
+
+  return (
+    <div
+      className={`mt-1 text-[10px] cursor-pointer rounded px-1.5 py-0.5 inline-block transition-colors ${hasValue
+        ? "text-amber-700 bg-amber-50 border border-amber-200 font-semibold"
+        : isHeader
+          ? "text-slate-400 hover:text-slate-600 hover:bg-white border border-dashed border-slate-200"
+          : "text-slate-400 hover:text-slate-600 hover:bg-slate-100"
+        }`}
+      onClick={() => { setLocal(hasValue ? String(value) : ""); setEditing(true); }}
+      title="Click để nhập giá"
+    >
+      {hasValue ? Number(value).toLocaleString("vi-VN") + "đ ✶" : placeholder || "—"}
+    </div>
+  );
+}
+
+function AddHeaderCell({ placeholder, onAdd }: { placeholder: string; onAdd: (v: string) => void }) {
+  const [open, setOpen] = React.useState(false);
+  const [val, setVal] = React.useState("");
+  if (open) {
+    return (
+      <div className="flex items-center gap-0.5">
+        <input
+          autoFocus value={val} onChange={e => setVal(e.target.value)}
+          placeholder={placeholder}
+          onKeyDown={e => {
+            if (e.key === "Enter" && val.trim()) { onAdd(val.trim()); setVal(""); setOpen(false); }
+            if (e.key === "Escape") { setVal(""); setOpen(false); }
+          }}
+          className="w-20 border border-teal-300 rounded px-1.5 py-0.5 text-[10px] outline-none bg-white"
+        />
+        <button onClick={() => { if (val.trim()) { onAdd(val.trim()); setVal(""); setOpen(false); } }}
+          className="text-teal-500 hover:text-teal-700"><Check size={10} /></button>
+        <button onClick={() => { setVal(""); setOpen(false); }}
+          className="text-slate-300 hover:text-slate-500"><X size={10} /></button>
+      </div>
+    );
+  }
+  return (
+    <button onClick={() => setOpen(true)}
+      className="text-[10px] text-teal-500 hover:text-teal-700 font-medium whitespace-nowrap flex items-center gap-0.5">
+      <Plus size={10} />{placeholder}
+    </button>
+  );
+}
+
+
 const emptyItemForm = {
   code: "",
   name: "",
@@ -90,6 +177,7 @@ const emptyItemForm = {
   category_id: "",
   item_type: "raw_material",
   unit: "cái",
+  item_status: "dang_dung",
   default_supplier_name: "",
   default_warehouse_id: "",
   standard_cost: 0,
@@ -114,10 +202,25 @@ const emptyTxForm = {
   note: "",
 };
 
+const ITEM_PAGE_SIZE = 50;
+
+type InventoryPagination = {
+  page: number;
+  per_page: number;
+  total: number;
+  pages: number;
+};
+
+type InventoryItemsResponse = {
+  data: InventoryItem[];
+  pagination: InventoryPagination;
+};
+
 const MaterialsDashboard: IPage["Component"] = () => {
-  const { userLeadId } = useUser();
+  const { userLeadId, canViewPermission } = useUser();
   const queryClient = useQueryClient();
-  const [activeTab, setActiveTab] = useState<"items" | "transactions" | "reports">("items");
+  const [activeTab, setActiveTab] = useState<"items" | "transactions" | "reports" | "locations" | "config">("items");
+  const itemStatuses = useItemStatuses(userLeadId);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("");
@@ -125,11 +228,68 @@ const MaterialsDashboard: IPage["Component"] = () => {
   const [txStatusFilter, setTxStatusFilter] = useState("");
   const [txTypeFilter, setTxTypeFilter] = useState("");
   const [month, setMonth] = useState(dayjs().format("YYYY-MM"));
+  const [itemPage, setItemPage] = useState(1);
   const [itemModalOpen, setItemModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<InventoryItem | null>(null);
   const [detailTx, setDetailTx] = useState<StockTransaction | null>(null);
   const [previewItemId, setPreviewItemId] = useState("");
   const [itemForm, setItemForm] = useState(emptyItemForm);
+  const [specRows, setSpecRows] = useState<SpecRow[]>([]);
+  const [specAddOpen, setSpecAddOpen] = useState(false);
+  const [specDraft, setSpecDraft] = useState(emptySpecDraft());
+  const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
+  // per-item inline add-form state
+  const [itemSpecDraft, setItemSpecDraft] = useState<Record<string, ReturnType<typeof emptySpecDraft>>>({});
+  // Đơn vị tính per lead
+  const [unitList] = useItemUnits(userLeadId);
+
+  const toggleExpandItem = (id: string) =>
+    setExpandedItems(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+
+  const saveItemSpecRows = async (item: InventoryItem, newRows: SpecRow[]) => {
+    try {
+      await InventoryService.updateItem(item.id, { lead_id: userLeadId, spec_rows: newRows } as any);
+      await refreshAll();
+    } catch { /* ignore */ }
+  };
+  const setItemSpecDraftValue = (itemId: string, patch: Partial<ReturnType<typeof emptySpecDraft>>) => {
+    setItemSpecDraft((prev) => ({
+      ...prev,
+      [itemId]: {
+        ...emptySpecDraft(),
+        ...(prev[itemId] || {}),
+        ...patch,
+      },
+    }));
+  };
+
+  const resetItemSpecDraft = (itemId: string, unit = "") => {
+    setItemSpecDraft((prev) => ({
+      ...prev,
+      [itemId]: { ...emptySpecDraft(), unit },
+    }));
+  };
+
+  const handleAddItemSpec = async (item: InventoryItem, itemSpecs: SpecRow[]) => {
+    const draft = itemSpecDraft[item.id] || emptySpecDraft();
+    const nextRow: SpecRow = {
+      ...emptySpec(),
+      color: draft.color.trim(),
+      spec: draft.spec.trim(),
+      unit: draft.unit.trim() || item.unit || "",
+      price: draft.price === "" ? "" : Number(draft.price),
+    };
+    if (!nextRow.color && !nextRow.spec) {
+      notification.warning({ message: "Nhap mau hoac quy cach truoc khi them" });
+      return;
+    }
+    await saveItemSpecRows(item, [...itemSpecs, nextRow]);
+    resetItemSpecDraft(item.id, item.unit || "");
+  };
   const [txForm, setTxForm] = useState(emptyTxForm);
 
   const paramsBase = { lead: userLeadId };
@@ -139,6 +299,10 @@ const MaterialsDashboard: IPage["Component"] = () => {
       InventoryService.bootstrap(userLeadId).catch(() => undefined);
     }
   }, [userLeadId]);
+
+  useEffect(() => {
+    setItemPage(1);
+  }, [userLeadId, search, statusFilter, categoryFilter, warehouseFilter]);
 
   const categoriesQuery = useQuery({
     queryKey: ["inventory-categories", userLeadId],
@@ -159,7 +323,7 @@ const MaterialsDashboard: IPage["Component"] = () => {
   });
 
   const itemsQuery = useQuery({
-    queryKey: ["inventory-items", userLeadId, search, statusFilter, categoryFilter, warehouseFilter],
+    queryKey: ["inventory-items", userLeadId, search, statusFilter, categoryFilter, warehouseFilter, itemPage],
     enabled: userLeadId > 0,
     queryFn: async () =>
       (await InventoryService.listItems({
@@ -168,9 +332,9 @@ const MaterialsDashboard: IPage["Component"] = () => {
         status: statusFilter || undefined,
         category_id: categoryFilter || undefined,
         warehouse_id: warehouseFilter || undefined,
-        page: 1,
-        limit: 200,
-      })).data.data as InventoryItem[],
+        page: itemPage,
+        limit: ITEM_PAGE_SIZE,
+      })).data as InventoryItemsResponse,
   });
 
   const transactionsQuery = useQuery({
@@ -200,7 +364,8 @@ const MaterialsDashboard: IPage["Component"] = () => {
       })).data.data as InventoryBalance[],
   });
 
-  const items = itemsQuery.data || [];
+  const items = itemsQuery.data?.data || [];
+  const itemsPagination = itemsQuery.data?.pagination;
   const transactions = transactionsQuery.data || [];
   const balances = balancesQuery.data || [];
   const categories = categoriesQuery.data || [];
@@ -215,6 +380,12 @@ const MaterialsDashboard: IPage["Component"] = () => {
   const money = (value: number) =>
     new Intl.NumberFormat("vi-VN", { maximumFractionDigits: 0 }).format(Number(value || 0));
 
+  useEffect(() => {
+    if (itemsPagination?.pages && itemPage > itemsPagination.pages) {
+      setItemPage(itemsPagination.pages);
+    }
+  }, [itemPage, itemsPagination?.pages]);
+
   const refreshAll = async () => {
     await Promise.all([
       queryClient.invalidateQueries({ queryKey: ["inventory-items", userLeadId] }),
@@ -226,7 +397,17 @@ const MaterialsDashboard: IPage["Component"] = () => {
 
   const itemMutation = useMutation({
     mutationFn: async () => {
-      const payload = { ...itemForm, lead_id: userLeadId };
+      const validSpecs = specRows.filter(r => r.color || r.spec || r.unit);
+      const payload = {
+        ...itemForm,
+        code: itemForm.code.trim().toUpperCase(),
+        name: itemForm.name.trim(),
+        sku: itemForm.sku.trim(),
+        default_supplier_name: itemForm.default_supplier_name.trim(),
+        note: itemForm.note.trim(),
+        lead_id: userLeadId,
+        spec_rows: validSpecs,
+      };
       if (editingItem) {
         return InventoryService.updateItem(editingItem.id, payload);
       }
@@ -237,6 +418,9 @@ const MaterialsDashboard: IPage["Component"] = () => {
       setItemModalOpen(false);
       setEditingItem(null);
       setItemForm(emptyItemForm);
+      setSpecRows([]);
+      setSpecAddOpen(false);
+      setSpecDraft(emptySpecDraft());
       await refreshAll();
     },
     onError: (error: any) =>
@@ -264,15 +448,39 @@ const MaterialsDashboard: IPage["Component"] = () => {
       notification.error({ message: error?.response?.data?.description || "Không thể tạo giao dịch kho" }),
   });
 
-  const toggleItemStatus = async (item: InventoryItem) => {
+  const legacyToggleItemStatus = async (item: InventoryItem) => {
     try {
-      await InventoryService.patchItemStatus(item.id, { lead_id: userLeadId, is_active: !item.is_active });
+      await InventoryService.deleteItem(item.id);
       notification.success({ message: item.is_active ? "Đã ngừng sử dụng vật tư" : "Đã kích hoạt lại vật tư" });
       await refreshAll();
     } catch (error: any) {
       notification.error({ message: error?.response?.data?.description || "Không thể đổi trạng thái vật tư" });
     }
   };
+
+  const handleDeleteItem = async (item: InventoryItem) => {
+    try {
+      await InventoryService.deleteItem(item.id);
+      notification.success({ message: "Đã xóa vật tư" });
+      if (previewItemId === item.id) {
+        setPreviewItemId("");
+      }
+      await refreshAll();
+    } catch (error: any) {
+      notification.error({ message: error?.response?.data?.description || "Không thể xóa vật tư" });
+    }
+  };
+
+  const toggleItemStatus = (item: InventoryItem) =>
+    Modal.confirm({
+      title: "Xóa vật tư",
+      content: `Xóa vật tư ${item.code} - ${item.name}?`,
+      okText: "Xóa",
+      okButtonProps: { danger: true },
+      cancelText: "Há»§y",
+      centered: true,
+      onOk: () => handleDeleteItem(item),
+    });
 
   const handleOpenEdit = (item: InventoryItem) => {
     setEditingItem(item);
@@ -283,6 +491,7 @@ const MaterialsDashboard: IPage["Component"] = () => {
       category_id: item.category_id || "",
       item_type: item.item_type,
       unit: item.unit,
+      item_status: (item as any).item_status ?? (item.is_active ? "dang_dung" : "khong_dung"),
       default_supplier_name: item.default_supplier_name || "",
       default_warehouse_id: item.default_warehouse_id || "",
       standard_cost: item.standard_cost || 0,
@@ -290,6 +499,10 @@ const MaterialsDashboard: IPage["Component"] = () => {
       min_stock_level: item.min_stock_level || 0,
       note: item.note || "",
     });
+    const savedSpecs = (item as any).spec_rows;
+    setSpecRows(Array.isArray(savedSpecs) && savedSpecs.length > 0 ? savedSpecs : []);
+    setSpecAddOpen(false);
+    setSpecDraft(emptySpecDraft());
     setItemModalOpen(true);
   };
 
@@ -303,7 +516,7 @@ const MaterialsDashboard: IPage["Component"] = () => {
   const previewMaterial =
     (previewItem && PREVIEW_MATERIAL_BY_TYPE[previewItem.item_type]) || PREVIEW_MATERIAL_BY_TYPE.raw_material;
 
-  return (
+  return canViewPermission?.view_material ? (
     <div className="w-full flex flex-col gap-5 pb-8">
       <section className="rounded-2xl border border-slate-100 bg-white/90 p-5 shadow-md">
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
@@ -334,15 +547,16 @@ const MaterialsDashboard: IPage["Component"] = () => {
             ["items", "Vật tư"],
             ["transactions", "Giao dịch kho"],
             ["reports", "Báo cáo tồn kho"],
+            ["locations", "📍 Địa điểm cất giữ"],
+            ["config", "⚙️ Cấu hình"],
           ].map(([key, label]) => (
             <button
               key={key}
               onClick={() => setActiveTab(key as typeof activeTab)}
-              className={`rounded-full border px-4 py-2 text-sm font-semibold ${
-                activeTab === key
-                  ? "border-teal-500 bg-teal-500 text-white"
-                  : "border-slate-200 bg-white text-slate-600"
-              }`}
+              className={`rounded-full border px-4 py-2 text-sm font-semibold transition-colors ${activeTab === key
+                ? "border-teal-500 bg-teal-500 text-white"
+                : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
+                }`}
             >
               {label}
             </button>
@@ -360,7 +574,7 @@ const MaterialsDashboard: IPage["Component"] = () => {
           </div>
           <div className="rounded-xl border border-cyan-100 bg-cyan-50 p-4">
             <div className="text-xs text-slate-500">Tổng giá trị tồn kho</div>
-            <div className="text-2xl font-semibold text-cyan-700">{money(summary.total_inventory_value)} đ</div>
+            <div className="text-2xl font-semibold text-cyan-700">{money(summary.total_inventory_value)} Ä'</div>
           </div>
           <div className="rounded-xl border border-amber-100 bg-amber-50 p-4">
             <div className="text-xs text-slate-500">Vật tư dưới định mức</div>
@@ -451,83 +665,333 @@ const MaterialsDashboard: IPage["Component"] = () => {
               </div>
 
               <div className="overflow-x-auto rounded-2xl border border-slate-100 bg-white shadow-sm">
-                <table className="min-w-[1120px] w-full text-sm">
+                <table className="min-w-[860px] w-full text-sm">
                   <thead>
                     <tr className="border-b bg-slate-50 text-left text-xs text-slate-500">
+                      <th className="px-3 py-3 w-8" />
                       <th className="px-3 py-3">Mã vật tư</th>
-                      <th className="px-3 py-3">Tên vật tư</th>
-                      <th className="px-3 py-3">Nhóm</th>
-                      <th className="px-3 py-3">Loại</th>
-                      <th className="px-3 py-3">Đơn vị</th>
-                      <th className="px-3 py-3">Kho mặc định / Tổng tồn</th>
-                      <th className="px-3 py-3">Đơn giá tham chiếu</th>
-                      <th className="px-3 py-3">Giá trị tồn</th>
-                      <th className="px-3 py-3">Tồn tối thiểu</th>
+                      <th className="px-3 py-3">Nhóm / Tên vật tư</th>
+                      <th className="px-3 py-3">Kho / Tổng tồn</th>
+                      <th className="px-3 py-3">Đơn giá</th>
+                      <th className="px-3 py-3">Tồn (giá trị / tối thiểu)</th>
                       <th className="px-3 py-3">Trạng thái</th>
                       <th className="px-3 py-3 text-center">Thao tác</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {items.map((item) => (
-                      <tr
-                        key={item.id}
-                        className={`border-b last:border-0 cursor-pointer ${
-                          previewItem?.id === item.id ? "bg-teal-50/60" : ""
-                        }`}
-                        onClick={() => setPreviewItemId(item.id)}
-                      >
-                        <td className="px-3 py-3 font-medium text-slate-700">{item.code}</td>
-                        <td className="px-3 py-3 text-slate-700">
-                          <div className="font-medium">{item.name}</div>
-                          <div className="text-xs text-slate-500">{item.sku || "-"}</div>
-                        </td>
-                        <td className="px-3 py-3 text-slate-600">{item.category_name || "-"}</td>
-                        <td className="px-3 py-3 text-slate-600">{ITEM_TYPE_LABEL[item.item_type] || item.item_type}</td>
-                        <td className="px-3 py-3 text-slate-600">{item.unit}</td>
-                        <td className="px-3 py-3 text-slate-600">
-                          {item.default_warehouse_name || "-"} / {money(item.quantity_on_hand || 0)}
-                        </td>
-                        <td className="px-3 py-3 text-slate-600">{money(item.average_cost || item.standard_cost)} đ</td>
-                        <td className="px-3 py-3 text-slate-700">{money(item.inventory_value || 0)} đ</td>
-                        <td className="px-3 py-3 text-slate-600">{money(item.min_stock_level || 0)}</td>
-                        <td className="px-3 py-3">
-                          <span
-                            className={`rounded-md border px-2 py-1 text-xs ${
-                              item.is_active
-                                ? "border-emerald-200 bg-emerald-50 text-emerald-700"
-                                : "border-slate-200 bg-slate-100 text-slate-600"
-                            }`}
+                    {items.map((item) => {
+                      const isExpanded = expandedItems.has(item.id);
+                      const itemSpecs: SpecRow[] = (item as any).spec_rows || [];
+                      const defaultPrice = item.average_cost || item.standard_cost || 0;
+                      const draft = itemSpecDraft[item.id] || emptySpecDraft();
+
+                      return (
+                        <React.Fragment key={item.id}>
+                          <tr
+                            className={`border-b last:border-0 cursor-pointer hover:bg-slate-50/60 transition-colors group ${previewItem?.id === item.id ? "bg-teal-50/40" : ""
+                              }`}
+                            onClick={() => setPreviewItemId(item.id)}
                           >
-                            {item.is_active ? "Đang dùng" : "Ngừng dùng"}
-                          </span>
-                        </td>
-                        <td className="px-3 py-3" onClick={(event) => event.stopPropagation()}>
-                          <div className="flex items-center justify-center gap-2">
-                            <button
-                              className="rounded-md border border-slate-200 px-2 py-1 text-xs text-slate-600"
-                              onClick={() => handleOpenEdit(item)}
-                            >
-                              Sửa
-                            </button>
-                            <button
-                              className="rounded-md border border-amber-200 px-2 py-1 text-xs text-amber-700"
-                              onClick={() => toggleItemStatus(item)}
-                            >
-                              {item.is_active ? "Ngừng dùng" : "Kích hoạt"}
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
+                            {/* Expand chevron */}
+                            <td className="px-2 py-3 text-center" onClick={(e) => { e.stopPropagation(); toggleExpandItem(item.id); }}>
+                              <button className="text-slate-300 hover:text-teal-600 transition-colors">
+                                {isExpanded ? <ChevronDown size={13} /> : <ChevronRight size={13} />}
+                              </button>
+                            </td>
+                            <td className="px-3 py-3 font-medium text-slate-700">{item.code}</td>
+                            <td className="px-3 py-3 text-slate-700">
+                              {item.category_name && (
+                                <div className="text-[10px] text-slate-400 font-medium uppercase tracking-wide mb-0.5">{item.category_name}</div>
+                              )}
+                              <div className="font-medium">{item.name}</div>
+                              {item.sku && <div className="text-xs text-slate-400">{item.sku}</div>}
+                            </td>
+                            <td className="px-3 py-3 text-slate-600">
+                              <div>{item.default_warehouse_name || "-"}</div>
+                              <div className="text-xs text-slate-400">{money(item.quantity_on_hand || 0)} {item.unit}</div>
+                            </td>
+                            <td className="px-3 py-3 text-slate-600 whitespace-nowrap">{money(item.average_cost || item.standard_cost)} Ä'</td>
+                            <td className="px-3 py-3 text-slate-600">
+                              <div className="text-slate-700">{money(item.inventory_value || 0)} Ä'</div>
+                              <div className="text-xs text-slate-400">min: {money(item.min_stock_level || 0)}</div>
+                            </td>
+                            <td className="px-3 py-3" onClick={(e) => e.stopPropagation()}>
+                              {(() => {
+                                const curKey = (item as any).item_status ?? (item.is_active ? "dang_dung" : "khong_dung");
+                                const meta: ItemStatus = itemStatuses.find(s => s.key === curKey) ?? itemStatuses[0];
+                                return (
+                                  <select
+                                    value={curKey}
+                                    className={`rounded-md border px-2 py-1 text-xs whitespace-nowrap cursor-pointer focus:outline-none ${meta.bg} ${meta.color}`}
+                                    onChange={async (e) => {
+                                      const newStatus = e.target.value;
+                                      const isActive = itemStatuses.find(s => s.key === newStatus)?.counts_active ?? false;
+                                      try {
+                                        await InventoryService.updateItem(item.id, { lead_id: userLeadId, item_status: newStatus, is_active: isActive } as any);
+                                        await refreshAll();
+                                      } catch { /* ignore */ }
+                                    }}
+                                  >
+                                    {itemStatuses.map(s => (
+                                      <option key={s.key} value={s.key}>{s.label}</option>
+                                    ))}
+                                  </select>
+                                );
+                              })()}
+                            </td>
+                            <td className="px-3 py-3" onClick={(e) => e.stopPropagation()}>
+                              <div className="flex items-center justify-center gap-1">
+                                <button title="Sá»­a" className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors" onClick={() => handleOpenEdit(item)}>
+                                  <Pencil size={14} />
+                                </button>
+                                <button title="Xoá / Ngừng dùng" className="p-1.5 rounded-lg hover:bg-rose-50 text-slate-400 hover:text-rose-500 transition-colors" onClick={() => toggleItemStatus(item)}>
+                                  <Trash2 size={14} />
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+
+                          {/* Sub-row: Spec rows (AR-style) */}
+                          {isExpanded && (
+                            <tr className="bg-slate-50/50">
+                              <td colSpan={8} className="p-0">
+                                <div className="border-t border-slate-100">
+                                  {/* ─── SPEC GRID ─────────────────────────────── */}
+                                  {(() => {
+                                    // Derive unique colors (columns) and specs (rows)
+                                    const colors = Array.from(new Set(
+                                      itemSpecs.filter(r => r.color).map(r => r.color)
+                                    ));
+                                    const specs = Array.from(new Set(
+                                      itemSpecs.filter(r => r.spec).map(r => r.spec)
+                                    ));
+
+                                    // Helper: find a cell price
+                                    const findCell = (spec: string, color: string) =>
+                                      itemSpecs.find(r => r.spec === spec && r.color === color);
+                                    const findColDefault = (color: string) =>
+                                      itemSpecs.find(r => r.color === color && !r.spec);
+                                    const findRowDefault = (spec: string) =>
+                                      itemSpecs.find(r => r.spec === spec && !r.color);
+
+                                    const upsertCell = (spec: string, color: string, price: number | "") => {
+                                      const existing = findCell(spec, color);
+                                      if (existing) {
+                                        saveItemSpecRows(item, itemSpecs.map(r =>
+                                          r.id === existing.id ? { ...r, price } : r
+                                        ));
+                                      } else {
+                                        saveItemSpecRows(item, [...itemSpecs, {
+                                          ...emptySpec(), spec, color,
+                                          unit: itemSpecs[0]?.unit || "",
+                                          price
+                                        }]);
+                                      }
+                                    };
+                                    const upsertHeader = (key: string, isColor: boolean, price: number | "") => {
+                                      const existing = isColor ? findColDefault(key) : findRowDefault(key);
+                                      if (existing) {
+                                        saveItemSpecRows(item, itemSpecs.map(r =>
+                                          r.id === existing.id ? { ...r, price } : r
+                                        ));
+                                      } else {
+                                        saveItemSpecRows(item, [...itemSpecs, {
+                                          ...emptySpec(),
+                                          color: isColor ? key : "",
+                                          spec: isColor ? "" : key,
+                                          unit: itemSpecs[0]?.unit || "",
+                                          price
+                                        }]);
+                                      }
+                                    };
+                                    const deleteCol = (color: string) =>
+                                      saveItemSpecRows(item, itemSpecs.filter(r => r.color !== color));
+                                    const deleteRow = (spec: string) =>
+                                      saveItemSpecRows(item, itemSpecs.filter(r => r.spec !== spec));
+
+                                    const hasGrid = colors.length > 0 || specs.length > 0;
+
+                                    return (
+                                      <div className="rounded-lg border border-slate-200 bg-slate-50 px-4 py-3">
+                                        {hasGrid && (
+                                          <div className="overflow-x-auto">
+                                            <table className="text-xs border-collapse min-w-max rounded-md overflow-hidden">
+                                              <thead>
+                                                <tr>
+                                                  {/* top-left corner: row label */}
+                                                  <th className="border border-slate-200 bg-slate-100 px-3 py-2 text-slate-500 font-normal text-left min-w-[110px]">
+                                                    Quy cách ╲ Màu
+                                                  </th>
+                                                  {colors.map(color => (
+                                                    <th key={color} className="border border-slate-200 bg-slate-100 px-2 py-2 text-center min-w-[100px]">
+                                                      <div className="flex items-center justify-between gap-1">
+                                                        <span className="inline-block rounded-full bg-teal-100 px-2 py-0.5 text-[10px] font-medium whitespace-nowrap text-teal-700">
+                                                          {color}
+                                                        </span>
+                                                        <button onClick={() => deleteCol(color)}
+                                                          className="text-slate-400 hover:text-rose-500 transition-colors flex-shrink-0">
+                                                          <X size={10} />
+                                                        </button>
+                                                      </div>
+                                                      {/* col default price */}
+                                                      <PriceCell
+                                                        value={findColDefault(color)?.price}
+                                                        placeholder="giá cột"
+                                                        isHeader
+                                                        onCommit={v => upsertHeader(color, true, v)}
+                                                      />
+                                                    </th>
+                                                  ))}
+                                                </tr>
+                                              </thead>
+                                              <tbody>
+                                                {specs.map(spec => {
+                                                  const rowDef = findRowDefault(spec);
+                                                  return (
+                                                    <tr key={spec} className="transition-colors hover:bg-slate-100/70">
+                                                      {/* Row header */}
+                                                      <td className="border border-slate-200 bg-slate-100 px-2 py-1.5">
+                                                        <div className="flex items-center gap-1 justify-between">
+                                                          <span className="inline-block rounded-full bg-sky-100 px-2 py-0.5 text-[10px] font-medium whitespace-nowrap text-sky-700">
+                                                            {spec}
+                                                          </span>
+                                                          <button onClick={() => deleteRow(spec)}
+                                                            className="text-slate-400 hover:text-rose-500 transition-colors flex-shrink-0">
+                                                            <X size={10} />
+                                                          </button>
+                                                        </div>
+                                                        {/* Row default price */}
+                                                        <PriceCell
+                                                          value={rowDef?.price}
+                                                          placeholder="giá hàng"
+                                                          isHeader
+                                                          onCommit={v => upsertHeader(spec, false, v)}
+                                                        />
+                                                      </td>
+                                                      {/* Cells */}
+                                                      {colors.map(color => {
+                                                        const cell = findCell(spec, color);
+                                                        return (
+                                                          <td key={color} className="border border-slate-200 bg-white px-2 py-1.5 text-center">
+                                                            <PriceCell
+                                                              value={cell?.price}
+                                                              placeholder={
+                                                                findColDefault(color)?.price !== undefined && findColDefault(color)?.price !== ""
+                                                                  ? String(Number(findColDefault(color)!.price).toLocaleString("vi-VN")) + "Ä'"
+                                                                  : rowDef?.price !== undefined && rowDef?.price !== ""
+                                                                    ? String(Number(rowDef!.price).toLocaleString("vi-VN")) + "Ä'"
+                                                                    : defaultPrice ? defaultPrice.toLocaleString("vi-VN") + "đ" : "—"
+                                                              }
+                                                              onCommit={v => upsertCell(spec, color, v)}
+                                                            />
+                                                          </td>
+                                                        );
+                                                      })}
+                                                    </tr>
+                                                  );
+                                                })}
+                                              </tbody>
+                                            </table>
+                                          </div>
+                                        )}
+
+                                        {/* If empty, show hint */}
+                                        {!hasGrid && (
+                                          <div className="flex flex-wrap items-center gap-3 py-2 px-2">
+                                            <span className="text-xs text-slate-400 italic">Chưa có quy cách / màu sắc.</span>
+                                          </div>
+                                        )}
+
+                                        <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-slate-200 pt-3">
+                                          <input
+                                            value={draft.color}
+                                            onChange={(e) => setItemSpecDraftValue(item.id, { color: e.target.value })}
+                                            placeholder="Màu"
+                                            className="min-w-[120px] flex-1 rounded-md border border-slate-200 bg-white px-2 py-1.5 text-xs text-slate-700 placeholder:text-slate-400 focus:border-cyan-400 focus:outline-none"
+                                          />
+                                          <input
+                                            value={draft.spec}
+                                            onChange={(e) => setItemSpecDraftValue(item.id, { spec: e.target.value })}
+                                            placeholder="Quy cách"
+                                            className="min-w-[160px] flex-[1.2] rounded-md border border-slate-200 bg-white px-2 py-1.5 text-xs text-slate-700 placeholder:text-slate-400 focus:border-cyan-400 focus:outline-none"
+                                          />
+                                          <input
+                                            value={draft.unit}
+                                            onChange={(e) => setItemSpecDraftValue(item.id, { unit: e.target.value })}
+                                            placeholder="Đơn vị"
+                                            className="w-24 rounded-md border border-slate-200 bg-white px-2 py-1.5 text-xs text-slate-700 placeholder:text-slate-400 focus:border-cyan-400 focus:outline-none"
+                                          />
+                                          <input
+                                            type="number"
+                                            min="0"
+                                            value={draft.price}
+                                            onChange={(e) =>
+                                              setItemSpecDraftValue(item.id, {
+                                                price: e.target.value === "" ? "" : Number(e.target.value),
+                                              })
+                                            }
+                                            onKeyDown={(e) => {
+                                              if (e.key === "Enter") void handleAddItemSpec(item, itemSpecs);
+                                            }}
+                                            placeholder="Giá"
+                                            className="w-28 rounded-md border border-slate-200 bg-white px-2 py-1.5 text-xs text-slate-700 placeholder:text-slate-400 focus:border-cyan-400 focus:outline-none"
+                                          />
+                                          <button
+                                            type="button"
+                                            onClick={() => void handleAddItemSpec(item, itemSpecs)}
+                                            className="rounded-md bg-teal-500 px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-teal-600"
+                                          >
+                                            Lưu
+                                          </button>
+                                        </div>
+                                      </div>
+                                    );
+                                  })()}
+                                </div>
+                              </td>
+                            </tr>
+                          )}
+                        </React.Fragment>
+                      );
+                    })}
                     {items.length === 0 && (
                       <tr>
-                        <td colSpan={11} className="px-3 py-8 text-center text-sm text-slate-500">
-                          Chưa có vật tư.
-                        </td>
+                        <td colSpan={8} className="px-3 py-8 text-center text-sm text-slate-500">Chưa có vật tư.</td>
                       </tr>
                     )}
                   </tbody>
                 </table>
+              </div>
+
+              <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-100 bg-white px-4 py-3 text-xs text-slate-500 shadow-sm">
+                <div>
+                  Hiển thị{" "}
+                  {itemsPagination?.total
+                    ? `${(itemPage - 1) * ITEM_PAGE_SIZE + 1}-${Math.min(itemPage * ITEM_PAGE_SIZE, itemsPagination.total)}`
+                    : "0-0"}{" "}
+                  / {itemsPagination?.total || 0} vật tư
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    className="rounded-lg border border-slate-200 px-3 py-1.5 text-slate-600 disabled:cursor-not-allowed disabled:opacity-50"
+                    disabled={itemPage <= 1}
+                    onClick={() => setItemPage((prev) => Math.max(1, prev - 1))}
+                  >
+                    Trước
+                  </button>
+                  <div className="min-w-[92px] text-center font-medium text-slate-600">
+                    Trang {itemsPagination?.page || 1}/{itemsPagination?.pages || 1}
+                  </div>
+                  <button
+                    type="button"
+                    className="rounded-lg border border-slate-200 px-3 py-1.5 text-slate-600 disabled:cursor-not-allowed disabled:opacity-50"
+                    disabled={!itemsPagination || itemPage >= itemsPagination.pages}
+                    onClick={() => setItemPage((prev) => prev + 1)}
+                  >
+                    Sau
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -733,8 +1197,8 @@ const MaterialsDashboard: IPage["Component"] = () => {
                         <td className="px-3 py-3 text-rose-700">
                           {tx.direction === "out" || tx.direction === "transfer" ? money(tx.quantity) : "-"}
                         </td>
-                        <td className="px-3 py-3 text-slate-600">{money(tx.unit_cost)} đ</td>
-                        <td className="px-3 py-3 text-slate-700">{money(tx.total_cost)} đ</td>
+                        <td className="px-3 py-3 text-slate-600">{money(tx.unit_cost)} Ä'</td>
+                        <td className="px-3 py-3 text-slate-700">{money(tx.total_cost)} Ä'</td>
                         <td className="px-3 py-3 text-slate-600">{tx.partner_name || tx.task_id || tx.project_id || "-"}</td>
                         <td className="px-3 py-3 text-slate-600">{tx.reference_code || tx.reference_id || "-"}</td>
                         <td className="px-3 py-3">
@@ -769,7 +1233,7 @@ const MaterialsDashboard: IPage["Component"] = () => {
                                   await refreshAll();
                                 }}
                               >
-                                Hủy
+                                Há»§y
                               </button>
                             )}
                           </div>
@@ -818,15 +1282,14 @@ const MaterialsDashboard: IPage["Component"] = () => {
                       <td className="px-3 py-3 text-slate-700">
                         {money(row.quantity_on_hand)} {row.unit || ""}
                       </td>
-                      <td className="px-3 py-3 text-slate-600">{money(row.average_cost)} đ</td>
-                      <td className="px-3 py-3 text-slate-700">{money(row.inventory_value)} đ</td>
+                      <td className="px-3 py-3 text-slate-600">{money(row.average_cost)} Ä'</td>
+                      <td className="px-3 py-3 text-slate-700">{money(row.inventory_value)} Ä'</td>
                       <td className="px-3 py-3">
                         <span
-                          className={`rounded-md border px-2 py-1 text-xs ${
-                            row.below_min_stock
-                              ? "border-amber-200 bg-amber-50 text-amber-700"
-                              : "border-slate-200 bg-white text-slate-500"
-                          }`}
+                          className={`rounded-md border px-2 py-1 text-xs ${row.below_min_stock
+                            ? "border-amber-200 bg-amber-50 text-amber-700"
+                            : "border-slate-200 bg-white text-slate-500"
+                            }`}
                         >
                           {money(row.min_stock_level || 0)}
                         </span>
@@ -869,14 +1332,36 @@ const MaterialsDashboard: IPage["Component"] = () => {
             </div>
           </div>
         )}
+
+        {activeTab === "locations" && (
+          <div className="rounded-2xl border border-slate-100 bg-white p-5 shadow-sm">
+            <div className="mb-1 text-sm font-semibold text-slate-700">📍 Địa điểm cất giữ</div>
+            <div className="mb-4 text-xs text-slate-500">
+              Quản lý danh sách địa điểm lưu trữ vật tư theo danh mục: Kho, Công ty, Văn phòng, Công trình, Nhà riêng...
+            </div>
+            <StorageLocationsTab leadId={userLeadId} />
+          </div>
+        )}
+
+        {activeTab === "config" && (
+          <div className="rounded-2xl border border-slate-100 bg-white p-5 shadow-sm">
+            <div className="mb-1 text-sm font-semibold text-slate-700">⚙️ Cấu hình vật tư</div>
+            <div className="mb-4 text-xs text-slate-500">Tùy chỉnh danh sách trạng thái vật tư, màu sắc hiển thị. Thay đổi có hiệu lực ngay lập tức trên toàn bộ bảng.</div>
+            <ItemConfigTab leadId={userLeadId} />
+          </div>
+        )}
       </section>
 
       <Modal
         open={itemModalOpen}
+        width={640}
         onCancel={() => {
           setItemModalOpen(false);
           setEditingItem(null);
           setItemForm(emptyItemForm);
+          setSpecRows([]);
+          setSpecAddOpen(false);
+          setSpecDraft(emptySpecDraft());
         }}
         onOk={() => itemMutation.mutate()}
         okText={editingItem ? "Cập nhật" : "Tạo vật tư"}
@@ -884,110 +1369,71 @@ const MaterialsDashboard: IPage["Component"] = () => {
         title={editingItem ? "Cập nhật vật tư" : "Tạo vật tư"}
       >
         <div className="space-y-3 pt-3">
+          {/* Mã + SKU */}
           <div className="grid grid-cols-2 gap-3">
-            <input
-              className="rounded-lg border border-slate-200 px-3 py-2"
-              placeholder="Mã vật tư"
+            <input className="rounded-lg border border-slate-200 px-3 py-2 text-sm" placeholder="Mã vật tư"
               value={itemForm.code}
-              disabled={Boolean(editingItem)}
-              onChange={(e) => setItemForm((prev) => ({ ...prev, code: e.target.value }))}
-            />
-            <input
-              className="rounded-lg border border-slate-200 px-3 py-2"
-              placeholder="SKU"
-              value={itemForm.sku}
-              onChange={(e) => setItemForm((prev) => ({ ...prev, sku: e.target.value }))}
-            />
+              onChange={(e) => setItemForm((p) => ({ ...p, code: e.target.value }))} />
+            <input className="rounded-lg border border-slate-200 px-3 py-2 text-sm" placeholder="SKU"
+              value={itemForm.sku} onChange={(e) => setItemForm((p) => ({ ...p, sku: e.target.value }))} />
           </div>
-          <input
-            className="w-full rounded-lg border border-slate-200 px-3 py-2"
-            placeholder="Tên vật tư"
-            value={itemForm.name}
-            onChange={(e) => setItemForm((prev) => ({ ...prev, name: e.target.value }))}
-          />
+
+          {/* Nhóm — full width, trên tên */}
+          <select className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
+            value={itemForm.category_id} onChange={(e) => setItemForm((p) => ({ ...p, category_id: e.target.value }))}>
+            <option value="">Chọn nhóm vật tư</option>
+            {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+          </select>
+
+          {/* Tên vật tư */}
+          <input className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm" placeholder="Tên vật tư"
+            value={itemForm.name} onChange={(e) => setItemForm((p) => ({ ...p, name: e.target.value }))} />
+
+          {/* Nhà cung cấp */}
+          <input className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm" placeholder="Nhà cung cấp"
+            value={itemForm.default_supplier_name} onChange={(e) => setItemForm((p) => ({ ...p, default_supplier_name: e.target.value }))} />
+
+          {/* Đơn giá trung bình + Đơn vị tính */}
           <div className="grid grid-cols-2 gap-3">
-            <select
-              className="rounded-lg border border-slate-200 px-3 py-2"
-              value={itemForm.category_id}
-              onChange={(e) => setItemForm((prev) => ({ ...prev, category_id: e.target.value }))}
+            <div className="relative">
+              <input type="number" min="0"
+                className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm pr-8"
+                placeholder="Đơn giá trung bình"
+                value={itemForm.average_cost || ""}
+                onChange={(e) => setItemForm((p) => ({ ...p, average_cost: Number(e.target.value) }))} />
+              <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs text-slate-400">Ä'</span>
+            </div>
+            <select className="rounded-lg border border-slate-200 px-3 py-2 text-sm"
+              value={itemForm.unit} onChange={(e) => setItemForm((p) => ({ ...p, unit: e.target.value }))}
             >
-              <option value="">Chọn nhóm</option>
-              {categories.map((category) => (
-                <option key={category.id} value={category.id}>
-                  {category.name}
-                </option>
-              ))}
-            </select>
-            <select
-              className="rounded-lg border border-slate-200 px-3 py-2"
-              value={itemForm.item_type}
-              onChange={(e) => setItemForm((prev) => ({ ...prev, item_type: e.target.value }))}
-            >
-              {Object.entries(ITEM_TYPE_LABEL).map(([key, label]) => (
-                <option key={key} value={key}>
-                  {label}
-                </option>
-              ))}
+              <option value="">Chọn đơn vị tính...</option>
+              {unitList.map(u => <option key={u} value={u}>{u}</option>)}
+              {itemForm.unit && !unitList.includes(itemForm.unit) && <option value={itemForm.unit}>{itemForm.unit}</option>}
             </select>
           </div>
-          <div className="grid grid-cols-2 gap-3">
-            <input
-              className="rounded-lg border border-slate-200 px-3 py-2"
-              placeholder="Đơn vị tính"
-              value={itemForm.unit}
-              onChange={(e) => setItemForm((prev) => ({ ...prev, unit: e.target.value }))}
-            />
-            <select
-              className="rounded-lg border border-slate-200 px-3 py-2"
-              value={itemForm.default_warehouse_id}
-              onChange={(e) => setItemForm((prev) => ({ ...prev, default_warehouse_id: e.target.value }))}
-            >
-              <option value="">Kho mặc định</option>
-              {warehouses.map((warehouse) => (
-                <option key={warehouse.id} value={warehouse.id}>
-                  {warehouse.name}
-                </option>
+
+          {/* Trạng thái */}
+          <div>
+            <div className="text-xs font-medium text-slate-500 mb-1">Trạng thái</div>
+            <div className="flex flex-wrap gap-2">
+              {itemStatuses.map(s => (
+                <button key={s.key} type="button"
+                  onClick={() => setItemForm(p => ({ ...p, item_status: s.key }))}
+                  className={`px-3 py-1.5 rounded-full border text-xs font-medium transition-colors ${itemForm.item_status === s.key
+                    ? `${s.bg} ${s.color} ring-2 ring-offset-1 ring-teal-400`
+                    : "border-slate-200 text-slate-500 hover:bg-slate-50"
+                    }`}>
+                  {s.label}
+                </button>
               ))}
-            </select>
+            </div>
           </div>
-          <input
-            className="w-full rounded-lg border border-slate-200 px-3 py-2"
-            placeholder="Nhà cung cấp mặc định"
-            value={itemForm.default_supplier_name}
-            onChange={(e) => setItemForm((prev) => ({ ...prev, default_supplier_name: e.target.value }))}
-          />
-          <div className="grid grid-cols-3 gap-3">
-            <input
-              type="number"
-              className="rounded-lg border border-slate-200 px-3 py-2"
-              placeholder="Giá chuẩn"
-              value={itemForm.standard_cost}
-              onChange={(e) => setItemForm((prev) => ({ ...prev, standard_cost: Number(e.target.value) }))}
-            />
-            <input
-              type="number"
-              className="rounded-lg border border-slate-200 px-3 py-2"
-              placeholder="Giá bình quân"
-              value={itemForm.average_cost}
-              onChange={(e) => setItemForm((prev) => ({ ...prev, average_cost: Number(e.target.value) }))}
-            />
-            <input
-              type="number"
-              className="rounded-lg border border-slate-200 px-3 py-2"
-              placeholder="Tồn tối thiểu"
-              value={itemForm.min_stock_level}
-              onChange={(e) => setItemForm((prev) => ({ ...prev, min_stock_level: Number(e.target.value) }))}
-            />
-          </div>
-          <textarea
-            className="min-h-[88px] w-full rounded-lg border border-slate-200 px-3 py-2"
-            placeholder="Ghi chú"
-            value={itemForm.note}
-            onChange={(e) => setItemForm((prev) => ({ ...prev, note: e.target.value }))}
-          />
+
+          <textarea className="min-h-[60px] w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
+            placeholder="Ghi chú" value={itemForm.note}
+            onChange={(e) => setItemForm((p) => ({ ...p, note: e.target.value }))} />
         </div>
       </Modal>
-
       <Modal
         open={Boolean(detailTx)}
         onCancel={() => setDetailTx(null)}
@@ -1032,7 +1478,7 @@ const MaterialsDashboard: IPage["Component"] = () => {
               </div>
               <div>
                 <div className="text-xs text-slate-500">Giá trị</div>
-                <div className="font-medium text-slate-700">{money(detailTx.total_cost)} đ</div>
+                <div className="font-medium text-slate-700">{money(detailTx.total_cost)} Ä'</div>
               </div>
               <div>
                 <div className="text-xs text-slate-500">Đối tác / task</div>
@@ -1074,7 +1520,7 @@ const MaterialsDashboard: IPage["Component"] = () => {
         )}
       </Modal>
     </div>
-  );
+  ) : <UnPermissionBoard />;
 };
 
 export default MaterialsDashboard;

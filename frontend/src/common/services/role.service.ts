@@ -3,8 +3,8 @@ import type { AxiosResponse } from "axios";
 import axiosClient from "./axiosClient";
 
 export const RoleService = {
-  getAll: (): Promise<AxiosResponse<Role[]>> => {
-    return axiosClient.get("/role/");
+  getAll: (leadId?: string | number): Promise<AxiosResponse<Role[]>> => {
+    return axiosClient.get(`/role/${leadId ? `?lead=${leadId}` : ""}`);
   },
   getId: (id: number): Promise<AxiosResponse<Role>> => {
     return axiosClient.get(`/role/${id}`);

@@ -1,6 +1,7 @@
-from flask import Blueprint, request, jsonify, abort
+from flask import Blueprint, request, jsonify, abort, g
 from models import db, Task, generate_datetime_id, dateStr, User, Customer, Message, Role,get_lead_by_json, get_lead_by_arg, Workspace
 import datetime
+import json as _json
 from sqlalchemy.orm.attributes import flag_modified
 from api.messages import upload_a_file_to_vps
 from sqlalchemy import cast, Text
@@ -9,14 +10,55 @@ from sqlalchemy import func, cast
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy import text
 from dateutil.relativedelta import relativedelta
+from permission_utils import ensure_resource_lead, require_can_view
 
 task_bp = Blueprint('task', __name__, url_prefix='/api/task')
 
 
+def _require_public_task_user(user_id: str | None) -> User:
+    user = db.session.get(User, user_id)
+    if not user:
+        abort(404, description="User not found")
+    return user
+
+
+@task_bp.before_request
+def guard_task_permission():
+    endpoint = request.endpoint or ""
+    view_args = request.view_args or {}
+
+    if endpoint in {"task.update_task", "task.create_task"}:
+        auth_header = (request.headers.get('Authorization') or '')
+        cookie_header = (request.headers.get('Cookie') or '')
+        print('[task-auth]', 'endpoint=', endpoint, 'auth_present=', bool(auth_header), 'auth_prefix=', auth_header[:48], 'cookie_present=', bool(cookie_header), 'cookie_prefix=', cookie_header[:96], 'content_type=', request.content_type)
+        try:
+            from flask_login import current_user
+            print('[task-auth]', 'current_user_authenticated=', bool(getattr(current_user, 'is_authenticated', False)), 'current_user_id=', getattr(current_user, 'id', None))
+        except Exception as log_err:
+            print('[task-auth]', 'current_user_log_error=', log_err)
+
+    if endpoint in {"task.get_task_by_user_id", "task.get_user_salary_task"}:
+        target_user = _require_public_task_user(view_args.get("user_id"))
+        g.permission_actor = target_user
+        return
+
+    actor, _ = require_can_view("view_workspace")
+    g.permission_actor = actor
+
+    task_id = view_args.get("id")
+    if task_id and task_id != "new":
+        task = db.session.get(Task, task_id)
+        if task:
+            ensure_resource_lead(task, actor, "task")
+
+
 @task_bp.route("/all", methods=["GET"])
 def get_all_tasks():
-    
-    tasks = [t.tdict() for t in Task.query.filter(Task.isDelete.is_(False))]
+    actor = g.permission_actor
+    tasks = [
+        t.tdict()
+        for t in Task.query.filter(Task.isDelete.is_(False), Task.lead_id == actor.lead_id)
+    ]
     return jsonify(tasks)
 
 
@@ -76,7 +118,9 @@ def update_task(id):
     task.assign_ids = data.get("assign_ids", task.assign_ids)
     task.customer_id = data.get("customer_id", task.customer_id)
 
-    # task.materials = data.get("materials", task.materials)
+    if data.get("materials") is not None:
+        task.materials = data.get("materials")
+        flag_modified(task, "materials")
     task.start_time = data.get("start_time", task.start_time)
     
     task.end_time = data.get("end_time", task.end_time)
@@ -85,6 +129,9 @@ def update_task(id):
     task.reward = data.get("reward", task.reward)
     task.amount = data.get("amount", task.amount)
     task.salary_type = data.get("salary_type", task.salary_type)
+
+    if "icon" in data:
+        task.icon = data.get("icon")
 
     flag_modified(task, "assign_ids")
     
@@ -110,7 +157,7 @@ def get_task_by_user_id(user_id):
     month_year = None
     if month_str:
         try:
-            dt = datetime.strptime(month_str, "%Y-%m")
+            dt = datetime.datetime.strptime(month_str, "%Y-%m")
             month_year = (dt.month, dt.year)
         except ValueError:
             month_year = None
@@ -143,11 +190,13 @@ def get_task_by_user_id(user_id):
                         total_agent_salary += salary
 
 
+                user_salary = user.salary if user.salary is not None else 0
+                reward_value = t.reward if t.reward is not None else 0
                 result["reward"].append({"title": t.title,
                                          "workspace": workspace.name,
                                          "start_time":t.start_time,
                                          "end_time":t.end_time,
-                                         "reward":  t.reward * user.salary / total_agent_salary if total_agent_salary != 0 else 0})
+                                         "reward":  reward_value * user_salary / total_agent_salary if total_agent_salary != 0 else 0})
             else:
                 result["data"].append(item)
 
@@ -190,6 +239,14 @@ def update_task_status(id):
 @task_bp.route("/<string:id>/upload-icon", methods=["PUT"])
 def update_task_icon(id):
     try:
+        auth_header = (request.headers.get('Authorization') or '')
+        cookie_header = (request.headers.get('Cookie') or '')
+        print('[upload-icon] auth_present=', bool(auth_header), 'auth_prefix=', auth_header[:48], 'cookie_present=', bool(cookie_header), 'cookie_prefix=', cookie_header[:96], 'content_type=', request.content_type)
+        try:
+            from flask_login import current_user
+            print('[upload-icon] current_user_authenticated=', bool(getattr(current_user, 'is_authenticated', False)), 'current_user_id=', getattr(current_user, 'id', None))
+        except Exception as log_err:
+            print('[upload-icon] current_user_log_error=', log_err)
         # ✅ Lấy task_id từ param hoặc form
         task_id = request.form.get("task_id", id)
         
@@ -213,14 +270,29 @@ def update_task_icon(id):
         if not filename:
             return jsonify({'error': 'Upload failed'}), 500
 
-        # ✅ Update task
-        task.icon = thumb_url
+        # ✅ Hỗ trợ nhiều ảnh: đọc icon hiện tại từ DB và append
+        db.session.refresh(task)  # đảm bảo đọc giá trị mới nhất từ DB
+        existing_icons = []
+        if task.icon:
+            try:
+                parsed = _json.loads(task.icon)
+                existing_icons = parsed if isinstance(parsed, list) else [parsed]
+            except (ValueError, TypeError):
+                existing_icons = [task.icon]  # format cũ: 1 string plain
+
+        print(f'✅ Existing icons: {existing_icons}')
+        new_icon = thumb_url or filename
+        existing_icons.append(new_icon)
+        print(f'✅ New icons list: {existing_icons}')
+        task.icon = _json.dumps(existing_icons)
+        flag_modified(task, 'icon')  # bắt SQLAlchemy flush String column chắc chắn
         db.session.commit()
 
         return jsonify({
             'success': True,
             'filename': filename,
             'thumb_url': thumb_url,
+            'icons': existing_icons,
             'task': task.tdict()
         }), 200
 
@@ -229,6 +301,65 @@ def update_task_icon(id):
         db.session.rollback()
         return jsonify({'error': str(e)}), 500
 
+
+@task_bp.route("/<string:id>/delete-icon", methods=["DELETE"])
+def delete_task_icon(id):
+    """Xóa 1 ảnh khỏi mảng icon theo index"""
+    try:
+        task = Task.query.get(id)
+        if not task:
+            return jsonify({'error': f'Task {id} not found'}), 404
+
+        idx = request.args.get('idx', type=int)
+        if idx is None:
+            return jsonify({'error': 'Missing idx param'}), 400
+
+        db.session.refresh(task)  # đọc mới nhất từ DB
+        existing_icons = []
+        if task.icon:
+            try:
+                parsed = _json.loads(task.icon)
+                existing_icons = parsed if isinstance(parsed, list) else [parsed]
+            except (ValueError, TypeError):
+                existing_icons = [task.icon]
+
+        if 0 <= idx < len(existing_icons):
+            existing_icons.pop(idx)
+
+        task.icon = _json.dumps(existing_icons) if existing_icons else None
+        flag_modified(task, 'icon')
+        db.session.commit()
+
+        return jsonify({'success': True, 'icons': existing_icons}), 200
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+
+
+@task_bp.route("/<string:id>/reorder-icons", methods=["PUT"])
+def reorder_task_icons(id):
+    """Lưu thứ tự ảnh mới sau khi drag-to-reorder"""
+    try:
+        task = Task.query.get(id)
+        if not task:
+            return jsonify({'error': f'Task {id} not found'}), 404
+
+        data = request.get_json()
+        new_order = data.get('icons', [])
+
+        if not isinstance(new_order, list):
+            return jsonify({'error': 'icons must be an array'}), 400
+
+        task.icon = _json.dumps(new_order)
+        flag_modified(task, 'icon')
+        db.session.commit()
+
+        return jsonify({'success': True, 'icons': new_order}), 200
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
 
 
 @task_bp.route("/<string:id>/upload", methods=["PUT"])
@@ -355,6 +486,14 @@ def update_task_message(id):
 @task_bp.route("/", methods=["POST"])
 def create_task():
     data = request.get_json()
+    if isinstance(data, dict):
+        if data.get("workspace_id"):
+            workspace = db.session.get(Workspace, data.get("workspace_id"))
+            if workspace:
+                ensure_resource_lead(workspace, g.permission_actor, "workspace")
+                data.setdefault("lead_id", workspace.lead_id)
+        elif not data.get("lead_id"):
+            data["lead_id"] = g.permission_actor.lead_id
 
     # print('New task', data)
 
@@ -401,11 +540,11 @@ def get_user_salary_task(user_id):
     target_month = None
     if month_str:
         try:
-            target_month = datetime.strptime(month_str, "%Y-%m")
+            target_month = datetime.datetime.strptime(month_str, "%Y-%m")
         except ValueError:
             target_month = None
 
-    now = target_month if target_month else datetime.now()
+    now = target_month if target_month else datetime.datetime.now()
     first_day = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
     last_day = (first_day + relativedelta(months=1) - relativedelta(days=1)).replace(hour=23, minute=59, second=59, microsecond=999999)
 

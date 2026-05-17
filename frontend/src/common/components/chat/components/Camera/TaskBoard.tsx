@@ -4,7 +4,7 @@ import JobTimeAndProcess from "../../../dashboard/work-tables/task/JobTimeAndPro
 import { Stack, Box, Button, Checkbox, Typography, Avatar } from "@mui/material";
 import { useMutation } from '@tanstack/react-query';
 import { useUser } from "../../../../common/hooks/useUser";
-import type { Task } from "../../../../@types/work-space.type";
+import { getPrimaryTaskIcon, type Task } from "../../../../@types/work-space.type";
 import { useApiHost, useApiStatic } from "../../../../common/hooks/useApiHost";
 import Divider from '@mui/material/Divider';
 import FormControlLabel from '@mui/material/FormControlLabel';
@@ -21,7 +21,6 @@ import JobAsset from "../../../dashboard/work-tables/task/JobAsset";
 import { Tabs } from 'antd';
 import type { NotifyProps } from "../../../../@types/notify.type";
 import { CenterBox } from "../commons/TitlePanel";
-
 const { TextArea } = Input;
 
 const fetchTaskByUser = async (userId: string): Promise<Task[]> => {
@@ -51,9 +50,30 @@ interface TaskBoardProps {
 
 const TaskBoard = ({ userId,fullName, open, onCancel }: TaskBoardProps) => {
   const [activeKey, setActiveKey] = useState('task');
+    const [iconPreviewOpen, setIconPreviewOpen] = useState(false);
     const { mutate, data, isPending, isError, error } = useTaskByUserMutation();
     const {isMobile,notifyAdmin,generateDatetimeId} = useUser();
     const {taskDetail,setTaskDetail} = useTaskContext();
+    const staticBase = useApiStatic();
+    const primaryIcon = getPrimaryTaskIcon(taskDetail?.icon);
+
+    const buildStaticUrl = (path?: string | null) => {
+      if (!path) return "";
+      if (path.startsWith("http://") || path.startsWith("https://") || path.startsWith("data:")) {
+        return path;
+      }
+      if (path.startsWith("/")) {
+        return path;
+      }
+      return `${staticBase}/${path}`;
+    };
+
+    const getOriginalImagePath = (path?: string | null) => {
+      if (!path) return "";
+      return path.startsWith("thumbs/thumb_")
+        ? path.replace("thumbs/thumb_", "")
+        : path;
+    };
 
     const handleFinishWarning = () => {
       const notify : NotifyProps = {
@@ -62,7 +82,7 @@ const TaskBoard = ({ userId,fullName, open, onCancel }: TaskBoardProps) => {
           type: 'task',
           description: taskDetail?.workspace_id,
           text: `<${taskDetail?.workspace}/${taskDetail?.title}> hoàn thành. Vui lòng chuyển trạng thái !`,
-          target: `/dashboard/work-tables/${taskDetail?.workspace_id}`,
+          target: `/work-tables/${taskDetail?.workspace_id}`,
       };
 
       console.log('Note', notify);
@@ -91,6 +111,10 @@ const TaskBoard = ({ userId,fullName, open, onCancel }: TaskBoardProps) => {
         setTaskDetail(data[currentPage - 1] || data[0]);
       }
     },[currentPage, data]);
+
+    useEffect(() => {
+      setIconPreviewOpen(false);
+    }, [taskDetail?.id]);
 
     const btnStyle = {color:"#fff", padding:10, 
       paddingLeft:30, paddingRight:30, 
@@ -176,12 +200,18 @@ const TaskBoard = ({ userId,fullName, open, onCancel }: TaskBoardProps) => {
           className="!rounded-lg !border !border-gray-300 focus:!border-cyan-500 focus:!shadow-lg hover:!border-cyan-500 !transition-all !duration-200 !shadow-sm !resize-none !text-xs sm:!text-sm h-40"
         />
 
-        {taskDetail?.icon && 
+        {primaryIcon &&
+          <button
+            type="button"
+            onClick={() => setIconPreviewOpen(true)}
+            style={{ border: "none", padding: 0, background: "transparent", cursor: "zoom-in" }}
+          >
             <Avatar
-                src={`${useApiStatic()}/${taskDetail.icon}`}
-                alt="Task icon"
-                sx={{ width: 100, height: 70, borderRadius: 0}}
-            />}
+              src={buildStaticUrl(primaryIcon)}
+              alt="Task icon"
+              sx={{ width: 100, height: 70, borderRadius: 0 }}
+            />
+          </button>}
             
         <JobTimeAndProcess key={el.id} form={null}/>
 
@@ -208,6 +238,21 @@ const TaskBoard = ({ userId,fullName, open, onCancel }: TaskBoardProps) => {
     )}
 
       </Stack>
+      <Modal
+        open={iconPreviewOpen}
+        footer={null}
+        onCancel={() => setIconPreviewOpen(false)}
+        width="auto"
+        centered
+      >
+        {primaryIcon && (
+          <img
+            src={buildStaticUrl(getOriginalImagePath(primaryIcon))}
+            alt="Task icon preview"
+            style={{ maxWidth: "80vw", maxHeight: "80vh", display: "block" }}
+          />
+        )}
+      </Modal>
       </CenterBox>
     </Modal>
     )

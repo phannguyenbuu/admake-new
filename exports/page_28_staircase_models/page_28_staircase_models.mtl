@@ -1,0 +1,39 @@
+newmtl steel
+Kd 0.55 0.58 0.60
+Ks 0.25 0.25 0.25
+Ns 32
+
+newmtl plate_4mm
+Kd 0.25 0.48 0.70
+Ks 0.20 0.20 0.20
+Ns 24
+
+newmtl plate_8mm
+Kd 0.86 0.58 0.18
+Ks 0.22 0.22 0.22
+Ns 24
+
+newmtl plate_10mm
+Kd 0.20 0.60 0.42
+Ks 0.22 0.22 0.22
+Ns 24
+
+newmtl bolt_m14_from_f14
+Kd 0.05 0.05 0.05
+Ks 0.40 0.40 0.40
+Ns 48
+
+newmtl bolt_m20_from_f20
+Kd 0.02 0.02 0.02
+Ks 0.45 0.45 0.45
+Ns 48
+
+newmtl weld_dark
+Kd 0.02 0.02 0.02
+Ks 0.18 0.18 0.18
+Ns 16
+
+newmtl stair_tread
+Kd 0.65 0.65 0.62
+Ks 0.15 0.15 0.15
+Ns 18

@@ -226,7 +226,7 @@
   "pricing": {
     "title": { "vi": "Bảng giá của ADMAKE", "en": "ADMAKE pricing", "zh": "ADMAKE 价格" },
     "content": "",
-    "image": "public/price.webp",
+    "image": "public/price-2.webp",
     "imageAlt": { "vi": "Ảnh chụp giao diện phần mềm", "en": "Pricing screenshot", "zh": "价格截图" },
     "cta": { "title": { "vi": "Tôi muốn được tư vấn", "en": "I want consultation", "zh": "我要咨询" }, "content": "", "href": "#dang-ky" }
   },

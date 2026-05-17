@@ -12,7 +12,7 @@ import { useApiHost, useApiStatic } from "./hooks/useApiHost";
 import { Stack, Box, Typography } from "@mui/material";
 import QRCode from "../components/chat/components/QRCode";
 import { useLocation } from "react-router-dom";
-import WorkDays, {QRColumn} from "../app/dashboard/workpoints/WorkDays";
+import WorkDays, { QRColumn } from "../app/dashboard/workpoints/WorkDays";
 import type { Workpoint, WorkDaysProps } from "../@types/workpoint";
 import type { ColumnsType } from "antd/es/table";
 import SalaryBoard from "../app/dashboard/workpoints/SalaryBoard";
@@ -87,7 +87,7 @@ export const columnsCustomer = [
     dataIndex: "name",
     key: "name",
     width: 200,
-     render: (text: string, record: WorkSpace) => (
+    render: (text: string, record: WorkSpace) => (
       <div>
         <div>{text}</div>
         {/* <span className="!text-cyan-700" style={{fontSize:12,fontStyle:'italic'}}>{record?.fullName}</span> */}
@@ -125,7 +125,7 @@ export const columnsCustomer = [
   }
 ];
 
-const formattedSalary = (salary:number) => new Intl.NumberFormat('vi-VN', {
+const formattedSalary = (salary: number) => new Intl.NumberFormat('vi-VN', {
   style: 'currency',
   currency: 'VND',
   minimumFractionDigits: 0,
@@ -140,11 +140,11 @@ export const columnsUser = [
     render: (text: string, record: User) => (
       <div>
         <div>{text}</div>
-        <span className="!text-cyan-700" style={{fontSize:12,fontStyle:'italic'}}>{record.role?.name}</span>
+        <span className="!text-cyan-700" style={{ fontSize: 12, fontStyle: 'italic' }}>{record.role?.name}</span>
       </div>
     ),
   },
-  
+
   {
     title: "Lương",
     dataIndex: "salary",
@@ -154,6 +154,40 @@ export const columnsUser = [
       <span className="!text-cyan-700 !line-clamp-2 !text-base">
         {formattedSalary(salary)}
       </span>
+    ),
+  },
+  {
+    title: "Phụ cấp + Bảo hiểm",
+    dataIndex: "allowance",
+    key: "allowance",
+    width: 160,
+    render: (_: any, record: User) => (
+      <div className="space-y-0.5">
+        <div className="custom-font-size">
+          <span className="text-slate-400">Phụ cấp: </span>
+          <span className="text-sky-600 font-medium">
+            {(record as any).allowance
+              ? `+${Number((record as any).allowance).toLocaleString("vi-VN")} đ`
+              : "—"}
+          </span>
+        </div>
+        <div className="custom-font-size">
+          <span className="text-slate-400">BHYT: </span>
+          <span className="text-emerald-600 font-medium">
+            {(record as any).bhyt
+              ? `-${Number((record as any).bhyt).toLocaleString("vi-VN")} đ`
+              : "—"}
+          </span>
+        </div>
+        <div className="custom-font-size">
+          <span className="text-slate-400">BHXH: </span>
+          <span className="text-rose-500 font-medium">
+            {(record as any).bhxh
+              ? `-${Number((record as any).bhxh).toLocaleString("vi-VN")} đ`
+              : "—"}
+          </span>
+        </div>
+      </div>
     ),
   },
   {
@@ -192,6 +226,7 @@ export const columnsUser = [
     ),
   }
 ];
+
 
 export const holidayTypes = [
   {
@@ -352,210 +387,210 @@ export const columnsAttendance = (
   isSunday: (day: number) => boolean,
   attendance: (key: string, userId: string) => void
 ) => [
-  {
-    title: (
-      <span className=" !text-black !text-base !font-bold">Tên nhân sự</span>
-    ),
-    dataIndex: "name",
-    key: "name",
-    fixed: "left" as const,
-    width: 200,
-    className: "!text-base !font-bold !bg-white !border-[#00b4b6]",
-  },
-  {
-    title: (
-      <span className=" !text-[#00b4b6] !text-base !font-bold">
-        Tháng {month + 1}/{year}
-      </span>
-    ),
-    children: days.map((day) => ({
+    {
       title: (
-        <div className="!text-center">
-          <div className="!text-[#00b4b6] !text-base !font-semibold">
-            {day < 10 ? `0${day}` : day}
-          </div>
-          <div className="!text-[#00b4b6] !text-xs !font-medium">
-            {getDayOfWeek(day, month, year)}
-          </div>
-        </div>
+        <span className=" !text-black !text-base !font-bold">Tên nhân sự</span>
       ),
-      dataIndex: `d${day - 1}`,
-      key: `d${day - 1}`,
-      align: "center" as const,
-      width: 60,
-      className: `!text-base !border-[#00b4b6] ${
-        isSunday(day) ? "!bg-yellow-100 " : "!bg-white"
-      }`,
-      render: (val: string, record: any) => {
-        const dayKey = record[`d${day - 1}_key`];
-        const dayUserId = record[`d${day - 1}_userId`];
+      dataIndex: "name",
+      key: "name",
+      fixed: "left" as const,
+      width: 200,
+      className: "!text-base !font-bold !bg-white !border-[#00b4b6]",
+    },
+    {
+      title: (
+        <span className=" !text-[#00b4b6] !text-base !font-bold">
+          Tháng {month + 1}/{year}
+        </span>
+      ),
+      children: days.map((day) => ({
+        title: (
+          <div className="!text-center">
+            <div className="!text-[#00b4b6] !text-base !font-semibold">
+              {day < 10 ? `0${day}` : day}
+            </div>
+            <div className="!text-[#00b4b6] !text-xs !font-medium">
+              {getDayOfWeek(day, month, year)}
+            </div>
+          </div>
+        ),
+        dataIndex: `d${day - 1}`,
+        key: `d${day - 1}`,
+        align: "center" as const,
+        width: 60,
+        className: `!text-base !border-[#00b4b6] ${isSunday(day) ? "!bg-yellow-100 " : "!bg-white"
+          }`,
+        render: (val: string, record: any) => {
+          const dayKey = record[`d${day - 1}_key`];
+          const dayUserId = record[`d${day - 1}_userId`];
 
-        const handleClick = () => {
-          if (dayKey && dayUserId) {
-            attendance(dayKey, dayUserId);
+          const handleClick = () => {
+            if (dayKey && dayUserId) {
+              attendance(dayKey, dayUserId);
+            }
+          };
+
+          if (isSunday(day)) {
+            return <span className="!text-base">&nbsp;</span>; // khoảng trắng để giữ chiều cao
           }
-        };
-
-        if (isSunday(day)) {
-          return <span className="!text-base">&nbsp;</span>; // khoảng trắng để giữ chiều cao
-        }
-        if (val === "T")
+          if (val === "T")
+            return (
+              <span
+                className="!text-base !font-bold cursor-pointer hover:!text-cyan-600"
+                onClick={handleClick}
+              >
+                T
+              </span>
+            );
+          if (val === "T+")
+            return (
+              <span
+                className="!text-base !font-bold !text-cyan-500 cursor-pointer hover:!text-cyan-600"
+                onClick={handleClick}
+              >
+                T
+              </span>
+            );
+          if (val === "T-")
+            return (
+              <span
+                className="!text-base !font-bold !text-red-500 cursor-pointer hover:!text-cyan-600"
+                onClick={handleClick}
+              >
+                T
+              </span>
+            );
+          if (val === "K")
+            return (
+              <span
+                className="!text-base !font-bold cursor-pointer hover:!text-cyan-600"
+                onClick={handleClick}
+              >
+                K
+              </span>
+            );
+          if (val === "K+")
+            return (
+              <span
+                className="!text-base !font-bold !text-cyan-500 cursor-pointer hover:!text-cyan-600"
+                onClick={handleClick}
+              >
+                K
+              </span>
+            );
+          if (val === "K-")
+            return (
+              <span
+                className="!text-base !font-bold !text-red-500 cursor-pointer hover:!text-cyan-600"
+                onClick={handleClick}
+              >
+                T
+              </span>
+            );
+          if (val === "-")
+            return (
+              <span
+                className="!text-base !text-gray-400 cursor-pointer hover:!text-cyan-600"
+                onClick={handleClick}
+              >
+                -
+              </span>
+            );
           return (
             <span
-              className="!text-base !font-bold cursor-pointer hover:!text-cyan-600"
+              className="!text-base cursor-pointer hover:!text-cyan-600"
               onClick={handleClick}
             >
-              T
+              {val}
             </span>
           );
-        if (val === "T+")
-          return (
-            <span
-              className="!text-base !font-bold !text-cyan-500 cursor-pointer hover:!text-cyan-600"
-              onClick={handleClick}
-            >
-              T
-            </span>
-          );
-        if (val === "T-")
-          return (
-            <span
-              className="!text-base !font-bold !text-red-500 cursor-pointer hover:!text-cyan-600"
-              onClick={handleClick}
-            >
-              T
-            </span>
-          );
-        if (val === "K")
-          return (
-            <span
-              className="!text-base !font-bold cursor-pointer hover:!text-cyan-600"
-              onClick={handleClick}
-            >
-              K
-            </span>
-          );
-        if (val === "K+")
-          return (
-            <span
-              className="!text-base !font-bold !text-cyan-500 cursor-pointer hover:!text-cyan-600"
-              onClick={handleClick}
-            >
-              K
-            </span>
-          );
-        if (val === "K-")
-          return (
-            <span
-              className="!text-base !font-bold !text-red-500 cursor-pointer hover:!text-cyan-600"
-              onClick={handleClick}
-            >
-              T
-            </span>
-          );
-        if (val === "-")
-          return (
-            <span
-              className="!text-base !text-gray-400 cursor-pointer hover:!text-cyan-600"
-              onClick={handleClick}
-            >
-              -
-            </span>
-          );
-        return (
-          <span
-            className="!text-base cursor-pointer hover:!text-cyan-600"
-            onClick={handleClick}
-          >
-            {val}
-          </span>
-        );
-      },
-    })),
-  },
-];
+        },
+      })),
+    },
+  ];
 
 const today = new Date();
 const month = today.getMonth();
 
 
-export const columnsWorkPoint = (handleOpenModal: (record: WorkDaysProps) => void,  selectedMonth: string): ColumnsType<WorkDaysProps> => [
-// export const columnsWorkPoint: ColumnsType<WorkDaysProps> = [
+export const columnsWorkPoint = (handleOpenModal: (record: WorkDaysProps) => void, selectedMonth: string): ColumnsType<WorkDaysProps> => [
+  // export const columnsWorkPoint: ColumnsType<WorkDaysProps> = [
   ...(typeof window !== "undefined" && window.innerWidth < 768
     ? [
-        {
-          title: `QR`,
-          dataIndex: "userrole",
-          key: "userrole",
-          width: 32,
-          render: (text: string, record: WorkDaysProps) => <QRColumn record={record} />,
-        },
-        {
-          title: "Họ Và Tên",
-          dataIndex: "username",
-          key: "username",
-          width: 140,
-          render: (text: string, record: WorkDaysProps) => (
-            <div style={{ cursor: "pointer" }} onClick={() => handleOpenModal(record)}>
-              <div>{text}</div>
-              <span style={{ fontSize: 12, fontStyle: "italic" }}>{record.userrole}</span>
-              <p style={{ fontSize: 8, color: "red", fontStyle: "italic" }}>Click để xem bảng lương</p>
-            </div>
-          ),
-        },
-        {
-          title: `Ngày công tác trong tháng ${month + 1}`,
-          dataIndex: "workpoint",
-          key: "workpoint",
-          width: 460,
-          render: (text: string, record: WorkDaysProps) => (
-            <div>
-              <WorkDays record={record} selectedMonth={selectedMonth} />
-            </div>
-          ),
-        },
-      ]
+      {
+        title: `QR`,
+        dataIndex: "userrole",
+        key: "userrole",
+        width: 32,
+        render: (text: string, record: WorkDaysProps) => <QRColumn record={record} />,
+      },
+      {
+        title: "Họ Và Tên",
+        dataIndex: "username",
+        key: "username",
+        width: 140,
+        render: (text: string, record: WorkDaysProps) => (
+          <div style={{ cursor: "pointer" }} onClick={() => handleOpenModal(record)}>
+            <div>{text}</div>
+            <span style={{ fontSize: 12, fontStyle: "italic" }}>{record.userrole}</span>
+            <p style={{ fontSize: 8, color: "red", fontStyle: "italic" }}>Click để xem bảng lương</p>
+          </div>
+        ),
+      },
+      {
+        title: `Ngày công tác trong tháng ${month + 1}`,
+        dataIndex: "workpoint",
+        key: "workpoint",
+        width: 460,
+        render: (text: string, record: WorkDaysProps) => (
+          <div>
+            <WorkDays record={record} selectedMonth={selectedMonth} />
+          </div>
+        ),
+      },
+    ]
     : [
-  {
-    title: `QR`,
-    dataIndex: "userrole",
-    key: "userrole",
-    width: 40,
-    render:  (text: string, record: WorkDaysProps)  => (
-     <QRColumn record = {record}/>
-    )
-  },
-  {
-    title: "Họ Và Tên",
-    dataIndex: "username",
-    key: "username",
-    width: 200,
-    render: (text: string, record: WorkDaysProps) => {
-     
-      
-    return(
-      <div
-          style={{ cursor: 'pointer' }}
-          onClick={() => handleOpenModal(record)}
-        >
-        <div>{text}</div>
-        <span style={{fontSize:12,fontStyle:'italic'}}>{record.userrole}</span>
-        <p style={{fontSize:8,color:'red',fontStyle:'italic'}}>Click để xem bảng lương</p>
-      </div>
-    )},
-  },
+      {
+        title: `QR`,
+        dataIndex: "userrole",
+        key: "userrole",
+        width: 40,
+        render: (text: string, record: WorkDaysProps) => (
+          <QRColumn record={record} />
+        )
+      },
+      {
+        title: "Họ Và Tên",
+        dataIndex: "username",
+        key: "username",
+        width: 200,
+        render: (text: string, record: WorkDaysProps) => {
 
-  {
-    title: `Ngày công tác trong tháng ${month + 1}`,
-    dataIndex: "workpoint",
-    key: "workpoint",
-    width: 620,
-    render:  (text: string, record: WorkDaysProps)  => (
-      <div>
-        <WorkDays record = {record}  selectedMonth={selectedMonth}/>
-      </div>
-    )
-  },
-]
+
+          return (
+            <div
+              style={{ cursor: 'pointer' }}
+              onClick={() => handleOpenModal(record)}
+            >
+              <div>{text}</div>
+              <span style={{ fontSize: 12, fontStyle: 'italic' }}>{record.userrole}</span>
+              <p style={{ fontSize: 8, color: 'red', fontStyle: 'italic' }}>Click để xem bảng lương</p>
+            </div>
+          )
+        },
+      },
+
+      {
+        title: `Ngày công tác trong tháng ${month + 1}`,
+        dataIndex: "workpoint",
+        key: "workpoint",
+        width: 620,
+        render: (text: string, record: WorkDaysProps) => (
+          <div>
+            <WorkDays record={record} selectedMonth={selectedMonth} />
+          </div>
+        )
+      },
+    ]
   ),
 ];

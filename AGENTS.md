@@ -1,3 +1,5 @@
+@RTK.md
+
 # AGENTS.md
 
 ## Scope
@@ -33,11 +35,29 @@
 - `cd frontend && npm run build`
 - Deploy static build:
 - `scp -r frontend/dist/* root@31.97.76.62:/var/www/admake`
+- Backend production hiện được restart qua `pm2 restart admake-api`
 - Backend runs on port `6000`, proxied by Nginx for:
 - `/api/`
 - `/static/`
 - `/lead-manage/`
 - `/socket.io/`
+
+## Current product notes
+- AR payment types are intentionally split:
+- `phat_sinh` only increases receivable value and must not create/link `daily_cash` or `journal`.
+- `tam_ung` is the real money collection flow and can link `daily_cash` plus `journal`.
+- Payroll adjustments are persisted in backend table `payroll_adjustments`; do not reintroduce browser-only `localStorage` as the source of truth.
+- User payroll profile currently includes `salary`, `allowance`, `bhyt`, `bhxh`.
+- `frontend/src/common/app/dashboard/materials/page.tsx` currently uses paging at `50` items per page.
+- Inventory item `code` is editable via `PUT /api/inventory/items/:id`.
+- Inventory item delete is allowed only when the item has no `stock transaction`; otherwise backend returns `Item already has stock transactions`.
+- Materials item spec rows are edited in the expanded sub-row under each item.
+- In `FormTask`, `Tài liệu & Bình luận` now lives inside the `Thông tin` tab as a collapsible section.
+
+## Recent migrations to know
+- `backend/migrations/20260407_user_payroll_fields.sql`
+- `backend/migrations/20260407_ar_phat_sinh_cleanup.sql`
+- `backend/migrations/20260407_payroll_adjustments.sql`
 
 ## Debugging rules
 - If UI shows a 404 page after an in-app action, inspect frontend console first for render errors; router error boundary can mask runtime issues.
@@ -45,3 +65,9 @@
 - frontend `WorkDays.tsx` date indexing logic,
 - backend `backend/api/workpoints.py` `/api/workpoint/page` month filtering.
 - When data correctness is in doubt, validate directly against PostgreSQL `admake_chat` before changing logic.
+
+## Codex runtime rules
+- At the start of a Codex session, run `rtk --version` to check whether RTK is available.
+- If RTK is installed, prefer `rtk`-wrapped commands for verbose shell work such as `git`, `rg`, `find`, `tree`, `pytest`, `npm test`, `pnpm test`, `vitest`, `cargo test`, `docker ps`, `kubectl get pods`, and large `ls`.
+- If raw command output is required for debugging, state why before running the non-RTK command.
+- This machine is configured to launch `codex` with `--sandbox danger-full-access --ask-for-approval never` by default. If a higher-priority runtime policy overrides that, state it explicitly.

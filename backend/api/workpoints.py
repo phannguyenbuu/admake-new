@@ -1,5 +1,5 @@
-from flask import Blueprint, request, jsonify, abort
-from models import db, app, Workpoint, WorkpointSetting, Message, User, Task, dateStr, generate_datetime_id, Leave, LeadPayload
+from flask import Blueprint, request, jsonify, abort, g
+from models import db, app, Workpoint, WorkpointSetting, Message, User, Task, dateStr, generate_datetime_id, Leave, LeadPayload, PayrollAdjustment
 from api.chat import socketio
 from sqlalchemy import desc
 from datetime import datetime, time, date, timedelta
@@ -8,8 +8,111 @@ from api.users import get_query_page_users
 from collections import defaultdict
 from dateutil.relativedelta import relativedelta
 from sqlalchemy import and_, or_
+from permission_utils import ensure_resource_lead, require_authenticated_user, require_can_view, require_self_or_lead
 
 workpoint_bp = Blueprint('workpoint', __name__, url_prefix='/api/workpoint')
+
+
+def _require_public_workpoint_user(user_id: str | None) -> User:
+    user = db.session.get(User, user_id)
+    if not user:
+        abort(404, description="User not found")
+    return user
+
+
+@workpoint_bp.before_request
+def guard_workpoint_permission():
+    endpoint = request.endpoint or ""
+    view_args = request.view_args or {}
+
+    payroll_endpoints = {
+        "workpoint.get_payroll_summary",
+        "workpoint.get_payroll_adjustments",
+        "workpoint.create_payroll_adjustment",
+        "workpoint.update_payroll_adjustment",
+        "workpoint.delete_payroll_adjustment",
+    }
+    if endpoint in payroll_endpoints:
+        actor, _ = require_can_view("view_acc_payroll")
+        g.permission_actor = actor
+        adjustment_id = view_args.get("adjustment_id")
+        if adjustment_id:
+            adjustment = db.session.get(PayrollAdjustment, adjustment_id)
+            if adjustment:
+                ensure_resource_lead(adjustment, actor, "payroll adjustment")
+        return
+
+    if endpoint in {"workpoint.get_user_workpoint_salary_task"}:
+        actor, _ = require_can_view(any_permissions=("view_workpoint", "view_acc_payroll"))
+        g.permission_actor = actor
+        target_user = db.session.get(User, view_args.get("user_id"))
+        if target_user:
+            ensure_resource_lead(target_user, actor, "user")
+        return
+
+    if endpoint in {"workpoint.get_workpoint_setting"}:
+        actor = require_authenticated_user()
+        g.permission_actor = actor
+        lead_id = int(view_args.get("lead_id") or 0)
+        lead = db.session.get(LeadPayload, lead_id)
+        if not lead:
+            abort(404, description="Lead not found")
+        if lead_id and int(actor.lead_id or 0) != lead_id:
+            abort(403, description="You do not have access to this lead")
+        return
+
+    if endpoint in {
+        "workpoint.get_workpoint_today_detail",
+        "workpoint.get_workpoint_checkpoint",
+        "workpoint.post_workpoint_by_user_and_date",
+        "workpoint.remove_workpoint_checklist",
+    }:
+        target_user = _require_public_workpoint_user(view_args.get("user_id"))
+        g.permission_actor = target_user
+        return
+
+    if endpoint == "workpoint.get_workpoint_detail":
+        actor, _target_user = require_self_or_lead(view_args.get("user_id"))
+        g.permission_actor = actor
+        return
+
+    if endpoint == "workpoint.put_remove_workpoint":
+        actor = require_authenticated_user()
+        g.permission_actor = actor
+        workpoint = db.session.get(Workpoint, view_args.get("id"))
+        if workpoint:
+            ensure_resource_lead(workpoint, actor, "workpoint")
+            require_self_or_lead(workpoint.user_id)
+        return
+
+    if endpoint == "workpoint.post_workpoint_message":
+        actor, _ = require_can_view(any_permissions=("view_workspace", "view_workpoint", "view_acc_payroll"))
+        g.permission_actor = actor
+        target_user_id = request.form.get("user_id")
+        if target_user_id:
+            target_user = db.session.get(User, target_user_id)
+            if target_user:
+                ensure_resource_lead(target_user, actor, "user")
+        return
+
+    actor, _ = require_can_view("view_workpoint")
+    g.permission_actor = actor
+
+    target_user_id = view_args.get("user_id")
+    if target_user_id:
+        target_user = db.session.get(User, target_user_id)
+        if target_user:
+            ensure_resource_lead(target_user, actor, "user")
+
+PAYROLL_ADJUSTMENT_SIGNS = {
+    "bonus": 1,
+    "punish": -1,
+    "advance": -1,
+    "commission": 1,
+    "allowance": 1,
+    "bhyt": -1,
+    "bhxh": -1,
+}
 
 
 def _parse_month_arg(value: str | None) -> datetime | None:
@@ -77,6 +180,31 @@ def _workhour_from_period(period_data: dict, period_name: str) -> float:
     return diff_hours if diff_hours > 0 else 0.0
 
 
+def _actual_overtime_hours(period_data: dict) -> float:
+    if not period_data or "in" not in period_data:
+        return 0.0
+
+    workhour = period_data.get("workhour")
+    if isinstance(workhour, (int, float)) and workhour > 0:
+        return float(workhour)
+
+    in_data = period_data.get("in") or {}
+    out_data = period_data.get("out") or {}
+    in_time = in_data.get("time")
+    out_time = out_data.get("time")
+    if not in_time or not out_time:
+        return 0.0
+
+    try:
+        in_dt = datetime.fromisoformat(in_time)
+        out_dt = datetime.fromisoformat(out_time)
+    except Exception:
+        return 0.0
+
+    diff_hours = (out_dt - in_dt).total_seconds() / 3600
+    return diff_hours if diff_hours > 0 else 0.0
+
+
 def _max_working_hours(month: int, year: int, setting: WorkpointSetting | None) -> int:
     days_in_month = (datetime(year, month, 1) + relativedelta(months=1) - relativedelta(days=1)).day
     total_hours = 0
@@ -107,17 +235,7 @@ def _extract_cash_amount(text_value) -> int:
         return 0
 
 
-@workpoint_bp.route("/payroll-summary", methods=["GET"])
-def get_payroll_summary():
-    lead_id = request.args.get("lead", 0, type=int)
-    lead = db.session.get(LeadPayload, lead_id)
-    if not lead:
-        abort(404, description="Lead not found")
-
-    month_arg = request.args.get("month", type=str)
-    from_month_arg = request.args.get("from_month", type=str)
-    to_month_arg = request.args.get("to_month", type=str)
-
+def _resolve_month_range(month_arg: str | None, from_month_arg: str | None, to_month_arg: str | None) -> tuple[datetime, datetime]:
     now_month = datetime.now().replace(day=1, hour=0, minute=0, second=0, microsecond=0)
     month_dt = _parse_month_arg(month_arg)
     from_month_dt = _parse_month_arg(from_month_arg)
@@ -141,6 +259,74 @@ def get_payroll_summary():
     if from_month_dt > to_month_dt:
         from_month_dt, to_month_dt = to_month_dt, from_month_dt
 
+    return from_month_dt, to_month_dt
+
+
+def _parse_entry_date(value: str | None) -> date | None:
+    if not value:
+        return None
+    try:
+        return datetime.strptime(value, "%Y-%m-%d").date()
+    except ValueError:
+        return None
+
+
+def _normalize_payroll_adjustment_type(value: str | None) -> str | None:
+    normalized = (value or "").strip().lower()
+    if normalized in PAYROLL_ADJUSTMENT_SIGNS:
+        return normalized
+    return None
+
+
+def _serialize_payroll_adjustment(item: PayrollAdjustment) -> dict:
+    return item.tdict()
+
+
+def _sum_payroll_adjustments(items) -> dict:
+    totals = {
+        "bonus": 0.0,
+        "punish": 0.0,
+        "advance": 0.0,
+        "commission": 0.0,
+        "allowance": 0.0,
+        "bhyt": 0.0,
+        "bhxh": 0.0,
+        "net": 0.0,
+    }
+    for item in items or []:
+        adjustment_type = _normalize_payroll_adjustment_type(getattr(item, "adjustment_type", None))
+        if not adjustment_type:
+            continue
+        amount = float(getattr(item, "amount", 0) or 0)
+        totals[adjustment_type] += amount
+        totals["net"] += amount * PAYROLL_ADJUSTMENT_SIGNS[adjustment_type]
+    return totals
+
+
+def _apply_payroll_adjustments(row: dict, totals: dict) -> dict:
+    adjusted = dict(row)
+    adjusted["bonus_total"] = round(float(adjusted.get("bonus_total", 0) or 0) + totals["bonus"], 0)
+    adjusted["punish_total"] = round(float(adjusted.get("punish_total", 0) or 0) - totals["punish"], 0)
+    adjusted["advance_total"] = round(float(adjusted.get("advance_total", 0) or 0) + totals["advance"], 0)
+    adjusted["allowance"] = round(float(adjusted.get("allowance", 0) or 0) + totals["allowance"], 0)
+    adjusted["bhyt"] = round(float(adjusted.get("bhyt", 0) or 0) + totals["bhyt"], 0)
+    adjusted["bhxh"] = round(float(adjusted.get("bhxh", 0) or 0) + totals["bhxh"], 0)
+    adjusted["net_salary"] = round(float(adjusted.get("net_salary", 0) or 0) + totals["net"], 0)
+    return adjusted
+
+
+@workpoint_bp.route("/payroll-summary", methods=["GET"])
+def get_payroll_summary():
+    lead_id = request.args.get("lead", 0, type=int) or int(g.permission_actor.lead_id or 0)
+    lead = db.session.get(LeadPayload, lead_id)
+    if not lead:
+        abort(404, description="Lead not found")
+
+    month_arg = request.args.get("month", type=str)
+    from_month_arg = request.args.get("from_month", type=str)
+    to_month_arg = request.args.get("to_month", type=str)
+    from_month_dt, to_month_dt = _resolve_month_range(month_arg, from_month_arg, to_month_arg)
+
     date_start, _ = _month_start_end(from_month_dt)
     _, date_end = _month_start_end(to_month_dt)
 
@@ -162,13 +348,18 @@ def get_payroll_summary():
                     "total_bonus": 0,
                     "total_punish": 0,
                     "total_advance": 0,
+                    "total_allowance": 0,
+                    "total_bhyt": 0,
+                    "total_bhxh": 0,
                     "total_net_salary": 0,
                 },
+                "adjustments": [],
             }
         )
 
     workpoint_setting = WorkpointSetting.query.filter_by(lead_id=lead_id).first()
-    overtime_ratio = float(getattr(workpoint_setting, "multiply_in_night_overtime", 1.5) or 1.5)
+    night_overtime_ratio = float(getattr(workpoint_setting, "multiply_in_night_overtime", 1.5) or 1.5)
+    sunday_overtime_ratio = float(getattr(workpoint_setting, "multiply_in_sun_overtime", 2.0) or 2.0)
 
     all_workpoints = (
         Workpoint.query.filter(
@@ -229,6 +420,22 @@ def get_payroll_summary():
             user_salary = float(users_by_id[uid].salary or 0)
             reward_by_user[uid] += reward_value * user_salary / total_agent_salary
 
+    all_adjustments = (
+        PayrollAdjustment.query.filter(
+            PayrollAdjustment.lead_id == lead_id,
+            PayrollAdjustment.user_id.in_(user_ids),
+            PayrollAdjustment.deletedAt.is_(None),
+            PayrollAdjustment.entry_date >= date_start.date(),
+            PayrollAdjustment.entry_date <= date_end.date(),
+        )
+        .order_by(PayrollAdjustment.entry_date.asc(), PayrollAdjustment.createdAt.asc())
+        .all()
+    )
+    adjustments_by_user: dict[str, list[PayrollAdjustment]] = defaultdict(list)
+    for item in all_adjustments:
+        if item.user_id:
+            adjustments_by_user[item.user_id].append(item)
+
     rows = []
     summary = {
         "from_month": from_month_dt.strftime("%Y-%m"),
@@ -241,6 +448,9 @@ def get_payroll_summary():
         "total_bonus": 0.0,
         "total_punish": 0.0,
         "total_advance": 0.0,
+        "total_allowance": 0.0,
+        "total_bhyt": 0.0,
+        "total_bhxh": 0.0,
         "total_net_salary": 0.0,
     }
 
@@ -250,6 +460,9 @@ def get_payroll_summary():
         role_name = (user.update_role() or {}).get("name", "")
         is_supplier = (user.role_id or 0) > 100
         salary = float(user.salary or 0)
+        allowance = float(getattr(user, "allowance", 0) or 0)
+        bhyt = float(getattr(user, "bhyt", 0) or 0)
+        bhxh = float(getattr(user, "bhxh", 0) or 0)
         period_work = 0
         work_hours = 0.0
         overtime_hours = 0.0
@@ -264,30 +477,54 @@ def get_payroll_summary():
             month_period_work = 0
             month_work_hours = 0.0
             month_overtime_hours = 0.0
+            month_night_overtime_hours = 0.0
+            month_sunday_overtime_hours = 0.0
+            work_in_sunday = bool(getattr(workpoint_setting, "work_in_sunday", False))
 
             for wp in by_user_workpoints.get(user.id, []):
                 if not wp.createdAt or wp.createdAt < month_start or wp.createdAt > month_end:
                     continue
                 checklist = wp.checklist or {}
 
+                # Xác định ngày Chủ nhật (weekday 6 = CN)
+                is_sunday = wp.createdAt.weekday() == 6
+
                 morning = checklist.get("morning") if isinstance(checklist, dict) else None
-                noon = checklist.get("noon") if isinstance(checklist, dict) else None
+                noon    = checklist.get("noon")    if isinstance(checklist, dict) else None
                 evening = checklist.get("evening") if isinstance(checklist, dict) else None
 
-                if isinstance(morning, dict) and morning.get("in"):
-                    month_period_work += 1
-                    month_work_hours += _workhour_from_period(morning, "morning")
-                if isinstance(noon, dict) and noon.get("in"):
-                    month_period_work += 1
-                    month_work_hours += _workhour_from_period(noon, "noon")
-                if isinstance(evening, dict) and evening.get("in"):
-                    month_overtime_hours += _workhour_from_period(evening, "evening")
+                if is_sunday and not work_in_sunday:
+                    # Toàn bộ ngày CN (không cấu hình làm CN) → tất cả buổi đều tính TĂNG CA
+                    for period_data, period_name in [(morning, "morning"), (noon, "noon"), (evening, "evening")]:
+                        if isinstance(period_data, dict) and period_data.get("in"):
+                            # Chỉ tính giờ nếu có check-out, nếu không có thì dùng default
+                            overtime_value = _actual_overtime_hours(period_data)
+                            month_overtime_hours += overtime_value
+                            month_sunday_overtime_hours += overtime_value
+                else:
+                    # Ngày bình thường
+                    # Sáng / chiều: tính bình thường dù chỉ check-in không check-out
+                    if isinstance(morning, dict) and morning.get("in"):
+                        month_period_work += 1
+                        month_work_hours += _workhour_from_period(morning, "morning")
+                    if isinstance(noon, dict) and noon.get("in"):
+                        month_period_work += 1
+                        month_work_hours += _workhour_from_period(noon, "noon")
+                    # Tối (evening): CHỈ tính tăng ca nếu có check-in TỐI (màu vàng)
+                    # Check-in tối không check-out → vẫn nhân hệ số (đây là trường hợp tăng ca thực sự)
+                    if isinstance(evening, dict) and evening.get("in"):
+                        overtime_value = _actual_overtime_hours(evening)
+                        month_overtime_hours += overtime_value
+                        month_night_overtime_hours += overtime_value
 
             period_work += month_period_work
             work_hours += month_work_hours
             overtime_hours += month_overtime_hours
             base_salary_total += salary_unit * 4 * month_period_work
-            overtime_salary_total += salary_unit * overtime_ratio * month_overtime_hours
+            overtime_salary_total += (
+                salary_unit * night_overtime_ratio * month_night_overtime_hours
+                + salary_unit * sunday_overtime_ratio * month_sunday_overtime_hours
+            )
 
         bonus = 0.0
         punish = 0.0
@@ -305,7 +542,7 @@ def get_payroll_summary():
 
         task_reward = float(reward_by_user.get(user.id, 0))
         total_bonus = bonus + task_reward
-        net_salary = base_salary_total + overtime_salary_total + total_bonus + punish + advance
+        net_salary = base_salary_total + overtime_salary_total + total_bonus + allowance + punish - advance - bhyt - bhxh
 
         row = {
             "user_id": user.id,
@@ -313,6 +550,7 @@ def get_payroll_summary():
             "phone": user.phone or "",
             "department": role_name or ("Thầu phụ" if is_supplier else "Nhân sự"),
             "group_type": "supplier" if is_supplier else "staff",
+            "bank_account": user.bankAccount or "",
             "salary_base": salary,
             "period_work": period_work,
             "work_hours": round(work_hours, 2),
@@ -322,8 +560,12 @@ def get_payroll_summary():
             "bonus_total": round(total_bonus, 0),
             "punish_total": round(punish, 0),
             "advance_total": round(advance, 0),
+            "allowance": round(allowance, 0),
+            "bhyt": round(bhyt, 0),
+            "bhxh": round(bhxh, 0),
             "net_salary": round(net_salary, 0),
         }
+        row = _apply_payroll_adjustments(row, _sum_payroll_adjustments(adjustments_by_user.get(user.id, [])))
         rows.append(row)
 
         summary["total_people"] += 1
@@ -336,6 +578,9 @@ def get_payroll_summary():
         summary["total_bonus"] += row["bonus_total"]
         summary["total_punish"] += row["punish_total"]
         summary["total_advance"] += row["advance_total"]
+        summary["total_allowance"] += row["allowance"]
+        summary["total_bhyt"] += row["bhyt"]
+        summary["total_bhxh"] += row["bhxh"]
         summary["total_net_salary"] += row["net_salary"]
 
     rows.sort(key=lambda r: (r.get("group_type") or "", (r.get("full_name") or "")))
@@ -346,6 +591,9 @@ def get_payroll_summary():
         "total_bonus",
         "total_punish",
         "total_advance",
+        "total_allowance",
+        "total_bhyt",
+        "total_bhxh",
         "total_net_salary",
     ):
         summary[key] = round(float(summary[key]), 0)
@@ -361,6 +609,9 @@ def get_payroll_summary():
             "total_bonus": round(sum(float(r.get("bonus_total", 0) or 0) for r in group_rows), 0),
             "total_punish": round(sum(float(r.get("punish_total", 0) or 0) for r in group_rows), 0),
             "total_advance": round(sum(float(r.get("advance_total", 0) or 0) for r in group_rows), 0),
+            "total_allowance": round(sum(float(r.get("allowance", 0) or 0) for r in group_rows), 0),
+            "total_bhyt": round(sum(float(r.get("bhyt", 0) or 0) for r in group_rows), 0),
+            "total_bhxh": round(sum(float(r.get("bhxh", 0) or 0) for r in group_rows), 0),
             "total_net_salary": round(sum(float(r.get("net_salary", 0) or 0) for r in group_rows), 0),
         }
 
@@ -372,17 +623,137 @@ def get_payroll_summary():
             "summary": summary,
             "staff_summary": build_group_summary(staff_rows),
             "supplier_summary": build_group_summary(supplier_rows),
+            "adjustments": [_serialize_payroll_adjustment(item) for item in all_adjustments],
         }
     ), 200
 
+
+@workpoint_bp.route("/payroll-adjustments", methods=["GET"])
+def get_payroll_adjustments():
+    lead_id = request.args.get("lead", 0, type=int) or int(g.permission_actor.lead_id or 0)
+    lead = db.session.get(LeadPayload, lead_id)
+    if not lead:
+        abort(404, description="Lead not found")
+
+    user_id = (request.args.get("user_id", type=str) or "").strip()
+    month_arg = request.args.get("month", type=str)
+    from_month_arg = request.args.get("from_month", type=str)
+    to_month_arg = request.args.get("to_month", type=str)
+    from_month_dt, to_month_dt = _resolve_month_range(month_arg, from_month_arg, to_month_arg)
+    date_start, _ = _month_start_end(from_month_dt)
+    _, date_end = _month_start_end(to_month_dt)
+
+    query = PayrollAdjustment.query.filter(
+        PayrollAdjustment.lead_id == lead_id,
+        PayrollAdjustment.deletedAt.is_(None),
+        PayrollAdjustment.entry_date >= date_start.date(),
+        PayrollAdjustment.entry_date <= date_end.date(),
+    )
+    if user_id:
+        query = query.filter(PayrollAdjustment.user_id == user_id)
+
+    rows = query.order_by(PayrollAdjustment.entry_date.asc(), PayrollAdjustment.createdAt.asc()).all()
+    return jsonify({"rows": [_serialize_payroll_adjustment(item) for item in rows]}), 200
+
+
+@workpoint_bp.route("/payroll-adjustments", methods=["POST"])
+def create_payroll_adjustment():
+    data = request.get_json(silent=True) or {}
+    lead_id = int(data.get("lead_id") or data.get("lead") or g.permission_actor.lead_id or 0)
+    lead = db.session.get(LeadPayload, lead_id)
+    if not lead:
+        abort(404, description="Lead not found")
+
+    user_id = str(data.get("user_id") or "").strip()
+    user = User.query.filter(User.id == user_id, User.lead_id == lead_id).first()
+    if not user:
+        abort(404, description="User not found")
+
+    adjustment_type = _normalize_payroll_adjustment_type(data.get("type") or data.get("adjustment_type"))
+    if not adjustment_type:
+        abort(400, description="Invalid adjustment type")
+
+    amount = float(data.get("amount") or 0)
+    if amount <= 0:
+        abort(400, description="Amount must be greater than 0")
+
+    entry_date = _parse_entry_date(data.get("entry_date"))
+    if not entry_date:
+        abort(400, description="Invalid entry date")
+
+    adjustment = PayrollAdjustment(
+        id=generate_datetime_id(),
+        lead_id=lead_id,
+        user_id=user_id,
+        adjustment_type=adjustment_type,
+        entry_date=entry_date,
+        amount=amount,
+        note=(str(data.get("note") or "").strip() or None),
+    )
+    db.session.add(adjustment)
+    db.session.commit()
+    return jsonify(_serialize_payroll_adjustment(adjustment)), 201
+
+
+@workpoint_bp.route("/payroll-adjustments/<adjustment_id>", methods=["PUT"])
+def update_payroll_adjustment(adjustment_id):
+    adjustment = db.session.get(PayrollAdjustment, adjustment_id)
+    if not adjustment or adjustment.deletedAt:
+        abort(404, description="Payroll adjustment not found")
+
+    data = request.get_json(silent=True) or {}
+    if "type" in data or "adjustment_type" in data:
+        adjustment_type = _normalize_payroll_adjustment_type(data.get("type") or data.get("adjustment_type"))
+        if not adjustment_type:
+            abort(400, description="Invalid adjustment type")
+        adjustment.adjustment_type = adjustment_type
+
+    if "amount" in data:
+        amount = float(data.get("amount") or 0)
+        if amount <= 0:
+            abort(400, description="Amount must be greater than 0")
+        adjustment.amount = amount
+
+    if "entry_date" in data:
+        entry_date = _parse_entry_date(data.get("entry_date"))
+        if not entry_date:
+            abort(400, description="Invalid entry date")
+        adjustment.entry_date = entry_date
+
+    if "note" in data:
+        adjustment.note = str(data.get("note") or "").strip() or None
+
+    db.session.commit()
+    return jsonify(_serialize_payroll_adjustment(adjustment)), 200
+
+
+@workpoint_bp.route("/payroll-adjustments/<adjustment_id>", methods=["DELETE"])
+def delete_payroll_adjustment(adjustment_id):
+    adjustment = db.session.get(PayrollAdjustment, adjustment_id)
+    if not adjustment or adjustment.deletedAt:
+        abort(404, description="Payroll adjustment not found")
+    adjustment.deletedAt = datetime.utcnow()
+    db.session.commit()
+    return jsonify({"success": True}), 200
+
 @workpoint_bp.route("/all", methods=["GET"])
 def get_all_workpoints():
-    workpoints = Workpoint.query.order_by(desc(Workpoint.createdAt)).all()
+    actor = g.permission_actor
+    user_ids = [
+        user.id
+        for user in User.query.filter(User.lead_id == actor.lead_id).all()
+    ]
+    workpoints = (
+        Workpoint.query
+        .filter(Workpoint.user_id.in_(user_ids))
+        .order_by(desc(Workpoint.createdAt))
+        .all()
+    )
     return jsonify([c.tdict() for c in workpoints])
 
 @workpoint_bp.route("/", methods=["GET"])
 def get_workpoints():
-    lead_id = request.args.get("lead", 0, type=int)
+    lead_id = request.args.get("lead", 0, type=int) or int(g.permission_actor.lead_id or 0)
     lead = db.session.get(LeadPayload, lead_id)
 
     if not lead:
@@ -485,7 +856,7 @@ def get_batch_workpoint_detail():
     from collections import defaultdict
 
     page = request.args.get("page", 1, type=int)
-    lead_id = request.args.get("lead", 0, type=int)
+    lead_id = request.args.get("lead", 0, type=int) or int(g.permission_actor.lead_id or 0)
 
 
 

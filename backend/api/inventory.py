@@ -3,7 +3,7 @@ from __future__ import annotations
 from collections import defaultdict
 from datetime import date, datetime, timedelta
 
-from flask import Blueprint, abort, jsonify, request
+from flask import Blueprint, abort, jsonify, request, g
 from sqlalchemy import or_
 
 from models import (
@@ -27,9 +27,32 @@ from models import (
     db,
     generate_datetime_id,
 )
+from permission_utils import ensure_resource_lead, require_can_view
 
 
 inventory_bp = Blueprint("inventory", __name__, url_prefix="/api/inventory")
+
+
+@inventory_bp.before_request
+def guard_inventory_permission():
+    actor, _ = require_can_view("view_material")
+    g.permission_actor = actor
+
+    view_args = request.view_args or {}
+    resource_checks = (
+        ("category_id", ItemCategory, "inventory category"),
+        ("warehouse_id", Warehouse, "warehouse"),
+        ("item_id", InventoryItem, "inventory item"),
+        ("transaction_id", StockTransaction, "stock transaction"),
+    )
+    for arg_name, model, resource_name in resource_checks:
+        resource_id = view_args.get(arg_name)
+        if not resource_id:
+            continue
+        resource = db.session.get(model, resource_id)
+        if resource:
+            ensure_resource_lead(resource, actor, resource_name)
+        break
 
 ITEM_TYPES = ["raw_material", "merchandise", "semi_finished", "finished_goods"]
 CATEGORY_STATUS = ["active", "inactive"]
@@ -939,7 +962,7 @@ def list_items():
     lead_id = request.args.get("lead", type=int) or request.args.get("lead_id", type=int)
     _require_lead(lead_id)
     page = request.args.get("page", 1, type=int)
-    limit = request.args.get("limit", 20, type=int)
+    limit = request.args.get("limit", 50, type=int)
     search = _clean_text(request.args.get("search"))
     category_id = _clean_text(request.args.get("category_id"))
     warehouse_id = _clean_text(request.args.get("warehouse_id"))
@@ -1061,6 +1084,18 @@ def update_item(item_id: str):
     item = InventoryItem.query.filter(InventoryItem.deletedAt.is_(None), InventoryItem.id == item_id).first()
     if not item:
         abort(404, description="Item not found")
+    if data.get("code") is not None:
+        code = (_clean_text(data.get("code")) or "").upper()
+        if not code:
+            abort(400, description="code is required")
+        if InventoryItem.query.filter(
+            InventoryItem.deletedAt.is_(None),
+            InventoryItem.lead_id == item.lead_id,
+            InventoryItem.code == code,
+            InventoryItem.id != item.id,
+        ).first():
+            abort(400, description="Item code already exists")
+        item.code = code
     if data.get("name") is not None:
         item.name = _clean_text(data.get("name"))
     if data.get("sku") is not None:

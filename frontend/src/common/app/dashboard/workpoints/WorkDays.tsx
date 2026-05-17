@@ -8,6 +8,7 @@ import { CenterBox } from "../../../components/chat/components/commons/TitlePane
 import type { Workpoint, WorkDaysProps, PeriodData, Checklist } from "../../../@types/workpoint";
 import DeleteConfirm from "../../../components/DeleteConfirm";
 import dayjs from "dayjs";
+import { useWorkpointSetting } from "../../../common/hooks/useWorkpointSetting";
 import {
   buildMonthlyStatuses,
   createEmptyStatuses,
@@ -56,8 +57,20 @@ interface ParamWorkDaysProps {
   selectedMonth?: string;
 }
 
+function resolveStaticImageUrl(staticBase: string, imagePath?: string | null): string {
+  const raw = (imagePath || "").trim();
+  if (!raw) return "";
+  if (raw.startsWith("http://") || raw.startsWith("https://")) return raw;
+  if (raw.startsWith("/api/static/") || raw.startsWith("/static/")) return raw;
+  if (raw.startsWith("uploads/") || raw.startsWith("thumbs/")) return `${staticBase}/${raw}`;
+  if (raw.startsWith("/")) return `${staticBase}${raw}`;
+  return `${staticBase}/${raw}`;
+}
+
 export default function WorkDays({ record, selectedMonth }: ParamWorkDaysProps) {
   const { items, leaves, username } = record;
+  const { workpointSetting } = useWorkpointSetting();
+  const workInSunday = !!(workpointSetting?.work_in_sunday);
 
   const baseDate = selectedMonth
     ? dayjs(`${selectedMonth}-01`, "YYYY-MM-DD").toDate()
@@ -68,6 +81,7 @@ export default function WorkDays({ record, selectedMonth }: ParamWorkDaysProps) 
   const daysInMonth = new Date(year, month + 1, 0).getDate();
   const todayDate = new Date().getDate();
 
+  const staticBase = useApiStatic();
   const [totalHour, setTotalHour] = useState<{ morning: number; noon: number; evening: number } | null>(null);
   const [mainData, setMainData] = useState<Workpoint[]>([]);
   const [modalImg, setModalImg] = useState<PeriodData | null>(null);
@@ -85,17 +99,20 @@ export default function WorkDays({ record, selectedMonth }: ParamWorkDaysProps) 
       year,
       month,
       daysInMonth,
+      workInSunday,
     });
 
     setTotalHour(total);
     setStatuses(monthlyStatuses);
-  }, [items, leaves, year, month, daysInMonth]);
+  }, [items, leaves, year, month, daysInMonth, workInSunday]);
 
-  type StatusKey = "in" | "out" | "off" | "null";
+  type StatusKey = "in" | "out" | "overtime-in" | "overtime-out" | "off" | "null";
 
   const colors: Record<StatusKey, string> = {
     in: "green",
     out: "red",
+    "overtime-in": "#FFA000",   // vàng — tăng ca check-in
+    "overtime-out": "#FFA000",  // vàng — tăng ca check-out
     off: "#999",
     null: "white",
   };
@@ -275,7 +292,7 @@ export default function WorkDays({ record, selectedMonth }: ParamWorkDaysProps) 
               <Stack>
                 <Typography textAlign="center">Check in {modalImg.in.time}</Typography>
                 <img
-                  src={`${useApiStatic()}/${modalImg.in.img}`}
+                  src={resolveStaticImageUrl(staticBase, modalImg.in.img)}
                   alt="Check-in"
                   style={{ maxHeight: "80vh", minWidth: 300, borderRadius: 8, marginBottom: 8, cursor: "pointer" }}
                   onClick={(e) => {
@@ -300,7 +317,7 @@ export default function WorkDays({ record, selectedMonth }: ParamWorkDaysProps) 
               <Stack>
                 <Typography textAlign="center">Check out {modalImg.out.time}</Typography>
                 <img
-                  src={`${useApiStatic()}/${modalImg.out.img}`}
+                  src={resolveStaticImageUrl(staticBase, modalImg.out.img)}
                   alt="Check-out"
                   style={{ maxHeight: "80vh", minWidth: 300, borderRadius: 8, marginBottom: 8, cursor: "pointer" }}
                   onClick={(e) => {

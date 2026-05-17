@@ -11,3 +11,22 @@ Include/
 Lib/
 Scripts/
 .pm2
+
+# Large binary files
+*.tgz
+*.dump
+*.tar.gz
+*.zip
+backend_from_vps/
+backend_from_vps_live/
+
+# Python
+backend/.venv/
+backend/__pycache__/
+backend/api/__pycache__/
+__pycache__/
+
+# Temp
+.codex_tmp/
+.dev-logs/
+frontend/.dev-logs/

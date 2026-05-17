@@ -1,11 +1,11 @@
-import React, { useEffect } from "react";
-import { Form, Input, Tag, Typography } from "antd";
-import { ProjectOutlined } from "@ant-design/icons";
-import {Stack, Box} from "@mui/material";
+import React, { useEffect, useRef } from "react";
+import { Form, Input } from "antd";
+import { Stack } from "@mui/material";
 import type { Task } from "../../../../@types/work-space.type";
 import { useUser } from "../../../../common/hooks/useUser";
-
-const { Text } = Typography;
+import UploadIconButton, { type UploadIconButtonHandle } from "./UploadIconButton";
+import { useApiHost } from "../../../../common/hooks/useApiHost";
+import { useTaskContext } from "../../../../common/hooks/useTask";
 
 export type StatusType = "OPEN" | "IN_PROGRESS" | "DONE" | "REWARD" | string;
 
@@ -18,56 +18,67 @@ interface JobInfoCardProps {
   currentStatus: StatusType;
   taskDetail: Task | null;
   form: any; // form instance từ Form.useForm()
+  uploadIconRef?: React.RefObject<UploadIconButtonHandle | null>;
 }
 
-const JobInfoCard: React.FC<JobInfoCardProps> = ({ currentStatus, taskDetail, form }) => {
-  const {isMobile} = useUser();
+const JobInfoCard: React.FC<JobInfoCardProps> = ({ currentStatus, taskDetail, form, uploadIconRef }) => {
+  const { isMobile } = useUser();
+  const { setTaskDetail } = useTaskContext();
+  const apiHost = useApiHost();
+  const syncedTaskIdRef = useRef<string | null>(null);
+
   useEffect(() => {
-    if (taskDetail) {
-      form.setFieldsValue({
-        title: taskDetail.title || "",
-        // có thể set thêm các trường khác
-      });
-    }else{
-      form.setFieldsValue({
-        title: "",
-        // có thể set thêm các trường khác
-      });
-    }
-  }, [taskDetail, form]);
+    const nextTaskId = taskDetail?.id ?? null;
+    if (syncedTaskIdRef.current === nextTaskId) return;
+
+    syncedTaskIdRef.current = nextTaskId;
+    form.setFieldsValue({
+      title: taskDetail?.title || "",
+    });
+  }, [taskDetail?.id, taskDetail?.title, form]);
 
   return (
-    <Stack style={{minWidth:400}}>
-      <div className="flex items-center gap-2 mb-2 sm:mb-3">
-        <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-md bg-gradient-to-r from-cyan-500/10 to-cyan-600/10 flex items-center justify-center">
-          <ProjectOutlined className="!text-cyan-600 !text-xs sm:!text-sm" />
-        </div>
-        <Text strong className="!text-gray-800 !text-sm sm:!text-base">
-          Thông tin
-        </Text>
-      </div>
+    <Stack spacing={4} sx={{ width: '100%' }}>
+      {/* Khối Thông tin */}
+      <Form.Item
+        name="title"
+        rules={[
+          { required: true, message: "Vui lòng nhập tên công việc" },
+          { min: 3, message: "Ít nhất 3 ký tự" },
+        ]}
+        className="!mb-0 w-full"
+      >
+        <Input
+          placeholder="Nhập tên công việc..."
+          className="w-full !h-9 sm:!h-10 !text-xs sm:!text-sm !rounded-lg !border !border-gray-300 focus:!border-cyan-500 focus:!shadow-lg hover:!border-cyan-500 !transition-all !duration-200 !shadow-sm !font-semibold"
+          size="middle"
+        />
+      </Form.Item>
 
-      <Stack direction="row" spacing={1}>
-        <Form.Item
-          name="title"
-          
-          rules={[
-            { required: true, message: "Vui lòng nhập tên công việc" },
-            { min: 3, message: "Ít nhất 3 ký tự" },
-          ]}
-          className="!mb-0 w-110"
-        >
-          <Input
-            placeholder="Nhập tên công việc..."
-            className="w-full !h-9 sm:!h-10 !text-xs sm:!text-sm !rounded-lg !border !border-gray-300 focus:!border-cyan-500 focus:!shadow-lg hover:!border-cyan-500 !transition-all !duration-200 !shadow-sm"
-            style={{maxWidth:'80vw'}}
-            size="middle"
-          />
-        </Form.Item>
+      {/* Gallery ảnh (không label) */}
+      <UploadIconButton
+        ref={uploadIconRef}
+        taskDetail={taskDetail}
+        apiUrl={`${apiHost}/task/${taskDetail?.id}/upload-icon`}
+        onIconsChange={(newIcons) => {
+          const nextValue = newIcons.length > 0 ? JSON.stringify(newIcons) : null;
 
-      </Stack>
+          setTaskDetail(prev => {
+            if (!prev) {
+              return prev;
+            }
+
+            return {
+              ...prev,
+              icon: nextValue ?? undefined,
+            } as Task;
+          });
+
+          form.setFieldValue('icon', nextValue);
+        }}
+      />
     </Stack>
-    
+
   );
 };
 

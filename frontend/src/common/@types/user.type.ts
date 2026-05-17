@@ -26,6 +26,9 @@ export type User = BaseEntity & {
   role_id: number;
   avatar?: string;
   salary?: number;
+  allowance?: number;
+  bhyt?: number;
+  bhxh?: number;
   total_salary?: number;
 
   gender: number,

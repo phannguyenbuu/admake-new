@@ -11,12 +11,14 @@ export default function ButtonComponent({
   title,
   loading = false,
   onSearch,
+  extraButtons,
 }: {
   toggle: () => void;
   refetch: () => void;
   title: string;
   loading?: boolean;
   onSearch?: (value: string) => void;
+  extraButtons?: React.ReactNode;
 }) {
   return (
     <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 bg-white px-4 sm:px-6 py-3 sm:py-4 mb-4 rounded-xl shadow-lg">
@@ -42,7 +44,9 @@ export default function ButtonComponent({
             {loading ? "Đang tải..." : "Tải lại"}
           </span>
         </Button>
+        {extraButtons}
       </div>
+
       <div className="w-full sm:w-auto">
         <Input
           placeholder="Tìm kiếm..."

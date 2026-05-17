@@ -83,6 +83,19 @@ CORS(
     allow_headers=["Content-Type", "Authorization"],
 )
 
+# ── Global JSON error handler ────────────────────────────────────────────────
+from werkzeug.exceptions import HTTPException
+
+@app.errorhandler(HTTPException)
+def handle_http_exception(e):
+    """Trả về JSON thay vì HTML cho tất cả HTTP errors (400, 404, 403, 500 ...)"""
+    return jsonify({
+        "code": e.code,
+        "description": e.description,
+        "name": e.name,
+    }), e.code
+# ─────────────────────────────────────────────────────────────────────────────
+
 @app.route('/login', methods=['GET'])
 def login_page():
     return render_template('login.html')

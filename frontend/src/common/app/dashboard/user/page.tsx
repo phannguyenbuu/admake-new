@@ -11,6 +11,7 @@ import { columnsUser } from "../../../common/data";
 import { useDebounce } from "../../../common/hooks/useDebounce";
 import { useUser } from "../../../common/hooks/useUser";
 import UnPermissionBoard from "../unPermissionBoard";
+import RoleSettings from "./RoleSettings";
 
 const UserDashboard: IPage["Component"] = () => {
   const [config, setConfig] = useState({
@@ -18,7 +19,7 @@ const UserDashboard: IPage["Component"] = () => {
     openUpdate: false,
   });
 
-  const {userId, username, userRoleId, userRole, userLeadId, canViewPermission } = useUser();
+  const { userId, username, userRoleId, userRole, userLeadId, canViewPermission } = useUser();
   const [query, setQuery] = useState<Partial<PaginationDto>>({
     page: 1,
     limit: 10,
@@ -30,7 +31,7 @@ const UserDashboard: IPage["Component"] = () => {
   // Debounce search value
   const debouncedSearch = useDebounce(query.search, 500);
 
-  const {data: users,isLoading: isLoadingUsers,refetch,
+  const { data: users, isLoading: isLoadingUsers, refetch,
   } = useUserQuery({ ...query, search: debouncedSearch });
   const userRows = Array.isArray((users as any)?.data?.data)
     ? (users as any).data.data
@@ -52,10 +53,9 @@ const UserDashboard: IPage["Component"] = () => {
     }
   };
 
-  useEffect(()=>
-  {
+  useEffect(() => {
     console.log('CVS', canViewPermission);
-  },[canViewPermission]);
+  }, [canViewPermission]);
 
   useEffect(() => {
     if (!userLeadId || userLeadId <= 0) return;
@@ -87,6 +87,7 @@ const UserDashboard: IPage["Component"] = () => {
         title="Thêm nhân sự"
         loading={isRefetching}
         onSearch={handleSearch}
+        extraButtons={<RoleSettings />}
       />
       <TableComponent<User>
         columns={columnsUser}
@@ -108,7 +109,7 @@ const UserDashboard: IPage["Component"] = () => {
           },
         }}
 
-        
+
         pagination={{
           pageSize: query.limit,
           current: query.page,
@@ -169,7 +170,7 @@ const UserDashboard: IPage["Component"] = () => {
         </div>
       )}
     </div>
-  ) : <UnPermissionBoard/>;
+  ) : <UnPermissionBoard />;
 };
 export const loader = async () => {
   // Simulate loading delay

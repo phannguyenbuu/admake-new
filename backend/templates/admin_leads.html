@@ -1,11 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>{{ labels.header_title or "Lead Management Dashboard" }}</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap"
+    rel="stylesheet">
 
   <style>
     :root {
@@ -17,6 +20,31 @@
       --accent-deep: #0b7f86;
       --card: #ffffff;
       --shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
+    }
+
+    .inline-edit {
+      width: 100%;
+      background: transparent;
+      border: 1px solid transparent;
+      border-radius: 4px;
+      padding: 0px 4px;
+      margin: 0px -4px;
+      font-size: inherit;
+      color: inherit;
+      font-family: inherit;
+      transition: all 0.2s;
+    }
+
+    .inline-edit:hover {
+      background: rgba(0, 0, 0, 0.03);
+      border-color: #cbd5e1;
+    }
+
+    .inline-edit:focus {
+      background: #fff;
+      border-color: var(--accent);
+      outline: none;
+      box-shadow: 0 0 0 2px rgba(10, 163, 166, 0.1);
     }
 
     body {
@@ -645,11 +673,11 @@
       gap: 6px;
     }
 
-    .landing-array-grid > .landing-block-title {
+    .landing-array-grid>.landing-block-title {
       grid-column: 1 / -1;
     }
 
-    .landing-array-grid > .landing-array-actions {
+    .landing-array-grid>.landing-array-actions {
       grid-column: 1 / -1;
     }
 
@@ -659,11 +687,11 @@
       gap: 6px;
     }
 
-    .landing-array-grid-2 > .landing-block-title {
+    .landing-array-grid-2>.landing-block-title {
       grid-column: 1 / -1;
     }
 
-    .landing-array-grid-2 > .landing-array-actions {
+    .landing-array-grid-2>.landing-array-actions {
       grid-column: 1 / -1;
     }
 
@@ -770,6 +798,7 @@
         opacity: 0;
         transform: translateY(12px);
       }
+
       to {
         opacity: 1;
         transform: translateY(0);
@@ -811,6 +840,7 @@
     }
   </style>
 </head>
+
 <body>
   <div class="shell">
     <aside class="sidebar">
@@ -842,8 +872,9 @@
             </div>
             <form class="search-box" method="get" style="flex-wrap: nowrap;">
               <input class="form-control" type="text" name="q" id="leadSearchInput" value="{{ query_text }}"
-                     placeholder="{{ labels.search_placeholder or "Search by lead name, company, or mobile" }}" />
-              <button class="search-clear {% if not query_text %}is-hidden{% endif %}" type="button" id="leadSearchClear">x</button>
+                placeholder="{{ labels.search_placeholder or " Search by lead name, company, or mobile" }}" />
+              <button class="search-clear {% if not query_text %}is-hidden{% endif %}" type="button"
+                id="leadSearchClear">x</button>
               <button class="btn btn-primary btn-sm" type="submit">{{ labels.search_button or "Search" }}</button>
             </form>
           </section>
@@ -856,7 +887,8 @@
             <div class="stat-card">
               <h3>{{ labels.stats_assignable_customers or "Assignable + Customers" }}</h3>
               <p data-count="{{ total_users_all }}">0</p>
-              <small>{{ labels.stats_customers_label or "Customers" }}: <span data-count="{{ totals.customers }}">0</span></small>
+              <small>{{ labels.stats_customers_label or "Customers" }}: <span
+                  data-count="{{ totals.customers }}">0</span></small>
             </div>
             <div class="stat-card">
               <h3>{{ labels.stats_workspaces_tasks or "Workspaces + Tasks" }}</h3>
@@ -893,42 +925,186 @@
               </li>
               {% endfor %}
 
-              {% if page < total_pages %}
-              <li class="page-item">
+              {% if page < total_pages %} <li class="page-item">
                 <a class="page-link" href="?page={{ page + 1 }}&q={{ query_text }}" aria-label="Next">
                   <span aria-hidden="true">&raquo;</span>
                 </a>
-              </li>
-              {% endif %}
+                </li>
+                {% endif %}
             </ul>
           </nav>
+
+          <!-- ═══ FILTER / SORT BAR ═══ -->
+          <form method="get" id="filterForm" style="margin-bottom:12px;">
+            <input type="hidden" name="q" value="{{ query_text }}">
+            <input type="hidden" name="page" value="1">
+
+            <div
+              style="background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:14px 18px;display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;">
+
+              <!-- Sort -->
+              <div style="display:flex;flex-direction:column;gap:4px;min-width:130px;">
+                <label style="font-size:11px;color:#64748b;font-weight:600;">SẮP XẾP THEO</label>
+                <div style="display:flex;gap:6px;">
+                  <select name="sort_by" class="form-select form-select-sm" style="font-size:12px;">
+                    <option value="id" {% if sort_by=='id' %}selected{% endif %}>#ID</option>
+                    <option value="name" {% if sort_by=='name' %}selected{% endif %}>Tên lead</option>
+                    <option value="company" {% if sort_by=='company' %}selected{% endif %}>Công ty</option>
+                    <option value="phone" {% if sort_by=='phone' %}selected{% endif %}>SĐT</option>
+                  </select>
+                  <select name="sort_dir" class="form-select form-select-sm" style="font-size:12px;width:80px;">
+                    <option value="asc" {% if sort_dir=='asc' %}selected{% endif %}>↑ Tăng</option>
+                    <option value="desc" {% if sort_dir=='desc' %}selected{% endif %}>↓ Giảm</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Filter tên -->
+              <div style="display:flex;flex-direction:column;gap:4px;min-width:140px;">
+                <label style="font-size:11px;color:#64748b;font-weight:600;">TÊN LEAD</label>
+                <input class="form-control form-control-sm" name="f_name" value="{{ f_name }}" placeholder="Tìm tên…"
+                  style="font-size:12px;">
+              </div>
+
+              <!-- Filter công ty -->
+              <div style="display:flex;flex-direction:column;gap:4px;min-width:150px;">
+                <label style="font-size:11px;color:#64748b;font-weight:600;">CÔNG TY</label>
+                <input class="form-control form-control-sm" name="f_company" value="{{ f_company }}"
+                  placeholder="Tìm công ty…" style="font-size:12px;">
+              </div>
+
+              <!-- Filter SĐT -->
+              <div style="display:flex;flex-direction:column;gap:4px;min-width:120px;">
+                <label style="font-size:11px;color:#64748b;font-weight:600;">SĐT</label>
+                <input class="form-control form-control-sm" name="f_phone" value="{{ f_phone }}" placeholder="SĐT…"
+                  style="font-size:12px;">
+              </div>
+
+              <!-- Filter Invited -->
+              <div style="display:flex;flex-direction:column;gap:4px;">
+                <label style="font-size:11px;color:#64748b;font-weight:600;">INVITED</label>
+                <select name="f_invited" class="form-select form-select-sm" style="font-size:12px;width:100px;">
+                  <option value="" {% if f_invited=='' %}selected{% endif %}>Tất cả</option>
+                  <option value="1" {% if f_invited=='1' %}selected{% endif %}>✔ Có</option>
+                  <option value="0" {% if f_invited=='0' %}selected{% endif %}>✗ Chưa</option>
+                </select>
+              </div>
+
+              <!-- Filter Active -->
+              <div style="display:flex;flex-direction:column;gap:4px;">
+                <label style="font-size:11px;color:#64748b;font-weight:600;">ACTIVE</label>
+                <select name="f_active" class="form-select form-select-sm" style="font-size:12px;width:100px;">
+                  <option value="" {% if f_active=='' %}selected{% endif %}>Tất cả</option>
+                  <option value="1" {% if f_active=='1' %}selected{% endif %}>✔ Có</option>
+                  <option value="0" {% if f_active=='0' %}selected{% endif %}>✗ Chưa</option>
+                </select>
+              </div>
+
+              <!-- Filter khoảng ngày đăng nhập -->
+              <div style="display:flex;flex-direction:column;gap:4px;">
+                <label style="font-size:11px;color:#64748b;font-weight:600;">ĐĂNG NHẬP GẦN NHẤT (từ – đến)</label>
+                <div style="display:flex;gap:6px;align-items:center;">
+                  <input type="date" class="form-control form-control-sm" name="f_login_from" value="{{ f_login_from }}"
+                    style="font-size:12px;width:140px;">
+                  <span style="font-size:12px;color:#94a3b8;">–</span>
+                  <input type="date" class="form-control form-control-sm" name="f_login_to" value="{{ f_login_to }}"
+                    style="font-size:12px;width:140px;">
+                </div>
+              </div>
+
+              <!-- Buttons -->
+              <div style="display:flex;gap:6px;align-items:flex-end;">
+                <button type="submit" class="btn btn-primary btn-sm" style="font-size:12px;">🔍 Lọc</button>
+                <a href="/lead-manage/" class="btn btn-outline-secondary btn-sm" style="font-size:12px;">↺ Xoá lọc</a>
+              </div>
+
+            </div>
+          </form>
+
+          <!-- ═══ COLUMN HEADERS (sortable) ═══ -->
+          {% macro sort_link(col, label) %}
+          {% set next_dir = 'desc' if (sort_by == col and sort_dir == 'asc') else 'asc' %}
+          <a href="?sort_by={{ col }}&sort_dir={{ next_dir }}&q={{ query_text }}&f_name={{ f_name }}&f_company={{ f_company }}&f_phone={{ f_phone }}&f_invited={{ f_invited }}&f_active={{ f_active }}&f_login_from={{ f_login_from }}&f_login_to={{ f_login_to }}"
+            style="color:inherit;text-decoration:none;">
+            {{ label }}
+            {% if sort_by == col %}
+            {{ '↑' if sort_dir == 'asc' else '↓' }}
+            {% endif %}
+          </a>
+          {% endmacro %}
+
+          <div
+            style="display:flex;gap:12px;padding:6px 14px;background:#f1f5f9;border-radius:8px;font-size:11px;font-weight:700;color:#475569;letter-spacing:.04em;margin-bottom:4px;">
+            <span style="width:70px;flex-shrink:0;">{{ sort_link('id','#ID') }}</span>
+            <span style="width:200px;flex-shrink:0;">{{ sort_link('name','TÊN LEAD') }}</span>
+            <span style="width:180px;flex-shrink:0;">{{ sort_link('company','CÔNG TY') }}</span>
+            <span style="width:120px;flex-shrink:0;">{{ sort_link('phone','SĐT') }}</span>
+            <span style="width:180px;flex-shrink:0;">{{ sort_link('login','ĐĂNG NHẬP GẦN NHẤT') }}</span>
+          </div>
 
           <section class="lead-list">
             {% for lead in leads %}
             <article class="lead-card" data-lead-id="{{ lead.id }}" style="--i: {{ loop.index0 }};">
               <div class="lead-row">
-                <div class="lead-row-main">
-                  <span class="lead-id">{{ labels.lead_prefix or "Lead" }} #{{ lead.id }}</span>
-                  <span>{{ lead.company or 'N/A' }}</span>
-                  <span>{{ lead.phone or 'N/A' }}</span>
-                  <span>{{ lead.email or 'N/A' }}</span>
+                <div class="lead-row-main" style="align-items:center;">
+                  <span class="lead-id" style="width:70px;flex-shrink:0;">{{ labels.lead_prefix or "Lead" }} #{{ lead.id
+                    }}</span>
+                  <span style="width:200px;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"
+                    title="{{ lead.name or '' }}">
+                    <input type="text" class="inline-edit" data-field="name" data-lead-id="{{ lead.id }}"
+                      value="{{ lead.name or '' }}" placeholder="Tên lead">
+                  </span>
+                  <span style="width:180px;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"
+                    title="{{ lead.company or '' }}">
+                    <input type="text" class="inline-edit" data-field="company" data-lead-id="{{ lead.id }}"
+                      value="{{ lead.company or '' }}" placeholder="Công ty">
+                  </span>
+                  <span style="width:120px;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"
+                    title="{{ lead.phone or '' }}">
+                    <input type="text" class="inline-edit" data-field="phone" data-lead-id="{{ lead.id }}"
+                      value="{{ lead.phone or '' }}" placeholder="SĐT">
+                  </span>
+
+                  <!-- Last login badge -->
+                  <div style="width:180px;flex-shrink:0;">
+                    {% if lead.days_since_login is none %}
+                    <span
+                      style="font-size:11px;color:#94a3b8;background:#f1f5f9;border-radius:6px;padding:2px 8px;white-space:nowrap;">⏺
+                      Chưa có dữ liệu</span>
+                    {% elif lead.days_since_login > 30 %}
+                    <span
+                      style="font-size:11px;color:#ef4444;background:#fef2f2;border:1px solid #fecaca;border-radius:6px;padding:2px 8px;white-space:nowrap;font-weight:600;">🔴
+                      {{ lead.days_since_login }} ngày chưa vào</span>
+                    {% elif lead.days_since_login > 7 %}
+                    <span
+                      style="font-size:11px;color:#f97316;background:#fff7ed;border:1px solid #fed7aa;border-radius:6px;padding:2px 8px;white-space:nowrap;">🟠
+                      {{ lead.days_since_login }} ngày chưa vào</span>
+                    {% else %}
+                    <span
+                      style="font-size:11px;color:#64748b;background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;padding:2px 8px;white-space:nowrap;">🟢
+                      {{ lead.days_since_login }} ngày trước</span>
+                    {% endif %}
+                  </div>
                 </div>
                 <div class="lead-row-actions">
                   <div class="lead-status">
                     <label>
-                      <input type="checkbox" name="selected_leads" value="{{ lead.id }}" {% if lead.isInvited %}checked{% endif %} />
+                      <input type="checkbox" name="selected_leads" value="{{ lead.id }}" {% if lead.isInvited
+                        %}checked{% endif %} />
                       {{ labels.status_invited or "Invited" }}
                     </label>
                     <label>
-                      <input type="checkbox" name="activated_leads" value="{{ lead.id }}" {% if lead.isActivated %}checked{% endif %} />
+                      <input type="checkbox" name="activated_leads" value="{{ lead.id }}" {% if lead.isActivated
+                        %}checked{% endif %} />
                       {{ labels.status_active or "Active" }}
                     </label>
                   </div>
                   <div class="level-control" data-lead-id="{{ lead.id }}" data-level="{{ lead.level or 0 }}">
                     <div class="level-stars">
                       {% for lvl in range(0, 4) %}
-                      <button type="button" class="level-star {% if lvl == 0 %}is-first{% endif %} {% if (lead.level or 0) == lvl %}is-selected{% endif %}"
-                              data-level="{{ lvl }}" aria-label="Level {{ lvl }}">
+                      <button type="button"
+                        class="level-star {% if lvl == 0 %}is-first{% endif %} {% if (lead.level or 0) == lvl %}is-selected{% endif %}"
+                        data-level="{{ lvl }}" aria-label="Level {{ lvl }}">
                         <svg viewBox="0 0 24 24" aria-hidden="true">
                           <path d="M12 2.6l2.6 5.3 5.9.9-4.3 4.2 1 5.9-5.2-2.8-5.2 2.8 1-5.9-4.3-4.2 5.9-.9L12 2.6z" />
                         </svg>
@@ -936,18 +1112,26 @@
                       {% endfor %}
                     </div>
                   </div>
-                  <button class="btn btn-sm btn-outline-secondary toggle-details" type="button" aria-label="Toggle details">
+                  <button class="btn btn-sm btn-outline-danger delete-lead-btn" type="button" title="Delete lead"
+                    data-lead-id="{{ lead.id }}" style="padding:4px 8px;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <polyline points="3 6 5 6 21 6"></polyline>
+                      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                      <line x1="10" y1="11" x2="10" y2="17"></line>
+                      <line x1="14" y1="11" x2="14" y2="17"></line>
+                    </svg>
+                  </button>
+                  <button class="btn btn-sm btn-outline-secondary toggle-details" type="button"
+                    aria-label="Toggle details">
                     <span class="toggle-icon" aria-hidden="true">
                       <svg viewBox="0 0 24 24" role="img">
                         <path d="M4 8 L12 16 L20 8" />
                       </svg>
                     </span>
                   </button>
-                  <button class="btn btn-sm btn-outline-dark detail-btn" type="button"
-                          data-lead-id="{{ lead.id }}"
-                          data-lead-name="{{ lead.name or 'N/A' }}"
-                          data-company="{{ lead.company or 'N/A' }}"
-                          data-stats='{{ lead.stats | tojson }}'>
+                  <button class="btn btn-sm btn-outline-dark detail-btn" type="button" data-lead-id="{{ lead.id }}"
+                    data-lead-name="{{ lead.name or 'N/A' }}" data-company="{{ lead.company or 'N/A' }}"
+                    data-stats='{{ lead.stats | tojson }}'>
                     {{ labels.button_details or "Details" }}
                   </button>
                 </div>
@@ -961,42 +1145,49 @@
                   </div>
                   <div class="lead-block select-user">
                     <div class="label">{{ labels.section_assigned_user_customer or "Assigned User + Customer" }}</div>
-                    <select class="form-select form-select-sm" name="status-{{ lead.id }}"
-                            id="select-{{ lead.id }}" data-lead-id="{{ lead.id }}">
+                    <select class="form-select form-select-sm" name="status-{{ lead.id }}" id="select-{{ lead.id }}"
+                      data-lead-id="{{ lead.id }}">
                       <option value="">{{ labels.select_user_placeholder or "-- Select user --" }}</option>
                       {% for user in users %}
-                      <option value="{{ user.id }}"
-                              data-username="{{ user.username }}"
-                              data-password="{{ user.password }}"
-                              {% if user.id|string == lead.user_id_str %}selected{% endif %}>
+                      <option value="{{ user.id }}" data-username="{{ user.username }}"
+                        data-password="{{ user.password }}" {% if user.id|string==lead.user_id_str %}selected{% endif
+                        %}>
                         {{ user.username }}
                       </option>
                       {% endfor %}
                     </select>
                     <p id="username-display-{{ lead.id }}" class="username-display"></p>
                     <p id="password-display-{{ lead.id }}" class="password-display"></p>
-                    <div class="lead-meta">{{ labels.label_customers or "Customers" }}: <span class="value">{{ lead.stats.customers }}</span></div>
+                    <div class="lead-meta">{{ labels.label_customers or "Customers" }}: <span class="value">{{
+                        lead.stats.customers }}</span></div>
                   </div>
                   <div class="lead-block">
                     <div class="label">{{ labels.section_company or "Company" }}</div>
                     <div class="value">{{ lead.company or 'N/A' }}</div>
-                    <div class="lead-meta">{{ labels.label_company_size or "Size" }}: <span class="value">{{ lead.companySize or 'N/A' }}</span></div>
+                    <div class="lead-meta">{{ labels.label_company_size or "Size" }}: <span class="value">{{
+                        lead.companySize or 'N/A' }}</span></div>
                   </div>
                   <div class="lead-block">
                     <div class="label">{{ labels.section_contact or "Contact" }}</div>
                     <div class="value">{{ lead.phone or 'N/A' }}</div>
-                    <div class="lead-meta">{{ labels.label_email or "Email" }}: <span class="value">{{ lead.email or 'N/A' }}</span></div>
+                    <div class="lead-meta">{{ labels.label_email or "Email" }}: <span class="value">{{ lead.email or
+                        'N/A' }}</span></div>
                   </div>
                   <div class="lead-block">
                     <div class="label">{{ labels.section_workspaces_tasks or "Workspaces + Tasks" }}</div>
-                    <div class="lead-meta">{{ labels.label_workspaces or "Workspaces" }}: <span class="value">{{ lead.stats.workspaces }}</span></div>
-                    <div class="lead-meta">{{ labels.label_tasks or "Tasks" }}: <span class="value">{{ lead.stats.tasks }}</span></div>
+                    <div class="lead-meta">{{ labels.label_workspaces or "Workspaces" }}: <span class="value">{{
+                        lead.stats.workspaces }}</span></div>
+                    <div class="lead-meta">{{ labels.label_tasks or "Tasks" }}: <span class="value">{{ lead.stats.tasks
+                        }}</span></div>
                   </div>
                   <div class="lead-block">
                     <div class="label">{{ labels.section_activity or "Activity" }}</div>
-                    <div class="lead-meta">{{ labels.label_messages or "Messages" }}: <span class="value">{{ lead.stats.messages }}</span></div>
-                    <div class="lead-meta">{{ labels.label_workpoints or "Workpoints" }}: <span class="value">{{ lead.stats.workpoints }}</span></div>
-                    <div class="lead-meta">{{ labels.label_leaves or "Leaves" }}: <span class="value">{{ lead.stats.leaves }}</span></div>
+                    <div class="lead-meta">{{ labels.label_messages or "Messages" }}: <span class="value">{{
+                        lead.stats.messages }}</span></div>
+                    <div class="lead-meta">{{ labels.label_workpoints or "Workpoints" }}: <span class="value">{{
+                        lead.stats.workpoints }}</span></div>
+                    <div class="lead-meta">{{ labels.label_leaves or "Leaves" }}: <span class="value">{{
+                        lead.stats.leaves }}</span></div>
                   </div>
                   <div class="lead-block">
                     <div class="label">{{ labels.section_balance or "Balance" }}</div>
@@ -1004,9 +1195,12 @@
                   </div>
                   <div class="lead-block">
                     <div class="label">{{ labels.section_dates or "Dates" }}</div>
-                    <div class="lead-meta">{{ labels.label_created or "Created" }}: <span class="value">{{ lead.createdAt }}</span></div>
-                    <div class="lead-meta">{{ labels.label_updated or "Updated" }}: <span class="value">{{ lead.updatedAt }}</span></div>
-                    <div class="lead-meta">{{ labels.label_expires or "Expires" }}: <span class="value" style="color: #c0392b;">{{ lead.expiredAt }}</span></div>
+                    <div class="lead-meta">{{ labels.label_created or "Created" }}: <span class="value">{{
+                        lead.createdAt }}</span></div>
+                    <div class="lead-meta">{{ labels.label_updated or "Updated" }}: <span class="value">{{
+                        lead.updatedAt }}</span></div>
+                    <div class="lead-meta">{{ labels.label_expires or "Expires" }}: <span class="value"
+                        style="color: #c0392b;">{{ lead.expiredAt }}</span></div>
                   </div>
                 </div>
               </div>
@@ -1057,8 +1251,10 @@
                   <div class="big-number" id="detailUsersTotal">0</div>
                   <div>{{ labels.modal_total_users or "Total Users" }}</div>
                   <div>{{ labels.modal_staff_users or "Staff Users" }}: <strong id="detailUsersStaff">0</strong></div>
-                  <div>{{ labels.modal_customer_role or "Customer Role" }}: <strong id="detailUsersCustomerRole">0</strong></div>
-                  <div>{{ labels.modal_customer_table or "Customer Table" }}: <strong id="detailCustomers">0</strong></div>
+                  <div>{{ labels.modal_customer_role or "Customer Role" }}: <strong
+                      id="detailUsersCustomerRole">0</strong></div>
+                  <div>{{ labels.modal_customer_table or "Customer Table" }}: <strong id="detailCustomers">0</strong>
+                  </div>
                 </div>
               </div>
             </div>
@@ -1079,11 +1275,16 @@
               <div class="lead-block">
                 <div class="label">{{ labels.modal_last_activity or "Last Activity" }}</div>
                 <div class="detail-meta">
-                  <div>{{ labels.modal_last_message or "Last Chat Message" }}: <strong id="detailLastMessage">N/A</strong></div>
-                  <div>{{ labels.modal_last_workspace or "Last Workspace Update" }}: <strong id="detailLastWorkspace">N/A</strong></div>
-                  <div>{{ labels.modal_last_task or "Last Task Update" }}: <strong id="detailLastTask">N/A</strong></div>
-                  <div>{{ labels.modal_last_user or "Last User Update" }}: <strong id="detailLastUser">N/A</strong></div>
-                  <div>{{ labels.modal_last_workpoint or "Last Workpoint Update" }}: <strong id="detailLastWorkpoint">N/A</strong></div>
+                  <div>{{ labels.modal_last_message or "Last Chat Message" }}: <strong
+                      id="detailLastMessage">N/A</strong></div>
+                  <div>{{ labels.modal_last_workspace or "Last Workspace Update" }}: <strong
+                      id="detailLastWorkspace">N/A</strong></div>
+                  <div>{{ labels.modal_last_task or "Last Task Update" }}: <strong id="detailLastTask">N/A</strong>
+                  </div>
+                  <div>{{ labels.modal_last_user or "Last User Update" }}: <strong id="detailLastUser">N/A</strong>
+                  </div>
+                  <div>{{ labels.modal_last_workpoint or "Last Workpoint Update" }}: <strong
+                      id="detailLastWorkpoint">N/A</strong></div>
                 </div>
               </div>
             </div>
@@ -1092,13 +1293,15 @@
                 <div class="label">{{ labels.modal_asset_images or "Recent Assets" }}</div>
                 <div class="detail-images" id="detailAssetImages"></div>
                 <div class="detail-gallery-controls">
-                  <button type="button" class="btn btn-sm btn-outline-secondary" id="detailGalleryPrev" aria-label="Previous">
+                  <button type="button" class="btn btn-sm btn-outline-secondary" id="detailGalleryPrev"
+                    aria-label="Previous">
                     <span class="gallery-arrow" aria-hidden="true">←</span>
                   </button>
                   <nav aria-label="Gallery pagination">
                     <ul class="pagination pagination-sm mb-0" id="detailGalleryPager"></ul>
                   </nav>
-                  <button type="button" class="btn btn-sm btn-outline-secondary" id="detailGalleryNext" aria-label="Next">
+                  <button type="button" class="btn btn-sm btn-outline-secondary" id="detailGalleryNext"
+                    aria-label="Next">
                     <span class="gallery-arrow" aria-hidden="true">→</span>
                   </button>
                 </div>
@@ -1107,7 +1310,8 @@
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ labels.modal_close or "Close" }}</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ labels.modal_close or "Close"
+            }}</button>
         </div>
       </div>
     </div>
@@ -1116,7 +1320,7 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
   <script>
-    document.addEventListener("DOMContentLoaded", function() {
+    document.addEventListener("DOMContentLoaded", function () {
       const tabButtons = document.querySelectorAll('.sidebar-link');
       const tabPanels = document.querySelectorAll('.tab-panel');
 
@@ -1643,21 +1847,21 @@
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(landingContent),
           })
-          .then(response => {
-            if (!response.ok) {
-              throw new Error('Save failed');
-            }
-            return response.json();
-          })
-          .then(() => {
-            setSaveStatus('Saved successfully.', 'success');
-          })
-          .catch(() => {
-            setSaveStatus('Save failed. Please retry.', 'error');
-          })
-          .finally(() => {
-            landingSaveBtn.disabled = false;
-          });
+            .then(response => {
+              if (!response.ok) {
+                throw new Error('Save failed');
+              }
+              return response.json();
+            })
+            .then(() => {
+              setSaveStatus('Saved successfully.', 'success');
+            })
+            .catch(() => {
+              setSaveStatus('Save failed. Please retry.', 'error');
+            })
+            .finally(() => {
+              landingSaveBtn.disabled = false;
+            });
         });
       }
 
@@ -1685,27 +1889,30 @@
             method: 'PUT',
             body: formData,
           })
-          .then(response => {
-            if (!response.ok) {
-              throw new Error('Upload failed');
-            }
-            return response.json();
-          })
-          .then((data) => {
-            setPricingImageStatus('Uploaded successfully.', 'success');
-            pricingImageFile.value = '';
-            const { pricingImagePath } = getPricingElements();
-            if (pricingImagePath) {
-              const imageValue = data?.path || landingContent?.pricing?.image;
-              pricingImagePath.textContent = imageValue ? `pricing.image (${imageValue})` : 'pricing.image';
-            }
-          })
-          .catch(() => {
-            setPricingImageStatus('Upload failed. Please retry.', 'error');
-          })
-          .finally(() => {
-            pricingImageUploadBtn.disabled = false;
-          });
+            .then(response => {
+              if (!response.ok) {
+                throw new Error('Upload failed');
+              }
+              return response.json();
+            })
+            .then((data) => {
+              setPricingImageStatus('Uploaded successfully.', 'success');
+              pricingImageFile.value = '';
+              if (landingContent?.pricing) {
+                landingContent.pricing.image = data?.path || landingContent.pricing.image;
+              }
+              const { pricingImagePath } = getPricingElements();
+              if (pricingImagePath) {
+                const imageValue = data?.path || landingContent?.pricing?.image;
+                pricingImagePath.textContent = imageValue ? `pricing.image (${imageValue})` : 'pricing.image';
+              }
+            })
+            .catch(() => {
+              setPricingImageStatus('Upload failed. Please retry.', 'error');
+            })
+            .finally(() => {
+              pricingImageUploadBtn.disabled = false;
+            });
         });
       };
 
@@ -1734,7 +1941,7 @@
       const checkboxes = document.querySelectorAll("input[name='selected_leads']");
 
       checkboxes.forEach(chk => {
-        chk.addEventListener('change', function() {
+        chk.addEventListener('change', function () {
           const leadId = this.value;
 
           fetch(`https://admake.vn/api/lead/${leadId}/check`, {
@@ -1744,22 +1951,22 @@
             },
             body: JSON.stringify({ isInvited: this.checked })
           })
-          .then(response => {
-            if (!response.ok) {
-              throw new Error('Update failed');
-            }
-            return response.json();
-          })
-          .catch(error => {
-            console.error('Update error:', error);
-          });
+            .then(response => {
+              if (!response.ok) {
+                throw new Error('Update failed');
+              }
+              return response.json();
+            })
+            .catch(error => {
+              console.error('Update error:', error);
+            });
         });
       });
 
       const activatedCheckboxes = document.querySelectorAll("input[name='activated_leads']");
 
       activatedCheckboxes.forEach(chk => {
-        chk.addEventListener('change', function() {
+        chk.addEventListener('change', function () {
           const leadId = this.value;
 
           fetch(`https://admake.vn/api/lead/${leadId}/activate`, {
@@ -1769,15 +1976,15 @@
             },
             body: JSON.stringify({ isActivated: this.checked })
           })
-          .then(response => {
-            if (!response.ok) {
-              throw new Error('Update failed');
-            }
-            return response.json();
-          })
-          .catch(error => {
-            console.error('Update error:', error);
-          });
+            .then(response => {
+              if (!response.ok) {
+                throw new Error('Update failed');
+              }
+              return response.json();
+            })
+            .catch(error => {
+              console.error('Update error:', error);
+            });
         });
       });
 
@@ -1788,7 +1995,7 @@
         const buttons = control.querySelectorAll('.level-star');
 
         buttons.forEach(button => {
-          button.addEventListener('click', function() {
+          button.addEventListener('click', function () {
             const level = Number(this.dataset.level);
 
             fetch(`https://admake.vn/api/lead/${leadId}/level`, {
@@ -1796,24 +2003,24 @@
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ level: level })
             })
-            .then(response => {
-              if (!response.ok) throw new Error('Update failed');
-              return response.json();
-            })
-            .then(() => {
-              buttons.forEach(btn => btn.classList.remove('is-selected'));
-              this.classList.add('is-selected');
-            })
-            .catch(error => {
-              console.error('Level update failed:', error);
-            });
+              .then(response => {
+                if (!response.ok) throw new Error('Update failed');
+                return response.json();
+              })
+              .then(() => {
+                buttons.forEach(btn => btn.classList.remove('is-selected'));
+                this.classList.add('is-selected');
+              })
+              .catch(error => {
+                console.error('Level update failed:', error);
+              });
           });
         });
       });
 
       const selects = document.querySelectorAll('select[id^="select-"]');
 
-      selects.forEach(function(selectElem) {
+      selects.forEach(function (selectElem) {
         const leadId = selectElem.dataset.leadId;
         const passwordDisplay = document.getElementById('password-display-' + leadId);
         const usernameDisplay = document.getElementById('username-display-' + leadId);
@@ -1829,7 +2036,7 @@
           passwordDisplay.textContent = selectedOption.getAttribute('data-password') || '';
         }
 
-        selectElem.addEventListener('change', function() {
+        selectElem.addEventListener('change', function () {
           const selectedOption = this.options[this.selectedIndex];
           const userId = selectedOption.value;
           usernameDisplay.textContent = selectedOption.getAttribute('data-username') || '';
@@ -1840,22 +2047,22 @@
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ user_id: userId || null })
           })
-          .then(response => {
-            if (!response.ok) throw new Error(`HTTP ${response.status}`);
-            return response.json();
-          })
-          .catch(error => {
-            console.error('Assign user failed:', error);
-            this.value = '';
-            usernameDisplay.textContent = '';
-            passwordDisplay.textContent = '';
-          });
+            .then(response => {
+              if (!response.ok) throw new Error(`HTTP ${response.status}`);
+              return response.json();
+            })
+            .catch(error => {
+              console.error('Assign user failed:', error);
+              this.value = '';
+              usernameDisplay.textContent = '';
+              passwordDisplay.textContent = '';
+            });
         });
       });
 
       const toggleButtons = document.querySelectorAll('.toggle-details');
       toggleButtons.forEach(btn => {
-        btn.addEventListener('click', function() {
+        btn.addEventListener('click', function () {
           const card = this.closest('.lead-card');
           if (!card) return;
           card.classList.toggle('is-expanded');
@@ -1983,7 +2190,7 @@
       }
 
       detailButtons.forEach(btn => {
-        btn.addEventListener('click', function() {
+        btn.addEventListener('click', function () {
           if (!detailModal) return;
           const stats = JSON.parse(this.dataset.stats || '{}');
 
@@ -2031,7 +2238,71 @@
           searchForm.submit();
         });
       }
+
+      // Inline Edit
+      document.querySelectorAll('.inline-edit').forEach(input => {
+        let originalValue = input.value;
+        input.addEventListener('blur', () => {
+          if (input.value !== originalValue) {
+            const field = input.getAttribute('data-field');
+            const leadId = input.getAttribute('data-lead-id');
+            const payload = {};
+            payload[field] = input.value;
+
+            fetch(`/lead-manage/${leadId}/update_inline`, {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(payload)
+            })
+              .then(r => r.json())
+              .then(res => {
+                if (res.success) {
+                  originalValue = input.value;
+                  input.style.borderColor = '#22c55e';
+                  setTimeout(() => { input.style.borderColor = 'transparent'; }, 1000);
+                } else {
+                  input.value = originalValue;
+                }
+              })
+              .catch(() => { input.value = originalValue; });
+          }
+        });
+
+        input.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') {
+            input.blur();
+          }
+        });
+      });
+
+      // Delete Lead
+      document.querySelectorAll('.delete-lead-btn').forEach(btn => {
+        btn.addEventListener('click', function (e) {
+          e.stopPropagation();
+          const leadId = this.dataset.leadId;
+          const leadName = this.closest('.lead-row').querySelector('.inline-edit[data-field="name"]').value;
+          if (confirm(`Bạn có chắc muốn xoá Lead "${leadName || '#' + leadId}" không?`)) {
+            fetch(`/lead-manage/${leadId}/delete`, {
+              method: 'DELETE',
+            })
+              .then(r => r.json())
+              .then(res => {
+                if (res.success) {
+                  this.closest('.lead-card').remove();
+                } else {
+                  alert('Không thể xoá lead này.');
+                }
+              })
+              .catch(err => {
+                console.error(err);
+                alert('Lỗi hệ thống khi xoá.');
+              });
+          }
+        });
+      });
+
     });
   </script>
 </body>
+
 </html>

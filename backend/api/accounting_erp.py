@@ -3,7 +3,7 @@ from __future__ import annotations
 from collections import defaultdict
 from datetime import date, datetime, timedelta
 
-from flask import Blueprint, abort, jsonify, request
+from flask import Blueprint, abort, jsonify, request, g
 from sqlalchemy import and_, func, or_
 
 from models import (
@@ -14,25 +14,71 @@ from models import (
     AccountingDailyCash,
     AccountingLink,
     AccountingPeriod,
+    AccountingRecord,
     ChartOfAccount,
     FixedAsset,
     FixedAssetDepreciation,
+    FixedAssetEvent,
     JournalEntry,
     JournalEntryLine,
     LeadPayload,
     TaxCode,
+    User,
     db,
     generate_datetime_id,
 )
+from permission_utils import ensure_resource_lead, require_can_view
 
 
 accounting_erp_bp = Blueprint("accounting_erp", __name__, url_prefix="/api/accounting")
+
+
+def _permission_for_accounting_erp_request():
+    path = (request.path or "").rstrip("/")
+    if "/ar-invoices" in path or path.endswith("/ar-aging") or path.endswith("/ar-statement"):
+        return "view_acc_ar"
+    if "/ap-bills" in path or path.endswith("/ap-aging") or path.endswith("/ap-statement"):
+        return "view_acc_ap"
+    if "/journal-entries" in path or path.endswith("/ledger") or path.endswith("/trial-balance"):
+        return "view_acc_ledger"
+    if "/reports/" in path:
+        return "view_acc_reports"
+    if path.endswith("/vat-report"):
+        return "view_acc_tax"
+    if "/fixed-assets" in path or path.endswith("/people-list"):
+        return "view_acc_assets"
+    if "/records" in path:
+        return "view_acc_records"
+    return "view_accountant"
+
+
+@accounting_erp_bp.before_request
+def guard_accounting_erp_permission():
+    actor, _ = require_can_view(_permission_for_accounting_erp_request())
+    g.permission_actor = actor
+
+    view_args = request.view_args or {}
+    resource_checks = (
+        ("invoice_id", ARInvoice, "accounts receivable invoice"),
+        ("bill_id", APBill, "accounts payable bill"),
+        ("entry_id", JournalEntry, "journal entry"),
+        ("asset_id", FixedAsset, "fixed asset"),
+        ("record_id", AccountingRecord, "accounting record"),
+    )
+    for arg_name, model, resource_name in resource_checks:
+        resource_id = view_args.get(arg_name)
+        if not resource_id:
+            continue
+        resource = db.session.get(model, resource_id)
+        if resource:
+            ensure_resource_lead(resource, actor, resource_name)
+        break
 
 AR_STATUS = ["draft", "confirmed", "partially_paid", "paid", "overdue", "cancelled"]
 AP_STATUS = ["draft", "confirmed", "partially_paid", "paid", "overdue", "cancelled"]
 ENTRY_STATUS = ["draft", "posted", "reversed"]
 PERIOD_STATUS = ["open", "closed"]
-FA_STATUS = ["active", "disposed", "paused"]
+FA_STATUS = ["active", "paused", "maintenance", "repair", "pending_disposal", "disposed"]
 PAYMENT_METHODS = ["cash", "bank_transfer", "card", "other"]
 TAX_DIRECTIONS = ["input", "output", "both"]
 ACCOUNT_TYPES = ["asset", "liability", "equity", "revenue", "expense"]
@@ -111,6 +157,115 @@ def _clean_text(value):
         return None
     text = str(value).strip()
     return text if text else None
+
+
+def _sum_ar_invoice_payments(invoice: ARInvoice, payment_type: str | None = None):
+    return _round_money(
+        sum(
+            item.amount or 0
+            for item in invoice.payments
+            if not item.deletedAt and (payment_type is None or item.payment_type == payment_type)
+        )
+    )
+
+
+def _build_ar_invoice_snapshot(invoice: ARInvoice):
+    phat_sinh_amount = _sum_ar_invoice_payments(invoice, "phat_sinh")
+    tam_ung_amount = _sum_ar_invoice_payments(invoice, "tam_ung")
+    tax_rate = _to_float(invoice.tax_rate, 0)
+    extra_total_amount = _round_money(phat_sinh_amount * (1 + tax_rate / 100.0))
+    effective_total_amount = _round_money((invoice.total_amount or 0) + extra_total_amount)
+    balance_amount = _round_money(effective_total_amount - tam_ung_amount)
+    return {
+        "phat_sinh_amount": phat_sinh_amount,
+        "tam_ung_amount": tam_ung_amount,
+        "paid_amount": tam_ung_amount,
+        "effective_total_amount": effective_total_amount,
+        "balance_amount": balance_amount,
+    }
+
+
+def _apply_ar_invoice_snapshot(invoice: ARInvoice):
+    snapshot = _build_ar_invoice_snapshot(invoice)
+    invoice.paid_amount = snapshot["paid_amount"]
+    invoice.balance_amount = snapshot["balance_amount"]
+    invoice.status = _recompute_receivable_status(invoice.status, invoice.balance_amount, invoice.due_date, date.today())
+    invoice.updated_by = _current_user_id()
+    return snapshot
+
+
+def _enrich_ar_invoice_dict(invoice: ARInvoice, data: dict | None = None):
+    snapshot = _build_ar_invoice_snapshot(invoice)
+    payload = data or invoice.tdict()
+    payload["phat_sinh_amount"] = snapshot["phat_sinh_amount"]
+    payload["tam_ung_amount"] = snapshot["tam_ung_amount"]
+    payload["paid_amount"] = snapshot["paid_amount"]
+    payload["effective_total_amount"] = snapshot["effective_total_amount"]
+    payload["balance_amount"] = snapshot["balance_amount"]
+    return payload
+
+
+def _refresh_ar_invoice_metrics(lead_id: int):
+    rows = ARInvoice.query.filter(ARInvoice.deletedAt.is_(None), ARInvoice.lead_id == lead_id).all()
+    changed = False
+    for row in rows:
+        snapshot = _build_ar_invoice_snapshot(row)
+        next_status = _recompute_receivable_status(row.status, snapshot["balance_amount"], row.due_date, date.today())
+        if (
+            _round_money(row.paid_amount or 0) != snapshot["paid_amount"]
+            or _round_money(row.balance_amount or 0) != snapshot["balance_amount"]
+            or row.status != next_status
+        ):
+            row.paid_amount = snapshot["paid_amount"]
+            row.balance_amount = snapshot["balance_amount"]
+            row.status = next_status
+            changed = True
+    if changed:
+        db.session.commit()
+
+
+def _sync_ar_payment_links(payment: ARInvoicePayment, invoice: ARInvoice):
+    if payment.daily_cash_id:
+        cash_row = db.session.get(AccountingDailyCash, payment.daily_cash_id)
+        if cash_row and not cash_row.deletedAt:
+            cash_row.txn_date = payment.payment_date
+            cash_row.amount = payment.amount
+            cash_row.counterparty_name = invoice.customer_name
+            cash_row.payment_method = payment.payment_method
+            cash_row.doc_ref = invoice.code
+            cash_row.note = payment.note
+    if payment.journal_entry_id:
+        entry = db.session.get(JournalEntry, payment.journal_entry_id)
+        if entry and not entry.deletedAt:
+            entry.entry_date = payment.payment_date
+            entry.reference_no = invoice.code
+            entry.description = f"Thu tien cong no {invoice.code}"
+            entry.updated_by = _current_user_id()
+            for line in entry.lines:
+                if line.deletedAt:
+                    continue
+                if _round_money(line.debit or 0) > 0:
+                    line.debit = payment.amount
+                    line.credit = 0
+                elif _round_money(line.credit or 0) > 0:
+                    line.debit = 0
+                    line.credit = payment.amount
+
+
+def _soft_delete_ar_payment_links(payment: ARInvoicePayment):
+    deleted_at = datetime.utcnow()
+    if payment.daily_cash_id:
+        cash_row = db.session.get(AccountingDailyCash, payment.daily_cash_id)
+        if cash_row and not cash_row.deletedAt:
+            cash_row.deletedAt = deleted_at
+    if payment.journal_entry_id:
+        entry = db.session.get(JournalEntry, payment.journal_entry_id)
+        if entry and not entry.deletedAt:
+            entry.deletedAt = deleted_at
+            entry.updated_by = _current_user_id()
+            for line in entry.lines:
+                if not line.deletedAt:
+                    line.deletedAt = deleted_at
 
 
 def _require_lead(lead_id: int):
@@ -483,11 +638,7 @@ def _create_daily_cash_row(
 
 
 def _update_invoice_balances(invoice: ARInvoice):
-    paid_amount = _round_money(sum(item.amount or 0 for item in invoice.payments if not item.deletedAt))
-    invoice.paid_amount = paid_amount
-    invoice.balance_amount = _round_money((invoice.total_amount or 0) - paid_amount)
-    invoice.status = _recompute_receivable_status(invoice.status, invoice.balance_amount, invoice.due_date, date.today())
-    invoice.updated_by = _current_user_id()
+    _apply_ar_invoice_snapshot(invoice)
 
 
 def _update_bill_balances(bill: APBill):
@@ -590,53 +741,63 @@ def _generate_ap_confirm_entry(bill: APBill):
     return entry
 
 
-def _record_ar_payment(invoice: ARInvoice, payment_date: date, amount: float, payment_method: str, note: str | None):
-    if invoice.status not in {"confirmed", "partially_paid", "overdue"}:
-        abort(400, description="Invoice is not ready for payment")
+def _record_ar_payment(invoice: ARInvoice, payment_date: date, amount: float, payment_method: str, note: str | None, payment_type: str = "phat_sinh"):
+    READY_STATUSES = {"confirmed", "partially_paid", "overdue"}
+    if invoice.status == "cancelled":
+        abort(400, description="Khong the ghi nhan thanh toan cho cong no da huy")
+    if payment_type == "phat_sinh":
+        if invoice.status not in READY_STATUSES:
+            abort(400, description="Cong no chua duoc xac nhan, chi co the them tam ung o trang thai nay")
     if amount <= 0:
-        abort(400, description="amount must be > 0")
-    if amount - invoice.balance_amount > 0.0001:
-        abort(400, description="Payment exceeds outstanding balance")
-    cash_row = _create_daily_cash_row(
-        lead_id=invoice.lead_id,
-        direction="income",
-        payment_date=payment_date,
-        amount=amount,
-        counterparty_name=invoice.customer_name,
-        description=f"Thu tiền khách hàng {invoice.code}",
-        payment_method=payment_method,
-        doc_ref=invoice.code,
-        source_type="ar_invoice",
-        source_id=invoice.id,
-    )
-    entry = _create_journal_entry(
-        lead_id=invoice.lead_id,
-        entry_date=payment_date,
-        description=f"Thu tiền công nợ {invoice.code}",
-        source_type="ar_payment",
-        source_id=invoice.id,
-        reference_no=invoice.code,
-        lines=[
-            {
-                "account_code": _cash_account_by_method(payment_method),
-                "partner_type": "customer",
-                "partner_id": invoice.customer_id,
-                "partner_name": invoice.customer_name,
-                "debit": amount,
-                "credit": 0,
-            },
-            {
-                "account_code": "131",
-                "partner_type": "customer",
-                "partner_id": invoice.customer_id,
-                "partner_name": invoice.customer_name,
-                "debit": 0,
-                "credit": amount,
-            },
-        ],
-        status="draft",
-    )
-    cash_row.journal_entry_id = entry.id
+        abort(400, description="So tien phai lon hon 0")
+
+    cash_row = None
+    entry = None
+    if payment_type == "tam_ung":
+        snapshot = _build_ar_invoice_snapshot(invoice)
+        if amount - snapshot["balance_amount"] > 0.0001:
+            abort(400, description="So tien tam ung vuot qua so con phai thu")
+        cash_row = _create_daily_cash_row(
+            lead_id=invoice.lead_id,
+            direction="income",
+            payment_date=payment_date,
+            amount=amount,
+            counterparty_name=invoice.customer_name,
+            description=f"Thu tien khach hang {invoice.code}",
+            payment_method=payment_method,
+            doc_ref=invoice.code,
+            source_type="ar_invoice",
+            source_id=invoice.id,
+        )
+        entry = _create_journal_entry(
+            lead_id=invoice.lead_id,
+            entry_date=payment_date,
+            description=f"Thu tien cong no {invoice.code}",
+            source_type="ar_payment",
+            source_id=invoice.id,
+            reference_no=invoice.code,
+            lines=[
+                {
+                    "account_code": _cash_account_by_method(payment_method),
+                    "partner_type": "customer",
+                    "partner_id": invoice.customer_id,
+                    "partner_name": invoice.customer_name,
+                    "debit": amount,
+                    "credit": 0,
+                },
+                {
+                    "account_code": "131",
+                    "partner_type": "customer",
+                    "partner_id": invoice.customer_id,
+                    "partner_name": invoice.customer_name,
+                    "debit": 0,
+                    "credit": amount,
+                },
+            ],
+            status="draft",
+        )
+        cash_row.journal_entry_id = entry.id
+
     payment = ARInvoicePayment(
         id=generate_datetime_id(),
         invoice_id=invoice.id,
@@ -644,20 +805,21 @@ def _record_ar_payment(invoice: ARInvoice, payment_date: date, amount: float, pa
         payment_date=payment_date,
         amount=amount,
         payment_method=payment_method,
-        daily_cash_id=cash_row.id,
-        journal_entry_id=entry.id,
+        payment_type=payment_type if payment_type in ("tam_ung", "phat_sinh") else "phat_sinh",
+        daily_cash_id=cash_row.id if cash_row else None,
+        journal_entry_id=entry.id if entry else None,
         note=_clean_text(note),
         created_by=_current_user_id(),
         updated_by=_current_user_id(),
     )
     db.session.add(payment)
     db.session.flush()
-    _upsert_link(invoice.lead_id, "ar_invoice", invoice.id, "daily_cash", cash_row.id, "payment")
-    _upsert_link(invoice.lead_id, "ar_invoice", invoice.id, "journal_entry", entry.id, "payment")
-    _upsert_link(invoice.lead_id, "daily_cash", cash_row.id, "journal_entry", entry.id, "payment_entry")
+    if cash_row and entry:
+        _upsert_link(invoice.lead_id, "ar_invoice", invoice.id, "daily_cash", cash_row.id, "payment")
+        _upsert_link(invoice.lead_id, "ar_invoice", invoice.id, "journal_entry", entry.id, "payment")
+        _upsert_link(invoice.lead_id, "daily_cash", cash_row.id, "journal_entry", entry.id, "payment_entry")
     _update_invoice_balances(invoice)
     return payment
-
 
 def _record_ap_payment(bill: APBill, payment_date: date, amount: float, payment_method: str, note: str | None):
     if bill.status not in {"confirmed", "partially_paid", "overdue"}:
@@ -893,6 +1055,7 @@ def create_period():
 def list_ar_invoices():
     lead_id = request.args.get("lead", 0, type=int)
     _require_lead(lead_id)
+    _refresh_ar_invoice_metrics(lead_id)
     page = request.args.get("page", 1, type=int)
     limit = min(request.args.get("limit", 20, type=int), 200)
     status = _clean_text(request.args.get("status"))
@@ -922,7 +1085,7 @@ def list_ar_invoices():
     )
     rows = query.all()
     summary = {
-        "total_receivable": _round_money(sum(item.total_amount or 0 for item in rows)),
+        "total_receivable": _round_money(sum(_build_ar_invoice_snapshot(item)["effective_total_amount"] for item in rows)),
         "paid_amount": _round_money(sum(item.paid_amount or 0 for item in rows)),
         "outstanding_amount": _round_money(sum(item.balance_amount or 0 for item in rows)),
         "overdue_amount": _round_money(
@@ -930,11 +1093,10 @@ def list_ar_invoices():
         ),
     }
     return jsonify({
-        "data": [item.tdict() for item in pagination.items],
+        "data": [_enrich_ar_invoice_dict(item) for item in pagination.items],
         "pagination": {"page": page, "per_page": limit, "pages": pagination.pages, "total": pagination.total},
         "summary": summary,
     }), 200
-
 
 @accounting_erp_bp.route("/ar-invoices", methods=["POST"])
 def create_ar_invoice():
@@ -983,20 +1145,22 @@ def get_ar_invoice_detail(invoice_id):
     item = ARInvoice.query.filter(ARInvoice.id == invoice_id, ARInvoice.deletedAt.is_(None)).first()
     if not item:
         abort(404, description="AR invoice not found")
-    payload = item.tdict(include_payments=True)
+    _update_invoice_balances(item)
+    payload = _enrich_ar_invoice_dict(item, item.tdict(include_payments=True))
     payload["journal_entry"] = _serialize_entry(item.journal_entry)
     payload["links"] = _trace_bidirectional(item.lead_id, "ar_invoice", item.id)
     return jsonify(payload), 200
-
 
 @accounting_erp_bp.route("/ar-invoices/<string:invoice_id>", methods=["PUT"])
 def update_ar_invoice(invoice_id):
     item = ARInvoice.query.filter(ARInvoice.id == invoice_id, ARInvoice.deletedAt.is_(None)).first()
     if not item:
         abort(404, description="AR invoice not found")
-    if item.status in {"confirmed", "partially_paid", "paid", "overdue"} and (item.journal_entry_id or item.paid_amount > 0):
-        abort(400, description="Cannot edit confirmed invoice with journal or payment")
+    if item.status == "cancelled":
+        abort(400, description="Không thể sửa công nợ đã huỷ")
     data = request.get_json() or {}
+
+    # ── Trường thông tin: luôn cho phép sửa ──────────────────────────────
     if data.get("customer_id") is not None:
         item.customer_id = _clean_text(data.get("customer_id"))
     if data.get("customer_name") is not None:
@@ -1004,30 +1168,47 @@ def update_ar_invoice(invoice_id):
     if data.get("invoice_date") is not None:
         parsed = _parse_date(data.get("invoice_date"))
         if not parsed:
-            abort(400, description="Invalid invoice_date")
+            abort(400, description="Ngày hoá đơn không hợp lệ")
         item.invoice_date = parsed
     if data.get("due_date") is not None:
         item.due_date = _parse_date(data.get("due_date"))
-    if data.get("document_id") is not None:
-        item.document_id = _clean_text(data.get("document_id"))
-    if data.get("tax_code_id") is not None:
-        tax_code = _find_tax_code(item.lead_id, _clean_text(data.get("tax_code_id")), "output")
-        item.tax_code_id = tax_code.id if tax_code else None
-        item.tax_rate = _round_money(getattr(tax_code, "rate", 0))
-    if data.get("base_amount") is not None:
-        item.base_amount = _round_money(data.get("base_amount"))
-    if data.get("tax_rate") is not None:
-        item.tax_rate = _round_money(data.get("tax_rate"))
-    item.tax_amount = _round_money(data.get("tax_amount") if data.get("tax_amount") is not None else _tax_amount(item.base_amount, item.tax_rate))
-    item.total_amount = _round_money(data.get("total_amount") if data.get("total_amount") is not None else item.base_amount + item.tax_amount)
-    item.balance_amount = _round_money(item.total_amount - item.paid_amount)
-    if data.get("currency") is not None:
-        item.currency = _clean_text(data.get("currency")) or "VND"
     if data.get("description") is not None:
         item.description = _clean_text(data.get("description"))
+    if data.get("document_id") is not None:
+        item.document_id = _clean_text(data.get("document_id"))
+    if data.get("currency") is not None:
+        item.currency = _clean_text(data.get("currency")) or "VND"
+
+    # ── Trường tài chính: chặn khi đã xác nhận và có journal ─────────────
+    finance_fields = {"base_amount", "tax_rate", "tax_code_id", "tax_amount", "total_amount"}
+    wants_finance_edit = any(data.get(k) is not None for k in finance_fields)
+    finance_locked = item.status in {"confirmed", "partially_paid", "paid", "overdue"} and item.journal_entry_id
+    if wants_finance_edit and finance_locked:
+        abort(400, description="Không thể thay đổi số tiền sau khi đã xác nhận và tạo bút toán")
+
+    if not finance_locked:
+        if data.get("tax_code_id") is not None:
+            tax_code = _find_tax_code(item.lead_id, _clean_text(data.get("tax_code_id")), "output")
+            item.tax_code_id = tax_code.id if tax_code else None
+            item.tax_rate = _round_money(getattr(tax_code, "rate", 0))
+        if data.get("base_amount") is not None:
+            item.base_amount = _round_money(data.get("base_amount"))
+        if data.get("tax_rate") is not None:
+            item.tax_rate = _round_money(data.get("tax_rate"))
+        item.tax_amount = _round_money(
+            data.get("tax_amount") if data.get("tax_amount") is not None
+            else _tax_amount(item.base_amount, item.tax_rate)
+        )
+        item.total_amount = _round_money(
+            data.get("total_amount") if data.get("total_amount") is not None
+            else item.base_amount + item.tax_amount
+        )
+        _update_invoice_balances(item)
+
     item.updated_by = _current_user_id()
     db.session.commit()
-    return jsonify(item.tdict()), 200
+    return jsonify(_enrich_ar_invoice_dict(item)), 200
+
 
 
 @accounting_erp_bp.route("/ar-invoices/<string:invoice_id>/confirm", methods=["POST"])
@@ -1073,9 +1254,10 @@ def record_ar_invoice_payment(invoice_id):
     data = request.get_json() or {}
     payment_date = _parse_date(data.get("payment_date")) or date.today()
     payment_method = _validate_enum("payment_method", data.get("payment_method"), PAYMENT_METHODS, "cash")
+    payment_type = _clean_text(data.get("payment_type")) or "phat_sinh"
     amount = _round_money(data.get("amount"))
     try:
-        payment = _record_ar_payment(item, payment_date, amount, payment_method, _clean_text(data.get("note")))
+        payment = _record_ar_payment(item, payment_date, amount, payment_method, _clean_text(data.get("note")), payment_type)
         db.session.commit()
     except Exception:
         db.session.rollback()
@@ -1091,26 +1273,94 @@ def list_ar_invoice_payments(invoice_id):
     return jsonify({"data": [payment.tdict() for payment in item.payments if not payment.deletedAt]}), 200
 
 
+@accounting_erp_bp.route("/ar-invoices/<string:invoice_id>/payments/<string:payment_id>", methods=["PATCH"])
+def update_ar_invoice_payment(invoice_id, payment_id):
+    """Sửa note, payment_date, amount của một payment entry."""
+    item = ARInvoice.query.filter(ARInvoice.id == invoice_id, ARInvoice.deletedAt.is_(None)).first()
+    if not item:
+        abort(404, description="AR invoice not found")
+    payment = ARInvoicePayment.query.filter(
+        ARInvoicePayment.id == payment_id,
+        ARInvoicePayment.invoice_id == invoice_id,
+        ARInvoicePayment.deletedAt.is_(None),
+    ).first()
+    if not payment:
+        abort(404, description="Payment not found")
+    data = request.get_json() or {}
+    next_date = payment.payment_date
+    next_amount = payment.amount
+    next_note = payment.note
+    if "note" in data:
+        next_note = _clean_text(data["note"])
+    if "payment_date" in data:
+        new_date = _parse_date(data["payment_date"])
+        if new_date:
+            next_date = new_date
+    if "amount" in data:
+        new_amt = _round_money(data["amount"])
+        if new_amt > 0:
+            next_amount = new_amt
+    if payment.payment_type == "tam_ung":
+        snapshot = _build_ar_invoice_snapshot(item)
+        max_amount = _round_money(snapshot["balance_amount"] + (payment.amount or 0))
+        if next_amount - max_amount > 0.0001:
+            abort(400, description="So tien tam ung vuot qua so con phai thu")
+    elif payment.daily_cash_id or payment.journal_entry_id:
+        _soft_delete_ar_payment_links(payment)
+        payment.daily_cash_id = None
+        payment.journal_entry_id = None
+    payment.payment_date = next_date
+    payment.amount = next_amount
+    payment.note = next_note
+    _update_invoice_balances(item)
+    _sync_ar_payment_links(payment, item)
+    payment.updated_by = _current_user_id()
+    db.session.commit()
+    return jsonify(payment.tdict()), 200
+
+
+@accounting_erp_bp.route("/ar-invoices/<string:invoice_id>/payments/<string:payment_id>", methods=["DELETE"])
+def delete_ar_invoice_payment(invoice_id, payment_id):
+    """Xóa mềm một payment entry, hoàn lại balance."""
+    item = ARInvoice.query.filter(ARInvoice.id == invoice_id, ARInvoice.deletedAt.is_(None)).first()
+    if not item:
+        abort(404, description="AR invoice not found")
+    payment = ARInvoicePayment.query.filter(
+        ARInvoicePayment.id == payment_id,
+        ARInvoicePayment.invoice_id == invoice_id,
+        ARInvoicePayment.deletedAt.is_(None),
+    ).first()
+    if not payment:
+        abort(404, description="Payment not found")
+    # Xóa mềm: đặt deletedAt
+    _soft_delete_ar_payment_links(payment)
+    payment.deletedAt = datetime.utcnow()
+    payment.updated_by = _current_user_id()
+    _update_invoice_balances(item)
+    db.session.commit()
+    return jsonify({"ok": True}), 200
+
+
 @accounting_erp_bp.route("/ar-aging", methods=["GET"])
 def ar_aging():
     lead_id = request.args.get("lead", 0, type=int)
     as_of = _parse_date(request.args.get("as_of")) or date.today()
     _require_lead(lead_id)
+    _refresh_ar_invoice_metrics(lead_id)
     rows = ARInvoice.query.filter(ARInvoice.deletedAt.is_(None), ARInvoice.lead_id == lead_id).all()
     return jsonify({"data": _aging_summary(rows, as_of)}), 200
-
 
 @accounting_erp_bp.route("/ar-statement", methods=["GET"])
 def ar_statement():
     lead_id = request.args.get("lead", 0, type=int)
     customer_id = _clean_text(request.args.get("customer_id"))
     _require_lead(lead_id)
+    _refresh_ar_invoice_metrics(lead_id)
     query = ARInvoice.query.filter(ARInvoice.deletedAt.is_(None), ARInvoice.lead_id == lead_id)
     if customer_id:
         query = query.filter(ARInvoice.customer_id == customer_id)
     rows = query.order_by(ARInvoice.invoice_date.asc()).all()
-    return jsonify({"data": [row.tdict(include_payments=True) for row in rows]}), 200
-
+    return jsonify({"data": [_enrich_ar_invoice_dict(row, row.tdict(include_payments=True)) for row in rows]}), 200
 
 @accounting_erp_bp.route("/ap-bills", methods=["GET"])
 def list_ap_bills():
@@ -1313,6 +1563,55 @@ def list_ap_bill_payments(bill_id):
     if not item:
         abort(404, description="AP bill not found")
     return jsonify({"data": [payment.tdict() for payment in item.payments if not payment.deletedAt]}), 200
+
+
+@accounting_erp_bp.route("/ap-bills/<string:bill_id>/payments/<string:payment_id>", methods=["PATCH"])
+def update_ap_bill_payment(bill_id, payment_id):
+    """Sửa note, payment_date, amount của một AP payment entry."""
+    item = APBill.query.filter(APBill.id == bill_id, APBill.deletedAt.is_(None)).first()
+    if not item:
+        abort(404, description="AP bill not found")
+    payment = APBillPayment.query.filter(
+        APBillPayment.id == payment_id,
+        APBillPayment.bill_id == bill_id,
+        APBillPayment.deletedAt.is_(None),
+    ).first()
+    if not payment:
+        abort(404, description="Payment not found")
+    data = request.get_json() or {}
+    if "note" in data:
+        payment.note = _clean_text(data["note"])
+    if "payment_date" in data:
+        new_date = _parse_date(data["payment_date"])
+        if new_date:
+            payment.payment_date = new_date
+    if "amount" in data:
+        new_amt = _round_money(data["amount"])
+        if new_amt > 0:
+            payment.amount = new_amt
+            _update_bill_balances(item)
+    payment.updated_by = _current_user_id()
+    db.session.commit()
+    return jsonify(payment.tdict()), 200
+
+
+@accounting_erp_bp.route("/ap-bills/<string:bill_id>/payments/<string:payment_id>", methods=["DELETE"])
+def delete_ap_bill_payment(bill_id, payment_id):
+    """Xóa mềm một AP payment entry, hoàn lại balance."""
+    item = APBill.query.filter(APBill.id == bill_id, APBill.deletedAt.is_(None)).first()
+    if not item:
+        abort(404, description="AP bill not found")
+    payment = APBillPayment.query.filter(
+        APBillPayment.id == payment_id,
+        APBillPayment.bill_id == bill_id,
+        APBillPayment.deletedAt.is_(None),
+    ).first()
+    if not payment:
+        abort(404, description="Payment not found")
+    payment.deletedAt = datetime.utcnow()
+    _update_bill_balances(item)
+    db.session.commit()
+    return jsonify({"ok": True}), 200
 
 
 @accounting_erp_bp.route("/ap-aging", methods=["GET"])
@@ -1562,7 +1861,21 @@ def cashflow_summary():
     from_date = _parse_date(request.args.get("from_date"))
     to_date = _parse_date(request.args.get("to_date"))
     _require_lead(lead_id)
-    query = AccountingDailyCash.query.filter(AccountingDailyCash.deletedAt.is_(None), AccountingDailyCash.lead_id == lead_id)
+    query = (
+        AccountingDailyCash.query
+        .outerjoin(
+            ARInvoicePayment,
+            and_(
+                ARInvoicePayment.daily_cash_id == AccountingDailyCash.id,
+                ARInvoicePayment.deletedAt.is_(None),
+            ),
+        )
+        .filter(
+            AccountingDailyCash.deletedAt.is_(None),
+            AccountingDailyCash.lead_id == lead_id,
+            or_(ARInvoicePayment.id.is_(None), ARInvoicePayment.payment_type != "phat_sinh"),
+        )
+    )
     if from_date:
         query = query.filter(AccountingDailyCash.txn_date >= from_date)
     if to_date:
@@ -1571,7 +1884,6 @@ def cashflow_summary():
     income = _round_money(sum(item.amount or 0 for item in rows if item.direction == "income"))
     expense = _round_money(sum(item.amount or 0 for item in rows if item.direction == "expense"))
     return jsonify({"summary": {"income": income, "expense": expense, "net": _round_money(income - expense)}}), 200
-
 
 @accounting_erp_bp.route("/vat-report", methods=["GET"])
 def vat_report():
@@ -1601,7 +1913,15 @@ def list_fixed_assets():
     if status:
         query = query.filter(FixedAsset.status == status)
     rows = query.order_by(FixedAsset.purchase_date.desc()).all()
-    return jsonify({"data": [row.tdict() for row in rows]}), 200
+    result = []
+    for row in rows:
+        d = row.tdict()
+        d["events"] = [
+            ev.tdict() for ev in row.events
+            if not ev.deletedAt
+        ]
+        result.append(d)
+    return jsonify({"data": result}), 200
 
 
 @accounting_erp_bp.route("/fixed-assets", methods=["POST"])
@@ -1628,6 +1948,7 @@ def create_fixed_asset():
         useful_life_months=useful_life_months,
         monthly_depreciation=monthly,
         accumulated_depreciation=_round_money(data.get("accumulated_depreciation")),
+        quantity=int(data.get("quantity") or 1),
         department=_clean_text(data.get("department")),
         asset_account_code=_clean_text(data.get("asset_account_code")) or "211",
         accumulated_account_code=_clean_text(data.get("accumulated_account_code")) or "214",
@@ -1712,6 +2033,283 @@ def depreciation_schedule(asset_id):
         FixedAssetDepreciation.asset_id == asset_id,
     ).order_by(FixedAssetDepreciation.period_key.asc()).all()
     return jsonify({"data": [row.tdict() for row in rows]}), 200
+
+
+# ─── People list (employees + subcontractors for picker) ─────────────────────
+
+@accounting_erp_bp.route("/people-list", methods=["GET"])
+def people_list():
+    """Return employees + subcontractors for a lead (for PersonPicker dropdown)."""
+    lead_id = request.args.get("lead", 0, type=int)
+    _require_lead(lead_id)
+    lead = LeadPayload.query.get(lead_id)
+    if not lead:
+        abort(404, description="Lead not found")
+
+    users = lead.users.filter(User.deletedAt.is_(None)).order_by(User.fullName).all()
+
+    result = []
+    seen_names = set()
+    for u in users:
+        name = (u.fullName or u.username or "").strip()
+        if not name:                    # bỏ qua tên trống
+            continue
+        if name in seen_names:          # bỏ qua tên trùng
+            continue
+        seen_names.add(name)
+        result.append({
+            "id": u.id,
+            "name": name,
+            "phone": (u.phone or "").strip(),
+            "user_type": "subcontractor" if (u.role_id or 0) > 100 else "employee",
+        })
+
+    return jsonify({"data": result}), 200
+
+
+# ─── Fixed Asset Events (sub-rows) ────────────────────────────────────────────
+
+@accounting_erp_bp.route("/fixed-assets/<string:asset_id>/events", methods=["GET"])
+def list_asset_events(asset_id):
+    item = FixedAsset.query.filter(FixedAsset.id == asset_id, FixedAsset.deletedAt.is_(None)).first()
+    if not item:
+        abort(404, description="Fixed asset not found")
+    rows = FixedAssetEvent.query.filter(
+        FixedAssetEvent.deletedAt.is_(None),
+        FixedAssetEvent.asset_id == asset_id,
+    ).order_by(FixedAssetEvent.event_date.asc()).all()
+    return jsonify({"data": [row.tdict() for row in rows]}), 200
+
+
+@accounting_erp_bp.route("/fixed-assets/<string:asset_id>/events", methods=["POST"])
+def create_asset_event(asset_id):
+    item = FixedAsset.query.filter(FixedAsset.id == asset_id, FixedAsset.deletedAt.is_(None)).first()
+    if not item:
+        abort(404, description="Fixed asset not found")
+    data = request.get_json() or {}
+    ev = FixedAssetEvent(
+        id=generate_datetime_id(),
+        asset_id=asset_id,
+        lead_id=item.lead_id,
+        event_type=_clean_text(data.get("event_type")) or "purchase",
+        event_date=_parse_date(data.get("event_date")),
+        person_name=_clean_text(data.get("person_name")),
+        person_phone=_clean_text(data.get("person_phone")),
+        note=_clean_text(data.get("note")),
+        created_by=_current_user_id(),
+        updated_by=_current_user_id(),
+    )
+    db.session.add(ev)
+    db.session.commit()
+    return jsonify(ev.tdict()), 201
+
+
+@accounting_erp_bp.route("/fixed-assets/<string:asset_id>/events/<string:event_id>", methods=["PATCH"])
+def update_asset_event(asset_id, event_id):
+    ev = FixedAssetEvent.query.filter(
+        FixedAssetEvent.id == event_id,
+        FixedAssetEvent.asset_id == asset_id,
+        FixedAssetEvent.deletedAt.is_(None),
+    ).first()
+    if not ev:
+        abort(404, description="Event not found")
+    data = request.get_json() or {}
+    if "event_type" in data:
+        ev.event_type = _clean_text(data["event_type"]) or ev.event_type
+    if "event_date" in data:
+        ev.event_date = _parse_date(data["event_date"])
+    if "person_name" in data:
+        ev.person_name = _clean_text(data["person_name"])
+    if "person_phone" in data:
+        ev.person_phone = _clean_text(data["person_phone"])
+    if "note" in data:
+        ev.note = _clean_text(data["note"])
+    ev.updated_by = _current_user_id()
+    db.session.commit()
+    return jsonify(ev.tdict()), 200
+
+
+@accounting_erp_bp.route("/fixed-assets/<string:asset_id>/events/<string:event_id>", methods=["DELETE"])
+def delete_asset_event(asset_id, event_id):
+    ev = FixedAssetEvent.query.filter(
+        FixedAssetEvent.id == event_id,
+        FixedAssetEvent.asset_id == asset_id,
+        FixedAssetEvent.deletedAt.is_(None),
+    ).first()
+    if not ev:
+        abort(404, description="Event not found")
+    import datetime as _dt
+    ev.deletedAt = _dt.datetime.utcnow()
+    db.session.commit()
+    return jsonify({"message": "deleted"}), 200
+
+
+# ─── Accounting Records (Hồ sơ kế toán) ──────────────────────────────────────
+
+@accounting_erp_bp.route("/records", methods=["GET"])
+def list_accounting_records():
+    """GET /api/accounting/records?lead=<id>&sub_tab=<hop-dong|nghiem-thu|thanh-toan>"""
+    lead_id = request.args.get("lead", 0, type=int)
+    if not lead_id:
+        abort(400, description="lead is required")
+    sub_tab = request.args.get("sub_tab", None, type=str)
+
+    q = AccountingRecord.query.filter(
+        AccountingRecord.lead_id == lead_id,
+        AccountingRecord.deletedAt.is_(None),
+    )
+    if sub_tab:
+        q = q.filter(AccountingRecord.sub_tab == sub_tab)
+    q = q.order_by(AccountingRecord.createdAt.desc())
+    return jsonify({"data": [r.tdict() for r in q.all()]}), 200
+
+
+@accounting_erp_bp.route("/records", methods=["POST"])
+def create_accounting_record():
+    """POST /api/accounting/records"""
+    data = request.get_json(force=True) or {}
+    lead_id = int(data.get("lead_id") or 0)
+    if not lead_id:
+        abort(400, description="lead_id is required")
+
+    name = str(data.get("name") or "").strip()
+    if not name:
+        abort(400, description="name is required")
+
+    rec = AccountingRecord(
+        id=generate_datetime_id(),
+        lead_id=lead_id,
+        sub_tab=str(data.get("sub_tab") or "hop-dong"),
+        name=name,
+        file_type=str(data.get("file_type") or "doc"),
+        folder=str(data.get("folder") or ""),
+        content=str(data.get("content") or ""),
+        created_by=str(data.get("created_by") or ""),
+        updated_by=str(data.get("created_by") or ""),
+    )
+    db.session.add(rec)
+    db.session.commit()
+    return jsonify(rec.tdict()), 201
+
+
+@accounting_erp_bp.route("/records/<string:record_id>", methods=["PUT"])
+def update_accounting_record(record_id: str):
+    """PUT /api/accounting/records/<id>"""
+    rec = AccountingRecord.query.filter_by(id=record_id).first()
+    if not rec or rec.deletedAt:
+        abort(404, description="Record not found")
+
+    data = request.get_json(force=True) or {}
+    if "name" in data and str(data["name"]).strip():
+        rec.name = str(data["name"]).strip()
+    if "sub_tab" in data:
+        rec.sub_tab = str(data["sub_tab"])
+    if "file_type" in data:
+        rec.file_type = str(data["file_type"])
+    if "folder" in data:
+        rec.folder = str(data["folder"])
+    if "content" in data:
+        rec.content = str(data["content"])
+    if "updated_by" in data:
+        rec.updated_by = str(data["updated_by"])
+
+    import datetime as _dt
+    rec.updatedAt = _dt.datetime.utcnow()
+    db.session.commit()
+    return jsonify(rec.tdict()), 200
+
+
+@accounting_erp_bp.route("/records/<string:record_id>", methods=["DELETE"])
+def delete_accounting_record(record_id: str):
+    """DELETE /api/accounting/records/<id>"""
+    rec = AccountingRecord.query.filter_by(id=record_id).first()
+    if not rec or rec.deletedAt:
+        abort(404, description="Record not found")
+
+    import datetime as _dt
+    rec.deletedAt = _dt.datetime.utcnow()
+    db.session.commit()
+    return jsonify({"message": "deleted"}), 200
+
+
+# ─── Convert .doc / .docx → HTML ─────────────────────────────────────────────
+
+@accounting_erp_bp.route("/records/convert-doc", methods=["POST"])
+def convert_doc_to_html():
+    """POST /api/accounting/records/convert-doc
+    Upload file .doc hoặc .docx → trả về {"html": "..."}
+    """
+    file = request.files.get("file")
+    if not file or not file.filename:
+        abort(400, description="No file uploaded")
+
+    import os, tempfile, subprocess, uuid, shutil
+
+    suffix = os.path.splitext((file.filename or "").lower())[1]  # .doc / .docx
+    tmp_dir = tempfile.mkdtemp()
+    tmp_path = os.path.join(tmp_dir, f"{uuid.uuid4()}{suffix}")
+
+    try:
+        file.save(tmp_path)
+
+        # 1️⃣  python-docx cho .docx  ─────────────────────────────────────
+        if suffix == ".docx":
+            try:
+                from docx import Document as DocxDocument
+                doc = DocxDocument(tmp_path)
+                parts = []
+                for para in doc.paragraphs:
+                    if para.text.strip():
+                        style = para.style.name if para.style else ""
+                        tag = "h1" if "Heading 1" in style else (
+                              "h2" if "Heading 2" in style else "p")
+                        text_html = para.text.replace("&", "&amp;").replace("<", "&lt;")
+                        parts.append(f"<{tag}>{text_html}</{tag}>")
+                    else:
+                        parts.append("<br/>")
+                html = "\n".join(parts) or "<p></p>"
+                return jsonify({"html": html}), 200
+            except Exception:
+                pass  # fall through
+
+        # 2️⃣  LibreOffice headless → HTML  ───────────────────────────────
+        import glob as _glob
+        lo_candidates = ["/usr/bin/libreoffice", "/usr/bin/soffice"] + \
+                        _glob.glob("/opt/libreoffice*/program/soffice")
+        lo_bin = next((p for p in lo_candidates if os.path.isfile(p)), None)
+
+        if lo_bin:
+            subprocess.run(
+                [lo_bin, "--headless", "--convert-to", "html",
+                 "--outdir", tmp_dir, tmp_path],
+                capture_output=True, timeout=30
+            )
+            base_name = os.path.splitext(os.path.basename(tmp_path))[0]
+            html_file = os.path.join(tmp_dir, base_name + ".html")
+            if os.path.isfile(html_file):
+                import re
+                raw = open(html_file, "r", encoding="utf-8", errors="replace").read()
+                m = re.search(r"<body[^>]*>(.*?)</body>", raw, re.DOTALL | re.IGNORECASE)
+                body = m.group(1).strip() if m else raw
+                return jsonify({"html": body}), 200
+
+        # 3️⃣  antiword / catdoc cho .doc cũ  ─────────────────────────────
+        for cmd_name in ["antiword", "catdoc"]:
+            try:
+                r = subprocess.run([cmd_name, tmp_path],
+                                   capture_output=True, timeout=15)
+                text = r.stdout.decode("utf-8", "replace").strip()
+                if text:
+                    esc = text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+                    return jsonify({"html": f"<pre style='white-space:pre-wrap'>{esc}</pre>"}), 200
+            except FileNotFoundError:
+                continue
+
+        # 4️⃣  Không có công cụ nào → báo lại  ────────────────────────────
+        return jsonify({"html": "", "error": "no_converter"}), 200
+
+    finally:
+        shutil.rmtree(tmp_dir, ignore_errors=True)
 
 
 @accounting_erp_bp.route("/trace", methods=["GET"])

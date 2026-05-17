@@ -192,7 +192,7 @@ export default function ModalManagerWorkSpace({
                   <div
                     key={workspace.id}
                     className={`group relative flex items-center gap-5 p-5 rounded-2xl border-2 transition-all duration-300 cursor-pointer hover:shadow-xl hover:-translate-y-1 ${
-                      pathname === `/dashboard/work-tables/${workspace.id}`
+                      pathname === `/work-tables/${workspace.id}`
                         ? "border-[#0891b2] bg-gradient-to-r from-[#0891b2]/8 to-[#0891b2]/4 shadow-lg shadow-[#0891b2]/20"
                         : "border-gray-200 hover:border-[#0891b2]/40 bg-white hover:bg-gradient-to-r hover:from-gray-50 hover:to-white"
                     }`}
@@ -201,7 +201,7 @@ export default function ModalManagerWorkSpace({
                     }}
                     onClick={() => {
                       // Chuyển đến workspace khi click
-                      navigate(`/dashboard/work-tables/${workspace.id}`);
+                      navigate(`/work-tables/${workspace.id}`);
                       setIsTabletWorkspaceModalOpen(false);
                     }}
                   >
@@ -218,7 +218,7 @@ export default function ModalManagerWorkSpace({
 
                       {/* Active indicator overlay */}
                       {pathname ===
-                        `/dashboard/work-tables/${workspace.id}` && (
+                        `/work-tables/${workspace.id}` && (
                         <div className="absolute top-2 right-2 w-3 h-3 rounded-full bg-[#0891b2] border-2 border-white shadow-sm"></div>
                       )}
                     </div>
@@ -229,7 +229,7 @@ export default function ModalManagerWorkSpace({
                         <Text
                           className={`font-bold text-lg block truncate transition-colors duration-300 ${
                             pathname ===
-                            `/dashboard/work-tables/${workspace.id}`
+                            `/work-tables/${workspace.id}`
                               ? "text-[#0891b2]"
                               : "text-gray-900 group-hover:text-[#0891b2]"
                           }`}
@@ -286,7 +286,7 @@ export default function ModalManagerWorkSpace({
                     {/* Enhanced Arrow indicator */}
                     <div
                       className={`transition-all duration-300 ${
-                        pathname === `/dashboard/work-tables/${workspace.id}`
+                        pathname === `/work-tables/${workspace.id}`
                           ? "text-[#0891b2] opacity-100"
                           : "text-gray-400 opacity-0 group-hover:opacity-100 group-hover:translate-x-1"
                       }`}

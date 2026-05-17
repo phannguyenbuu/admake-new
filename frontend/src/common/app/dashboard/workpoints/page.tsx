@@ -7,8 +7,10 @@ import { useUser } from "../../../common/hooks/useUser";
 import type { WorkDaysProps } from "../../../@types/workpoint";
 import { useTaskContext } from "../../../common/hooks/useTask";
 import SalaryBoard from "./SalaryBoard";
-import { Typography, Select } from "antd";
+import { Typography, Select, Button } from "antd";
+import { SettingOutlined } from "@ant-design/icons";
 import UnPermissionBoard from "../unPermissionBoard";
+import NoteWorkpointModal from "../../../common/layouts/base/NoteWorkpointModal";
 import dayjs from "dayjs";
 
 const { Option } = Select;
@@ -72,13 +74,13 @@ const WorkPointPage: IPage["Component"] = () => {
     try {
       const response = await fetch(
         `${useApiHost()}/workpoint/page?` +
-          new URLSearchParams({
-            lead: userLeadId.toString(),
-            page: String(page),
-            limit: String(limit),
-            search,
-            month,
-          })
+        new URLSearchParams({
+          lead: userLeadId.toString(),
+          page: String(page),
+          limit: String(limit),
+          search,
+          month,
+        })
       );
 
       const result = await response.json();
@@ -100,6 +102,8 @@ const WorkPointPage: IPage["Component"] = () => {
     setTaskDetail(null);
   }, []);
 
+  const [questionOpen, setQuestionOpen] = useState(false);
+
   return canViewPermission?.view_workpoint ? (
     <>
       <div className="min-h-screen p-2 w-full">
@@ -117,7 +121,7 @@ const WorkPointPage: IPage["Component"] = () => {
           <Select
             value={query.month}
             onChange={(value) => handleQueryChange({ month: value })}
-            style={{ width: "50vw" }}
+            style={{ width: 200 }}
             placeholder="Chọn tháng"
           >
             {monthOptions.map((option) => (
@@ -126,7 +130,17 @@ const WorkPointPage: IPage["Component"] = () => {
               </Option>
             ))}
           </Select>
+
+          <Button
+            icon={<SettingOutlined />}
+            onClick={() => setQuestionOpen(true)}
+            type="default"
+          >
+            Cài đặt chấm công
+          </Button>
         </div>
+
+        <NoteWorkpointModal questionOpen={questionOpen} onCancel={() => setQuestionOpen(false)} />
 
         <TableComponent<WorkDaysProps>
           columns={columnsWorkPoint(handleOpenModal, query.month)}

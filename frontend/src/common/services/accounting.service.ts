@@ -59,6 +59,7 @@ export type PayrollRow = {
   phone: string;
   department: string;
   group_type: "staff" | "supplier";
+  bank_account?: string;
   salary_base: number;
   period_work: number;
   work_hours: number;
@@ -68,7 +69,24 @@ export type PayrollRow = {
   bonus_total: number;
   punish_total: number;
   advance_total: number;
+  allowance?: number;   // Phụ cấp (+)
+  bhyt?: number;        // BHYT (-)
+  bhxh?: number;        // BHXH (-)
   net_salary: number;
+};
+
+export type PayrollAdjustmentType = "bonus" | "punish" | "advance" | "commission" | "allowance" | "bhyt" | "bhxh";
+
+export type PayrollAdjustmentRow = {
+  id: string;
+  lead_id: number;
+  user_id: string;
+  type: PayrollAdjustmentType;
+  note?: string | null;
+  amount: number;
+  entry_date: string;
+  createdAt?: string;
+  updatedAt?: string;
 };
 
 export type PayrollSummary = {
@@ -82,6 +100,9 @@ export type PayrollSummary = {
   total_bonus: number;
   total_punish: number;
   total_advance: number;
+  total_allowance?: number;
+  total_bhyt?: number;
+  total_bhxh?: number;
   total_net_salary: number;
 };
 
@@ -92,6 +113,9 @@ export type PayrollGroupSummary = {
   total_bonus: number;
   total_punish: number;
   total_advance: number;
+  total_allowance?: number;
+  total_bhyt?: number;
+  total_bhxh?: number;
   total_net_salary: number;
 };
 
@@ -102,11 +126,20 @@ export type PayrollSummaryResponse = {
   summary?: PayrollSummary;
   staff_summary?: PayrollGroupSummary;
   supplier_summary?: PayrollGroupSummary;
+  adjustments?: PayrollAdjustmentRow[];
 };
 
 export const AccountingService = {
   getPayrollSummary: (params: Record<string, any>) =>
     axiosClient.get<PayrollSummaryResponse>("/workpoint/payroll-summary", { params }),
+  getPayrollAdjustments: (params: Record<string, any>) =>
+    axiosClient.get<{ rows: PayrollAdjustmentRow[] }>("/workpoint/payroll-adjustments", { params }),
+  createPayrollAdjustment: (payload: Partial<PayrollAdjustmentRow> & { lead_id: number; user_id: string; type: PayrollAdjustmentType; amount: number; entry_date: string }) =>
+    axiosClient.post<PayrollAdjustmentRow>("/workpoint/payroll-adjustments", payload),
+  updatePayrollAdjustment: (id: string, payload: Partial<PayrollAdjustmentRow>) =>
+    axiosClient.put<PayrollAdjustmentRow>(`/workpoint/payroll-adjustments/${id}`, payload),
+  deletePayrollAdjustment: (id: string) =>
+    axiosClient.delete<{ success: boolean }>(`/workpoint/payroll-adjustments/${id}`),
   getDailyCash: (params: Record<string, any>) => axiosClient.get("/accounting/daily-cash", { params }),
   createDailyCash: (payload: Partial<DailyCashRow>) => axiosClient.post("/accounting/daily-cash", payload),
   updateDailyCash: (id: string, payload: Partial<DailyCashRow>) =>

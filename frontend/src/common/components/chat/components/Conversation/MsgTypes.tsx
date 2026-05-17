@@ -317,7 +317,7 @@ const TimeLine: React.FC<MsgTypeProps> = ({ el, menu, onDelete }) => {
 
       console.log('Send rate message', el.workspace_id, data);
       notifyAdmin({text:`Khách hàng vừa chấm ${rate} sao`, 
-        target: `/dashboard/work-tables/${el?.workspace_id}`});
+        target: `/work-tables/${el?.workspace_id}`});
       
       socket.emit('admake/chat/rate', data);
    

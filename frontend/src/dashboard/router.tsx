@@ -1,34 +1,47 @@
-﻿import { createBrowserRouter, type NonIndexRouteObject } from "react-router-dom";
-import { Navigate } from "react-router-dom";
-import BaseLayout from "../common/common/layouts/base.layout";
-import type { UserRole } from "../common/@types/user.type";
-import Error404 from "../common/app/404";
 import React, { Suspense, lazy } from "react";
 import {
+  createBrowserRouter,
+  Navigate,
+  type NonIndexRouteObject,
+} from "react-router-dom";
+import {
   AccountBookOutlined,
+  BarChartOutlined,
   BookOutlined,
   CheckOutlined,
   FileTextOutlined,
   FormOutlined,
   HomeOutlined,
   InboxOutlined,
+  LineChartOutlined,
+  PieChartOutlined,
   TeamOutlined,
   UserOutlined,
-  PieChartOutlined,
-  BarChartOutlined,
-  LineChartOutlined,
 } from "@ant-design/icons";
-import { InforDashboard } from "../common/app/infor/page";
-
-import { CenterBox } from "../common/components/chat/components/commons/TitlePanel";
 import { Typography } from "@mui/material";
-import { WorkpointSettingProvider } from "../common/common/hooks/useWorkpointSetting";
-import { WorkpointInforProvider } from "../common/common/hooks/useWorpointInfor";
+import BaseLayout from "../common/common/layouts/base.layout";
+import type { UserRole } from "../common/@types/user.type";
+import type {
+  DashboardPermissionKey,
+  UserCanViewFormProps,
+} from "../common/@types/user-can-view.type";
+import Error404 from "../common/app/404";
+import UnPermissionBoard from "../common/app/dashboard/unPermissionBoard";
+import { InforDashboard } from "../common/app/infor/page";
+import { useUser } from "../common/common/hooks/useUser";
 import { TaskProvider } from "../common/common/hooks/useTask";
+import { WorkpointInforProvider } from "../common/common/hooks/useWorpointInfor";
+import { WorkpointSettingProvider } from "../common/common/hooks/useWorkpointSetting";
+import {
+  getFirstAccessibleDashboardPath,
+  hasDashboardPermission,
+} from "../common/common/utils/permission.util";
+import { CenterBox } from "../common/components/chat/components/commons/TitlePanel";
 
 interface TRoute extends Omit<NonIndexRouteObject, "index" | "children"> {
   children?: TRoute[];
   roles?: UserRole[];
+  requiredPermission?: DashboardPermissionKey;
   title?: string;
   icon?: React.ReactNode;
   ignoreInMenu?: boolean;
@@ -43,10 +56,10 @@ const DevelopeDashboard = () => {
   return (
     <CenterBox spacing={5}>
       <Typography color="#00B4B6" fontSize={16} fontStyle="italic" mt={25} textAlign="center">
-        Cảm ơn quý khách đã quan tâm. Tính năng này đang phát triển ...
+        Cảm ơn quý khách đã quan tâm. Tính năng này đang phát triển...
       </Typography>
       <Typography color="#00B4B6" fontSize={16} fontStyle="italic" textAlign="center">
-        Vui lòng quay lại sau!
+        Vui lòng quay lại sau.
       </Typography>
     </CenterBox>
   );
@@ -62,6 +75,24 @@ const StatisticDashboard = lazy(() => import("../common/app/dashboard/statistic/
 const InvoiceDashboard = lazy(() => import("../common/app/dashboard/invoices/page"));
 const MaterialsDashboard = lazy(() => import("../common/app/dashboard/materials/page"));
 const AccountingDashboard = lazy(() => import("../common/app/dashboard/accounting/page"));
+
+const DashboardIndexRedirect = () => {
+  const { canViewPermission } = useUser();
+  const hasAccessToken =
+    typeof window !== "undefined" && Boolean(localStorage.getItem("accessToken"));
+
+  if (hasAccessToken && !canViewPermission) {
+    return <div>Loading...</div>;
+  }
+
+  const nextPath = getFirstAccessibleDashboardPath(canViewPermission);
+
+  if (nextPath) {
+    return <Navigate to={nextPath} replace />;
+  }
+
+  return <UnPermissionBoard />;
+};
 
 const routes: TRoute = {
   path: "/",
@@ -88,7 +119,7 @@ const routes: TRoute = {
       children: [
         {
           index: true,
-          element: <Navigate to="/users" replace />,
+          element: <DashboardIndexRedirect />,
           title: "Home",
           icon: <HomeOutlined />,
           ignoreInMenu: true,
@@ -100,6 +131,7 @@ const routes: TRoute = {
               <WorkPointPage />
             </Suspense>
           ),
+          requiredPermission: "view_workpoint",
           title: "Chấm công",
           icon: <CheckOutlined />,
         },
@@ -117,6 +149,7 @@ const routes: TRoute = {
             </Suspense>
           ),
           roles: ["user:management"],
+          requiredPermission: "view_user",
           title: "Quản lý nhân sự",
           icon: <LineChartOutlined />,
         },
@@ -128,6 +161,7 @@ const routes: TRoute = {
             </Suspense>
           ),
           roles: ["user:management"],
+          requiredPermission: "view_supplier",
           title: "Quản lý thầu phụ",
           icon: <FormOutlined />,
         },
@@ -139,6 +173,7 @@ const routes: TRoute = {
             </Suspense>
           ),
           roles: ["customer:management"],
+          requiredPermission: "view_customer",
           title: "Quản lý khách hàng",
           icon: <TeamOutlined />,
           isDevelope: false,
@@ -150,6 +185,7 @@ const routes: TRoute = {
               <WorkTableDetailPage />
             </Suspense>
           ),
+          requiredPermission: "view_workspace",
           title: "Bảng công việc",
           icon: <BarChartOutlined />,
           children: [
@@ -172,6 +208,7 @@ const routes: TRoute = {
               <StatisticDashboard />
             </Suspense>
           ),
+          requiredPermission: "view_statistic",
           title: "Phân tích",
           icon: <PieChartOutlined />,
         },
@@ -183,6 +220,7 @@ const routes: TRoute = {
             </Suspense>
           ),
           roles: ["accounting:management"],
+          requiredPermission: "view_accountant",
           title: "Kế toán",
           icon: <AccountBookOutlined />,
         },
@@ -194,6 +232,7 @@ const routes: TRoute = {
             </Suspense>
           ),
           roles: ["warehouse:management"],
+          requiredPermission: "view_material",
           title: "Quản lý vật liệu",
           icon: <InboxOutlined />,
           isDevelope: false,
@@ -206,6 +245,7 @@ const routes: TRoute = {
             </Suspense>
           ),
           roles: ["accounting:management"],
+          requiredPermission: "view_invoice",
           title: "Báo giá",
           icon: <FileTextOutlined />,
         },
@@ -232,7 +272,10 @@ type MenuItem = {
   style: any;
 };
 
-export function getMainMenuItems(pathname?: string): MenuItem[] {
+export function getMainMenuItems(
+  pathname?: string,
+  canViewPermission?: UserCanViewFormProps | null,
+): MenuItem[] {
   if (!pathname) {
     pathname = window.location.pathname;
   }
@@ -240,11 +283,14 @@ export function getMainMenuItems(pathname?: string): MenuItem[] {
     pathname = pathname.slice(0, -1);
   }
 
-  const loop = (routes: Array<TRoute | undefined>): MenuItem[] => {
-    return routes.reduce((acc: MenuItem[], route) => {
+  const loop = (routeItems: Array<TRoute | undefined>): MenuItem[] => {
+    return routeItems.reduce((acc: MenuItem[], route) => {
       if (!route) return acc;
 
-      const hasPermission = true; // Gộp check quyền nếu cần.
+      const hasPermission = hasDashboardPermission(
+        canViewPermission,
+        route.requiredPermission,
+      );
 
       if (!route.ignoreInMenu && hasPermission) {
         if (route.isDivider) {
@@ -256,8 +302,7 @@ export function getMainMenuItems(pathname?: string): MenuItem[] {
             isDivider: true,
           });
         } else {
-          const isDeveloping = (route as any).isDevelope || false;
-
+          const isDeveloping = route.isDevelope || false;
           const push: MenuItem = {
             key: route.path || "",
             icon: route.icon || <BookOutlined />,
@@ -280,16 +325,16 @@ export function getMainMenuItems(pathname?: string): MenuItem[] {
       }
 
       return acc;
-    }, []) as MenuItem[];
+    }, []);
   };
 
   const main =
     routes.children
       ?.filter((route) => route.isMainMenu && !route.ignoreInMenu)
-      .map((e) => e.children)
+      .map((route) => route.children)
       .flat() || [];
 
-  return loop(main) as MenuItem[];
+  return loop(main);
 }
 
 export const router = createBrowserRouter([routes as NonIndexRouteObject], {});

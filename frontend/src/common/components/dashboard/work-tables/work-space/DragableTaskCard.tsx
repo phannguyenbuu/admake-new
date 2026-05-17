@@ -4,6 +4,7 @@ import { StarOutlined, PlusOutlined, MoreOutlined, StarFilled } from "@ant-desig
 import CloseIcon from '@mui/icons-material/Close';
 import { Typography, Stack, IconButton, Box, TextField, Avatar } from "@mui/material";
 import { useApiHost, useApiStatic } from "../../../../common/hooks/useApiHost";
+import { TOKEN_LABEL } from "../../../../common/config";
 
 import FormTask from "../FormTask";
 import {
@@ -16,10 +17,11 @@ import {
 
 
 
-import type {
-  ColumnType,
-  Task,
-  TasksResponse,
+import {
+  getPrimaryTaskIcon,
+  type ColumnType,
+  type Task,
+  type TasksResponse,
 } from "../../../../@types/work-space.type";
 import {
   useWorkSpaceQueryTaskById,
@@ -40,6 +42,13 @@ interface DragableTaskCardProps {
   // setSelectedTask: React.Dispatch<React.SetStateAction<Task | null>>;
   // setEditingTaskId: React.Dispatch<React.SetStateAction<string | null>>;
   setShowFormTask: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+function getAuthHeaders(): HeadersInit {
+  const accessToken =
+    localStorage.getItem(TOKEN_LABEL) || sessionStorage.getItem(TOKEN_LABEL);
+
+  return accessToken ? { Authorization: `Bearer ${accessToken}` } : {};
 }
 
 // Component nhận props theo kiểu object 1 lần
@@ -112,6 +121,7 @@ export const CardItem: React.FC<CardItemProps> = ({
     try {
       const response = await fetch(`${useApiHost()}/task/${id}`, {
         method: "DELETE",
+        headers: getAuthHeaders(),
       });
 
       if (!response.ok) {
@@ -197,9 +207,9 @@ export const CardItem: React.FC<CardItemProps> = ({
         )}
 
         <Stack direction="row">
-            {task?.icon && 
+            {getPrimaryTaskIcon(task?.icon) && 
             <Avatar
-                src={`${useApiStatic()}/${task.icon}`}
+                src={`${useApiStatic()}/${getPrimaryTaskIcon(task?.icon)}`}
                 alt="Task icon"
                 sx={{ width: 100, height: 70, borderRadius: 0}}
             />}

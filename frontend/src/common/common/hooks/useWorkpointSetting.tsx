@@ -43,9 +43,21 @@ export const WorkpointSettingProvider = ({ children }: {children: React.ReactNod
     
 
   const fetchWorkpointSetting = () => {
+    const accessToken = localStorage.getItem("accessToken");
+    if (!accessToken || !userLeadId) {
+      setWorkpointSetting(null);
+      setLoading(false);
+      setError(null);
+      return;
+    }
+
     setLoading(true);
     
-    fetch(`${useApiHost()}/workpoint/setting/${userLeadId}/`)
+    fetch(`${useApiHost()}/workpoint/setting/${userLeadId}/`, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    })
       .then(res => {
         if (!res.ok) {
           notification.error({ message: 'Không lấy được dữ liệu setting' });
@@ -74,8 +86,11 @@ export const WorkpointSettingProvider = ({ children }: {children: React.ReactNod
     
     console.log('Setting', location, userLeadId);
 
-    if (userLeadId) {
+    if (userLeadId && localStorage.getItem("accessToken")) {
       fetchWorkpointSetting();
+    } else {
+      setWorkpointSetting(null);
+      setError(null);
     }
   }, [userLeadId]);
 

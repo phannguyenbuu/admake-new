@@ -7,6 +7,7 @@ import type { QueryObserverResult, RefetchOptions } from '@tanstack/react-query'
 import { useApiHost } from './useApiHost';
 import dayjs, { Dayjs } from 'dayjs';
 import isBetween from 'dayjs/plugin/isBetween';
+import { TOKEN_LABEL } from '../config';
 
 dayjs.extend(isBetween);
 
@@ -87,9 +88,13 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const updateTaskStatus = async (taskId: string, newType: string) => {
     setIsLoading(true);
     try {
+      const accessToken = localStorage.getItem(TOKEN_LABEL) || '';
       const response = await fetch(`${useApiHost()}/task/${taskId}/status`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+        },
         body: JSON.stringify({ status: newType }),
       });
       if (!response.ok) throw new Error('Update failed');

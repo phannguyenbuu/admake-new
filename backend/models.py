@@ -198,6 +198,17 @@ class UserCanView(BaseModel):
     view_invoice = db.Column(db.Boolean, default=False)
     view_accountant = db.Column(db.Boolean, default=False)
     view_statistic = db.Column(db.Boolean, default=False)
+    # ─── Kế toán sub-modules ─────────────────────────────────────────────────
+    view_acc_payroll    = db.Column(db.Boolean, default=False)  # Bảng lương
+    view_acc_cashflow   = db.Column(db.Boolean, default=False)  # Thu chi hàng ngày
+    view_acc_ar         = db.Column(db.Boolean, default=False)  # Công nợ phải thu
+    view_acc_ap         = db.Column(db.Boolean, default=False)  # Công nợ phải trả
+    view_acc_docs       = db.Column(db.Boolean, default=False)  # Sổ chứng từ
+    view_acc_ledger     = db.Column(db.Boolean, default=False)  # Sổ kế toán
+    view_acc_tax        = db.Column(db.Boolean, default=False)  # Thuế
+    view_acc_assets     = db.Column(db.Boolean, default=False)  # Tài sản cố định
+    view_acc_records    = db.Column(db.Boolean, default=False)  # Hồ sơ
+    view_acc_reports    = db.Column(db.Boolean, default=False)  # Báo cáo
 
     def tdict(self):
         result = {}
@@ -235,6 +246,9 @@ class User(BaseModel):
     hashKey = db.Column(db.String(255))
     fullName = db.Column(db.String(255))
     salary = db.Column(db.Integer)
+    allowance = db.Column(db.Integer, default=0)
+    bhyt = db.Column(db.Integer, default=0)
+    bhxh = db.Column(db.Integer, default=0)
     phone = db.Column(db.String(20))
     avatar = db.Column(db.String(255))
 
@@ -358,8 +372,8 @@ class Role(BaseModel):
     
     permissions = db.Column(JSON)  # lưu list permissions
     name = db.Column(db.String(255))
-    # lead_id = db.Column(db.Integer, db.ForeignKey('lead.id'))
-    # lead = db.relationship('LeadPayload', backref='roles')
+    lead_id = db.Column(db.Integer, db.ForeignKey('lead.id'))
+    lead = db.relationship('LeadPayload', backref='roles')
 
     def tdict(self):
         result = {}
@@ -489,9 +503,10 @@ class Task(BaseModel):
     workspace_id = db.Column(db.String(50))
     customer_id = db.Column(db.String(50))
     assets = db.Column(db.JSON)  # lưu JSON string của list dict {materialId, quantity}
-    icon = db.Column(db.String(255))
+    icon = db.Column(db.Text)
     end_time = db.Column(db.Date)
     start_time = db.Column(db.Date)
+    materials = db.Column(db.JSON, default=[])
 
     check_reward = db.Column(db.Boolean, default = False)
     lead_id = db.Column(db.Integer, db.ForeignKey('lead.id'))
@@ -545,6 +560,22 @@ class Task(BaseModel):
             msg = Message.create_item(item)
             assets.append(msg.message_id)
 
+        icon_payload = data.get("icon")
+        icon_value = None
+        if isinstance(icon_payload, list):
+            normalized_icons = []
+            for icon_item in icon_payload:
+                if isinstance(icon_item, dict):
+                    thumb_url = icon_item.get("thumb_url") or icon_item.get("file_url")
+                    if thumb_url:
+                        normalized_icons.append(thumb_url)
+                elif isinstance(icon_item, str) and icon_item:
+                    normalized_icons.append(icon_item)
+            if normalized_icons:
+                icon_value = json.dumps(normalized_icons)
+        elif isinstance(icon_payload, str) and icon_payload:
+            icon_value = icon_payload
+
         return Task(
             id=generate_datetime_id(),
             workspace_id = data.get("workspace_id", ''),
@@ -559,7 +590,8 @@ class Task(BaseModel):
             start_time=data.get("start_time", None),
             amount = data.get("amount"),
             salary_type = data.get("salary_type", ''),
-            assets = assets
+            assets = assets,
+            icon = icon_value
         )
     # @staticmethod
     # def create_item(params):
@@ -953,6 +985,7 @@ class ARInvoicePayment(BaseModel):
     payment_date = db.Column(db.Date, nullable=False)
     amount = db.Column(db.Float, default=0)
     payment_method = db.Column(db.String(30), default="cash")
+    payment_type = db.Column(db.String(30), default="phat_sinh")  # tam_ung | phat_sinh
     daily_cash_id = db.Column(db.String(50), db.ForeignKey("accounting_daily_cash.id"), nullable=True)
     journal_entry_id = db.Column(db.String(50), db.ForeignKey("journal_entries.id"), nullable=True)
     note = db.Column(db.Text, nullable=True)
@@ -976,6 +1009,38 @@ class ARInvoicePayment(BaseModel):
             if isinstance(value, (datetime.datetime, datetime.date)):
                 value = value.isoformat()
             result[column.name] = value
+        return result
+
+
+class PayrollAdjustment(BaseModel):
+    __tablename__ = "payroll_adjustments"
+
+    id = db.Column(db.String(50), primary_key=True)
+    lead_id = db.Column(db.Integer, db.ForeignKey("lead.id"), nullable=False)
+    user_id = db.Column(db.String(50), db.ForeignKey("user.id"), nullable=False)
+    adjustment_type = db.Column(db.String(30), nullable=False)
+    entry_date = db.Column(db.Date, nullable=False)
+    amount = db.Column(db.Float, default=0)
+    note = db.Column(db.Text, nullable=True)
+    created_by = db.Column(db.String(50), nullable=True)
+    updated_by = db.Column(db.String(50), nullable=True)
+
+    lead = db.relationship("LeadPayload", backref="payroll_adjustments")
+    user = db.relationship("User", backref="payroll_adjustments")
+
+    __table_args__ = (
+        Index("ix_payroll_adjustments_lead_user_date", "lead_id", "user_id", "entry_date"),
+        Index("ix_payroll_adjustments_lead_type", "lead_id", "adjustment_type"),
+    )
+
+    def tdict(self):
+        result = {}
+        for column in self.__table__.columns:
+            value = getattr(self, column.name)
+            if isinstance(value, (datetime.datetime, datetime.date)):
+                value = value.isoformat()
+            result[column.name] = value
+        result["type"] = result.pop("adjustment_type", None)
         return result
 
 
@@ -1082,6 +1147,7 @@ class FixedAsset(BaseModel):
     monthly_depreciation = db.Column(db.Float, default=0)
     accumulated_depreciation = db.Column(db.Float, default=0)
     department = db.Column(db.String(100), nullable=True)
+    quantity = db.Column(db.Integer, default=1)
     asset_account_code = db.Column(db.String(20), default="211")
     accumulated_account_code = db.Column(db.String(20), default="214")
     expense_account_code = db.Column(db.String(20), default="642")
@@ -1132,6 +1198,72 @@ class FixedAssetDepreciation(BaseModel):
     __table_args__ = (
         Index("ix_fixed_asset_depreciations_asset_period", "asset_id", "period_key", unique=True),
         Index("ix_fixed_asset_depreciations_lead_period", "lead_id", "period_key"),
+    )
+
+    def tdict(self):
+        result = {}
+        for column in self.__table__.columns:
+            value = getattr(self, column.name)
+            if isinstance(value, (datetime.datetime, datetime.date)):
+                value = value.isoformat()
+            result[column.name] = value
+        return result
+
+
+class AccountingRecord(BaseModel):
+    """Hồ sơ kế toán: hợp đồng, báo giá, biên bản, thanh lý..."""
+    __tablename__ = "accounting_records"
+
+    id          = db.Column(db.String(50), primary_key=True)
+    lead_id     = db.Column(db.Integer, db.ForeignKey("lead.id"), nullable=False)
+    sub_tab     = db.Column(db.String(30), nullable=False, default="hop-dong")
+    # hop-dong | nghiem-thu | thanh-toan
+    name        = db.Column(db.String(255), nullable=False)
+    file_type   = db.Column(db.String(20), nullable=True)   # doc, docx, pdf, xlsx...
+    folder      = db.Column(db.String(255), nullable=True)
+    content     = db.Column(db.Text, nullable=True)          # richtext HTML
+    created_by  = db.Column(db.String(50), nullable=True)
+    updated_by  = db.Column(db.String(50), nullable=True)
+
+    lead = db.relationship("LeadPayload", backref="accounting_records")
+
+    __table_args__ = (
+        Index("ix_accounting_records_lead_tab", "lead_id", "sub_tab"),
+    )
+
+    def tdict(self):
+        result = {}
+        for column in self.__table__.columns:
+            value = getattr(self, column.name)
+            if isinstance(value, (datetime.datetime, datetime.date)):
+                value = value.isoformat()
+            result[column.name] = value
+        return result
+
+
+FA_EVENT_TYPES = ["purchase", "maintenance", "responsible"]
+
+class FixedAssetEvent(BaseModel):
+    """Sub-rows for a fixed asset: purchase info, maintenance, responsible person."""
+    __tablename__ = "fixed_asset_events"
+
+    id = db.Column(db.String(50), primary_key=True)
+    asset_id = db.Column(db.String(50), db.ForeignKey("fixed_assets.id", ondelete="CASCADE"), nullable=False)
+    lead_id = db.Column(db.Integer, db.ForeignKey("lead.id"), nullable=False)
+    event_type = db.Column(db.String(30), nullable=False)  # purchase | maintenance | responsible
+    event_date = db.Column(db.Date, nullable=True)          # ngày mua / ngày bảo trì
+    person_name = db.Column(db.String(255), nullable=True)  # người mua / người bảo trì / người chịu trách nhiệm
+    person_phone = db.Column(db.String(30), nullable=True)  # SĐT liên hệ
+    note = db.Column(db.Text, nullable=True)                # ghi chú thêm
+    created_by = db.Column(db.String(50), nullable=True)
+    updated_by = db.Column(db.String(50), nullable=True)
+
+    asset = db.relationship("FixedAsset", backref="events")
+    lead = db.relationship("LeadPayload", backref="fixed_asset_events")
+
+    __table_args__ = (
+        Index("ix_fa_events_asset", "asset_id"),
+        Index("ix_fa_events_lead", "lead_id"),
     )
 
     def tdict(self):

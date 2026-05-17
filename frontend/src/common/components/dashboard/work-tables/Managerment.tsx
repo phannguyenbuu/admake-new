@@ -32,32 +32,32 @@ import { useTaskContext } from "../../../common/hooks/useTask";
 import { useUser } from "../../../common/hooks/useUser";
 
 export interface DeleteConfirmProps {
-    visible: boolean;
-    taskId: string | null;
-    taskTitle: string;
+  visible: boolean;
+  taskId: string | null;
+  taskTitle: string;
 }
 
 export const fixedColumns = [
-    { id: "col-0", title: "Đơn hàng", type: "OPEN" },
-    { id: "col-1", title: "Phân việc", type: "IN_PROGRESS" },
-    { id: "col-2", title: "Thực hiện", type: "DONE" },
-    { id: "col-3", title: "Hoàn thiện", type: "REWARD" },
-  ];
+  { id: "col-0", title: "Đơn hàng", type: "OPEN" },
+  { id: "col-1", title: "Phân việc", type: "IN_PROGRESS" },
+  { id: "col-2", title: "Thực hiện", type: "DONE" },
+  { id: "col-3", title: "Hoàn thiện", type: "REWARD" },
+];
 
 export function getTitleByStatus(type: string): string | undefined {
-    const col = fixedColumns.find(col => col.type === type);
-    return col ? col.title : undefined;
+  const col = fixedColumns.find(col => col.type === type);
+  return col ? col.title : undefined;
 }
 
 export default function ManagermentBoard() {
   const context = useContext(UpdateButtonContext);
   if (!context) throw new Error("UpdateButtonContext not found");
   const { showUpdateButton, setShowUpdateButton } = context;
-  
-  const {workspaceId, isCurrentWorkspaceFree, userLeadId} = useUser();
+
+  const { workspaceId, isCurrentWorkspaceFree, userLeadId } = useUser();
   const { data: workspaceData } = useWorkSpaceQueryById(workspaceId);
 
-  const {tasksData, updateTaskStatus, refetchTasks, taskDetail, setTaskDetail} = useTaskContext();
+  const { tasksData, updateTaskStatus, refetchTasks, taskDetail, setTaskDetail } = useTaskContext();
   const [currentColumn, setCurrentColumn] = useState<number>(0);
   const deleteTaskMutation = useDeleteTask();
 
@@ -81,7 +81,7 @@ export default function ManagermentBoard() {
   // Reload columns when board data changes
   useEffect(() => {
     if (showUpdateButton === 1) {
-      
+
     }
 
     // @ts-ignore
@@ -131,17 +131,6 @@ export default function ManagermentBoard() {
     (start: any) => {
       // if (!adminMode) return;
 
-      // Kiểm tra xem task có đang ở cột "Khoán thưởng" không
-      const sourceColumn = columns.find((col) =>
-        // @ts-ignore - Bỏ qua type check vì columns có tasks trong runtime
-        col.tasks?.some((task: any) => task.id === start.draggableId)
-      );
-
-      if (sourceColumn?.type === "REWARD") {
-        message.warning("Không thể di chuyển task đã hoàn thành khoán thưởng!");
-        return;
-      }
-
       setIsDragging(true);
       setDraggedTaskId(start.draggableId);
 
@@ -173,7 +162,7 @@ export default function ManagermentBoard() {
         }
       }
     },
-    [ columns]
+    [columns]
   );
 
   const onDragUpdate = useCallback(
@@ -181,7 +170,7 @@ export default function ManagermentBoard() {
       // if (!adminMode) return;
 
 
-      if(update.destination?.droppableId) {
+      if (update.destination?.droppableId) {
         const destColIdx = columns.findIndex(
           (c) => c.id === update.destination.droppableId
         );
@@ -224,10 +213,10 @@ export default function ManagermentBoard() {
         }
       }
     },
-    [ columns]
+    [columns]
   );
 
-  
+
 
 
 
@@ -332,7 +321,7 @@ export default function ManagermentBoard() {
           };
 
           // Cập nhật status của task qua API
-          
+
           // const newStatus = fixedColumns[destColIdx].type;
           if (movedTask.id) {
             updateTaskStatus(movedTask.id, fixedColumns[destColIdx].type);
@@ -363,8 +352,8 @@ export default function ManagermentBoard() {
   }, [resetDragState]);
 
   const [showFormTask, setShowFormTask] = useState(false);
-  const {setWorkspaces} = useUser();
-  
+  const { setWorkspaces } = useUser();
+
   const handleFormSuccess = useCallback(() => {
     setShowFormTask(false);
     // setSelectedTask(null);
@@ -396,44 +385,44 @@ export default function ManagermentBoard() {
 
   return (
     <div className="relative w-full">
-      <WorkspaceHeader workspaceData={workspaceData}/>
-      
+      <WorkspaceHeader workspaceData={workspaceData} />
+
       {/* Board */}
-      <WorkspaceBoard onDragStart = {onDragStart} 
-                      onDragUpdate = {onDragUpdate}
-                      // adminMode = {adminMode}
-                      onDragEnd = {onDragEnd}
-                      isDragging = {isDragging}
-                      columns = {columns}
-                      // setSelectedTask = {setSelectedTask} 
-                      // setEditingTaskId = {setTaskDetail}
-                      setShowFormTask = {setShowFormTask}
-                      currentColumn={currentColumn}
-                      setCurrentColumn = {setCurrentColumn}
-                    />
+      <WorkspaceBoard onDragStart={onDragStart}
+        onDragUpdate={onDragUpdate}
+        // adminMode = {adminMode}
+        onDragEnd={onDragEnd}
+        isDragging={isDragging}
+        columns={columns}
+        // setSelectedTask = {setSelectedTask} 
+        // setEditingTaskId = {setTaskDetail}
+        setShowFormTask={setShowFormTask}
+        currentColumn={currentColumn}
+        setCurrentColumn={setCurrentColumn}
+      />
 
       <FormTask
         currentColumn={currentColumn}
         open={showFormTask}
         onCancel={() => { setShowFormTask(false); }}
-        
+
         // workspaceId={workspaceId}
         initialValues={taskDetail}
         onSuccess={handleFormSuccess}
 
         // @ts-ignore
-        users = {workspaceData?.users}
+        users={workspaceData?.users}
         // @ts-ignore
         // customers = {workspaceData?.customers}
         updateTaskStatus={updateTaskStatus}
       />
 
-      <WorkspaceModal deleteConfirmModal={deleteConfirmModal}      
-                      handleDeleteCancel={handleDeleteCancel}
-                      handleDeleteConfirm={handleDeleteConfirm}
-                      deleteTaskMutation={deleteConfirmModal}
-                      
-                />
+      <WorkspaceModal deleteConfirmModal={deleteConfirmModal}
+        handleDeleteCancel={handleDeleteCancel}
+        handleDeleteConfirm={handleDeleteConfirm}
+        deleteTaskMutation={deleteConfirmModal}
+
+      />
     </div>
   );
 }

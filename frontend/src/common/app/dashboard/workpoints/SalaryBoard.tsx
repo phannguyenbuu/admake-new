@@ -117,12 +117,14 @@ const SalaryBoard: React.FC<SalaryBoardProps> = ({
   
 
   useEffect(() => {
+    if (!modalVisible || !selectedRecord?.user_id) return;
+
     setDataMessages([]);
 
     if (taskDetail) {
       const fetchData = async () => {
         try {
-          const response = await fetch(`${useApiHost()}/task/${selectedRecord?.user_id}/salary?month=${month}`, {
+          const response = await fetch(`${useApiHost()}/task/${selectedRecord.user_id}/salary?month=${month}`, {
             method: "GET",
             headers: {
               "Content-Type": "application/json"
@@ -141,10 +143,10 @@ const SalaryBoard: React.FC<SalaryBoardProps> = ({
         }
       };
       fetchData();
-    }else{
+    } else {
       const fetchData = async () => {
         try {
-          const response = await fetch(`${useApiHost()}/workpoint/${selectedRecord?.user_id}/salary?month=${month}`, {
+          const response = await fetch(`${useApiHost()}/workpoint/${selectedRecord.user_id}/salary?month=${month}`, {
             method: "GET",
             headers: {
               "Content-Type": "application/json"
@@ -155,14 +157,14 @@ const SalaryBoard: React.FC<SalaryBoardProps> = ({
           }
           const data = await response.json();
           setDataMessages(data.messages);
-          console.log("Salary tasks data:",selectedRecord?.user_id, data);
+          console.log("Salary tasks data:", selectedRecord.user_id, data);
         } catch (error) {
           console.error("Fetch error:", error);
         }
       };
       fetchData();
     }
-  }, [selectedRecord, modalVisible, month]);
+  }, [selectedRecord, modalVisible, month, taskDetail, setTaskDetail]);
 
   useEffect(()=>{
     if(!taskDetail || ! taskDetail.assets) 
@@ -205,11 +207,14 @@ const SalaryBoard: React.FC<SalaryBoardProps> = ({
   const isAdmin = !window.location.href.includes('/point/');
 
   const fetchTaskByUser = async (): Promise<Task[]> => {
-    const response = await fetch(`${useApiHost()}/task/${selectedRecord?.user_id}/by_user?month=${month}`);
-    
+    if (!selectedRecord?.user_id) {
+      return [];
+    }
+
+    const response = await fetch(`${useApiHost()}/task/${selectedRecord.user_id}/by_user?month=${month}`);
+
     if (!response.ok) {
-      // console.log("Error in fetching");
-      throw new Error(`Error fetching tasks for user ${selectedRecord?.user_id}`);
+      throw new Error(`Error fetching tasks for user ${selectedRecord.user_id}`);
     }
     
     // Chỉ gọi response.json() một lần
@@ -268,7 +273,17 @@ const SalaryBoard: React.FC<SalaryBoardProps> = ({
 
 
     useEffect(() => {
-      if (!selectedRecord?.items?.length) return;
+      if (!modalVisible || !selectedRecord?.user_id) return;
+      if (!selectedRecord?.items?.length) {
+        setTimeWork(0);
+        setPeriodWork(0);
+        setOverTimeWork(0);
+        setLateMinutes(0);
+        setEarlyMinutes(0);
+        setSalaryUnit(0);
+        fetchTaskByUser();
+        return;
+      }
 
       // ✅ DÙNG selectedMonthIndex, selectedYear từ props
       const monthItems = selectedRecord.items.filter(item => {

@@ -38,6 +38,15 @@ server {
         allow all;
     }
 
+    # Legacy lead admin URL
+    location = /admin/leads {
+        return 302 /lead-manage/;
+    }
+
+    location /admin/leads/ {
+        return 302 /lead-manage/;
+    }
+
     # Landing page
     location / {
         root /var/www/admake-landing-page;

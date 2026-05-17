@@ -1,0 +1,1 @@
+import{l as r,$ as o}from"./index-D4TxyAum.js";function x({direction:t="column",top:n=0,gap:i=0,...e}){return r.jsx(o,{id:e.id,sx:{display:"flex",mt:n,gap:i,justifyContent:"center",alignItems:"center",flexDirection:t},children:e.children})}export{x as C};

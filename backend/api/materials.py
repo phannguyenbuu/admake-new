@@ -1,8 +1,21 @@
-from flask import Blueprint, request, jsonify, abort
+from flask import Blueprint, request, jsonify, abort, g
 from sqlalchemy import func
 from models import db, Material, MaterialTransaction, generate_datetime_id
+from permission_utils import ensure_resource_lead, require_can_view
 
 material_bp = Blueprint("material", __name__, url_prefix="/api/material")
+
+
+@material_bp.before_request
+def guard_material_permission():
+    actor, _ = require_can_view("view_material")
+    g.permission_actor = actor
+
+    material_id = (request.view_args or {}).get("material_id")
+    if material_id:
+        material = db.session.get(Material, material_id)
+        if material:
+            ensure_resource_lead(material, actor, "material")
 
 
 def _to_float(value, default=0.0):
@@ -28,7 +41,7 @@ def get_materials():
     page = request.args.get("page", 1, type=int)
     limit = request.args.get("limit", 20, type=int)
     search = request.args.get("search", "", type=str).strip()
-    lead_id = request.args.get("lead", 0, type=int)
+    lead_id = request.args.get("lead", 0, type=int) or int(g.permission_actor.lead_id or 0)
     category = request.args.get("category", "", type=str).strip()
 
     query = Material.query
@@ -66,7 +79,7 @@ def get_materials():
 
 @material_bp.route("/summary", methods=["GET"])
 def get_material_summary():
-    lead_id = request.args.get("lead", 0, type=int)
+    lead_id = request.args.get("lead", 0, type=int) or int(g.permission_actor.lead_id or 0)
     query = Material.query
     if lead_id > 0:
         query = query.filter(Material.lead_id == lead_id)
@@ -94,7 +107,7 @@ def create_material():
 
     quantity = _to_float(data.get("quantity"), 0.0)
     price = _to_float(data.get("price"), 0.0)
-    lead_id = _to_int(data.get("lead_id"), 0) or None
+    lead_id = _to_int(data.get("lead_id"), int(g.permission_actor.lead_id or 0)) or None
 
     # Embed category metadata in description for backward compatibility
     category = (data.get("category") or "").strip()

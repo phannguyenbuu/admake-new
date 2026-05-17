@@ -7,7 +7,8 @@ import type { WorkSpace } from '../../@types/work-space.type';
 import type { NotifyProps } from '../../@types/notify.type';
 import type { MessageTypeProps } from '../../@types/chat.type';
 import type { User } from '../../@types/user.type';
-import type { UserCanViewFormProps } from '../../app/infor/UserCanView';
+import type { UserCanViewFormProps } from '../../@types/user-can-view.type';
+import { normalizeDashboardPermission } from '../utils/permission.util';
 
 interface UserContextProps {
   isCurrentWorkspaceFree: boolean;
@@ -112,11 +113,17 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
 
 
-  useEffect(()=>{
+  useEffect(()=>{ 
     setIsFullChatUI(userRoleId === -2);
     console.log('innerHeight', window.innerHeight);
     setChatBoxHeight(userRoleId === -2 ? window.innerHeight - 145: window.innerHeight);
   },[userRoleId]);
+
+  useEffect(() => {
+    if (userRoleId === -2 && !canViewPermission) {
+      setCanViewPermission(normalizeDashboardPermission(-2, null));
+    }
+  }, [userRoleId, canViewPermission]);
   
 
   useEffect(()=>{
@@ -253,7 +260,9 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setUserRole(data.role);
       setUserIcon(data.icon ?? 'images/avatar.png');
       setUserLeadId(data.lead_id ?? null);
-      setCanViewPermission(data.can_views ?? null);
+      setCanViewPermission(
+        normalizeDashboardPermission(data.role_id, data.can_views ?? null),
+      );
 
       // Sau khi đăng nhập thành công, bạn có thể redirect đến trang chính
       window.location.href = '/'; // hoặc route bạn muốn
@@ -352,7 +361,9 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setUserRole(data.role ?? null);
         setUserIcon(data.icon ?? 'images/avatar.png');
         setUserLeadId(data.lead_id ?? null);
-        setCanViewPermission(data.can_views ?? null);
+        setCanViewPermission(
+          normalizeDashboardPermission(data.role_id ?? 0, data.can_views ?? null),
+        );
       } else if (res.status === 401) {
         // Token hết hạn hoặc không hợp lệ, xóa token, chuyển về login
         console.warn("Access token expired or invalid, logging out.");

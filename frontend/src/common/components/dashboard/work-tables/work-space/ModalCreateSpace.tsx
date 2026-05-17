@@ -41,7 +41,7 @@ export default function ModalCreateSpace({
       const wItem:WorkSpace = await response.json();
 
       notification.success({message:"Tạo bảng công việc thành công!", description: values.name});
-      window.location.href = `${window.location.origin}/dashboard/work-tables/${wItem.id}`
+      window.location.href = `${window.location.origin}/work-tables/${wItem.id}`
       
     } catch (error) {
       notification.error({message:"Tạo bảng công việc thất bại"});

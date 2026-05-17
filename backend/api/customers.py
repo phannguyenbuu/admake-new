@@ -1,18 +1,32 @@
-from flask import Blueprint, request, jsonify, abort
+from flask import Blueprint, request, jsonify, abort, g
 from models import db, Workspace, dateStr, User, create_workspace_method, Message, LeadPayload, get_model_columns, get_query_page_users
 # from api.groups import create_group
 import datetime
 from sqlalchemy import desc
 from sqlalchemy import or_
+from permission_utils import ensure_resource_lead, require_can_view
 
 customer_bp = Blueprint('customer', __name__, url_prefix='/api/customer')
+
+
+@customer_bp.before_request
+def guard_customer_permission():
+    actor, _ = require_can_view("view_customer")
+    g.permission_actor = actor
+
+    view_args = request.view_args or {}
+    workspace_id = view_args.get("id") or view_args.get("workspace_id")
+    if workspace_id:
+        workspace = db.session.get(Workspace, workspace_id)
+        if workspace:
+            ensure_resource_lead(workspace, actor, "customer")
 
 @customer_bp.route("/", methods=["GET"])
 def get_customers():
     page = request.args.get("page", 1, type=int)
     limit = request.args.get("limit", 10, type=int)
     search = request.args.get("search", "", type=str)
-    lead_id = request.args.get("lead", 0, type=int)
+    lead_id = request.args.get("lead", 0, type=int) or int(g.permission_actor.lead_id or 0)
 
     if lead_id == 0:
         print("Zero lead")
@@ -54,13 +68,15 @@ def get_customers():
 @customer_bp.route("/", methods=["POST"])
 def create_customer():
     data = request.get_json()
+    if isinstance(data, dict) and not data.get("lead_id"):
+        data["lead_id"] = g.permission_actor.lead_id
     
     return create_workspace_method(data)
 
 @customer_bp.route("/<string:id>", methods=["GET"])
 def get_customer_detail(id):
     customer = db.session.get(Workspace, id)
-    if not customer:
+    if not customer or not customer.owner_id:
         abort(404, description="Customer not found")
 
     result = customer.tdict()
@@ -82,7 +98,7 @@ def get_customer_detail(id):
 def update_customer(id):
     data = request.get_json()
     workspace = db.session.get(Workspace, id)
-    if not workspace:
+    if not workspace or not workspace.owner_id:
         return jsonify({"error": "Workspace not found"}), 404
 
     user = db.session.get(User, workspace.owner_id)
@@ -113,7 +129,7 @@ def update_customer(id):
 @customer_bp.route("/<string:workspace_id>", methods=["DELETE"])
 def delete_customer(workspace_id):
     workspace = db.session.get(Workspace, workspace_id)
-    if not workspace:
+    if not workspace or not workspace.owner_id:
         print('Cannot find workspace', workspace_id)
         return jsonify({"error": "Workspace not found"}), 404
     

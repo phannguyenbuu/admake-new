@@ -13,7 +13,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import SendIcon from '@mui/icons-material/Send';
 import FileUploadWithPreview from "../../../FileUploadWithPreview";
 import { Modal } from "antd";
-import {Button,Checkbox,FormControlLabel,} from "@mui/material";
+import { Button, Checkbox, FormControlLabel, } from "@mui/material";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -109,18 +109,18 @@ interface ChatInputProps {
   setMessage: React.Dispatch<React.SetStateAction<string>>;
   onSend: (message: string) => void;
   isCash?: boolean;
-  isChoose? : boolean;
+  isChoose?: boolean;
 }
 
 const ChatInput: React.FC<ChatInputProps> = ({ children, onSend, message, setMessage, isCash, isChoose }) => {
   const [formOpen, setFormOpen] = useState(false);
   // const [message, setMessage] = useState('');
-  const {userId, username, isMobile} = useUser();
+  const { userId, username, isMobile } = useUser();
 
   const handleMessageSend = () => {
-    console.log("S",message);
+    console.log("S", message);
 
-    if(isCash)
+    if (isCash)
       setFormOpen(true);
     else {
       if (message.trim() === '') return;
@@ -137,21 +137,20 @@ const ChatInput: React.FC<ChatInputProps> = ({ children, onSend, message, setMes
 
   return (
     <>
-      <Box display="flex" alignItems="center" padding={1} borderTop="1px solid #ccc">
+      <Box display="flex" alignItems="center" padding={1}>
         {children}
-        <IconButton key="send" color="primary" 
-          onClick={handleMessageSend} 
+        <IconButton key="send" color="primary"
+          onClick={handleMessageSend}
           aria-label="send message"
-          style={{top:-10}}
-          >
+        >
           <SendIcon />
         </IconButton>
       </Box>
-      <BankTransferModal 
-        open={formOpen} 
-        setOpen={setFormOpen} 
+      <BankTransferModal
+        open={formOpen}
+        setOpen={setFormOpen}
         onClose={handleDialogClose}
-        rewardContent={isChoose? ["Thưởng", "Phạt"]:[]}/>
+        rewardContent={isChoose ? ["Thưởng", "Phạt"] : []} />
     </>
   );
 };
@@ -166,27 +165,27 @@ interface ImagePasteUploadProps {
 }
 
 
-const ImagePasteUpload: React.FC<ImagePasteUploadProps> = ({ 
+const ImagePasteUpload: React.FC<ImagePasteUploadProps> = ({
   onMessageSend, isCash,
   onAssetSend, title }) => {
-    const [message, setMessage] = useState<string>('');
-    const {isMobile} = useUser();
+  const [message, setMessage] = useState<string>('');
+  const { isMobile } = useUser();
 
   const handleKeyPress = (event: React.KeyboardEvent<HTMLDivElement>) => {
     if (event.key === 'Enter' && !event.shiftKey) {
       event.preventDefault();
       // const target = event.target as HTMLTextAreaElement;
-      
+
       onMessageSend(message);
       setMessage('');
     }
   };
-  
-  
+
+
   const handlePaste = (event: React.ClipboardEvent<HTMLDivElement>) => {
-    
+
     const items = event.clipboardData?.items;
-    
+
     if (!items) return;
 
     let isImagePasted = false;
@@ -212,7 +211,7 @@ const ImagePasteUpload: React.FC<ImagePasteUploadProps> = ({
 
 
   return (
-    <Stack direction="row">
+    <Stack direction="row" sx={{ flexGrow: 1, width: '90%', alignItems: 'center' }}>
       <TextField
         placeholder={title}
         multiline
@@ -223,14 +222,14 @@ const ImagePasteUpload: React.FC<ImagePasteUploadProps> = ({
         onChange={e => setMessage(e.target.value)}
         onPaste={handlePaste}
         onKeyDown={handleKeyPress}
-        sx={{ marginRight: 1, minWidth: isMobile ? 200 : 300 }}
+        sx={{ marginRight: 1 }}
       />
 
-      <ChatInput onSend={onMessageSend} 
-                    message={message} 
-                    setMessage={setMessage}
-                    isCash={isCash}
-                    isChoose={false}>
+      <ChatInput onSend={onMessageSend}
+        message={message}
+        setMessage={setMessage}
+        isCash={isCash}
+        isChoose={false}>
       </ChatInput>
     </Stack>
   );

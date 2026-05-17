@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify, abort
+from flask import Blueprint, request, jsonify, abort, g
 from models import app, db, Workspace, Task, dateStr,Message, generate_datetime_id, User, create_workspace_method, get_model_columns, LeadPayload,get_lead_by_json, get_lead_by_arg
 import datetime
 from collections import defaultdict
@@ -6,15 +6,29 @@ from sqlalchemy import desc, asc
 from sqlalchemy.orm.attributes import flag_modified
 from sqlalchemy.sql import func
 from sqlalchemy import or_
+from permission_utils import ensure_resource_lead, require_can_view
 
 workspace_bp = Blueprint('workspace', __name__, url_prefix='/api/workspace')
+
+
+@workspace_bp.before_request
+def guard_workspace_permission():
+    actor, _ = require_can_view("view_workspace")
+    g.permission_actor = actor
+
+    view_args = request.view_args or {}
+    workspace_id = view_args.get("id") or view_args.get("workspace_id")
+    if workspace_id:
+        workspace = db.session.get(Workspace, workspace_id)
+        if workspace:
+            ensure_resource_lead(workspace, actor, "workspace")
 
 @workspace_bp.route("/", methods=["GET"])
 def get_workspaces():
     # lead_id, lead = get_lead_by_json(request)
     page = request.args.get("page", 1, type=int)
     limit = request.args.get("limit", 10, type=int)
-    lead_id = request.args.get("lead", 0, type=int)
+    lead_id = request.args.get("lead", 0, type=int) or int(g.permission_actor.lead_id or 0)
     search = request.args.get("search", "", type=str)
 
     # if lead_id == 0 or not lead:
@@ -45,7 +59,8 @@ def get_all_users_by_lead_id(lead_id):
         "fullName": user.fullName,
         "user_id": user.id,
         "role": get_role(user),
-        "phone": user.phone
+        "phone": user.phone,
+        "salary": user.salary or 0
         } for user in User.query.all() if user.lead_id == lead_id and user.role_id and user.role_id > 0]
 
     
@@ -206,6 +221,8 @@ def get_workspace_detail(id):
 @workspace_bp.route("/", methods=["POST"])
 def create_workspace():
     data = request.get_json()
+    if isinstance(data, dict) and not data.get("lead_id"):
+        data["lead_id"] = g.permission_actor.lead_id
     # print(data)
     
     return create_workspace_method(data, False)

@@ -22,6 +22,7 @@ interface BuildMonthlyStatusParams {
   year: number;
   month: number;
   daysInMonth: number;
+  workInSunday?: boolean;
 }
 
 export const createEmptyStatuses = (daysInMonth: number): StatusMatrix =>
@@ -33,6 +34,7 @@ export const buildMonthlyStatuses = ({
   year,
   month,
   daysInMonth,
+  workInSunday = false,
 }: BuildMonthlyStatusParams): { statuses: StatusMatrix; totalHour: WorkHourSummary } => {
   const statuses = createEmptyStatuses(daysInMonth);
   const totalHour: WorkHourSummary = { morning: 0, noon: 0, evening: 0 };
@@ -47,15 +49,22 @@ export const buildMonthlyStatuses = ({
     const dayIndex = localTime.getDate() - 1;
     if (dayIndex < 0 || dayIndex >= daysInMonth || !statuses[dayIndex]) return;
 
+    // Chủ nhật (0) mà không cấu hình làm CN → toàn bộ buổi là tăng ca
+    const isSunday = localTime.getDay() === 0;
+    const isDayOvertime = isSunday && !workInSunday;
+
     (Object.keys(item.checklist) as (keyof Checklist)[]).forEach((period) => {
       const periodData = item.checklist[period];
       if (!periodData) return;
 
+      // Buổi tối (evening) hoặc ngày tăng ca → dùng overtime status
+      const isOvertimePeriod = isDayOvertime || period === "evening";
+
       if (periodData.out) {
         totalHour[period] += periodData.workhour || 0;
-        statuses[dayIndex][PERIOD_MAP[period]] = "out";
+        statuses[dayIndex][PERIOD_MAP[period]] = isOvertimePeriod ? "overtime-out" : "out";
       } else if (periodData.in) {
-        statuses[dayIndex][PERIOD_MAP[period]] = "in";
+        statuses[dayIndex][PERIOD_MAP[period]] = isOvertimePeriod ? "overtime-in" : "in";
       } else {
         statuses[dayIndex][PERIOD_MAP[period]] = null;
       }

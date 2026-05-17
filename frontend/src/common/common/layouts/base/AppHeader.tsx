@@ -11,7 +11,7 @@ import { useWorkSpaceQueryAll } from "../../hooks/work-space.hook";
 import ChatGroupList from "./ChatGroupList";
 import { useUser } from "../../hooks/useUser";
 import { QuestionOutlined } from '@ant-design/icons';
-import AllTasksModal from "../../../components/dashboard/work-tables/AllTasksModal";
+
 import { useLocation } from "react-router-dom";
 import { ChatGroupProvider } from "../../../components/chat/ProviderChat";
 import NoteWorkpointModal from "./NoteWorkpointModal";
@@ -26,20 +26,20 @@ export default function AppHeader() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [notificationOpen, setNotificationOpen] = useState(false);
-  const {username, userId, userRole, userRoleId, userLeadId, workspaces, setWorkspaces, fullName} = useUser();
+  const { username, userId, userRole, userRoleId, userLeadId, workspaces, setWorkspaces, fullName } = useUser();
   const [questionOpen, setQuestionOpen] = useState(false);
-  const {getNotifyList, notifyList} = useUser();
+  const { getNotifyList, notifyList } = useUser();
   // console.log('USER_NAME', useUser(), username);
-  
+
   // call hook useInfo
   const { data: info, refetch: refetchInfo } = useInfo();
   // const { isConnected, on } = useSocket();
 
   //@ts-ignore
-  const { data: receiveWorkSpaces, refetch: refetchWorkSpaces } = useWorkSpaceQueryAll({lead: userLeadId});
+  const { data: receiveWorkSpaces, refetch: refetchWorkSpaces } = useWorkSpaceQueryAll({ lead: userLeadId });
 
-  useEffect(()=>{
-    if(!receiveWorkSpaces) return;
+  useEffect(() => {
+    if (!receiveWorkSpaces) return;
     //@ts-ignore
     receiveWorkSpaces.sort((a, b) => {
       if (a.pinned === b.pinned) {
@@ -53,7 +53,7 @@ export default function AppHeader() {
     });
     //@ts-ignore
     setWorkspaces(receiveWorkSpaces);
-  },[receiveWorkSpaces]);
+  }, [receiveWorkSpaces]);
 
   const handleQuestionClick = () => {
     setQuestionOpen(true);
@@ -63,7 +63,7 @@ export default function AppHeader() {
     setQuestionOpen(false)
   }
 
-  
+
   useEffect(() => {
     getNotifyList(); // Gọi lần đầu khi mount
 
@@ -82,95 +82,89 @@ export default function AppHeader() {
     queryClient.clear();
     refetchInfo();
 
-    notification.success({message:"Logout successful"});
+    notification.success({ message: "Logout successful" });
     window.location.href = "/login";
   };
 
+  const avatarMenuItems = [
+    ...(userRoleId === -2
+      ? [
+          {
+            key: "user",
+            label: "Phân quyền xem theo user",
+            icon: <UserOutlined />,
+            onClick: () => {
+              navigate("/infor");
+            },
+          },
+        ]
+      : []),
+    {
+      key: "logout",
+      label: "Đăng xuất",
+      icon: <LogoutOutlined />,
+      danger: true,
+      onClick: handleLogout,
+    },
+  ];
+
   return (
     <>
-    <ChatGroupProvider>
-      <Header className="flex items-center gap-1 justify-between !px-4 md:!px-8 !bg-white shadow-sm h-14 md:h-16 sticky top-0 z-30 border-b border-gray-200">
-        {/* Logo Section - Left side */}
-        <div className="flex items-center gap-3">
-          {/* Logo icon */}
-          <div>
-            <img src="/logo.jpg" alt="logo" style={{width:40,height:'auto'}} />
-          </div>
-          {/* Logo text */}
-          <div className="flex items-center justify-center">
-            <img src="/ADMAKE.svg" alt="ADMAKE" className="h-8" />
-          </div>
-        </div>
-
-        {/* Menu Chat Group List */}
-        <ChatGroupList/>
-
-        <AllTasksModal/>
-         
-          <div onClick={handleQuestionClick}
-            className="p-0 rounded-full hover:bg-gray-100 transition-all duration-200 flex items-center justify-center">
-            <QuestionOutlined 
-              className={`text-lg md:text-xl transition-colors duration-200`}
-            />
+      <ChatGroupProvider>
+        <Header className="flex items-center gap-1 justify-between !px-4 md:!px-8 !bg-white shadow-sm h-14 md:h-16 sticky top-0 z-30 border-b border-gray-200">
+          {/* Logo Section - Left side */}
+          <div className="flex items-center gap-3">
+            {/* Logo icon */}
+            <div>
+              <img src="/logo.jpg" alt="logo" style={{ width: 40, height: 'auto' }} />
+            </div>
+            {/* Logo text */}
+            <div className="flex items-center justify-center">
+              <img src="/ADMAKE.svg" alt="ADMAKE" className="h-8" />
+            </div>
           </div>
 
-          {/* Admin role text */}
-          <div className="hidden md:flex items-center">
-            <span className="text-gray-700 font-semibold text-sm px-3 py-1.5 bg-gray-100 rounded-full">
-              {fullName || "Admin"} / {userRole?.name}
-            </span>
+          {/* Right Section */}
+          <div className="flex items-center gap-3 md:gap-4">
+            {/* Menu Chat Group List */}
+            <ChatGroupList />
 
-            <NotifyModal />
-          </div>
+            {/* Admin role text */}
+            <div className="hidden md:flex items-center">
+              <span className="text-gray-700 font-semibold text-sm px-3 py-1.5 bg-gray-100 rounded-full">
+                {fullName || "Admin"} / {userRole?.name}
+              </span>
 
-          {/* Avatar dropdown */}
-          <div className="flex items-center">
-            <Dropdown
-              menu={{
-                items: [
-                  {
-                    key: "user",
-                    label: "Thông tin",
-                    icon: <UserOutlined />,
-                    onClick: () => {
-                      navigate("/infor");
-                    },
-                  },
-                  {
-                    key: "logout",
-                    label: "Đăng xuất",
-                    icon: <LogoutOutlined />,
-                    danger: true,
-                    onClick: handleLogout,
-                  },
-                ],
-              }}
-              trigger={["click"]}
-              placement="bottomRight"
-              arrow
-            >
-              <Avatar
-                size={32}
-                className="md:!size-10 hover:scale-105 transition-transform duration-200 cursor-pointer shadow-md"
-                style={{
-                  background:
-                    "linear-gradient(135deg, #06b6d4 0%, #0891b2 100%)",
-                  color: "#fff",
-                  border: "2px solid #e5e7eb",
+              <NotifyModal />
+            </div>
+
+            {/* Avatar dropdown */}
+            <div className="flex items-center">
+              <Dropdown
+                menu={{
+                  items: avatarMenuItems,
                 }}
-                icon={<UserOutlined />}
-              />
-            </Dropdown>
+                trigger={["click"]}
+                placement="bottomRight"
+                arrow
+              >
+                <Avatar
+                  size={32}
+                  className="md:!size-10 hover:scale-105 transition-transform duration-200 cursor-pointer shadow-md"
+                  style={{
+                    background:
+                      "linear-gradient(135deg, #06b6d4 0%, #0891b2 100%)",
+                    color: "#fff",
+                    border: "2px solid #e5e7eb",
+                  }}
+                  icon={<UserOutlined />}
+                />
+              </Dropdown>
+            </div>
           </div>
+        </Header>
+      </ChatGroupProvider>
 
-          
-        
-      </Header>
-
-      {location === '/workpoints'
-        && <NoteWorkpointModal questionOpen={questionOpen} onCancel={handleCancel} />}
-    </ChatGroupProvider>
-    
     </>
   );
 }

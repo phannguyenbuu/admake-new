@@ -12,7 +12,7 @@ import axios from "axios";
 import { useDebounce } from "../../common/hooks/useDebounce";
 import AddIcon from "@mui/icons-material/Add";
 import UserCanViewForm from "./UserCanView";
-import type {UserCanViewFormProps} from "./UserCanView";
+import type {UserCanViewFormProps} from "../../@types/user-can-view.type";
 import UnPermissionBoard from "../dashboard/unPermissionBoard";
 
 export const InforDashboard: IPage["Component"] = () => {

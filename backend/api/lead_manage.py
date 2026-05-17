@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, request
 import json
 import os
+import datetime
 from sqlalchemy import cast, func, Integer, or_
 
 from models import (
@@ -22,12 +23,54 @@ from models import (
 
 lead_manage_bp = Blueprint("lead_manage", __name__, url_prefix="/lead-manage")
 
+@lead_manage_bp.route("/<int:lead_id>/update_inline", methods=["PUT"])
+def update_inline(lead_id):
+    from flask import jsonify, request
+    data = request.get_json()
+    lead = db.session.get(LeadPayload, lead_id)
+    if not lead:
+        return jsonify({"error": "Lead not found"}), 404
+        
+    if "name" in data:
+        lead.name = data["name"]
+    if "company" in data:
+        lead.company = data["company"]
+    if "phone" in data:
+        lead.phone = data["phone"]
+
+    db.session.commit()
+    return jsonify({"success": True})
+
+@lead_manage_bp.route("/<int:lead_id>/delete", methods=["DELETE"])
+def delete_lead(lead_id):
+    from flask import jsonify
+    lead = db.session.get(LeadPayload, lead_id)
+    if not lead:
+        return jsonify({"error": "Lead not found"}), 404
+        
+    db.session.delete(lead)
+    db.session.commit()
+    return jsonify({"success": True})
 
 @lead_manage_bp.route("/", methods=["GET"])
 def admin_leads():
     page = request.args.get("page", 1, type=int)
     query_text = request.args.get("q", "").strip()
     per_page = 50
+
+    # ── Sort params ──────────────────────────────────────────────
+    sort_by    = request.args.get("sort_by", "id")
+    sort_dir   = request.args.get("sort_dir", "asc")
+
+    # ── Column filter params ─────────────────────────────────────
+    f_name     = request.args.get("f_name", "").strip()
+    f_company  = request.args.get("f_company", "").strip()
+    f_phone    = request.args.get("f_phone", "").strip()
+    f_invited  = request.args.get("f_invited", "")     # "1" / "0" / ""
+    f_active   = request.args.get("f_active", "")      # "1" / "0" / ""
+    # Date-range filter for last login
+    f_login_from = request.args.get("f_login_from", "").strip()
+    f_login_to   = request.args.get("f_login_to", "").strip()
 
     labels_path = os.path.join(os.path.dirname(__file__), "..", "config", "lead_dashboard_labels.json")
     try:
@@ -57,6 +100,8 @@ def admin_leads():
     ).all()
 
     lead_query = LeadPayload.query
+
+    # Text search
     if query_text:
         like = f"%{query_text}%"
         lead_query = lead_query.filter(
@@ -67,7 +112,47 @@ def admin_leads():
             )
         )
 
-    pagination = lead_query.order_by(LeadPayload.id).paginate(
+    # Column filters
+    if f_name:
+        lead_query = lead_query.filter(LeadPayload.name.ilike(f"%{f_name}%"))
+    if f_company:
+        lead_query = lead_query.filter(LeadPayload.company.ilike(f"%{f_company}%"))
+    if f_phone:
+        lead_query = lead_query.filter(LeadPayload.phone.ilike(f"%{f_phone}%"))
+    if f_invited == "1":
+        lead_query = lead_query.filter(LeadPayload.isInvited == True)
+    elif f_invited == "0":
+        lead_query = lead_query.filter(LeadPayload.isInvited == False)
+    if f_active == "1":
+        lead_query = lead_query.filter(LeadPayload.isActivated == True)
+    elif f_active == "0":
+        lead_query = lead_query.filter(LeadPayload.isActivated == False)
+
+    # ── Sort ─────────────────────────────────────────────────────
+    if sort_by == "login":
+        # Create a subquery to find max updatedAt for each lead
+        subq = db.session.query(
+            User.lead_id,
+            func.max(User.updatedAt).label("max_updated")
+        ).group_by(User.lead_id).subquery()
+        
+        lead_query = lead_query.outerjoin(subq, LeadPayload.id == subq.c.lead_id)
+        if sort_dir == "desc":
+            sort_col = subq.c.max_updated.desc().nullslast()
+        else:
+            sort_col = subq.c.max_updated.asc().nullsfirst()
+    else:
+        sort_col_map = {
+            "id":      LeadPayload.id,
+            "name":    LeadPayload.name,
+            "company": LeadPayload.company,
+            "phone":   LeadPayload.phone,
+        }
+        sort_col = sort_col_map.get(sort_by, LeadPayload.id)
+        if sort_dir == "desc":
+            sort_col = sort_col.desc()
+
+    pagination = lead_query.order_by(sort_col).paginate(
         page=page, per_page=per_page, error_out=False
     )
 
@@ -175,20 +260,20 @@ def admin_leads():
         .filter(User.lead_id.in_(lead_ids), User.role_id > 0, User.role_id < 100)
         .group_by(User.lead_id)
         .all()
-    )
+    ) if lead_ids else {}
     customer_role_by_lead = dict(
         db.session.query(User.lead_id, func.count())
         .filter(User.lead_id.in_(lead_ids), User.role_id == -1)
         .group_by(User.lead_id)
         .all()
-    )
+    ) if lead_ids else {}
     customer_table_by_lead = dict(
         db.session.query(User.lead_id, func.count(Customer.id))
         .join(Customer, Customer.user_id == User.id)
         .filter(User.lead_id.in_(lead_ids))
         .group_by(User.lead_id)
         .all()
-    )
+    ) if lead_ids else {}
 
     workspace_by_lead = _count_by_lead(Workspace)
     task_by_lead = _count_by_lead(Task)
@@ -298,10 +383,29 @@ def admin_leads():
     else:
         asset_images_by_lead = {}
 
+    # ── Compute last_login and days_since per lead ────────────────
+    now_utc = datetime.datetime.utcnow()
+
+    def _days_since(dt):
+        """Return int days since dt (None → None)."""
+        if dt is None:
+            return None
+        if dt.tzinfo is not None:
+            dt = dt.replace(tzinfo=None)
+        delta = now_utc - dt
+        return max(0, delta.days)
+
     leads_data = []
     for lead in pagination.items:
         lead_dict = lead.tdict()
         lead_dict["user_id_str"] = str(lead.user_id) if lead.user_id else None
+
+        lu_at = last_user_at.get(lead.id)      # datetime or None
+        days = _days_since(lu_at)
+
+        lead_dict["last_login_at"] = lu_at.isoformat() if lu_at else None
+        lead_dict["days_since_login"] = days    # None / int
+
         lead_dict["stats"] = {
             "users_total": total_users_by_lead.get(lead.id, 0),
             "users_staff": employee_users_by_lead.get(lead.id, 0),
@@ -315,7 +419,7 @@ def admin_leads():
             "last_message_at": last_message_at.get(lead.id),
             "last_workspace_at": last_workspace_at.get(lead.id),
             "last_task_at": last_task_at.get(lead.id),
-            "last_user_at": last_user_at.get(lead.id),
+            "last_user_at": lu_at,
             "last_workpoint_at": last_workpoint_at.get(lead.id),
             "preview_images": _unique_keep_order_images(
                 (
@@ -326,6 +430,30 @@ def admin_leads():
             ),
         }
         leads_data.append(lead_dict)
+
+    # ── Apply date-range filter on days_since (post-query) ───────
+    if f_login_from or f_login_to:
+        try:
+            from_date = datetime.datetime.strptime(f_login_from, "%Y-%m-%d") if f_login_from else None
+            to_date   = datetime.datetime.strptime(f_login_to,   "%Y-%m-%d") if f_login_to   else None
+        except ValueError:
+            from_date = to_date = None
+
+        def _in_range(lead_dict):
+            raw = lead_dict.get("last_login_at")
+            if not raw:
+                return False
+            try:
+                dt = datetime.datetime.fromisoformat(raw).replace(tzinfo=None)
+            except Exception:
+                return False
+            if from_date and dt < from_date:
+                return False
+            if to_date and dt > to_date + datetime.timedelta(days=1):
+                return False
+            return True
+
+        leads_data = [l for l in leads_data if _in_range(l)]
 
     return render_template(
         "admin_leads.html",
@@ -346,4 +474,14 @@ def admin_leads():
         total_pages=pagination.pages,
         query_text=query_text,
         labels=labels,
+        # Pass filter/sort state back to template
+        sort_by=sort_by,
+        sort_dir=sort_dir,
+        f_name=f_name,
+        f_company=f_company,
+        f_phone=f_phone,
+        f_invited=f_invited,
+        f_active=f_active,
+        f_login_from=f_login_from,
+        f_login_to=f_login_to,
     )

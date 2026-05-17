@@ -1,15 +1,16 @@
+import { useEffect, useState, type ReactNode } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { getMainMenuItems } from "../router";
-import { useEffect, useState } from "react";
-import ModalCreateSpace from "../../common/components/dashboard/work-tables/work-space/ModalCreateSpace";
-import { PlusOutlined, StarFilled } from "@ant-design/icons";
-import FooterMenuBar from "./FooterMenuBar";
 import { Menu } from "antd";
+import { PlusOutlined, StarFilled } from "@ant-design/icons";
 import type { WorkSpace } from "../../common/@types/work-space.type";
-import "./mobile-menu.css";
-import ModalManagerWorkSpace from "../../common/components/dashboard/work-tables/work-space/ModalManagerWorkSpace";
 import { useUser } from "../../common/common/hooks/useUser";
+import ModalCreateSpace from "../../common/components/dashboard/work-tables/work-space/ModalCreateSpace";
+import ModalManagerWorkSpace from "../../common/components/dashboard/work-tables/work-space/ModalManagerWorkSpace";
+import AllTasksModal from "../../common/components/dashboard/work-tables/AllTasksModal";
+import { getMainMenuItems } from "../router";
+import FooterMenuBar from "./FooterMenuBar";
 import { MOBILE_CORE_KEYS, MOBILE_FALLBACK_ITEMS } from "./menu.constants";
+import "./mobile-menu.css";
 
 const useWindowSize = () => {
   const [windowSize, setWindowSize] = useState({
@@ -45,32 +46,40 @@ export default function RenderMenuBar() {
   const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
 
   const isMobile = width <= 768;
-  const isTablet = width > 768 && width <= 1024;
-
-  const allMenuItems = getMainMenuItems(pathname);
+  const allMenuItems = getMainMenuItems(pathname, canViewPermission);
 
   const createMobileMenuItems = () => {
-    const mobileItems = allMenuItems.filter((item) =>
-      MOBILE_CORE_KEYS.includes(item.key as (typeof MOBILE_CORE_KEYS)[number])
+    const coreItems = allMenuItems.filter((item) =>
+      MOBILE_CORE_KEYS.includes(item.key as (typeof MOBILE_CORE_KEYS)[number]),
     );
 
-    if (mobileItems.length < 3) {
-      return MOBILE_FALLBACK_ITEMS.map((route) => {
-        const routerItem = mobileItems.find((item) => item.key === route.key);
-        return {
-          ...route,
-          label: routerItem?.label || route.label,
-          icon: routerItem?.icon || route.icon,
-        };
-      });
+    if (coreItems.length > 0) {
+      return coreItems.map((item) => ({
+        key: item.key,
+        label: item.label,
+        icon: item.icon,
+        path: item.key,
+      }));
     }
 
-    return mobileItems.map((item) => ({
-      key: item.key,
-      label: item.label,
-      icon: item.icon,
-      path: item.key,
-    }));
+    return MOBILE_FALLBACK_ITEMS
+      .map((fallbackItem) => {
+        const matched = allMenuItems.find((item) => item.key === fallbackItem.key);
+        if (!matched) return null;
+
+        return {
+          key: fallbackItem.key,
+          label: matched.label,
+          icon: matched.icon,
+          path: fallbackItem.path,
+        };
+      })
+      .filter(Boolean) as Array<{
+        key: string;
+        label: string;
+        icon: ReactNode;
+        path: string;
+      }>;
   };
 
   const mobileMenuItems = createMobileMenuItems();
@@ -80,26 +89,29 @@ export default function RenderMenuBar() {
   }
 
   const createMenuItems = () => {
-    return getMainMenuItems(pathname)
+    return allMenuItems
       .filter((item) => item.key !== "/infor")
       .map((item) => {
         const hasChildren = item.key === "/work-tables";
 
-        if (hasChildren && !isTablet && canViewPermission?.view_workspace) {
+        if (hasChildren && canViewPermission?.view_workspace) {
           return {
             key: item.key,
             icon: item.icon,
             label: (
               <div className="flex items-center justify-between w-full">
                 <span>{item.label}</span>
-                <div
-                  className="w-6 h-6 rounded-md bg-cyan-500 hover:bg-cyan-600 flex items-center justify-center shadow-sm transition-all duration-200"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setIsTabletWorkspaceModalOpen(true);
-                  }}
-                >
-                  <PlusOutlined className="text-white text-xs font-bold" />
+                <div className="flex items-center gap-1">
+                  <AllTasksModal />
+                  <div
+                    className="w-6 h-6 rounded-md bg-cyan-500 hover:bg-cyan-600 flex items-center justify-center shadow-sm transition-all duration-200"
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      setIsTabletWorkspaceModalOpen(true);
+                    }}
+                  >
+                    <PlusOutlined className="text-white text-xs font-bold" />
+                  </div>
                 </div>
               </div>
             ),
@@ -107,13 +119,13 @@ export default function RenderMenuBar() {
               id: workspace.id,
               key: `/work-tables/${workspace.id}`,
               label: (
-                <div className="flex items-center gap-3 py-1 px-2 rounded-lg hover:bg-white/10 transition-all duration-200">
+                <div className="flex items-center gap-2 py-0.5 px-1 rounded-md hover:bg-white/10 transition-all duration-200">
                   <div style={{ padding: 0, background: "none", border: "none", color: "yellow" }}>
                     {workspace.pinned && <StarFilled />}
                   </div>
                   <span
-                    className="text-sm font-semibold text-white truncate flex-1 min-w-0"
-                    style={{ color: workspace?.status === "FREE" ? "yellow" : "#fff" }}
+                    className="text-xs font-medium text-white truncate flex-1 min-w-0"
+                    style={{ color: workspace.status === "FREE" ? "yellow" : "#fff" }}
                   >
                     {workspace.name}
                   </span>
@@ -126,7 +138,7 @@ export default function RenderMenuBar() {
         return {
           key: item.key,
           icon: item.icon,
-          label: isTablet ? null : item.label,
+          label: item.label,
         };
       });
   };
@@ -134,11 +146,10 @@ export default function RenderMenuBar() {
   const handleMenuClick = ({ key }: { key: string }) => {
     if (key === "create-workspace") {
       setIsTabletWorkspaceModalOpen(true);
-    } else if (key === "/work-tables" && isTablet) {
-      setIsTabletWorkspaceModalOpen(true);
-    } else {
-      navigate(key);
+      return;
     }
+
+    navigate(key);
   };
 
   return (

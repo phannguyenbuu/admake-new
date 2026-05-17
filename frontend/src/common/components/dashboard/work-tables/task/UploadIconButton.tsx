@@ -1,53 +1,65 @@
-import React, { useState, useRef, useEffect, type ChangeEvent } from 'react';
+import React, { useState, useRef, useEffect, forwardRef, useImperativeHandle, type ChangeEvent } from 'react';
 import {
   IconButton,
   Stack,
   Avatar,
   CircularProgress,
-  Tooltip
+  Tooltip,
 } from '@mui/material';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import EditIcon from '@mui/icons-material/Edit';
-import type { Task } from '../../../../@types/work-space.type';
-import { useApiHost, useApiStatic } from '../../../../common/hooks/useApiHost';
+import { parseTaskIconList, type Task } from '../../../../@types/work-space.type';
+import { useApiStatic } from '../../../../common/hooks/useApiHost';
+import { TOKEN_LABEL } from '../../../../common/config';
 import { notification } from 'antd';
 
 interface UploadIconButtonProps {
   taskDetail: Task | null;
-  onIconChange: (iconUrl: string) => void;
+  onIconsChange: (iconUrls: string[]) => void;
   apiUrl: string;
 }
 
-const UploadIconButton: React.FC<UploadIconButtonProps> = ({
-  taskDetail,
-  onIconChange,
-  apiUrl
-}) => {
+export interface UploadIconButtonHandle {
+  uploadImageFile: (file: File) => Promise<void>;
+}
+
+function getAuthHeaders(): HeadersInit {
+  const accessToken =
+    localStorage.getItem(TOKEN_LABEL) || sessionStorage.getItem(TOKEN_LABEL);
+
+  return accessToken ? { Authorization: `Bearer ${accessToken}` } : {};
+}
+
+const UploadIconButton = forwardRef<UploadIconButtonHandle, UploadIconButtonProps>(({ taskDetail, onIconsChange, apiUrl }, ref) => {
   const [preview, setPreview] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [hasExistingIcon, setHasExistingIcon] = useState(false);
+  const [iconUrls, setIconUrls] = useState<string[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const apiStatic = useApiStatic();
 
-
-  // ✅ Hiển thị icon hiện tại khi load
   useEffect(() => {
-    console.log('Preview taskDetail', taskDetail);
-    if(!taskDetail) return;
+    const icons = parseTaskIconList(taskDetail?.icon);
+    setIconUrls(icons);
 
-    if (taskDetail?.icon) {
-      setPreview(`${useApiStatic()}/${taskDetail.icon}`);
-      setHasExistingIcon(true);
+    if (icons.length > 0) {
+      setPreview(`${apiStatic}/${icons[0]}`);
     } else {
       setPreview(null);
-      setHasExistingIcon(false);
     }
-  }, [taskDetail]);
+  }, [apiStatic, taskDetail?.icon]);
 
-  const handleFileSelect = async (e: ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  const restorePreviewFromIcons = (icons: string[]) => {
+    if (icons.length > 0) {
+      setPreview(`${apiStatic}/${icons[0]}`);
+    } else {
+      setPreview(null);
+    }
+  };
 
-    // ✅ Preview ngay lập tức
+  const uploadImageFile = async (file: File) => {
+    const previousIcons = [...iconUrls];
+
     const reader = new FileReader();
     reader.onloadend = () => {
       setPreview(reader.result as string);
@@ -55,7 +67,6 @@ const UploadIconButton: React.FC<UploadIconButtonProps> = ({
     reader.readAsDataURL(file);
 
     setLoading(true);
-    e.target.value = ''; // ✅ Reset input để chọn lại file cùng tên
 
     try {
       const formData = new FormData();
@@ -63,61 +74,78 @@ const UploadIconButton: React.FC<UploadIconButtonProps> = ({
 
       const response = await fetch(apiUrl, {
         method: 'PUT',
-        body: formData
+        headers: getAuthHeaders(),
+        body: formData,
       });
 
       const data = await response.json();
 
       if (response.ok && data.success) {
-        onIconChange(data.thumb_url || data.filename || '');
-        setHasExistingIcon(true);
+        const nextIcons = Array.isArray(data.icons)
+          ? data.icons.filter((item: unknown): item is string => typeof item === 'string' && item.trim() !== '')
+          : [];
+
+        setIconUrls(nextIcons);
+        onIconsChange(nextIcons);
+        restorePreviewFromIcons(nextIcons);
+
         notification.success({
-          message: '✅ Upload thành công',
-          description: `Icon: ${data.filename}`
+          message: 'Upload thành công',
+          description: data.filename ? `Icon: ${data.filename}` : undefined,
         });
       } else {
+        setIconUrls(previousIcons);
+        restorePreviewFromIcons(previousIcons);
         notification.error({
-          message: '❌ Upload thất bại',
-          description: data.error || 'Unknown error'
+          message: 'Upload thất bại',
+          description: data.error || 'Unknown error',
         });
-        // Reset preview nếu lỗi
-        if (taskDetail?.icon) {
-          setPreview(`${useApiStatic()}/${taskDetail.icon}`);
-        } else {
-          setPreview(null);
-        }
       }
     } catch (error) {
-      console.error('❌ Network error:', error);
+      console.error('Upload icon error:', error);
+      setIconUrls(previousIcons);
+      restorePreviewFromIcons(previousIcons);
       notification.error({
-        message: '❌ Lỗi kết nối',
-        description: 'Vui lòng thử lại'
+        message: 'Lỗi kết nối',
+        description: 'Vui lòng thử lại',
       });
-      // Reset về icon cũ
-      if (taskDetail?.icon) {
-        setPreview(`${useApiStatic()}/${taskDetail.icon}`);
-      } else {
-        setPreview(null);
-      }
     } finally {
       setLoading(false);
     }
   };
 
+  const handleFileSelect = async (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    e.target.value = '';
+    await uploadImageFile(file);
+  };
+
+  useImperativeHandle(ref, () => ({
+    uploadImageFile,
+  }), [iconUrls, apiUrl]);
+
   const handleUploadClick = () => {
     fileInputRef.current?.click();
   };
 
+  const handleRemoveClick = () => {
+    setIconUrls([]);
+    setPreview(null);
+    onIconsChange([]);
+  };
+
+  const hasExistingIcon = iconUrls.length > 0;
+
   return (
-    <Stack sx={{ direction: 'column', alignItems:'center', justifyContent:'center',
-         gap: 1, border: '1px solid #999', borderRadius: 2, width: 200 }}>
-      {/* ✅ ICON PREVIEW */}
+    <Stack sx={{ direction: 'column', alignItems: 'center', justifyContent: 'center', gap: 1, border: '1px solid #999', borderRadius: 2, width: 200 }}>
       {preview ? (
-        <Tooltip title={hasExistingIcon ? "Thay đổi icon" : "Đã upload"}>
+        <Tooltip title={hasExistingIcon ? 'Thay đổi icon' : 'Tải icon'}>
           <Avatar
             src={preview}
             alt="Task icon"
-            sx={{ width: 100, height: 70, borderRadius: 0}}
+            sx={{ width: 100, height: 70, borderRadius: 0 }}
           />
         </Tooltip>
       ) : (
@@ -126,27 +154,34 @@ const UploadIconButton: React.FC<UploadIconButtonProps> = ({
         </Avatar>
       )}
 
-      {/* ✅ UPLOAD BUTTON */}
-      <Tooltip title={hasExistingIcon ? "Thay đổi icon" : "Upload icon"}>
-        <span>
+      <Stack direction="row" spacing={1} alignItems="center">
+        <IconButton
+          onClick={handleUploadClick}
+          size="small"
+          disabled={loading}
+          sx={{ ml: 1 }}
+        >
+          {loading ? (
+            <CircularProgress size={20} />
+          ) : hasExistingIcon ? (
+            <EditIcon color="primary" />
+          ) : (
+            <CloudUploadIcon />
+          )}
+        </IconButton>
+
+        {hasExistingIcon && (
           <IconButton
-            onClick={handleUploadClick}
+            onClick={handleRemoveClick}
             size="small"
             disabled={loading}
-            sx={{ ml: 1 }}
+            color="error"
           >
-            {loading ? (
-              <CircularProgress size={20} />
-            ) : hasExistingIcon ? (
-              <EditIcon color="primary" />
-            ) : (
-              <CloudUploadIcon />
-            )}
+            <DeleteOutlineIcon />
           </IconButton>
-        </span>
-      </Tooltip>
+        )}
+      </Stack>
 
-      {/* ✅ HIDDEN FILE INPUT */}
       <input
         ref={fileInputRef}
         type="file"
@@ -156,6 +191,8 @@ const UploadIconButton: React.FC<UploadIconButtonProps> = ({
       />
     </Stack>
   );
-};
+});
+
+UploadIconButton.displayName = 'UploadIconButton';
 
 export default UploadIconButton;

@@ -1,12 +1,13 @@
 from collections import defaultdict
 from datetime import date, datetime
 
-from flask import Blueprint, abort, jsonify, request
-from sqlalchemy import or_
+from flask import Blueprint, abort, jsonify, request, g
+from sqlalchemy import and_, or_
 
 from models import (
     AccountingDailyCash,
     AccountingDocument,
+    ARInvoicePayment,
     DocumentCenterDocument,
     LeadPayload,
     Material,
@@ -14,9 +15,39 @@ from models import (
     generate_datetime_id,
     upload_a_file_to_vps,
 )
+from permission_utils import ensure_resource_lead, require_can_view
 
 
 accounting_bp = Blueprint("accounting", __name__, url_prefix="/api/accounting")
+
+
+def _permission_for_accounting_request():
+    path = (request.path or "").rstrip("/")
+    if "/daily-cash" in path:
+        return "view_acc_cashflow"
+    if "/documents" in path:
+        return "view_acc_docs"
+    return "view_accountant"
+
+
+@accounting_bp.before_request
+def guard_accounting_permission():
+    actor, _ = require_can_view(_permission_for_accounting_request())
+    g.permission_actor = actor
+
+    view_args = request.view_args or {}
+    resource_checks = (
+        ("item_id", AccountingDailyCash, "daily cash row"),
+        ("doc_id", AccountingDocument, "accounting document"),
+    )
+    for arg_name, model, resource_name in resource_checks:
+        resource_id = view_args.get(arg_name)
+        if not resource_id:
+            continue
+        resource = db.session.get(model, resource_id)
+        if resource:
+            ensure_resource_lead(resource, actor, resource_name)
+        break
 
 DOCUMENT_TYPES = [
     "BANG_BAO_GIA",
@@ -247,7 +278,21 @@ def get_daily_cash():
     from_date = _parse_date(request.args.get("from_date", "", type=str))
     to_date = _parse_date(request.args.get("to_date", "", type=str))
 
-    query = AccountingDailyCash.query.filter(AccountingDailyCash.lead_id == lead_id)
+    query = (
+        AccountingDailyCash.query
+        .outerjoin(
+            ARInvoicePayment,
+            and_(
+                ARInvoicePayment.daily_cash_id == AccountingDailyCash.id,
+                ARInvoicePayment.deletedAt.is_(None),
+            ),
+        )
+        .filter(
+            AccountingDailyCash.lead_id == lead_id,
+            AccountingDailyCash.deletedAt.is_(None),
+            or_(ARInvoicePayment.id.is_(None), ARInvoicePayment.payment_type != "phat_sinh"),
+        )
+    )
     if direction in CASH_DIRECTIONS:
         query = query.filter(AccountingDailyCash.direction == direction)
     if status in CASH_STATUS:

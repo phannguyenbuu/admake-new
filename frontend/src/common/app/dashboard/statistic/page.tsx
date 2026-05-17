@@ -6,6 +6,7 @@ import { LineChart } from "@mui/x-charts/LineChart";
 import { CaretDownOutlined, CaretUpOutlined } from "@ant-design/icons";
 import { useUser } from "../../../common/hooks/useUser";
 import { useApiHost } from "../../../common/hooks/useApiHost";
+import UnPermissionBoard from "../unPermissionBoard";
 
 const tabs = [
   { key: "cong-viec", label: "Thống kê công việc" },
@@ -82,7 +83,7 @@ const toPercentByTotal = (value: number, total: number) => {
 };
 
 const StatisticDashboard: IPage["Component"] = () => {
-  const { userLeadId } = useUser();
+  const { userLeadId, canViewPermission } = useUser();
   const apiHost = useApiHost();
   const [activeTab, setActiveTab] = React.useState(tabs[0].key);
   const [fromMonth, setFromMonth] = React.useState<string>(() => {
@@ -154,7 +155,7 @@ const StatisticDashboard: IPage["Component"] = () => {
     [data?.people_customer.department_ratio],
   );
 
-  return (
+  return canViewPermission?.view_statistic ? (
     <div className="w-full flex flex-col gap-6 pb-10">
       <section className="bg-white/90 rounded-2xl shadow-md border border-slate-100 p-6">
         <div className="flex flex-wrap gap-2 border-b border-slate-200 mb-4">
@@ -615,7 +616,7 @@ const StatisticDashboard: IPage["Component"] = () => {
         )}
       </section>
     </div>
-  );
+  ) : <UnPermissionBoard />;
 };
 
 export default StatisticDashboard;

@@ -4,7 +4,7 @@ from collections import defaultdict
 from datetime import datetime, timedelta
 
 from dateutil.relativedelta import relativedelta
-from flask import Blueprint, abort, jsonify, request
+from flask import Blueprint, abort, jsonify, request, g
 from sqlalchemy import and_, or_
 
 from models import (
@@ -17,8 +17,15 @@ from models import (
     Workspace,
     db,
 )
+from permission_utils import require_can_view
 
 statistics_bp = Blueprint("statistics", __name__, url_prefix="/api/statistics")
+
+
+@statistics_bp.before_request
+def guard_statistics_permission():
+    actor, _ = require_can_view("view_statistic")
+    g.permission_actor = actor
 
 
 def _parse_month_arg(value: str | None) -> datetime | None:
@@ -318,7 +325,7 @@ STATUS_TO_COLOR = {
 
 @statistics_bp.route("/dashboard", methods=["GET"])
 def get_statistics_dashboard():
-    lead_id = request.args.get("lead", 0, type=int)
+    lead_id = request.args.get("lead", 0, type=int) or int(g.permission_actor.lead_id or 0)
     lead = db.session.get(LeadPayload, lead_id)
     if not lead:
         abort(404, description="Lead not found")

@@ -40,46 +40,57 @@ export interface WorkSpace {
   updatedAt?: string | Date;
   deletedAt?: string | Date | null;
   // cover?: string;
-  
+
   users: UserSearchProps[],
   customers: UserSearchProps[]
   user_fullName: string;
   role: number,
   // members: number,
   owner_id: string;
-  fullName:string,
+  fullName: string,
   // message_id: string;
   description: string;
   // img:string,
   // time:string,
   // msg:string,
-  status:string,
-  pinned:boolean,
-  address:string,
-  version:number;
-  column_open_name:string,
-  column_in_progress_name:string,
-  column_done_name:string,
-  column_reward_name:string,
-}
-
-export interface MaterialTask {
-  materialId: number;
-  quantity: number;
+  status: string,
+  pinned: boolean,
+  address: string,
+  version: number;
+  phone: string,
+  workAddress: string,
+  column_open_name: string,
+  column_in_progress_name: string,
+  column_done_name: string,
+  column_reward_name: string,
 }
 
 export interface UserSearchProps {
   fullName: string,
-  user_id:  string,
-  role:  string,
-  phone:  string,
+  user_id: string,
+  role: string,
+  phone: string,
   workAddress: string,
+  salary?: number,
 }
 
+export interface MaterialTask {
+  materialId?: number;
+  quantity?: number;
+}
+
+/** Dòng vật liệu trong tab Vật liệu của task */
+export interface TaskMaterialItem {
+  id: string;         // uuid client-side
+  ten: string;        // Tên vật liệu
+  quy_cach: string;   // Quy cách
+  so_luong: string;   // Số lượng + đơn vị
+  dia_diem: string;   // Địa điểm
+}
 
 export interface ZipUserSearchProps {
   name: string,
-  id:  string,
+  id: string,
 }
 
 export interface Task extends BaseEntity {
@@ -95,7 +106,7 @@ export interface Task extends BaseEntity {
   icon?: string;
   tempIcon?: string;
   customer_id?: string; // id của customer
-  materials?: MaterialTask[]; // danh sách vật tư
+  materials?: TaskMaterialItem[]; // danh sách vật liệu công việc
   start_time?: Dayjs | null; // Thời gian bắt đầu
   end_time?: Dayjs | null; // Thời gian kết thúc
   assets?: MessageTypeProps[];
@@ -116,7 +127,7 @@ export interface ColumnType {
   id: string;
   title: string;
   type: string;
-  tasks? : Task[];
+  tasks?: Task[];
 }
 
 export interface FormTaskDetailProps {
@@ -151,3 +162,23 @@ export interface Mode {
   adminMode: AdminPermissions;
   userMode: boolean;
 }
+
+export const parseTaskIconList = (iconValue?: string | null): string[] => {
+  if (!iconValue) return [];
+
+  try {
+    const parsed = JSON.parse(iconValue);
+    if (Array.isArray(parsed)) {
+      return parsed.filter((item): item is string => typeof item === "string" && item.trim() !== "");
+    }
+  } catch {
+    // Backward compatibility for legacy single-string values.
+  }
+
+  return typeof iconValue === "string" && iconValue.trim() !== "" ? [iconValue] : [];
+};
+
+export const getPrimaryTaskIcon = (iconValue?: string | null): string | null => {
+  const icons = parseTaskIconList(iconValue);
+  return icons.length > 0 ? icons[0] : null;
+};

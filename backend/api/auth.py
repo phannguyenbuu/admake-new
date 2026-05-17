@@ -12,6 +12,7 @@ from flask_jwt_extended import (
 
 
 from models import User, jwt
+from permission_utils import get_user_can_view_map
 
 auth_bp = Blueprint('auth', __name__, url_prefix='/api/auth')
 
@@ -93,26 +94,7 @@ def login_user_form(username, password):
         return jsonify({'status': 'fail', 'message': 'Invalid credentials wrong password'}), 401
 
 def get_user_can_view(user):
-    can_views = {
-        "view_workpoint": True,
-        "view_user": True,
-        "view_supplier": True,
-        "view_customer": True,
-        "view_workspace": True,
-        "view_material": True,
-        "view_invoice": True,
-        "view_accountant": True,
-        "view_statistic": True,
-    }
-
-    if user.role_id != -2:
-        can_views = {key: False for key in can_views}
-        ucv = UserCanView.query.filter(UserCanView.user_id == user.id).first()
-
-        if ucv:
-            can_views = {key: getattr(ucv, key) for key in can_views}
-    
-    return can_views
+    return get_user_can_view_map(user)
 
 
 @auth_bp.route('/logout', methods=['POST'])

@@ -1,431 +1,582 @@
-import React, { useState, useEffect } from "react";
-import { Typography, Stack, IconButton, Box, TextField, Switch } from "@mui/material";
-import { Select, MenuItem, InputLabel, FormControl } from "@mui/material";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { Box, IconButton, Stack, Typography } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
-import { useApiHost, useApiStatic } from "../../../../common/hooks/useApiHost";
 import { notification } from "antd";
-import DescriptionIcon from "@mui/icons-material/Description"; // icon tài liệu
-import { CircularProgress } from '@mui/material';
-import { useUser } from "../../../../common/hooks/useUser";
-import { useTaskContext } from "../../../../common/hooks/useTask";
-import CloseIcon from '@mui/icons-material/Close';
 import type { MessageTypeProps } from "../../../../@types/chat.type";
-import SendIcon from '@mui/icons-material/Send';
-import FileUploadWithPreview from "../../../FileUploadWithPreview";
-import { Modal } from "antd";
-import {Button,Checkbox,FormControlLabel,} from "@mui/material";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import BankTransferModal from "./BankTransformModal";
-import dayjs, { Dayjs } from "dayjs";
-import 'dayjs/locale/vi';
-
+import { TOKEN_LABEL } from "../../../../common/config";
+import { useApiHost } from "../../../../common/hooks/useApiHost";
+import { useTaskContext } from "../../../../common/hooks/useTask";
+import { useUser } from "../../../../common/hooks/useUser";
 import DeleteConfirm from "../../../DeleteConfirm";
-import { InputNumber } from 'antd';
-import bankList from "./banklist.json";
+import FileUploadWithPreview from "../../../FileUploadWithPreview";
+import ImagePasteUpload from "./ImagePasteUpload";
 
-import ImagePasteUpload,{createThumbnail} from "./ImagePasteUpload";
-
-dayjs.locale('vi'); // thiết lập locale
+type ItemKind = "asset" | "message";
 
 interface JobAssetProps {
   title?: string;
-  type?: string; // là ứng tiền hay hình ảnh tham khảo công trình
+  type?: string;
   readOnly?: boolean;
   messages?: MessageTypeProps[];
-
-
-  targetUserId? : string;
+  targetUserId?: string;
 }
 
-const JobAsset: React.FC<JobAssetProps> = ({ title, type, messages, targetUserId, readOnly = false }) => {
-  
-  const {taskDetail, setTaskDetail} = useTaskContext();
-  const {userId, username, isMobile, 
-        fullName, generateDatetimeId,
-        tmpTaskCreatedAssets, setTmpTaskCreatedAssets,
-        tmpTaskCreatedMessages, setTmpTaskCreatedMessages} = useUser();
+function getAccessToken(): string {
+  if (typeof window === "undefined") return "";
+  return localStorage.getItem(TOKEN_LABEL) || sessionStorage.getItem(TOKEN_LABEL) || "";
+}
 
-  const [ListMessages, setListMessages] = useState<MessageTypeProps[]>([]);
-  const [Assets, setAssets] = useState<MessageTypeProps[]>([]);
-  const [thumbLoading, setThumbLoading] = useState(false);
+function buildAuthHeaders(): HeadersInit | undefined {
+  const token = getAccessToken();
+  return token ? { Authorization: `Bearer ${token}` } : undefined;
+}
 
-  const imageTypes = ["image/jpeg", "image/jpg", "image/png", "image/gif", "image/webp"];
-  
-  const formatDate = (date: Date): string => {
-    const pad = (n: number) => (n < 10 ? "0" + n : n);
-    return (
-      date.getFullYear().toString() +
-      pad(date.getMonth() + 1) +
-      pad(date.getDate()) +
-      "_" +
-      pad(date.getHours()) +
-      pad(date.getMinutes()) +
-      pad(date.getSeconds())
-    );
-  };
+function formatDate(date: Date): string {
+  const pad = (n: number) => (n < 10 ? `0${n}` : `${n}`);
+  return (
+    date.getFullYear().toString() +
+    pad(date.getMonth() + 1) +
+    pad(date.getDate()) +
+    "_" +
+    pad(date.getHours()) +
+    pad(date.getMinutes()) +
+    pad(date.getSeconds())
+  );
+}
 
-  useEffect(()=>{
-    if(messages)
-      setListMessages(messages);
-  }, [messages, targetUserId]);
+function normalizeMessageType(messageType?: string): string {
+  return (messageType || "").trim();
+}
 
-  useEffect(()=>{
-    if(!taskDetail || !taskDetail.assets)
-    {
-      setTmpTaskCreatedAssets([]);
-      setTmpTaskCreatedMessages([]);
-      // setAssets([]);
-      // setListMessages([]);
+function isSameType(messageType: string | undefined, currentType: string | undefined): boolean {
+  return normalizeMessageType(messageType) === normalizeMessageType(currentType);
+}
+
+function hasText(message: MessageTypeProps): boolean {
+  return Boolean(message.text && message.text.trim() !== "");
+}
+
+function hasFile(message: MessageTypeProps): boolean {
+  return Boolean(message.file_url && message.file_url.trim() !== "");
+}
+
+function isCashType(type?: string): boolean {
+  return Boolean(type && type.includes("cash"));
+}
+
+function getFilenameFromUrl(url: string): string {
+  return url.substring(url.lastIndexOf("/") + 1);
+}
+
+function mergeByMessageId(items: MessageTypeProps[]): MessageTypeProps[] {
+  const withId = new Map<string, MessageTypeProps>();
+  const withoutId: MessageTypeProps[] = [];
+
+  items.forEach((item) => {
+    if (item.message_id) {
+      withId.set(item.message_id, item);
       return;
-    } 
+    }
+    withoutId.push(item);
+  });
 
-    const imgList = taskDetail.assets.filter(el => el.type === type && el.file_url && el.file_url != '');
-    const msgList = taskDetail.assets.filter(el => el.type === type && el.text && el.text != '');
+  return [...withId.values(), ...withoutId];
+}
 
-    
-    setAssets(imgList);
-    setListMessages(msgList);
-  },[taskDetail]);
+function formatCashPreview(text?: string): string {
+  if (!text) return "";
+  const parts = text.split("/");
+  const amount = parts[0] || "";
+  const hint = parts.length > 1 ? parts[parts.length - 1] : "";
+  return hint ? `${amount}[${hint}]` : amount;
+}
 
-  const handleAssetSend = async (file: File) => {
-    
-    setThumbLoading(true);
-    const now = new Date();
-    const dateTimeStr = formatDate(now);
+interface FormDataInput {
+  file?: File;
+  text?: string;
+  includeUsername?: boolean;
+  taskId?: string;
+  type?: string;
+  userId?: string;
+  username?: string;
+}
 
-    const formData = new FormData();
-    formData.append("time", dateTimeStr);
-    formData.append("type", type || '');
+function createMessageFormData({
+  file,
+  text,
+  includeUsername = false,
+  taskId,
+  type,
+  userId,
+  username,
+}: FormDataInput): FormData {
+  const formData = new FormData();
+  formData.append("time", formatDate(new Date()));
+  formData.append("type", type || "");
+  formData.append("user_id", userId || "");
+  formData.append("task_id", taskId || "");
+
+  if (file) {
     formData.append("file", file);
-    formData.append("user_id", userId || '');
-    formData.append("type", type || '');
-    formData.append("task_id", taskDetail?.id.toString() ?? '');
+  }
+  if (typeof text === "string") {
+    formData.append("text", text);
+  }
+  if (includeUsername) {
+    formData.append("username", username || "");
+  }
 
-    console.log('handleAssetSend Upload', type, Object.fromEntries(formData.entries()));
+  return formData;
+}
 
-    try {
-      
-      if(taskDetail)
-      {
-        const response = await fetch(`${useApiHost()}/task/${taskDetail?.id}/upload`, {
-          method: "PUT",
-          body: formData,
-        });
+const JobAsset: React.FC<JobAssetProps> = ({
+  title,
+  type,
+  messages,
+  targetUserId,
+  readOnly = false,
+}) => {
+  const apiHost = useApiHost();
+  const { taskDetail, setTaskDetail } = useTaskContext();
+  const {
+    userId,
+    username,
+    fullName,
+    generateDatetimeId,
+    tmpTaskCreatedAssets,
+    setTmpTaskCreatedAssets,
+    tmpTaskCreatedMessages,
+    setTmpTaskCreatedMessages,
+  } = useUser();
 
-        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+  const [listMessages, setListMessages] = useState<MessageTypeProps[]>([]);
+  const [assets, setAssets] = useState<MessageTypeProps[]>([]);
 
-        const result = await response.json();
-        notification.success({ message: "Đã upload thành công!", description: result });
-        // console.log('success is image?',result.filename,isImageFile(result.filename));
-        setAssets(prev => prev ? [...prev, result.message] : [result.message]);
-        setTaskDetail(prev => {
-          if (!prev) return null; // handle null case explicitly
-          
-          return {
-            ...prev,
-            assets: prev.assets ? [...prev.assets, result.message] : [result.message],
-            // ensure all required fields like title, description exist in prev,
-            // or provide defaults here if needed to satisfy the type
-          };
-        });
-      }else if (type === "task"){
-        const response = await fetch(`${useApiHost()}/task/new/upload`, {
-          method: "PUT",
-          body: formData,
-        });
+  const tmpAssetsByType = useMemo(
+    () => tmpTaskCreatedAssets.filter((item) => isSameType(item.type, type)),
+    [tmpTaskCreatedAssets, type]
+  );
+  const tmpMessagesByType = useMemo(
+    () => tmpTaskCreatedMessages.filter((item) => isSameType(item.type, type)),
+    [tmpTaskCreatedMessages, type]
+  );
 
-        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+  useEffect(() => {
+    if (taskDetail?.assets) {
+      const itemsByType = taskDetail.assets.filter((item) => isSameType(item.type, type));
+      setAssets(itemsByType.filter(hasFile));
+      setListMessages(itemsByType.filter(hasText));
+      return;
+    }
 
-        const result = await response.json();
-        notification.success({ message: "Đã upload local thành công!", description: result });
+    const fallbackMessages = (messages || []).filter((item) =>
+      type ? isSameType(item.type, type) : true
+    );
+    setListMessages(fallbackMessages);
+    setAssets([]);
+  }, [messages, taskDetail?.assets, taskDetail?.id, type]);
 
-        setTmpTaskCreatedAssets(prev => prev ? [...prev, result.message] : [result.message]);
-      //   createThumbnail(file,100,70,(blobTxt) => {
-      //     if(blobTxt)
-      //     {
-      //       // console.log('Blob', blobTxt);
-      //       var tmp: MessageTypeProps = {
-      //                     message_id: generateDatetimeId(),
-      //                     user_id: userId,
-      //                     file_url:file.name, 
-      //                     username: fullName ?? '',
-      //                     thumb_url:blobTxt};
+  const visibleMessages = useMemo(() => {
+    if (taskDetail) return listMessages;
+    return mergeByMessageId([...listMessages, ...tmpMessagesByType]);
+  }, [listMessages, taskDetail, tmpMessagesByType]);
 
-      //       setTmpTaskCreatedAssets(prev => prev ? [...prev, tmp] : [tmp]);
-      //     }
-      //   });
+  const visibleAssets = useMemo(() => {
+    if (taskDetail) return assets;
+    return mergeByMessageId([...assets, ...tmpAssetsByType]);
+  }, [assets, taskDetail, tmpAssetsByType]);
+
+  const requestJson = useCallback(async <T,>(url: string, init: RequestInit): Promise<T> => {
+    const response = await fetch(url, {
+      credentials: "include",
+      ...init,
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+
+    return (await response.json()) as T;
+  }, []);
+
+  const appendToTaskAssets = useCallback(
+    (message: MessageTypeProps) => {
+      setTaskDetail((prev) => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          assets: prev.assets ? [...prev.assets, message] : [message],
+        };
+      });
+    },
+    [setTaskDetail]
+  );
+
+  const removeFromTaskAssets = useCallback(
+    (messageId: string | number | undefined) => {
+      setTaskDetail((prev) => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          assets: prev.assets?.filter((item) => item.message_id !== messageId),
+        };
+      });
+    },
+    [setTaskDetail]
+  );
+
+  const pushLocalItem = useCallback((kind: ItemKind, message: MessageTypeProps) => {
+    if (kind === "asset") {
+      setAssets((prev) => mergeByMessageId([...prev, message]));
+      return;
+    }
+    setListMessages((prev) => mergeByMessageId([...prev, message]));
+  }, []);
+
+  const removeLocalItem = useCallback((kind: ItemKind, messageId: string | number | undefined) => {
+    if (kind === "asset") {
+      setAssets((prev) => prev.filter((asset) => asset.message_id !== messageId));
+      return;
+    }
+    setListMessages((prev) => prev.filter((msg) => msg.message_id !== messageId));
+  }, []);
+
+  const pushDraftItem = useCallback(
+    (kind: ItemKind, message: MessageTypeProps) => {
+      if (kind === "asset") {
+        setTmpTaskCreatedAssets((prev) => mergeByMessageId([...prev, message]));
+        return;
+      }
+      setTmpTaskCreatedMessages((prev) => mergeByMessageId([...prev, message]));
+    },
+    [setTmpTaskCreatedAssets, setTmpTaskCreatedMessages]
+  );
+
+  const removeDraftItem = useCallback(
+    (kind: ItemKind, messageId: string | number | undefined) => {
+      if (kind === "asset") {
+        setTmpTaskCreatedAssets((prev) => prev.filter((asset) => asset.message_id !== messageId));
+        return;
+      }
+      setTmpTaskCreatedMessages((prev) => prev.filter((msg) => msg.message_id !== messageId));
+    },
+    [setTmpTaskCreatedAssets, setTmpTaskCreatedMessages]
+  );
+
+  const sendTaskItem = useCallback(
+    async (
+      kind: ItemKind,
+      endpoint: string,
+      formData: FormData,
+      method: "POST" | "PUT",
+      successMessage: string,
+      syncTaskAssets: boolean
+    ) => {
+      const result = await requestJson<{ message: MessageTypeProps }>(endpoint, {
+        method,
+        headers: buildAuthHeaders(),
+        body: formData,
+      });
+
+      pushLocalItem(kind, result.message);
+
+      if (syncTaskAssets) {
+        appendToTaskAssets(result.message);
       }
 
-    } catch (err: any) {
-      notification.error({ message: "Lỗi upload ảnh:", description: err.message });
-    } finally {
-      setThumbLoading(false);
-    }
-  };
+      notification.success({ message: successMessage });
+    },
+    [appendToTaskAssets, pushLocalItem, requestJson]
+  );
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    // if(!taskDetail || !taskDetail?.id) return;
+  const deleteItem = useCallback(
+    async (kind: ItemKind, messageId: string | number | undefined, entityLabel: string) => {
+      if (!taskDetail) {
+        removeDraftItem(kind, messageId);
+        return;
+      }
 
-    if (e.target.files && e.target.files.length > 0) {
-      const file = e.target.files[0];
-      // setSelectedFile(file);
+      await requestJson<{ message: string }>(`${apiHost}/message/${messageId}`, {
+        method: "DELETE",
+        headers: buildAuthHeaders(),
+      });
+
+      removeLocalItem(kind, messageId);
+      removeFromTaskAssets(messageId);
+      notification.success({ message: `Đã xóa ${entityLabel}` });
+    },
+    [apiHost, removeDraftItem, removeFromTaskAssets, removeLocalItem, requestJson, taskDetail]
+  );
+
+  const handleAssetSend = useCallback(
+    async (file: File) => {
+      const formData = createMessageFormData({
+        file,
+        taskId: taskDetail?.id?.toString(),
+        type,
+        userId: userId || undefined,
+      });
+
+      try {
+        if (taskDetail?.id) {
+          await sendTaskItem(
+            "asset",
+            `${apiHost}/task/${taskDetail.id}/upload`,
+            formData,
+            "PUT",
+            "Đã upload thành công!",
+            true
+          );
+          return;
+        }
+
+        if (type !== "task") return;
+
+        const result = await requestJson<{ message: MessageTypeProps }>(`${apiHost}/task/new/upload`, {
+          method: "PUT",
+          headers: buildAuthHeaders(),
+          body: formData,
+        });
+
+        const draftAsset: MessageTypeProps = {
+          ...result.message,
+          type: type || result.message?.type,
+        };
+        pushDraftItem("asset", draftAsset);
+        notification.success({ message: "Đã upload thành công!" });
+      } catch (error) {
+        const err = error as Error;
+        notification.error({ message: "Lỗi upload ảnh", description: err.message });
+      }
+    },
+    [apiHost, pushDraftItem, requestJson, sendTaskItem, taskDetail?.id, type, userId]
+  );
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
       handleAssetSend(file);
     }
   };
 
-
-  function getFilenameFromUrl(url: string) {
-    return url.substring(url.lastIndexOf('/') + 1);
-  }
-
-  
-  const handleDelete = (message_id: string | number| undefined) => {
-    if(!taskDetail)
-    {
-      setTmpTaskCreatedAssets(prev => prev.filter(asset => asset.message_id !== message_id));
-      return;
-    }
-
-    fetch(`${useApiHost()}/message/${message_id}`, {
-      method: 'DELETE',
-    })
-    .then(response => {
-      if (!response.ok) 
-        notification.error({message:'Failed to delete message', description:message_id});
-      else
-      {
-        notification.success({message:'Message deleted successfully', description:message_id});
-        setAssets(prev => prev.filter(asset => asset.message_id !== message_id));
-        setTaskDetail(prev => {
-            if (prev === null) return null;
-            
-            return{
-            ...prev,
-            assets: prev.assets?.filter(item => item.message_id !== message_id)
-          }
-        });
+  const handleAssetDelete = useCallback(
+    async (messageId: string | number | undefined) => {
+      try {
+        await deleteItem("asset", messageId, "tài liệu");
+      } catch (error) {
+        console.error("Delete asset error:", error);
+        notification.error({ message: "Lỗi khi xóa tài liệu" });
       }
-    })
-    .catch(error => {
-      console.error('Error deleting message:', error);
-    });
-  };
+    },
+    [deleteItem]
+  );
 
-  const handleMessageSend = async (text: string) => {
-    setThumbLoading(true);
-    const now = new Date();
-    const dateTimeStr = formatDate(now);
+  const handleMessageSend = useCallback(
+    async (text: string) => {
+      const normalizedText = (text || "").trim();
+      if (!normalizedText) return;
 
-    const formData = new FormData();
-    formData.append("time", dateTimeStr);
-    formData.append("type", type || '');
-    formData.append("user_id", userId || '');
-
-    formData.append("username", username || '');
-    formData.append("text", text || '');
-    formData.append("task_id", taskDetail?.id.toString() ?? '');
-
-    console.log('handleMessageSend Upload', type, Object.fromEntries(formData.entries()));
-    
-
-    try {
-      if(taskDetail)
-      {
-        const response = await fetch(`${useApiHost()}/task/${taskDetail?.id}/message`, {
-          method: "PUT",
-          body: formData,
-        });
-
-        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-
-        const result = await response.json();
-        notification.success({ message: "Đã gửi comment thành công!", description: result });
-        // console.log('success is image?',result.filename,isImageFile(result.filename));
-        setListMessages(prev => prev ? [...prev, result.message] : [result.message]);
-        setTaskDetail(prev => {
-          if (! prev ) return null; // handle null case explicitly
-          if (prev.assets === null) prev.assets = [];
-
-          return {...prev,
-            assets: prev.assets ? [...prev.assets, result.message] : [result.message],};
-        });
-    }else 
-    {
-        if (type === "task"){
-          // console.log("G",text);
-          var tmp: MessageTypeProps = {
-                        type,
-                        message_id: generateDatetimeId(),
-                        user_id: targetUserId,
-                        username: fullName ?? '',
-                        text};
-                        
-          setTmpTaskCreatedMessages(prev => prev ? [...prev, tmp] : [tmp]);
-        } else if (type?.includes("cash"))  {
-          const response = await fetch(`${useApiHost()}/workpoint/message`, {
-            method: "POST",
-            body: formData,
-          });
-
-          if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-
-          const result = await response.json();
-          notification.success({ message: "Đã lưu thành công!", description: result });
-          // console.log('success is image?',result.filename,isImageFile(result.filename));
-          setListMessages(prev => prev ? [...prev, result.message] : [result.message]);
-          // setTaskDetail(prev => {
-          //   if (! prev ) return null; // handle null case explicitly
-          //   if (prev.assets === null) prev.assets = [];
-
-          //   return {...prev,
-          //     assets: prev.assets ? [...prev.assets, result.message] : [result.message],};
-          // });
-        }
-    }
-
-    } catch (err: any) {
-      notification.error({ message: "Lỗi gửi comment:", description: err.message });
-    } finally {
-      setThumbLoading(false);
-    }
-  };
-
-  
-  const handleMessageDelete = (message_id: string | number| undefined) => {
-    if(!taskDetail)
-    {
-      setTmpTaskCreatedMessages(prev => prev.filter(asset => asset.message_id !== message_id));
-      return;
-    }
-
-    fetch(`${useApiHost()}/message/${message_id}`, {
-      method: 'DELETE',
-    })
-    .then(response => {
-      if (!response.ok) 
-        notification.error({message:'Failed to delete message', description:message_id});
-      else
-      {
-        setListMessages(prev => prev.filter(asset => asset.message_id !== message_id));
-        setTaskDetail(prev => {
-            if (prev === null) return null;
-            
-            return{
-            ...prev,
-            assets: prev?.assets?.filter(item => item.message_id !== message_id)
-          }
-        });
-        notification.success({message:'Message deleted successfully', description:message_id});
-      }
-
-      
-    })
-    .catch(error => {
-      console.error('Error deleting message:', error);
-    });
-  };
-
-  const handleChangeFavourite = (message_id: string, checked: boolean) => {
-    setListMessages(prevMessages =>
-      prevMessages.map(m =>
-        m.message_id === message_id
-          ? { ...m, is_favourite: checked }
-          : m
-      )
-    );
-
-    fetch(`${useApiHost()}/message/${message_id}/favourite`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' }, // phải có header này
-      body: JSON.stringify({ favourite: checked }) // stringify đối tượng JSON
-    })
-      .then(response => {
-        if (!response.ok) {
-          notification.error({ message: 'Failed to check message', description: checked });
-        } else {
-          notification.success({ message: 'Message check successfully', description: checked });
-        }
-      })
-      .catch(error => {
-        console.error('Error deleting message:', error);
+      const formData = createMessageFormData({
+        text: normalizedText,
+        includeUsername: true,
+        taskId: taskDetail?.id?.toString(),
+        type,
+        userId: userId || undefined,
+        username: username || undefined,
       });
-  };
 
-  
-  return (
-    <>
-    <Stack style={{maxWidth: isMobile? 300: '100%'}}>
-      {!readOnly && 
-      <Stack direction="row" spacing={1} sx= {{width:'100%'}}>
-        <label htmlFor={`upload-image-file-${type}`}>
-          <IconButton color="primary" component="span"
-            aria-label="upload picture" size="small"
-            sx={{ border: "1px dashed #3f51b5", width: 40, height: 40,}} >
-            <AddIcon />
-          </IconButton>
-        </label>
+      try {
+        if (taskDetail?.id) {
+          await sendTaskItem(
+            "message",
+            `${apiHost}/task/${taskDetail.id}/message`,
+            formData,
+            "PUT",
+            "Đã gửi bình luận thành công!",
+            true
+          );
+          return;
+        }
 
-         <ImagePasteUpload 
-                title={title} 
-                onMessageSend={handleMessageSend} 
-                onAssetSend={handleAssetSend}
-                isCash={type?.includes('cash')}
-            />
-      </Stack>}
+        if (type === "task" || type === "comment") {
+          const draftMessage: MessageTypeProps = {
+            type,
+            message_id: generateDatetimeId(),
+            user_id: targetUserId || userId,
+            username: fullName || username || "",
+            text: normalizedText,
+            is_favourite: false,
+          };
+          pushDraftItem("message", draftMessage);
+          return;
+        }
 
-      {[...ListMessages,...tmpTaskCreatedMessages].map((el, index) => 
-      {
-        // console.log("List", el);
-        return <Stack direction="row" key={index} spacing={1} alignItems="center">
-          {title === "Thông tin từ admin" &&
-            <input
-              type="checkbox"
-              checked={el.is_favourite}
-              onChange={(e) => handleChangeFavourite(el?.message_id ?? '', e.target.checked)}/>}
-          
-          <Typography style={{ fontSize: 12, fontWeight: 700 }}>
-            {el.username}:
-          </Typography>
-          <Typography style={{ fontSize: 10, fontWeight: 500 }}>
-            { type?.includes("cash") ? `${el?.text?.split('/')[0]}[${el.text?.split('/')[el.text.split('/').length - 1]}]` : el.text }
-          </Typography>
-
-          {!readOnly && <DeleteConfirm elId={el?.message_id ?? ''} 
-            onDelete={handleMessageDelete} text='tin nhắn'/>}
-        </Stack>
+        if (isCashType(type)) {
+          await sendTaskItem(
+            "message",
+            `${apiHost}/workpoint/message`,
+            formData,
+            "POST",
+            "Đã lưu thành công!",
+            false
+          );
+        }
+      } catch (error) {
+        const err = error as Error;
+        notification.error({ message: "Lỗi gửi bình luận", description: err.message });
       }
+    },
+    [
+      apiHost,
+      fullName,
+      generateDatetimeId,
+      pushDraftItem,
+      sendTaskItem,
+      targetUserId,
+      taskDetail?.id,
+      type,
+      userId,
+      username,
+    ]
+  );
+
+  const handleMessageDelete = useCallback(
+    async (messageId: string | number | undefined) => {
+      try {
+        await deleteItem("message", messageId, "tin nhắn");
+      } catch (error) {
+        console.error("Delete message error:", error);
+        notification.error({ message: "Lỗi khi xóa tin nhắn" });
+      }
+    },
+    [deleteItem]
+  );
+
+  const handleChangeFavourite = useCallback(
+    async (messageId: string, checked: boolean) => {
+      setListMessages((prev) =>
+        prev.map((item) => (item.message_id === messageId ? { ...item, is_favourite: checked } : item))
+      );
+      setTmpTaskCreatedMessages((prev) =>
+        prev.map((item) => (item.message_id === messageId ? { ...item, is_favourite: checked } : item))
+      );
+
+      if (!taskDetail) return;
+
+      try {
+        const headers: HeadersInit = {
+          "Content-Type": "application/json",
+          ...(buildAuthHeaders() || {}),
+        };
+
+        await requestJson<{ message: string }>(`${apiHost}/message/${messageId}/favourite`, {
+          method: "PUT",
+          headers,
+          body: JSON.stringify({ favourite: checked }),
+        });
+        notification.success({ message: "Đã cập nhật đánh dấu" });
+      } catch (error) {
+        console.error("Favourite update error:", error);
+        notification.error({ message: "Lỗi khi cập nhật đánh dấu" });
+      }
+    },
+    [apiHost, requestJson, setTmpTaskCreatedMessages, taskDetail]
+  );
+
+  return (
+    <Stack sx={{ width: "100%" }}>
+      {!readOnly && (
+        <Stack direction="row" spacing={1} alignItems="center" sx={{ width: "100%" }}>
+          <label htmlFor={`upload-image-file-${type}`}>
+            <IconButton
+              color="primary"
+              component="span"
+              aria-label="upload picture"
+              size="small"
+              sx={{ border: "1px dashed #3f51b5", width: 40, height: 40 }}
+            >
+              <AddIcon />
+            </IconButton>
+          </label>
+
+          <Box sx={{ flexGrow: 1 }}>
+            <ImagePasteUpload
+              title={title}
+              onMessageSend={handleMessageSend}
+              onAssetSend={handleAssetSend}
+              isCash={isCashType(type)}
+            />
+          </Box>
+        </Stack>
       )}
 
+      {visibleMessages.map((message, index) => (
+        <Stack
+          direction="row"
+          spacing={1}
+          alignItems="center"
+          key={message.message_id || `${index}-${message.text || ""}`}
+        >
+          {(title === "Thông tin từ admin" || type === "comment") && (
+            <input
+              type="checkbox"
+              checked={Boolean(message.is_favourite)}
+              onChange={(event) =>
+                handleChangeFavourite(message.message_id || "", event.target.checked)
+              }
+            />
+          )}
 
+          <Typography style={{ fontSize: 12, fontWeight: 700 }}>{message.username}:</Typography>
+          <Typography style={{ fontSize: 10, fontWeight: 500 }}>
+            {isCashType(type) ? formatCashPreview(message.text) : message.text}
+          </Typography>
+
+          {!readOnly && (
+            <DeleteConfirm
+              elId={message.message_id || ""}
+              onDelete={handleMessageDelete}
+              text="tin nhắn"
+            />
+          )}
+        </Stack>
+      ))}
 
       <Stack direction="row" spacing={1}>
         <Stack
           direction="row"
           spacing={1}
           useFlexGap
-          sx={{ flexWrap: 'wrap', overflowY: 'auto', height: 150, width: '100%', minHeight: 200 }} // Thêm thuộc tính flexWrap để xuống dòng
+          sx={{ flexWrap: "wrap", width: "100%", minHeight: 200 }}
         >
-         
-        {[...Assets,...tmpTaskCreatedAssets].map((el, index) => {
-            const url = el.file_url ? getFilenameFromUrl(el.file_url) :  null;
-            
+          {visibleAssets.map((asset, index) => {
+            const filename = asset.file_url ? getFilenameFromUrl(asset.file_url) : null;
+
             return (
-              <Stack key={index} direction="column" alignItems="center" spacing={1} sx={{ width: 'calc(33.33% - 8px)' }}>
-                {url && <FileUploadWithPreview handleSend={handleAssetSend} message={el}/>}
+              <Stack
+                key={asset.message_id || `${index}-${asset.file_url || ""}`}
+                direction="column"
+                alignItems="center"
+                spacing={1}
+                sx={{ width: "calc(33.33% - 8px)" }}
+              >
+                {filename && <FileUploadWithPreview handleSend={handleAssetSend} message={asset} />}
 
                 <Stack direction="row" gap={0}>
-                  {!readOnly && <DeleteConfirm elId={el?.message_id ?? ''} 
-                    onDelete={handleDelete} text='tài liệu'/>}
-                  <Typography fontSize={12} sx={{ maxWidth: 100, whiteSpace: 'nowrap' }}>
-                    {url && url.length > 9 ? `${url.substring(0, 9)}...` : url}
+                  {!readOnly && (
+                    <DeleteConfirm
+                      elId={asset.message_id || ""}
+                      onDelete={handleAssetDelete}
+                      text="tài liệu"
+                    />
+                  )}
+                  <Typography fontSize={12} sx={{ maxWidth: 100, whiteSpace: "nowrap" }}>
+                    {filename && filename.length > 9 ? `${filename.substring(0, 9)}...` : filename}
                   </Typography>
                 </Stack>
               </Stack>
             );
           })}
-
         </Stack>
 
         <input
@@ -436,13 +587,9 @@ const JobAsset: React.FC<JobAssetProps> = ({ title, type, messages, targetUserId
           type="file"
           onChange={handleFileChange}
         />
-        
       </Stack>
     </Stack>
-    </>
   );
 };
 
 export default JobAsset;
-
-

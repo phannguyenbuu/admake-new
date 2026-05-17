@@ -1,19 +1,39 @@
-from flask import Blueprint, request, jsonify, abort
+from flask import Blueprint, request, jsonify, abort, g
 from models import db, dateStr, User, generate_datetime_id, LeadPayload
 import datetime
 from sqlalchemy import desc
+from permission_utils import ensure_resource_lead, require_can_view
 
 supplier_bp = Blueprint('supplier', __name__, url_prefix='/api/supplier')
 def get_model_columns(model):
     """Lấy danh sách tên các cột từ 1 model"""
     return [c.name for c in model.__table__.columns]
 
+
+def _get_supplier_or_404(user_id):
+    supplier_user = db.session.get(User, user_id)
+    if not supplier_user or (supplier_user.role_id or 0) <= 100:
+        abort(404, description="supplier not found")
+    return supplier_user
+
+
+@supplier_bp.before_request
+def guard_supplier_permission():
+    actor, _ = require_can_view("view_supplier")
+    g.permission_actor = actor
+
+    supplier_id = (request.view_args or {}).get("id")
+    if supplier_id:
+        supplier_user = _get_supplier_or_404(supplier_id)
+        ensure_resource_lead(supplier_user, actor, "supplier")
+
+
 @supplier_bp.route("/", methods=["GET"])
 def get_suppliers():
     page = request.args.get("page", 1, type=int)
     limit = request.args.get("limit", 10, type=int)
     search = request.args.get("search", "", type=str)
-    lead_id = request.args.get("lead", 0, type=int)
+    lead_id = request.args.get("lead", 0, type=int) or int(g.permission_actor.lead_id or 0)
     lead = db.session.get(LeadPayload, lead_id)
 
     if not lead:
@@ -49,6 +69,8 @@ def get_suppliers():
 @supplier_bp.route("/", methods=["POST"])
 def create_supplier():
     data = request.get_json()
+    if isinstance(data, dict) and not data.get("lead_id"):
+        data["lead_id"] = g.permission_actor.lead_id
     print('Create new supplier', data)
 
     # chia dữ liệu thành phần User và supplier
@@ -85,10 +107,8 @@ def create_supplier():
 
 @supplier_bp.route("/<string:id>", methods=["GET"])
 def get_supplier_detail(id):
-    supplier = db.session.get(supplier, id)
-    if not supplier:
-        abort(404, description="supplier not found")
-    return jsonify(supplier.tdict())
+    supplier_user = _get_supplier_or_404(id)
+    return jsonify(supplier_user.tdict())
 
 # @supplier_bp.route("/<string:id>", methods=["PUT"])
 # def update_supplier(id):
@@ -122,9 +142,7 @@ def get_supplier_detail(id):
 def update_user(id):
     data = request.get_json()
     print('PUT user', data)
-    user = db.session.get(User, id)
-    if not user:
-        return jsonify({"error": "user not found"}), 404
+    user = _get_supplier_or_404(id)
     
     for key, value in data.items():
         if hasattr(user, key):
@@ -143,7 +161,7 @@ def update_user(id):
 
 @supplier_bp.route("/<string:id>", methods=["DELETE"])
 def delete_user(id):
-    user = db.session.get(User, id)
+    user = _get_supplier_or_404(id)
     if user:
         db.session.delete(user)
     db.session.commit()

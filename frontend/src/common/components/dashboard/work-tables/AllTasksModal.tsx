@@ -8,7 +8,7 @@ import { useApiHost, useApiStatic } from "../../../common/hooks/useApiHost";
 import { useUser } from "../../../common/hooks/useUser";
 import { SearchOutlined } from "@ant-design/icons";
 import { Input as AntdInput, Menu } from "antd";
-import type { ColumnType, Task, TasksResponse } from "../../../@types/work-space.type";
+import { getPrimaryTaskIcon, type ColumnType, type Task, type TasksResponse } from "../../../@types/work-space.type";
 import type { WorkSpace } from "../../../@types/work-space.type";
 import { useTaskContext } from "../../../common/hooks/useTask";
 import "./css/css.css";
@@ -19,6 +19,7 @@ import { Form } from "antd";
 import dayjs, { Dayjs } from "dayjs";
 import utc from 'dayjs/plugin/utc';
 import timezone from "dayjs/plugin/timezone";
+import { TOKEN_LABEL } from "../../../common/config";
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
@@ -31,6 +32,13 @@ const items = [
   { key: "status", label: "Tiến trình" },
   { key: "role", label: "Thùng rác" },
 ];
+
+function getAuthHeaders(): HeadersInit {
+  const accessToken =
+    localStorage.getItem(TOKEN_LABEL) || sessionStorage.getItem(TOKEN_LABEL);
+
+  return accessToken ? { Authorization: `Bearer ${accessToken}` } : {};
+}
 
 export default function AllTasksModal() {
   const [clearTrashVisible, setClearTrashVisible] = useState(false);
@@ -63,7 +71,7 @@ export default function AllTasksModal() {
     try {
       const res = await fetch(
         `${useApiHost()}/task/restore/${taskId}`,
-        { method: "PUT" }
+        { method: "PUT", headers: getAuthHeaders() }
       );
 
       if (!res.ok) throw new Error("Restore failed");
@@ -112,7 +120,7 @@ export default function AllTasksModal() {
       : `${useApiHost()}/task/inlead/${userLeadId}`;
 
     try {
-      const response = await fetch(apiUrl, {method: "GET"});
+      const response = await fetch(apiUrl, { method: "GET", headers: getAuthHeaders() });
       if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
       const data = await response.json();
       // console.log(data);
@@ -127,7 +135,7 @@ export default function AllTasksModal() {
     try {
       const res = await fetch(
         `${useApiHost()}/task/trash/clear/inlead/${userLeadId}`,
-        { method: "DELETE" }
+        { method: "DELETE", headers: getAuthHeaders() }
       );
 
       if (!res.ok) throw new Error("Clear trash failed");
@@ -433,9 +441,9 @@ export const CardStaticItem: React.FC<CardStaticItemProps> = ({
 
 
       <Stack direction="row">
-                  {task?.icon && 
+                  {getPrimaryTaskIcon(task?.icon) && 
                   <Avatar
-                      src={`${useApiStatic()}/${task.icon}`}
+                      src={`${useApiStatic()}/${getPrimaryTaskIcon(task?.icon)}`}
                       alt="Task icon"
                       sx={{ width: 100, height: 70, borderRadius: 0}}
                   />}

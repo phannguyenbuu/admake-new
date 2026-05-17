@@ -1,5 +1,5 @@
-import os
-import paramiko
+import os, sys, io, paramiko
+sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
 
 def sftp_mkdirs(sftp, remote_path):
     dirs = remote_path.strip('/').split('/')
@@ -54,8 +54,8 @@ def deploy():
     # 4. Restart services
     print("Restarting Backend service via PM2...")
     # PM2 thường quản lý các ứng dụng, tôi sẽ chạy lệnh restart cho backend
-    stdin, stdout, stderr = ssh.exec_command("pm2 restart all")
-    print(stdout.read().decode())
+    _, stdout, stderr = ssh.exec_command("pm2 restart all")
+    print(stdout.read().decode("utf-8", "replace"))
 
     ssh.close()
     print("--- Deployment Complete ---")

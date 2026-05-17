@@ -1,0 +1,664 @@
+<!doctype html>
+<html lang="vi" class="scroll-smooth">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ADMAKE Landing Page</title>
+    <link rel="stylesheet" href="style.css" />
+    <style>
+      body { font-family: ui-sans-serif, system-ui, sans-serif; }
+    </style>
+  </head>
+  <body class="min-h-dvh w-full bg-background text-foreground">
+    <main class="min-h-dvh w-full">
+      <header class="w-full border-b bg-white/80 backdrop-blur supports-[backdrop-filter]:bg-white/60 overflow-visible">
+        <div class="container mx-auto flex items-center justify-between px-4 py-3 overflow-visible">
+          <div class="flex items-center">
+            <div class="flex items-center justify-center">
+              <img id="brand-logo" width="50" height="50" class="h-13 w-13 mr-3" alt="" />
+              <img id="brand-wordmark" width="154" height="30" class="h-8" alt="" />
+            </div>
+          </div>
+          <nav id="nav-links" class="hidden items-center gap-6 text-sm md:flex"></nav>
+          <div class="flex flex-col items-end gap-2">
+            <div class="relative z-50">
+              <button
+                id="lang-button"
+                type="button"
+                class="inline-flex items-center gap-2 rounded-md border bg-white px-2 py-1 text-xs whitespace-nowrap"
+                aria-haspopup="listbox"
+                aria-expanded="false"
+              >
+                <img id="lang-button-flag" class="h-4 w-4" alt="" />
+                <span id="lang-button-label"></span>
+              </button>
+              <div
+                id="lang-menu"
+                class="fixed hidden w-40 rounded-md border bg-white shadow z-[9999]"
+                role="listbox"
+              >
+                <button type="button" class="lang-option flex w-full items-center gap-2 px-3 py-2 text-xs hover:bg-neutral-100 whitespace-nowrap" data-lang="vi">
+                  <img src="public/flags/vietnam.png" class="h-4 w-4" alt="Vietnam flag" />
+                  <span>Tiếng Việt</span>
+                </button>
+                <button type="button" class="lang-option flex w-full items-center gap-2 px-3 py-2 text-xs hover:bg-neutral-100 whitespace-nowrap" data-lang="en">
+                  <img src="public/flags/united-kingdom.png" class="h-4 w-4" alt="UK flag" />
+                  <span>English</span>
+                </button>
+                <button type="button" class="lang-option flex w-full items-center gap-2 px-3 py-2 text-xs hover:bg-neutral-100 whitespace-nowrap" data-lang="zh">
+                  <img src="public/flags/china.png" class="h-4 w-4" alt="China flag" />
+                  <span>中文</span>
+                </button>
+              </div>
+            </div>
+            <a
+              id="header-cta"
+              class="inline-flex h-8 items-center justify-center rounded-md bg-brand-500 px-3 text-sm font-medium text-white transition hover:bg-brand-400 whitespace-nowrap"
+            ></a>
+          </div>
+        </div>
+      </header>
+
+      <section class="relative isolate">
+        <div class="absolute inset-0 -z-10">
+          <img id="hero-bg" alt="" class="h-full w-full object-cover" />
+          <div class="absolute inset-0 bg-gradient-to-b from-black/40 via-black/40 to-black/55"></div>
+        </div>
+
+        <div class="container mx-auto grid grid-cols-1 gap-8 px-4 py-12 md:grid-cols-[1.2fr_1fr] md:py-16 lg:py-20">
+          <div class="text-white">
+            <p id="hero-badge" class="mb-2 inline-block rounded bg-brand-500 px-2 py-1 text-xs font-semibold uppercase tracking-wide text-white"></p>
+            <h1 id="hero-title" class="text-2xl font-bold md:text-3xl"></h1>
+            <p id="hero-desc" class="mt-4 max-w-2xl text-sm/6 md:text-base/7 text-white/90"></p>
+            <ul id="hero-features" class="mt-6 grid max-w-2xl grid-cols-1 gap-3 text-sm font-bold md:grid-cols-2"></ul>
+          </div>
+
+          <div id="dang-ky" class="bg-card text-card-foreground flex flex-col gap-6 rounded-xl border bg-white/95 py-6 shadow-sm">
+            <div class="@container/card-header grid auto-rows-min grid-rows-[auto_auto] items-start gap-1.5 px-6 pb-3">
+              <div id="form-title" class="text-xl leading-none font-semibold"></div>
+              <div id="form-subtitle" class="text-muted-foreground text-sm"></div>
+            </div>
+            <div class="px-6">
+              <form id="lead-form" class="space-y-3 text-sm text-neutral-700">
+                <div id="form-fields" class="space-y-3"></div>
+                <button
+                  id="form-submit"
+                  type="submit"
+                  class="inline-flex h-9 w-full items-center justify-center rounded-md bg-brand-500 px-4 text-sm font-medium text-white transition hover:bg-brand-400"
+                ></button>
+                <div id="lead-status" class="text-xs text-neutral-600"></div>
+                <div id="form-contacts" class="space-y-3"></div>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-neutral-800/80 py-10">
+          <div class="container mx-auto px-4">
+            <div id="categories-title" class="mx-auto mb-6 flex h-32 w-32 items-center justify-center rounded-full border-4 border-brand-400 text-center text-[11px] font-semibold uppercase tracking-wide text-white"></div>
+            <div id="categories-items" class="mx-auto grid max-w-3xl grid-cols-2 gap-2 text-xs sm:grid-cols-3 md:grid-cols-4 lg:text-sm"></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="tong-quan" class="bg-brand-400 py-14 text-white">
+        <div class="container mx-auto px-4">
+          <div class="mx-auto max-w-3xl text-center">
+            <h2 id="overview-title" class="text-2xl font-bold md:text-3xl"></h2>
+            <p id="overview-subtitle" class="mt-2 font-bold text-white/80"></p>
+          </div>
+
+          <div id="overview-items" class="mt-8 grid gap-5 font-bold sm:grid-cols-2 lg:grid-cols-3"></div>
+          <div class="mt-8 text-center">
+            <a
+              id="overview-cta"
+              class="inline-flex h-9 items-center justify-center rounded-md bg-brand-500 px-4 text-sm font-medium text-white transition hover:bg-brand-400"
+            ></a>
+          </div>
+        </div>
+      </section>
+
+      <section id="phan-he" class="relative overflow-hidden bg-gradient-to-b from-brand-300 to-brand-100 py-14">
+        <div class="container mx-auto px-4">
+          <h2 id="features-title" class="text-center text-2xl font-bold md:text-3xl"></h2>
+
+          <div id="features-items" class="mt-8 grid gap-5 font-bold sm:grid-cols-2 lg:grid-cols-3"></div>
+          <div class="mt-8 text-center">
+            <a
+              id="features-cta"
+              class="inline-flex h-9 items-center justify-center rounded-md bg-brand-500 px-4 text-sm font-medium text-white transition hover:bg-brand-400"
+            ></a>
+          </div>
+        </div>
+      </section>
+
+      <section id="bang-gia" class="bg-brand-300 py-14 text-white">
+        <div class="container mx-auto px-4">
+          <h2 id="pricing-title" class="text-center text-2xl font-bold md:text-3xl"></h2>
+          <div class="mx-auto mt-8 aspect-[16/7] w-full max-w-5xl overflow-hidden rounded-xl border-4 border-black/10 bg-white shadow">
+            <img id="pricing-image" alt="" class="w-full object-cover" />
+          </div>
+          <div class="mt-6 flex justify-center gap-3">
+            <a
+              id="pricing-cta"
+              class="inline-flex h-9 items-center justify-center rounded-md bg-brand-500 px-4 text-sm font-medium text-white transition hover:bg-brand-400"
+            ></a>
+          </div>
+        </div>
+      </section>
+
+      <section id="ly-do" class="bg-white py-14">
+        <div class="container mx-auto px-4">
+          <h2 id="reasons-title" class="text-center text-2xl font-bold md:text-3xl"></h2>
+          <div id="reasons-columns" class="mt-8 grid gap-6 font-bold md:grid-cols-3"></div>
+        </div>
+      </section>
+
+      <section id="hieu-qua" class="bg-brand-400 py-14 text-white">
+        <div class="container mx-auto px-4">
+          <h2 id="kpi-title" class="text-center text-2xl font-bold md:text-3xl"></h2>
+          <div id="kpi-items" class="mx-auto mt-8 grid max-w-5xl grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6"></div>
+          <div class="mt-6 flex justify-center gap-3">
+            <a
+              id="kpi-cta"
+              class="inline-flex h-9 items-center justify-center rounded-md bg-brand-500 px-4 text-sm font-medium text-white transition hover:bg-brand-400"
+            ></a>
+          </div>
+        </div>
+      </section>
+
+      <footer id="lien-he" class="relative bg-neutral-900 py-14 text-neutral-200">
+        <div class="absolute inset-0 -z-10 opacity-20">
+          <img id="footer-bg" alt="" class="h-full w-full object-cover" />
+        </div>
+
+        <div class="container mx-auto grid gap-10 px-4 md:grid-cols-[1.1fr_1fr]">
+          <div>
+            <h3 id="footer-title" class="text-2xl font-bold text-white"></h3>
+            <p id="footer-desc" class="mt-2 max-w-xl text-neutral-300"></p>
+            <dl id="footer-contacts" class="mt-6 space-y-2 text-sm"></dl>
+            <div class="mt-6 flex gap-3">
+              <a
+                id="footer-cta-primary"
+                class="inline-flex h-9 items-center justify-center gap-2 rounded-md bg-brand-500 px-4 text-sm font-medium text-white transition hover:bg-brand-400"
+              ></a>
+              <a
+                id="footer-cta-secondary"
+                class="inline-flex h-9 items-center justify-center rounded-md border bg-background px-4 text-sm font-medium text-black shadow-xs transition hover:bg-accent hover:text-accent-foreground"
+              ></a>
+            </div>
+          </div>
+        </div>
+        <div id="footer-copyright" class="container mx-auto mt-10 px-4 text-center text-xs text-neutral-400"></div>
+      </footer>
+    </main>
+
+    <template id="nav-link-template">
+      <a class="hover:text-brand-600"></a>
+    </template>
+    <template id="hero-feature-template">
+      <li class="flex items-start gap-2">
+        <span class="mt-0.5 inline-flex h-4 w-4 items-center justify-center rounded-full bg-brand-400 text-[10px] font-bold text-white">&#10003;</span>
+        <div>
+          <div class="feature-title font-semibold text-white"></div>
+          <div class="feature-content text-xs text-white/80"></div>
+        </div>
+      </li>
+    </template>
+    <template id="category-template">
+      <button type="button" class="flex items-center gap-3 rounded-full bg-brand-500 pl-2 pr-4 font-medium text-white shadow hover:bg-brand-400">
+        <img class="h-10 w-10 rounded-full bg-white shadow-lg" alt="" />
+        <span class="category-title"></span>
+      </button>
+    </template>
+    <template id="overview-template">
+      <div class="bg-card text-card-foreground flex flex-col gap-6 rounded-xl border-0 bg-white py-6 shadow">
+        <div class="@container/card-header grid auto-rows-min grid-rows-[auto_auto] items-start gap-1.5 px-6 pb-2">
+          <div class="flex items-center gap-3">
+            <div class="flex h-10 w-10 items-center justify-center rounded-full bg-brand-500 text-white">
+              <span class="text-xs font-bold">+</span>
+            </div>
+            <div class="item-title text-base leading-none font-semibold"></div>
+          </div>
+        </div>
+        <div class="item-content px-6 pt-0 text-sm text-muted-foreground"></div>
+      </div>
+    </template>
+    <template id="feature-template">
+      <div class="bg-card text-card-foreground flex flex-col gap-6 rounded-xl border-0 bg-white py-6 shadow">
+        <div class="@container/card-header grid auto-rows-min grid-rows-[auto_auto] items-start gap-1.5 px-6 pb-2">
+          <div class="flex items-center gap-3">
+            <div class="flex h-10 w-10 items-center justify-center rounded-md bg-brand-500 text-white">
+              <span class="text-xs font-bold">+</span>
+            </div>
+            <div class="item-title text-base leading-none font-semibold"></div>
+          </div>
+        </div>
+        <div class="item-content px-6 pt-0 text-sm text-neutral-600"></div>
+      </div>
+    </template>
+    <template id="reason-column-template">
+      <div class="bg-card text-card-foreground flex flex-col gap-6 rounded-xl border-0 bg-neutral-50 py-6 shadow-sm">
+        <div class="@container/card-header grid auto-rows-min grid-rows-[auto_auto] items-start gap-1.5 px-6">
+          <div class="column-title text-lg leading-none font-semibold"></div>
+        </div>
+        <div class="px-6 text-sm text-neutral-700">
+          <ul class="column-items space-y-2"></ul>
+        </div>
+      </div>
+    </template>
+    <template id="reason-item-template">
+      <li class="flex items-start gap-2">
+        <span class="mt-0.5 inline-flex h-4 w-4 items-center justify-center rounded-full bg-brand-500 text-[10px] font-bold text-white">&#10003;</span>
+        <span class="item-title"></span>
+      </li>
+    </template>
+    <template id="kpi-template">
+      <div class="flex items-center justify-center">
+        <div
+          class="flex h-28 w-28 flex-col items-center justify-center bg-white text-center text-neutral-900 shadow"
+          style="clip-path: polygon(25% 6.7%, 75% 6.7%, 100% 50%, 75% 93.3%, 25% 93.3%, 0% 50%)"
+        >
+          <div class="item-title text-xl font-extrabold"></div>
+          <div class="item-content px-2 text-[10px] text-neutral-600"></div>
+        </div>
+      </div>
+    </template>
+    <template id="contact-template">
+      <div class="grid grid-cols-[80px_1fr] gap-2">
+        <dt class="contact-title text-neutral-400"></dt>
+        <dd class="contact-content"></dd>
+      </div>
+    </template>
+    <template id="form-input-template">
+      <div>
+        <label class="field-label mb-1 block text-xs font-semibold text-neutral-600"></label>
+        <input class="field-input w-full rounded-md border bg-white px-3 py-2 text-sm" />
+      </div>
+    </template>
+    <template id="form-textarea-template">
+      <div>
+        <label class="field-label mb-1 block text-xs font-semibold text-neutral-600"></label>
+        <textarea rows="3" class="field-input w-full rounded-md border bg-white px-3 py-2 text-sm"></textarea>
+      </div>
+    </template>
+    <template id="form-select-template">
+      <div>
+        <label class="field-label mb-1 block text-xs font-semibold text-neutral-600"></label>
+        <select class="field-input w-full rounded-md border bg-white px-3 py-2 text-sm"></select>
+      </div>
+    </template>
+
+    <script>
+      (function () {
+        var state = { data: null, lang: "vi" };
+        var savedLang = localStorage.getItem("admakeLang");
+        if (savedLang) state.lang = savedLang;
+
+        function pick(value) {
+          if (!value) return "";
+          if (typeof value === "string") return value;
+          return value[state.lang] || value.vi || value.en || "";
+        }
+
+        function setText(id, value, useHtml) {
+          var el = document.getElementById(id);
+          if (!el) return;
+          if (useHtml) {
+            el.innerHTML = pick(value);
+          } else {
+            el.textContent = pick(value);
+          }
+        }
+
+        function clearEl(el) {
+          while (el && el.firstChild) el.removeChild(el.firstChild);
+        }
+
+        function cloneTemplate(id) {
+          var tpl = document.getElementById(id);
+          return tpl ? tpl.content.firstElementChild.cloneNode(true) : null;
+        }
+
+        function renderNav(items) {
+          var nav = document.getElementById("nav-links");
+          clearEl(nav);
+          items.forEach(function (item) {
+            var link = cloneTemplate("nav-link-template");
+            link.href = item.id ? "#" + item.id : item.href || "#";
+            link.textContent = pick(item.title);
+            nav.appendChild(link);
+          });
+        }
+
+        function renderHeroFeatures(items) {
+          var list = document.getElementById("hero-features");
+          clearEl(list);
+          items.forEach(function (item) {
+            var li = cloneTemplate("hero-feature-template");
+            li.querySelector(".feature-title").textContent = pick(item.title);
+            li.querySelector(".feature-content").textContent = pick(item.content);
+            list.appendChild(li);
+          });
+        }
+
+        function renderCategories(items) {
+          var list = document.getElementById("categories-items");
+          clearEl(list);
+          items.forEach(function (item) {
+            var node = cloneTemplate("category-template");
+            var img = node.querySelector("img");
+            img.src = item.icon;
+            img.alt = pick(item.title);
+            node.querySelector(".category-title").textContent = pick(item.title);
+            list.appendChild(node);
+          });
+        }
+
+        function renderCardList(containerId, templateId, items) {
+          var list = document.getElementById(containerId);
+          clearEl(list);
+          items.forEach(function (item) {
+            var node = cloneTemplate(templateId);
+            node.querySelector(".item-title").textContent = pick(item.title);
+            node.querySelector(".item-content").textContent = pick(item.content);
+            list.appendChild(node);
+          });
+        }
+
+        function renderReasons(columns) {
+          var container = document.getElementById("reasons-columns");
+          clearEl(container);
+          columns.forEach(function (col) {
+            var colNode = cloneTemplate("reason-column-template");
+            colNode.querySelector(".column-title").textContent = pick(col.title);
+            var list = colNode.querySelector(".column-items");
+            col.items.forEach(function (item) {
+              var li = cloneTemplate("reason-item-template");
+              li.querySelector(".item-title").textContent = pick(item.title);
+              list.appendChild(li);
+            });
+            container.appendChild(colNode);
+          });
+        }
+
+        function renderKpis(items) {
+          var list = document.getElementById("kpi-items");
+          clearEl(list);
+          items.forEach(function (item) {
+            var node = cloneTemplate("kpi-template");
+            node.querySelector(".item-title").textContent = pick(item.title);
+            node.querySelector(".item-content").textContent = pick(item.content);
+            list.appendChild(node);
+          });
+        }
+
+        function renderContacts(items) {
+          var list = document.getElementById("footer-contacts");
+          clearEl(list);
+          items.forEach(function (item) {
+            var node = cloneTemplate("contact-template");
+            node.querySelector(".contact-title").textContent = pick(item.title);
+            var contentEl = node.querySelector(".contact-content");
+            if (item.href) {
+              var link = document.createElement("a");
+              link.href = item.href;
+              link.textContent = pick(item.content);
+              link.className = "hover:underline";
+              contentEl.appendChild(link);
+            } else {
+              contentEl.textContent = pick(item.content);
+            }
+            list.appendChild(node);
+          });
+        }
+
+        function renderFormFields(fields) {
+          var container = document.getElementById("form-fields");
+          clearEl(container);
+          fields.forEach(function (field) {
+            var node;
+            if (field.type === "textarea") {
+              node = cloneTemplate("form-textarea-template");
+              node.querySelector("textarea").name = field.name;
+              node.querySelector("textarea").placeholder = pick(field.placeholder);
+              if (field.required) node.querySelector("textarea").required = true;
+            } else if (field.type === "select") {
+              node = cloneTemplate("form-select-template");
+              var select = node.querySelector("select");
+              select.name = field.name;
+              if (field.required) select.required = true;
+              (field.options || []).forEach(function (opt) {
+                var option = document.createElement("option");
+                option.value = opt.value || "";
+                option.textContent = pick(opt.title);
+                select.appendChild(option);
+              });
+            } else {
+              node = cloneTemplate("form-input-template");
+              var input = node.querySelector("input");
+              input.name = field.name;
+              input.type = field.type || "text";
+              input.placeholder = pick(field.placeholder);
+              if (field.required) input.required = true;
+            }
+            node.querySelector(".field-label").textContent = pick(field.title);
+            container.appendChild(node);
+          });
+        }
+
+        function renderFormContacts(items) {
+          var list = document.getElementById("form-contacts");
+          clearEl(list);
+          items.forEach(function (item) {
+            var wrapper = document.createElement("div");
+            wrapper.className = "rounded-md border bg-white p-3";
+            var title = document.createElement("div");
+            title.className = "font-semibold text-neutral-900";
+            title.textContent = pick(item.title);
+            var value = document.createElement("a");
+            value.className = "text-brand-600 hover:underline";
+            value.href = item.href || "#";
+            value.textContent = pick(item.content);
+            wrapper.appendChild(title);
+            wrapper.appendChild(value);
+            list.appendChild(wrapper);
+          });
+        }
+
+        function renderPage(data) {
+          state.data = data;
+          document.documentElement.lang = state.lang;
+          if (data.meta && data.meta.title) document.title = pick(data.meta.title);
+
+          document.getElementById("brand-logo").src = data.header.brand.logo;
+          document.getElementById("brand-logo").alt = pick(data.header.brand.logoAlt);
+          document.getElementById("brand-wordmark").src = data.header.brand.wordmark;
+          document.getElementById("brand-wordmark").alt = pick(data.header.brand.wordmarkAlt);
+
+          renderNav(data.header.nav);
+          var cta = document.getElementById("header-cta");
+          cta.textContent = pick(data.header.cta.title);
+          cta.href = data.header.cta.href;
+
+          document.getElementById("hero-bg").src = data.hero.backgroundImage;
+          document.getElementById("hero-bg").alt = pick(data.hero.backgroundAlt);
+          setText("hero-badge", data.hero.badge);
+          setText("hero-title", data.hero.title);
+          setText("hero-desc", data.hero.content);
+          renderHeroFeatures(data.hero.features);
+
+          setText("form-title", data.form.title);
+          setText("form-subtitle", data.form.content);
+          setText("form-submit", data.form.submit);
+          renderFormFields(data.form.fields);
+          renderFormContacts(data.form.contacts);
+
+          setText("categories-title", data.categories.title, true);
+          renderCategories(data.categories.items);
+
+          setText("overview-title", data.overview.title);
+          setText("overview-subtitle", data.overview.content);
+          renderCardList("overview-items", "overview-template", data.overview.items);
+          var overviewCta = document.getElementById("overview-cta");
+          overviewCta.textContent = pick(data.overview.cta.title);
+          overviewCta.href = data.overview.cta.href;
+
+          setText("features-title", data.features.title);
+          renderCardList("features-items", "feature-template", data.features.items);
+          var featuresCta = document.getElementById("features-cta");
+          featuresCta.textContent = pick(data.features.cta.title);
+          featuresCta.href = data.features.cta.href;
+
+          setText("pricing-title", data.pricing.title);
+          document.getElementById("pricing-image").src = data.pricing.image;
+          document.getElementById("pricing-image").alt = pick(data.pricing.imageAlt);
+          var pricingCta = document.getElementById("pricing-cta");
+          pricingCta.textContent = pick(data.pricing.cta.title);
+          pricingCta.href = data.pricing.cta.href;
+
+          setText("reasons-title", data.reasons.title);
+          renderReasons(data.reasons.columns);
+
+          setText("kpi-title", data.kpis.title);
+          renderKpis(data.kpis.items);
+          var kpiCta = document.getElementById("kpi-cta");
+          kpiCta.textContent = pick(data.kpis.cta.title);
+          kpiCta.href = data.kpis.cta.href;
+
+          document.getElementById("footer-bg").src = data.footer.backgroundImage;
+          document.getElementById("footer-bg").alt = pick(data.footer.backgroundAlt);
+          setText("footer-title", data.footer.title);
+          setText("footer-desc", data.footer.content);
+          renderContacts(data.footer.contacts);
+          var ctaPrimary = document.getElementById("footer-cta-primary");
+          ctaPrimary.innerHTML = '<span class="inline-flex h-4 w-4 items-center justify-center rounded-full border border-white text-[10px]">+</span>' + pick(data.footer.ctaPrimary.title);
+          ctaPrimary.href = data.footer.ctaPrimary.href;
+          var ctaSecondary = document.getElementById("footer-cta-secondary");
+          ctaSecondary.textContent = pick(data.footer.ctaSecondary.title);
+          ctaSecondary.href = data.footer.ctaSecondary.href;
+          setText("footer-copyright", data.footer.copyright, true);
+          var yearEl = document.getElementById("year");
+          if (yearEl) yearEl.textContent = String(new Date().getFullYear());
+        }
+
+        function bindForm(data) {
+          var form = document.getElementById("lead-form");
+          var statusEl = document.getElementById("lead-status");
+          if (!form) return;
+          form.addEventListener("submit", function (e) {
+            e.preventDefault();
+            if (statusEl) statusEl.textContent = pick(data.form.status.sending);
+
+            var formData = new FormData(form);
+            var payload = {};
+            formData.forEach(function (value, key) {
+              var trimmed = String(value || "").trim();
+              if (trimmed) payload[key] = trimmed;
+            });
+
+            fetch(data.form.endpoint, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(payload),
+            })
+              .then(function (res) {
+                if (!res.ok) throw new Error("Request failed");
+                return res.json();
+              })
+              .then(function () {
+                form.reset();
+                if (statusEl) statusEl.textContent = pick(data.form.status.success);
+              })
+              .catch(function () {
+                if (statusEl) statusEl.textContent = pick(data.form.status.error);
+              });
+          });
+        }
+
+        function setLang(lang) {
+          state.lang = lang;
+          localStorage.setItem("admakeLang", lang);
+          if (state.data) {
+            renderPage(state.data);
+          }
+        }
+
+        var langButton = document.getElementById("lang-button");
+        var langMenu = document.getElementById("lang-menu");
+        var langButtonLabel = document.getElementById("lang-button-label");
+        var langButtonFlag = document.getElementById("lang-button-flag");
+        var langOptions = document.querySelectorAll(".lang-option");
+        var langMeta = {
+          vi: { label: "Tiếng Việt", flag: "public/flags/vietnam.png" },
+          en: { label: "English", flag: "public/flags/united-kingdom.png" },
+          zh: { label: "中文", flag: "public/flags/china.png" }
+        };
+
+        function setLangButton(lang) {
+          var meta = langMeta[lang] || langMeta.vi;
+          if (langButtonLabel) langButtonLabel.textContent = meta.label;
+          if (langButtonFlag) langButtonFlag.src = meta.flag;
+        }
+
+        setLangButton(state.lang);
+
+        function positionLangMenu() {
+          if (!langButton || !langMenu) return;
+          var rect = langButton.getBoundingClientRect();
+          var menuWidth = langMenu.offsetWidth || 160;
+          langMenu.style.left = Math.max(8, rect.right - menuWidth) + "px";
+          langMenu.style.top = Math.max(8, rect.top - langMenu.offsetHeight - 8) + "px";
+        }
+
+        if (langButton && langMenu) {
+          langButton.addEventListener("click", function () {
+            var isOpen = !langMenu.classList.contains("hidden");
+            if (isOpen) {
+              langMenu.classList.add("hidden");
+              langButton.setAttribute("aria-expanded", "false");
+              return;
+            }
+            langMenu.classList.remove("hidden");
+            positionLangMenu();
+            langButton.setAttribute("aria-expanded", "true");
+          });
+        }
+
+        langOptions.forEach(function (btn) {
+          btn.addEventListener("click", function () {
+            var lang = btn.getAttribute("data-lang") || "vi";
+            setLang(lang);
+            setLangButton(lang);
+            if (langMenu) langMenu.classList.add("hidden");
+            if (langButton) langButton.setAttribute("aria-expanded", "false");
+          });
+        });
+
+        document.addEventListener("click", function (e) {
+          if (!langMenu || !langButton) return;
+          if (langMenu.classList.contains("hidden")) return;
+          if (!langMenu.contains(e.target) && !langButton.contains(e.target)) {
+            langMenu.classList.add("hidden");
+            langButton.setAttribute("aria-expanded", "false");
+          }
+        });
+
+        window.addEventListener("resize", positionLangMenu);
+
+        fetch("https://admake.vn/api/lead/content/", { cache: "no-store" })
+          .then(function (res) { return res.json(); })
+          .then(function (data) {
+            renderPage(data);
+            bindForm(data);
+          })
+          .catch(function () {
+            var fallback = document.getElementById("lead-status");
+            if (fallback) fallback.textContent = "Không thể tải nội dung.";
+          });
+      })();
+    </script>
+  </body>
+</html>
