@@ -311,10 +311,22 @@ def delete_user(id):
         print("No user", id)
         abort(404, description = "No user")
     else:
+        # Import models here to avoid circular imports
+        from models import UserCanView, PayrollAdjustment, Workpoint, Leave, Notify, Customer, AccountingDailyCash
+        
+        # 1. Delete all referencing records to avoid foreign key / IntegrityErrors
         Message.query.filter_by(user_id=user.id).delete(synchronize_session=False)
-        db.session.commit()  # Đảm bảo các message được xóa trước, tránh vi phạm khoá ngoại
+        UserCanView.query.filter_by(user_id=user.id).delete(synchronize_session=False)
+        PayrollAdjustment.query.filter_by(user_id=user.id).delete(synchronize_session=False)
+        Workpoint.query.filter_by(user_id=user.id).delete(synchronize_session=False)
+        Leave.query.filter_by(user_id=user.id).delete(synchronize_session=False)
+        Notify.query.filter_by(user_id=user.id).delete(synchronize_session=False)
+        Customer.query.filter_by(user_id=user.id).delete(synchronize_session=False)
+        AccountingDailyCash.query.filter_by(user_id=user.id).delete(synchronize_session=False)
+        
+        db.session.commit()  # commit all deletions first
 
-        # Lấy user và xóa
+        # 2. Finally delete the user
         user = db.session.get(User, user.id)
         if user:
             db.session.delete(user)
