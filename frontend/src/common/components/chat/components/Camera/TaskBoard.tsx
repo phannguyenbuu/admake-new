@@ -129,15 +129,13 @@ const TaskBoard = ({ userId,fullName, open, onCancel }: TaskBoardProps) => {
       alignItems: 'center', gap: 16 }}>
 
       <button
-        onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-        disabled={currentPage === 1}
+        onClick={() => setCurrentPage(prev => (prev === 1 ? totalPages : prev - 1))}
       >
         <ArrowBackIosNewIcon fontSize="small" />
       </button>
       <span>Trang {currentPage} / {totalPages}</span>
       <button
-        onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-        disabled={currentPage === totalPages}
+        onClick={() => setCurrentPage(prev => (prev === totalPages ? 1 : prev + 1))}
       >
         <ArrowForwardIosIcon fontSize="small" />
       </button>
