@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify, abort, g
-from models import db, app, Workpoint, WorkpointSetting, Message, User, Task, dateStr, generate_datetime_id, Leave, LeadPayload, PayrollAdjustment
+from models import db, app, Workpoint, WorkpointSetting, Message, User, Task, dateStr, generate_datetime_id, Leave, LeadPayload, PayrollAdjustment, Role
 from api.chat import socketio
 from sqlalchemy import desc
 from datetime import datetime, time, date, timedelta
@@ -22,6 +22,9 @@ def _require_public_workpoint_user(user_id: str | None) -> User:
 
 @workpoint_bp.before_request
 def guard_workpoint_permission():
+    if request.method == "OPTIONS":
+        return
+
     endpoint = request.endpoint or ""
     view_args = request.view_args or {}
 
@@ -66,6 +69,7 @@ def guard_workpoint_permission():
         "workpoint.get_workpoint_checkpoint",
         "workpoint.post_workpoint_by_user_and_date",
         "workpoint.remove_workpoint_checklist",
+        "workpoint.get_single_workpoint_detail",
     }:
         target_user = _require_public_workpoint_user(view_args.get("user_id"))
         g.permission_actor = target_user
@@ -102,7 +106,9 @@ def guard_workpoint_permission():
     if target_user_id:
         target_user = db.session.get(User, target_user_id)
         if target_user:
-            ensure_resource_lead(target_user, actor, "user")
+            # Admin (role_id=1) and subcontractor (role_id=2) can view any user
+            if getattr(actor, "role_id", None) not in (1, 2):
+                ensure_resource_lead(target_user, actor, "user")
 
 PAYROLL_ADJUSTMENT_SIGNS = {
     "bonus": 1,
@@ -112,7 +118,9 @@ PAYROLL_ADJUSTMENT_SIGNS = {
     "allowance": 1,
     "bhyt": -1,
     "bhxh": -1,
+    "carry_forward": 1,
 }
+
 
 
 def _parse_month_arg(value: str | None) -> datetime | None:
@@ -291,6 +299,7 @@ def _sum_payroll_adjustments(items) -> dict:
         "allowance": 0.0,
         "bhyt": 0.0,
         "bhxh": 0.0,
+        "carry_forward": 0.0,
         "net": 0.0,
     }
     for item in items or []:
@@ -311,8 +320,10 @@ def _apply_payroll_adjustments(row: dict, totals: dict) -> dict:
     adjusted["allowance"] = round(float(adjusted.get("allowance", 0) or 0) + totals["allowance"], 0)
     adjusted["bhyt"] = round(float(adjusted.get("bhyt", 0) or 0) + totals["bhyt"], 0)
     adjusted["bhxh"] = round(float(adjusted.get("bhxh", 0) or 0) + totals["bhxh"], 0)
+    adjusted["carry_forward"] = round(float(adjusted.get("carry_forward", 0) or 0) + totals["carry_forward"], 0)
     adjusted["net_salary"] = round(float(adjusted.get("net_salary", 0) or 0) + totals["net"], 0)
     return adjusted
+
 
 
 @workpoint_bp.route("/payroll-summary", methods=["GET"])
@@ -451,14 +462,16 @@ def get_payroll_summary():
         "total_allowance": 0.0,
         "total_bhyt": 0.0,
         "total_bhxh": 0.0,
+        "total_carry_forward": 0.0,
         "total_net_salary": 0.0,
     }
+
 
     month_list = list(_iter_months(from_month_dt, to_month_dt))
 
     for user in users:
         role_name = (user.update_role() or {}).get("name", "")
-        is_supplier = (user.role_id or 0) > 100
+        is_supplier = (user.role_id == 101) or (role_name == "Thầu phụ")
         salary = float(user.salary or 0)
         allowance = float(getattr(user, "allowance", 0) or 0)
         bhyt = float(getattr(user, "bhyt", 0) or 0)
@@ -563,6 +576,7 @@ def get_payroll_summary():
             "allowance": round(allowance, 0),
             "bhyt": round(bhyt, 0),
             "bhxh": round(bhxh, 0),
+            "carry_forward": 0,
             "net_salary": round(net_salary, 0),
         }
         row = _apply_payroll_adjustments(row, _sum_payroll_adjustments(adjustments_by_user.get(user.id, [])))
@@ -581,6 +595,7 @@ def get_payroll_summary():
         summary["total_allowance"] += row["allowance"]
         summary["total_bhyt"] += row["bhyt"]
         summary["total_bhxh"] += row["bhxh"]
+        summary["total_carry_forward"] += row["carry_forward"]
         summary["total_net_salary"] += row["net_salary"]
 
     rows.sort(key=lambda r: (r.get("group_type") or "", (r.get("full_name") or "")))
@@ -594,6 +609,7 @@ def get_payroll_summary():
         "total_allowance",
         "total_bhyt",
         "total_bhxh",
+        "total_carry_forward",
         "total_net_salary",
     ):
         summary[key] = round(float(summary[key]), 0)
@@ -612,8 +628,10 @@ def get_payroll_summary():
             "total_allowance": round(sum(float(r.get("allowance", 0) or 0) for r in group_rows), 0),
             "total_bhyt": round(sum(float(r.get("bhyt", 0) or 0) for r in group_rows), 0),
             "total_bhxh": round(sum(float(r.get("bhxh", 0) or 0) for r in group_rows), 0),
+            "total_carry_forward": round(sum(float(r.get("carry_forward", 0) or 0) for r in group_rows), 0),
             "total_net_salary": round(sum(float(r.get("net_salary", 0) or 0) for r in group_rows), 0),
         }
+
 
     return jsonify(
         {
@@ -802,11 +820,13 @@ def post_workpoint_message():
     user_id = request.form.get("user_id")
     type = request.form.get("type")
     text = request.form.get("text")
+    file_url = request.form.get("file_url")
 
     message = Message.create_item({"message_id": generate_datetime_id(),
                                    "type": type,
                                     "user_id":user_id, 
                                     "text":text, 
+                                    "file_url": file_url,
                                     })
     
     print("Workpoint message", message.tdict())
@@ -863,7 +883,7 @@ def get_batch_workpoint_detail():
     limit = request.args.get("limit", 10, type=int)
     search = request.args.get("search", "", type=str)
 
-    users, pagination = get_query_page_users(lead_id, page, limit, search)
+    users, pagination = get_query_page_users(lead_id, page, limit, search, only_active=True)
     user_id_list = [user["id"] for user in users]
 
     month_str = request.args.get("month", None)

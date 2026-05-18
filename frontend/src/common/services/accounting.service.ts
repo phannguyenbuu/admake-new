@@ -72,10 +72,11 @@ export type PayrollRow = {
   allowance?: number;   // Phụ cấp (+)
   bhyt?: number;        // BHYT (-)
   bhxh?: number;        // BHXH (-)
+  carry_forward?: number; // Mang sang (+)
   net_salary: number;
 };
 
-export type PayrollAdjustmentType = "bonus" | "punish" | "advance" | "commission" | "allowance" | "bhyt" | "bhxh";
+export type PayrollAdjustmentType = "bonus" | "punish" | "advance" | "commission" | "allowance" | "bhyt" | "bhxh" | "carry_forward";
 
 export type PayrollAdjustmentRow = {
   id: string;
@@ -103,6 +104,7 @@ export type PayrollSummary = {
   total_allowance?: number;
   total_bhyt?: number;
   total_bhxh?: number;
+  total_carry_forward?: number;
   total_net_salary: number;
 };
 
@@ -116,6 +118,7 @@ export type PayrollGroupSummary = {
   total_allowance?: number;
   total_bhyt?: number;
   total_bhxh?: number;
+  total_carry_forward?: number;
   total_net_salary: number;
 };
 

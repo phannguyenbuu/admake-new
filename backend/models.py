@@ -18,13 +18,14 @@ from flask_jwt_extended import (
     JWTManager, create_access_token,
     jwt_required, get_jwt_identity
 )
+from flask_login import UserMixin
 import logging
 import re
 from flask_cors import CORS
 from flask import Blueprint, request, jsonify, abort
 from sqlalchemy.orm.attributes import flag_modified
 from collections import namedtuple
-from sqlalchemy import desc, and_, func, select, Index
+from sqlalchemy import desc, and_, or_, func, select, Index
 import uuid
 from PIL import Image
 
@@ -234,7 +235,7 @@ class UserCanView(BaseModel):
         return item
     
 
-class User(BaseModel):
+class User(BaseModel, UserMixin):
     __tablename__ = 'user'
 
     id = db.Column(db.String(50), primary_key=True)    
@@ -324,6 +325,15 @@ class User(BaseModel):
         }
         if "gender" in filtered_params and isinstance(filtered_params["gender"], str):
             filtered_params["gender"] = gender_map.get(filtered_params["gender"].lower(), filtered_params["gender"])
+
+        # Xử lý is_active
+        if "is_active" in filtered_params:
+            if isinstance(filtered_params["is_active"], str):
+                filtered_params["is_active"] = filtered_params["is_active"].lower() == "true"
+            else:
+                filtered_params["is_active"] = bool(filtered_params["is_active"])
+        else:
+            filtered_params["is_active"] = True
 
         filtered_params["id"] = generate_datetime_id()
 
@@ -1241,7 +1251,7 @@ class AccountingRecord(BaseModel):
         return result
 
 
-FA_EVENT_TYPES = ["purchase", "maintenance", "responsible"]
+FA_EVENT_TYPES = ["purchase", "maintenance", "responsible", "volume"]
 
 class FixedAssetEvent(BaseModel):
     """Sub-rows for a fixed asset: purchase info, maintenance, responsible person."""
@@ -2155,7 +2165,7 @@ def test_sync_backup_to_drive(dry_run=True):
     except subprocess.CalledProcessError as e:
         print("Sync backup to Drive failed:", e.stderr or e)
 
-def get_query_page_users(lead_id, page, limit, search, role_id = 0):
+def get_query_page_users(lead_id, page, limit, search, role_id = 0, only_active = False):
     Pagination = namedtuple('Pagination', ['total', 'pages'])
     empty_pagination = Pagination(total=0, pages=0)
 
@@ -2167,19 +2177,33 @@ def get_query_page_users(lead_id, page, limit, search, role_id = 0):
         return [], empty_pagination
     
     if role_id == 0:
+        supplier_role_ids = {101}
+        roles = Role.query.filter(Role.lead_id == lead_id, Role.name == "Thầu phụ").all()
+        for r in roles:
+            supplier_role_ids.add(r.id)
+
         query = lead.users.filter(
             and_(
                 User.role_id > 0,
-                User.role_id < 100,
+                ~User.role_id.in_(supplier_role_ids),
             )
         )
     else:
         query = lead.users.filter(User.role_id == role_id)
 
-    if search:
+    if only_active:
         query = query.filter(
-            (User.username.ilike(f"%{search}%")) | 
-            (User.fullName.ilike(f"%{search}%"))
+            or_(
+                User.is_active.is_(True),
+                User.is_active.is_(None)
+            )
+        )
+
+    if search:
+        search_stripped = search.strip()
+        query = query.filter(
+            (User.username.ilike(f"%{search_stripped}%")) | 
+            (User.fullName.ilike(f"%{search_stripped}%"))
         )
 
     split_length = func.array_length(func.regexp_split_to_array(User.fullName, ' '), 1)

@@ -13,7 +13,7 @@ import {
 import { Plus, Trash2, Check, X, Pencil, ChevronDown, ChevronRight } from "lucide-react";
 
 // ─── Bonus/Punish CRUD (localStorage) ──────────────────────────────────────────────────
-type PayrollAdjustmentType = "bonus" | "punish" | "advance" | "commission" | "allowance" | "bhyt" | "bhxh";
+type PayrollAdjustmentType = "bonus" | "punish" | "advance" | "commission" | "allowance" | "bhyt" | "bhxh" | "carry_forward";
 
 type BonusPunishRow = {
   id: string;
@@ -25,7 +25,7 @@ type BonusPunishRow = {
   entry_date?: string;
 };
 
-type PayrollExpandableAdjustmentType = "bonus" | "punish" | "advance";
+type PayrollExpandableAdjustmentType = "bonus" | "punish" | "advance" | "carry_forward";
 
 const ADJUSTMENT_META: Record<PayrollAdjustmentType, { label: string; sign: 1 | -1; rowTone: string; badgeTone: string; textTone: string }> = {
   bonus: { label: "Thưởng", sign: 1, rowTone: "bg-green-50", badgeTone: "bg-green-200 text-green-700", textTone: "text-green-700" },
@@ -35,10 +35,11 @@ const ADJUSTMENT_META: Record<PayrollAdjustmentType, { label: string; sign: 1 | 
   allowance: { label: "Phụ cấp", sign: 1, rowTone: "bg-sky-50", badgeTone: "bg-sky-200 text-sky-700", textTone: "text-sky-700" },
   bhyt: { label: "BHYT", sign: -1, rowTone: "bg-emerald-50", badgeTone: "bg-emerald-200 text-emerald-700", textTone: "text-emerald-700" },
   bhxh: { label: "BHXH", sign: -1, rowTone: "bg-fuchsia-50", badgeTone: "bg-fuchsia-200 text-fuchsia-700", textTone: "text-fuchsia-700" },
+  carry_forward: { label: "Mang sang", sign: 1, rowTone: "bg-teal-50", badgeTone: "bg-teal-200 text-teal-700", textTone: "text-teal-700" },
 };
 type AdjustmentMeta = (typeof ADJUSTMENT_META)[PayrollAdjustmentType];
 const ADJUSTMENT_OPTIONS = Object.entries(ADJUSTMENT_META) as [PayrollAdjustmentType, AdjustmentMeta][];
-const PAYROLL_EXPANDABLE_TYPES: PayrollExpandableAdjustmentType[] = ["bonus", "punish", "advance"];
+const PAYROLL_EXPANDABLE_TYPES: PayrollExpandableAdjustmentType[] = ["bonus", "punish", "advance", "carry_forward"];
 const PAYROLL_EXPANDABLE_OPTIONS = PAYROLL_EXPANDABLE_TYPES.map((type) => [type, ADJUSTMENT_META[type]] as const);
 const PAYROLL_ADJUSTMENT_EVENT = "payroll-adjustments:changed";
 
@@ -91,6 +92,7 @@ const getAdjustmentTotals = (rows: BonusPunishRow[]) => ({
   allowance: sumAdjustments(rows, "allowance"),
   bhyt: sumAdjustments(rows, "bhyt"),
   bhxh: sumAdjustments(rows, "bhxh"),
+  carry_forward: sumAdjustments(rows, "carry_forward"),
   net: getAdjustmentNet(rows),
 });
 
@@ -191,6 +193,7 @@ function getPayrollTableComputedValues(row: PayrollRow, bpRows: BonusPunishRow[]
     allowanceAmount: Number(row.allowance || 0) + adjustments.allowance,
     bhytAmount: Number(row.bhyt || 0) + adjustments.bhyt,
     bhxhAmount: Number(row.bhxh || 0) + adjustments.bhxh,
+    carryForwardAmount: Number(row.carry_forward || 0) + adjustments.carry_forward,
     adjustedNet: Number(row.net_salary || 0) + adjustments.net,
   };
 }
@@ -206,10 +209,11 @@ function getAdjustedGroupSummary(summary: GroupSummary, rows: PayrollRow[], peri
         allowance: acc.allowance + adjustments.allowance,
         bhyt: acc.bhyt + adjustments.bhyt,
         bhxh: acc.bhxh + adjustments.bhxh,
+        carry_forward: acc.carry_forward + adjustments.carry_forward,
         net: acc.net + adjustments.net,
       };
     },
-    { bonus: 0, punish: 0, advance: 0, allowance: 0, bhyt: 0, bhxh: 0, net: 0 },
+    { bonus: 0, punish: 0, advance: 0, allowance: 0, bhyt: 0, bhxh: 0, carry_forward: 0, net: 0 },
   );
 
   return {
@@ -220,6 +224,7 @@ function getAdjustedGroupSummary(summary: GroupSummary, rows: PayrollRow[], peri
     total_allowance: Number(summary.total_allowance || 0) + extra.allowance,
     total_bhyt: Number(summary.total_bhyt || 0) + extra.bhyt,
     total_bhxh: Number(summary.total_bhxh || 0) + extra.bhxh,
+    total_carry_forward: Number(summary.total_carry_forward || 0) + extra.carry_forward,
     total_net_salary: Number(summary.total_net_salary || 0) + extra.net,
   };
 }
@@ -239,6 +244,7 @@ const emptySummary: PayrollSummary = {
   total_base_salary: 0, total_overtime_salary: 0,
   total_bonus: 0, total_punish: 0, total_advance: 0,
   total_allowance: 0, total_bhyt: 0, total_bhxh: 0,
+  total_carry_forward: 0,
   total_net_salary: 0,
 };
 
@@ -246,6 +252,7 @@ const emptyGroupSummary: GroupSummary = {
   total_people: 0, total_base_salary: 0, total_overtime_salary: 0,
   total_bonus: 0, total_punish: 0, total_advance: 0,
   total_allowance: 0, total_bhyt: 0, total_bhxh: 0,
+  total_carry_forward: 0,
   total_net_salary: 0,
 };
 
@@ -268,11 +275,10 @@ function buildGroupSummary(rows: PayrollRow[]): GroupSummary {
     total_allowance: rows.reduce((s, r) => s + Number(r.allowance || 0), 0),
     total_bhyt: rows.reduce((s, r) => s + Number(r.bhyt || 0), 0),
     total_bhxh: rows.reduce((s, r) => s + Number(r.bhxh || 0), 0),
+    total_carry_forward: rows.reduce((s, r) => s + Number(r.carry_forward || 0), 0),
     total_net_salary: rows.reduce((s, r) => s + Number(r.net_salary || 0), 0),
   };
 }
-
-// ─── Payslip Modal ───────────────────────────────────────────────────────────
 
 const isMobile = () =>
   /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
@@ -469,6 +475,11 @@ function buildPayslipHTML(row: PayrollRow, period: string, bpRows: BonusPunishRo
         <td>BHXH</td>
         <td>${bhxhAmount > 0 ? `Tong BHXH ${fm(bhxhAmount)} d` : "-"}</td>
         <td class="col-amount minus-text">${bhxhAmount > 0 ? `-${fm(bhxhAmount)}` : ""}</td>
+      </tr>
+      <tr>
+        <td>Mang sang</td>
+        <td>${Number(row.carry_forward || 0) !== 0 ? `Mang sang thang truoc ${fm(Number(row.carry_forward || 0))} d` : "-"}</td>
+        <td class="col-amount plus-text">${Number(row.carry_forward || 0) !== 0 ? `+${fm(Number(row.carry_forward || 0))}` : ""}</td>
       </tr>
       <tr class="section-row">
         <td colspan="3">ĐIỀU CHỈNH THÊM</td>
@@ -891,6 +902,13 @@ function PayslipModal({
       tone: "text-rose-600",
       prefix: "-",
     },
+    {
+      label: "Mang sang",
+      content: describeMoneyChange(Number(row.carry_forward || 0), adjustments.carry_forward, 1),
+      amount: Number(row.carry_forward || 0),
+      tone: "text-teal-600",
+      prefix: "+",
+    },
   ];
 
   return (
@@ -1188,14 +1206,15 @@ function PayrollTableLegacy({
               <th className="py-3 px-3 text-sky-600">Phụ cấp (+)</th>
               <th className="py-3 px-3 text-rose-600">BHYT (-)</th>
               <th className="py-3 px-3 text-rose-600">BHXH (-)</th>
+              <th className="py-3 px-3 text-teal-600">Mang sang</th>
               <th className="py-3 px-3">Thực nhận</th>
             </tr>
           </thead>
           <tbody>
             {isLoading ? (
-              <tr><td className="py-8 px-3 text-center text-slate-500" colSpan={17}>Đang tải dữ liệu bảng lương...</td></tr>
+              <tr><td className="py-8 px-3 text-center text-slate-500" colSpan={18}>Đang tải dữ liệu bảng lương...</td></tr>
             ) : rows.length === 0 ? (
-              <tr><td className="py-8 px-3 text-center text-slate-500" colSpan={17}>Không có dữ liệu cho kỳ đã chọn.</td></tr>
+              <tr><td className="py-8 px-3 text-center text-slate-500" colSpan={18}>Không có dữ liệu cho kỳ đã chọn.</td></tr>
             ) : (
               rows.map((row, index) => (
                 <tr
@@ -1220,6 +1239,7 @@ function PayrollTableLegacy({
                   <td className="py-3 px-3 text-sky-600 font-semibold">{row.allowance ? `+${formatMoney(row.allowance)}` : '—'} đ</td>
                   <td className="py-3 px-3 text-rose-500">{row.bhyt ? `-${formatMoney(row.bhyt)}` : '—'} đ</td>
                   <td className="py-3 px-3 text-rose-500">{row.bhxh ? `-${formatMoney(row.bhxh)}` : '—'} đ</td>
+                  <td className="py-3 px-3 text-teal-600 font-semibold">{Number(row.carry_forward || 0) !== 0 ? `${formatMoney(row.carry_forward || 0)} đ` : '—'}</td>
                   <td className="py-3 px-3 text-teal-700 font-semibold">{formatMoney(row.net_salary)} đ</td>
                 </tr>
               ))
@@ -1308,14 +1328,15 @@ function PayrollTableOld({
               <th className="py-3 px-3 text-sky-600">Phụ cấp (+)</th>
               <th className="py-3 px-3 text-rose-600">BHYT (-)</th>
               <th className="py-3 px-3 text-rose-600">BHXH (-)</th>
+              <th className="py-3 px-3 text-teal-600">Mang sang</th>
               <th className="py-3 px-3">Thực nhận</th>
             </tr>
           </thead>
           <tbody>
             {isLoading ? (
-              <tr><td className="py-8 px-3 text-center text-slate-500" colSpan={17}>Đang tải dữ liệu bảng lương...</td></tr>
+              <tr><td className="py-8 px-3 text-center text-slate-500" colSpan={18}>Đang tải dữ liệu bảng lương...</td></tr>
             ) : rows.length === 0 ? (
-              <tr><td className="py-8 px-3 text-center text-slate-500" colSpan={17}>Không có dữ liệu cho kỳ đã chọn.</td></tr>
+              <tr><td className="py-8 px-3 text-center text-slate-500" colSpan={18}>Không có dữ liệu cho kỳ đã chọn.</td></tr>
             ) : (
               rows.map((row, index) => (
                 <tr
@@ -1340,6 +1361,7 @@ function PayrollTableOld({
                   <td className="py-3 px-3 text-sky-600 font-semibold">{row.allowance ? `+${formatMoney(row.allowance)} đ` : "-"}</td>
                   <td className="py-3 px-3 text-rose-500">{row.bhyt ? `-${formatMoney(row.bhyt)} đ` : "-"}</td>
                   <td className="py-3 px-3 text-rose-500">{row.bhxh ? `-${formatMoney(row.bhxh)} đ` : "-"}</td>
+                  <td className="py-3 px-3 text-teal-600 font-semibold">{Number(row.carry_forward || 0) !== 0 ? `${formatMoney(row.carry_forward || 0)} đ` : "-"}</td>
                   <td className="py-3 px-3 text-teal-700 font-semibold">{formatMoney(row.net_salary)} đ</td>
                 </tr>
               ))
@@ -1357,6 +1379,7 @@ function PayrollTableOld({
                 <td className="py-3 px-3 text-sky-700">{formatMoney(summary.total_allowance || 0)} đ</td>
                 <td className="py-3 px-3 text-rose-600">-{formatMoney(summary.total_bhyt || 0)} đ</td>
                 <td className="py-3 px-3 text-rose-600">-{formatMoney(summary.total_bhxh || 0)} đ</td>
+                <td className="py-3 px-3 text-teal-600">{formatMoney(summary.total_carry_forward || 0)} đ</td>
                 <td className="py-3 px-3 text-teal-700">{formatMoney(summary.total_net_salary)} đ</td>
               </tr>
             </tfoot>
@@ -1370,7 +1393,7 @@ function PayrollTableOld({
 const isPayrollExpandableType = (
   value: PayrollAdjustmentType | undefined,
 ): value is PayrollExpandableAdjustmentType =>
-  value === "bonus" || value === "punish" || value === "advance";
+  value === "bonus" || value === "punish" || value === "advance" || value === "carry_forward";
 
 type PayrollExpandableRow = BonusPunishRow & { type: PayrollExpandableAdjustmentType };
 type PayrollExpandableDraft = Omit<BonusPunishRow, "id" | "type"> & { type: PayrollExpandableAdjustmentType };
@@ -1396,6 +1419,12 @@ const PAYROLL_EXPANDABLE_TONES: Record<
     view: "bg-amber-50 border-amber-200 text-amber-800",
     action: "text-amber-500 hover:text-amber-700",
     saveButton: "bg-amber-500 hover:bg-amber-600",
+  },
+  carry_forward: {
+    edit: "bg-teal-50 border-teal-300",
+    view: "bg-teal-50 border-teal-200 text-teal-850",
+    action: "text-teal-500 hover:text-teal-700",
+    saveButton: "bg-teal-500 hover:bg-teal-600",
   },
 };
 
@@ -1669,12 +1698,13 @@ function PayrollTableRowOld({
         <td className="py-3 px-3 text-sky-600 font-semibold">{values.allowanceAmount > 0 ? `+${formatMoney(values.allowanceAmount)} đ` : "-"}</td>
         <td className="py-3 px-3 text-rose-500">{values.bhytAmount > 0 ? `-${formatMoney(values.bhytAmount)} đ` : "-"}</td>
         <td className="py-3 px-3 text-rose-500">{values.bhxhAmount > 0 ? `-${formatMoney(values.bhxhAmount)} đ` : "-"}</td>
+        <td className="py-3 px-3 text-teal-600 font-semibold">{values.carryForwardAmount !== 0 ? `${formatMoney(values.carryForwardAmount)} đ` : "-"}</td>
         <td className="py-3 px-3 text-teal-700 font-semibold">{formatMoney(values.adjustedNet)} đ</td>
       </tr>
 
       {isExpanded && (
         <tr className="bg-slate-50/50">
-          <td colSpan={18} className="p-0">
+          <td colSpan={19} className="p-0">
             <PayrollAdjustmentSubRowOld store={store} />
           </td>
         </tr>
@@ -1773,14 +1803,15 @@ function PayrollTableLocalOld({
               <th className="py-3 px-3 text-sky-600">Phá»¥ cáº¥p (+)</th>
               <th className="py-3 px-3 text-rose-600">BHYT (-)</th>
               <th className="py-3 px-3 text-rose-600">BHXH (-)</th>
-              <th className="py-3 px-3">Thá»±c nháº­n</th>
+              <th className="py-3 px-3 text-teal-600">Mang sang</th>
+              <th className="py-3 px-3">Thực nhận</th>
             </tr>
           </thead>
           <tbody>
             {isLoading ? (
-              <tr><td className="py-8 px-3 text-center text-slate-500" colSpan={18}>Äang táº£i dá»¯ liá»‡u báº£ng lÆ°Æ¡ng...</td></tr>
+              <tr><td className="py-8 px-3 text-center text-slate-500" colSpan={19}>Äang táº£i dá»¯ liá»‡u báº£ng lÆ°Æ¡ng...</td></tr>
             ) : rows.length === 0 ? (
-              <tr><td className="py-8 px-3 text-center text-slate-500" colSpan={18}>KhÃ´ng cÃ³ dá»¯ liá»‡u cho ká»³ Ä‘Ã£ chá»n.</td></tr>
+              <tr><td className="py-8 px-3 text-center text-slate-500" colSpan={19}>KhÃ´ng cÃ³ dá»¯ liá»‡u cho ká»³ Ä‘Ã£ chá»n.</td></tr>
             ) : (
               rows.map((row, index) => (
                 <PayrollTableRowOld
@@ -1808,6 +1839,7 @@ function PayrollTableLocalOld({
                 <td className="py-3 px-3 text-rose-600">-{formatMoney(adjustedSummary.total_bhyt || 0)} Ä‘</td>
                 <td className="py-3 px-3 text-rose-600">-{formatMoney(adjustedSummary.total_bhxh || 0)} Ä‘</td>
                 <td className="py-3 px-3 text-teal-700">{formatMoney(adjustedSummary.total_net_salary)} Ä‘</td>
+                <td className="py-3 px-3 text-teal-600">{formatMoney(adjustedSummary.total_carry_forward || 0)} đ</td>
               </tr>
             </tfoot>
           )}
@@ -1984,12 +2016,13 @@ function PayrollTableRow({
         <td className="py-3 px-3 text-sky-600 font-semibold">{Number(row.allowance || 0) > 0 ? `+${formatMoney(row.allowance || 0)} đ` : "-"}</td>
         <td className="py-3 px-3 text-rose-500">{Number(row.bhyt || 0) > 0 ? `-${formatMoney(row.bhyt || 0)} đ` : "-"}</td>
         <td className="py-3 px-3 text-rose-500">{Number(row.bhxh || 0) > 0 ? `-${formatMoney(row.bhxh || 0)} đ` : "-"}</td>
+        <td className="py-3 px-3 text-teal-600 font-semibold">{Number(row.carry_forward || 0) !== 0 ? `${formatMoney(row.carry_forward || 0)} đ` : "-"}</td>
         <td className="py-3 px-3 text-teal-700 font-semibold">{formatMoney(row.net_salary)} đ</td>
       </tr>
 
       {isExpanded && (
         <tr className="bg-slate-50/50">
-          <td colSpan={18} className="p-0">
+          <td colSpan={19} className="p-0">
             <PayrollAdjustmentSubRow
               userId={row.user_id}
               adjustmentRows={adjustmentRows}
@@ -2097,14 +2130,15 @@ function PayrollTable({
               <th className="py-3 px-3 text-sky-600">Phụ cấp (+)</th>
               <th className="py-3 px-3 text-rose-600">BHYT (-)</th>
               <th className="py-3 px-3 text-rose-600">BHXH (-)</th>
+              <th className="py-3 px-3 text-teal-600">Mang sang</th>
               <th className="py-3 px-3">Thực nhận</th>
             </tr>
           </thead>
           <tbody>
             {isLoading ? (
-              <tr><td className="py-8 px-3 text-center text-slate-500" colSpan={18}>Đang tải dữ liệu bảng lương...</td></tr>
+              <tr><td className="py-8 px-3 text-center text-slate-500" colSpan={19}>Đang tải dữ liệu bảng lương...</td></tr>
             ) : rows.length === 0 ? (
-              <tr><td className="py-8 px-3 text-center text-slate-500" colSpan={18}>Không có dữ liệu cho kỳ đã chọn.</td></tr>
+              <tr><td className="py-8 px-3 text-center text-slate-500" colSpan={19}>Không có dữ liệu cho kỳ đã chọn.</td></tr>
             ) : (
               rows.map((row, index) => (
                 <PayrollTableRow
@@ -2134,6 +2168,7 @@ function PayrollTable({
                 <td className="py-3 px-3 text-sky-700">{formatMoney(summary.total_allowance || 0)} đ</td>
                 <td className="py-3 px-3 text-rose-600">-{formatMoney(summary.total_bhyt || 0)} đ</td>
                 <td className="py-3 px-3 text-rose-600">-{formatMoney(summary.total_bhxh || 0)} đ</td>
+                <td className="py-3 px-3 text-teal-600">{formatMoney(summary.total_carry_forward || 0)} đ</td>
                 <td className="py-3 px-3 text-teal-700">{formatMoney(summary.total_net_salary)} đ</td>
               </tr>
             </tfoot>
