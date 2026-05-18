@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Box, IconButton, Stack, Typography } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import { notification } from "antd";
@@ -19,6 +19,15 @@ interface JobAssetProps {
   readOnly?: boolean;
   messages?: MessageTypeProps[];
   targetUserId?: string;
+  instantSave?: boolean;
+  senderName?: string;
+  /** Tăng giá trị này để trigger flush toàn bộ draft → lưu ngay */
+  saveSignal?: number;
+  /** Callback sau khi flush xong */
+  onSaved?: () => void;
+  /** Tăng giá trị này để discard toàn bộ draft */
+  discardSignal?: number;
+  taskId?: string;
 }
 
 function getAccessToken(): string {
@@ -135,6 +144,12 @@ const JobAsset: React.FC<JobAssetProps> = ({
   messages,
   targetUserId,
   readOnly = false,
+  instantSave = false,
+  senderName,
+  saveSignal,
+  onSaved,
+  discardSignal,
+  taskId,
 }) => {
   const apiHost = useApiHost();
   const { taskDetail, setTaskDetail } = useTaskContext();
@@ -149,8 +164,74 @@ const JobAsset: React.FC<JobAssetProps> = ({
     setTmpTaskCreatedMessages,
   } = useUser();
 
+  const currentTaskId = taskId || taskDetail?.id?.toString();
+
   const [listMessages, setListMessages] = useState<MessageTypeProps[]>([]);
   const [assets, setAssets] = useState<MessageTypeProps[]>([]);
+
+  // Flush draft assets khi saveSignal tăng (trigger từ bên ngoài, ví dụ nút Cập nhật)
+  const prevSaveSignal = useRef<number | undefined>(undefined);
+  useEffect(() => {
+    if (saveSignal === undefined || saveSignal === 0) return;
+    if (prevSaveSignal.current === saveSignal) return;
+    prevSaveSignal.current = saveSignal;
+
+    const draftAssets = tmpTaskCreatedAssets.filter((item) => isSameType(item.type, type));
+    const draftMessages = tmpTaskCreatedMessages.filter((item) => isSameType(item.type, type));
+
+    const flush = async () => {
+      for (const draft of draftAssets) {
+        if (!draft.file_url) continue;
+        // file đã upload lên server tạm, chỉ cần tạo message workpoint link đến file
+        const formData = new FormData();
+        formData.append("type", type || "");
+        formData.append("user_id", targetUserId || userId || "");
+        formData.append("username", username || "");
+        formData.append("file_url", draft.file_url);
+        formData.append("time", new Date().toISOString());
+        await fetch(`${apiHost}/workpoint/message`, {
+          method: "POST",
+          headers: buildAuthHeaders() as HeadersInit,
+          body: formData,
+        }).catch(console.error);
+        pushLocalItem("asset", draft);
+        setTmpTaskCreatedAssets((prev) => prev.filter((a) => a.message_id !== draft.message_id));
+      }
+      for (const draft of draftMessages) {
+        const formData = new FormData();
+        formData.append("type", type || "");
+        formData.append("user_id", targetUserId || userId || "");
+        formData.append("username", username || "");
+        formData.append("text", draft.text || "");
+        formData.append("time", new Date().toISOString());
+        await fetch(`${apiHost}/workpoint/message`, {
+          method: "POST",
+          headers: buildAuthHeaders() as HeadersInit,
+          body: formData,
+        }).catch(console.error);
+        pushLocalItem("message", draft);
+        setTmpTaskCreatedMessages((prev) => prev.filter((m) => m.message_id !== draft.message_id));
+      }
+      if (draftAssets.length > 0 || draftMessages.length > 0) {
+        notification.success({ message: "Đã lưu ứng tiền thành công!" });
+      }
+      onSaved?.();
+    };
+    flush();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [saveSignal]);
+
+  // Discard tất cả draft khi discardSignal tăng
+  const prevDiscardSignal = useRef<number | undefined>(undefined);
+  useEffect(() => {
+    if (discardSignal === undefined || discardSignal === 0) return;
+    if (prevDiscardSignal.current === discardSignal) return;
+    prevDiscardSignal.current = discardSignal;
+    setTmpTaskCreatedAssets((prev) => prev.filter((item) => !isSameType(item.type, type)));
+    setTmpTaskCreatedMessages((prev) => prev.filter((item) => !isSameType(item.type, type)));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [discardSignal]);
+
 
   const tmpAssetsByType = useMemo(
     () => tmpTaskCreatedAssets.filter((item) => isSameType(item.type, type)),
@@ -172,19 +253,17 @@ const JobAsset: React.FC<JobAssetProps> = ({
     const fallbackMessages = (messages || []).filter((item) =>
       type ? isSameType(item.type, type) : true
     );
-    setListMessages(fallbackMessages);
-    setAssets([]);
+    setListMessages(fallbackMessages.filter(hasText));
+    setAssets(fallbackMessages.filter(hasFile));
   }, [messages, taskDetail?.assets, taskDetail?.id, type]);
 
   const visibleMessages = useMemo(() => {
-    if (taskDetail) return listMessages;
     return mergeByMessageId([...listMessages, ...tmpMessagesByType]);
-  }, [listMessages, taskDetail, tmpMessagesByType]);
+  }, [listMessages, tmpMessagesByType]);
 
   const visibleAssets = useMemo(() => {
-    if (taskDetail) return assets;
     return mergeByMessageId([...assets, ...tmpAssetsByType]);
-  }, [assets, taskDetail, tmpAssetsByType]);
+  }, [assets, tmpAssetsByType]);
 
   const requestJson = useCallback(async <T,>(url: string, init: RequestInit): Promise<T> => {
     const response = await fetch(url, {
@@ -291,8 +370,14 @@ const JobAsset: React.FC<JobAssetProps> = ({
 
   const deleteItem = useCallback(
     async (kind: ItemKind, messageId: string | number | undefined, entityLabel: string) => {
-      if (!taskDetail) {
+      const isDraft =
+        kind === "asset"
+          ? tmpTaskCreatedAssets.some((item) => item.message_id === messageId)
+          : tmpTaskCreatedMessages.some((item) => item.message_id === messageId);
+
+      if ((!taskDetail && type !== "material") || isDraft) {
         removeDraftItem(kind, messageId);
+        notification.success({ message: `Đã xóa ${entityLabel} (nháp)` });
         return;
       }
 
@@ -305,57 +390,143 @@ const JobAsset: React.FC<JobAssetProps> = ({
       removeFromTaskAssets(messageId);
       notification.success({ message: `Đã xóa ${entityLabel}` });
     },
-    [apiHost, removeDraftItem, removeFromTaskAssets, removeLocalItem, requestJson, taskDetail]
+    [
+      apiHost,
+      removeDraftItem,
+      removeFromTaskAssets,
+      removeLocalItem,
+      requestJson,
+      taskDetail,
+      tmpTaskCreatedAssets,
+      tmpTaskCreatedMessages,
+      type,
+    ]
   );
 
   const handleAssetSend = useCallback(
     async (file: File) => {
       const formData = createMessageFormData({
         file,
-        taskId: taskDetail?.id?.toString(),
+        taskId: currentTaskId,
         type,
-        userId: userId || undefined,
+        userId: targetUserId || userId || undefined,
+        username: senderName || fullName || username || undefined,
       });
 
       try {
-        if (taskDetail?.id) {
-          await sendTaskItem(
-            "asset",
-            `${apiHost}/task/${taskDetail.id}/upload`,
-            formData,
-            "PUT",
-            "Đã upload thành công!",
-            true
-          );
+        if (isCashType(type)) {
+          // 1. Upload file lên server tạm
+          const result = await requestJson<{ message: MessageTypeProps }>(`${apiHost}/task/new/upload`, {
+            method: "PUT",
+            headers: buildAuthHeaders(),
+            body: formData,
+          });
+
+          // 2. Tạo ngay message liên kết đến file vừa upload
+          const msgFormData = new FormData();
+          msgFormData.append("type", type || "");
+          msgFormData.append("user_id", targetUserId || userId || "");
+          msgFormData.append("username", senderName || fullName || username || "");
+          msgFormData.append("file_url", result.message.file_url || "");
+          msgFormData.append("time", new Date().toISOString());
+
+          const saveRes = await requestJson<{ message: MessageTypeProps }>(`${apiHost}/workpoint/message`, {
+            method: "POST",
+            headers: buildAuthHeaders(),
+            body: msgFormData,
+          });
+
+          pushLocalItem("asset", saveRes.message || result.message);
+          notification.success({ message: "Đã lưu tài liệu thành công!" });
           return;
         }
 
-        if (type !== "task") return;
+        if (type === "material") {
+          // 1. Upload file lên server tạm
+          const result = await requestJson<{ message: MessageTypeProps }>(`${apiHost}/task/new/upload`, {
+            method: "PUT",
+            headers: buildAuthHeaders(),
+            body: formData,
+          });
 
-        const result = await requestJson<{ message: MessageTypeProps }>(`${apiHost}/task/new/upload`, {
-          method: "PUT",
-          headers: buildAuthHeaders(),
-          body: formData,
-        });
+          // 2. Tạo ngay message liên kết đến file vừa upload
+          const msgFormData = new FormData();
+          msgFormData.append("type", type || "");
+          msgFormData.append("user_id", userId || "");
+          msgFormData.append("username", fullName || username || "");
+          msgFormData.append("file_url", result.message.file_url || "");
+          msgFormData.append("time", new Date().toISOString());
 
-        const draftAsset: MessageTypeProps = {
-          ...result.message,
-          type: type || result.message?.type,
-        };
-        pushDraftItem("asset", draftAsset);
-        notification.success({ message: "Đã upload thành công!" });
+          const saveRes = await requestJson<{ message: MessageTypeProps }>(`${apiHost}/inventory/items/${currentTaskId}/message`, {
+            method: "POST",
+            headers: buildAuthHeaders(),
+            body: msgFormData,
+          });
+
+          pushLocalItem("asset", saveRes.message || result.message);
+          notification.success({ message: "Đã lưu tài liệu thành công!" });
+          return;
+        }
+
+        if (instantSave && taskDetail?.id) {
+          const result = await requestJson<{ message: MessageTypeProps }>(`${apiHost}/task/${taskDetail.id}/upload`, {
+            method: "PUT",
+            headers: buildAuthHeaders(),
+            body: formData,
+          });
+
+          pushLocalItem("asset", result.message);
+          appendToTaskAssets(result.message);
+          notification.success({ message: "Đã lưu tài liệu thành công!" });
+        } else {
+          // Luôn upload file lên server tạm (để lưu file vật lý), nhưng KHÔNG gắn vào task
+          const result = await requestJson<{ message: MessageTypeProps }>(`${apiHost}/task/new/upload`, {
+            method: "PUT",
+            headers: buildAuthHeaders(),
+            body: formData,
+          });
+
+          const draftAsset: MessageTypeProps = {
+            ...result.message,
+            message_id: result.message?.message_id || generateDatetimeId(),
+            type: type || result.message?.type,
+          };
+          pushDraftItem("asset", draftAsset);
+          notification.success({ message: "Đã thêm tài liệu (chưa lưu)" });
+        }
       } catch (error) {
         const err = error as Error;
         notification.error({ message: "Lỗi upload ảnh", description: err.message });
       }
     },
-    [apiHost, pushDraftItem, requestJson, sendTaskItem, taskDetail?.id, type, userId]
+    [
+      apiHost,
+      appendToTaskAssets,
+      fullName,
+      generateDatetimeId,
+      instantSave,
+      pushDraftItem,
+      pushLocalItem,
+      requestJson,
+      senderName,
+      targetUserId,
+      currentTaskId,
+      taskDetail?.id,
+      type,
+      userId,
+      username,
+    ]
   );
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      handleAssetSend(file);
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(event.target.files || []);
+    if (!files.length) return;
+    
+    // Clear the input value so the same files can be selected again if needed
+    event.target.value = '';
+
+    for (const file of files) {
+      await handleAssetSend(file);
     }
   };
 
@@ -376,42 +547,17 @@ const JobAsset: React.FC<JobAssetProps> = ({
       const normalizedText = (text || "").trim();
       if (!normalizedText) return;
 
-      const formData = createMessageFormData({
-        text: normalizedText,
-        includeUsername: true,
-        taskId: taskDetail?.id?.toString(),
-        type,
-        userId: userId || undefined,
-        username: username || undefined,
-      });
-
       try {
-        if (taskDetail?.id) {
-          await sendTaskItem(
-            "message",
-            `${apiHost}/task/${taskDetail.id}/message`,
-            formData,
-            "PUT",
-            "Đã gửi bình luận thành công!",
-            true
-          );
-          return;
-        }
-
-        if (type === "task" || type === "comment") {
-          const draftMessage: MessageTypeProps = {
-            type,
-            message_id: generateDatetimeId(),
-            user_id: targetUserId || userId,
-            username: fullName || username || "",
-            text: normalizedText,
-            is_favourite: false,
-          };
-          pushDraftItem("message", draftMessage);
-          return;
-        }
-
+        // Loại cash (workpoint) vẫn gửi trực tiếp vì nó không thuộc form task
         if (isCashType(type)) {
+          const formData = createMessageFormData({
+            text: normalizedText,
+            includeUsername: true,
+            taskId: taskDetail?.id?.toString(),
+            type,
+            userId: userId || undefined,
+            username: username || undefined,
+          });
           await sendTaskItem(
             "message",
             `${apiHost}/workpoint/message`,
@@ -420,19 +566,74 @@ const JobAsset: React.FC<JobAssetProps> = ({
             "Đã lưu thành công!",
             false
           );
+          return;
+        }
+
+        if (type === "material") {
+          const formData = createMessageFormData({
+            text: normalizedText,
+            includeUsername: true,
+            taskId: currentTaskId,
+            type,
+            userId: userId || undefined,
+            username: fullName || username || undefined,
+          });
+          await sendTaskItem(
+            "message",
+            `${apiHost}/inventory/items/${currentTaskId}/message`,
+            formData,
+            "POST",
+            "Đã lưu thành công!",
+            false
+          );
+          return;
+        }
+
+        // Tất cả loại khác (task, comment): luôn lưu bản nháp, chờ bấm Lưu
+        if (type === "task" || type === "comment") {
+          if (instantSave && taskDetail?.id) {
+            const formData = createMessageFormData({
+              text: normalizedText,
+              taskId: taskDetail?.id?.toString(),
+              type,
+              userId: targetUserId || userId || undefined,
+              username: senderName || fullName || username || undefined,
+            });
+            await sendTaskItem(
+              "message",
+              `${apiHost}/task/${taskDetail.id}/message`,
+              formData,
+              "PUT",
+              "Đã lưu thành công!",
+              true
+            );
+          } else {
+            const draftMessage: MessageTypeProps = {
+              type,
+              message_id: generateDatetimeId(),
+              user_id: targetUserId || userId,
+              username: senderName || fullName || username || "",
+              text: normalizedText,
+              is_favourite: false,
+            };
+            pushDraftItem("message", draftMessage);
+          }
         }
       } catch (error) {
         const err = error as Error;
-        notification.error({ message: "Lỗi gửi bình luận", description: err.message });
+        notification.error({ message: "Lỗi gửi comment:", description: err.message });
       }
     },
     [
       apiHost,
       fullName,
       generateDatetimeId,
+      instantSave,
       pushDraftItem,
       sendTaskItem,
+      senderName,
       targetUserId,
+      currentTaskId,
       taskDetail?.id,
       type,
       userId,
@@ -461,7 +662,7 @@ const JobAsset: React.FC<JobAssetProps> = ({
         prev.map((item) => (item.message_id === messageId ? { ...item, is_favourite: checked } : item))
       );
 
-      if (!taskDetail) return;
+      if (!taskDetail && type !== "material") return;
 
       try {
         const headers: HeadersInit = {
@@ -480,7 +681,7 @@ const JobAsset: React.FC<JobAssetProps> = ({
         notification.error({ message: "Lỗi khi cập nhật đánh dấu" });
       }
     },
-    [apiHost, requestJson, setTmpTaskCreatedMessages, taskDetail]
+    [apiHost, requestJson, setTmpTaskCreatedMessages, taskDetail, type]
   );
 
   return (
@@ -517,7 +718,7 @@ const JobAsset: React.FC<JobAssetProps> = ({
           alignItems="center"
           key={message.message_id || `${index}-${message.text || ""}`}
         >
-          {(title === "Thông tin từ admin" || type === "comment") && (
+          {(type === "task" || type === "comment" || title === "Thông tin từ admin") && (
             <input
               type="checkbox"
               checked={Boolean(message.is_favourite)}
@@ -582,6 +783,7 @@ const JobAsset: React.FC<JobAssetProps> = ({
         <input
           key={`file-change-${type}`}
           accept="image/*"
+          multiple
           style={{ display: "none" }}
           id={`upload-image-file-${type}`}
           type="file"

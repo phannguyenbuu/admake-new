@@ -11,6 +11,9 @@ customer_bp = Blueprint('customer', __name__, url_prefix='/api/customer')
 
 @customer_bp.before_request
 def guard_customer_permission():
+    if request.method == "OPTIONS":
+        return
+
     actor, _ = require_can_view("view_customer")
     g.permission_actor = actor
 

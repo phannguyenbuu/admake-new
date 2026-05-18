@@ -8,6 +8,9 @@ material_bp = Blueprint("material", __name__, url_prefix="/api/material")
 
 @material_bp.before_request
 def guard_material_permission():
+    if request.method == "OPTIONS":
+        return
+
     actor, _ = require_can_view("view_material")
     g.permission_actor = actor
 

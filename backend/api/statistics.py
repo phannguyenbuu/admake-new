@@ -16,6 +16,7 @@ from models import (
     WorkpointSetting,
     Workspace,
     db,
+    Role,
 )
 from permission_utils import require_can_view
 
@@ -24,6 +25,9 @@ statistics_bp = Blueprint("statistics", __name__, url_prefix="/api/statistics")
 
 @statistics_bp.before_request
 def guard_statistics_permission():
+    if request.method == "OPTIONS":
+        return
+
     actor, _ = require_can_view("view_statistic")
     g.permission_actor = actor
 
@@ -68,14 +72,19 @@ def _normalize_dt(dt: datetime | None) -> datetime | None:
     return dt
 
 
-def _is_staff(user: User) -> bool:
-    role_id = user.role_id or 0
-    return role_id > 0 and role_id < 100
-
-
 def _is_supplier(user: User) -> bool:
     role_id = user.role_id or 0
-    return role_id > 100
+    if role_id == 101:
+        return True
+    role = db.session.get(Role, role_id) if role_id > 0 else None
+    return bool(role and role.name == "Thầu phụ")
+
+
+def _is_staff(user: User) -> bool:
+    role_id = user.role_id or 0
+    if role_id <= 0:
+        return False
+    return not _is_supplier(user)
 
 
 def _is_inactive(status: str | None) -> bool:

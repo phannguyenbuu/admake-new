@@ -72,6 +72,7 @@ const WorkPointPage: IPage["Component"] = () => {
     }
     setIsLoading(true);
     try {
+      const token = typeof window !== "undefined" ? localStorage.getItem("accessToken") || sessionStorage.getItem("accessToken") || "" : "";
       const response = await fetch(
         `${useApiHost()}/workpoint/page?` +
         new URLSearchParams({
@@ -80,13 +81,22 @@ const WorkPointPage: IPage["Component"] = () => {
           limit: String(limit),
           search,
           month,
-        })
+        }),
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
 
       const result = await response.json();
 
-      setWorkpoints(result.data);
-      setTotal(result.pagination.total);
+      if (!response.ok) {
+        throw new Error(result.message || "Failed to fetch workpoints");
+      }
+
+      setWorkpoints(result.data || []);
+      setTotal(result.pagination?.total || 0);
     } catch (error) {
       console.error("Failed to fetch workpoints", error);
     } finally {

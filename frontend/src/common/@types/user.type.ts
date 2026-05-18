@@ -41,6 +41,7 @@ export type User = BaseEntity & {
   taxCode: string,
 
   lead_id: number,
+  is_active?: boolean;
 };
 
 export type JwtResponse = {

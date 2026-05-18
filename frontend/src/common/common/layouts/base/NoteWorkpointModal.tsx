@@ -150,6 +150,11 @@ const NoteWorkpointModal: React.FC<NoteWorkpointModalProps> = ({
                 <Box sx={{width:20,height:20,borderRadius:10,background:'grey'}}/>
                 <Typography>Nghỉ phép</Typography>
             </Stack>
+
+            <Stack direction="row" spacing={1}>
+                <Box sx={{width:20,height:20,borderRadius:10,background:'#FFA000'}}/>
+                <Typography style={{whiteSpace:'nowrap'}}>Tăng ca</Typography>
+            </Stack>
         </Stack>
 
             <Stack direction="row" spacing={1} sx={{height:72}}>

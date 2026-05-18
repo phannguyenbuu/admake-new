@@ -6,4 +6,5 @@ export interface Leave {
   reason: string;
   morning: boolean;
   noon: boolean;
+  createdAt?: string;
 }

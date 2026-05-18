@@ -42,7 +42,7 @@ const JobAgentInfo: React.FC<JobAgentInfoProps> = ({
     if (!value) {
       setOptions(
         users.map((c) => ({
-          value: c.fullName || "",
+          value: (c.fullName || "") + " (" + (c.phone || c.user_id || "") + ")",
           label: (
             <div>
               <div>{c.fullName}</div>
@@ -70,7 +70,7 @@ const JobAgentInfo: React.FC<JobAgentInfoProps> = ({
 
     setOptions(
       filtered.map((c) => ({
-        value: c.fullName || "",  // nếu fullName undefined thì dùng chuỗi rỗng
+        value: (c.fullName || "") + " (" + (c.phone || c.user_id || "") + ")",
         label: (
           <div>
             <div>{c.fullName}</div>
@@ -88,10 +88,10 @@ const JobAgentInfo: React.FC<JobAgentInfoProps> = ({
 
   // Khi chọn khách hàng
   const handleSelect = (value: string) => {
-    const user = users.find((c) => c.fullName === value) || null;
+    const user = users.find((c) => ((c.fullName || "") + " (" + (c.phone || c.user_id || "") + ")") === value) || null;
     setselectedAgent(user);
     // Cập nhật form field nếu form có quản lý
-    form.setFieldsValue({ [mode]: value });
+    form.setFieldsValue({ [mode]: user?.fullName || "" });
     setSearchValue('');
   };
 

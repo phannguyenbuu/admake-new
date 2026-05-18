@@ -227,7 +227,7 @@ const TaskBoard = ({ userId,fullName, open, onCancel }: TaskBoardProps) => {
             {
               key: 'comments',
               label: 'Bình luận',
-              children: <JobAsset title="Bình luận cho mọi người" type="comment" />,
+              children: <JobAsset title="Bình luận cho mọi người" type="comment" targetUserId={userId} senderName={fullName} instantSave={true} />,
             },
           ]}
         />

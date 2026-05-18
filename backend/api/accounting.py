@@ -32,6 +32,9 @@ def _permission_for_accounting_request():
 
 @accounting_bp.before_request
 def guard_accounting_permission():
+    if request.method == "OPTIONS":
+        return
+
     actor, _ = require_can_view(_permission_for_accounting_request())
     g.permission_actor = actor
 

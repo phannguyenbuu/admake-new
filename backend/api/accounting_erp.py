@@ -26,6 +26,7 @@ from models import (
     User,
     db,
     generate_datetime_id,
+    Role,
 )
 from permission_utils import ensure_resource_lead, require_can_view
 
@@ -54,6 +55,9 @@ def _permission_for_accounting_erp_request():
 
 @accounting_erp_bp.before_request
 def guard_accounting_erp_permission():
+    if request.method == "OPTIONS":
+        return
+
     actor, _ = require_can_view(_permission_for_accounting_erp_request())
     g.permission_actor = actor
 
@@ -2057,11 +2061,19 @@ def people_list():
         if name in seen_names:          # bỏ qua tên trùng
             continue
         seen_names.add(name)
+        is_supplier = False
+        if u.role_id == 101:
+            is_supplier = True
+        else:
+            role_item = db.session.get(Role, u.role_id) if u.role_id else None
+            if role_item and role_item.name == "Thầu phụ":
+                is_supplier = True
+
         result.append({
             "id": u.id,
             "name": name,
             "phone": (u.phone or "").strip(),
-            "user_type": "subcontractor" if (u.role_id or 0) > 100 else "employee",
+            "user_type": "subcontractor" if is_supplier else "employee",
         })
 
     return jsonify({"data": result}), 200

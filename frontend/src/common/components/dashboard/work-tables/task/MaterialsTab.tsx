@@ -41,7 +41,7 @@ interface SuggestSelectProps {
 }
 
 function SuggestSelect({ value, onChange, options, placeholder }: SuggestSelectProps) {
-    const selectedOption = options.find(o => o.label === value);
+    const selectedOption = options.find(o => o.ten === value || o.label === value);
 
     const handleSelect = (val: string) => {
         const opt = options.find(o => o.label === val);
@@ -63,7 +63,7 @@ function SuggestSelect({ value, onChange, options, placeholder }: SuggestSelectP
         >
             <Select
                 showSearch
-                value={selectedOption ? selectedOption.label : undefined}
+                value={selectedOption ? selectedOption.label : (value || undefined)}
                 onChange={handleSelect}
                 placeholder={placeholder}
                 style={{ width: '100%' }}

@@ -54,7 +54,6 @@ const JobDescription: React.FC<JobDescriptionProps> = ({ form, onPasteImage }) =
 
       event.preventDefault();
       await onPasteImage(file);
-      return;
     }
   };
 

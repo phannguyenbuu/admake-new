@@ -224,6 +224,20 @@ export const columnsUser = [
         </span>
       </div>
     ),
+  },
+  {
+    title: "Trạng thái",
+    dataIndex: "is_active",
+    key: "is_active",
+    width: 140,
+    render: (is_active: any) => {
+      const active = is_active !== false;
+      return active ? (
+        <Tag color="success" className="!font-medium">Đang làm việc</Tag>
+      ) : (
+        <Tag color="error" className="!font-medium">Đã nghỉ việc</Tag>
+      );
+    }
   }
 ];
 

@@ -79,7 +79,7 @@ const CameraDialog: React.FC<CameraDialogProps> = ({userEl}) => {
   const [workpoint, setWorkpoint] = useState<Workpoint | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [openWork, setOpenWork] = useState(userEl?.role && userEl?.role_id > 100);
+  const [openWork, setOpenWork] = useState(userEl?.role && userEl?.role?.name !== "Thầu phụ");
   const [openHoliday, setOpenHoliday] = useState(false);
   const [hasCamera, setHasCamera] = useState(false);
   const {workpointEl, fetchWorkpointEl } = useWorkpointInfor();
@@ -425,7 +425,7 @@ async function postWorkpointCheck(imgUrl: string, lat:string, long:string) {
     setOpenHoliday(true);
   }
 
-  const isSupplier = userEl?.role_id && userEl?.role_id > 100;
+  const isSupplier = userEl?.role?.name === "Thầu phụ";
 
 
   return (

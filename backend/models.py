@@ -1548,6 +1548,7 @@ class StockTransaction(BaseModel):
     project_id = db.Column(db.String(80), nullable=True)
     note = db.Column(db.Text, nullable=True)
     reference_type = db.Column(db.String(40), nullable=True)
+    storekeeper_id = db.Column(db.String(50), nullable=True)
     reference_id = db.Column(db.String(80), nullable=True)
     reference_code = db.Column(db.String(120), nullable=True)
     source_type = db.Column(db.String(40), nullable=True)

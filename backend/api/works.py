@@ -13,6 +13,9 @@ workspace_bp = Blueprint('workspace', __name__, url_prefix='/api/workspace')
 
 @workspace_bp.before_request
 def guard_workspace_permission():
+    if request.method == "OPTIONS":
+        return
+
     actor, _ = require_can_view("view_workspace")
     g.permission_actor = actor
 

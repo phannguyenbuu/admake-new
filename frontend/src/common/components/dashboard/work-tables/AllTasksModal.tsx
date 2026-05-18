@@ -419,7 +419,7 @@ export const CardStaticItem: React.FC<CardStaticItemProps> = ({
         });
         return;
       }
-      window.location.href = `/dashboard/work-tables/${task.workspace_id}`;
+      window.location.href = `/work-tables/${task.workspace_id}`;
     }}
   >
     <div

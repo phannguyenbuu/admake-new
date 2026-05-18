@@ -68,6 +68,7 @@ export type StockTransaction = {
   reference_type?: string | null;
   reference_id?: string | null;
   reference_code?: string | null;
+  storekeeper_id?: string | null;
   accounting_entry_id?: string | null;
   confirmed_at?: string | null;
   cancelled_at?: string | null;

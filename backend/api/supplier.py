@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify, abort, g
-from models import db, dateStr, User, generate_datetime_id, LeadPayload
+from models import db, dateStr, User, generate_datetime_id, LeadPayload, Role
 import datetime
 from sqlalchemy import desc
 from permission_utils import ensure_resource_lead, require_can_view
@@ -12,13 +12,27 @@ def get_model_columns(model):
 
 def _get_supplier_or_404(user_id):
     supplier_user = db.session.get(User, user_id)
-    if not supplier_user or (supplier_user.role_id or 0) <= 100:
+    if not supplier_user:
+        abort(404, description="supplier not found")
+
+    is_supplier = False
+    if supplier_user.role_id == 101:
+        is_supplier = True
+    else:
+        role_item = db.session.get(Role, supplier_user.role_id) if supplier_user.role_id else None
+        if role_item and role_item.name == "Thầu phụ":
+            is_supplier = True
+
+    if not is_supplier:
         abort(404, description="supplier not found")
     return supplier_user
 
 
 @supplier_bp.before_request
 def guard_supplier_permission():
+    if request.method == "OPTIONS":
+        return
+
     actor, _ = require_can_view("view_supplier")
     g.permission_actor = actor
 
@@ -40,7 +54,12 @@ def get_suppliers():
         abort(404, description="Lead not found")
 
 
-    query = lead.users.filter(User.role_id > 100)
+    supplier_role_ids = {101}
+    roles = Role.query.filter(Role.lead_id == lead_id, Role.name == "Thầu phụ").all()
+    for r in roles:
+        supplier_role_ids.add(r.id)
+
+    query = lead.users.filter(User.role_id.in_(supplier_role_ids))
 
     if search:
         # Lọc theo tên (user.fullName), cách này dùng ilike để không phân biệt hoa thường

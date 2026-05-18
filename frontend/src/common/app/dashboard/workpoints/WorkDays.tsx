@@ -338,29 +338,40 @@ export default function WorkDays({ record, selectedMonth }: ParamWorkDaysProps) 
               </Stack>
             )}
 
-            {modalImg?.status === "off" && (
-              <Stack direction="column">
-                <Typography textAlign="center" style={{ fontWeight: 700 }}>
-                  XIN NGHỈ PHÉP
-                </Typography>
-                <Typography textAlign="center">
-                  {modalImg.day.getDate().toString().padStart(2, "0") + "-" +
-                    (modalImg.day.getMonth() + 1).toString().padStart(2, "0") + "-" +
-                    modalImg.day.getFullYear()}
-                </Typography>
-                <Typography textAlign="center">
-                  Buổi {modalImg.period === 0 ? "sáng" : modalImg.period === 1 ? "chiều" : "tối"}
-                </Typography>
-                <Typography textAlign="center">Lý do: {modalImg.text}</Typography>
+            {modalImg?.status === "off" && (() => {
+              const leaveItem = record.leaves?.find((l) => String(l.id) === String(modalImg.id));
+              const createdDateStr = leaveItem?.createdAt 
+                ? dayjs(leaveItem.createdAt).format("DD-MM-YYYY HH:mm")
+                : null;
+              return (
+                <Stack direction="column">
+                  <Typography textAlign="center" style={{ fontWeight: 700 }}>
+                    XIN NGHỈ PHÉP
+                  </Typography>
+                  <Typography textAlign="center">
+                    {modalImg.day.getDate().toString().padStart(2, "0") + "-" +
+                      (modalImg.day.getMonth() + 1).toString().padStart(2, "0") + "-" +
+                      modalImg.day.getFullYear()}
+                  </Typography>
+                  <Typography textAlign="center">
+                    Buổi {modalImg.period === 0 ? "sáng" : modalImg.period === 1 ? "chiều" : "tối"}
+                  </Typography>
+                  <Typography textAlign="center">Lý do: {modalImg.text}</Typography>
+                  {createdDateStr && (
+                    <Typography textAlign="center" style={{ fontSize: "0.85rem", color: "#666", marginTop: 4 }}>
+                      Ngày gửi xin phép: {createdDateStr}
+                    </Typography>
+                  )}
 
-                <DeleteConfirm
-                  caption="XÓA NGHỈ PHÉP"
-                  text="Bạn muốn xóa nghỉ phép này?"
-                  elId={modalImg.id}
-                  onDelete={() => handleLeaveDelete(modalImg.id)}
-                />
-              </Stack>
-            )}
+                  <DeleteConfirm
+                    caption="XÓA NGHỈ PHÉP"
+                    text="Bạn muốn xóa nghỉ phép này?"
+                    elId={modalImg.id}
+                    onDelete={() => handleLeaveDelete(modalImg.id)}
+                  />
+                </Stack>
+              );
+            })()}
           </Stack>
         </CenterBox>
       </Modal>

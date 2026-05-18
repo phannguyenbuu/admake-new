@@ -1,5 +1,5 @@
 import React, {useEffect, useState, useRef} from 'react';
-import { Tag, Modal, notification, type MessageArgsProps } from "antd";
+import { Tag, Modal, notification, Button, type MessageArgsProps } from "antd";
 import { Tabs, Tab, Stack, Box, Typography } from "@mui/material";
 import { CenterBox } from '../../../components/chat/components/commons/TitlePanel';
 import type { PeriodData, WorkDaysProps } from '../../../@types/workpoint';
@@ -13,6 +13,7 @@ import { useTaskContext } from '../../../common/hooks/useTask';
 import dayjs from 'dayjs';
 import { number } from 'framer-motion';
 import type { MessageTypeProps } from '../../../@types/chat.type';
+import { TOKEN_LABEL } from '../../../common/config';
 
 interface SalaryBoardProps {
   selectedRecord: WorkDaysProps | null;
@@ -121,13 +122,17 @@ const SalaryBoard: React.FC<SalaryBoardProps> = ({
 
     setDataMessages([]);
 
+    const token = localStorage.getItem(TOKEN_LABEL) || sessionStorage.getItem(TOKEN_LABEL) || "";
+    const authHeaders: HeadersInit = token ? { Authorization: `Bearer ${token}` } : {};
+
     if (taskDetail) {
       const fetchData = async () => {
         try {
           const response = await fetch(`${useApiHost()}/task/${selectedRecord.user_id}/salary?month=${month}`, {
             method: "GET",
             headers: {
-              "Content-Type": "application/json"
+              "Content-Type": "application/json",
+              ...authHeaders
             }
           });
           if (!response.ok) {
@@ -149,7 +154,8 @@ const SalaryBoard: React.FC<SalaryBoardProps> = ({
           const response = await fetch(`${useApiHost()}/workpoint/${selectedRecord.user_id}/salary?month=${month}`, {
             method: "GET",
             headers: {
-              "Content-Type": "application/json"
+              "Content-Type": "application/json",
+              ...authHeaders
             }
           });
           if (!response.ok) {
@@ -211,7 +217,12 @@ const SalaryBoard: React.FC<SalaryBoardProps> = ({
       return [];
     }
 
-    const response = await fetch(`${useApiHost()}/task/${selectedRecord.user_id}/by_user?month=${month}`);
+    const token = localStorage.getItem(TOKEN_LABEL) || sessionStorage.getItem(TOKEN_LABEL) || "";
+    const authHeaders: HeadersInit = token ? { Authorization: `Bearer ${token}` } : {};
+
+    const response = await fetch(`${useApiHost()}/task/${selectedRecord.user_id}/by_user?month=${month}`, {
+      headers: authHeaders
+    });
 
     if (!response.ok) {
       throw new Error(`Error fetching tasks for user ${selectedRecord.user_id}`);
@@ -574,13 +585,13 @@ const SalaryBoard: React.FC<SalaryBoardProps> = ({
           messages={dataMessages.filter(el => el.type === "advance-salary-cash")}
           title = 'Ứng tiền cho nhân viên' 
           type="advance-salary-cash" 
-          readOnly={!isAdmin}/>
+          readOnly={!isAdmin}
+        />
       </TabPanel>
     </Box>
 
    
         </CenterBox>
-
           
         </Modal>
       

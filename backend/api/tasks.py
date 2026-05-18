@@ -24,6 +24,9 @@ def _require_public_task_user(user_id: str | None) -> User:
 
 @task_bp.before_request
 def guard_task_permission():
+    if request.method == "OPTIONS":
+        return
+
     endpoint = request.endpoint or ""
     view_args = request.view_args or {}
 
@@ -41,6 +44,38 @@ def guard_task_permission():
         target_user = _require_public_task_user(view_args.get("user_id"))
         g.permission_actor = target_user
         return
+
+    if endpoint in {"task.update_task_message", "task.update_task_assets"}:
+        try:
+            actor, _ = require_can_view("view_workspace")
+            g.permission_actor = actor
+            return
+        except Exception:
+            user_id = request.form.get("user_id")
+            if user_id:
+                target_user = _require_public_task_user(user_id)
+                g.permission_actor = target_user
+                task_id = view_args.get("id")
+                if task_id and task_id != "new":
+                    task = db.session.get(Task, task_id)
+                    if task:
+                        assigns = []
+                        if task.assign_ids:
+                            try:
+                                if isinstance(task.assign_ids, str):
+                                    assigns = _json.loads(task.assign_ids)
+                                elif isinstance(task.assign_ids, list):
+                                    assigns = task.assign_ids
+                            except Exception:
+                                assigns = []
+                        assign_str_list = [str(x) for x in assigns]
+                        user_in_assigns = str(user_id) in assign_str_list or any(
+                            isinstance(x, dict) and str(x.get('id')) == str(user_id) for x in assigns
+                        )
+                        if not user_in_assigns and str(task.customer_id) != str(user_id):
+                            abort(403, description="Task is not assigned to this user")
+                return
+            abort(401, description="Unauthorized")
 
     actor, _ = require_can_view("view_workspace")
     g.permission_actor = actor
@@ -250,11 +285,6 @@ def update_task_icon(id):
         # ✅ Lấy task_id từ param hoặc form
         task_id = request.form.get("task_id", id)
         
-        # ✅ Query task
-        task = Task.query.get(task_id)
-        if not task:
-            return jsonify({'error': f'Task {task_id} not found'}), 404
-
         # ✅ Validate file
         if 'file' not in request.files:
             return jsonify({'error': 'No file provided'}), 400
@@ -270,31 +300,66 @@ def update_task_icon(id):
         if not filename:
             return jsonify({'error': 'Upload failed'}), 500
 
-        # ✅ Hỗ trợ nhiều ảnh: đọc icon hiện tại từ DB và append
-        db.session.refresh(task)  # đảm bảo đọc giá trị mới nhất từ DB
-        existing_icons = []
-        if task.icon:
-            try:
-                parsed = _json.loads(task.icon)
-                existing_icons = parsed if isinstance(parsed, list) else [parsed]
-            except (ValueError, TypeError):
-                existing_icons = [task.icon]  # format cũ: 1 string plain
-
-        print(f'✅ Existing icons: {existing_icons}')
         new_icon = thumb_url or filename
-        existing_icons.append(new_icon)
-        print(f'✅ New icons list: {existing_icons}')
-        task.icon = _json.dumps(existing_icons)
-        flag_modified(task, 'icon')  # bắt SQLAlchemy flush String column chắc chắn
-        db.session.commit()
+        pushed_messages = []
 
-        return jsonify({
-            'success': True,
-            'filename': filename,
-            'thumb_url': thumb_url,
-            'icons': existing_icons,
-            'task': task.tdict()
-        }), 200
+        if task_id != 'new':
+            # ✅ Query task
+            task = Task.query.get(task_id)
+            if not task:
+                return jsonify({'error': f'Task {task_id} not found'}), 404
+
+            db.session.refresh(task)  # đảm bảo đọc giá trị mới nhất từ DB
+            existing_icons = []
+            if task.icon:
+                try:
+                    parsed = _json.loads(task.icon)
+                    existing_icons = parsed if isinstance(parsed, list) else [parsed]
+                except (ValueError, TypeError):
+                    existing_icons = [task.icon]  # format cũ: 1 string plain
+
+            # Nếu có ảnh cũ, chuyển tất cả ảnh cũ sang phần tài liệu (Message)
+            if existing_icons:
+                user_id = request.form.get("user_id") or getattr(current_user, 'id', None)
+                ls = task.assets if task.assets else []
+                for old_icon in existing_icons:
+                    json_data = {
+                        "type": "task",
+                        "user_id": str(user_id) if user_id else None,
+                        "file_url": old_icon,
+                        "thumb_url": old_icon,
+                        "message_id": generate_datetime_id(),
+                        "task_id": task_id
+                    }
+                    message = Message.create_item(json_data)
+                    ls.append(message.message_id)
+                    pushed_messages.append(message.tdict())
+                
+                task.assets = ls
+                flag_modified(task, "assets")
+
+            # Gán ảnh mới làm icon duy nhất
+            task.icon = _json.dumps([new_icon])
+            flag_modified(task, 'icon')
+            db.session.commit()
+
+            return jsonify({
+                'success': True,
+                'filename': filename,
+                'thumb_url': thumb_url,
+                'icons': [new_icon],
+                'pushed_messages': pushed_messages,
+                'task': task.tdict()
+            }), 200
+        else:
+            # Task 'new' chưa lưu DB
+            return jsonify({
+                'success': True,
+                'filename': filename,
+                'thumb_url': thumb_url,
+                'icons': [new_icon],
+                'pushed_messages': []
+            }), 200
 
     except Exception as e:
         print(f"❌ Error upload icon: {str(e)}")
@@ -362,6 +427,45 @@ def reorder_task_icons(id):
         return jsonify({'error': str(e)}), 500
 
 
+@task_bp.route("/<string:id>/upload-link", methods=["PUT"])
+def link_draft_asset_to_task(id):
+    """Link an already-uploaded file (by file_url) to an existing task as a Message asset."""
+    try:
+        task = Task.query.get(id)
+        if not task:
+            return jsonify({'error': f'Task {id} not found'}), 404
+
+        file_url = request.form.get("file_url")
+        thumb_url = request.form.get("thumb_url", file_url)
+        user_id = request.form.get("user_id")
+        type_ = request.form.get("type", "task")
+
+        if not file_url:
+            return jsonify({'error': 'No file_url provided'}), 400
+
+        ls = task.assets if task.assets else []
+
+        json_data = {
+            "type": type_,
+            "user_id": user_id,
+            "file_url": file_url,
+            "thumb_url": thumb_url,
+            "message_id": generate_datetime_id(),
+            "task_id": id,
+        }
+        message = Message.create_item(json_data)
+        ls.append(message.message_id)
+
+        task.assets = ls
+        flag_modified(task, "assets")
+        db.session.commit()
+
+        return jsonify({'message': message.tdict(), **task.tdict()})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+
+
 @task_bp.route("/<string:id>/upload", methods=["PUT"])
 def update_task_assets(id):
     time = request.form.get("time")
@@ -424,6 +528,7 @@ def update_task_assets(id):
             'message': message.tdict(),
             **task.tdict()})
     else:
+        json_data["message_id"] = generate_datetime_id()
         return jsonify({
             # 'filename': filename,
             # 'assets': ls,

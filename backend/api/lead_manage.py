@@ -255,12 +255,24 @@ def admin_leads():
         target_map.setdefault(lead_id, []).append(full_url)
 
     total_users_by_lead = _count_by_lead(User)
-    employee_users_by_lead = dict(
-        db.session.query(User.lead_id, func.count())
-        .filter(User.lead_id.in_(lead_ids), User.role_id > 0, User.role_id < 100)
-        .group_by(User.lead_id)
-        .all()
-    ) if lead_ids else {}
+    if lead_ids:
+        supplier_role_ids = {101}
+        roles = Role.query.filter(Role.lead_id.in_(lead_ids), Role.name == "Thầu phụ").all()
+        for r in roles:
+            supplier_role_ids.add(r.id)
+
+        employee_users_by_lead = dict(
+            db.session.query(User.lead_id, func.count())
+            .filter(
+                User.lead_id.in_(lead_ids),
+                User.role_id > 0,
+                ~User.role_id.in_(supplier_role_ids)
+            )
+            .group_by(User.lead_id)
+            .all()
+        )
+    else:
+        employee_users_by_lead = {}
     customer_role_by_lead = dict(
         db.session.query(User.lead_id, func.count())
         .filter(User.lead_id.in_(lead_ids), User.role_id == -1)

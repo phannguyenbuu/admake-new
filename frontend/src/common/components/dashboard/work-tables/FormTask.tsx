@@ -114,6 +114,63 @@ export default function FormTask({
     });
   }, [userSelected]);
 
+  const apiHost = useApiHost();
+
+  /** Flush pending draft messages/assets to server for an existing task */
+  const flushDraftsForExistingTask = useCallback(
+    async (taskId: string, accessToken: string) => {
+      const headers: Record<string, string> = accessToken ? { Authorization: `Bearer ${accessToken}` } : {};
+
+      // 1. Upload pending draft assets (files are already on server, just link them to the task)
+      for (const draftAsset of tmpTaskCreatedAssets) {
+        try {
+          const formData = new FormData();
+          formData.append("time", new Date().toISOString());
+          formData.append("type", draftAsset.type || "task");
+          formData.append("user_id", draftAsset.user_id || "");
+          formData.append("task_id", taskId);
+          // file is already uploaded – pass URL reference
+          formData.append("file_url", draftAsset.file_url || "");
+          formData.append("thumb_url", draftAsset.thumb_url || "");
+
+          await fetch(`${apiHost}/task/${taskId}/upload-link`, {
+            method: "PUT",
+            credentials: "include",
+            headers,
+            body: formData,
+          });
+        } catch (err) {
+          console.error("Flush draft asset error:", err);
+        }
+      }
+
+      // 2. Send pending draft messages/comments
+      for (const draftMsg of tmpTaskCreatedMessages) {
+        try {
+          const formData = new FormData();
+          formData.append("time", new Date().toISOString());
+          formData.append("type", draftMsg.type || "task");
+          formData.append("user_id", draftMsg.user_id || "");
+          formData.append("task_id", taskId);
+          formData.append("text", draftMsg.text || "");
+          formData.append("username", draftMsg.username || "");
+
+          await fetch(`${apiHost}/task/${taskId}/message`, {
+            method: "PUT",
+            credentials: "include",
+            headers,
+            body: formData,
+          });
+        } catch (err) {
+          console.error("Flush draft message error:", err);
+        }
+      }
+
+      clearTemporaryTaskDraft();
+    },
+    [apiHost, clearTemporaryTaskDraft, tmpTaskCreatedAssets, tmpTaskCreatedMessages]
+  );
+
   const [isUpdating, setIsUpdating] = useState(false);
 
   const handleUpdate = async () => {
@@ -131,7 +188,7 @@ export default function FormTask({
       const accessToken = getAccessToken();
 
       if (taskDetail) {
-        const response = await fetch(`${useApiHost()}/task/${taskDetail.id}`, {
+        const response = await fetch(`${apiHost}/task/${taskDetail.id}`, {
           method: "PUT",
           credentials: "include",
           headers: {
@@ -146,10 +203,17 @@ export default function FormTask({
         }
 
         await response.json();
+
+        // Flush pending drafts (messages/assets) to the server
+        const hasDrafts = tmpTaskCreatedAssets.length > 0 || tmpTaskCreatedMessages.length > 0;
+        if (hasDrafts && taskDetail.id) {
+          await flushDraftsForExistingTask(taskDetail.id.toString(), accessToken);
+        }
+
         notification.success({ message: "Cập nhật công việc thành công!" });
       } else {
         preparedValues["status"] = fixedColumns[currentColumn].type;
-        preparedValues["icon"] = tmpTaskCreatedAssets.filter((item) => item.type === 'icon');
+        preparedValues["icon"] = preparedValues["icon"] || null;
         preparedValues["assets"] = [
           ...tmpTaskCreatedAssets.filter((item) => item.type !== 'icon'),
           ...tmpTaskCreatedMessages,
@@ -157,7 +221,7 @@ export default function FormTask({
 
         clearTemporaryTaskDraft();
 
-        const response = await fetch(`${useApiHost()}/task/`, {
+        const response = await fetch(`${apiHost}/task/`, {
           method: "POST",
           credentials: "include",
           headers: {
@@ -220,9 +284,7 @@ export default function FormTask({
   useEffect(() => {
     if (!open) {
       initializedTaskIdRef.current = undefined;
-      if (!taskDetail?.id) {
-        clearTemporaryTaskDraft();
-      }
+      clearTemporaryTaskDraft();
       return;
     }
 
@@ -260,11 +322,27 @@ export default function FormTask({
   }, [clearTemporaryTaskDraft, form, open, taskDetail?.id, workspaceId]);
 
   const handleModalCancel = useCallback(() => {
-    if (!taskDetail?.id) {
-      clearTemporaryTaskDraft();
+    const hasPendingDrafts = tmpTaskCreatedAssets.length > 0 || tmpTaskCreatedMessages.length > 0;
+
+    if (hasPendingDrafts) {
+      Modal.confirm({
+        title: "Bạn có thay đổi chưa lưu",
+        content: "Các tài liệu và bình luận vừa thêm sẽ bị mất nếu đóng. Bạn có muốn tiếp tục?",
+        okText: "Đóng không lưu",
+        cancelText: "Quay lại",
+        okButtonProps: { danger: true },
+        centered: true,
+        onOk: () => {
+          clearTemporaryTaskDraft();
+          onCancel();
+        },
+      });
+      return;
     }
+
+    clearTemporaryTaskDraft();
     onCancel();
-  }, [clearTemporaryTaskDraft, onCancel, taskDetail?.id]);
+  }, [clearTemporaryTaskDraft, onCancel, tmpTaskCreatedAssets.length, tmpTaskCreatedMessages.length]);
 
   const docsCommentsSection = (
     <div className="mx-auto mt-5 w-[96%] max-w-5xl">

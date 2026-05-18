@@ -11,8 +11,10 @@ import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import EditIcon from '@mui/icons-material/Edit';
 import { parseTaskIconList, type Task } from '../../../../@types/work-space.type';
 import { useApiStatic } from '../../../../common/hooks/useApiHost';
+import { useTaskContext } from '../../../../common/hooks/useTask';
+import { useUser } from '../../../../common/hooks/useUser';
 import { TOKEN_LABEL } from '../../../../common/config';
-import { notification } from 'antd';
+import { notification, Modal } from 'antd';
 
 interface UploadIconButtonProps {
   taskDetail: Task | null;
@@ -35,6 +37,7 @@ const UploadIconButton = forwardRef<UploadIconButtonHandle, UploadIconButtonProp
   const [preview, setPreview] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [iconUrls, setIconUrls] = useState<string[]>([]);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const apiStatic = useApiStatic();
 
@@ -48,6 +51,9 @@ const UploadIconButton = forwardRef<UploadIconButtonHandle, UploadIconButtonProp
       setPreview(null);
     }
   }, [apiStatic, taskDetail?.icon]);
+
+  const { setTaskDetail } = useTaskContext();
+  const { setTmpTaskCreatedAssets } = useUser();
 
   const restorePreviewFromIcons = (icons: string[]) => {
     if (icons.length > 0) {
@@ -71,6 +77,19 @@ const UploadIconButton = forwardRef<UploadIconButtonHandle, UploadIconButtonProp
     try {
       const formData = new FormData();
       formData.append('file', file);
+      
+      // If task is new, frontend manually pushes old icons to draft assets
+      if (!taskDetail?.id && iconUrls.length > 0) {
+         for (const oldIcon of iconUrls) {
+           const newAsset = {
+             message_id: new Date().getTime().toString() + Math.random().toString().slice(2, 6),
+             type: 'task',
+             file_url: oldIcon,
+             thumb_url: oldIcon
+           };
+           setTmpTaskCreatedAssets(prev => [...prev, newAsset as any]);
+         }
+      }
 
       const response = await fetch(apiUrl, {
         method: 'PUT',
@@ -81,6 +100,11 @@ const UploadIconButton = forwardRef<UploadIconButtonHandle, UploadIconButtonProp
       const data = await response.json();
 
       if (response.ok && data.success) {
+        // If task exists, backend pushed old icons and returned the updated task
+        if (taskDetail?.id && data.task) {
+          setTaskDetail(data.task);
+        }
+
         const nextIcons = Array.isArray(data.icons)
           ? data.icons.filter((item: unknown): item is string => typeof item === 'string' && item.trim() !== '')
           : [];
@@ -115,11 +139,15 @@ const UploadIconButton = forwardRef<UploadIconButtonHandle, UploadIconButtonProp
   };
 
   const handleFileSelect = async (e: ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+    const files = Array.from(e.target.files || []);
+    if (!files.length) return;
 
     e.target.value = '';
-    await uploadImageFile(file);
+    
+    // Upload files sequentially so backend/frontend can push previous ones to assets
+    for (const file of files) {
+      await uploadImageFile(file);
+    }
   };
 
   useImperativeHandle(ref, () => ({
@@ -139,13 +167,25 @@ const UploadIconButton = forwardRef<UploadIconButtonHandle, UploadIconButtonProp
   const hasExistingIcon = iconUrls.length > 0;
 
   return (
+    <>
     <Stack sx={{ direction: 'column', alignItems: 'center', justifyContent: 'center', gap: 1, border: '1px solid #999', borderRadius: 2, width: 200 }}>
       {preview ? (
-        <Tooltip title={hasExistingIcon ? 'Thay đổi icon' : 'Tải icon'}>
+        <Tooltip title="Click để xem ảnh gốc">
           <Avatar
             src={preview}
             alt="Task icon"
-            sx={{ width: 100, height: 70, borderRadius: 0 }}
+            onClick={() => setLightboxOpen(true)}
+            sx={{
+              width: 100,
+              height: 70,
+              borderRadius: 0,
+              cursor: 'pointer',
+              transition: 'opacity 0.2s, box-shadow 0.2s',
+              '&:hover': {
+                opacity: 0.85,
+                boxShadow: '0 2px 12px rgba(0,180,182,0.3)',
+              },
+            }}
           />
         </Tooltip>
       ) : (
@@ -186,10 +226,56 @@ const UploadIconButton = forwardRef<UploadIconButtonHandle, UploadIconButtonProp
         ref={fileInputRef}
         type="file"
         accept="image/*"
+        multiple
         onChange={handleFileSelect}
         style={{ display: 'none' }}
       />
     </Stack>
+
+    {/* ── Lightbox preview modal ─────────────────────────────────────── */}
+    <Modal
+      open={lightboxOpen}
+      onCancel={() => setLightboxOpen(false)}
+      footer={null}
+      centered
+      closable={false}
+      width="auto"
+      styles={{
+        body: {
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          padding: 0,
+          background: 'transparent',
+        },
+        content: {
+          background: 'transparent',
+          boxShadow: 'none',
+          padding: 0,
+        },
+        mask: {
+          background: 'rgba(0, 0, 0, 0.8)',
+          backdropFilter: 'blur(5px)',
+        },
+      }}
+    >
+      {preview && (
+        <img
+          src={preview.replace('thumbs/thumb_', '')}
+          alt="Xem ảnh gốc"
+          onClick={() => setLightboxOpen(false)}
+          style={{
+            maxWidth: '90vw',
+            maxHeight: '85vh',
+            objectFit: 'contain',
+            borderRadius: 8,
+            cursor: 'pointer',
+            boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
+          }}
+        />
+      )}
+    </Modal>
+    </>
   );
 });
 

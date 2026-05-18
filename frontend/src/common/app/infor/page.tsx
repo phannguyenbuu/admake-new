@@ -9,6 +9,7 @@ import { useUserQuery } from "../../common/hooks/user.hook";
 import type { PaginationDto } from "../../@types/common.type";
 import type { User } from "../../@types/user.type";
 import axios from "axios";
+import axiosClient from "../../services/axiosClient";
 import { useDebounce } from "../../common/hooks/useDebounce";
 import AddIcon from "@mui/icons-material/Add";
 import UserCanViewForm from "./UserCanView";
@@ -61,7 +62,7 @@ export const InforDashboard: IPage["Component"] = () => {
     useEffect(() => {
       async function fetchAllUsersCanView() {
         try {
-          const response = await axios.get<{data:UserCanViewFormProps[]}>(`${useApiHost()}/user/${userId}/can-view-all`);
+          const response = await axiosClient.get<{data:UserCanViewFormProps[]}>(`/user/${userId}/can-view-all`);
           const users_can_view = response.data;
           console.log('users_can_view',users_can_view);
           setFilteredUsersCanView(users_can_view.data);
@@ -77,7 +78,7 @@ export const InforDashboard: IPage["Component"] = () => {
     useEffect(() => {
       async function fetchUsers() {
         try {
-          const response = await axios.get<{data:User[]}>(`${useApiHost()}/user/`, {
+          const response = await axiosClient.get<{data:User[]}>(`/user/`, {
             params: {
               page: 1,
               limit: 1000,
@@ -107,28 +108,17 @@ export const InforDashboard: IPage["Component"] = () => {
     console.log("Form values", values);
 
     try {
-      const response = await fetch(`${useApiHost()}/user/${userId}/password`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(values),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        notification.error({message:"Lỗi server:", description:data.description});
-        // message.error(data.description || "Cập nhật thất bại");
-        return;
-      }
-
+      const response = await axiosClient.put(`/user/${userId}/password`, values);
+      
       setFullName(values.fullName);
       message.success("Cập nhật thông tin thành công");
       setConfig((prev) => ({ ...prev, openEdit: false }));
-    } catch (error) {
+    } catch (error: any) {
       console.error("Fetch error:", error);
-      message.error("Lỗi server");
+      notification.error({
+        message: "Lỗi server:", 
+        description: error.response?.data?.description || "Cập nhật thất bại"
+      });
     }
   };
 
@@ -157,11 +147,7 @@ export const InforDashboard: IPage["Component"] = () => {
       try {
         if(!ucvId.startsWith('tmp'))
         {
-          const response = await fetch(`${useApiHost()}/user/${ucvId}/can-view`, {
-            method: 'DELETE',
-            headers: { 'Content-Type': 'application/json' }
-          });
-          if (!response.ok) throw new Error('Delete failed');
+          await axiosClient.delete(`/user/${ucvId}/can-view`);
         }
 
         setFilteredUsersCanView(prev => prev.filter(el => el.id != ucvId));
@@ -333,12 +319,8 @@ const OldPasswordInput = ({ userId }: { userId: string }) => {
     if (!oldPassword) return;
 
     try {
-      const res = await fetch(`${useApiHost()}/user/${userId}/check-password`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ old_password: oldPassword }),
-      });
-      const data = await res.json();
+      const res = await axiosClient.post(`/user/${userId}/check-password`, { old_password: oldPassword });
+      const data = res.data;
       console.log('message',data);
       if (data.message = "right password") {
         setValid(true);

@@ -18,6 +18,7 @@ const EVENT_TYPE_LABELS: Record<string, { label: string; color: string; icon: st
   purchase: { label: "Ngày mua", color: "bg-teal-100 text-teal-700", icon: "🛒" },
   maintenance: { label: "Ngày bảo trì", color: "bg-amber-100 text-amber-700", icon: "🔧" },
   responsible: { label: "Người phụ trách", color: "bg-purple-100 text-purple-700", icon: "👤" },
+  volume: { label: "Thông tin khối lượng", color: "bg-emerald-100 text-emerald-700", icon: "⚖️" },
 };
 
 const emptyForm = {

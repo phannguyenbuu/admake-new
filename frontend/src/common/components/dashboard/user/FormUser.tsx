@@ -15,7 +15,7 @@ import { CloseOutlined } from "@ant-design/icons";
 import { PlusOutlined, InfoCircleOutlined } from "@ant-design/icons";
 import { useEffect, useRef, useState } from "react";
 import type { FormUserProps } from "../../../@types/user.type";
-import { useCreateUser, useUpdateUser } from "../../../common/hooks/user.hook";
+import { useCreateUser, useUpdateUser, useDeleteUser } from "../../../common/hooks/user.hook";
 import { useSettingQuery } from "../../../common/hooks/setting.hook";
 import { useRoleQuery } from "../../../common/hooks/role.hook";
 import type { Role } from "../../../@types/role.type";
@@ -38,9 +38,10 @@ export default function FormUser({
   const divRef = useRef<HTMLDivElement>(null);
   const { mutate: createUser, isPending: isCreating } = useCreateUser();
   const { mutate: updateUser, isPending: isUpdating } = useUpdateUser();
+  const { mutate: deleteUser, isPending: isDeleting } = useDeleteUser();
   const { data: settings } = useSettingQuery();
-  const { data: roles } = useRoleQuery();
   const { userLeadId } = useUser();
+  const { data: roles } = useRoleQuery(userLeadId);
 
   const [width, setWidth] = useState(0);
 
@@ -65,14 +66,14 @@ export default function FormUser({
   //     ?.value as Array<{ id: string; salary: number; index: number }>) || [];
 
   // @ts-ignore
-  const role = roles?.find((role: Role) => role.id === user?.role?.id);
+  const role = roles?.find((role: Role) => Number(role.id) === Number(user?.role?.id || user?.role_id));
   const isEditing = !!user;
 
   // options
   const rolesData = (Array.isArray(roles) && roles) || [];
   const roleOptions = rolesData.map((role: Role) => ({
     label: role.name,
-    value: role.id,
+    value: Number(role.id),
   }));
 
   // const salaryOptions = salaryLevels.map((level) => ({
@@ -93,19 +94,20 @@ export default function FormUser({
         phone: user.phone,
         username: user.username,
         password: user.password,
-        role_id: isSupplier ? 101 : (role ? role.id : user.role?.id),
+        role_id: isSupplier ? 101 : (role ? Number(role.id) : (user.role?.id ? Number(user.role.id) : (user.role_id ? Number(user.role_id) : undefined))),
         salary: user.salary,
         allowance: user.allowance,
         bhyt: user.bhyt,
         bhxh: user.bhxh,
 
-        gender: user.gender,
+        gender: (user.gender === 1 || String(user.gender) === '1' || String(user.gender).toLowerCase() === 'female') ? 1 : 0,
         address: user.address,
         citizenId: user.citizenId,
         email: user.email,
         facebookAccount: user.facebookAccount,
         bankAccount: user.bankAccount,
         referrer: user.referrer,
+        is_active: user.is_active !== false,
 
         // Thêm các field khác nếu có trong form
       });
@@ -113,34 +115,28 @@ export default function FormUser({
 
     } else {
       form.resetFields();
+      form.setFieldsValue({
+        is_active: true,
+      });
     }
   }, [user, form, role]);
 
   const handleDelete = () => {
     if (!user) return;
 
-    fetch(`${useApiHost()}/user/${user.id}`, {
-      method: "DELETE",
-    })
-      .then((response) => {
-        if (!response.ok) {
-          notification.error({ message: "Xóa user thất bại" });
-        }
-        // Xử lý khi xóa thành công, ví dụ cập nhật state hoặc thông báo
+    deleteUser(user.id, {
+      onSuccess: () => {
         notification.success({ message: `User ${user.fullName} đã được xóa` });
-        if (onRefresh)
-          onRefresh();
-
-        if (onCancel)
-          onCancel();
-      })
-      .catch((error) => {
-        notification.error({ message: "Lỗi khi xóa user:", description: error });
-        if (onCancel)
-          onCancel();
-      });
-
-
+        onRefresh?.();
+        onCancel?.();
+      },
+      onError: (error: any) => {
+        notification.error({
+          message: "Xóa user thất bại",
+          description: error?.response?.data?.message || error?.message || "Có lỗi xảy ra",
+        });
+      },
+    });
   };
 
 
@@ -401,7 +397,7 @@ export default function FormUser({
 
 
           <Row gutter={[16, 16]}>
-            <Col xs={24} sm={12} lg={12}>
+            <Col xs={24} sm={8} lg={8}>
               <Form.Item
                 name="gender"
                 label={<span className="text-sm sm:text-base font-semibold text-gray-700">Giới tính:</span>}
@@ -410,9 +406,8 @@ export default function FormUser({
                 <Select
                   placeholder="Chọn giới tính"
                   options={[
-                    { label: 'Nam', value: 'male' },
-                    { label: 'Nữ', value: 'female' },
-                    { label: 'Khác', value: 'other' },
+                    { label: 'Nam', value: 0 },
+                    { label: 'Nữ', value: 1 },
                   ]}
                   allowClear
                   getPopupContainer={() => document.body}
@@ -421,7 +416,24 @@ export default function FormUser({
               </Form.Item>
             </Col>
 
-            <Col xs={24} sm={12} lg={12}>
+            <Col xs={24} sm={8} lg={8}>
+              <Form.Item
+                name="is_active"
+                label={<span className="text-sm sm:text-base font-semibold text-gray-700">Trạng thái:</span>}
+                className="!mb-0"
+              >
+                <Select
+                  options={[
+                    { label: "Đang làm việc", value: true },
+                    { label: "Đã nghỉ việc", value: false },
+                  ]}
+                  getPopupContainer={() => document.body}
+                  className="!text-sm sm:!text-base !h-9 sm:!h-10 !rounded-lg !border-gray-300 focus:!border-cyan-500 !shadow-lg hover:!shadow-xl !transition-all !duration-300"
+                />
+              </Form.Item>
+            </Col>
+
+            <Col xs={24} sm={8} lg={8}>
               <Form.Item
                 name="address"
                 label={<span className="text-sm sm:text-base font-semibold text-gray-700">Địa chỉ:</span>}

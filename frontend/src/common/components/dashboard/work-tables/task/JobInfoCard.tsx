@@ -59,7 +59,7 @@ const JobInfoCard: React.FC<JobInfoCardProps> = ({ currentStatus, taskDetail, fo
       <UploadIconButton
         ref={uploadIconRef}
         taskDetail={taskDetail}
-        apiUrl={`${apiHost}/task/${taskDetail?.id}/upload-icon`}
+        apiUrl={`${apiHost}/task/${taskDetail?.id || "new"}/upload-icon`}
         onIconsChange={(newIcons) => {
           const nextValue = newIcons.length > 0 ? JSON.stringify(newIcons) : null;
 

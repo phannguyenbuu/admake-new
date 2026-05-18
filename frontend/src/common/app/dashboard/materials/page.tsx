@@ -14,11 +14,14 @@ import {
   type StockTransaction,
   type Warehouse,
 } from "../../../services/inventory.service";
-import MaterialSphereViewer from "../../../components/dashboard/materials/MaterialSphereViewer";
+import { UserService } from "../../../services/user.service";
 import StorageLocationsTab from "./StorageLocationsTab";
 import ItemConfigTab, { useItemStatuses, useItemUnits } from "./ItemConfigTab";
 import type { ItemStatus } from "./ItemConfigTab";
 import UnPermissionBoard from "../unPermissionBoard";
+import JobAsset from "../../../components/dashboard/work-tables/task/JobAsset";
+import { useApiHost } from "../../../common/hooks/useApiHost";
+import type { MessageTypeProps } from "../../../@types/chat.type";
 
 const ITEM_TYPE_LABEL: Record<string, string> = {
   raw_material: "Nguyên vật liệu",
@@ -118,7 +121,7 @@ function PriceCell({ value, placeholder, isHeader, onCommit }: {
           className="w-20 border border-teal-300 rounded px-1.5 py-0.5 text-[10px] outline-none bg-white"
           placeholder="giá..."
         />
-        <span className="text-[9px] text-slate-400">Ä'</span>
+        <span className="text-[9px] text-slate-400">đ</span>
       </div>
     );
   }
@@ -200,6 +203,7 @@ const emptyTxForm = {
   reference_type: "",
   reference_id: "",
   note: "",
+  storekeeper_id: "",
 };
 
 const ITEM_PAGE_SIZE = 50;
@@ -316,6 +320,12 @@ const MaterialsDashboard: IPage["Component"] = () => {
     queryFn: async () => (await InventoryService.listWarehouses(paramsBase)).data.data as Warehouse[],
   });
 
+  const usersQuery = useQuery({
+    queryKey: ["inventory-users", userLeadId],
+    enabled: userLeadId > 0,
+    queryFn: async () => (await UserService.getAll({ lead_id: userLeadId, limit: 1000 } as any)).data.data as any[],
+  });
+
   const summaryQuery = useQuery({
     queryKey: ["inventory-summary", userLeadId, month],
     enabled: userLeadId > 0,
@@ -370,6 +380,7 @@ const MaterialsDashboard: IPage["Component"] = () => {
   const balances = balancesQuery.data || [];
   const categories = categoriesQuery.data || [];
   const warehouses = warehousesQuery.data || [];
+  const users = usersQuery.data || [];
   const summary = summaryQuery.data || {
     active_items: 0,
     transaction_count: 0,
@@ -477,7 +488,7 @@ const MaterialsDashboard: IPage["Component"] = () => {
       content: `Xóa vật tư ${item.code} - ${item.name}?`,
       okText: "Xóa",
       okButtonProps: { danger: true },
-      cancelText: "Há»§y",
+      cancelText: "Hủy",
       centered: true,
       onOk: () => handleDeleteItem(item),
     });
@@ -515,6 +526,25 @@ const MaterialsDashboard: IPage["Component"] = () => {
   const previewItem = items.find((item) => item.id === previewItemId) || items[0] || null;
   const previewMaterial =
     (previewItem && PREVIEW_MATERIAL_BY_TYPE[previewItem.item_type]) || PREVIEW_MATERIAL_BY_TYPE.raw_material;
+
+  const apiHost = useApiHost();
+  const [previewMessages, setPreviewMessages] = useState<MessageTypeProps[]>([]);
+
+  useEffect(() => {
+    if (previewItem?.id) {
+      const token = localStorage.getItem("accessToken") || sessionStorage.getItem("accessToken") || localStorage.getItem("token") || sessionStorage.getItem("token") || "";
+      fetch(`${apiHost}/inventory/items/${previewItem.id}/messages`, {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          setPreviewMessages(data.messages || []);
+        })
+        .catch(console.error);
+    } else {
+      setPreviewMessages([]);
+    }
+  }, [previewItem?.id, apiHost]);
 
   return canViewPermission?.view_material ? (
     <div className="w-full flex flex-col gap-5 pb-8">
@@ -574,7 +604,7 @@ const MaterialsDashboard: IPage["Component"] = () => {
           </div>
           <div className="rounded-xl border border-cyan-100 bg-cyan-50 p-4">
             <div className="text-xs text-slate-500">Tổng giá trị tồn kho</div>
-            <div className="text-2xl font-semibold text-cyan-700">{money(summary.total_inventory_value)} Ä'</div>
+            <div className="text-2xl font-semibold text-cyan-700">{money(summary.total_inventory_value)} đ</div>
           </div>
           <div className="rounded-xl border border-amber-100 bg-amber-50 p-4">
             <div className="text-xs text-slate-500">Vật tư dưới định mức</div>
@@ -634,32 +664,39 @@ const MaterialsDashboard: IPage["Component"] = () => {
               <div className="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm">
                 <div className="mb-3 flex items-center justify-between">
                   <div>
-                    <div className="text-sm font-semibold text-slate-700">Preview vật liệu</div>
-                    <div className="text-xs text-slate-500">Giữ lại khối Three.js để xem nhanh bề mặt vật tư</div>
+                    <div className="text-sm font-semibold text-slate-700">Hình ảnh vật tư</div>
+                    <div className="text-xs text-slate-500">Đính kèm hình ảnh và ghi chú cho vật tư</div>
                   </div>
                   {previewItem && (
-                    <span className="rounded-full bg-slate-100 px-3 py-1 text-xs text-slate-600">
-                      {ITEM_TYPE_LABEL[previewItem.item_type] || previewItem.item_type}
+                    <span className="rounded-full bg-teal-100 px-3 py-1 text-xs text-teal-600 font-medium">
+                      {previewItem.code}
                     </span>
                   )}
                 </div>
-                <div className="mb-3 h-[280px] rounded-2xl bg-slate-900 p-2">
-                  <MaterialSphereViewer {...previewMaterial} />
-                </div>
                 {previewItem ? (
-                  <div className="space-y-2 rounded-2xl border border-slate-100 bg-slate-50 p-3 text-sm">
-                    <div className="font-semibold text-slate-700">{previewItem.name}</div>
-                    <div className="text-slate-500">Mã: {previewItem.code}</div>
-                    <div className="grid grid-cols-2 gap-2 text-xs text-slate-500">
-                      <div>SKU: {previewItem.sku || "-"}</div>
-                      <div>Đơn vị: {previewItem.unit}</div>
-                      <div>Giá bình quân: {money(previewItem.average_cost || previewItem.standard_cost)} đ</div>
-                      <div>Tồn hiện tại: {money(previewItem.quantity_on_hand || 0)}</div>
+                  <div className="space-y-4">
+                    <div className="space-y-2 rounded-2xl border border-slate-100 bg-slate-50 p-3 text-sm">
+                      <div className="font-semibold text-slate-700">{previewItem.name}</div>
+                      <div className="grid grid-cols-2 gap-2 text-xs text-slate-500">
+                        <div>SKU: {previewItem.sku || "-"}</div>
+                        <div>Đơn vị: {previewItem.unit}</div>
+                        <div>Giá bình quân: {money(previewItem.average_cost || previewItem.standard_cost)} đ</div>
+                        <div>Tồn hiện tại: {money(previewItem.quantity_on_hand || 0)}</div>
+                      </div>
+                    </div>
+                    <div className="border-t border-slate-100 pt-3 font-normal">
+                      <JobAsset
+                        taskId={previewItem.id}
+                        type="material"
+                        messages={previewMessages}
+                        title="Hình ảnh vật tư"
+                        instantSave={true}
+                      />
                     </div>
                   </div>
                 ) : (
-                  <div className="rounded-2xl border border-dashed border-slate-200 p-4 text-sm text-slate-500">
-                    Chưa có vật tư để preview.
+                  <div className="rounded-2xl border border-dashed border-slate-200 p-8 text-center text-sm text-slate-500">
+                    Chọn một vật tư bên dưới để xem hình ảnh.
                   </div>
                 )}
               </div>
@@ -710,9 +747,9 @@ const MaterialsDashboard: IPage["Component"] = () => {
                               <div>{item.default_warehouse_name || "-"}</div>
                               <div className="text-xs text-slate-400">{money(item.quantity_on_hand || 0)} {item.unit}</div>
                             </td>
-                            <td className="px-3 py-3 text-slate-600 whitespace-nowrap">{money(item.average_cost || item.standard_cost)} Ä'</td>
+                            <td className="px-3 py-3 text-slate-600 whitespace-nowrap">{money(item.average_cost || item.standard_cost)} đ</td>
                             <td className="px-3 py-3 text-slate-600">
-                              <div className="text-slate-700">{money(item.inventory_value || 0)} Ä'</div>
+                              <div className="text-slate-700">{money(item.inventory_value || 0)} đ</div>
                               <div className="text-xs text-slate-400">min: {money(item.min_stock_level || 0)}</div>
                             </td>
                             <td className="px-3 py-3" onClick={(e) => e.stopPropagation()}>
@@ -741,7 +778,7 @@ const MaterialsDashboard: IPage["Component"] = () => {
                             </td>
                             <td className="px-3 py-3" onClick={(e) => e.stopPropagation()}>
                               <div className="flex items-center justify-center gap-1">
-                                <button title="Sá»­a" className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors" onClick={() => handleOpenEdit(item)}>
+                                <button title="Sửa" className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors" onClick={() => handleOpenEdit(item)}>
                                   <Pencil size={14} />
                                 </button>
                                 <button title="Xoá / Ngừng dùng" className="p-1.5 rounded-lg hover:bg-rose-50 text-slate-400 hover:text-rose-500 transition-colors" onClick={() => toggleItemStatus(item)}>
@@ -877,9 +914,9 @@ const MaterialsDashboard: IPage["Component"] = () => {
                                                               value={cell?.price}
                                                               placeholder={
                                                                 findColDefault(color)?.price !== undefined && findColDefault(color)?.price !== ""
-                                                                  ? String(Number(findColDefault(color)!.price).toLocaleString("vi-VN")) + "Ä'"
+                                                                  ? String(Number(findColDefault(color)!.price).toLocaleString("vi-VN")) + "đ"
                                                                   : rowDef?.price !== undefined && rowDef?.price !== ""
-                                                                    ? String(Number(rowDef!.price).toLocaleString("vi-VN")) + "Ä'"
+                                                                    ? String(Number(rowDef!.price).toLocaleString("vi-VN")) + "đ"
                                                                     : defaultPrice ? defaultPrice.toLocaleString("vi-VN") + "đ" : "—"
                                                               }
                                                               onCommit={v => upsertCell(spec, color, v)}
@@ -1073,6 +1110,18 @@ const MaterialsDashboard: IPage["Component"] = () => {
                   value={txForm.unit_cost}
                   onChange={(e) => setTxForm((prev) => ({ ...prev, unit_cost: Number(e.target.value) }))}
                 />
+                <select
+                  className="w-full rounded-lg border border-slate-200 px-3 py-2"
+                  value={txForm.storekeeper_id || ""}
+                  onChange={(e) => setTxForm((prev) => ({ ...prev, storekeeper_id: e.target.value }))}
+                >
+                  <option value="">Thủ kho (Không bắt buộc)</option>
+                  {users.map((u: any) => (
+                    <option key={u.id} value={u.id}>
+                      {u.fullName || u.username}
+                    </option>
+                  ))}
+                </select>
                 <input
                   className="w-full rounded-lg border border-slate-200 px-3 py-2"
                   placeholder="Đối tác"
@@ -1178,12 +1227,16 @@ const MaterialsDashboard: IPage["Component"] = () => {
                       <th className="px-3 py-3">Thành tiền</th>
                       <th className="px-3 py-3">Đối tượng / task</th>
                       <th className="px-3 py-3">Tham chiếu</th>
+                      <th className="px-3 py-3">Thủ kho</th>
                       <th className="px-3 py-3">Trạng thái</th>
                       <th className="px-3 py-3 text-center">Thao tác</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {transactions.map((tx) => (
+                    {transactions.map((tx) => {
+                      const storekeeper = users.find((u: any) => String(u.id) === String(tx.storekeeper_id));
+                      const storekeeperName = storekeeper ? (storekeeper.fullName || storekeeper.username) : (tx.storekeeper_id || "-");
+                      return (
                       <tr key={tx.id} className="border-b last:border-0">
                         <td className="px-3 py-3 text-slate-600">{dayjs(tx.transaction_date).format("DD/MM/YYYY")}</td>
                         <td className="px-3 py-3 font-medium text-slate-700">{tx.transaction_code}</td>
@@ -1197,10 +1250,11 @@ const MaterialsDashboard: IPage["Component"] = () => {
                         <td className="px-3 py-3 text-rose-700">
                           {tx.direction === "out" || tx.direction === "transfer" ? money(tx.quantity) : "-"}
                         </td>
-                        <td className="px-3 py-3 text-slate-600">{money(tx.unit_cost)} Ä'</td>
-                        <td className="px-3 py-3 text-slate-700">{money(tx.total_cost)} Ä'</td>
+                        <td className="px-3 py-3 text-slate-600">{money(tx.unit_cost)} đ</td>
+                        <td className="px-3 py-3 text-slate-700">{money(tx.total_cost)} đ</td>
                         <td className="px-3 py-3 text-slate-600">{tx.partner_name || tx.task_id || tx.project_id || "-"}</td>
                         <td className="px-3 py-3 text-slate-600">{tx.reference_code || tx.reference_id || "-"}</td>
+                        <td className="px-3 py-3 text-slate-600">{storekeeperName}</td>
                         <td className="px-3 py-3">
                           <span className={`rounded-md border px-2 py-1 text-xs ${STATUS_BADGE[tx.status] || STATUS_BADGE.draft}`}>
                             {STATUS_LABEL[tx.status] || tx.status}
@@ -1233,13 +1287,14 @@ const MaterialsDashboard: IPage["Component"] = () => {
                                   await refreshAll();
                                 }}
                               >
-                                Há»§y
+                                Hủy
                               </button>
                             )}
                           </div>
                         </td>
                       </tr>
-                    ))}
+                      );
+                    })}
                     {transactions.length === 0 && (
                       <tr>
                         <td colSpan={13} className="px-3 py-8 text-center text-sm text-slate-500">
@@ -1282,8 +1337,8 @@ const MaterialsDashboard: IPage["Component"] = () => {
                       <td className="px-3 py-3 text-slate-700">
                         {money(row.quantity_on_hand)} {row.unit || ""}
                       </td>
-                      <td className="px-3 py-3 text-slate-600">{money(row.average_cost)} Ä'</td>
-                      <td className="px-3 py-3 text-slate-700">{money(row.inventory_value)} Ä'</td>
+                      <td className="px-3 py-3 text-slate-600">{money(row.average_cost)} đ</td>
+                      <td className="px-3 py-3 text-slate-700">{money(row.inventory_value)} đ</td>
                       <td className="px-3 py-3">
                         <span
                           className={`rounded-md border px-2 py-1 text-xs ${row.below_min_stock
@@ -1363,7 +1418,62 @@ const MaterialsDashboard: IPage["Component"] = () => {
           setSpecAddOpen(false);
           setSpecDraft(emptySpecDraft());
         }}
-        onOk={() => itemMutation.mutate()}
+        onOk={() => {
+          const code = itemForm.code.trim().toUpperCase();
+          if (!code) {
+            notification.warning({ message: "Vui lòng nhập mã vật tư" });
+            return;
+          }
+          if (!itemForm.name.trim()) {
+            notification.warning({ message: "Vui lòng nhập tên vật tư" });
+            return;
+          }
+          
+          const dup = items.find(
+            (it) =>
+              it.code.toUpperCase() === code &&
+              (!editingItem || it.id !== editingItem.id)
+          );
+          
+          if (dup) {
+            Modal.confirm({
+              title: "Trùng mã vật tư",
+              content: `Mã vật tư "${code}" đã tồn tại cho vật tư "${dup.name}". Bạn có muốn cập nhật (ghi đè) thông tin vào vật tư cũ này không?`,
+              okText: "Ghi đè",
+              okButtonProps: { danger: true },
+              cancelText: "Hủy",
+              centered: true,
+              onOk: async () => {
+                try {
+                  const validSpecs = specRows.filter(r => r.color || r.spec || r.unit);
+                  const payload = {
+                    ...itemForm,
+                    code: code,
+                    name: itemForm.name.trim(),
+                    sku: itemForm.sku.trim(),
+                    default_supplier_name: itemForm.default_supplier_name.trim(),
+                    note: itemForm.note.trim(),
+                    lead_id: userLeadId,
+                    spec_rows: validSpecs,
+                  };
+                  await InventoryService.updateItem(dup.id, payload);
+                  notification.success({ message: "Đã cập nhật (ghi đè) vật tư thành công" });
+                  setItemModalOpen(false);
+                  setEditingItem(null);
+                  setItemForm(emptyItemForm);
+                  setSpecRows([]);
+                  setSpecAddOpen(false);
+                  setSpecDraft(emptySpecDraft());
+                  await refreshAll();
+                } catch (error: any) {
+                  notification.error({ message: error?.response?.data?.description || "Không thể ghi đè vật tư" });
+                }
+              }
+            });
+          } else {
+            itemMutation.mutate();
+          }
+        }}
         okText={editingItem ? "Cập nhật" : "Tạo vật tư"}
         confirmLoading={itemMutation.isPending}
         title={editingItem ? "Cập nhật vật tư" : "Tạo vật tư"}
@@ -1377,6 +1487,23 @@ const MaterialsDashboard: IPage["Component"] = () => {
             <input className="rounded-lg border border-slate-200 px-3 py-2 text-sm" placeholder="SKU"
               value={itemForm.sku} onChange={(e) => setItemForm((p) => ({ ...p, sku: e.target.value }))} />
           </div>
+
+          {(() => {
+            const codeTrim = itemForm.code.trim().toUpperCase();
+            if (!codeTrim) return null;
+            const dup = items.find(
+              (it) =>
+                it.code.toUpperCase() === codeTrim &&
+                (!editingItem || it.id !== editingItem.id)
+            );
+            if (!dup) return null;
+            return (
+              <div className="text-xs text-amber-600 bg-amber-50 border border-amber-200 rounded-lg p-2 flex items-center gap-1.5 font-medium animate-pulse">
+                <span>⚠️</span>
+                <span>Mã vật tư <strong>"{codeTrim}"</strong> đã tồn tại (Vật tư: <strong>{dup.name}</strong>). Lưu sẽ ghi đè lên vật tư cũ.</span>
+              </div>
+            );
+          })()}
 
           {/* Nhóm — full width, trên tên */}
           <select className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
@@ -1401,7 +1528,7 @@ const MaterialsDashboard: IPage["Component"] = () => {
                 placeholder="Đơn giá trung bình"
                 value={itemForm.average_cost || ""}
                 onChange={(e) => setItemForm((p) => ({ ...p, average_cost: Number(e.target.value) }))} />
-              <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs text-slate-400">Ä'</span>
+              <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs text-slate-400">đ</span>
             </div>
             <select className="rounded-lg border border-slate-200 px-3 py-2 text-sm"
               value={itemForm.unit} onChange={(e) => setItemForm((p) => ({ ...p, unit: e.target.value }))}
@@ -1478,7 +1605,7 @@ const MaterialsDashboard: IPage["Component"] = () => {
               </div>
               <div>
                 <div className="text-xs text-slate-500">Giá trị</div>
-                <div className="font-medium text-slate-700">{money(detailTx.total_cost)} Ä'</div>
+                <div className="font-medium text-slate-700">{money(detailTx.total_cost)} đ</div>
               </div>
               <div>
                 <div className="text-xs text-slate-500">Đối tác / task</div>
@@ -1487,6 +1614,15 @@ const MaterialsDashboard: IPage["Component"] = () => {
               <div>
                 <div className="text-xs text-slate-500">Tham chiếu</div>
                 <div className="font-medium text-slate-700">{detailTx.reference_code || detailTx.reference_id || "-"}</div>
+              </div>
+              <div>
+                <div className="text-xs text-slate-500">Thủ kho</div>
+                <div className="font-medium text-slate-700">
+                  {(() => {
+                    const storekeeper = users.find((u: any) => String(u.id) === String(detailTx.storekeeper_id));
+                    return storekeeper ? (storekeeper.fullName || storekeeper.username) : (detailTx.storekeeper_id || "-");
+                  })()}
+                </div>
               </div>
             </div>
             <div>

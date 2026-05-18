@@ -19,6 +19,7 @@ from models import (
     JournalEntry,
     JournalEntryLine,
     LeadPayload,
+    Message,
     StockAdjustmentReason,
     StockTransaction,
     Task,
@@ -35,6 +36,9 @@ inventory_bp = Blueprint("inventory", __name__, url_prefix="/api/inventory")
 
 @inventory_bp.before_request
 def guard_inventory_permission():
+    if request.method == "OPTIONS":
+        return
+
     actor, _ = require_can_view("view_material")
     g.permission_actor = actor
 
@@ -776,6 +780,7 @@ def _build_transaction_payload(data, lead_id: int, current: StockTransaction | N
         "source_type": _clean_text(data.get("source_type")) if data.get("source_type") is not None else (current.source_type if current else None),
         "source_id": _clean_text(data.get("source_id")) if data.get("source_id") is not None else (current.source_id if current else None),
         "adjustment_reason_id": adjustment_reason_id,
+        "storekeeper_id": _clean_text(data.get("storekeeper_id")) if data.get("storekeeper_id") is not None else (current.storekeeper_id if current else None),
     }
 
 
@@ -1257,6 +1262,7 @@ def create_transaction():
         source_type=payload["source_type"],
         source_id=payload["source_id"],
         adjustment_reason_id=payload["adjustment_reason_id"],
+        storekeeper_id=payload["storekeeper_id"],
         created_by=_current_user_id(),
         updated_by=_current_user_id(),
     )
@@ -1302,6 +1308,7 @@ def update_transaction(transaction_id: str):
     tx.source_type = payload["source_type"]
     tx.source_id = payload["source_id"]
     tx.adjustment_reason_id = payload["adjustment_reason_id"]
+    tx.storekeeper_id = payload["storekeeper_id"]
     tx.updated_by = _current_user_id()
     db.session.commit()
     return jsonify(tx.tdict()), 200
@@ -1382,6 +1389,7 @@ def cancel_transaction(transaction_id: str):
             source_type="stock_transaction_cancel",
             source_id=tx.id,
             adjustment_reason_id=tx.adjustment_reason_id,
+            storekeeper_id=tx.storekeeper_id,
             reversal_transaction_id=tx.id,
             confirmed_at=datetime.utcnow(),
             created_by=_current_user_id(),
@@ -1583,3 +1591,33 @@ def inventory_trace():
         ),
     ).all()
     return jsonify({"data": [row.tdict() for row in links]}), 200
+
+
+@inventory_bp.route("/items/<string:item_id>/messages", methods=["GET"])
+def get_item_messages(item_id):
+    messages = Message.query.filter(Message.task_id == item_id).order_by(Message.createdAt.asc()).all()
+    return jsonify({"messages": [m.tdict() for m in messages]}), 200
+
+
+@inventory_bp.route("/items/<string:item_id>/message", methods=["POST"])
+def post_item_message(item_id):
+    user_id = request.form.get("user_id") or _current_user_id()
+    type = request.form.get("type") or "material"
+    text = request.form.get("text")
+    file_url = request.form.get("file_url")
+
+    item = InventoryItem.query.get(item_id)
+    if not item:
+        abort(404, description="Item not found")
+
+    message = Message.create_item({
+        "message_id": generate_datetime_id(),
+        "type": type,
+        "user_id": user_id,
+        "task_id": item_id,
+        "text": text,
+        "file_url": file_url,
+        "lead_id": item.lead_id
+    })
+    db.session.commit()
+    return jsonify({"message": message.tdict()}), 200

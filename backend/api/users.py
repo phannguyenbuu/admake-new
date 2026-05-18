@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify, abort
-from models import db, User, Task, dateStr, app,UserCanView,LeadPayload, Message, get_query_page_users, generate_datetime_id
+from models import db, User, Task, dateStr, app,UserCanView,LeadPayload, Message, get_query_page_users, generate_datetime_id, Role
 from flask import Flask, request, jsonify, session
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 import datetime
@@ -18,7 +18,17 @@ def _get_target_user_or_404(user_id, message="User not found"):
 
 def _require_user_resource_access(target_user: User | None = None, role_id: int | None = None):
     resolved_role_id = role_id if role_id is not None else (target_user.role_id if target_user else None)
-    permission = "view_supplier" if (resolved_role_id or 0) > 100 else "view_user"
+    
+    is_supplier = False
+    if resolved_role_id:
+        if resolved_role_id == 101:
+            is_supplier = True
+        else:
+            role_item = db.session.get(Role, resolved_role_id)
+            if role_item and role_item.name == "Thầu phụ":
+                is_supplier = True
+
+    permission = "view_supplier" if is_supplier else "view_user"
     actor, _ = require_can_view(permission)
     if target_user:
         ensure_resource_lead(target_user, actor, "user")
@@ -249,10 +259,15 @@ def get_user_detail(id):
 @user_bp.route("/<string:id>", methods=["PUT"])
 def update_user(id):
     data = request.get_json()
-    # print('PUT user', data)
     user = _get_target_user_or_404(id, "user not found")
     _require_user_resource_access(user)
-    
+
+    if data and "is_active" in data:
+        if isinstance(data["is_active"], str):
+            data["is_active"] = data["is_active"].lower() == "true"
+        else:
+            data["is_active"] = bool(data["is_active"])
+
     for key, value in data.items():
         if hasattr(user, key):
             if key in ['workStart', 'workEnd'] and isinstance(value, str):

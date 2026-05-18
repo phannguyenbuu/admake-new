@@ -4,10 +4,10 @@ import type { Role } from "../../@types/role.type";
 
 export const ROLE_QUERY_KEY = "role/queryPagination";
 export const ROLE_DETAIL_QUERY_KEY = "role/queryDetail";
-export function useRoleQuery() {
+export function useRoleQuery(leadId?: string | number) {
   return useQuery({
-    queryKey: [ROLE_QUERY_KEY],
-    queryFn: () => RoleService.getAll().then((res) => res?.data ?? []),
+    queryKey: [ROLE_QUERY_KEY, leadId],
+    queryFn: () => RoleService.getAll(leadId).then((res) => res?.data ?? []),
   });
 }
 
