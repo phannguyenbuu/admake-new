@@ -1,5 +1,5 @@
 import type { IPage } from "../../../@types/common.type";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState, Suspense, useDeferredValue } from "react";
 import { Pencil, Trash2, Plus, X, Check, ChevronDown, ChevronRight } from "lucide-react";
 import { Modal, notification } from "antd";
 import dayjs from "dayjs";
@@ -20,8 +20,10 @@ import ItemConfigTab, { useItemStatuses, useItemUnits } from "./ItemConfigTab";
 import type { ItemStatus } from "./ItemConfigTab";
 import UnPermissionBoard from "../unPermissionBoard";
 import JobAsset from "../../../components/dashboard/work-tables/task/JobAsset";
-import { useApiHost } from "../../../common/hooks/useApiHost";
+import { useApiHost, useApiStatic } from "../../../common/hooks/useApiHost";
 import type { MessageTypeProps } from "../../../@types/chat.type";
+
+const MaterialLab = React.lazy(() => import("../../../components/dashboard/material-lab/MaterialLab"));
 
 const ITEM_TYPE_LABEL: Record<string, string> = {
   raw_material: "Nguyên vật liệu",
@@ -237,6 +239,8 @@ const MaterialsDashboard: IPage["Component"] = () => {
   const [editingItem, setEditingItem] = useState<InventoryItem | null>(null);
   const [detailTx, setDetailTx] = useState<StockTransaction | null>(null);
   const [previewItemId, setPreviewItemId] = useState("");
+  const [activeViewerTab, setActiveViewerTab] = useState<"3d" | "photos">("3d");
+  const [photoModalSrc, setPhotoModalSrc] = useState<string | null>(null);
   const [itemForm, setItemForm] = useState(emptyItemForm);
   const [specRows, setSpecRows] = useState<SpecRow[]>([]);
   const [specAddOpen, setSpecAddOpen] = useState(false);
@@ -523,7 +527,8 @@ const MaterialsDashboard: IPage["Component"] = () => {
   );
 
   const activeWarehouseName = warehouses.find((warehouse) => warehouse.id === warehouseFilter)?.name;
-  const previewItem = items.find((item) => item.id === previewItemId) || items[0] || null;
+  const deferredPreviewItemId = useDeferredValue(previewItemId);
+  const previewItem = items.find((item) => item.id === deferredPreviewItemId) || items[0] || null;
   const previewMaterial =
     (previewItem && PREVIEW_MATERIAL_BY_TYPE[previewItem.item_type]) || PREVIEW_MATERIAL_BY_TYPE.raw_material;
 
@@ -545,6 +550,10 @@ const MaterialsDashboard: IPage["Component"] = () => {
       setPreviewMessages([]);
     }
   }, [previewItem?.id, apiHost]);
+
+  const materialImages = useMemo(() => {
+    return previewMessages.filter((msg) => msg.file_url && msg.file_url.trim() !== "");
+  }, [previewMessages]);
 
   return canViewPermission?.view_material ? (
     <div className="w-full flex flex-col gap-5 pb-8">
@@ -684,14 +693,113 @@ const MaterialsDashboard: IPage["Component"] = () => {
                         <div>Tồn hiện tại: {money(previewItem.quantity_on_hand || 0)}</div>
                       </div>
                     </div>
-                    <div className="border-t border-slate-100 pt-3 font-normal">
-                      <JobAsset
-                        taskId={previewItem.id}
-                        type="material"
-                        messages={previewMessages}
-                        title="Hình ảnh vật tư"
-                        instantSave={true}
-                      />
+
+                    {/* 3D Material Lab & Photos Viewer */}
+                    <div className="mt-4 rounded-2xl border border-slate-100 bg-[#03050c] p-3 shadow-sm">
+                      {/* Tab Header */}
+                      <div className="mb-3 flex items-center justify-between border-b border-white/5 pb-2">
+                        <div className="flex gap-2">
+                          <button
+                            type="button"
+                            onClick={() => setActiveViewerTab("3d")}
+                            className={`text-xs font-semibold px-3 py-1.5 rounded-lg transition-all duration-200 cursor-pointer ${
+                              activeViewerTab === "3d"
+                                ? "bg-teal-500 text-white shadow-lg shadow-teal-500/20"
+                                : "text-slate-400 hover:text-slate-200 hover:bg-white/5"
+                            }`}
+                          >
+                            🧊 Xem 3D
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setActiveViewerTab("photos")}
+                            className={`text-xs font-semibold px-3 py-1.5 rounded-lg transition-all duration-200 cursor-pointer ${
+                              activeViewerTab === "photos"
+                                ? "bg-teal-500 text-white shadow-lg shadow-teal-500/20"
+                                : "text-slate-400 hover:text-slate-200 hover:bg-white/5"
+                            }`}
+                          >
+                            🖼️ Ảnh thực tế ({materialImages.length})
+                          </button>
+                        </div>
+                      </div>
+
+                      {activeViewerTab === "3d" ? (
+                        <Suspense fallback={
+                          <div className="flex items-center justify-center aspect-square w-full rounded-xl bg-slate-900/50" style={{ maxWidth: 380 }}>
+                            <div className="text-xs text-slate-500 animate-pulse">Đang tải 3D viewer…</div>
+                          </div>
+                        }>
+                          <MaterialLab
+                            initialMaterialId={previewItem?.preview_material || "lumion_standard"}
+                            materialProps={previewItem}
+                            onSaveMaterial={async (materialId) => {
+                              if (!previewItem) return;
+                              try {
+                                await InventoryService.updateItem(previewItem.id, {
+                                  lead_id: userLeadId,
+                                  preview_material: materialId,
+                                } as any);
+                                notification.success({ message: "Đã cập nhật vật liệu 3D" });
+                                await refreshAll();
+                              } catch {
+                                notification.error({ message: "Không thể cập nhật vật liệu" });
+                              }
+                            }}
+                          />
+                        </Suspense>
+                      ) : (
+                        /* Photos Tab Content */
+                        <div className="aspect-square w-full rounded-xl bg-slate-900/20 p-2 overflow-y-auto" style={{ maxWidth: 380 }}>
+                          {materialImages.length === 0 ? (
+                            <div className="flex flex-col items-center justify-center h-full text-slate-500 text-xs gap-2 py-8">
+                              <span className="text-2xl">📷</span>
+                              <span className="text-slate-400">Không có ảnh thực tế nào.</span>
+                              <span className="text-[10px] text-slate-600 text-center px-4">Hãy bấm nút "Sửa" trên dòng vật tư để đăng tải hình ảnh.</span>
+                            </div>
+                          ) : (
+                            <div className="grid grid-cols-3 gap-2">
+                              {materialImages.map((asset, index) => {
+                                const staticBase = useApiStatic();
+                                const buildStaticUrl = (path?: string | null) => {
+                                  if (!path) return "";
+                                  if (path.startsWith("http://") || path.startsWith("https://") || path.startsWith("data:")) {
+                                    return path;
+                                  }
+                                  if (path.startsWith("/")) {
+                                    return path;
+                                  }
+                                  return `${staticBase}/${path}`;
+                                };
+                                
+                                const getOriginalImagePath = (path?: string | null) => {
+                                  if (!path) return "";
+                                  return path.startsWith("thumbs/thumb_")
+                                    ? path.replace("thumbs/thumb_", "")
+                                    : path;
+                                };
+
+                                const thumbSrc = buildStaticUrl(asset.thumb_url || asset.file_url);
+                                const fullSrc = buildStaticUrl(getOriginalImagePath(asset.file_url));
+
+                                return (
+                                  <div
+                                    key={asset.message_id || index}
+                                    onClick={() => setPhotoModalSrc(fullSrc)}
+                                    className="relative aspect-square rounded-lg overflow-hidden border border-white/5 cursor-zoom-in hover:border-teal-500/50 transition-colors bg-slate-950 group"
+                                  >
+                                    <img
+                                      src={thumbSrc}
+                                      alt="material"
+                                      className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                                    />
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          )}
+                        </div>
+                      )}
                     </div>
                   </div>
                 ) : (
@@ -725,8 +833,7 @@ const MaterialsDashboard: IPage["Component"] = () => {
                       return (
                         <React.Fragment key={item.id}>
                           <tr
-                            className={`border-b last:border-0 cursor-pointer hover:bg-slate-50/60 transition-colors group ${previewItem?.id === item.id ? "bg-teal-50/40" : ""
-                              }`}
+                            className={`border-b last:border-0 cursor-pointer hover:bg-slate-50/60 transition-colors group ${(previewItemId ? previewItemId === item.id : items[0]?.id === item.id) ? "bg-teal-50/40" : ""}`}
                             onClick={() => setPreviewItemId(item.id)}
                           >
                             {/* Expand chevron */}
@@ -1654,6 +1761,23 @@ const MaterialsDashboard: IPage["Component"] = () => {
             </div>
           </div>
         )}
+      </Modal>
+
+      {/* Modal view full photo */}
+      <Modal
+        open={Boolean(photoModalSrc)}
+        onCancel={() => setPhotoModalSrc(null)}
+        footer={null}
+        centered
+        width={800}
+      >
+        <div className="flex justify-center items-center bg-black/5 rounded-lg overflow-hidden">
+          <img
+            src={photoModalSrc || ""}
+            alt="material full"
+            className="max-w-full max-h-[80vh] object-contain block"
+          />
+        </div>
       </Modal>
     </div>
   ) : <UnPermissionBoard />;
