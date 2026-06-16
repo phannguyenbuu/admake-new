@@ -829,35 +829,39 @@ const MaterialsDashboard: IPage["Component"] = () => {
                       const itemSpecs: SpecRow[] = (item as any).spec_rows || [];
                       const defaultPrice = item.average_cost || item.standard_cost || 0;
                       const draft = itemSpecDraft[item.id] || emptySpecDraft();
+                      const isActive = (previewItemId ? previewItemId === item.id : items[0]?.id === item.id);
+                      const textPrimary = isActive ? "text-white" : "text-slate-700";
+                      const textSecondary = isActive ? "text-white/90" : "text-slate-600";
+                      const textMuted = isActive ? "text-white/70" : "text-slate-400";
 
                       return (
                         <React.Fragment key={item.id}>
                           <tr
-                            className={`border-b last:border-0 cursor-pointer hover:bg-slate-50/60 transition-colors group ${(previewItemId ? previewItemId === item.id : items[0]?.id === item.id) ? "bg-teal-50/40" : ""}`}
+                            className={`border-b last:border-0 cursor-pointer hover:bg-slate-50/60 transition-colors group ${isActive ? "bg-[#00bba7]" : ""}`}
                             onClick={() => setPreviewItemId(item.id)}
                           >
                             {/* Expand chevron */}
                             <td className="px-2 py-3 text-center" onClick={(e) => { e.stopPropagation(); toggleExpandItem(item.id); }}>
-                              <button className="text-slate-300 hover:text-teal-600 transition-colors">
+                              <button className={`transition-colors ${isActive ? "text-white/70 hover:text-white" : "text-slate-300 hover:text-teal-600"}`}>
                                 {isExpanded ? <ChevronDown size={13} /> : <ChevronRight size={13} />}
                               </button>
                             </td>
-                            <td className="px-3 py-3 font-medium text-slate-700">{item.code}</td>
-                            <td className="px-3 py-3 text-slate-700">
+                            <td className={`px-3 py-3 font-medium ${textPrimary}`}>{item.code}</td>
+                            <td className={`px-3 py-3 ${textPrimary}`}>
                               {item.category_name && (
-                                <div className="text-[10px] text-slate-400 font-medium uppercase tracking-wide mb-0.5">{item.category_name}</div>
+                                <div className={`text-[10px] font-medium uppercase tracking-wide mb-0.5 ${textMuted}`}>{item.category_name}</div>
                               )}
                               <div className="font-medium">{item.name}</div>
-                              {item.sku && <div className="text-xs text-slate-400">{item.sku}</div>}
+                              {item.sku && <div className={`text-xs ${textMuted}`}>{item.sku}</div>}
                             </td>
-                            <td className="px-3 py-3 text-slate-600">
+                            <td className={`px-3 py-3 ${textSecondary}`}>
                               <div>{item.default_warehouse_name || "-"}</div>
-                              <div className="text-xs text-slate-400">{money(item.quantity_on_hand || 0)} {item.unit}</div>
+                              <div className={`text-xs ${textMuted}`}>{money(item.quantity_on_hand || 0)} {item.unit}</div>
                             </td>
-                            <td className="px-3 py-3 text-slate-600 whitespace-nowrap">{money(item.average_cost || item.standard_cost)} đ</td>
-                            <td className="px-3 py-3 text-slate-600">
-                              <div className="text-slate-700">{money(item.inventory_value || 0)} đ</div>
-                              <div className="text-xs text-slate-400">min: {money(item.min_stock_level || 0)}</div>
+                            <td className={`px-3 py-3 whitespace-nowrap ${textSecondary}`}>{money(item.average_cost || item.standard_cost)} đ</td>
+                            <td className={`px-3 py-3 ${textSecondary}`}>
+                              <div className={textPrimary}>{money(item.inventory_value || 0)} đ</div>
+                              <div className={`text-xs ${textMuted}`}>min: {money(item.min_stock_level || 0)}</div>
                             </td>
                             <td className="px-3 py-3" onClick={(e) => e.stopPropagation()}>
                               {(() => {
@@ -885,10 +889,10 @@ const MaterialsDashboard: IPage["Component"] = () => {
                             </td>
                             <td className="px-3 py-3" onClick={(e) => e.stopPropagation()}>
                               <div className="flex items-center justify-center gap-1">
-                                <button title="Sửa" className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors" onClick={() => handleOpenEdit(item)}>
+                                <button title="Sửa" className={`p-1.5 rounded-lg transition-colors ${isActive ? "text-white/80 hover:text-white hover:bg-white/10" : "text-slate-400 hover:text-slate-600 hover:bg-slate-100"}`} onClick={() => handleOpenEdit(item)}>
                                   <Pencil size={14} />
                                 </button>
-                                <button title="Xoá / Ngừng dùng" className="p-1.5 rounded-lg hover:bg-rose-50 text-slate-400 hover:text-rose-500 transition-colors" onClick={() => toggleItemStatus(item)}>
+                                <button title="Xoá / Ngừng dùng" className={`p-1.5 rounded-lg transition-colors ${isActive ? "text-white/80 hover:text-rose-200 hover:bg-white/10" : "text-slate-400 hover:text-rose-500 hover:bg-rose-50"}`} onClick={() => toggleItemStatus(item)}>
                                   <Trash2 size={14} />
                                 </button>
                               </div>
