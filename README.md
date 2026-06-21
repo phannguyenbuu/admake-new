@@ -8,7 +8,7 @@ Tài liệu này cung cấp cái nhìn toàn diện về kiến trúc hệ thố
 *   **Repository Name:** `phannguyenbuu/admake-new`
 *   **Cấu trúc thư mục chính:**
     *   `frontend/`: Mã nguồn ứng dụng giao diện (React + Vite, TypeScript).
-    *   `backend/`: Mã nguồn ứng dụng API Server & Socket (Flask + Flask-SocketIO). *Lưu ý: Không dùng thư mục `main-be/` cũ.*
+    *   `backend/`: Mã nguồn ứng dụng API Server & Socket (Flask + Flask-SocketIO).
     *   `admake-landing-page/`: Mã nguồn trang giới thiệu/landing page của Admake.
     *   `admake.vn`: File cấu hình Nginx gốc của dự án.
 
@@ -93,12 +93,3 @@ Mỗi khi cập nhật code Python backend hoặc migrations database:
     ```
 
 ---
-
-## 5. Các Điểm Lưu Ý Đặc Biệt Về Nghiệp Vụ (Business Logic Rules)
-Để bàn giao cho đội kỹ thuật tiếp quản của khách hàng, cần lưu ý các quy tắc nghiệp vụ quan trọng đã được thống nhất:
-*   **Phân loại công nợ phải thu (AR Payment Types):**
-    *   `phat_sinh` (Phát sinh): Chỉ làm tăng giá trị công nợ phải thu của khách hàng, tuyệt đối không tự động tạo giao dịch trong quỹ tiền mặt (`daily_cash`) hay sổ nhật ký chung (`journal`).
-    *   `tam_ung` (Tạm ứng): Đây là luồng thu tiền mặt thực tế, hệ thống sẽ tự động liên kết tạo bản ghi vào `daily_cash` và `journal`.
-*   **Hồ sơ bảng lương (Payroll adjustments):** Lưu trữ tập trung tại bảng `payroll_adjustments` trên PostgreSQL database. Không sử dụng `localStorage` của trình duyệt làm nguồn lưu thông tin cấu hình lương tránh sai lệch dữ liệu.
-*   **Xóa danh mục kho (Inventory delete):** Chỉ cho phép xóa mặt hàng kho khi mặt hàng đó chưa phát sinh bất kỳ giao dịch kho nào (`stock transaction`). Nếu đã có giao dịch, Backend sẽ chặn và trả về mã lỗi nhằm bảo toàn lịch sử dữ liệu.
-*   **Xác thực API (Authorization Header):** Tất cả các lệnh gọi API tĩnh hoặc động từ Frontend đến các endpoint cần quyền hạn (ví dụ `/api/statistics/dashboard`) đều bắt buộc phải đính kèm Header `Authorization: Bearer ${token}`.
