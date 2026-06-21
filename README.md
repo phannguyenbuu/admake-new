@@ -1,140 +1,104 @@
-# Admake
+# TÀI LIỆU BÀN GIAO & TỔNG QUAN DỰ ÁN: ADMAKE
 
-Admake is the production repository for the internal operations platform used at `admake.vn`. The active stack in this repo is a React/Vite dashboard frontend and a Flask backend backed by PostgreSQL.
+Tài liệu này cung cấp cái nhìn toàn diện về kiến trúc hệ thống, mã nguồn, cách thức triển khai (Deployment) và vận hành hệ thống Admake trên môi trường Production (VPS, Domain, Nginx).
 
-## Production scope
+---
 
-- Frontend production source: `frontend/`
-- Backend production source: `backend/`
-- Database: PostgreSQL `admake_chat`
-- Reverse proxy: Nginx config at repo root and `nginx/`
-- Backend runtime: port `6000`, restarted in production with `pm2 restart admake-api`
+## 1. Thông Tin Mã Nguồn (Github Repository)
+*   **Repository Name:** `phannguyenbuu/admake-new`
+*   **Cấu trúc thư mục chính:**
+    *   `frontend/`: Mã nguồn ứng dụng giao diện (React + Vite, TypeScript).
+    *   `backend/`: Mã nguồn ứng dụng API Server & Socket (Flask + Flask-SocketIO). *Lưu ý: Không dùng thư mục `main-be/` cũ.*
+    *   `admake-landing-page/`: Mã nguồn trang giới thiệu/landing page của Admake.
+    *   `admake.vn`: File cấu hình Nginx gốc của dự án.
 
-## Repo layout
+---
 
-- `frontend/`: React 19 + Vite dashboard, multi-entry build
-- `backend/`: Flask API, Flask-SocketIO, SQLAlchemy models, migrations, tests
-- `nginx/`: Nginx site configs
-- `guidance/`: internal runbooks and domain notes
-- `editor/`: separate editor app
-- `admake-landing-page/`: public landing page project
-- `static/`: uploaded/static assets
+## 2. Kiến Trúc Hệ Thống & Môi Trường Vận Hành (Runtime Architecture)
 
-## Frontend
+### 2.1. Client-Side (Frontend)
+*   **Công nghệ:** React, Vite, TypeScript, TailwindCSS/Vanilla CSS.
+*   **Cơ chế Đa Trang (Multi-entry):** Giao diện được chia thành các phân hệ độc lập để tối ưu hiệu năng tải trang:
+    *   `dashboard.html`: Trang quản trị trung tâm (quản lý công việc, kế toán, nguyên vật liệu, thống kê).
+    *   `chat.html`: Phân hệ chat nội bộ & tương tác thời gian thực.
+    *   `point.html`: Phân hệ theo dõi chấm công và tính điểm công việc (Workpoints).
+    *   `login.html`: Phân hệ xác thực người dùng.
 
-The frontend is a multi-entry Vite app. Main HTML outputs:
+### 2.2. Server-Side (Backend)
+*   **Công nghệ:** Python, Flask Framework, Flask-SocketIO (cho tính năng cập nhật thời gian thực như Chat và Notification).
+*   **Database:** PostgreSQL. Cơ sở dữ liệu chính có tên là `admake_chat`.
+*   **Quản lý tiến trình (Process Manager):** Sử dụng **PM2** để chạy ngầm và tự động khởi động lại dịch vụ backend (tên tiến trình trên VPS: `admake-api`).
+*   **Cổng dịch vụ:** Backend chạy nội bộ tại port `6000` trên VPS và được Proxy qua Nginx.
 
-- `dashboard.html`
-- `chat.html`
-- `point.html`
-- `login.html`
+### 2.3. Reverse Proxy (Nginx) & Tên Miền
+*   **Domain chính:** `admake.vn`
+*   **Nginx Configuration:** File cấu hình Nginx điều hướng các request đi vào VPS như sau:
+    *   `/*` (Root): Phục vụ các file tĩnh của Frontend (React build) nằm tại thư mục `/var/www/admake`.
+    *   `/api/`: Điều hướng (Reverse Proxy) sang Backend (`http://127.0.0.1:6000/api/`).
+    *   `/socket.io/`: Điều hướng các kết nối WebSocket đến Backend (`http://127.0.0.1:6000/socket.io/`) nhằm đảm bảo tính năng thời gian thực.
+    *   `/static/`: Tài nguyên tĩnh do Flask Backend quản lý (ví dụ: file tải lên).
+    *   `/lead-manage/`: Quản trị thông tin khách hàng tiềm năng (Leads).
 
-Key source areas:
+---
 
-- `frontend/src/common/app/dashboard/accounting/`: accounting screens
-- `frontend/src/common/app/dashboard/materials/`: inventory and materials screens
-- `frontend/src/common/components/dashboard/work-tables/`: task board, task modal, workspace UI
-- `frontend/src/common/services/`: API client layer
+## 3. Hướng Dẫn Cài Đặt và Chạy Local (Local Development)
 
-Run locally:
-
-```powershell
+### 3.1. Chạy Frontend
+Yêu cầu đã cài đặt Node.js (phiên bản khuyến nghị >= 18).
+```bash
 cd frontend
 npm install
 npm run dev
 ```
 
-Build:
-
-```powershell
-cd frontend
-npm run build
-```
-
-## Backend
-
-The backend uses Flask, Flask-JWT-Extended, Flask-Login, Flask-SocketIO, SQLAlchemy, and PostgreSQL.
-
-Important files:
-
-- `backend/app.py`: app bootstrap and blueprint registration
-- `backend/models.py`: models and shared helpers
-- `backend/api/`: API modules
-- `backend/requirements.txt`: Python dependencies
-
-Run locally:
-
-```powershell
+### 3.2. Chạy Backend
+Yêu cầu đã cài đặt Python 3.10+ và PostgreSQL.
+```bash
 cd backend
 python -m venv .venv
-.\.venv\Scripts\activate
+# Trên Windows:
+.venv\Scripts\activate
+# Trên macOS/Linux:
+source .venv/bin/activate
+
 pip install -r requirements.txt
 python app.py
 ```
 
-Default production behavior:
+---
 
-- backend listens on `6000`
-- Nginx proxies `/api/`, `/static/`, `/lead-manage/`, `/socket.io/`
+## 4. Quy Trình Triển Khai Lên VPS (Deployment Guide)
 
-## Current product rules
+Hạ tầng hiện tại chạy trên VPS IP: `31.97.76.62`
 
-- AR payment types are intentionally split:
-  - `phat_sinh` only increases receivable value and must not create/link `daily_cash` or `journal`
-  - `tam_ung` is the real money collection flow and can link `daily_cash` plus `journal`
-- Payroll adjustments are persisted in backend table `payroll_adjustments`
-- User payroll profile currently includes `salary`, `allowance`, `bhyt`, `bhxh`
-- Materials page currently uses paging at `50` items per page
-- Inventory item `code` is editable via `PUT /api/inventory/items/:id`
-- Inventory item delete is allowed only when the item has no stock transaction
-- In `FormTask`, `Tai lieu & Binh luan` lives inside the `Thong tin` tab as a collapsible section
+### 4.1. Deploy Frontend (Static files)
+Mỗi khi có thay đổi ở Frontend, chạy lệnh build và upload folder `dist` lên thư mục gốc của Web server trên VPS:
+1.  **Build mã nguồn:**
+    ```bash
+    cd frontend
+    npm run build
+    ```
+2.  **Upload lên VPS:**
+    ```bash
+    # Upload đè các file build tĩnh vào thư mục Nginx static trên VPS
+    scp -r frontend/dist/* root@31.97.76.62:/var/www/admake
+    ```
 
-## Recent migrations
+### 4.2. Deploy Backend & Restart Service
+Mỗi khi cập nhật code Python backend hoặc migrations database:
+1.  Đẩy code mới lên VPS (thông qua Git pull hoặc các công cụ đồng bộ như SCP).
+2.  **Restart dịch vụ Backend:** SSH vào VPS và sử dụng PM2 để làm mới ứng dụng:
+    ```bash
+    pm2 restart admake-api
+    ```
 
-- `backend/migrations/20260407_user_payroll_fields.sql`
-- `backend/migrations/20260407_ar_phat_sinh_cleanup.sql`
-- `backend/migrations/20260407_payroll_adjustments.sql`
+---
 
-## Local checks
-
-Frontend:
-
-```powershell
-cd frontend
-npm run build
-```
-
-Backend tests commonly used in this repo:
-
-```powershell
-backend\.venv\Scripts\python.exe -m unittest \
-  backend.tests.test_accounting_erp_logic \
-  backend.tests.test_accounting_erp_simulation \
-  backend.tests.test_inventory_logic \
-  backend.tests.test_inventory_simulation \
-  backend.tests.test_inventory_item_crud \
-  backend.tests.test_workpoints_logic
-```
-
-## Deployment notes
-
-Build frontend and deploy static files:
-
-```powershell
-cd frontend
-npm run build
-scp -r dist/* root@31.97.76.62:/var/www/admake
-```
-
-Backend deployment notes:
-
-- sync changed backend files
-- run required migrations
-- restart with `pm2 restart admake-api`
-
-## Debugging rules
-
-- If the UI shows a 404 page after an in-app action, inspect the frontend console first. Router error boundaries can hide render errors.
-- For attendance/workpoint bugs, verify month handling in both frontend `WorkDays.tsx` and backend `backend/api/workpoints.py`.
-- When correctness is unclear, validate directly against PostgreSQL `admake_chat` before changing logic.
-- Production backend source is `backend/`, not `main-be/`.
+## 5. Các Điểm Lưu Ý Đặc Biệt Về Nghiệp Vụ (Business Logic Rules)
+Để bàn giao cho đội kỹ thuật tiếp quản của khách hàng, cần lưu ý các quy tắc nghiệp vụ quan trọng đã được thống nhất:
+*   **Phân loại công nợ phải thu (AR Payment Types):**
+    *   `phat_sinh` (Phát sinh): Chỉ làm tăng giá trị công nợ phải thu của khách hàng, tuyệt đối không tự động tạo giao dịch trong quỹ tiền mặt (`daily_cash`) hay sổ nhật ký chung (`journal`).
+    *   `tam_ung` (Tạm ứng): Đây là luồng thu tiền mặt thực tế, hệ thống sẽ tự động liên kết tạo bản ghi vào `daily_cash` và `journal`.
+*   **Hồ sơ bảng lương (Payroll adjustments):** Lưu trữ tập trung tại bảng `payroll_adjustments` trên PostgreSQL database. Không sử dụng `localStorage` của trình duyệt làm nguồn lưu thông tin cấu hình lương tránh sai lệch dữ liệu.
+*   **Xóa danh mục kho (Inventory delete):** Chỉ cho phép xóa mặt hàng kho khi mặt hàng đó chưa phát sinh bất kỳ giao dịch kho nào (`stock transaction`). Nếu đã có giao dịch, Backend sẽ chặn và trả về mã lỗi nhằm bảo toàn lịch sử dữ liệu.
+*   **Xác thực API (Authorization Header):** Tất cả các lệnh gọi API tĩnh hoặc động từ Frontend đến các endpoint cần quyền hạn (ví dụ `/api/statistics/dashboard`) đều bắt buộc phải đính kèm Header `Authorization: Bearer ${token}`.
