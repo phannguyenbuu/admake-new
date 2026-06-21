@@ -93,3 +93,86 @@ Mỗi khi cập nhật code Python backend hoặc migrations database:
     ```
 
 ---
+
+## 5. Các Điểm Lưu Ý Đặc Biệt Về Nghiệp Vụ (Business Logic Rules)
+Để bàn giao cho đội kỹ thuật tiếp quản của khách hàng, cần lưu ý các quy tắc nghiệp vụ quan trọng đã được thống nhất:
+*   **Phân loại công nợ phải thu (AR Payment Types):**
+    *   `phat_sinh` (Phát sinh): Chỉ làm tăng giá trị công nợ phải thu của khách hàng, tuyệt đối không tự động tạo giao dịch trong quỹ tiền mặt (`daily_cash`) hay sổ nhật ký chung (`journal`).
+    *   `tam_ung` (Tạm ứng): Đây là luồng thu tiền mặt thực tế, hệ thống sẽ tự động liên kết tạo bản ghi vào `daily_cash` và `journal`.
+*   **Hồ sơ bảng lương (Payroll adjustments):** Lưu trữ tập trung tại bảng `payroll_adjustments` trên PostgreSQL database. Không sử dụng `localStorage` của trình duyệt làm nguồn lưu thông tin cấu hình lương tránh sai lệch dữ liệu.
+*   **Xóa danh mục kho (Inventory delete):** Chỉ cho phép xóa mặt hàng kho khi mặt hàng đó chưa phát sinh bất kỳ giao dịch kho nào (`stock transaction`). Nếu đã có giao dịch, Backend sẽ chặn và trả về mã lỗi nhằm bảo toàn lịch sử dữ liệu.
+*   **Xác thực API (Authorization Header):** Tất cả các lệnh gọi API tĩnh hoặc động từ Frontend đến các endpoint cần quyền hạn (ví dụ `/api/statistics/dashboard`) đều bắt buộc phải đính kèm Header `Authorization: Bearer ${token}`.
+
+---
+
+## 6. Tổng Quan Kiến Trúc Nâng Cao (Classes, Components & Features)
+
+Phần này liệt kê chi tiết các thành phần cốt lõi của hệ thống, giúp các nhà phát triển dễ dàng tra cứu và nắm bắt cấu trúc mã nguồn cũng như ánh xạ tới các tính năng trên giao diện.
+
+### 6.1. Backend (Flask + SQLAlchemy)
+
+Backend sử dụng kiến trúc phân hệ (Blueprint) để quản lý các tính năng.
+
+**Các Database Models (Classes) chính (`backend/models.py`):**
+- **Nhân sự & Phân quyền:** `User`, `Role`, `UserCanView`
+- **Quản lý công việc (Workspaces & Tasks):** `Workspace`, `Task`, `Message`, `Notify`, `Workpoint`, `WorkpointSetting`, `Leave`
+- **Khách hàng & Thầu phụ:** `Customer`, `LeadPayload`
+- **Kế toán (Accounting ERP):** `ChartOfAccount`, `TaxCode`, `AccountingPeriod`, `JournalEntry`, `JournalEntryLine`, `ARInvoice`, `ARInvoicePayment`, `APBill`, `APBillPayment`, `PayrollAdjustment`, `AccountingDailyCash`, `AccountingDocument`, `AccountingRecord`, `AccountingLink`
+- **Tài sản cố định:** `FixedAsset`, `FixedAssetDepreciation`, `FixedAssetEvent`
+- **Kho & Vật tư (Inventory & Materials):** `Material`, `MaterialTransaction`, `Warehouse`, `ItemCategory`, `InventoryItem`, `StockAdjustmentReason`, `InventoryAccountMapping`, `InventoryBalance`, `StockTransaction`
+- **Trung tâm tài liệu:** `DocumentCenterDocument`, `DocumentCenterAttachment`, `DocumentCenterLink`, `DocumentCenterAuditLog`
+
+**Các API Modules (`backend/api/`):**
+Mỗi module xử lý logic routing, validation và tương tác CSDL cho từng phân hệ:
+- `auth.py`: Đăng nhập, phân quyền JWT.
+- `users.py`: Quản lý hồ sơ nhân viên.
+- `workpoints.py`: Logic chấm công và tính điểm.
+- `tasks.py`, `works.py`: Xử lý bảng công việc (Kanban), giao việc.
+- `accounting_erp.py`, `accounting.py`: Xử lý sổ cái, công nợ, chứng từ kế toán.
+- `inventory.py`, `materials.py`: Logic xuất/nhập/tồn kho và danh mục vật liệu.
+- `lead_manage.py`, `leads.py`: Quản lý khách hàng tiềm năng, phễu bán hàng.
+
+### 6.2. Frontend (React + Vite)
+
+Frontend được chia thành nhiều ứng dụng độc lập (`dashboard`, `chat`, `login`, `point`). Dưới đây là ánh xạ các tính năng chính trên Quản trị (Dashboard) theo menu/router (`frontend/src/dashboard/router.tsx`):
+
+- **`/` (Trang chủ / Bảng điều khiển):** Tổng quan hệ thống.
+- **`/workpoints` (Chấm công & Điểm công việc):**
+  - **Tính năng:** Quản lý chấm công hàng ngày, tính toán công thợ, xem bảng lương tổng hợp (`SalaryBoard`).
+  - **Components chính:** `WorkDays`, `FormTask`, `SalaryBoard`.
+- **`/users` (Quản lý nhân sự):**
+  - **Tính năng:** Quản lý hồ sơ nhân viên, phân quyền truy cập (`UserCanView`).
+  - **Components chính:** `FormUser`.
+- **`/supplier` (Quản lý thầu phụ):**
+  - **Tính năng:** Quản lý thông tin và theo dõi công nợ thầu phụ.
+- **`/customers` (Quản lý khách hàng):**
+  - **Tính năng:** Quản lý danh sách khách hàng định danh.
+  - **Components chính:** `FormCustomer`.
+- **`/lead-manage` (Quản lý Khách hàng tiềm năng / Leads):**
+  - **Tính năng:** Theo dõi quá trình tư vấn (phễu CRM), lên báo giá, chốt hợp đồng. Hỗ trợ tạo hợp đồng và theo dõi các khoản thanh toán tạm ứng ban đầu.
+- **`/work-tables` (Bảng công việc / Workspaces):**
+  - **Tính năng:** Quản lý dự án dạng bảng Kanban (tương tự Trello). Cho phép kéo thả công việc, giao việc, đính kèm tài liệu và thảo luận nội bộ.
+  - **Components chính:** `WorkspaceBoard`, `DragableTaskCard`, `FormTask`, `JobDescription`.
+- **`/statistics` (Phân tích):**
+  - **Tính năng:** Cung cấp biểu đồ thống kê doanh thu, chi phí, và báo cáo hiệu suất công việc.
+- **`/accounting` (Kế toán ERP):**
+  - **Tính năng:** Quản lý khoản phải thu (AR), khoản phải trả (AP). Quản lý quỹ tiền mặt, sổ nhật ký chung, bảng cân đối. Tích hợp chặt chẽ việc xử lý các loại thanh toán `phat_sinh` và `tam_ung`.
+  - **Components chính:** `AccountsReceivableTab`, `AccountsPayableTab`, `PayrollSummaryTab`, `ReportsTab`.
+- **`/materials` (Quản lý vật liệu & Kho):**
+  - **Tính năng:** Quản lý danh mục vật tư, tồn kho, các giao dịch xuất/nhập/điều chỉnh. Hỗ trợ cấu hình thuộc tính động (Specs) cho vật tư và phân hệ thử nghiệm vật liệu 3D (`MaterialLab`).
+  - **Components chính:** `MaterialSphereViewer`, `FormMaterial`, `ThreeCanvas` (cho không gian 3D).
+- **`/invoices` (Báo giá):**
+  - **Tính năng:** Tạo và theo dõi các báo giá gửi khách hàng.
+- **`/infor` (Hồ sơ cá nhân):**
+  - **Tính năng:** Xem và chỉnh sửa thông tin cá nhân của user đang đăng nhập.
+
+### 6.3. Landing Page (`admake-landing-page/`)
+
+Trang web giới thiệu (Front-facing website) dành cho khách hàng bên ngoài.
+- **Tính năng:**
+  - Giới thiệu dịch vụ của Admake.
+  - Cung cấp form liên hệ để thu thập thông tin khách hàng tiềm năng (Leads), đẩy dữ liệu về hệ thống Backend.
+  - Tích hợp bảng giá dịch vụ tương tác.
+- **Thành phần cấu trúc:**
+  - `index.html`: Giao diện chính (Static/HTML).
+  - Thư mục `pricing/`: Một ứng dụng React nhỏ (Mini React App) nhúng vào landing page để hiển thị bảng giá tương tác phức tạp.
