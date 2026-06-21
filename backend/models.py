@@ -508,6 +508,7 @@ class Task(BaseModel):
     rate = db.Column(db.Integer)
     reward = db.Column(db.Integer)
     amount = db.Column(db.Integer)
+    prepayment = db.Column(db.Integer, default=0)
     salary_type = db.Column(db.String(10))
     assign_ids = db.Column(db.JSON)  # lưu JSON string của list ObjectId
     workspace_id = db.Column(db.String(50))
@@ -599,6 +600,7 @@ class Task(BaseModel):
             end_time=data.get("end_time", None),
             start_time=data.get("start_time", None),
             amount = data.get("amount"),
+            prepayment = data.get("prepayment"),
             salary_type = data.get("salary_type", ''),
             assets = assets,
             icon = icon_value
@@ -939,6 +941,7 @@ class ARInvoice(BaseModel):
 
     id = db.Column(db.String(50), primary_key=True)
     lead_id = db.Column(db.Integer, db.ForeignKey("lead.id"), nullable=False)
+    task_id = db.Column(db.String(50), db.ForeignKey("task.id"), nullable=True)
     code = db.Column(db.String(80), nullable=False)
     customer_id = db.Column(db.String(80), nullable=True)
     customer_name = db.Column(db.String(255), nullable=False)
@@ -962,6 +965,7 @@ class ARInvoice(BaseModel):
     updated_by = db.Column(db.String(50), nullable=True)
 
     lead = db.relationship("LeadPayload", backref="ar_invoices")
+    task = db.relationship("Task", backref="ar_invoices")
     document = db.relationship("DocumentCenterDocument", backref="ar_invoices")
     tax_code = db.relationship("TaxCode", backref="ar_invoices")
     journal_entry = db.relationship("JournalEntry", foreign_keys=[journal_entry_id])
@@ -1398,6 +1402,22 @@ class InventoryItem(BaseModel):
     note = db.Column(db.Text, nullable=True)
     created_by = db.Column(db.String(50), nullable=True)
     updated_by = db.Column(db.String(50), nullable=True)
+    spec_rows = db.Column(db.JSON, nullable=False, default=[])
+    preview_material = db.Column(db.String(80), nullable=True, default="lumion_standard")
+    
+    # 3D Material properties
+    diffuse = db.Column(db.String(50), nullable=True, default="#ffffff")
+    reflection = db.Column(db.Float, default=0.0)
+    glossy = db.Column(db.Float, default=0.0)
+    refraction = db.Column(db.Float, default=1.0)
+    transparent = db.Column(db.Boolean, default=False)
+    bump = db.Column(db.Boolean, default=False)
+    displacement = db.Column(db.Boolean, default=False)
+    metalness = db.Column(db.Float, default=0.0)
+    roughness = db.Column(db.Float, default=1.0)
+    emissive = db.Column(db.String(50), nullable=True, default="#000000")
+    emissive_intensity = db.Column(db.Float, default=0.0)
+    opacity = db.Column(db.Float, default=1.0)
 
     lead = db.relationship("LeadPayload", backref="inventory_items")
     category = db.relationship("ItemCategory", backref="items")
@@ -1908,6 +1928,26 @@ class LeadPayload(BaseModel):
     isInvited = db.Column(db.Boolean, default = False)
     isActivated = db.Column(db.Boolean, default = False)
 
+    # Contract info fields
+    tax_code = db.Column(db.String(50))
+    legal_rep = db.Column(db.String(255))
+    legal_rep_position = db.Column(db.String(100))
+    invoice_email = db.Column(db.String(255))
+    promo_code = db.Column(db.String(50))
+
+    # Plan selection
+    selected_plan = db.Column(db.String(50))
+    selected_billing = db.Column(db.String(10))
+    contract_amount = db.Column(db.Integer)
+
+    # Contract status tracking
+    contract_status = db.Column(db.String(20))
+    contract_submitted_at = db.Column(db.DateTime)
+    payment_confirmed_at = db.Column(db.DateTime)
+
+    # Trial tracking
+    trial_started_at = db.Column(db.DateTime)
+
     column_open_name = db.Column(db.String(255), default="Đơn hàng")
     column_in_progress_name = db.Column(db.String(255), default="Phân việc")
     column_done_name = db.Column(db.String(255), default="Thực hiện")
@@ -1979,7 +2019,7 @@ def create_workspace_method(data, has_owner = True):
 
     if has_owner:
         user_fields = get_model_columns(User)
-        user_data = {k: v for k, v in data.items() if k in user_fields}
+        user_data = {k: v for k, v in data.items() if k in user_fields and k != 'lead_id'}
 
         new_user = User(
             id=generate_datetime_id(),   # ✅ bắt buộc gán id string

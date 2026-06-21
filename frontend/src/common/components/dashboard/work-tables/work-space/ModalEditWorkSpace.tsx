@@ -11,6 +11,8 @@ import { EditOutlined } from "@ant-design/icons";
 import { useUpdateWorkSpace } from "../../../../common/hooks/work-space.hook";
 import { useCallback } from "react";
 import { useApiHost } from "../../../../common/hooks/useApiHost";
+import { TOKEN_LABEL } from "../../../../common/config";
+import { useUser } from "../../../../common/hooks/useUser";
 
 const { Title, Text } = Typography;
 
@@ -31,13 +33,20 @@ export default function ModalEditWorkSpace({
 }: ModalEditWorkSpaceProps) {
   const { mutate: updateWorkSpace, isPending: isUpdating } =
     useUpdateWorkSpace();
+  const { setWorkspaces } = useUser();
 
   // Hàm xử lý update workspace
   const handleUpdate = (values: any) => {
     // console.log('TaskID', workspaceId);
+    const token = localStorage.getItem(TOKEN_LABEL) || sessionStorage.getItem(TOKEN_LABEL);
+    const headers: HeadersInit = { "Content-Type": "application/json" };
+    if (token) {
+      headers["Authorization"] = `Bearer ${token}`;
+    }
+
     fetch(`${useApiHost()}/workspace/${workspaceId}`, {
       method: "PUT",
-      headers: { "Content-Type": "application/json" },
+      headers,
       body: JSON.stringify({ name: values.name }),
     })
       .then((response) => {
@@ -46,6 +55,9 @@ export default function ModalEditWorkSpace({
       })
       .then(() => {
         message.success("Cập nhật workspace thành công!");
+        setWorkspaces((prev) =>
+          prev.map((w) => (w.id === workspaceId ? { ...w, name: values.name } : w))
+        );
         closeEditModal();
         editForm.resetFields();
         onSuccess?.();

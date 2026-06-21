@@ -9,6 +9,7 @@ import { useUser } from '../../../common/hooks/useUser';
 import { useApiHost } from '../../../common/hooks/useApiHost';
 import type { Task } from '../../../@types/work-space.type';
 import JobAsset from '../../../components/dashboard/work-tables/task/JobAsset';
+import AdvanceSalaryAsset from '../../../components/dashboard/work-tables/task/AdvanceSalaryAsset';
 import { useTaskContext } from '../../../common/hooks/useTask';
 import dayjs from 'dayjs';
 import { number } from 'framer-motion';
@@ -25,7 +26,7 @@ interface SalaryBoardProps {
 
 function toVNISOString(dt: string, h: number): string {
   const clone = new Date(dt); // clone đối tượng Date
-  clone.setHours(h + 7, 0, 0, 0); // chỉnh sửa giờ trên bản clone
+  clone.setHours(h, 0, 0, 0); // chỉnh sửa giờ trên bản clone (local hour)
   return clone.toString();
 }
 
@@ -111,6 +112,165 @@ const SalaryBoard: React.FC<SalaryBoardProps> = ({
   const [lateMinutes, setLateMinutes] = useState<number>(0);
   const [earlyMinutes, setEarlyMinutes] = useState<number>(0);
 
+  const [diligenceInput, setDiligenceInput] = useState<number>(0);
+  const [adjustments, setAdjustments] = useState<any[]>([]);
+  const [payrollRow, setPayrollRow] = useState<any>(null);
+
+  const { userLeadId } = useUser();
+
+  const fetchAdjustments = async () => {
+    if (!selectedRecord?.user_id || !userLeadId) return;
+    const token = localStorage.getItem(TOKEN_LABEL) || sessionStorage.getItem(TOKEN_LABEL) || "";
+    const authHeaders: HeadersInit = token ? { Authorization: `Bearer ${token}` } : {};
+
+    try {
+      const response = await fetch(`${useApiHost()}/workpoint/payroll-adjustments?lead=${userLeadId}&user_id=${selectedRecord.user_id}&month=${month}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          ...authHeaders
+        }
+      });
+      if (response.ok) {
+        const data = await response.json();
+        const rows = data.rows || [];
+        setAdjustments(rows);
+        const diligence = rows.find((r: any) => r.adjustment_type === "bonus" && r.note === "Thưởng chuyên cần");
+        if (diligence) {
+          setDiligenceInput(diligence.amount || 0);
+        } else {
+          setDiligenceInput(0);
+        }
+      }
+    } catch (e) {
+      console.error("Fetch adjustments error:", e);
+    }
+  };
+
+  const reloadAdvanceData = async () => {
+    await fetchAdjustments();
+    await fetchPayroll();
+    
+    if (!modalVisible || !selectedRecord?.user_id) return;
+    const token = localStorage.getItem(TOKEN_LABEL) || sessionStorage.getItem(TOKEN_LABEL) || "";
+    const authHeaders: HeadersInit = token ? { Authorization: `Bearer ${token}` } : {};
+
+    try {
+      const url = taskDetail
+        ? `${useApiHost()}/task/${selectedRecord.user_id}/salary?month=${month}`
+        : `${useApiHost()}/workpoint/${selectedRecord.user_id}/salary?month=${month}`;
+      const response = await fetch(url, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          ...authHeaders
+        }
+      });
+      if (response.ok) {
+        const data = await response.json();
+        if (taskDetail) {
+          setTaskDetail(data.infor);
+          setRateTasks(data.rates);
+        }
+        setDataMessages(data.messages || []);
+      }
+    } catch (error) {
+      console.error("Reload advance data error:", error);
+    }
+  };
+
+  const fetchPayroll = async () => {
+    if (!selectedRecord?.user_id || !userLeadId) return;
+    const token = localStorage.getItem(TOKEN_LABEL) || sessionStorage.getItem(TOKEN_LABEL) || "";
+    const authHeaders: HeadersInit = token ? { Authorization: `Bearer ${token}` } : {};
+
+    try {
+      const response = await fetch(`${useApiHost()}/workpoint/payroll-summary?lead=${userLeadId}&month=${month}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          ...authHeaders
+        }
+      });
+      if (response.ok) {
+        const data = await response.json();
+        const rows = data.rows || [];
+        const found = rows.find((r: any) => r.user_id === selectedRecord.user_id);
+        if (found) {
+          setPayrollRow(found);
+        }
+      }
+    } catch (error) {
+      console.error("Fetch payroll error:", error);
+    }
+  };
+
+  const handleSaveDiligence = async () => {
+    if (!selectedRecord?.user_id || !userLeadId) return;
+    const token = localStorage.getItem(TOKEN_LABEL) || sessionStorage.getItem(TOKEN_LABEL) || "";
+    const authHeaders: HeadersInit = token ? { Authorization: `Bearer ${token}` } : {};
+
+    const diligenceAdj = adjustments.find((adj: any) => adj.adjustment_type === "bonus" && adj.note === "Thưởng chuyên cần");
+
+    try {
+      if (diligenceInput === 0) {
+        if (diligenceAdj) {
+          const deleteRes = await fetch(`${useApiHost()}/workpoint/payroll-adjustments/${diligenceAdj.id}`, {
+            method: "DELETE",
+            headers: authHeaders
+          });
+          if (deleteRes.ok) {
+            notification.success({ message: "Đã xoá thưởng chuyên cần" });
+          }
+        }
+      } else {
+        if (diligenceAdj) {
+          const updateRes = await fetch(`${useApiHost()}/workpoint/payroll-adjustments/${diligenceAdj.id}`, {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+              ...authHeaders
+            },
+            body: JSON.stringify({ amount: diligenceInput })
+          });
+          if (updateRes.ok) {
+            notification.success({ message: "Đã cập nhật thưởng chuyên cần" });
+          }
+        } else {
+          const createRes = await fetch(`${useApiHost()}/workpoint/payroll-adjustments`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              ...authHeaders
+            },
+            body: JSON.stringify({
+              lead_id: userLeadId,
+              user_id: selectedRecord.user_id,
+              type: "bonus",
+              note: "Thưởng chuyên cần",
+              amount: diligenceInput,
+              entry_date: `${month}-01`
+            })
+          });
+          if (createRes.ok) {
+            notification.success({ message: "Đã thêm thưởng chuyên cần" });
+          }
+        }
+      }
+      await fetchAdjustments();
+      await fetchPayroll();
+    } catch (e) {
+      console.error(e);
+      notification.error({ message: "Lỗi lưu thưởng chuyên cần" });
+    }
+  };
+
+  useEffect(() => {
+    if (modalVisible) {
+      fetchAdjustments();
+      fetchPayroll();
+    }
+  }, [selectedRecord, modalVisible, month, userLeadId]);
 
   const selectedDate = dayjs(month, "YYYY-MM");
   const selectedYear = selectedDate.year();
@@ -311,6 +471,11 @@ const SalaryBoard: React.FC<SalaryBoardProps> = ({
 
       let t = 0, over_t = 0, p = 0, late = 0, early = 0;
 
+      const morningInHour = workpointSetting?.morning_in_hour ?? 7;
+      const morningInMin = workpointSetting?.morning_in_minute ?? 30;
+      const noonInHour = workpointSetting?.noon_in_hour ?? 13;
+      const noonInMin = workpointSetting?.noon_in_minute ?? 30;
+
       // Tính trên monthItems
       monthItems.forEach(item => {
         const checklist = item.checklist;
@@ -326,12 +491,26 @@ const SalaryBoard: React.FC<SalaryBoardProps> = ({
         if (checklist.morning?.in) {
           t += checkWorkhour(checklist.morning, 12);
           p += checkWorkPeriod(checklist.morning);
+
+          const inTime = dayjs(checklist.morning.in.time).local();
+          const configTime = inTime.hour(morningInHour).minute(morningInMin).second(0).millisecond(0);
+          const diff = inTime.diff(configTime, 'minute');
+          if (diff > 0) {
+            late += diff;
+          }
         }
         
         // Noon
         if (checklist.noon?.in) {
           t += checkWorkhour(checklist.noon, 17);
           p += checkWorkPeriod(checklist.noon);
+
+          const inTime = dayjs(checklist.noon.in.time).local();
+          const configTime = inTime.hour(noonInHour).minute(noonInMin).second(0).millisecond(0);
+          const diff = inTime.diff(configTime, 'minute');
+          if (diff > 0) {
+            late += diff;
+          }
         }
         
         // Evening (overtime)
@@ -357,9 +536,15 @@ const SalaryBoard: React.FC<SalaryBoardProps> = ({
 
 
     const highlightRow = {fontStyle:"italic", color:'red'};
-    const tabStyle = {fontSize: 10, minWidth: 70, maxWidth: 70, 
-      paddingLeft: isMobile ? 0: 50,paddingRight: isMobile ? 0: 50,
-      whiteSpace:isMobile?'wrap':'nowrap', borderLeft: '1px solid #666'};
+    const tabStyle = {
+      fontSize: isMobile ? 10 : 11, 
+      fontWeight: 600,
+      minWidth: isMobile ? 65 : 90, 
+      paddingLeft: isMobile ? 2 : 12,
+      paddingRight: isMobile ? 2 : 12,
+      whiteSpace: 'nowrap' as const, 
+      borderLeft: '1px solid #e2e8f0'
+    };
 
     return (
       <Modal
@@ -396,7 +581,9 @@ const SalaryBoard: React.FC<SalaryBoardProps> = ({
               </Typography>
 
               <Typography sx={{ textTransform: "uppercase", color: "#fff"}}>{selectedRecord?.username.toUpperCase()}</Typography>
-              {/* <Typography style={{ fontWeight: 300, fontSize: 12, fontStyle: "italic" }}>{selectedRecord?.userrole}</Typography> */}
+              <Typography style={{ fontWeight: 500, fontSize: 11, color: "#eee", marginTop: 2 }}>
+                Lương cơ bản: {formatMoney(selectedRecord?.salary || 0)} ₫
+              </Typography>
             </Box>
             
             <Tabs
@@ -411,6 +598,7 @@ const SalaryBoard: React.FC<SalaryBoardProps> = ({
               <Tab style={tabStyle} label="Thưởng Phạt" id="nav-tab-1" aria-controls="nav-tabpanel-1" />
               <Tab style={tabStyle} label="Chuyên Cần" id="nav-tab-2" aria-controls="nav-tabpanel-2" />
               <Tab style={tabStyle} label="Ứng Tiền" id="nav-tab-3" aria-controls="nav-tabpanel-3" />
+              <Tab style={tabStyle} label="Phiếu Lương" id="nav-tab-4" aria-controls="nav-tabpanel-4" />
             </Tabs>
 
           <TabPanel value={tabIndex} index={0}>
@@ -548,31 +736,56 @@ const SalaryBoard: React.FC<SalaryBoardProps> = ({
             <Table style={{ padding: 0 }}>
               <TableBody>
                 <TableRow>
-                  <TableCell style={{ fontWeight: 700 }}>Nội dung</TableCell>
-                  <TableCell style={{ fontWeight: 700 }}>Giá trị</TableCell>
+                  <TableCell style={{ fontWeight: 700, width: "50%" }}>Nội dung</TableCell>
+                  <TableCell style={{ fontWeight: 700, width: "50%" }}>Giá trị</TableCell>
                 </TableRow>
                 
                 <TableRow>
                   <TableCell>Số phút đi trễ</TableCell>
-                  <TableCell>{lateMinutes}</TableCell>
+                  <TableCell className="font-semibold text-rose-600">{lateMinutes} phút</TableCell>
                 </TableRow>
 
-                {rateTasks && rateTasks.length === 5 &&
-                rateTasks.map((val, idx) => 
                 <TableRow>
-                  <TableCell>Số việc chấm {idx + 1} sao</TableCell>
-                  <TableCell>{val}</TableCell>
-                </TableRow>)
-                }
-                
-                {/* {rewardList.map((el: any, idx: number) => (
-                  <TableRow key={idx}>
-                    <TableCell style={highlightRow}>+ {el.workspace}</TableCell>
-                    <TableCell style={highlightRow}>({el.title})</TableCell>
-                    <TableCell style={highlightRow}>-</TableCell>
-                    <TableCell style={highlightRow}>{formatMoney(el.reward)} ₫</TableCell>
-                  </TableRow>
-                ))} */}
+                  <TableCell>
+                    <div>Đủ 26 công (Đã làm: {(periodWork / 2).toFixed(1)} ngày)</div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex flex-col gap-2">
+                      <span className={`font-semibold ${periodWork / 2 >= 26 ? "text-teal-600" : "text-amber-600"}`}>
+                        {periodWork / 2 >= 26 ? "Đủ 26 công" : "Chưa đủ"}
+                      </span>
+                      <div className="flex items-center gap-1.5 mt-1">
+                        <input
+                          type="number"
+                          min="0"
+                          value={diligenceInput || ""}
+                          onChange={(e) => setDiligenceInput(e.target.value ? Number(e.target.value) : 0)}
+                          placeholder="Tiền thưởng..."
+                          className="w-28 border border-slate-200 rounded-lg px-2 py-1 text-xs outline-none"
+                          disabled={!isAdmin}
+                        />
+                        {isAdmin && (
+                          <button
+                            onClick={handleSaveDiligence}
+                            className="bg-teal-500 hover:bg-teal-600 text-white rounded-lg px-2.5 py-1 text-[10px] font-semibold transition-colors"
+                          >
+                            Lưu
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  </TableCell>
+                </TableRow>
+
+                <TableRow>
+                  <TableCell>Tổng số giờ làm</TableCell>
+                  <TableCell className="font-semibold">{timeWork.toFixed(2)} giờ</TableCell>
+                </TableRow>
+
+                <TableRow>
+                  <TableCell>Số giờ tăng ca</TableCell>
+                  <TableCell className="font-semibold text-teal-600">{overTimeWork.toFixed(2)} giờ</TableCell>
+                </TableRow>
                 
               </TableBody>
             </Table>
@@ -580,13 +793,137 @@ const SalaryBoard: React.FC<SalaryBoardProps> = ({
       </TabPanel>
       <TabPanel value={tabIndex} index={3}>
         
-        <JobAsset key="cash-assets" 
+        <AdvanceSalaryAsset key="cash-assets" 
           targetUserId = {selectedRecord?.user_id}
           messages={dataMessages.filter(el => el.type === "advance-salary-cash")}
           title = 'Ứng tiền cho nhân viên' 
           type="advance-salary-cash" 
           readOnly={!isAdmin}
+          reloadAll={reloadAdvanceData}
         />
+      </TabPanel>
+      <TabPanel value={tabIndex} index={4}>
+        {payrollRow ? (
+          <div className="flex-1 overflow-y-auto max-w-3xl bg-white">
+            {/* Info header */}
+            <div className="text-xs text-slate-700 space-y-0.5 mb-3 font-medium">
+              <div className="text-sm font-bold text-slate-800">PHIẾU LƯƠNG THÁNG {selectedDate.format("MM/YYYY")}</div>
+              <div>TÊN NHÂN VIÊN: <span className="font-bold">{payrollRow.full_name?.toUpperCase()}</span></div>
+              <div>VỊ TRÍ: <span className="font-semibold">{(payrollRow.department || "").toUpperCase()}</span></div>
+              <div>NGÀY {dayjs(month + "-01").endOf('month').format("DD/MM/YYYY")}</div>
+              <div>SỐ TÀI KHOẢN: <span className="font-semibold">{payrollRow.bank_account || "—"}</span></div>
+            </div>
+
+            {/* Payslip table */}
+            <table className="w-full text-xs border-collapse">
+              <thead>
+                <tr>
+                  {["MỤC LỤC", "NỘI DUNG", "THÀNH TIỀN"].map((h) => (
+                    <th key={h} className="border border-slate-300 px-2 py-1.5 text-left bg-blue-200 font-bold text-slate-800">{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {/* Lương căn bản */}
+                <tr className="font-semibold">
+                  <td className="border border-slate-300 px-2 py-1.5 whitespace-nowrap">
+                    Lương căn bản {payrollRow.period_work || 0} CÔNG &nbsp;
+                    <span className="text-slate-600">{formatMoney(payrollRow.salary_base)} Đ</span>
+                  </td>
+                  <td className="border border-slate-300 px-2 py-1.5 whitespace-nowrap">LÀM ĐƯỢC {payrollRow.period_work || 0} CÔNG</td>
+                  <td className="border border-slate-300 px-2 py-1.5 text-right font-bold whitespace-nowrap">
+                    {payrollRow.salary_base_total > 0 ? formatMoney(payrollRow.salary_base_total) : ""}
+                  </td>
+                </tr>
+                {/* Rows tĩnh */}
+                {[
+                  { label: "Lương Hiệu Suất", content: "", amount: 0 },
+                  { label: "Thâm niên", content: "Theo chế độ", amount: 0 },
+                  {
+                    label: "Tăng ca",
+                    content: payrollRow.overtime_hours ? `${payrollRow.overtime_hours} Giờ` : "Giờ",
+                    amount: payrollRow.salary_overtime_total,
+                  },
+                  { label: "Hoa Hồng", content: "", amount: 0 },
+                ].map(({ label, content, amount }) => (
+                  <tr key={label}>
+                    <td className="border border-slate-300 px-2 py-1.5 whitespace-nowrap">{label}</td>
+                    <td className="border border-slate-300 px-2 py-1.5 whitespace-nowrap">{content}</td>
+                    <td className="border border-slate-300 px-2 py-1.5 text-right font-semibold whitespace-nowrap">
+                      {amount > 0 ? formatMoney(amount) : ""}
+                    </td>
+                  </tr>
+                ))}
+                {/* Phụ cấp */}
+                <tr>
+                  <td className="border border-slate-300 px-2 py-1.5">Phụ cấp (+)</td>
+                  <td className="border border-slate-300 px-2 py-1.5 text-sky-600">
+                    {(payrollRow.allowance ?? 0) > 0 ? `+${formatMoney(payrollRow.allowance!)} đ` : <span className="text-slate-300 italic text-[10px]">chưa có</span>}
+                  </td>
+                  <td className="border border-slate-300 px-2 py-1.5 text-right font-semibold text-sky-600">
+                    {(payrollRow.allowance ?? 0) > 0 ? formatMoney(payrollRow.allowance!) : ""}
+                  </td>
+                </tr>
+                {/* BHYT */}
+                <tr>
+                  <td className="border border-slate-300 px-2 py-1.5">BHYT (trừ)</td>
+                  <td className="border border-slate-300 px-2 py-1.5 text-rose-500">
+                    {(payrollRow.bhyt ?? 0) > 0 ? `-${formatMoney(payrollRow.bhyt!)} đ` : <span className="text-slate-300 italic text-[10px]">chưa có</span>}
+                  </td>
+                  <td className="border border-slate-300 px-2 py-1.5 text-right font-semibold text-rose-500">
+                    {(payrollRow.bhyt ?? 0) > 0 ? `-${formatMoney(payrollRow.bhyt!)}` : ""}
+                  </td>
+                </tr>
+                {/* BHXH */}
+                <tr>
+                  <td className="border border-slate-300 px-2 py-1.5">BHXH (trừ)</td>
+                  <td className="border border-slate-300 px-2 py-1.5 text-rose-500">
+                    {(payrollRow.bhxh ?? 0) > 0 ? `-${formatMoney(payrollRow.bhxh!)} đ` : <span className="text-slate-300 italic text-[10px]">chưa có</span>}
+                  </td>
+                  <td className="border border-slate-300 px-2 py-1.5 text-right font-semibold text-rose-500">
+                    {(payrollRow.bhxh ?? 0) > 0 ? `-${formatMoney(payrollRow.bhxh!)}` : ""}
+                  </td>
+                </tr>
+                {/* Thưởng phạt */}
+                <tr>
+                  <td className="border border-slate-300 px-2 py-1.5">Tổng Thưởng (+)</td>
+                  <td className="border border-slate-300 px-2 py-1.5 text-green-600">
+                    {(payrollRow.bonus_total ?? 0) > 0 ? `+${formatMoney(payrollRow.bonus_total!)} đ` : ""}
+                  </td>
+                  <td className="border border-slate-300 px-2 py-1.5 text-right font-semibold text-green-600">
+                    {(payrollRow.bonus_total ?? 0) > 0 ? formatMoney(payrollRow.bonus_total!) : ""}
+                  </td>
+                </tr>
+                <tr>
+                  <td className="border border-slate-300 px-2 py-1.5">Tổng Phạt (-)</td>
+                  <td className="border border-slate-300 px-2 py-1.5 text-rose-600">
+                    {(payrollRow.punish_total ?? 0) < 0 ? `${formatMoney(payrollRow.punish_total!)} đ` : ""}
+                  </td>
+                  <td className="border border-slate-300 px-2 py-1.5 text-right font-semibold text-rose-600">
+                    {(payrollRow.punish_total ?? 0) < 0 ? formatMoney(payrollRow.punish_total!) : ""}
+                  </td>
+                </tr>
+                {/* Tạm ứng */}
+                <tr className="bg-yellow-50">
+                  <td className="border border-slate-300 px-2 py-1.5">Tạm ứng</td>
+                  <td className="border border-slate-300 px-2 py-1.5"></td>
+                  <td className="border border-slate-300 px-2 py-1.5 text-right font-semibold text-amber-700">
+                    {payrollRow.advance_total > 0 ? formatMoney(payrollRow.advance_total) : ""}
+                  </td>
+                </tr>
+                {/* Thực nhận */}
+                <tr className="bg-slate-100 font-bold">
+                  <td colSpan={2} className="border border-slate-300 px-2 py-2 text-slate-800">Thực nhận</td>
+                  <td className="border border-slate-300 px-2 py-2 text-right text-red-600 text-sm">
+                    {formatMoney(payrollRow.net_salary)} đ
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <div className="text-slate-400 italic text-sm p-4">Đang tải phiếu lương...</div>
+        )}
       </TabPanel>
     </Box>
 
@@ -618,7 +955,7 @@ function TabPanel(props: TabPanelProps) {
       aria-labelledby={`nav-tab-${index}`}
       {...other}
     >
-      {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
+      {value === index && <Box sx={{ p: index === 4 ? 0 : 3 }}>{children}</Box>}
     </div>
   );
 }

@@ -10,19 +10,13 @@ import { useApiHost } from "../../../../common/hooks/useApiHost";
 import { Tabs } from 'antd';
 import { useUser } from "../../../../common/hooks/useUser";
 import MaterialsTab from "./MaterialsTab";
+import RichTextEditor from "./RichTextEditor";
 
 const { Text } = Typography;
-const { TextArea } = Input;
-
-// interface TaskDetailType {
-//   description?: string;
-// }
 
 interface JobDescriptionProps {
-  // taskDetail: Task | null;
   form: any;
   onPasteImage?: (file: File) => Promise<void>;
-  // salaryType: string;
 }
 
 const JobDescription: React.FC<JobDescriptionProps> = ({ form, onPasteImage }) => {
@@ -40,23 +34,6 @@ const JobDescription: React.FC<JobDescriptionProps> = ({ form, onPasteImage }) =
     });
   }, [taskDetail?.id, taskDetail?.description, form]);
 
-  const handlePaste = async (event: React.ClipboardEvent<HTMLTextAreaElement>) => {
-    if (!onPasteImage) return;
-
-    const items = event.clipboardData?.items;
-    if (!items) return;
-
-    for (const item of Array.from(items)) {
-      if (!item.type.startsWith("image/")) continue;
-
-      const file = item.getAsFile();
-      if (!file) continue;
-
-      event.preventDefault();
-      await onPasteImage(file);
-    }
-  };
-
   return (
     <Stack className="flex-1 w-full h-full flex flex-col" sx={{
       width: '100%',
@@ -67,7 +44,6 @@ const JobDescription: React.FC<JobDescriptionProps> = ({ form, onPasteImage }) =
       '& .ant-form-item-control': { flex: 1, display: 'flex', flexDirection: 'column', height: '100%', width: '100%' },
       '& .ant-form-item-control-input': { flex: 1, display: 'flex', flexDirection: 'column', height: '100%', width: '100%' },
       '& .ant-form-item-control-input-content': { flex: 1, display: 'flex', flexDirection: 'column', height: '100%', width: '100%' },
-      '& textarea': { height: '100% !important', width: '100% !important' }
     }}>
       <div className="flex items-center gap-2 mb-2 sm:mb-3">
         <span className="text-green-600 text-xs sm:text-sm">📝</span>
@@ -82,10 +58,9 @@ const JobDescription: React.FC<JobDescriptionProps> = ({ form, onPasteImage }) =
         className="!mb-0 w-full flex-1 flex flex-col"
         style={{ height: '100%' }}
       >
-        <TextArea
+        <RichTextEditor
           placeholder="Mô tả chi tiết về công việc cần thực hiện..."
-          className="!rounded-lg !border !border-gray-300 focus:!border-cyan-500 focus:!shadow-lg hover:!border-cyan-500 !transition-all !duration-200 !shadow-sm !resize-none !text-xs sm:!text-sm h-full min-h-[160px] w-full"
-          onPaste={handlePaste}
+          onPasteImage={onPasteImage}
         />
       </Form.Item>
     </Stack>

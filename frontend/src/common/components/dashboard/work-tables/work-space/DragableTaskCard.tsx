@@ -32,6 +32,7 @@ import {
 // import { useCheckPermission } from "../../../../common/hooks/checkPermission.hook";
 import type { DraggableProvided, DraggableStateSnapshot } from "@hello-pangea/dnd";
 import { useTaskContext } from "../../../../common/hooks/useTask";
+import { useUser } from "../../../../common/hooks/useUser";
 
 interface DragableTaskCardProps {
   task: any;
@@ -62,20 +63,23 @@ const DragableTaskCard: React.FC<DragableTaskCardProps> = ({
   // setEditingTaskId,
   setShowFormTask,
 }) => {
+    const { userRoleId } = useUser();
     const isRewardColumn = col.type === "REWARD";
+    const isDragDisabled = isRewardColumn && userRoleId !== -2;
 
     return (
     <Draggable
         key={task.id}
         draggableId={task.id}
         index={idx}
-        isDragDisabled={isRewardColumn} // Vô hiệu hóa drag cho task trong cột khoán thưởng
+        isDragDisabled={isDragDisabled} // Vô hiệu hóa drag cho task trong cột khoán thưởng đối với nhân viên thường
     >
         {(provided, snapshot?) => 
         <CardItem provided={provided} 
             snapshot={snapshot} 
             theme={theme}
             isRewardColumn={isRewardColumn}
+            isDragDisabled={isDragDisabled}
             task={task}
             isDragging={isDragging}
             // setSelectedTask={setSelectedTask}
@@ -92,6 +96,7 @@ interface CardItemProps {
   provided?: DraggableProvided;
   snapshot?: DraggableStateSnapshot;
   isRewardColumn: boolean;
+  isDragDisabled: boolean;
   task: Task;
   theme: any;
   isDragging?: boolean;
@@ -104,6 +109,7 @@ export const CardItem: React.FC<CardItemProps> = ({
   provided,
   snapshot,
   isRewardColumn,
+  isDragDisabled,
   task,
   theme,
   isDragging,
@@ -138,7 +144,10 @@ export const CardItem: React.FC<CardItemProps> = ({
     }
   };
 
-  const card_width = Math.min(300, Math.round((window.innerWidth - 360)/4));
+  const isMobileView = window.innerWidth <= 640;
+  const card_width = isMobileView
+    ? Math.min(250, window.innerWidth - 32)
+    : Math.min(300, Math.round((window.innerWidth - 360) / 4));
 
 
     return (
@@ -148,9 +157,9 @@ export const CardItem: React.FC<CardItemProps> = ({
       ref={provided?.innerRef}
       {...provided?.draggableProps}
       {...provided?.dragHandleProps}
-      className={`task-card group/task relative mb-3 transition-all duration-200]
+      className={`task-card group/task relative mb-3 transition-all duration-200
         ${
-        isRewardColumn ? "cursor-not-allowed opacity-90" : "cursor-pointer"
+        isDragDisabled ? "cursor-not-allowed opacity-90" : "cursor-pointer"
       } ${
         snapshot?.isDragging
           ? "shadow-xl scale-105 ring-2 ring-[#00B4B6]/30 z-50 border-2 border-[#00B4B6]/50 rotate-1"
@@ -158,7 +167,9 @@ export const CardItem: React.FC<CardItemProps> = ({
       } ${!snapshot?.isDragging ? "drag-item-reset" : ""}`}
       style={{
         ...provided?.draggableProps.style,
-        maxWidth: 300,
+        maxWidth: isMobileView ? card_width : 300,
+        width: '100%',
+        boxSizing: 'border-box',
         ...(snapshot?.isDragging
           ? {
               transition: "none",
@@ -198,6 +209,11 @@ export const CardItem: React.FC<CardItemProps> = ({
             ? "shadow-xl border-[#00B4B6]/50 bg-white/95 backdrop-blur-sm"
             : "shadow-md border-gray-100/50 group-hover/task:shadow-lg group-hover/task:border-gray-200/70"
         }`}
+        style={{
+          height: '150px',
+          boxSizing: 'border-box',
+          overflow: 'hidden',
+        }}
       >
         {/* Badge task khoán thưởng đặc biệt */}
         {isRewardColumn && (
@@ -206,26 +222,48 @@ export const CardItem: React.FC<CardItemProps> = ({
           </div>
         )}
 
-        <Stack direction="row">
+        <Stack direction="row" sx={{ height: '100%', overflow: 'hidden', width: '100%' }}>
             {getPrimaryTaskIcon(task?.icon) && 
             <Avatar
                 src={`${useApiStatic()}/${getPrimaryTaskIcon(task?.icon)}`}
                 alt="Task icon"
-                sx={{ width: 100, height: 70, borderRadius: 0}}
+                sx={{ width: 70, height: 70, borderRadius: 0, flexShrink: 0 }}
             />}
 
-            <div className="space-y-1 sm:space-y-1.5 flex-1 min-w-0">
+            <div className="space-y-1 sm:space-y-1.5 flex-1 min-w-0" style={{ overflow: 'hidden', minWidth: 0 }}>
               <div className="flex items-start justify-between gap-2">
                 <h3
-                  className={`font-bold text-xs sm:text-sm break-words whitespace-normal transition-colors duration-150 flex-1 min-w-0 ${
+                  className={`font-bold text-xs sm:text-sm transition-colors duration-150 flex-1 min-w-0 ${
                     isRewardColumn ? "text-purple-800" : "text-gray-800 group-hover/task:text-gray-900"
                   }`}
+                  style={{
+                    wordBreak: 'break-word',
+                    overflowWrap: 'anywhere',
+                    whiteSpace: 'normal',
+                    overflow: 'hidden',
+                    display: '-webkit-box',
+                    WebkitLineClamp: 3,
+                    WebkitBoxOrient: 'vertical',
+                  }}
                 >
                   {task.title}
                 </h3>
               </div>
               {task.description && (
-                <p className="text-gray-500 text-xs whitespace-normal leading-relaxed">{task.description}</p>
+                <p 
+                  className="text-gray-500 text-xs leading-relaxed"
+                  style={{
+                    display: '-webkit-box',
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: 'vertical',
+                    overflow: 'hidden',
+                    wordBreak: 'break-word',
+                    overflowWrap: 'anywhere',
+                    whiteSpace: 'normal',
+                  }}
+                >
+                  {task.description}
+                </p>
               )}
               {task.reward && (
                 <div className="flex items-center gap-1 text-xs text-green-600 font-semibold">
@@ -239,7 +277,6 @@ export const CardItem: React.FC<CardItemProps> = ({
             {/* Task footer */}
             <div className="flex items-center justify-between mt-2 pt-2 border-t border-gray-100/50">
               
-
               <IconButton
                 size="small"
                 aria-label="delete"
@@ -261,13 +298,13 @@ export const CardItem: React.FC<CardItemProps> = ({
               >
                 <CloseIcon />
               </IconButton>
-              {task?.rate && task.rate > 0 &&
-              <div className="text-xs text-gray-400 font-mono flex-shrink-0">
-                
-                {[...Array(task.rate)].map((_, index) => (
-                  <StarFilled key={index} style={{color:'orange'}}/>
-                ))}
-              </div>}
+              {!!(task?.rate && task.rate > 0) && (
+                <div className="text-xs text-gray-400 font-mono flex-shrink-0">
+                  {[...Array(task.rate)].map((_, index) => (
+                    <StarFilled key={index} style={{color:'orange'}}/>
+                  ))}
+                </div>
+              )}
 
             </div>
           </Stack>

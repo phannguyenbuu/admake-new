@@ -1,5 +1,5 @@
 import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
-import { Form, Modal, Typography, notification, Tabs } from "antd";
+import { Form, Modal, Typography, notification, Tabs, InputNumber } from "antd";
 import {
   FileTextOutlined,
   InboxOutlined,
@@ -23,6 +23,8 @@ import JobInfoCard from "./task/JobInfoCard";
 import JobTimeAndProcess from "./task/JobTimeAndProcess ";
 import MaterialsTab from "./task/MaterialsTab";
 import type { UploadIconButtonHandle } from "./task/UploadIconButton";
+import { useQuery } from "@tanstack/react-query";
+import { InventoryService, type InventoryItem } from "../../../services/inventory.service";
 
 const { Text } = Typography;
 
@@ -33,12 +35,51 @@ function getAccessToken(): string {
     || '';
 }
 
+function getMaterialRowPrice(row: any, items: any[]): number {
+  for (const item of items) {
+    const specs = item.spec_rows || [];
+    if (specs.length > 0) {
+      for (const spec of specs) {
+        const specStr = [spec.color, spec.spec].filter(Boolean).join(" - ");
+        const formattedName = `${item.name} - ${specStr}`;
+        if (row.ten === formattedName || (row.ten === item.name && row.quy_cach === specStr)) {
+          return Number(spec.price) || 0;
+        }
+      }
+    }
+    if (row.ten === item.name) {
+      return item.standard_cost || item.average_cost || 0;
+    }
+    if (item.name && row.ten && row.ten.startsWith(item.name)) {
+      if (specs.length > 0) {
+        for (const spec of specs) {
+          const specStr = [spec.color, spec.spec].filter(Boolean).join(" - ");
+          if (row.ten.includes(specStr) || row.quy_cach === specStr) {
+            return Number(spec.price) || 0;
+          }
+        }
+      }
+      return item.standard_cost || item.average_cost || 0;
+    }
+  }
+  return 0;
+}
+
+function getTaskMaterialCost(materials: any[], items: any[]): number {
+  return materials.reduce((sum: number, row: any) => {
+    const qty = parseFloat(row.so_luong) || 0;
+    const price = getMaterialRowPrice(row, items);
+    return sum + qty * price;
+  }, 0);
+}
+
 interface FormTaskProps {
   open: boolean;
   onCancel: () => void;
   onSuccess: () => void;
   initialValues: Task | null;
   users: UserSearchProps[];
+  customers?: UserSearchProps[];
   currentColumn: number;
 }
 
@@ -47,9 +88,10 @@ export default function FormTask({
   onCancel,
   onSuccess,
   users,
+  customers = [],
   currentColumn,
 }: FormTaskProps) {
-  const { workspaceId, isMobile, tmpTaskCreatedAssets, tmpTaskCreatedMessages, setTmpTaskCreatedAssets, setTmpTaskCreatedMessages } =
+  const { userLeadId, workspaceId, isMobile, tmpTaskCreatedAssets, tmpTaskCreatedMessages, setTmpTaskCreatedAssets, setTmpTaskCreatedMessages } =
     useUser();
   const { taskDetail, setTaskDetail } = useTaskContext();
 
@@ -59,7 +101,8 @@ export default function FormTask({
 
   const [form] = Form.useForm();
   const [activeTabKey, setActiveTabKey] = useState("info");
-  const [isDocsCommentsExpanded, setIsDocsCommentsExpanded] = useState(false);
+  const [isDocsCommentsExpanded, setIsDocsCommentsExpanded] = useState(true);
+  const [isMaterialsExpanded, setIsMaterialsExpanded] = useState(true);
   const uploadIconRef = useRef<UploadIconButtonHandle | null>(null);
   const initializedTaskIdRef = useRef<string | null | undefined>(undefined);
 
@@ -273,13 +316,274 @@ export default function FormTask({
     }, 0);
   }, [computedDays, userList, users]);
 
+  // Fetch Inventory Library for material cost calculation
+  const { data: resItems } = useQuery({
+    queryKey: ["inventory-items", userLeadId],
+    enabled: userLeadId > 0,
+    queryFn: async () => (await InventoryService.listItems({ lead: userLeadId, limit: 1000 })).data?.data as InventoryItem[],
+  });
+
+  const materials = Form.useWatch("materials", form) || [];
+  const computedMaterialsCost = useMemo(() => {
+    if (!resItems || !materials.length) return 0;
+    return getTaskMaterialCost(materials, resItems);
+  }, [materials, resItems]);
+
+  const handlePrint = () => {
+    if (!taskDetail || !customerSelected) return;
+
+    const taskTitle = form.getFieldValue("title") || taskDetail.title || "Đơn hàng";
+    const amountVal = form.getFieldValue("amount") || 0;
+    const prepaymentVal = form.getFieldValue("prepayment") || 0;
+    const balanceVal = Math.max(0, amountVal - prepaymentVal);
+
+    const materialsList = form.getFieldValue("materials") || [];
+
+    const dateStr = dayjs().format("DD/MM/YYYY");
+
+    const materialRowsHtml = (materialsList || []).map((row: any, index: number) => {
+      const price = getMaterialRowPrice(row, resItems || []);
+      const qty = parseFloat(row.so_luong) || 0;
+      const total = qty * price;
+      return `
+        <tr>
+          <td style="text-align: center; border: 1px solid #cbd5e1; padding: 10px;">${index + 1}</td>
+          <td style="border: 1px solid #cbd5e1; padding: 10px;">${row.ten || ""}</td>
+          <td style="border: 1px solid #cbd5e1; padding: 10px;">${row.quy_cach || ""}</td>
+          <td style="text-align: center; border: 1px solid #cbd5e1; padding: 10px;">${row.don_vi || ""}</td>
+          <td style="text-align: right; border: 1px solid #cbd5e1; padding: 10px;">${qty}</td>
+          <td style="text-align: right; border: 1px solid #cbd5e1; padding: 10px;">${new Intl.NumberFormat("vi-VN").format(price)}₫</td>
+          <td style="text-align: right; border: 1px solid #cbd5e1; padding: 10px;">${new Intl.NumberFormat("vi-VN").format(total)}₫</td>
+        </tr>
+      `;
+    }).join("");
+
+    const printHtml = `
+      <html>
+      <head>
+        <title>Báo giá / Bill - ${taskTitle}</title>
+        <style>
+          @page {
+            size: A4;
+            margin: 20mm;
+          }
+          body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            color: #334155;
+            font-size: 14px;
+            line-height: 1.6;
+          }
+          .header-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 25px;
+          }
+          .header-logo {
+            font-size: 26px;
+            font-weight: 800;
+            color: #0f766e;
+            letter-spacing: 0.5px;
+          }
+          .header-company-info {
+            text-align: right;
+            font-size: 11.5px;
+            color: #64748b;
+            line-height: 1.5;
+          }
+          .title-section {
+            text-align: center;
+            margin-bottom: 30px;
+          }
+          .title-section h1 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: 800;
+            color: #1e293b;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+          }
+          .info-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+          }
+          .info-table td {
+            padding: 8px 4px;
+            vertical-align: top;
+            border-bottom: 1px dashed #f1f5f9;
+          }
+          .main-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+          }
+          .main-table th {
+            background-color: #f8fafc;
+            border: 1px solid #cbd5e1;
+            padding: 12px 10px;
+            font-weight: 700;
+            text-align: center;
+            font-size: 13px;
+            color: #475569;
+          }
+          .summary-table {
+            width: 50%;
+            margin-left: auto;
+            border-collapse: collapse;
+            margin-bottom: 40px;
+          }
+          .summary-table td {
+            padding: 8px 10px;
+            border-bottom: 1px solid #f1f5f9;
+          }
+          .summary-table tr:last-child td {
+            border-bottom: 2px solid #0f766e;
+            font-weight: bold;
+            font-size: 16px;
+            color: #0f766e;
+          }
+          .signature-section {
+            width: 100%;
+            margin-top: 60px;
+            page-break-inside: avoid;
+          }
+          .signature-box {
+            text-align: center;
+            width: 50%;
+            float: left;
+            box-sizing: border-box;
+          }
+          .signature-space {
+            height: 100px;
+          }
+        </style>
+      </head>
+      <body>
+        <table class="header-table">
+          <tr>
+            <td class="header-logo">DECOR B-ONE</td>
+            <td class="header-company-info">
+              <strong>CÔNG TY TNHH DECOR B-ONE</strong><br/>
+              Địa chỉ: 96 Đường số 1, KDC Cityland, Phường 7, Gò Vấp, TP.HCM<br/>
+              Hotline: 0909 123 456 | Email: contact@b-onedecor.vn
+            </td>
+          </tr>
+        </table>
+
+        <div class="title-section">
+          <h1>BẢNG BÁO GIÁ & ĐƠN ĐẶT HÀNG</h1>
+          <div style="margin-top: 6px; color: #64748b; font-weight: 500;">Ngày lập: ${dateStr}</div>
+        </div>
+
+        <table class="info-table">
+          <tr>
+            <td style="width: 15%; color: #64748b;"><strong>Khách hàng:</strong></td>
+            <td style="width: 45%; color: #1e293b; font-weight: 600;">${customerSelected.fullName || "Khách hàng vãng lai"}</td>
+            <td style="width: 15%; color: #64748b;"><strong>Đơn hàng:</strong></td>
+            <td style="width: 25%; color: #1e293b; font-weight: 600;">${taskTitle}</td>
+          </tr>
+          <tr>
+            <td style="color: #64748b;"><strong>Điện thoại:</strong></td>
+            <td style="color: #1e293b;">${customerSelected.phone || "-"}</td>
+            <td style="color: #64748b;"><strong>Mã công việc:</strong></td>
+            <td style="color: #1e293b; font-family: monospace;">${taskDetail.id}</td>
+          </tr>
+          <tr>
+            <td style="color: #64748b;"><strong>Địa chỉ:</strong></td>
+            <td style="color: #1e293b;">${customerSelected.workAddress || "-"}</td>
+            <td style="color: #64748b;"><strong>Email:</strong></td>
+            <td style="color: #1e293b;">${customerSelected.email || "-"}</td>
+          </tr>
+        </table>
+
+        <div style="font-weight: 700; margin-bottom: 12px; text-transform: uppercase; font-size: 12px; color: #475569; letter-spacing: 0.5px;">Chi tiết vật tư đơn hàng</div>
+        <table class="main-table">
+          <thead>
+            <tr>
+              <th style="width: 6%;">STT</th>
+              <th style="width: 38%;">Tên vật tư</th>
+              <th style="width: 18%;">Quy cách</th>
+              <th style="width: 10%;">Đơn vị</th>
+              <th style="width: 8%;">SL</th>
+              <th style="width: 10%;">Đơn giá</th>
+              <th style="width: 10%;">Thành tiền</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${materialRowsHtml || `<tr><td colspan="7" style="text-align: center; border: 1px solid #cbd5e1; padding: 20px; color: #94a3b8;">Không có vật tư nào được ghi nhận</td></tr>`}
+          </tbody>
+        </table>
+
+        <table class="summary-table">
+          <tr>
+            <td style="color: #64748b;">Tổng tiền vật tư:</td>
+            <td style="text-align: right; font-weight: 600; color: #1e293b;">${new Intl.NumberFormat("vi-VN").format(Math.round(computedMaterialsCost))}₫</td>
+          </tr>
+          <tr>
+            <td style="color: #64748b;">Chi phí thực hiện (nhân công):</td>
+            <td style="text-align: right; font-weight: 600; color: #1e293b;">${new Intl.NumberFormat("vi-VN").format(taskDetail.reward || 0)}₫</td>
+          </tr>
+          <tr>
+            <td style="font-weight: 700; color: #1e293b;">Tổng giá trị đơn hàng:</td>
+            <td style="text-align: right; color: #0f766e; font-weight: 800;">${new Intl.NumberFormat("vi-VN").format(amountVal)}₫</td>
+          </tr>
+          <tr>
+            <td style="color: #64748b;">Đã tạm ứng:</td>
+            <td style="text-align: right; color: #be123c; font-weight: 600;">-${new Intl.NumberFormat("vi-VN").format(prepaymentVal)}₫</td>
+          </tr>
+          <tr>
+            <td style="font-weight: 700; color: #0f766e;">Còn lại phải thanh toán:</td>
+            <td style="text-align: right; color: #0f766e; font-weight: 800; font-size: 16px;">${new Intl.NumberFormat("vi-VN").format(balanceVal)}₫</td>
+          </tr>
+        </table>
+
+        <div style="clear: both;"></div>
+
+        <div class="signature-section">
+          <div class="signature-box">
+            <strong style="color: #334155;">ĐẠI DIỆN KHÁCH HÀNG</strong><br/>
+            <span style="font-size: 11px; color: #94a3b8;">(Ký và ghi rõ họ tên)</span>
+            <div class="signature-space"></div>
+          </div>
+          <div class="signature-box">
+            <strong style="color: #334155;">ĐẠI DIỆN CÔNG TY</strong><br/>
+            <span style="font-size: 11px; color: #94a3b8;">(Ký và ghi rõ họ tên)</span>
+            <div class="signature-space"></div>
+          </div>
+        </div>
+      </body>
+      </html>
+    `;
+
+    const iframe = document.createElement("iframe");
+    iframe.style.position = "absolute";
+    iframe.style.width = "0px";
+    iframe.style.height = "0px";
+    iframe.style.border = "none";
+    document.body.appendChild(iframe);
+
+    const doc = iframe.contentWindow?.document;
+    if (doc) {
+      doc.open();
+      doc.write(printHtml);
+      doc.close();
+      
+      setTimeout(() => {
+        iframe.contentWindow?.focus();
+        iframe.contentWindow?.print();
+        document.body.removeChild(iframe);
+      }, 500);
+    }
+  };
+
   useEffect(() => {
     form.setFieldsValue({
       assign_ids: userList ? userList.map((user) => user.id) : [],
       work_days: computedWorkDays,
-      icon: taskDetail?.icon ?? null,
     });
-  }, [computedWorkDays, form, taskDetail?.icon, userList]);
+  }, [computedWorkDays, form, userList]);
 
   useEffect(() => {
     if (!open) {
@@ -299,7 +603,8 @@ export default function FormTask({
     setCustomerSearch("");
     setCustomerSelected(null);
     setActiveTabKey("info");
-    setIsDocsCommentsExpanded(!taskDetail?.id);
+    setIsDocsCommentsExpanded(true);
+    setIsMaterialsExpanded(true);
 
     if (!taskDetail?.id) {
       clearTemporaryTaskDraft();
@@ -311,15 +616,54 @@ export default function FormTask({
         icon: null,
         start_time: dayjs().hour(8).minute(0).second(0),
         end_time: dayjs().hour(17).minute(0).second(0),
+        amount: null,
+        prepayment: null,
+        customer_id: null,
+        customer: null,
       });
+      setCustomerSelected(null);
     } else {
+      const custObj = taskDetail?.customer_id;
+      const custId = typeof custObj === "object" && custObj ? custObj.id : (custObj ?? null);
+      const custName = typeof custObj === "object" && custObj ? custObj.name : null;
+
       form.setFieldsValue({
         workspace_id: workspaceId,
         work_days: (taskDetail as any)?.work_days ?? 0,
         icon: taskDetail?.icon ?? null,
+        amount: taskDetail?.amount ?? null,
+        prepayment: taskDetail?.prepayment ?? null,
+        customer_id: custId,
+        customer: custName,
+      });
+
+      if (custObj) {
+        setCustomerSelected({
+          user_id: custId,
+          fullName: custName ?? "",
+          phone: typeof custObj === "object" ? custObj.phone : "",
+          workAddress: typeof custObj === "object" ? custObj.address : "",
+          email: typeof custObj === "object" ? custObj.email : "",
+        } as any);
+      } else {
+        setCustomerSelected(null);
+      }
+    }
+  }, [clearTemporaryTaskDraft, form, open, taskDetail, workspaceId]);
+
+  useEffect(() => {
+    if (customerSelected) {
+      form.setFieldsValue({
+        customer_id: customerSelected.user_id,
+        customer: customerSelected.fullName || "",
+      });
+    } else {
+      form.setFieldsValue({
+        customer_id: null,
+        customer: null,
       });
     }
-  }, [clearTemporaryTaskDraft, form, open, taskDetail?.id, workspaceId]);
+  }, [customerSelected, form]);
 
   const handleModalCancel = useCallback(() => {
     const hasPendingDrafts = tmpTaskCreatedAssets.length > 0 || tmpTaskCreatedMessages.length > 0;
@@ -347,28 +691,32 @@ export default function FormTask({
   const docsCommentsSection = (
     <div className="mx-auto mt-5 w-[96%] max-w-5xl">
       <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-        <div className="flex items-center justify-between gap-3 px-5 py-4">
-          <div className="min-w-0">
-            <div className="text-xs font-bold uppercase tracking-wider text-slate-500">
+        {/* Header */}
+        <div className="flex items-center justify-between gap-3 px-5 py-3.5 bg-slate-50/50 border-b border-slate-100">
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-bold uppercase tracking-wider text-slate-700">
               Tài liệu & Bình luận
-            </div>
-            <div className="mt-1 text-xs text-slate-400">
-              Mở khi cần để xem tài liệu đính kèm và trao đổi.
-            </div>
+            </span>
           </div>
 
-          <button
-            type="button"
-            onClick={() => setIsDocsCommentsExpanded((prev) => !prev)}
-            className="flex h-10 w-10 items-center justify-center rounded-full border-0 bg-transparent p-0 text-slate-400 transition hover:text-teal-600"
-            title={isDocsCommentsExpanded ? "Thu gọn tài liệu và bình luận" : "Mở tài liệu và bình luận"}
-          >
-            {isDocsCommentsExpanded ? <ChevronDown size={18} /> : <ChevronRight size={18} />}
-          </button>
+          <div className="flex items-center gap-2">
+            <span className="text-[11px] text-slate-400 font-medium hidden sm:inline">
+              Minh chứng & Trao đổi
+            </span>
+            <button
+              type="button"
+              onClick={() => setIsDocsCommentsExpanded((prev) => !prev)}
+              className="flex h-9 w-9 items-center justify-center rounded-full border-0 bg-transparent p-0 text-slate-400 transition hover:bg-slate-100 hover:text-teal-600"
+              title={isDocsCommentsExpanded ? "Thu gọn" : "Mở rộng"}
+            >
+              {isDocsCommentsExpanded ? <ChevronDown size={18} /> : <ChevronRight size={18} />}
+            </button>
+          </div>
         </div>
 
+        {/* Content Body */}
         {isDocsCommentsExpanded && (
-          <div className="border-t border-slate-200 bg-slate-50 px-4 py-4 md:px-5">
+          <div className="bg-slate-50 px-4 py-4 md:px-5">
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <div className="max-h-[420px] overflow-y-auto rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
                 <div className="mb-5 flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-500">
@@ -383,6 +731,47 @@ export default function FormTask({
                 </div>
                 <JobAsset title="" type="comment" />
               </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+
+  const materialsSection = (
+    <div className="mx-auto mt-5 w-[96%] max-w-5xl">
+      <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+        {/* Header */}
+        <div className="flex items-center justify-between gap-3 px-5 py-3.5 bg-slate-50/50 border-b border-slate-100">
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-bold uppercase tracking-wider text-slate-700">
+              Vật liệu
+            </span>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <span className="text-[11px] text-slate-400 font-medium hidden sm:inline">
+              Danh sách vật tư công việc
+            </span>
+            <button
+              type="button"
+              onClick={() => setIsMaterialsExpanded((prev) => !prev)}
+              className="flex h-9 w-9 items-center justify-center rounded-full border-0 bg-transparent p-0 text-slate-400 transition hover:bg-slate-100 hover:text-teal-600"
+              title={isMaterialsExpanded ? "Thu gọn" : "Mở rộng"}
+            >
+              {isMaterialsExpanded ? <ChevronDown size={18} /> : <ChevronRight size={18} />}
+            </button>
+          </div>
+        </div>
+
+        {/* Content Body */}
+        {isMaterialsExpanded && (
+          <div className="bg-slate-50 px-4 py-4 md:px-5">
+            <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+              <div className="mb-4 flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-500">
+                <InboxOutlined /> Danh sách vật liệu
+              </div>
+              <MaterialsTab form={form} />
             </div>
           </div>
         )}
@@ -416,6 +805,9 @@ export default function FormTask({
         <Form.Item name="workspace_id" initialValue={workspaceId} hidden />
         <Form.Item name="assign_ids" initialValue={userList?.map((user) => user.id)} hidden />
         <Form.Item name="icon" hidden />
+        <Form.Item name="materials" hidden />
+        <Form.Item name="customer_id" hidden />
+        <Form.Item name="customer" hidden />
 
         <Tabs
           activeKey={activeTabKey}
@@ -456,14 +848,14 @@ export default function FormTask({
 
                     <Stack spacing={4} className="h-fit min-w-0 w-full">
                       <div className="w-full rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
-                        <div className="mb-4 flex w-full items-center justify-between gap-2">
+                        <div className="mb-4 flex flex-col sm:flex-row w-full items-start sm:items-center justify-between gap-2">
                           <div className="flex items-center gap-2">
                             <div className="flex h-5 w-5 items-center justify-center rounded-md bg-gradient-to-r from-blue-100 to-blue-200 sm:h-6 sm:w-6">
                               <span className="flex items-center justify-center text-xs leading-none text-blue-600 sm:text-sm">
                                 👔
                               </span>
                             </div>
-                            <Text strong className="!text-sm !text-slate-800 sm:!text-base">
+                            <Text strong className="!text-sm !text-slate-800 sm:!text-base whitespace-nowrap">
                               Nhân sự phụ trách
                             </Text>
                           </div>
@@ -486,6 +878,17 @@ export default function FormTask({
                               </span>
                               <span className="mt-0.5 whitespace-nowrap text-[10px] font-medium text-emerald-400">
                                 Số lương
+                              </span>
+                            </div>
+
+                            <div className="flex min-w-[80px] flex-col items-center rounded-lg border border-amber-100 bg-amber-50 px-3 py-1.5">
+                              <span className="text-[14px] font-bold leading-tight text-amber-700">
+                                {computedMaterialsCost > 0
+                                  ? `${new Intl.NumberFormat("vi-VN").format(Math.round(computedMaterialsCost))}₫`
+                                  : "—"}
+                              </span>
+                              <span className="mt-0.5 whitespace-nowrap text-[10px] font-medium text-amber-500">
+                                Tiền vật tư
                               </span>
                             </div>
                           </div>
@@ -513,28 +916,92 @@ export default function FormTask({
                       </div>
 
                       <JobTimeAndProcess form={form} />
+
+                      {/* Khách hàng & Thanh toán Card */}
+                      <div className="w-full rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+                        <div className="mb-4 flex flex-col sm:flex-row w-full items-start sm:items-center justify-between gap-2">
+                          <div className="flex items-center gap-2">
+                            <div className="flex h-5 w-5 items-center justify-center rounded-md bg-gradient-to-r from-teal-100 to-teal-200 sm:h-6 sm:w-6">
+                              <span className="flex items-center justify-center text-xs leading-none text-teal-600 sm:text-sm">
+                                💰
+                              </span>
+                            </div>
+                            <Text strong className="!text-sm !text-slate-800 sm:!text-base whitespace-nowrap">
+                              Khách hàng & Thanh toán
+                            </Text>
+                          </div>
+                        </div>
+
+                        <div className="flex flex-col gap-4">
+                          <div>
+                            <span className="block mb-1 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                              Tìm kiếm khách hàng
+                            </span>
+                            <JobAgentInfo
+                              form={form}
+                              mode="customer"
+                              users={customers}
+                              searchValue={customerSearch}
+                              setSearchValue={setCustomerSearch}
+                              selectedAgent={customerSelected}
+                              setselectedAgent={setCustomerSelected}
+                            />
+                          </div>
+
+                          <div className="grid grid-cols-2 gap-4">
+                            <Form.Item
+                              name="amount"
+                              label={
+                                <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                                  Tổng đơn
+                                </span>
+                              }
+                              className="!mb-0"
+                            >
+                              <InputNumber
+                                className="w-full !rounded-lg !border-slate-200"
+                                placeholder="0"
+                                formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                                parser={(value) => value!.replace(/\$\s?|(,*)/g, "") as any}
+                                style={{ width: "100%" }}
+                              />
+                            </Form.Item>
+
+                            <Form.Item
+                              name="prepayment"
+                              label={
+                                <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                                  Tạm ứng
+                                </span>
+                              }
+                              className="!mb-0"
+                            >
+                              <InputNumber
+                                className="w-full !rounded-lg !border-slate-200"
+                                placeholder="0"
+                                formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                                parser={(value) => value!.replace(/\$\s?|(,*)/g, "") as any}
+                                style={{ width: "100%" }}
+                              />
+                            </Form.Item>
+                          </div>
+
+                          {customerSelected && (
+                            <button
+                              type="button"
+                              onClick={handlePrint}
+                              className="mt-2 w-full flex items-center justify-center gap-2 py-2 px-4 rounded-xl border-none bg-gradient-to-r from-teal-500 to-emerald-600 hover:from-teal-600 hover:to-emerald-700 text-white font-semibold shadow-md hover:shadow-lg transition-all duration-200 cursor-pointer"
+                            >
+                              🖨️ In Báo Giá / Bill
+                            </button>
+                          )}
+                        </div>
+                      </div>
                     </Stack>
                   </div>
 
                   {docsCommentsSection}
-                </div>
-              ),
-            },
-            {
-              key: "materials",
-              label: (
-                <span className="select-none flex items-center gap-1.5">
-                  <InboxOutlined /> Vật liệu
-                </span>
-              ),
-              children: (
-                <div className="min-h-[520px] border-t border-slate-200 bg-[#f3f2f1] -mx-6 -mb-8 px-4 py-4 pb-8 sm:px-6 sm:py-6 sm:pb-12">
-                  <div className="mx-auto h-fit w-[96%] max-w-5xl rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
-                    <div className="mb-5 text-xs font-bold uppercase tracking-wider text-slate-500">
-                      DANH SÁCH VẬT LIỆU
-                    </div>
-                    <MaterialsTab />
-                  </div>
+                  {materialsSection}
                 </div>
               ),
             },

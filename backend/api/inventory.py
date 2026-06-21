@@ -731,8 +731,9 @@ def _build_transaction_payload(data, lead_id: int, current: StockTransaction | N
     if warehouse.status != "active":
         abort(400, description="Warehouse is inactive")
     tx_date = _parse_date(data.get("transaction_date")) or (current.transaction_date if current else date.today())
+    status = data.get("status") or (current.status if current else "draft")
     quantity = _to_float(data.get("quantity"), current.quantity if current else 0)
-    if quantity <= 0:
+    if status != "draft" and quantity <= 0:
         abort(400, description="quantity must be > 0")
     reference_type = _clean_text(data.get("reference_type")) or (current.reference_type if current else None)
     reference_id = _clean_text(data.get("reference_id")) or (current.reference_id if current else None)
@@ -989,7 +990,7 @@ def list_items():
         query = query.filter(InventoryItem.is_active.is_(True))
     elif status == "inactive":
         query = query.filter(InventoryItem.is_active.is_(False))
-    pagination = query.order_by(InventoryItem.updatedAt.desc()).paginate(page=page, per_page=limit, error_out=False)
+    pagination = query.order_by(InventoryItem.code.asc()).paginate(page=page, per_page=limit, error_out=False)
     rows = []
     for item in pagination.items:
         payload = item.tdict()
@@ -1062,6 +1063,20 @@ def create_item():
         note=_clean_text(data.get("note")),
         created_by=_current_user_id(),
         updated_by=_current_user_id(),
+        spec_rows=data.get("spec_rows") or [],
+        # 3D material properties
+        diffuse=_clean_text(data.get("diffuse")) or "#ffffff",
+        reflection=_to_float(data.get("reflection"), 0.0),
+        glossy=_to_float(data.get("glossy"), 0.0),
+        refraction=_to_float(data.get("refraction"), 1.0),
+        transparent=_to_bool(data.get("transparent"), False),
+        bump=_to_bool(data.get("bump"), False),
+        displacement=_to_bool(data.get("displacement"), False),
+        metalness=_to_float(data.get("metalness"), 0.0),
+        roughness=_to_float(data.get("roughness"), 1.0),
+        emissive=_clean_text(data.get("emissive")) or "#000000",
+        emissive_intensity=_to_float(data.get("emissive_intensity") or data.get("emissiveIntensity"), 0.0),
+        opacity=_to_float(data.get("opacity"), 1.0),
     )
     db.session.add(row)
     db.session.commit()
@@ -1145,6 +1160,37 @@ def update_item(item_id: str):
         item.is_active = _to_bool(data.get("is_active"), item.is_active)
     if data.get("note") is not None:
         item.note = _clean_text(data.get("note"))
+    if "spec_rows" in data:
+        item.spec_rows = data.get("spec_rows") or []
+    if data.get("preview_material") is not None:
+        item.preview_material = _clean_text(data.get("preview_material")) or "lumion_standard"
+    
+    # 3D material properties
+    if "diffuse" in data:
+        item.diffuse = _clean_text(data.get("diffuse"))
+    if "reflection" in data:
+        item.reflection = _to_float(data.get("reflection"), item.reflection)
+    if "glossy" in data:
+        item.glossy = _to_float(data.get("glossy"), item.glossy)
+    if "refraction" in data:
+        item.refraction = _to_float(data.get("refraction"), item.refraction)
+    if "transparent" in data:
+        item.transparent = _to_bool(data.get("transparent"), item.transparent)
+    if "bump" in data:
+        item.bump = _to_bool(data.get("bump"), item.bump)
+    if "displacement" in data:
+        item.displacement = _to_bool(data.get("displacement"), item.displacement)
+    if "metalness" in data:
+        item.metalness = _to_float(data.get("metalness"), item.metalness)
+    if "roughness" in data:
+        item.roughness = _to_float(data.get("roughness"), item.roughness)
+    if "emissive" in data:
+        item.emissive = _clean_text(data.get("emissive"))
+    if "emissive_intensity" in data or "emissiveIntensity" in data:
+        item.emissive_intensity = _to_float(data.get("emissive_intensity") or data.get("emissiveIntensity"), item.emissive_intensity)
+    if "opacity" in data:
+        item.opacity = _to_float(data.get("opacity"), item.opacity)
+
     item.updated_by = _current_user_id()
     db.session.commit()
     return jsonify(item.tdict()), 200
@@ -1188,6 +1234,7 @@ def list_transactions():
     warehouse_id = _clean_text(request.args.get("warehouse_id"))
     item_id = _clean_text(request.args.get("item_id"))
     search = _clean_text(request.args.get("search"))
+    storekeeper_id = _clean_text(request.args.get("storekeeper_id"))
     from_date = _parse_date(request.args.get("from_date"))
     to_date = _parse_date(request.args.get("to_date"))
     query = _transaction_query(lead_id)
@@ -1199,6 +1246,8 @@ def list_transactions():
         query = query.filter(StockTransaction.warehouse_id == warehouse_id)
     if item_id:
         query = query.filter(StockTransaction.item_id == item_id)
+    if storekeeper_id:
+        query = query.filter(StockTransaction.storekeeper_id == storekeeper_id)
     if from_date:
         query = query.filter(StockTransaction.transaction_date >= from_date)
     if to_date:
@@ -1321,6 +1370,8 @@ def confirm_transaction(transaction_id: str):
         abort(404, description="Transaction not found")
     if tx.status != "draft":
         abort(400, description="Only draft transaction can be confirmed")
+    if tx.quantity <= 0:
+        abort(400, description="quantity must be > 0 to confirm")
 
     _ensure_inventory_setup(tx.lead_id)
     item = _find_item(tx.item_id, tx.lead_id)

@@ -74,9 +74,10 @@ export type PayrollRow = {
   bhxh?: number;        // BHXH (-)
   carry_forward?: number; // Mang sang (+)
   net_salary: number;
+  is_completed?: boolean;
 };
 
-export type PayrollAdjustmentType = "bonus" | "punish" | "advance" | "commission" | "allowance" | "bhyt" | "bhxh" | "carry_forward";
+export type PayrollAdjustmentType = "bonus" | "punish" | "advance" | "commission" | "allowance" | "bhyt" | "bhxh" | "carry_forward" | "completed";
 
 export type PayrollAdjustmentRow = {
   id: string;

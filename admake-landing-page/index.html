@@ -3,8 +3,11 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
     <title>ADMAKE Landing Page</title>
-    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="style.css?v=20260528185" />
     <style>
       body { font-family: ui-sans-serif, system-ui, sans-serif; }
     </style>
@@ -135,9 +138,209 @@
       <section id="bang-gia" class="bg-brand-300 py-14 text-white">
         <div class="container mx-auto px-4">
           <h2 id="pricing-title" class="text-center text-2xl font-bold md:text-3xl"></h2>
-          <div class="mx-auto mt-8 aspect-[16/7] w-full max-w-5xl overflow-hidden rounded-xl border-4 border-black/10 bg-white shadow">
-            <img id="pricing-image" alt="" class="w-full object-cover" />
-          </div>
+
+          <!-- PRICING WIDGET INLINE -->
+          <div id="pricing-widget" class="mx-auto mt-8 w-full max-w-5xl">
+            <!-- 3-column grid -->
+             <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;align-items:start;">
+
+               <!-- CARD: CƠ BẢN -->
+               <div id="card-basic" onclick="pw_selectPlan('basic')" style="background:#fff;border-radius:24px;border:2px solid #e2e8f0;box-shadow:0 4px 16px rgba(0,0,0,.08);display:flex;flex-direction:column;min-height:700px;cursor:pointer;transition:border .2s,box-shadow .2s;position:relative;overflow:hidden;">
+                 <div id="basic-recommended-badge" style="position:absolute;top:0;right:0;background:#f59e0b;color:#1c1917;font-weight:900;font-size:9px;padding:6px 14px;border-bottom-left-radius:10px;text-transform:uppercase;letter-spacing:1px;z-index:2;display:none;">GỢI Ý TỐT NHẤT</div>
+                 <div style="position:absolute;top:0;right:0;width:80px;height:80px;background:radial-gradient(circle at 80% 20%,rgba(34,211,238,.25),transparent 70%);pointer-events:none;"></div>
+                 <div style="padding:24px 24px 0;">
+                   <div onclick="pw_selectPlan('basic')" style="display:inline-block;cursor:pointer;">
+                     <div style="background:#22d3ee;color:#fff;font-weight:900;font-size:13px;font-style:italic;padding:8px 28px;transform:skewX(-12deg);letter-spacing:2px;font-family:monospace;box-shadow:2px 3px 6px rgba(34,211,238,.4);position:relative;">
+                       <span id="basic-plan-title" style="display:inline-block;transform:skewX(12deg);">CƠ BẢN</span>
+                     </div>
+                   </div>
+                 </div>
+                 <div style="padding:20px 24px;border-bottom:1px solid #f1f5f9;">
+                   <div id="basic-opt-6" onclick="event.stopPropagation();pw_selectPlan('basic');pw_setBilling('6')" style="display:flex;align-items:center;gap:10px;padding:6px 8px;border-radius:8px;cursor:pointer;margin-bottom:6px;transition:background .15s;">
+                     <div id="basic-radio-6" style="width:16px;height:16px;border-radius:50%;border:2px solid #cbd5e1;flex-shrink:0;display:flex;align-items:center;justify-content:center;"></div>
+                     <span id="basic-price-6" style="font-size:20px;font-weight:900;color:#f43f5e;font-family:sans-serif;">2.000.000 <span style="color:#94a3b8;font-size:11px;font-weight:400;font-family:monospace;">/6 tháng</span></span>
+                   </div>
+                   <div id="basic-opt-12" onclick="event.stopPropagation();pw_selectPlan('basic');pw_setBilling('12')" style="display:flex;align-items:center;gap:10px;padding:6px 8px;border-radius:8px;cursor:pointer;transition:background .15s;">
+                     <div id="basic-radio-12" style="width:16px;height:16px;border-radius:50%;border:2px solid #cbd5e1;flex-shrink:0;display:flex;align-items:center;justify-content:center;"></div>
+                     <span id="basic-price-12" style="font-size:20px;font-weight:900;color:#f43f5e;font-family:sans-serif;">3.000.000 <span style="color:#94a3b8;font-size:11px;font-weight:400;font-family:monospace;">/12 tháng</span></span>
+                   </div>
+                   <div id="basic-storage-label" style="margin-top:14px;background:rgba(34,211,238,.12);display:inline-flex;padding:4px 12px;border-radius:6px;font-size:11px;font-family:monospace;font-weight:700;color:#0891b2;">Lưu trữ 10 GB</div>
+                 </div>
+                 <div style="padding:20px 24px;flex:1;">
+                   <div style="font-size:10px;font-weight:700;color:#94a3b8;letter-spacing:2px;text-transform:uppercase;font-family:monospace;margin-bottom:12px;">Tính Năng Chi Tiết</div>
+                   <div id="basic-features"></div>
+                 </div>
+                 <div style="padding:20px 24px;background:#f8fafc;border-top:1px solid #f1f5f9;">
+                   <button id="btn-basic" onclick="event.stopPropagation();pw_selectPlan('basic')" style="width:100%;padding:10px;border-radius:12px;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:1px;border:1px solid #e2e8f0;background:#fff;color:#374151;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:all .2s;">
+                     Kích Hoạt Gói Này →
+                   </button>
+                 </div>
+               </div>
+
+               <!-- CARD: CHUYÊN NGHIỆP -->
+               <div id="card-professional" onclick="pw_selectPlan('professional')" style="background:#fff;border-radius:24px;border:2px solid #e2e8f0;box-shadow:0 4px 16px rgba(0,0,0,.08);display:flex;flex-direction:column;min-height:700px;cursor:pointer;transition:border .2s,box-shadow .2s;position:relative;overflow:hidden;">
+                 <div id="pro-recommended-badge" style="position:absolute;top:0;right:0;background:#f59e0b;color:#1c1917;font-weight:900;font-size:9px;padding:6px 14px;border-bottom-left-radius:10px;text-transform:uppercase;letter-spacing:1px;z-index:2;">GỢI Ý TỐT NHẤT</div>
+                 <div style="position:absolute;top:0;right:0;width:80px;height:80px;background:radial-gradient(circle at 80% 20%,rgba(24,155,180,.2),transparent 70%);pointer-events:none;"></div>
+                 <div style="padding:24px 24px 0;">
+                   <div onclick="pw_selectPlan('professional')" style="display:inline-block;cursor:pointer;">
+                     <div style="background:#189bb4;color:#fff;font-weight:900;font-size:13px;font-style:italic;padding:8px 28px;transform:skewX(-12deg);letter-spacing:2px;font-family:monospace;box-shadow:2px 3px 6px rgba(24,155,180,.4);position:relative;">
+                       <span id="pro-plan-title" style="display:inline-block;transform:skewX(12deg);">CHUYÊN NGHIỆP</span>
+                     </div>
+                   </div>
+                 </div>
+                 <div style="padding:20px 24px;border-bottom:1px solid #f1f5f9;">
+                   <div id="pro-opt-6" onclick="event.stopPropagation();pw_selectPlan('professional');pw_setBilling('6')" style="display:flex;align-items:center;gap:10px;padding:6px 8px;border-radius:8px;cursor:pointer;margin-bottom:6px;transition:background .15s;">
+                     <div id="pro-radio-6" style="width:16px;height:16px;border-radius:50%;border:2px solid #cbd5e1;flex-shrink:0;display:flex;align-items:center;justify-content:center;"></div>
+                     <span id="pro-price-6" style="font-size:20px;font-weight:900;color:#f43f5e;font-family:sans-serif;">2.500.000 <span style="color:#94a3b8;font-size:11px;font-weight:400;font-family:monospace;">/6 tháng</span></span>
+                   </div>
+                   <div id="pro-opt-12" onclick="event.stopPropagation();pw_selectPlan('professional');pw_setBilling('12')" style="display:flex;align-items:center;gap:10px;padding:6px 8px;border-radius:8px;cursor:pointer;transition:background .15s;">
+                     <div id="pro-radio-12" style="width:16px;height:16px;border-radius:50%;border:2px solid #cbd5e1;flex-shrink:0;display:flex;align-items:center;justify-content:center;"></div>
+                     <span id="pro-price-12" style="font-size:20px;font-weight:900;color:#f43f5e;font-family:sans-serif;">4.000.000 <span style="color:#94a3b8;font-size:11px;font-weight:400;font-family:monospace;">/12 tháng</span></span>
+                   </div>
+                   <div id="pro-storage-label" style="margin-top:14px;background:rgba(24,155,180,.12);display:inline-flex;padding:4px 12px;border-radius:6px;font-size:11px;font-family:monospace;font-weight:700;color:#189bb4;">Lưu trữ 20 GB</div>
+                 </div>
+                 <div style="padding:20px 24px;flex:1;">
+                   <div style="font-size:10px;font-weight:700;color:#94a3b8;letter-spacing:2px;text-transform:uppercase;font-family:monospace;margin-bottom:12px;">Tính Năng Chi Tiết</div>
+                   <div id="pro-features"></div>
+                 </div>
+                 <div style="padding:20px 24px;background:#f8fafc;border-top:1px solid #f1f5f9;">
+                   <button id="btn-professional" onclick="event.stopPropagation();pw_selectPlan('professional')" style="width:100%;padding:10px;border-radius:12px;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:1px;border:1px solid #e2e8f0;background:#fff;color:#374151;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:all .2s;">
+                     Kích Hoạt Gói Này →
+                   </button>
+                 </div>
+               </div>
+
+               <!-- RIGHT COLUMN: 3D BADGE + CALCULATOR -->
+               <div style="display:flex;flex-direction:column;gap:20px;">
+
+                 <!-- 3D BADGE CARD -->
+                  <div id="card-specialized" onclick="pw_selectPlan('specialized')" style="background:transparent;border-radius:24px;border:2px solid transparent;box-shadow:none;padding:20px;cursor:pointer;transition:border .2s,box-shadow .2s;position:relative;">
+                    <div id="specialized-recommended-badge" style="position:absolute;top:0;right:0;background:#f59e0b;color:#1c1917;font-weight:900;font-size:9px;padding:6px 14px;border-bottom-left-radius:10px;text-transform:uppercase;letter-spacing:1px;z-index:2;display:none;">GỢI Ý TỐT NHẤT</div>
+                    <h3 id="svg-specialized-title" style="font-size:13px;font-weight:900;text-align:center;color:#ffffff;border-bottom:1px solid rgba(255,255,255,0.2);padding-bottom:8px;margin-bottom:4px;letter-spacing:1px;">SƠ ĐỒ GÓI CHUYÊN BIỆT</h3>
+                    <div style="position:absolute;top:10px;right:12px;background:#f43f5e;color:#fff;font-size:9px;font-weight:900;padding:3px 8px;border-radius:20px;text-transform:uppercase;letter-spacing:1px;animation:pw_bounce 1s infinite alternate;">TIẾT KIỆM</div>
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 520" style="width:100%;height:auto;cursor:pointer;transform:scale(1.5);transform-origin:center;margin:80px 0;" onclick="pw_selectPlan('specialized')">
+                     <defs>
+                       <linearGradient id="pw_blue3DFront" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#25aae1"/><stop offset="50%" stop-color="#0071bc"/><stop offset="100%" stop-color="#1a539b"/></linearGradient>
+                       <linearGradient id="pw_blue3DHL" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#4bc4f7"/><stop offset="50%" stop-color="#00adde"/><stop offset="100%" stop-color="#005a9e"/></linearGradient>
+                       <linearGradient id="pw_gold" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#fbb03b"/><stop offset="50%" stop-color="#ffdd6b"/><stop offset="100%" stop-color="#f7931e"/></linearGradient>
+                       <linearGradient id="pw_orange" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#ff5a15"/><stop offset="100%" stop-color="#ee2c12"/></linearGradient>
+                       <linearGradient id="pw_yellow" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#fff200"/><stop offset="100%" stop-color="#fbb03b"/></linearGradient>
+                       <linearGradient id="pw_skyBlue" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#00c0f0"/><stop offset="100%" stop-color="#0071bc"/></linearGradient>
+                       <linearGradient id="pw_green" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#40c550"/><stop offset="100%" stop-color="#009245"/></linearGradient>
+                     </defs>
+                     <!-- Gold ring -->
+                     <circle cx="300" cy="250" r="155" fill="none" stroke="url(#pw_gold)" stroke-width="10" stroke-dasharray="975" stroke-dashoffset="0"/>
+                     <circle cx="300" cy="250" r="144" fill="none" stroke="url(#pw_gold)" stroke-width="2" stroke-dasharray="4 8" opacity="0.8"/>
+                     <!-- Bottom stripes -->
+                     <g opacity="0.85">
+                       <line x1="220" y1="408" x2="380" y2="408" stroke="#f7931e" stroke-width="6" stroke-linecap="round"/>
+                       <line x1="235" y1="422" x2="365" y2="422" stroke="#fbb03b" stroke-width="5" stroke-linecap="round"/>
+                       <line x1="250" y1="435" x2="350" y2="435" stroke="#ffdd6b" stroke-width="5" stroke-linecap="round"/>
+                       <line x1="270" y1="446" x2="330" y2="446" stroke="#ffd915" stroke-width="4" stroke-linecap="round"/>
+                     </g>
+                     <!-- Inner text top -->
+                     <text x="300" y="168" fill="url(#pw_skyBlue)" font-size="20" text-anchor="middle" letter-spacing="2" font-weight="900" font-family="system-ui,sans-serif">BỐC TÁCH VẬT TƯ</text>
+                     <text x="200" y="196" fill="url(#pw_green)" font-size="17" text-anchor="middle" letter-spacing="1.5" font-weight="900" font-family="system-ui,sans-serif">BÁO GIÁ TỰ ĐỘNG</text>
+                     <!-- DIỄN HỌA banner -->
+                     <g transform="rotate(-11 250 270)">
+                       <rect x="110" y="253" width="235" height="52" rx="4" fill="#232b38" filter="drop-shadow(2px 5px 6px rgba(0,0,0,0.4))"/>
+                       <line x1="116" y1="259" x2="116" y2="301" stroke="#fff200" stroke-width="4" stroke-dasharray="3 3"/>
+                       <line x1="124" y1="259" x2="124" y2="301" stroke="#fff200" stroke-width="4" stroke-dasharray="3 3"/>
+                       <line x1="331" y1="259" x2="331" y2="301" stroke="#fff200" stroke-width="4" stroke-dasharray="3 3"/>
+                       <text x="226" y="292" fill="#ffffff" font-family="system-ui,sans-serif" font-weight="900" font-size="30" font-style="italic" letter-spacing="2" text-anchor="middle">DIỄN HỌA</text>
+                     </g>
+                     <!-- 3D Cube + 3D text -->
+                     <g transform="translate(460,215)">
+                       <ellipse cx="5" cy="95" rx="60" ry="16" fill="rgba(0,0,0,0.25)"/>
+                       <polygon points="-70,-22 5,-65 80,-22 5,20" fill="url(#pw_blue3DHL)" stroke="#4bc4f7" stroke-width="1"/>
+                       <polygon points="-70,-22 5,20 5,105 -70,62" fill="#1c55aa" stroke="#25aae1" stroke-width="1"/>
+                       <polygon points="5,20 80,-22 80,62 5,105" fill="#0c3575" stroke="#1c55aa" stroke-width="1"/>
+                       <g transform="translate(-90,104) scale(2.5)">
+                         <text x="0" y="0" fill="#042240" font-size="68" transform="skewY(29.5) scale(1,0.866)" font-weight="900" font-family="system-ui,sans-serif">3</text>
+                         <text x="-1.5" y="-1.5" fill="#0c438c" font-size="68" transform="skewY(29.5) scale(1,0.866)" font-weight="900" font-family="system-ui,sans-serif">3</text>
+                         <text x="-3" y="-3" fill="url(#pw_blue3DHL)" font-size="68" transform="skewY(29.5) scale(1,0.866)" font-weight="900" font-family="system-ui,sans-serif">3</text>
+                       </g>
+                       <g transform="translate(-32,166) scale(2.5)">
+                         <text x="0" y="0" fill="#021428" font-size="68" transform="skewY(-29.5) scale(1,0.866)" font-weight="900" font-family="system-ui,sans-serif">D</text>
+                         <text x="1.5" y="-1.5" fill="#0c3c78" font-size="68" transform="skewY(-29.5) scale(1,0.866)" font-weight="900" font-family="system-ui,sans-serif">D</text>
+                         <text x="3" y="-3" fill="#ffffff" font-size="68" transform="skewY(-29.5) scale(1,0.866)" font-weight="900" font-family="system-ui,sans-serif">D</text>
+                       </g>
+                     </g>
+                     <!-- Orange "GÓI CHUYÊN DỤNG" banner -->
+                     <g transform="rotate(-15 250 365)">
+                       <rect x="120" y="345" width="255" height="56" rx="28" fill="url(#pw_orange)" stroke="#fff" stroke-width="4" filter="drop-shadow(3px 6px 8px rgba(0,0,0,0.35))"/>
+                       <text x="248" y="383" fill="#fff" font-size="18" font-weight="bold" letter-spacing="1" text-anchor="middle" font-family="system-ui,sans-serif">GÓI CHUYÊN DỤNG</text>
+                     </g>
+                     <!-- Yellow "2.000.000/NĂM" badge -->
+                     <g transform="rotate(-11 390 425)">
+                       <rect x="255" y="398" width="258" height="68" rx="18" fill="url(#pw_yellow)" stroke="#fff" stroke-width="4" filter="drop-shadow(4px 8px 10px rgba(0,0,0,0.4))"/>
+                       <rect x="262" y="405" width="244" height="54" rx="13" fill="none" stroke="#e1af26" stroke-width="2" stroke-dasharray="6 4"/>
+                       <text x="384" y="444" fill="#182c3c" font-family="system-ui,sans-serif" font-weight="900" font-size="24" text-anchor="middle"><tspan id="svg-yearly-price-val">2.000.000</tspan> <tspan id="svg-yearly-price-unit" fill="#344d5c" font-size="16" font-weight="bold">/NĂM</tspan></text>
+                     </g>
+                   </svg>
+                 </div>
+
+                <!-- CALCULATOR CARD -->
+                <div style="display:none !important;background:#fff;border-radius:24px;border:1px solid #e2e8f0;box-shadow:0 4px 16px rgba(0,0,0,.08);padding:20px;position:relative;overflow:hidden;">
+                  <div style="position:absolute;top:-40px;left:-40px;width:100px;height:100px;background:rgba(34,211,238,.1);border-radius:50%;"></div>
+                  <div onclick="pw_toggleCalc()" style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;padding-bottom:12px;border-bottom:1px solid #f1f5f9;margin-bottom:14px;" role="button">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                      <span style="font-size:16px;">🧮</span>
+                      <h3 style="font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#1c1917;margin:0;">Bảng Tính Giá Ước Tính</h3>
+                    </div>
+                    <span id="calc-chevron" style="color:#94a3b8;font-size:14px;transition:transform .3s;">▼</span>
+                  </div>
+                  <div id="calc-body" style="display:none;">
+                    <!-- Summary -->
+                    <div style="background:#f8fafc;border:1px solid #f1f5f9;border-radius:12px;padding:14px;margin-bottom:14px;">
+                      <div style="display:flex;justify-content:space-between;align-items:center;font-size:11px;margin-bottom:6px;">
+                        <span style="color:#64748b;">Gói Dịch Vụ:</span>
+                        <span id="calc-plan-name" style="font-weight:900;text-transform:uppercase;color:#0891b2;font-size:11px;"></span>
+                      </div>
+                      <div style="display:flex;justify-content:space-between;align-items:center;font-size:11px;">
+                        <span style="color:#64748b;">Chu kỳ:</span>
+                        <span id="calc-cycle-name" style="font-weight:700;color:#d97706;font-size:11px;"></span>
+                      </div>
+                      <div id="calc-savings-row" style="display:none;background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.3);border-radius:8px;padding:4px 10px;margin-top:8px;display:flex;justify-content:space-between;align-items:center;font-size:10px;">
+                        <span style="color:#92400e;font-weight:700;">🔥 Tiết kiệm:</span>
+                        <span id="calc-savings-val" style="color:#b45309;font-weight:900;font-family:monospace;"></span>
+                      </div>
+                    </div>
+                    <!-- Storage slider -->
+                    <div style="margin-bottom:12px;">
+                      <div style="display:flex;justify-content:space-between;align-items:center;font-size:11px;margin-bottom:4px;">
+                        <span style="color:#374151;font-weight:600;">Dung Lượng Thêm (GB)</span>
+                        <span id="calc-storage-val" style="font-weight:700;color:#0891b2;font-family:monospace;font-size:13px;">+0 GB</span>
+                      </div>
+                      <input type="range" id="calc-storage" min="0" max="100" step="10" value="0" oninput="pw_updateCalc()" style="width:100%;accent-color:#22d3ee;height:6px;cursor:pointer;border-radius:4px;">
+                      <span style="font-size:9px;color:#94a3b8;font-family:monospace;">+20,000đ mỗi 10 GB</span>
+                    </div>
+                    <!-- Users slider -->
+                    <div style="margin-bottom:14px;">
+                      <div style="display:flex;justify-content:space-between;align-items:center;font-size:11px;margin-bottom:4px;">
+                        <span style="color:#374151;font-weight:600;">Số Lượng Người Dùng</span>
+                        <span id="calc-users-val" style="font-weight:700;color:#0891b2;font-family:monospace;font-size:13px;">10 Users</span>
+                      </div>
+                      <input type="range" id="calc-users" min="5" max="50" step="5" value="10" oninput="pw_updateCalc()" style="width:100%;accent-color:#22d3ee;height:6px;cursor:pointer;border-radius:4px;">
+                      <span style="font-size:9px;color:#94a3b8;font-family:monospace;">Miễn phí 10 users, +50,000đ/user/tháng</span>
+                    </div>
+                    <!-- Total -->
+                    <div style="padding-top:12px;border-top:1px solid #f1f5f9;">
+                      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px;">
+                        <span style="font-size:10px;color:#64748b;font-weight:700;text-transform:uppercase;">Tổng chi phí:</span>
+                        <span id="calc-total" style="font-size:24px;font-weight:900;color:#d97706;font-family:sans-serif;"></span>
+                      </div>
+                      <button onclick="pw_openContact()" style="width:100%;background:#22d3ee;color:#fff;font-weight:700;font-size:10px;text-transform:uppercase;letter-spacing:2px;padding:12px;border-radius:12px;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 12px rgba(34,211,238,.4);transition:background .2s;">
+                        📄 Tải PDF Báo Giá / Chi Tiết
+                      </button>
+                      <p style="font-size:9px;color:#94a3b8;text-align:center;margin-top:6px;font-family:monospace;">* Giá trên chưa bao gồm VAT</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div><!-- end grid -->
+          </div><!-- end pricing-widget -->
+
           <div class="mt-6 flex justify-center gap-3">
             <a
               id="pricing-cta"
@@ -146,6 +349,260 @@
           </div>
         </div>
       </section>
+
+      <style>
+        #pricing-widget, #pricing-widget * { font-family: ui-sans-serif, system-ui, -apple-system, sans-serif !important; }
+        #pricing-widget button:hover { opacity: .9; }
+        @keyframes pw_bounce { from { transform: translateY(0); } to { transform: translateY(-3px); } }
+        .pw-active-card { border-color: #22d3ee !important; box-shadow: 0 0 0 3px rgba(34,211,238,.2), 0 8px 24px rgba(0,0,0,.12) !important; }
+        .pw-active-btn { background: #0891b2 !important; color: #fff !important; border-color: #0891b2 !important; box-shadow: 0 4px 12px rgba(8,145,178,.3) !important; }
+        .pw-active-btn-pro { background: #189bb4 !important; color: #fff !important; border-color: #189bb4 !important; box-shadow: 0 4px 12px rgba(24,155,180,.3) !important; }
+        .pw-radio-on { background: #22d3ee !important; border-color: #22d3ee !important; }
+        .pw-radio-on-pro { background: #189bb4 !important; border-color: #189bb4 !important; }
+        .pw-radio-dot::after { content: ''; display: block; width: 6px; height: 6px; background: #fff; border-radius: 50%; margin: auto; margin-top: 3px; }
+        .pw-row-bg { background: rgba(34,211,238,.06) !important; }
+        .pw-row-bg-pro { background: rgba(24,155,180,.06) !important; }
+        @media (max-width: 768px) {
+          #pricing-widget > div { grid-template-columns: 1fr !important; }
+        }
+      </style>
+
+      <script>
+      (function() {
+        var FEATURES = [
+          { id: 'reports', name: 'Báo Cáo & Phân Tích', special: false },
+          { id: 'gps_attendance', name: 'Chấm Công GPS', special: false },
+          { id: 'tasks', name: 'Giao Việc', special: false },
+          { id: 'orders', name: 'Quản Lý Đơn Hàng', special: false },
+          { id: 'crm', name: 'Quản Lý Khách Hàng', special: false },
+          { id: 'contract_piece', name: 'Cơ Chế Khoán', special: false },
+          { id: 'hr', name: 'Quản Lý Nhân Sự', special: false },
+          { id: 'subcontractors', name: 'Quản Lý Thầu Phụ', special: false },
+          { id: 'payroll', name: 'Bảng Lương', special: false },
+          { id: 'chat', name: 'Chat Nhóm', special: false },
+          { id: 'rating', name: 'Chấm Sao', special: false },
+          { id: 'contracts', name: 'Giấy Tờ Hợp Đồng', special: false },
+          { id: 'inventory', name: 'Vật Tư - Tồn Kho', special: true },
+          { id: 'quotations', name: 'Báo Giá', special: true }
+        ];
+        var BASIC_FEATURES = ['reports','gps_attendance','tasks','orders','crm','contract_piece','hr','subcontractors','payroll','chat','rating','contracts'];
+        var PRO_FEATURES = ['reports','gps_attendance','tasks','orders','crm','contract_piece','hr','subcontractors','payroll','chat','rating','contracts','inventory','quotations'];
+        var PLANS = {
+          basic: { name: 'CƠ BẢN', p6: 2000000, p12: 3000000, storageGB: 10 },
+          professional: { name: 'CHUYÊN NGHIỆP', p6: 2500000, p12: 4000000, storageGB: 20 },
+          specialized: { name: 'CHUYÊN DỤNG 3D', p6: 0, p12: 0, yearly: 2000000, storageGB: 50 }
+        };
+
+        var pw_state = { plan: 'professional', billing: '12', storage: 0, users: 10 };
+        window._pw_state = pw_state;
+        window._pw_PLANS = PLANS;
+
+        function renderFeatureList(containerId, included) {
+          var el = document.getElementById(containerId);
+          if (!el) return;
+          el.innerHTML = FEATURES.map(function(f) {
+            var inc = included.indexOf(f.id) !== -1;
+            var color = inc ? (f.special ? '#dc2626' : '#1c1917') : '#d1d5db';
+            var checkColor = inc ? (f.special ? '#ef4444' : '#10b981') : '#d1d5db';
+            var strike = inc ? '' : 'text-decoration:line-through;opacity:.4;';
+            return '<div style="display:flex;align-items:start;gap:8px;font-size:11px;padding:4px 4px;' + strike + 'color:' + color + ';' + (f.special && inc ? 'font-weight:800;' : '') + '">' +
+              '<svg style="width:14px;height:14px;flex-shrink:0;margin-top:1px;color:' + checkColor + ';" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>' +
+              '<span>' + f.name + '</span></div>';
+          }).join('');
+        }
+
+        function pw_fmt(n) {
+          return new Intl.NumberFormat('vi-VN').format(n) + ' đ';
+        }
+
+        function pw_updateCalc() {
+          var storage = parseInt(document.getElementById('calc-storage').value) || 0;
+          var users = parseInt(document.getElementById('calc-users').value) || 10;
+          pw_state.storage = storage;
+          pw_state.users = users;
+          document.getElementById('calc-storage-val').textContent = '+' + storage + ' GB';
+          document.getElementById('calc-users-val').textContent = users + ' Users';
+
+          var plan = PLANS[pw_state.plan];
+          var billing = pw_state.billing;
+          var dur = billing === '6' ? 6 : 12;
+          var base = 0;
+          if (pw_state.plan === 'specialized') { base = plan.yearly || 2000000; dur = 12; }
+          else { base = billing === '6' ? plan.p6 : plan.p12; }
+
+          var storageExtra = Math.floor(storage / 10) * 20000 * dur;
+          var userExtra = Math.max(0, users - 10) * 50000 * dur;
+          var total = base + storageExtra + userExtra;
+
+          document.getElementById('calc-total').textContent = pw_fmt(total);
+          document.getElementById('calc-plan-name').textContent = plan.name;
+          document.getElementById('calc-cycle-name').textContent = billing === '6' ? (document.documentElement.lang === 'en' ? '6 months' : (document.documentElement.lang === 'zh' ? '6个月' : '6 tháng')) : (billing === '12' ? (document.documentElement.lang === 'en' ? '12 months' : (document.documentElement.lang === 'zh' ? '12个月' : '12 tháng')) : (document.documentElement.lang === 'en' ? 'Year' : (document.documentElement.lang === 'zh' ? '年' : 'Năm')));
+
+          // Savings
+          var savRow = document.getElementById('calc-savings-row');
+          var savings = 0;
+          if (pw_state.plan !== 'specialized') {
+            var cost2x6 = billing === '12' ? plan.p6 * 2 : plan.p6;
+            savings = Math.max(0, cost2x6 - base);
+          } else { savings = 500000; }
+          if (savings > 0) {
+            savRow.style.display = 'flex';
+            document.getElementById('calc-savings-val').textContent = '-' + pw_fmt(savings);
+          } else { savRow.style.display = 'none'; }
+        }
+        window.pw_updateCalc = pw_updateCalc;
+
+        window.pw_selectPlan = function(plan) {
+          pw_state.plan = plan;
+          // update card borders
+          ['basic','professional','specialized'].forEach(function(p) {
+            var c = document.getElementById('card-' + p);
+            if (c) c.classList.toggle('pw-active-card', p === plan);
+          });
+          // update buttons
+          var btnBasic = document.getElementById('btn-basic');
+          var btnPro = document.getElementById('btn-professional');
+          if (btnBasic) { btnBasic.className = plan === 'basic' ? 'pw-active-btn' : ''; btnBasic.style.cssText = plan === 'basic' ? 'width:100%;padding:10px;border-radius:12px;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:1px;border:none;background:#0891b2;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;box-shadow:0 4px 12px rgba(8,145,178,.3);' : 'width:100%;padding:10px;border-radius:12px;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:1px;border:1px solid #e2e8f0;background:#fff;color:#374151;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;'; }
+          if (btnPro) { btnPro.style.cssText = plan === 'professional' ? 'width:100%;padding:10px;border-radius:12px;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:1px;border:none;background:#189bb4;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;box-shadow:0 4px 12px rgba(24,155,180,.3);' : 'width:100%;padding:10px;border-radius:12px;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:1px;border:1px solid #e2e8f0;background:#fff;color:#374151;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;'; }
+          pw_updateRadios();
+          pw_updateCalc();
+        };
+
+        window.pw_setBilling = function(cycle) {
+          if (pw_state.plan === 'specialized' && cycle !== 'yearly') return;
+          pw_state.billing = cycle;
+          pw_updateRadios();
+          pw_updateCalc();
+        };
+
+        function pw_updateRadios() {
+          var plan = pw_state.plan;
+          var billing = pw_state.billing;
+          function setRadio(id, on, isPro) {
+            var el = document.getElementById(id);
+            if (!el) return;
+            el.style.background = on ? (isPro ? '#189bb4' : '#22d3ee') : '';
+            el.style.borderColor = on ? (isPro ? '#189bb4' : '#22d3ee') : '#cbd5e1';
+            el.innerHTML = on ? '<div style="width:6px;height:6px;background:#fff;border-radius:50%;"></div>' : '';
+          }
+          function setRowBg(id, on, isPro) {
+            var el = document.getElementById(id);
+            if (!el) return;
+            el.style.background = on ? (isPro ? 'rgba(24,155,180,.06)' : 'rgba(34,211,238,.06)') : '';
+          }
+          setRadio('basic-radio-6', plan === 'basic' && billing === '6', false);
+          setRadio('basic-radio-12', plan === 'basic' && billing === '12', false);
+          setRadio('pro-radio-6', plan === 'professional' && billing === '6', true);
+          setRadio('pro-radio-12', plan === 'professional' && billing === '12', true);
+          setRowBg('basic-opt-6', plan === 'basic' && billing === '6', false);
+          setRowBg('basic-opt-12', plan === 'basic' && billing === '12', false);
+          setRowBg('pro-opt-6', plan === 'professional' && billing === '6', true);
+          setRowBg('pro-opt-12', plan === 'professional' && billing === '12', true);
+        }
+
+        window.pw_toggleCalc = function() {
+          var body = document.getElementById('calc-body');
+          var chev = document.getElementById('calc-chevron');
+          var open = body.style.display !== 'none';
+          body.style.display = open ? 'none' : 'block';
+          if (chev) chev.style.transform = open ? '' : 'rotate(180deg)';
+        };
+
+        window.pw_openContact = function() {
+          var el = document.getElementById('dang-ky');
+          if (el) el.scrollIntoView({ behavior: 'smooth' });
+        };
+
+        // Expose dynamic updates
+        window.pw_updatePricingData = function(pricingData, currentLang) {
+          if (!pricingData) return;
+
+          function localPick(val) {
+            if (!val) return "";
+            if (typeof val === "string") return val;
+            return val[currentLang] || val.vi || val.en || "";
+          }
+
+          if (Array.isArray(pricingData.featureList)) {
+            FEATURES = pricingData.featureList.map(function(f) {
+              return {
+                id: f.id,
+                name: localPick(f.name),
+                special: Boolean(f.special)
+              };
+            });
+          }
+
+          if (Array.isArray(pricingData.plans)) {
+            pricingData.plans.forEach(function(plan) {
+              if (plan.id === 'basic') {
+                PLANS.basic.name = localPick(plan.name);
+                PLANS.basic.p6 = plan.price6;
+                PLANS.basic.p12 = plan.price12;
+                PLANS.basic.storageGB = plan.storageGB || 10;
+                BASIC_FEATURES = plan.features || [];
+
+                var titleEl = document.getElementById('basic-plan-title');
+                if (titleEl) titleEl.textContent = PLANS.basic.name;
+                var p6El = document.getElementById('basic-price-6');
+                if (p6El) p6El.innerHTML = pw_fmt(plan.price6) + ' <span style="color:#94a3b8;font-size:11px;font-weight:400;font-family:monospace;">/' + (currentLang === 'en' ? '6 months' : (currentLang === 'zh' ? '6个月' : '6 tháng')) + '</span>';
+                var p12El = document.getElementById('basic-price-12');
+                if (p12El) p12El.innerHTML = pw_fmt(plan.price12) + ' <span style="color:#94a3b8;font-size:11px;font-weight:400;font-family:monospace;">/' + (currentLang === 'en' ? '12 months' : (currentLang === 'zh' ? '12个月' : '12 tháng')) + '</span>';
+                var storeEl = document.getElementById('basic-storage-label');
+                if (storeEl) storeEl.textContent = (currentLang === 'en' ? 'Storage ' : (currentLang === 'zh' ? '存储 ' : 'Lưu trữ ')) + (plan.storageGB || 10) + ' GB';
+
+                var badgeEl = document.getElementById('basic-recommended-badge');
+                if (badgeEl) badgeEl.style.display = plan.recommended ? 'block' : 'none';
+              } else if (plan.id === 'professional') {
+                PLANS.professional.name = localPick(plan.name);
+                PLANS.professional.p6 = plan.price6;
+                PLANS.professional.p12 = plan.price12;
+                PLANS.professional.storageGB = plan.storageGB || 20;
+                PRO_FEATURES = plan.features || [];
+
+                var titleEl = document.getElementById('pro-plan-title');
+                if (titleEl) titleEl.textContent = PLANS.professional.name;
+                var p6El = document.getElementById('pro-price-6');
+                if (p6El) p6El.innerHTML = pw_fmt(plan.price6) + ' <span style="color:#94a3b8;font-size:11px;font-weight:400;font-family:monospace;">/' + (currentLang === 'en' ? '6 months' : (currentLang === 'zh' ? '6个月' : '6 tháng')) + '</span>';
+                var p12El = document.getElementById('pro-price-12');
+                if (p12El) p12El.innerHTML = pw_fmt(plan.price12) + ' <span style="color:#94a3b8;font-size:11px;font-weight:400;font-family:monospace;">/' + (currentLang === 'en' ? '12 months' : (currentLang === 'zh' ? '12个月' : '12 tháng')) + '</span>';
+                var storeEl = document.getElementById('pro-storage-label');
+                if (storeEl) storeEl.textContent = (currentLang === 'en' ? 'Storage ' : (currentLang === 'zh' ? '存储 ' : 'Lưu trữ ')) + (plan.storageGB || 20) + ' GB';
+
+                var badgeEl = document.getElementById('pro-recommended-badge');
+                if (badgeEl) badgeEl.style.display = plan.recommended ? 'block' : 'none';
+              } else if (plan.id === 'specialized') {
+                PLANS.specialized.name = localPick(plan.name);
+                PLANS.specialized.yearly = plan.priceYearly;
+                PLANS.specialized.storageGB = plan.storageGB || 50;
+
+                var svgTitleEl = document.getElementById('svg-specialized-title');
+                if (svgTitleEl) svgTitleEl.textContent = PLANS.specialized.name;
+                var svgPriceVal = document.getElementById('svg-yearly-price-val');
+                if (svgPriceVal) svgPriceVal.textContent = new Intl.NumberFormat('vi-VN').format(plan.priceYearly);
+                var svgPriceUnit = document.getElementById('svg-yearly-price-unit');
+                if (svgPriceUnit) svgPriceUnit.textContent = '/' + (currentLang === 'en' ? 'YEAR' : (currentLang === 'zh' ? '年' : 'NĂM'));
+
+                var badgeEl = document.getElementById('specialized-recommended-badge');
+                if (badgeEl) badgeEl.style.display = plan.recommended ? 'block' : 'none';
+              }
+            });
+          }
+
+          renderFeatureList('basic-features', BASIC_FEATURES);
+          renderFeatureList('pro-features', PRO_FEATURES);
+          pw_updateRadios();
+          pw_updateCalc();
+        };
+
+        // Init
+        renderFeatureList('basic-features', BASIC_FEATURES);
+        renderFeatureList('pro-features', PRO_FEATURES);
+        pw_selectPlan('professional');
+        pw_setBilling('12');
+        pw_updateCalc();
+      })();
+      </script>
 
       <section id="ly-do" class="bg-white py-14">
         <div class="container mx-auto px-4">
@@ -191,6 +648,724 @@
         </div>
         <div id="footer-copyright" class="container mx-auto mt-10 px-4 text-center text-xs text-neutral-400"></div>
       </footer>
+
+      <!-- ==================== CONTRACT MODAL ==================== -->
+      <div id="contract-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9999;overflow-y:auto;">
+        <div style="max-width:900px;margin:32px auto;background:#fff;border-radius:16px;box-shadow:0 24px 48px rgba(0,0,0,.2);position:relative;">
+          <!-- Close button -->
+          <button onclick="cm_close()" style="position:absolute;top:16px;right:16px;background:none;border:none;font-size:24px;color:#94a3b8;cursor:pointer;z-index:10;line-height:1;" title="Đóng">&times;</button>
+
+          <!-- STEP 1: Form -->
+          <div id="cm-step1" style="padding:32px;">
+            <h2 style="font-size:20px;font-weight:800;color:#1c1917;margin:0 0 4px;">Đăng Ký Hợp Đồng</h2>
+            <p style="font-size:13px;color:#64748b;margin:0 0 20px;">Vui lòng điền thông tin để tạo hợp đồng sử dụng phần mềm ADMAKE</p>
+
+            <div style="display:flex;gap:24px;">
+              <!-- Form fields -->
+              <div style="flex:1;">
+                <form id="cm-form" onsubmit="return cm_toStep2()">
+                  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                    <div>
+                      <label style="display:block;font-size:11px;font-weight:600;color:#374151;margin-bottom:4px;">Họ tên <span style="color:#ef4444;">*</span></label>
+                      <input name="name" type="text" required style="width:100%;padding:8px 10px;border:1px solid #e2e8f0;border-radius:8px;font-size:13px;" />
+                    </div>
+                    <div>
+                      <label style="display:block;font-size:11px;font-weight:600;color:#374151;margin-bottom:4px;">Số điện thoại <span style="color:#ef4444;">*</span></label>
+                      <input name="phone" type="tel" required style="width:100%;padding:8px 10px;border:1px solid #e2e8f0;border-radius:8px;font-size:13px;" />
+                    </div>
+                    <div>
+                      <label style="display:block;font-size:11px;font-weight:600;color:#374151;margin-bottom:4px;">Email</label>
+                      <input name="email" type="email" style="width:100%;padding:8px 10px;border:1px solid #e2e8f0;border-radius:8px;font-size:13px;" />
+                    </div>
+                    <div>
+                      <label style="display:block;font-size:11px;font-weight:600;color:#374151;margin-bottom:4px;">Tên công ty <span style="color:#ef4444;">*</span></label>
+                      <input name="company" type="text" required style="width:100%;padding:8px 10px;border:1px solid #e2e8f0;border-radius:8px;font-size:13px;" />
+                    </div>
+                    <div>
+                      <label style="display:block;font-size:11px;font-weight:600;color:#374151;margin-bottom:4px;">Ngành nghề</label>
+                      <select name="industry" style="width:100%;padding:8px 10px;border:1px solid #e2e8f0;border-radius:8px;font-size:13px;background:#fff;">
+                        <option value="">-- Chọn --</option>
+                        <option value="Nhôm kính">Nhôm kính</option>
+                        <option value="Nội thất">Nội thất</option>
+                        <option value="Cơ khí">Cơ khí</option>
+                        <option value="Xây dựng">Xây dựng</option>
+                        <option value="Khác">Khác</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label style="display:block;font-size:11px;font-weight:600;color:#374151;margin-bottom:4px;">Quy mô</label>
+                      <select name="companySize" style="width:100%;padding:8px 10px;border:1px solid #e2e8f0;border-radius:8px;font-size:13px;background:#fff;">
+                        <option value="">-- Chọn --</option>
+                        <option value="1-5">1-5</option>
+                        <option value="6-20">6-20</option>
+                        <option value="21-50">21-50</option>
+                        <option value="51-100">51-100</option>
+                        <option value="100+">100+</option>
+                      </select>
+                    </div>
+                    <div style="grid-column:span 2;">
+                      <label style="display:block;font-size:11px;font-weight:600;color:#374151;margin-bottom:4px;">Địa chỉ <span style="color:#ef4444;">*</span></label>
+                      <input name="address" type="text" required style="width:100%;padding:8px 10px;border:1px solid #e2e8f0;border-radius:8px;font-size:13px;" />
+                    </div>
+                    <div>
+                      <label style="display:block;font-size:11px;font-weight:600;color:#374151;margin-bottom:4px;">Mã số thuế <span style="color:#ef4444;">*</span></label>
+                      <input name="tax_code" type="text" required style="width:100%;padding:8px 10px;border:1px solid #e2e8f0;border-radius:8px;font-size:13px;" />
+                    </div>
+                    <div>
+                      <label style="display:block;font-size:11px;font-weight:600;color:#374151;margin-bottom:4px;">Đại diện pháp luật <span style="color:#ef4444;">*</span></label>
+                      <input name="legal_rep" type="text" required style="width:100%;padding:8px 10px;border:1px solid #e2e8f0;border-radius:8px;font-size:13px;" />
+                    </div>
+                    <div>
+                      <label style="display:block;font-size:11px;font-weight:600;color:#374151;margin-bottom:4px;">Chức vụ <span style="color:#ef4444;">*</span></label>
+                      <input name="legal_rep_position" type="text" required style="width:100%;padding:8px 10px;border:1px solid #e2e8f0;border-radius:8px;font-size:13px;" />
+                    </div>
+                    <div>
+                      <label style="display:block;font-size:11px;font-weight:600;color:#374151;margin-bottom:4px;">Email nhận hóa đơn</label>
+                      <input name="invoice_email" type="email" style="width:100%;padding:8px 10px;border:1px solid #e2e8f0;border-radius:8px;font-size:13px;" />
+                    </div>
+                    <div style="grid-column:span 2;">
+                      <label style="display:block;font-size:11px;font-weight:600;color:#374151;margin-bottom:4px;">Mô tả thêm</label>
+                      <textarea name="description" rows="2" style="width:100%;padding:8px 10px;border:1px solid #e2e8f0;border-radius:8px;font-size:13px;resize:vertical;"></textarea>
+                    </div>
+                    <div>
+                      <label style="display:block;font-size:11px;font-weight:600;color:#374151;margin-bottom:4px;">Mã giảm giá</label>
+                      <input name="promo_code" type="text" style="width:100%;padding:8px 10px;border:1px solid #e2e8f0;border-radius:8px;font-size:13px;" />
+                    </div>
+                  </div>
+                  <button type="submit" style="margin-top:20px;width:100%;padding:12px;border:none;border-radius:12px;background:#0891b2;color:#fff;font-weight:700;font-size:13px;cursor:pointer;letter-spacing:0.5px;">Tiếp tục →</button>
+                </form>
+              </div>
+
+              <!-- Summary sidebar -->
+              <div style="width:240px;flex-shrink:0;background:#f8fafc;border-radius:12px;padding:20px;border:1px solid #f1f5f9;align-self:flex-start;">
+                <div style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:2px;margin-bottom:12px;">Tóm tắt đơn hàng</div>
+                <div style="font-size:14px;font-weight:800;color:#1c1917;margin-bottom:4px;" id="cm-summary-plan"></div>
+                <div style="font-size:11px;color:#64748b;margin-bottom:16px;" id="cm-summary-billing"></div>
+                <div style="border-top:1px solid #e2e8f0;padding-top:12px;">
+                  <div style="display:flex;justify-content:space-between;font-size:12px;color:#374151;margin-bottom:6px;">
+                    <span>Phí dịch vụ</span>
+                    <span id="cm-summary-base" style="font-weight:700;"></span>
+                  </div>
+                  <div style="display:flex;justify-content:space-between;font-size:12px;color:#374151;margin-bottom:6px;">
+                    <span>Thuế GTGT 10%</span>
+                    <span id="cm-summary-vat" style="font-weight:700;"></span>
+                  </div>
+                  <div style="border-top:1px solid #e2e8f0;padding-top:8px;display:flex;justify-content:space-between;font-size:14px;font-weight:900;color:#d97706;">
+                    <span>Tổng cộng</span>
+                    <span id="cm-summary-total"></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- STEP 2: Contract Preview -->
+          <div id="cm-step2" style="display:none;padding:32px;">
+            <div id="cm-contract-body" style="font-family:ui-sans-serif,system-ui,sans-serif;font-size:13px;line-height:1.7;color:#1c1917;">
+              <div style="text-align:center;margin-bottom:24px;">
+                <div style="font-size:13px;font-weight:700;">CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</div>
+                <div style="font-size:13px;font-weight:700;text-decoration:underline;">Độc lập – Tự do – Hạnh phúc</div>
+                <div style="margin-top:16px;font-size:16px;font-weight:900;">HỢP ĐỒNG CUNG CẤP QUYỀN SỬ DỤNG PHẦN MỀM ADMAKE</div>
+                <div style="font-size:12px;color:#64748b;margin-top:4px;" id="cm-contract-number"></div>
+              </div>
+
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:24px;">
+                <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:16px;">
+                  <div style="font-weight:800;font-size:14px;margin-bottom:8px;color:#166534;">BÊN A (Bên sử dụng)</div>
+                  <div id="cm-party-a"></div>
+                </div>
+                <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:16px;">
+                  <div style="font-weight:800;font-size:14px;margin-bottom:8px;color:#1e40af;">BÊN B (Bên cung cấp)</div>
+                  <div>
+                    <div><strong>Tên:</strong> CÔNG TY TNHH MỘT THÀNH VIÊN CÔNG NGHỆ ADMAKE</div>
+                    <div><strong>MST:</strong> 6001813231</div>
+                    <div><strong>Địa chỉ:</strong> 167 Nguyễn Du, TP. Buôn Ma Thuột, Tỉnh Đắk Lắk</div>
+                    <div><strong>Đại diện:</strong> Ông DƯƠNG ĐÌNH BẢO – Giám đốc</div>
+                    <div><strong>ĐT:</strong> 0837 88 44 77</div>
+                    <div><strong>TK:</strong> 660030 0837884477 – COOPBANK CN ĐẮK LẮK</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Service info -->
+              <div style="background:#fefce8;border:1px solid #fde68a;border-radius:8px;padding:16px;margin-bottom:24px;">
+                <div style="font-weight:800;font-size:13px;margin-bottom:8px;color:#92400e;">THÔNG TIN DỊCH VỤ</div>
+                <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;font-size:12px;">
+                  <div><strong>Gói:</strong> <span id="cm-svc-plan"></span></div>
+                  <div><strong>Thời hạn:</strong> <span id="cm-svc-duration"></span></div>
+                  <div><strong>Giá trị HĐ:</strong> <span id="cm-svc-amount" style="color:#d97706;font-weight:800;"></span></div>
+                </div>
+              </div>
+
+              <!-- Accordion clauses -->
+              <div id="cm-clauses" style="margin-bottom:24px;"></div>
+
+              <!-- Signature Area -->
+              <div style="margin-top: 40px; display: grid; grid-template-columns: 1fr 1fr; gap: 24px; text-align: center; page-break-inside: avoid;">
+                <div>
+                  <div style="font-weight: 700; font-size: 13px;">ĐẠI DIỆN BÊN A</div>
+                  <div style="font-style: italic; font-size: 11px; color: #64748b; margin-bottom: 8px;">(Ký và ghi rõ họ tên)</div>
+                  <div id="cm-sig-a-img-container" style="height: 80px; display: flex; align-items: center; justify-content: center; margin-bottom: 8px;">
+                    <div style="color: #cbd5e1; font-size: 11px; font-style: italic; border: 1px dashed #cbd5e1; padding: 12px 24px; border-radius: 6px; width: 80%; display: flex; align-items: center; justify-content: center;">Chưa ký</div>
+                  </div>
+                  <div id="cm-sig-a-name" style="font-weight: 700; font-size: 13px;"></div>
+                </div>
+                <div>
+                  <div style="font-weight: 700; font-size: 13px;">ĐẠI DIỆN BÊN B</div>
+                  <div style="font-style: italic; font-size: 11px; color: #64748b; margin-bottom: 8px;">(Ký và ghi rõ họ tên)</div>
+                  <div style="height: 80px; display: flex; align-items: center; justify-content: center; margin-bottom: 8px;">
+                    <span style="font-family: 'Brush Script MT', cursive, sans-serif; font-size: 32px; color: #0891b2; transform: rotate(-5deg); display: inline-block;">Admake</span>
+                  </div>
+                  <div style="font-weight: 700; font-size: 13px;">DƯƠNG ĐÌNH BẢO</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Signature Pad and controls -->
+            <div style="margin-top: 24px; padding: 16px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; font-family: ui-sans-serif, system-ui, sans-serif;">
+              <div style="font-weight: 700; font-size: 13px; color: #1f2937; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;">
+                <span>Ký tên điện tử (Ký trực tiếp tại khung dưới)</span>
+                <button type="button" onclick="cm_clearSignature()" style="background: none; border: none; color: #ef4444; font-size: 11px; cursor: pointer; font-weight: 600;">Xóa chữ ký</button>
+              </div>
+              <div style="background: #fff; border: 1px solid #cbd5e1; border-radius: 8px; position: relative; height: 120px; overflow: hidden; touch-action: none;">
+                <canvas id="cm-signature-pad" style="width: 100%; height: 100%; display: block; cursor: crosshair;"></canvas>
+              </div>
+            </div>
+
+            <!-- Actions row: Download PDF -->
+            <div style="margin-top: 16px; margin-bottom: 20px; display: flex; gap: 12px; align-items: center; font-family: ui-sans-serif, system-ui, sans-serif;">
+              <button type="button" onclick="cm_downloadPDF(event)" style="flex: 1; display: flex; justify-content: center; align-items: center; gap: 8px; padding: 10px 16px; border: 1px solid #cbd5e1; border-radius: 10px; background: #fff; color: #374151; font-weight: 600; font-size: 13px; cursor: pointer; transition: background 0.15s; line-height: 1;">
+                <svg style="width: 16px; height: 16px; fill: currentColor;" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                </svg>
+                Tải Hợp Đồng (PDF)
+              </button>
+            </div>
+
+            <!-- Agree checkbox -->
+            <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:14px;margin-bottom:20px;">
+              <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:13px;color:#374151;font-family:ui-sans-serif,system-ui,sans-serif;">
+                <input type="checkbox" id="cm-agree" onchange="cm_toggleConfirm()" style="width:18px;height:18px;accent-color:#0891b2;cursor:pointer;" />
+                <span>Tôi đã đọc và đồng ý với các điều khoản hợp đồng</span>
+              </label>
+            </div>
+
+            <div style="display:flex;gap:12px;justify-content:space-between;font-family:ui-sans-serif,system-ui,sans-serif;">
+              <button onclick="cm_showStep(1)" style="padding:10px 24px;border:1px solid #e2e8f0;border-radius:10px;background:#fff;color:#374151;font-weight:600;font-size:13px;cursor:pointer;">← Quay lại</button>
+              <button id="cm-btn-confirm" disabled onclick="cm_submitContract()" style="padding:10px 24px;border:none;border-radius:10px;background:#d1d5db;color:#fff;font-weight:700;font-size:13px;cursor:not-allowed;">Xác nhận &amp; Thanh toán →</button>
+            </div>
+            <div id="cm-submit-status" style="text-align:center;margin-top:8px;font-size:12px;color:#64748b;font-family:ui-sans-serif,system-ui,sans-serif;"></div>
+          </div>
+
+          <!-- STEP 3: Payment -->
+          <div id="cm-step3" style="display:none;padding:32px;text-align:center;">
+            <div id="cm-pay-success" style="display:none;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:24px;margin-bottom:20px;">
+              <div style="font-size:40px;margin-bottom:8px;">✅</div>
+              <div style="font-size:16px;font-weight:800;color:#166534;">Cảm ơn bạn!</div>
+              <div style="font-size:13px;color:#15803d;margin-top:4px;">Chúng tôi đã nhận được thông tin hợp đồng. Đội ngũ ADMAKE sẽ liên hệ xác nhận trong thời gian sớm nhất.</div>
+            </div>
+            <div id="cm-pay-content">
+              <h3 style="font-size:18px;font-weight:800;color:#1c1917;margin:0 0 4px;">Thanh Toán Chuyển Khoản</h3>
+              <p style="font-size:13px;color:#64748b;margin:0 0 20px;">Quét mã QR hoặc chuyển khoản theo thông tin bên dưới</p>
+
+              <div style="display:flex;gap:24px;justify-content:center;align-items:flex-start;flex-wrap:wrap;">
+                <!-- QR -->
+                <div style="flex-shrink:0;">
+                  <img id="cm-qr-img" style="width:240px;height:auto;border-radius:12px;border:1px solid #e2e8f0;" alt="VietQR" />
+                </div>
+                <!-- Bank info -->
+                <div style="text-align:left;background:#f8fafc;border:1px solid #f1f5f9;border-radius:12px;padding:20px;min-width:280px;">
+                  <div style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:2px;margin-bottom:12px;">Thông tin chuyển khoản</div>
+                  <div style="font-size:13px;color:#374151;line-height:2;">
+                    <div><strong>Chủ TK:</strong> CÔNG TY TNHH MTV CÔNG NGHỆ ADMAKE</div>
+                    <div><strong>STK:</strong> <span style="font-family:monospace;font-weight:700;color:#0891b2;">660030 0837884477</span></div>
+                    <div><strong>Ngân hàng:</strong> COOPBANK – CN ĐẮK LẮK</div>
+                    <div><strong>Nội dung:</strong> <span id="cm-pay-ref" style="font-family:monospace;font-weight:700;color:#d97706;"></span></div>
+                  </div>
+                  <div style="margin-top:12px;display:flex;justify-content:space-between;font-size:14px;font-weight:900;color:#d97706;padding-top:10px;border-top:1px solid #e2e8f0;">
+                    <span>Số tiền:</span>
+                    <span id="cm-pay-amount"></span>
+                  </div>
+                </div>
+              </div>
+
+              <div style="margin-top:24px;display:flex;gap:12px;justify-content:center;">
+                <button onclick="cm_confirmPayment()" style="padding:12px 28px;border:none;border-radius:12px;background:#0891b2;color:#fff;font-weight:700;font-size:13px;cursor:pointer;">Tôi đã chuyển khoản ✓</button>
+              </div>
+            </div>
+            <div style="margin-top:16px;">
+              <button onclick="cm_close()" style="padding:10px 24px;border:1px solid #e2e8f0;border-radius:10px;background:#fff;color:#374151;font-weight:600;font-size:13px;cursor:pointer;">Đóng</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- ==================== END CONTRACT MODAL ==================== -->
+
+      <style>
+        #contract-modal input:focus, #contract-modal select:focus, #contract-modal textarea:focus {
+          outline: none; border-color: #0891b2; box-shadow: 0 0 0 2px rgba(8,145,178,.15);
+        }
+        #contract-modal input, #contract-modal select, #contract-modal textarea {
+          box-sizing: border-box; transition: border-color .15s, box-shadow .15s;
+        }
+        .cm-clause-header {
+          display: flex; justify-content: space-between; align-items: center;
+          padding: 10px 14px; background: #f8fafc; border: 1px solid #e2e8f0;
+          border-radius: 8px; cursor: pointer; font-weight: 700; font-size: 13px;
+          color: #374151; margin-bottom: 4px; transition: background .15s;
+          font-family: ui-sans-serif, system-ui, sans-serif;
+        }
+        .cm-clause-header:hover { background: #f1f5f9; }
+        .cm-clause-body {
+          display: none; padding: 12px 14px; border: 1px solid #f1f5f9;
+          border-top: none; border-radius: 0 0 8px 8px; margin-bottom: 8px;
+          font-size: 12.5px; line-height: 1.8; color: #475569;
+        }
+        .cm-clause-body.cm-open { display: block; }
+        @media (max-width: 768px) {
+          #cm-step1 > div:first-of-type { flex-direction: column; }
+          #cm-step1 > div:first-of-type > div:last-child { width: 100%; }
+          #cm-step1 form > div { grid-template-columns: 1fr !important; }
+          #cm-step1 form > div > div[style*="grid-column:span 2"] { grid-column: span 1 !important; }
+          #cm-step2 .cm-party-grid { grid-template-columns: 1fr !important; }
+          #cm-step3 > div > div:first-of-type { flex-direction: column; align-items: center; }
+        }
+      </style>
+
+      <script>
+      (function() {
+        var cm_leadData = null;
+        var sigCanvas = null;
+        var sigCtx = null;
+        var sigDrawing = false;
+        var sigHasContent = false;
+
+        var CM_CLAUSES = [
+          {
+            title: 'Điều 1: Nội dung dịch vụ',
+            body: 'Bên B cấp quyền sử dụng phần mềm quản lý công việc ADMAKE cho Bên A theo gói dịch vụ đã chọn. Phần mềm bao gồm các tính năng: quản lý công việc, chấm công GPS, quản lý nhân sự, quản lý kho vật tư, báo cáo phân tích và các tính năng khác theo gói dịch vụ đăng ký.'
+          },
+          {
+            title: 'Điều 2: Thời hạn hợp đồng',
+            body: 'Hợp đồng có hiệu lực kể từ ngày thanh toán thành công và có thời hạn theo chu kỳ đăng ký (6 tháng hoặc 12 tháng). Hợp đồng tự động gia hạn nếu hai bên không có thỏa thuận khác trước 30 ngày hết hạn.'
+          },
+          {
+            title: 'Điều 3: Giá trị hợp đồng và phương thức thanh toán',
+            body: 'Giá trị hợp đồng theo gói dịch vụ và chu kỳ thanh toán đã chọn (đã bao gồm thuế GTGT 10%). Bên A thanh toán bằng hình thức chuyển khoản ngân hàng theo thông tin tài khoản của Bên B. Hợp đồng có hiệu lực sau khi Bên B xác nhận nhận được thanh toán.'
+          },
+          {
+            title: 'Điều 4: Quyền và nghĩa vụ của Bên A',
+            body: 'Bên A được sử dụng phần mềm trong phạm vi gói đăng ký. Bên A có trách nhiệm bảo mật thông tin tài khoản, không chia sẻ tài khoản cho bên thứ ba. Bên A cam kết sử dụng phần mềm đúng mục đích, không vi phạm pháp luật.'
+          },
+          {
+            title: 'Điều 5: Quyền và nghĩa vụ của Bên B',
+            body: 'Bên B đảm bảo cung cấp dịch vụ liên tục, ổn định (uptime tối thiểu 99.5%). Bên B hỗ trợ kỹ thuật trong giờ hành chính (8h-17h, T2-T7). Bên B có trách nhiệm bảo mật dữ liệu của Bên A và không cung cấp cho bên thứ ba.'
+          },
+          {
+            title: 'Điều 6: Điều khoản chung',
+            body: 'Mọi tranh chấp phát sinh được giải quyết thông qua thương lượng. Trường hợp không thương lượng được, hai bên đồng ý đưa ra Tòa án có thẩm quyền tại TP. Buôn Ma Thuột, tỉnh Đắk Lắk để giải quyết. Hợp đồng được lập thành 02 bản có giá trị pháp lý như nhau.'
+          }
+        ];
+
+        function cm_initSignaturePad() {
+          sigCanvas = document.getElementById('cm-signature-pad');
+          if (!sigCanvas) return;
+          sigCtx = sigCanvas.getContext('2d');
+          sigDrawing = false;
+          sigHasContent = false;
+
+          // Adjust size relative to CSS size
+          var rect = sigCanvas.getBoundingClientRect();
+          sigCanvas.width = rect.width || 300;
+          sigCanvas.height = rect.height || 120;
+
+          sigCtx.strokeStyle = '#0f172a';
+          sigCtx.lineWidth = 2.5;
+          sigCtx.lineCap = 'round';
+          sigCtx.lineJoin = 'round';
+
+          cm_updateContractSignature();
+
+          function getPos(e) {
+            var r = sigCanvas.getBoundingClientRect();
+            var clientX = e.clientX;
+            var clientY = e.clientY;
+            if (e.touches && e.touches.length > 0) {
+              clientX = e.touches[0].clientX;
+              clientY = e.touches[0].clientY;
+            }
+            return {
+              x: clientX - r.left,
+              y: clientY - r.top
+            };
+          }
+
+          function start(e) {
+            e.preventDefault();
+            sigDrawing = true;
+            var pos = getPos(e);
+            sigCtx.beginPath();
+            sigCtx.moveTo(pos.x, pos.y);
+          }
+
+          function move(e) {
+            if (!sigDrawing) return;
+            e.preventDefault();
+            var pos = getPos(e);
+            sigCtx.lineTo(pos.x, pos.y);
+            sigCtx.stroke();
+            sigHasContent = true;
+            cm_updateContractSignature();
+          }
+
+          function stop() {
+            if (sigDrawing) {
+              sigCtx.closePath();
+              sigDrawing = false;
+            }
+          }
+
+          sigCanvas.onmousedown = start;
+          sigCanvas.onmousemove = move;
+          sigCanvas.onmouseup = stop;
+          sigCanvas.onmouseleave = stop;
+
+          sigCanvas.ontouchstart = start;
+          sigCanvas.ontouchmove = move;
+          sigCanvas.ontouchend = stop;
+          sigCanvas.ontouchcancel = stop;
+        }
+
+        window.cm_clearSignature = function() {
+          if (!sigCanvas || !sigCtx) return;
+          sigCtx.clearRect(0, 0, sigCanvas.width, sigCanvas.height);
+          sigHasContent = false;
+          cm_updateContractSignature();
+        };
+
+        function cm_updateContractSignature() {
+          var container = document.getElementById('cm-sig-a-img-container');
+          if (!container) return;
+          if (sigHasContent) {
+            var dataUrl = sigCanvas.toDataURL();
+            container.innerHTML = '<img src="' + dataUrl + '" style="max-height:100%; max-width:80%; object-fit:contain;" />';
+          } else {
+            container.innerHTML = '<div style="color: #cbd5e1; font-size: 11px; font-style: italic; border: 1px dashed #cbd5e1; padding: 12px 24px; border-radius: 6px; width: 80%; text-align:center;">Chưa ký</div>';
+          }
+        }
+
+        window.cm_downloadPDF = function(event) {
+          var btn = event ? event.currentTarget : document.querySelector('button[onclick*="cm_downloadPDF"]');
+          var originalText = btn ? btn.innerHTML : '';
+          if (btn) {
+            btn.disabled = true;
+            btn.innerHTML = 'Đang tạo PDF...';
+          }
+
+          var proceed = function() {
+            var element = document.getElementById('cm-contract-body').cloneNode(true);
+            
+            // Apply standard print font-family on clone
+            element.style.fontFamily = 'ui-sans-serif, system-ui, sans-serif';
+            element.style.padding = '20px';
+            element.style.background = '#fff';
+
+            var opt = {
+              margin:       15,
+              filename:     (document.getElementById('cm-contract-number')?.textContent || 'hop-dong-admake').replace(/[^a-zA-Z0-9-]/g, '_') + '.pdf',
+              image:        { type: 'jpeg', quality: 0.98 },
+              html2canvas:  { scale: 2, useCORS: true, letterRendering: true },
+              jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            html2pdf().set(opt).from(element).save().then(function() {
+              if (btn) {
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+              }
+            }).catch(function(err) {
+              console.error(err);
+              if (btn) {
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+              }
+            });
+          };
+
+          if (typeof html2pdf === 'undefined') {
+            var script = document.createElement('script');
+            script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
+            script.onload = proceed;
+            script.onerror = function() {
+              alert('Không thể tải thư viện PDF. Vui lòng kiểm tra kết nối mạng của bạn.');
+              if (btn) {
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+              }
+            };
+            document.head.appendChild(script);
+          } else {
+            proceed();
+          }
+        };
+
+        function cm_fmt(n) {
+          return new Intl.NumberFormat('vi-VN').format(n) + ' đ';
+        }
+
+        function cm_getPrice() {
+          var st = window._pw_state;
+          var plans = window._pw_PLANS;
+          if (!st || !plans) return 0;
+          var plan = plans[st.plan];
+          if (!plan) return 0;
+          if (st.plan === 'specialized') return plan.yearly || 2000000;
+          return st.billing === '6' ? plan.p6 : plan.p12;
+        }
+
+        function cm_getPlanName() {
+          var st = window._pw_state;
+          var plans = window._pw_PLANS;
+          if (!st || !plans) return '';
+          var plan = plans[st.plan];
+          return plan ? plan.name : '';
+        }
+
+        function cm_getBillingLabel() {
+          var st = window._pw_state;
+          if (!st) return '';
+          if (st.plan === 'specialized') return '12 tháng (Năm)';
+          return st.billing === '6' ? '6 tháng' : '12 tháng';
+        }
+
+        function cm_updateSummary() {
+          var base = cm_getPrice();
+          var vat = Math.round(base * 0.1);
+          var total = base + vat;
+          var el = function(id) { return document.getElementById(id); };
+          if (el('cm-summary-plan')) el('cm-summary-plan').textContent = 'Gói ' + cm_getPlanName();
+          if (el('cm-summary-billing')) el('cm-summary-billing').textContent = cm_getBillingLabel();
+          if (el('cm-summary-base')) el('cm-summary-base').textContent = cm_fmt(base);
+          if (el('cm-summary-vat')) el('cm-summary-vat').textContent = cm_fmt(vat);
+          if (el('cm-summary-total')) el('cm-summary-total').textContent = cm_fmt(total);
+        }
+
+        function cm_showStep(n) {
+          document.getElementById('cm-step1').style.display = n === 1 ? 'block' : 'none';
+          document.getElementById('cm-step2').style.display = n === 2 ? 'block' : 'none';
+          document.getElementById('cm-step3').style.display = n === 3 ? 'block' : 'none';
+          // Scroll modal to top
+          document.getElementById('contract-modal').scrollTop = 0;
+        }
+        window.cm_showStep = cm_showStep;
+
+        window.cm_open = function() {
+          cm_updateSummary();
+          cm_showStep(1);
+          document.getElementById('contract-modal').style.display = 'block';
+          document.body.style.overflow = 'hidden';
+        };
+
+        window.cm_close = function() {
+          document.getElementById('contract-modal').style.display = 'none';
+          document.body.style.overflow = '';
+        };
+
+        // Click overlay to close
+        document.getElementById('contract-modal').addEventListener('click', function(e) {
+          if (e.target === this) cm_close();
+        });
+
+        // ESC to close
+        document.addEventListener('keydown', function(e) {
+          if (e.key === 'Escape' && document.getElementById('contract-modal').style.display === 'block') {
+            cm_close();
+          }
+        });
+
+        // Step 1 → Step 2
+        window.cm_toStep2 = function() {
+          var form = document.getElementById('cm-form');
+          if (!form.checkValidity()) { form.reportValidity(); return false; }
+
+          // Build Party A info
+          var fd = new FormData(form);
+          var partyA = document.getElementById('cm-party-a');
+          if (partyA) {
+            partyA.innerHTML =
+              '<div><strong>Tên CT:</strong> ' + (fd.get('company') || '') + '</div>' +
+              '<div><strong>MST:</strong> ' + (fd.get('tax_code') || '') + '</div>' +
+              '<div><strong>Địa chỉ:</strong> ' + (fd.get('address') || '') + '</div>' +
+              '<div><strong>Đại diện:</strong> ' + (fd.get('legal_rep') || '') + ' – ' + (fd.get('legal_rep_position') || '') + '</div>' +
+              '<div><strong>ĐT:</strong> ' + (fd.get('phone') || '') + '</div>' +
+              '<div><strong>Email:</strong> ' + (fd.get('email') || fd.get('invoice_email') || '') + '</div>';
+          }
+
+          // Contract number
+          var cnEl = document.getElementById('cm-contract-number');
+          if (cnEl) {
+            var d = new Date();
+            cnEl.textContent = 'Số: ADMAKE-' + d.getFullYear() + String(d.getMonth()+1).padStart(2,'0') + String(d.getDate()).padStart(2,'0') + '-' + String(d.getHours()).padStart(2,'0') + String(d.getMinutes()).padStart(2,'0');
+          }
+
+          // Service info
+          var base = cm_getPrice();
+          var vat = Math.round(base * 0.1);
+          var total = base + vat;
+          var el = function(id) { return document.getElementById(id); };
+          if (el('cm-svc-plan')) el('cm-svc-plan').textContent = cm_getPlanName();
+          if (el('cm-svc-duration')) el('cm-svc-duration').textContent = cm_getBillingLabel();
+          if (el('cm-svc-amount')) el('cm-svc-amount').textContent = cm_fmt(total) + ' (đã bao gồm VAT 10%)';
+
+          // Set representative name at signature block
+          var repNameEl = document.getElementById('cm-sig-a-name');
+          if (repNameEl) repNameEl.textContent = fd.get('legal_rep') || fd.get('name') || '';
+
+          // Build clauses fully expanded
+          var clausesEl = document.getElementById('cm-clauses');
+          clausesEl.innerHTML = '';
+          CM_CLAUSES.forEach(function(clause) {
+            var clauseDiv = document.createElement('div');
+            clauseDiv.style.marginBottom = '14px';
+            clauseDiv.style.pageBreakInside = 'avoid';
+
+            var header = document.createElement('div');
+            header.style.fontWeight = '700';
+            header.style.fontSize = '13.5px';
+            header.style.color = '#1c1917';
+            header.style.marginBottom = '4px';
+            header.textContent = clause.title;
+
+            var body = document.createElement('div');
+            body.style.fontSize = '12.5px';
+            body.style.lineHeight = '1.7';
+            body.style.color = '#4b5563';
+            body.textContent = clause.body;
+
+            clauseDiv.appendChild(header);
+            clauseDiv.appendChild(body);
+            clausesEl.appendChild(clauseDiv);
+          });
+
+          // Reset agree checkbox
+          var agreeEl = document.getElementById('cm-agree');
+          if (agreeEl) agreeEl.checked = false;
+          cm_toggleConfirm();
+
+          cm_showStep(2);
+          setTimeout(function() {
+            cm_initSignaturePad();
+          }, 50);
+          return false;
+        };
+
+        window.cm_toggleConfirm = function() {
+          var btn = document.getElementById('cm-btn-confirm');
+          var agreed = document.getElementById('cm-agree') && document.getElementById('cm-agree').checked;
+          if (btn) {
+            btn.disabled = !agreed;
+            btn.style.background = agreed ? '#0891b2' : '#d1d5db';
+            btn.style.cursor = agreed ? 'pointer' : 'not-allowed';
+          }
+        };
+
+        window.cm_submitContract = function() {
+          var form = document.getElementById('cm-form');
+          var fd = new FormData(form);
+          var payload = {};
+          fd.forEach(function(value, key) {
+            var trimmed = String(value || '').trim();
+            if (trimmed) payload[key] = trimmed;
+          });
+          payload.selected_plan = window._pw_state ? window._pw_state.plan : '';
+          payload.selected_billing = window._pw_state ? window._pw_state.billing : '';
+
+          var statusEl = document.getElementById('cm-submit-status');
+          var btn = document.getElementById('cm-btn-confirm');
+          if (statusEl) statusEl.textContent = 'Đang gửi...';
+          if (btn) { btn.disabled = true; btn.style.background = '#d1d5db'; btn.style.cursor = 'not-allowed'; }
+
+          fetch('https://admake.vn/api/lead/contract', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          })
+          .then(function(res) {
+            if (!res.ok) throw new Error('Request failed');
+            return res.json();
+          })
+          .then(function(data) {
+            cm_leadData = data;
+            if (statusEl) statusEl.textContent = '';
+            cm_setupPayment(data);
+            cm_showStep(3);
+          })
+          .catch(function(err) {
+            if (statusEl) statusEl.textContent = 'Có lỗi xảy ra, vui lòng thử lại.';
+            if (btn) { btn.disabled = false; btn.style.background = '#0891b2'; btn.style.cursor = 'pointer'; }
+          });
+        };
+
+        function cm_setupPayment(data) {
+          var base = cm_getPrice();
+          var vat = Math.round(base * 0.1);
+          var total = base + vat;
+          var leadId = (data && data.lead && data.lead.id) ? data.lead.id : (data && data.id ? data.id : 'NEW');
+          var ref = 'ADMAKE-' + leadId;
+
+          var el = function(id) { return document.getElementById(id); };
+          if (el('cm-pay-ref')) el('cm-pay-ref').textContent = ref;
+          if (el('cm-pay-amount')) el('cm-pay-amount').textContent = cm_fmt(total);
+
+          // VietQR
+          var qrUrl = 'https://img.vietqr.io/image/COOPBANK-6600300837884477-compact2.png' +
+            '?amount=' + total +
+            '&addInfo=' + encodeURIComponent(ref) +
+            '&accountName=' + encodeURIComponent('CONG TY TNHH MTV CONG NGHE ADMAKE');
+          if (el('cm-qr-img')) el('cm-qr-img').src = qrUrl;
+
+          // Reset success state
+          if (el('cm-pay-success')) el('cm-pay-success').style.display = 'none';
+          if (el('cm-pay-content')) el('cm-pay-content').style.display = 'block';
+        }
+
+        window.cm_confirmPayment = function() {
+          var el = function(id) { return document.getElementById(id); };
+          if (el('cm-pay-success')) el('cm-pay-success').style.display = 'block';
+          if (el('cm-pay-content')) el('cm-pay-content').style.display = 'none';
+        };
+
+        // Hook CTA buttons
+        function cm_hookButtons() {
+          var btnBasic = document.getElementById('btn-basic');
+          var btnPro = document.getElementById('btn-professional');
+
+          if (btnBasic) {
+            var origBasicClick = btnBasic.getAttribute('onclick') || '';
+            btnBasic.setAttribute('onclick', origBasicClick + ';cm_open();');
+          }
+          if (btnPro) {
+            var origProClick = btnPro.getAttribute('onclick') || '';
+            btnPro.setAttribute('onclick', origProClick + ';cm_open();');
+          }
+
+          // Hook specialized SVG click
+          var svgEl = document.querySelector('#card-specialized svg[onclick]');
+          if (svgEl) {
+            var origSvgClick = svgEl.getAttribute('onclick') || '';
+            svgEl.setAttribute('onclick', origSvgClick + ';cm_open();');
+          }
+        }
+
+        // Run hooks after DOM is ready
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', cm_hookButtons);
+        } else {
+          cm_hookButtons();
+        }
+      })();
+      </script>
+
     </main>
 
     <template id="nav-link-template">
@@ -511,11 +1686,17 @@
           featuresCta.href = data.features.cta.href;
 
           setText("pricing-title", data.pricing.title);
-          document.getElementById("pricing-image").src = data.pricing.image;
-          document.getElementById("pricing-image").alt = pick(data.pricing.imageAlt);
+          var pricingImg = document.getElementById("pricing-image");
+          if (pricingImg) {
+            pricingImg.src = data.pricing.image;
+            pricingImg.alt = pick(data.pricing.imageAlt);
+          }
           var pricingCta = document.getElementById("pricing-cta");
           pricingCta.textContent = pick(data.pricing.cta.title);
           pricingCta.href = data.pricing.cta.href;
+          if (window.pw_updatePricingData) {
+            window.pw_updatePricingData(data.pricing, state.lang);
+          }
 
           setText("reasons-title", data.reasons.title);
           renderReasons(data.reasons.columns);

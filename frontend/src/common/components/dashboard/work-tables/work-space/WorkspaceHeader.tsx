@@ -1,8 +1,9 @@
-﻿import { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Button, notification } from "antd";
 import { StarOutlined, StarFilled } from "@ant-design/icons";
 import { useUser } from "../../../../common/hooks/useUser";
 import { useApiHost } from "../../../../common/hooks/useApiHost";
+import { TOKEN_LABEL } from "../../../../common/config";
 
 interface WorkspaceHeaderProps {
   workspaceData: any;
@@ -17,10 +18,16 @@ const WorkspaceHeader: React.FC<WorkspaceHeaderProps> = ({ workspaceData }) => {
   }, [currentWorkspace]);
 
   const togglePin = async () => {
+    const token = localStorage.getItem(TOKEN_LABEL) || sessionStorage.getItem(TOKEN_LABEL);
+    const headers: HeadersInit = { "Content-Type": "application/json" };
+    if (token) {
+      headers["Authorization"] = `Bearer ${token}`;
+    }
+
     fetch(`${useApiHost()}/workspace/${workspaceId}/pin`, {
       method: "PUT",
       body: JSON.stringify({ id: workspaceId, pin: !pinned }),
-      headers: { "Content-Type": "application/json" },
+      headers,
     })
       .then((response) => {
         if (!response.ok) {

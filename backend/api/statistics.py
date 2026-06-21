@@ -585,6 +585,30 @@ def get_statistics_dashboard():
 
     total_salary_period = round(sum(float(month_totals[key]["staff_net_salary"]) for key in month_keys), 0)
 
+    oldest_created = min([u.createdAt for u in users if u.createdAt]) if users else None
+    if oldest_created:
+        oldest_naive = oldest_created.replace(tzinfo=None) if oldest_created.tzinfo else oldest_created
+        days_used = (datetime.now() - oldest_naive).days
+    else:
+        days_used = 1
+
+    total_tasks_all_time = Task.query.filter(
+        Task.isDelete.is_(False),
+        Task.lead_id == lead_id
+    ).count()
+
+    total_workpoints_all_time = Workpoint.query.filter(
+        Workpoint.user_id.in_([u.id for u in users])
+    ).count() if users else 0
+
+    capacity_data = {
+        "days_used": max(days_used, 1),
+        "total_members": len(users),
+        "total_tasks": total_tasks_all_time,
+        "total_workpoints": total_workpoints_all_time,
+        "total_workspaces": len(workspaces),
+    }
+
     result = {
         "period": {
             "from_month": from_month.strftime("%Y-%m"),
@@ -625,6 +649,7 @@ def get_statistics_dashboard():
             "department_ratio": department_ratio,
             "top_staff": top_staff_rows,
         },
+        "capacity": capacity_data,
     }
 
     return jsonify(result), 200

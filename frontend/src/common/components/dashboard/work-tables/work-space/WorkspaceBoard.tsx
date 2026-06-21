@@ -1,4 +1,4 @@
-﻿import { useEffect, useState, useCallback, useContext } from "react";
+import { useEffect, useState, useCallback, useContext } from "react";
 import { Row, Col, Card, Button, message, Modal, notification, Select } from "antd";
 import { StarOutlined, PlusOutlined, MoreOutlined } from "@ant-design/icons";
 import type { ColumnType } from "../../../../@types/work-space.type";
@@ -17,6 +17,7 @@ import type { Task } from "../../../../@types/work-space.type";
 import { UpdateButtonContext } from "../../../../common/hooks/useUpdateButtonTask";
 import { useTaskContext } from "../../../../common/hooks/useTask";
 import dayjs from "dayjs";
+import { TOKEN_LABEL } from "../../../../common/config";
 
 interface WorkspaceBoardProps {
   columns: ColumnType[];
@@ -96,7 +97,7 @@ const WorkspaceBoard: React.FC<WorkspaceBoardProps> = ({
     },[colNames]);
 
     const cardWidth = isMobile
-      ? 320
+      ? Math.min(250, window.innerWidth - 32)
       : Math.min(320, Math.max(220, Math.round((window.innerWidth - 360) / 4)));
 
     const monthOptions = (() => {
@@ -135,8 +136,13 @@ const WorkspaceBoard: React.FC<WorkspaceBoardProps> = ({
                 return (
                     <Col
                     key={col.id}
-                    style={{ minWidth: cardWidth }}
-                    // className="flex-shrink-0 min-w-[480px] sm:min-w-[460px] max-w-[620px] sm:max-w-[680px]"
+                    style={{
+                      width: isMobile ? cardWidth : undefined,
+                      minWidth: cardWidth,
+                      maxWidth: isMobile ? cardWidth : undefined,
+                      flexShrink: 0,
+                      overflow: 'hidden',
+                    }}
                     >
                     <Droppable droppableId={col.id}>
                         {(provided, snapshot) => (
@@ -191,6 +197,12 @@ const WorkspaceBoard: React.FC<WorkspaceBoardProps> = ({
                                 padding: "12px",
                                 minHeight: "120px",
                                 border: "none",
+                                overflow: "hidden",
+                                maxWidth: "100%",
+                                },
+                                header: {
+                                overflow: "hidden",
+                                maxWidth: "100%",
                                 },
                                 // @ts-ignore
                                 Board: {
@@ -297,11 +309,17 @@ const MoreOptionsModal: React.FC<MoreOptionsModalProps> = ({ type, idx, setColNa
 
   const updateColumnName = async (name: string) => {
     try {
+        const token = localStorage.getItem(TOKEN_LABEL) || sessionStorage.getItem(TOKEN_LABEL);
+        const headers: HeadersInit = {
+            'Content-Type': 'application/json',
+        };
+        if (token) {
+            headers["Authorization"] = `Bearer ${token}`;
+        }
+
         const response = await fetch(`${useApiHost()}/workspace/${workspaceId}/column_name`, {
             method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers,
             body: JSON.stringify({ type, name }),
         });
 

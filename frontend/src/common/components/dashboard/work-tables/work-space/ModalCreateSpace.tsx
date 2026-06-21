@@ -4,6 +4,7 @@ import { useApiHost } from "../../../../common/hooks/useApiHost";
 import { useUser } from "../../../../common/hooks/useUser";
 import { useNavigate } from 'react-router-dom';
 import type { WorkSpace } from "../../../../@types/work-space.type";
+import { TOKEN_LABEL } from "../../../../common/config";
 
 const { Title, Text } = Typography;
 
@@ -26,11 +27,17 @@ export default function ModalCreateSpace({
   
   const handleCreate = async (values:{name: string} ) => {
     try {
+      const token = localStorage.getItem(TOKEN_LABEL) || sessionStorage.getItem(TOKEN_LABEL);
+      const headers: HeadersInit = {
+        "Content-Type": "application/json",
+      };
+      if (token) {
+        headers["Authorization"] = `Bearer ${token}`;
+      }
+
       const response = await fetch(`${useApiHost()}/workspace/`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers,
         body: JSON.stringify({ name: values.name, lead: userLeadId, status:"FREE" }),
       });
 

@@ -13,7 +13,7 @@ import {
 import { Plus, Trash2, Check, X, Pencil, ChevronDown, ChevronRight } from "lucide-react";
 
 // ─── Bonus/Punish CRUD (localStorage) ──────────────────────────────────────────────────
-type PayrollAdjustmentType = "bonus" | "punish" | "advance" | "commission" | "allowance" | "bhyt" | "bhxh" | "carry_forward";
+type PayrollAdjustmentType = "bonus" | "punish" | "advance" | "commission" | "allowance" | "bhyt" | "bhxh" | "carry_forward" | "completed";
 
 type BonusPunishRow = {
   id: string;
@@ -27,7 +27,7 @@ type BonusPunishRow = {
 
 type PayrollExpandableAdjustmentType = "bonus" | "punish" | "advance" | "carry_forward";
 
-const ADJUSTMENT_META: Record<PayrollAdjustmentType, { label: string; sign: 1 | -1; rowTone: string; badgeTone: string; textTone: string }> = {
+const ADJUSTMENT_META: Record<PayrollAdjustmentType, { label: string; sign: 1 | -1 | 0; rowTone: string; badgeTone: string; textTone: string }> = {
   bonus: { label: "Thưởng", sign: 1, rowTone: "bg-green-50", badgeTone: "bg-green-200 text-green-700", textTone: "text-green-700" },
   punish: { label: "Phạt", sign: -1, rowTone: "bg-rose-50", badgeTone: "bg-rose-200 text-rose-700", textTone: "text-rose-600" },
   advance: { label: "Tạm ứng", sign: -1, rowTone: "bg-amber-50", badgeTone: "bg-amber-200 text-amber-700", textTone: "text-amber-700" },
@@ -36,6 +36,7 @@ const ADJUSTMENT_META: Record<PayrollAdjustmentType, { label: string; sign: 1 | 
   bhyt: { label: "BHYT", sign: -1, rowTone: "bg-emerald-50", badgeTone: "bg-emerald-200 text-emerald-700", textTone: "text-emerald-700" },
   bhxh: { label: "BHXH", sign: -1, rowTone: "bg-fuchsia-50", badgeTone: "bg-fuchsia-200 text-fuchsia-700", textTone: "text-fuchsia-700" },
   carry_forward: { label: "Mang sang", sign: 1, rowTone: "bg-teal-50", badgeTone: "bg-teal-200 text-teal-700", textTone: "text-teal-700" },
+  completed: { label: "Hoàn thành", sign: 0, rowTone: "bg-slate-50", badgeTone: "bg-slate-200 text-slate-700", textTone: "text-slate-700" },
 };
 type AdjustmentMeta = (typeof ADJUSTMENT_META)[PayrollAdjustmentType];
 const ADJUSTMENT_OPTIONS = Object.entries(ADJUSTMENT_META) as [PayrollAdjustmentType, AdjustmentMeta][];
@@ -93,6 +94,7 @@ const getAdjustmentTotals = (rows: BonusPunishRow[]) => ({
   bhyt: sumAdjustments(rows, "bhyt"),
   bhxh: sumAdjustments(rows, "bhxh"),
   carry_forward: sumAdjustments(rows, "carry_forward"),
+  completed: sumAdjustments(rows, "completed"),
   net: getAdjustmentNet(rows),
 });
 
@@ -784,6 +786,24 @@ function PayslipModal({
   const [editId, setEditId] = useState<string | null>(null);
   const [editDraft, setEditDraft] = useState<PayrollAdjustmentDraft>(emptyBpDraft());
   const [savingKey, setSavingKey] = useState<string | null>(null);
+  const completedItem = adjustmentList.find((item) => item.type === "completed");
+  const isCompleted = !!completedItem && completedItem.amount > 0;
+
+  const handleToggleCompleted = async () => {
+    if (isCompleted) {
+      if (completedItem) {
+        await deleteAdjustment(completedItem.id);
+      }
+    } else {
+      await createAdjustment(row.user_id, {
+        type: "completed" as any,
+        amount: 1,
+        note: "Đã hoàn thành lương",
+        entry_date: `${period}-01`,
+      });
+    }
+  };
+
   const backdropRef = useRef<HTMLDivElement>(null);
 
   const adjustments = getAdjustmentTotals(adjustmentList);
@@ -836,7 +856,7 @@ function PayslipModal({
 
   const adjustmentSummary = ADJUSTMENT_OPTIONS
     .map(([type, meta]) => ({ type, meta, amount: adjustments[type] }))
-    .filter((item) => item.amount > 0);
+    .filter((item) => item.type !== "completed" && item.amount > 0);
 
   const payslipRows = [
     {
@@ -923,7 +943,21 @@ function PayslipModal({
             <div className="font-bold text-slate-800 text-sm">Phiếu Lương Tháng {monthLabel}</div>
             <div className="text-xs text-slate-500 mt-0.5">{row.full_name}</div>
           </div>
-          <button onClick={onClose} className="text-slate-400 hover:text-slate-600 text-lg font-bold leading-none">x</button>
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={handleToggleCompleted}
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all shadow-sm active:scale-95 ${
+                isCompleted
+                  ? "bg-emerald-600 hover:bg-emerald-700 text-white"
+                  : "bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200"
+              }`}
+            >
+              {isCompleted ? <Check size={13} /> : <X size={13} />}
+              {isCompleted ? "Đã hoàn thành" : "Chưa hoàn thành"}
+            </button>
+            <button onClick={onClose} className="text-slate-400 hover:text-slate-600 text-lg font-bold leading-none">x</button>
+          </div>
         </div>
 
         <div className="flex-1 overflow-y-auto p-4">
@@ -972,99 +1006,107 @@ function PayslipModal({
                         <Plus size={11} /> Thêm
                       </button>
                     </div>
-                    {adjustmentList.length === 0 && !addOpen && (
-                      <div className="text-[10px] text-slate-400 italic py-0.5">Chưa có khoản điều chỉnh nào.</div>
-                    )}
-                    {adjustmentList.map((item) => {
-                      const meta = ADJUSTMENT_META[item.type];
+                    {(() => {
+                      const displayList = adjustmentList.filter(item => item.type !== "completed");
                       return (
-                        <div key={item.id} className={`flex items-center gap-1.5 py-1 text-xs rounded px-1 mb-1 ${meta.rowTone}`}>
-                          {editId === item.id ? (
-                            <>
-                              <select
-                                value={editDraft.type}
-                                onChange={(e) => setEditDraft((prev) => ({ ...prev, type: e.target.value as PayrollAdjustmentType }))}
-                                className="border border-slate-200 rounded px-1 py-0.5 text-[10px] w-32"
-                              >
-                                {ADJUSTMENT_OPTIONS.map(([type, optionMeta]) => (
-                                  <option key={type} value={type}>
-                                    {optionMeta.sign > 0 ? "+ " : "- "}{optionMeta.label}
-                                  </option>
-                                ))}
-                              </select>
-                              <input
-                                type="date"
-                                value={editDraft.entry_date || ""}
-                                onChange={(e) => setEditDraft((prev) => ({ ...prev, entry_date: e.target.value }))}
-                                className="border border-slate-200 rounded px-1 py-0.5 text-[10px] outline-none"
-                              />
-                              <input
-                                value={editDraft.note}
-                                onChange={(e) => setEditDraft((prev) => ({ ...prev, note: e.target.value }))}
-                                placeholder="Ghi chú..."
-                                className="flex-1 border border-slate-200 rounded px-1 py-0.5 text-[10px] outline-none"
-                              />
-                              <input
-                                type="number"
-                                min="0"
-                                value={editDraft.amount || ""}
-                                onChange={(e) => setEditDraft((prev) => ({ ...prev, amount: Number(e.target.value) }))}
-                                className="w-24 border border-slate-200 rounded px-1 py-0.5 text-[10px] outline-none"
-                                placeholder="Số tiền"
-                              />
-                              <button
-                                onClick={async () => {
-                                  if (editDraft.amount > 0) {
-                                    setSavingKey(item.id);
-                                    try {
-                                      await updateAdjustment(item.id, editDraft);
-                                      setEditId(null);
-                                    } finally {
-                                      setSavingKey(null);
-                                    }
-                                  }
-                                }}
-                                disabled={savingKey === item.id}
-                                className="text-teal-500 hover:text-teal-700 disabled:opacity-40"
-                              >
-                                <Check size={11} />
-                              </button>
-                              <button onClick={() => setEditId(null)} className="text-slate-400 hover:text-slate-600">
-                                <X size={11} />
-                              </button>
-                            </>
-                          ) : (
-                            <>
-                              <span className={`px-1.5 py-0.5 rounded text-[10px] font-semibold ${meta.badgeTone}`}>{meta.label}</span>
-                              <span className="text-[10px] text-slate-400">{item.entry_date ? dayjs(item.entry_date).format("DD/MM/YYYY") : "-"}</span>
-                              <span className={`font-bold text-[10px] ${meta.textTone}`}>
-                                {meta.sign > 0 ? "+ " : "- "}{formatMoney(item.amount)} đ
-                              </span>
-                              <span className="flex-1 text-slate-600 text-[10px]">{item.note || "Điều chỉnh thủ công"}</span>
-                              <button
-                                onClick={() => { setEditId(item.id); setEditDraft({ type: item.type, note: item.note, amount: item.amount, entry_date: item.entry_date }); }}
-                                className="text-slate-300 hover:text-slate-600 transition-colors"
-                              >
-                                <Pencil size={10} />
-                              </button>
-                              <button
-                                onClick={async () => {
-                                  setSavingKey(item.id);
-                                  try {
-                                    await deleteAdjustment(item.id);
-                                  } finally {
-                                    setSavingKey(null);
-                                  }
-                                }}
-                                className="text-slate-300 hover:text-rose-500 transition-colors"
-                              >
-                                <Trash2 size={10} />
-                              </button>
-                            </>
+                        <>
+                          {displayList.length === 0 && !addOpen && (
+                            <div className="text-[10px] text-slate-400 italic py-0.5">Chưa có khoản điều chỉnh nào.</div>
                           )}
-                        </div>
+                          {displayList.map((item) => {
+                            const meta = ADJUSTMENT_META[item.type];
+                            if (!meta) return null;
+                            return (
+                              <div key={item.id} className={`flex items-center gap-1.5 py-1 text-xs rounded px-1 mb-1 ${meta.rowTone}`}>
+                                {editId === item.id ? (
+                                  <>
+                                    <select
+                                      value={editDraft.type}
+                                      onChange={(e) => setEditDraft((prev) => ({ ...prev, type: e.target.value as PayrollAdjustmentType }))}
+                                      className="border border-slate-200 rounded px-1 py-0.5 text-[10px] w-32"
+                                    >
+                                      {ADJUSTMENT_OPTIONS.filter(([t]) => t !== "completed").map(([type, optionMeta]) => (
+                                        <option key={type} value={type}>
+                                          {optionMeta.sign > 0 ? "+ " : "- "}{optionMeta.label}
+                                        </option>
+                                      ))}
+                                    </select>
+                                    <input
+                                      type="date"
+                                      value={editDraft.entry_date || ""}
+                                      onChange={(e) => setEditDraft((prev) => ({ ...prev, entry_date: e.target.value }))}
+                                      className="border border-slate-200 rounded px-1 py-0.5 text-[10px] outline-none"
+                                    />
+                                    <input
+                                      value={editDraft.note}
+                                      onChange={(e) => setEditDraft((prev) => ({ ...prev, note: e.target.value }))}
+                                      placeholder="Ghi chú..."
+                                      className="flex-1 border border-slate-200 rounded px-1 py-0.5 text-[10px] outline-none"
+                                    />
+                                    <input
+                                      type="number"
+                                      min="0"
+                                      value={editDraft.amount || ""}
+                                      onChange={(e) => setEditDraft((prev) => ({ ...prev, amount: Number(e.target.value) }))}
+                                      className="w-24 border border-slate-200 rounded px-1 py-0.5 text-[10px] outline-none"
+                                      placeholder="Số tiền"
+                                    />
+                                    <button
+                                      onClick={async () => {
+                                        if (editDraft.amount > 0) {
+                                          setSavingKey(item.id);
+                                          try {
+                                            await updateAdjustment(item.id, editDraft);
+                                            setEditId(null);
+                                          } finally {
+                                            setSavingKey(null);
+                                          }
+                                        }
+                                      }}
+                                      disabled={savingKey === item.id}
+                                      className="text-teal-500 hover:text-teal-700 disabled:opacity-40"
+                                    >
+                                      <Check size={11} />
+                                    </button>
+                                    <button onClick={() => setEditId(null)} className="text-slate-400 hover:text-slate-600">
+                                      <X size={11} />
+                                    </button>
+                                  </>
+                                ) : (
+                                  <>
+                                    <span className={`px-1.5 py-0.5 rounded text-[10px] font-semibold ${meta.badgeTone}`}>{meta.label}</span>
+                                    <span className="text-[10px] text-slate-400">{item.entry_date ? dayjs(item.entry_date).format("DD/MM/YYYY") : "-"}</span>
+                                    <span className={`font-bold text-[10px] ${meta.textTone}`}>
+                                      {meta.sign > 0 ? "+ " : "- "}{formatMoney(item.amount)} đ
+                                    </span>
+                                    <span className="flex-1 text-slate-600 text-[10px]">{item.note || "Điều chỉnh thủ công"}</span>
+                                    <button
+                                      onClick={() => { setEditId(item.id); setEditDraft({ type: item.type, note: item.note, amount: item.amount, entry_date: item.entry_date }); }}
+                                      className="text-slate-300 hover:text-slate-600 transition-colors"
+                                    >
+                                      <Pencil size={10} />
+                                    </button>
+                                    <button
+                                      onClick={async () => {
+                                        setSavingKey(item.id);
+                                        try {
+                                          await deleteAdjustment(item.id);
+                                        } finally {
+                                          setSavingKey(null);
+                                        }
+                                      }}
+                                      className="text-slate-300 hover:text-rose-500 transition-colors"
+                                    >
+                                      <Trash2 size={10} />
+                                    </button>
+                                  </>
+                                )}
+                              </div>
+                            );
+                          })}
+                        </>
                       );
-                    })}
+                    })()}
                     {addOpen && (
                       <div className="flex items-center gap-1.5 mt-1 pt-1 border-t border-slate-200">
                         <select
@@ -1072,7 +1114,7 @@ function PayslipModal({
                           onChange={(e) => setDraft((prev) => ({ ...prev, type: e.target.value as PayrollAdjustmentType }))}
                           className="border border-slate-200 rounded px-1 py-0.5 text-[10px] w-32"
                         >
-                          {ADJUSTMENT_OPTIONS.map(([type, meta]) => (
+                          {ADJUSTMENT_OPTIONS.filter(([t]) => t !== "completed").map(([type, meta]) => (
                             <option key={type} value={type}>
                               {meta.sign > 0 ? "+ " : "- "}{meta.label}
                             </option>
@@ -1195,6 +1237,7 @@ function PayrollTableLegacy({
               <th className="py-3 px-3">SĐT</th>
               <th className="py-3 px-3">Bộ phận</th>
               <th className="py-3 px-3">Lương cơ bản</th>
+              <th className="py-3 px-3 text-teal-600 font-semibold">Mang sang</th>
               <th className="py-3 px-3">Số buổi</th>
               <th className="py-3 px-3">Số giờ</th>
               <th className="py-3 px-3">Tăng ca (giờ)</th>
@@ -1206,7 +1249,6 @@ function PayrollTableLegacy({
               <th className="py-3 px-3 text-sky-600">Phụ cấp (+)</th>
               <th className="py-3 px-3 text-rose-600">BHYT (-)</th>
               <th className="py-3 px-3 text-rose-600">BHXH (-)</th>
-              <th className="py-3 px-3 text-teal-600">Mang sang</th>
               <th className="py-3 px-3">Thực nhận</th>
             </tr>
           </thead>
@@ -1228,6 +1270,7 @@ function PayrollTableLegacy({
                   <td className="py-3 px-3 text-slate-600">{row.phone || "-"}</td>
                   <td className="py-3 px-3 text-slate-600">{row.department || "-"}</td>
                   <td className="py-3 px-3 text-slate-700">{formatMoney(row.salary_base)} đ</td>
+                  <td className="py-3 px-3 text-teal-600 font-semibold">{Number(row.carry_forward || 0) !== 0 ? `${formatMoney(row.carry_forward || 0)} đ` : '—'}</td>
                   <td className="py-3 px-3 text-slate-600">{row.period_work}</td>
                   <td className="py-3 px-3 text-slate-600">{row.work_hours}</td>
                   <td className="py-3 px-3 text-slate-600">{row.overtime_hours}</td>
@@ -1239,7 +1282,6 @@ function PayrollTableLegacy({
                   <td className="py-3 px-3 text-sky-600 font-semibold">{row.allowance ? `+${formatMoney(row.allowance)}` : '—'} đ</td>
                   <td className="py-3 px-3 text-rose-500">{row.bhyt ? `-${formatMoney(row.bhyt)}` : '—'} đ</td>
                   <td className="py-3 px-3 text-rose-500">{row.bhxh ? `-${formatMoney(row.bhxh)}` : '—'} đ</td>
-                  <td className="py-3 px-3 text-teal-600 font-semibold">{Number(row.carry_forward || 0) !== 0 ? `${formatMoney(row.carry_forward || 0)} đ` : '—'}</td>
                   <td className="py-3 px-3 text-teal-700 font-semibold">{formatMoney(row.net_salary)} đ</td>
                 </tr>
               ))
@@ -1248,7 +1290,9 @@ function PayrollTableLegacy({
           {!isLoading && rows.length > 0 && (
             <tfoot>
               <tr className="border-t bg-slate-50 font-semibold text-slate-700">
-                <td className="py-3 px-3" colSpan={8}>Tổng cộng</td>
+                <td className="py-3 px-3" colSpan={5}>Tổng cộng</td>
+                <td className="py-3 px-3 text-teal-600">{formatMoney(summary.total_carry_forward || 0)} đ</td>
+                <td className="py-3 px-3" colSpan={3}></td>
                 <td className="py-3 px-3">{formatMoney(summary.total_base_salary)} đ</td>
                 <td className="py-3 px-3">{formatMoney(summary.total_overtime_salary)} đ</td>
                 <td className="py-3 px-3 text-emerald-700">{formatMoney(summary.total_bonus)} đ</td>
@@ -1317,6 +1361,7 @@ function PayrollTableOld({
               <th className="py-3 px-3">SĐT</th>
               <th className="py-3 px-3">Bộ phận</th>
               <th className="py-3 px-3">Lương cơ bản</th>
+              <th className="py-3 px-3 text-teal-600 font-semibold">Mang sang</th>
               <th className="py-3 px-3">Số buổi</th>
               <th className="py-3 px-3">Số giờ</th>
               <th className="py-3 px-3">Tăng ca (giờ)</th>
@@ -1328,7 +1373,6 @@ function PayrollTableOld({
               <th className="py-3 px-3 text-sky-600">Phụ cấp (+)</th>
               <th className="py-3 px-3 text-rose-600">BHYT (-)</th>
               <th className="py-3 px-3 text-rose-600">BHXH (-)</th>
-              <th className="py-3 px-3 text-teal-600">Mang sang</th>
               <th className="py-3 px-3">Thực nhận</th>
             </tr>
           </thead>
@@ -1350,6 +1394,7 @@ function PayrollTableOld({
                   <td className="py-3 px-3 text-slate-600">{row.phone || "-"}</td>
                   <td className="py-3 px-3 text-slate-600">{row.department || "-"}</td>
                   <td className="py-3 px-3 text-slate-700">{formatMoney(row.salary_base)} đ</td>
+                  <td className="py-3 px-3 text-teal-600 font-semibold">{Number(row.carry_forward || 0) !== 0 ? `${formatMoney(row.carry_forward || 0)} đ` : "-"}</td>
                   <td className="py-3 px-3 text-slate-600">{row.period_work}</td>
                   <td className="py-3 px-3 text-slate-600">{row.work_hours}</td>
                   <td className="py-3 px-3 text-slate-600">{row.overtime_hours}</td>
@@ -1361,7 +1406,6 @@ function PayrollTableOld({
                   <td className="py-3 px-3 text-sky-600 font-semibold">{row.allowance ? `+${formatMoney(row.allowance)} đ` : "-"}</td>
                   <td className="py-3 px-3 text-rose-500">{row.bhyt ? `-${formatMoney(row.bhyt)} đ` : "-"}</td>
                   <td className="py-3 px-3 text-rose-500">{row.bhxh ? `-${formatMoney(row.bhxh)} đ` : "-"}</td>
-                  <td className="py-3 px-3 text-teal-600 font-semibold">{Number(row.carry_forward || 0) !== 0 ? `${formatMoney(row.carry_forward || 0)} đ` : "-"}</td>
                   <td className="py-3 px-3 text-teal-700 font-semibold">{formatMoney(row.net_salary)} đ</td>
                 </tr>
               ))
@@ -1370,7 +1414,9 @@ function PayrollTableOld({
           {!isLoading && rows.length > 0 && (
             <tfoot>
               <tr className="border-t bg-slate-50 font-semibold text-slate-700">
-                <td className="py-3 px-3" colSpan={8}>Tổng cộng</td>
+                <td className="py-3 px-3" colSpan={5}>Tổng cộng</td>
+                <td className="py-3 px-3 text-teal-600">{formatMoney(summary.total_carry_forward || 0)} đ</td>
+                <td className="py-3 px-3" colSpan={3}></td>
                 <td className="py-3 px-3">{formatMoney(summary.total_base_salary)} đ</td>
                 <td className="py-3 px-3">{formatMoney(summary.total_overtime_salary)} đ</td>
                 <td className="py-3 px-3 text-emerald-700">{formatMoney(summary.total_bonus)} đ</td>
@@ -1379,7 +1425,6 @@ function PayrollTableOld({
                 <td className="py-3 px-3 text-sky-700">{formatMoney(summary.total_allowance || 0)} đ</td>
                 <td className="py-3 px-3 text-rose-600">-{formatMoney(summary.total_bhyt || 0)} đ</td>
                 <td className="py-3 px-3 text-rose-600">-{formatMoney(summary.total_bhxh || 0)} đ</td>
-                <td className="py-3 px-3 text-teal-600">{formatMoney(summary.total_carry_forward || 0)} đ</td>
                 <td className="py-3 px-3 text-teal-700">{formatMoney(summary.total_net_salary)} đ</td>
               </tr>
             </tfoot>
@@ -1687,6 +1732,7 @@ function PayrollTableRowOld({
         <td className="py-3 px-3 text-slate-600">{row.phone || "-"}</td>
         <td className="py-3 px-3 text-slate-600">{row.department || "-"}</td>
         <td className="py-3 px-3 text-slate-700">{formatMoney(row.salary_base)} đ</td>
+        <td className="py-3 px-3 text-teal-600 font-semibold">{values.carryForwardAmount !== 0 ? `${formatMoney(values.carryForwardAmount)} đ` : "-"}</td>
         <td className="py-3 px-3 text-slate-600">{row.period_work}</td>
         <td className="py-3 px-3 text-slate-600">{row.work_hours}</td>
         <td className="py-3 px-3 text-slate-600">{row.overtime_hours}</td>
@@ -1698,7 +1744,6 @@ function PayrollTableRowOld({
         <td className="py-3 px-3 text-sky-600 font-semibold">{values.allowanceAmount > 0 ? `+${formatMoney(values.allowanceAmount)} đ` : "-"}</td>
         <td className="py-3 px-3 text-rose-500">{values.bhytAmount > 0 ? `-${formatMoney(values.bhytAmount)} đ` : "-"}</td>
         <td className="py-3 px-3 text-rose-500">{values.bhxhAmount > 0 ? `-${formatMoney(values.bhxhAmount)} đ` : "-"}</td>
-        <td className="py-3 px-3 text-teal-600 font-semibold">{values.carryForwardAmount !== 0 ? `${formatMoney(values.carryForwardAmount)} đ` : "-"}</td>
         <td className="py-3 px-3 text-teal-700 font-semibold">{formatMoney(values.adjustedNet)} đ</td>
       </tr>
 
@@ -1788,30 +1833,30 @@ function PayrollTableLocalOld({
             <tr className="text-slate-500 text-xs border-b bg-slate-50">
               <th className="py-3 px-3 w-10"></th>
               <th className="py-3 px-3">STT</th>
-              <th className="py-3 px-3">Há» tÃªn</th>
-              <th className="py-3 px-3">SÄT</th>
+              <th className="py-3 px-3">Há»  tÃªn</th>
+              <th className="py-3 px-3">SÄ T</th>
               <th className="py-3 px-3">Bá»™ pháº­n</th>
               <th className="py-3 px-3">LÆ°Æ¡ng cÆ¡ báº£n</th>
+              <th className="py-3 px-3 text-teal-600 font-semibold">Mang sang</th>
               <th className="py-3 px-3">Sá»‘ buá»•i</th>
-              <th className="py-3 px-3">Sá»‘ giá»</th>
-              <th className="py-3 px-3">TÄƒng ca (giá»)</th>
-              <th className="py-3 px-3">Tiá»n lÆ°Æ¡ng</th>
-              <th className="py-3 px-3">Tiá»n tÄƒng ca</th>
+              <th className="py-3 px-3">Sá»‘ giá» </th>
+              <th className="py-3 px-3">TÄƒng ca (giá» )</th>
+              <th className="py-3 px-3">Tiá» n lÆ°Æ¡ng</th>
+              <th className="py-3 px-3">Tiá» n tÄƒng ca</th>
               <th className="py-3 px-3">ThÆ°á»Ÿng</th>
               <th className="py-3 px-3">Pháº¡t</th>
               <th className="py-3 px-3">Táº¡m á»©ng</th>
               <th className="py-3 px-3 text-sky-600">Phá»¥ cáº¥p (+)</th>
               <th className="py-3 px-3 text-rose-600">BHYT (-)</th>
               <th className="py-3 px-3 text-rose-600">BHXH (-)</th>
-              <th className="py-3 px-3 text-teal-600">Mang sang</th>
               <th className="py-3 px-3">Thực nhận</th>
             </tr>
           </thead>
           <tbody>
             {isLoading ? (
-              <tr><td className="py-8 px-3 text-center text-slate-500" colSpan={19}>Äang táº£i dá»¯ liá»‡u báº£ng lÆ°Æ¡ng...</td></tr>
+              <tr><td className="py-8 px-3 text-center text-slate-500" colSpan={19}>Ä ang táº£i dá»¯ liá»‡u báº£ng lÆ°Æ¡ng...</td></tr>
             ) : rows.length === 0 ? (
-              <tr><td className="py-8 px-3 text-center text-slate-500" colSpan={19}>KhÃ´ng cÃ³ dá»¯ liá»‡u cho ká»³ Ä‘Ã£ chá»n.</td></tr>
+              <tr><td className="py-8 px-3 text-center text-slate-500" colSpan={19}>KhÃ´ng cÃ³ dá»¯ liá»‡u cho ká»³ Ä‘Ã£ chá» n.</td></tr>
             ) : (
               rows.map((row, index) => (
                 <PayrollTableRowOld
@@ -1829,7 +1874,9 @@ function PayrollTableLocalOld({
           {!isLoading && rows.length > 0 && (
             <tfoot>
               <tr className="border-t bg-slate-50 font-semibold text-slate-700">
-                <td className="py-3 px-3" colSpan={9}>Tá»•ng cá»™ng</td>
+                <td className="py-3 px-3" colSpan={6}>Tá»•ng cá»™ng</td>
+                <td className="py-3 px-3 text-teal-600">{formatMoney(adjustedSummary.total_carry_forward || 0)} đ</td>
+                <td className="py-3 px-3" colSpan={3}></td>
                 <td className="py-3 px-3">{formatMoney(adjustedSummary.total_base_salary)} Ä‘</td>
                 <td className="py-3 px-3">{formatMoney(adjustedSummary.total_overtime_salary)} Ä‘</td>
                 <td className="py-3 px-3 text-emerald-700">{formatMoney(adjustedSummary.total_bonus)} Ä‘</td>
@@ -2001,10 +2048,20 @@ function PayrollTableRow({
           </button>
         </td>
         <td className="py-3 px-3 text-slate-600">{index + 1}</td>
-        <td className="py-3 px-3 text-teal-700 font-semibold group-hover:underline">{row.full_name}</td>
+        <td className="py-3 px-3 text-teal-700 font-semibold group-hover:underline">
+          <div className="flex items-center gap-1.5">
+            {row.full_name}
+            {row.is_completed && (
+              <span className="inline-flex items-center justify-center px-1.5 py-0.5 rounded-full text-[9px] font-bold bg-emerald-100 text-emerald-800" title="Đã hoàn thành">
+                ✓ Hoàn thành
+              </span>
+            )}
+          </div>
+        </td>
         <td className="py-3 px-3 text-slate-600">{row.phone || "-"}</td>
         <td className="py-3 px-3 text-slate-600">{row.department || "-"}</td>
         <td className="py-3 px-3 text-slate-700">{formatMoney(row.salary_base)} đ</td>
+        <td className="py-3 px-3 text-teal-600 font-semibold">{Number(row.carry_forward || 0) !== 0 ? `${formatMoney(row.carry_forward || 0)} đ` : "-"}</td>
         <td className="py-3 px-3 text-slate-600">{row.period_work}</td>
         <td className="py-3 px-3 text-slate-600">{row.work_hours}</td>
         <td className="py-3 px-3 text-slate-600">{row.overtime_hours}</td>
@@ -2016,7 +2073,6 @@ function PayrollTableRow({
         <td className="py-3 px-3 text-sky-600 font-semibold">{Number(row.allowance || 0) > 0 ? `+${formatMoney(row.allowance || 0)} đ` : "-"}</td>
         <td className="py-3 px-3 text-rose-500">{Number(row.bhyt || 0) > 0 ? `-${formatMoney(row.bhyt || 0)} đ` : "-"}</td>
         <td className="py-3 px-3 text-rose-500">{Number(row.bhxh || 0) > 0 ? `-${formatMoney(row.bhxh || 0)} đ` : "-"}</td>
-        <td className="py-3 px-3 text-teal-600 font-semibold">{Number(row.carry_forward || 0) !== 0 ? `${formatMoney(row.carry_forward || 0)} đ` : "-"}</td>
         <td className="py-3 px-3 text-teal-700 font-semibold">{formatMoney(row.net_salary)} đ</td>
       </tr>
 
@@ -2119,6 +2175,7 @@ function PayrollTable({
               <th className="py-3 px-3">SĐT</th>
               <th className="py-3 px-3">Bộ phận</th>
               <th className="py-3 px-3">Lương cơ bản</th>
+              <th className="py-3 px-3 text-teal-600 font-semibold">Mang sang</th>
               <th className="py-3 px-3">Số buổi</th>
               <th className="py-3 px-3">Số giờ</th>
               <th className="py-3 px-3">Tăng ca (giờ)</th>
@@ -2130,7 +2187,6 @@ function PayrollTable({
               <th className="py-3 px-3 text-sky-600">Phụ cấp (+)</th>
               <th className="py-3 px-3 text-rose-600">BHYT (-)</th>
               <th className="py-3 px-3 text-rose-600">BHXH (-)</th>
-              <th className="py-3 px-3 text-teal-600">Mang sang</th>
               <th className="py-3 px-3">Thực nhận</th>
             </tr>
           </thead>
@@ -2159,7 +2215,9 @@ function PayrollTable({
           {!isLoading && rows.length > 0 && (
             <tfoot>
               <tr className="border-t bg-slate-50 font-semibold text-slate-700">
-                <td className="py-3 px-3" colSpan={9}>Tổng cộng</td>
+                <td className="py-3 px-3" colSpan={6}>Tổng cộng</td>
+                <td className="py-3 px-3 text-teal-600">{formatMoney(summary.total_carry_forward || 0)} đ</td>
+                <td className="py-3 px-3" colSpan={3}></td>
                 <td className="py-3 px-3">{formatMoney(summary.total_base_salary)} đ</td>
                 <td className="py-3 px-3">{formatMoney(summary.total_overtime_salary)} đ</td>
                 <td className="py-3 px-3 text-emerald-700">{formatMoney(summary.total_bonus)} đ</td>
@@ -2168,7 +2226,6 @@ function PayrollTable({
                 <td className="py-3 px-3 text-sky-700">{formatMoney(summary.total_allowance || 0)} đ</td>
                 <td className="py-3 px-3 text-rose-600">-{formatMoney(summary.total_bhyt || 0)} đ</td>
                 <td className="py-3 px-3 text-rose-600">-{formatMoney(summary.total_bhxh || 0)} đ</td>
-                <td className="py-3 px-3 text-teal-600">{formatMoney(summary.total_carry_forward || 0)} đ</td>
                 <td className="py-3 px-3 text-teal-700">{formatMoney(summary.total_net_salary)} đ</td>
               </tr>
             </tfoot>

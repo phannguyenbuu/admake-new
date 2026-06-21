@@ -36,13 +36,19 @@ const tabs: AccountingTab[] = [
 ];
 
 const AccountingDashboard: IPage["Component"] = () => {
-  const { canViewPermission } = useUser();
+  const { canViewPermission, userRoleId } = useUser();
   const [activeTab, setActiveTab] = useState("");
   const [isTabbarExpanded, setIsTabbarExpanded] = useState(false);
 
   const availableTabs = useMemo(
-    () => tabs.filter((tab) => Boolean(canViewPermission?.[tab.permission])),
-    [canViewPermission],
+    () =>
+      tabs.filter((tab) => {
+        if (tab.key === "bao-cao") {
+          return userRoleId === -2 || userRoleId === 1 || Boolean(canViewPermission?.view_acc_reports);
+        }
+        return Boolean(canViewPermission?.[tab.permission]);
+      }),
+    [canViewPermission, userRoleId],
   );
 
   useEffect(() => {

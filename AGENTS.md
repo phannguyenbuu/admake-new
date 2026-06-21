@@ -53,6 +53,8 @@
 - Inventory item delete is allowed only when the item has no `stock transaction`; otherwise backend returns `Item already has stock transactions`.
 - Materials item spec rows are edited in the expanded sub-row under each item.
 - In `FormTask`, `Tài liệu & Bình luận` now lives inside the `Thông tin` tab as a collapsible section.
+- Material images (`JobAsset`) have been removed from the main `/materials` UI and moved entirely into the Material Create/Update modals. Draft images during creation are managed via `tmpTaskCreatedAssets`/`tmpTaskCreatedMessages` and flushed after the backend responds.
+- The `fetch` calls in the frontend components (like `frontend/src/common/app/dashboard/statistic/page.tsx` for `/api/statistics/dashboard`) must explicitly pass the `Authorization: Bearer ${token}` header, as `require_can_view` decorators on the backend will block requests returning a `401 Unauthorized` without it.
 
 ## Recent migrations to know
 - `backend/migrations/20260407_user_payroll_fields.sql`

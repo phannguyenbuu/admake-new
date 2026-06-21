@@ -4,11 +4,20 @@ import LockIcon from '@mui/icons-material/Lock';
 import { notification } from 'antd';
 import { useChatGroup } from '../ProviderChat';
 import { useApiHost } from '../../../common/hooks/useApiHost';
+import { TOKEN_LABEL } from '../../../common/config';
 
 const RatingButtons = () => {
   const {workspaceEl} = useChatGroup();
   const [value, setValue] = React.useState<string | null | undefined>(workspaceEl?.status);
   
+  const token = localStorage.getItem(TOKEN_LABEL) || sessionStorage.getItem(TOKEN_LABEL);
+  const headers: HeadersInit = {
+    'Content-Type': 'application/json'
+  };
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
+
   useEffect(() => {
     if (!workspaceEl?.status || workspaceEl?.status === '' || workspaceEl?.status === '0') {
       setValue("start");
@@ -37,9 +46,7 @@ const RatingButtons = () => {
 
       fetch(`${useApiHost()}/group/${workspaceEl?.id}/status`, { // hoặc đường dẫn chính xác endpoint của bạn
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
+        headers,
         body: JSON.stringify({status: newValue}),
       })
       .then(response => {
@@ -60,9 +67,7 @@ const RatingButtons = () => {
       if (newValue === 'pass') {
         fetch(`${useApiHost()}/workspace/`, { // hoặc đường dẫn chính xác endpoint của bạn
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
+          headers,
           body: JSON.stringify(data),
         })
         .then(response => {

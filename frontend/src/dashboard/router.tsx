@@ -248,6 +248,7 @@ const routes: TRoute = {
           requiredPermission: "view_invoice",
           title: "Báo giá",
           icon: <FileTextOutlined />,
+          ignoreInMenu: true,
         },
         {
           path: "/infor",

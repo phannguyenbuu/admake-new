@@ -22,7 +22,7 @@ export default function TaxTab() {
   const taxCodeQuery = useQuery({
     queryKey: ["tax-codes", userLeadId],
     enabled: !!userLeadId,
-    queryFn: async () => (await AccountingErpService.listTaxCodes({ lead: userLeadId })).data,
+    queryFn: async () => ((await AccountingErpService.listTaxCodes({ lead: userLeadId })).data?.data || []) as any[],
   });
 
   const vatQuery = useQuery({
@@ -59,7 +59,7 @@ export default function TaxTab() {
       <div className="overflow-x-auto bg-white rounded-2xl border border-slate-100 shadow-sm">
         <table className="w-full text-sm">
           <thead><tr className="text-xs text-slate-500 border-b bg-slate-50"><th className="px-3 py-3">Code</th><th className="px-3 py-3">Tên</th><th className="px-3 py-3">Rate</th><th className="px-3 py-3">Direction</th></tr></thead>
-          <tbody>{(taxCodeQuery.data?.data || []).map((row: any) => <tr key={row.id} className="border-b last:border-0"><td className="px-3 py-3 font-medium">{row.code}</td><td className="px-3 py-3">{row.name}</td><td className="px-3 py-3">{row.rate}%</td><td className="px-3 py-3">{row.direction}</td></tr>)}</tbody>
+          <tbody>{(taxCodeQuery.data || []).map((row: any) => <tr key={row.id} className="border-b last:border-0"><td className="px-3 py-3 font-medium">{row.code}</td><td className="px-3 py-3">{row.name}</td><td className="px-3 py-3">{row.rate}%</td><td className="px-3 py-3">{row.direction}</td></tr>)}</tbody>
         </table>
       </div>
 

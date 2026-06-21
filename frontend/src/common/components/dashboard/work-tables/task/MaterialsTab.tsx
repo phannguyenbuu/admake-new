@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
-import { notification, Select, ConfigProvider } from "antd";
+import { notification, Select, ConfigProvider, type FormInstance } from "antd";
 import { Trash2, Plus, ChevronDown } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useTaskContext } from "../../../../common/hooks/useTask";
@@ -12,6 +12,36 @@ import axiosClient from "../../../../services/axiosClient";
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 function uid() {
     return Math.random().toString(36).slice(2) + Date.now().toString(36);
+}
+
+function getMaterialRowPrice(row: any, items: any[]): number {
+    for (const item of items) {
+        const specs = item.spec_rows || [];
+        if (specs.length > 0) {
+            for (const spec of specs) {
+                const specStr = [spec.color, spec.spec].filter(Boolean).join(" - ");
+                const formattedName = `${item.name} - ${specStr}`;
+                if (row.ten === formattedName || (row.ten === item.name && row.quy_cach === specStr)) {
+                    return Number(spec.price) || 0;
+                }
+            }
+        }
+        if (row.ten === item.name) {
+            return item.standard_cost || item.average_cost || 0;
+        }
+        if (item.name && row.ten && row.ten.startsWith(item.name)) {
+            if (specs.length > 0) {
+                for (const spec of specs) {
+                    const specStr = [spec.color, spec.spec].filter(Boolean).join(" - ");
+                    if (row.ten.includes(specStr) || row.quy_cach === specStr) {
+                        return Number(spec.price) || 0;
+                    }
+                }
+            }
+            return item.standard_cost || item.average_cost || 0;
+        }
+    }
+    return 0;
 }
 
 const EMPTY_ROW = (): TaskMaterialItem => ({
@@ -87,8 +117,12 @@ function SuggestSelect({ value, onChange, options, placeholder }: SuggestSelectP
     );
 }
 
+interface MaterialsGridProps {
+    form?: FormInstance;
+}
+
 // ─── Materials Grid Tab ───────────────────────────────────────────────────────
-function MaterialsGrid() {
+function MaterialsGrid({ form }: MaterialsGridProps) {
     const { taskDetail } = useTaskContext();
     const { userLeadId } = useUser();
 
@@ -136,6 +170,12 @@ function MaterialsGrid() {
     const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     useEffect(() => { setRows(initRows()); }, [taskDetail?.id]);
+
+    useEffect(() => {
+        if (form) {
+            form.setFieldValue("materials", rows.filter((r) => r.ten || r.so_luong));
+        }
+    }, [rows, form]);
 
     // ── Auto-save ────────────────────────────────────────────────────────────
     const saveToServer = useCallback(async (data: TaskMaterialItem[]) => {
@@ -205,109 +245,137 @@ function MaterialsGrid() {
     };
 
     // ── Column widths ─────────────────────────────────────────────────────────
-    const COL_W = ["minmax(0, 4fr)", "minmax(0, 3fr)", "minmax(0, 2fr)", "minmax(0, 2fr)", "32px"];
+    const COL_W = ["minmax(0, 3fr)", "minmax(0, 1.5fr)", "minmax(0, 1.2fr)", "minmax(0, 1.5fr)", "minmax(0, 1.8fr)", "minmax(0, 1.5fr)", "32px"];
 
     return (
-        <div className="py-2">
-            {/* Header */}
-            <div style={{ display: "grid", gridTemplateColumns: COL_W.join(" "), gap: 4, marginBottom: 4 }}>
-                {["Từ thư viện vật tư", "Quy cách", "Số lượng", "Phân bổ", ""].map((label) => (
-                    <div key={label} className="text-xs font-semibold text-slate-500 uppercase tracking-wide px-2 py-1 bg-slate-100 rounded">
-                        {label}
-                    </div>
-                ))}
-            </div>
-
-            {/* Rows */}
-            <div className="flex flex-col gap-1">
-                {rows.map((row, rowIdx) => {
-                    const inputCls = `
-                        text-sm border border-slate-200 rounded px-2 py-1.5
-                        focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-200
-                        bg-white hover:border-slate-300 transition-colors w-full
-                    `;
-                    const readOnlyCls = `
-                        text-sm border border-slate-100 rounded px-2 py-1.5
-                        bg-slate-50 text-slate-500 w-full cursor-not-allowed
-                    `;
-
-                    return (
-                        <div key={row.id} style={{ display: "grid", gridTemplateColumns: COL_W.join(" "), gap: 4 }}>
-                            {/* Tên / Combobox */}
-                            <SuggestSelect
-                                value={row.ten}
-                                onChange={(opt) => handleSelectMaterial(row.id, opt)}
-                                options={libraryOptions}
-                                placeholder="🔍 Chọn vật liệu..."
-                                className={inputCls}
-                            />
-
-                            {/* Quy cách (Read-only) */}
-                            <input
-                                readOnly
-                                value={row.quy_cach}
-                                placeholder="Tự động..."
-                                className={readOnlyCls}
-                                title="Lấy tự động từ thư viện"
-                            />
-
-                            {/* Số lượng + đơn vị */}
-                            <input
-                                type="number"
-                                step="any"
-                                min="0"
-                                value={row.so_luong}
-                                onChange={(e) => handleChange(row.id, "so_luong", e.target.value)}
-                                placeholder="VD: 5.5"
-                                className={inputCls}
-                                onKeyDown={(e) => handleKeyDown(e, rowIdx, 2)}
-                            />
-
-                            {/* Địa điểm (Read-only) */}
-                            <input
-                                readOnly
-                                value={row.dia_diem}
-                                placeholder="Kho..."
-                                className={readOnlyCls}
-                                title="Lấy tự động từ thư viện"
-                            />
-
-                            {/* Delete */}
-                            <button
-                                type="button"
-                                onClick={() => handleDeleteRow(row.id)}
-                                className="flex items-center justify-center w-8 h-8 rounded hover:bg-rose-50 hover:text-rose-500 text-slate-300 transition-colors"
-                                title="Xoá dòng"
-                            >
-                                <Trash2 size={13} />
-                            </button>
+        <div className="py-2 w-full overflow-x-auto">
+            <div style={{ minWidth: 780 }}>
+                {/* Header */}
+                <div style={{ display: "grid", gridTemplateColumns: COL_W.join(" "), gap: 4, marginBottom: 4 }}>
+                    {["Từ thư viện vật tư", "Quy cách", "Số lượng", "Đơn giá", "Thành tiền", "Phân bổ", ""].map((label) => (
+                        <div key={label} className="text-xs font-semibold text-slate-500 uppercase tracking-wide px-2 py-1 bg-slate-100 rounded whitespace-nowrap">
+                            {label}
                         </div>
-                    );
-                })}
-            </div>
+                    ))}
+                </div>
 
-            {/* Footer */}
-            <div className="flex items-center justify-between mt-3 pb-4">
-                <button
-                    type="button"
-                    onClick={handleAddRow}
-                    className="flex items-center gap-1.5 text-xs text-cyan-600 hover:text-cyan-800 font-medium border border-dashed border-cyan-300 rounded-lg px-3 py-1.5 hover:bg-cyan-50 transition-colors"
-                >
-                    <Plus size={13} />
-                    Thêm dòng
-                </button>
-                <span className="text-xs text-slate-400">
-                    {saving
-                        ? "Đang lưu..."
-                        : rows.filter((r) => r.ten || r.so_luong).length > 0
-                            ? `${rows.filter((r) => r.ten || r.so_luong).length} vật liệu`
-                            : "Chưa có vật liệu"}
-                </span>
+                {/* Rows */}
+                <div className="flex flex-col gap-1">
+                    {rows.map((row, rowIdx) => {
+                        const inputCls = `
+                            text-sm border border-slate-200 rounded px-2 py-1.5
+                            focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-200
+                            bg-white hover:border-slate-300 transition-colors w-full
+                        `;
+                        const readOnlyCls = `
+                            text-sm border border-slate-100 rounded px-2 py-1.5
+                            bg-slate-50 text-slate-500 w-full cursor-not-allowed
+                        `;
+
+                        const price = getMaterialRowPrice(row, resItems || []);
+                        const qty = parseFloat(row.so_luong) || 0;
+                        const totalAmount = price * qty;
+
+                        return (
+                            <div key={row.id} style={{ display: "grid", gridTemplateColumns: COL_W.join(" "), gap: 4 }}>
+                                {/* Tên / Combobox */}
+                                <SuggestSelect
+                                    value={row.ten}
+                                    onChange={(opt) => handleSelectMaterial(row.id, opt)}
+                                    options={libraryOptions}
+                                    placeholder="🔍 Chọn vật liệu..."
+                                    className={inputCls}
+                                />
+
+                                {/* Quy cách (Read-only) */}
+                                <input
+                                    readOnly
+                                    value={row.quy_cach}
+                                    placeholder="Tự động..."
+                                    className={readOnlyCls}
+                                    title="Lấy tự động từ thư viện"
+                                />
+
+                                {/* Số lượng + đơn vị */}
+                                <input
+                                    type="number"
+                                    step="any"
+                                    min="0"
+                                    value={row.so_luong}
+                                    onChange={(e) => handleChange(row.id, "so_luong", e.target.value)}
+                                    placeholder="VD: 5.5"
+                                    className={inputCls}
+                                    onKeyDown={(e) => handleKeyDown(e, rowIdx, 2)}
+                                />
+
+                                {/* Đơn giá */}
+                                <input
+                                    readOnly
+                                    value={price > 0 ? `${new Intl.NumberFormat("vi-VN").format(Math.round(price))} ₫` : "—"}
+                                    placeholder="0 ₫"
+                                    className={readOnlyCls}
+                                    title="Đơn giá"
+                                />
+
+                                {/* Thành tiền */}
+                                <input
+                                    readOnly
+                                    value={totalAmount > 0 ? `${new Intl.NumberFormat("vi-VN").format(Math.round(totalAmount))} ₫` : "—"}
+                                    placeholder="0 ₫"
+                                    className={readOnlyCls}
+                                    title="Thành tiền"
+                                />
+
+                                {/* Địa điểm (Read-only) */}
+                                <input
+                                    readOnly
+                                    value={row.dia_diem}
+                                    placeholder="Kho..."
+                                    className={readOnlyCls}
+                                    title="Lấy tự động từ thư viện"
+                                />
+
+                                {/* Delete */}
+                                <button
+                                    type="button"
+                                    onClick={() => handleDeleteRow(row.id)}
+                                    className="flex items-center justify-center w-8 h-8 rounded hover:bg-rose-50 hover:text-rose-500 text-slate-300 transition-colors"
+                                    title="Xoá dòng"
+                                >
+                                    <Trash2 size={13} />
+                                </button>
+                            </div>
+                        );
+                    })}
+                </div>
+
+                {/* Footer */}
+                <div className="flex items-center justify-between mt-3 pb-4">
+                    <button
+                        type="button"
+                        onClick={handleAddRow}
+                        className="flex items-center gap-1.5 text-xs text-cyan-600 hover:text-cyan-800 font-medium border border-dashed border-cyan-300 rounded-lg px-3 py-1.5 hover:bg-cyan-50 transition-colors"
+                    >
+                        <Plus size={13} />
+                        Thêm dòng
+                    </button>
+                    <span className="text-xs text-slate-400">
+                        {saving
+                            ? "Đang lưu..."
+                            : rows.filter((r) => r.ten || r.so_luong).length > 0
+                                ? `${rows.filter((r) => r.ten || r.so_luong).length} vật liệu`
+                                : "Chưa có vật liệu"}
+                    </span>
+                </div>
             </div>
         </div>
     );
 }
 
-export default function MaterialsTab() {
-    return <MaterialsGrid />;
+interface MaterialsTabProps {
+    form?: FormInstance;
+}
+
+export default function MaterialsTab({ form }: MaterialsTabProps) {
+    return <MaterialsGrid form={form} />;
 }

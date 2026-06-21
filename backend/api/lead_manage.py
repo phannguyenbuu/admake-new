@@ -418,6 +418,21 @@ def admin_leads():
         lead_dict["last_login_at"] = lu_at.isoformat() if lu_at else None
         lead_dict["days_since_login"] = days    # None / int
 
+        # Trial/subscription expiry tracking
+        if lead.expiredAt:
+            exp = lead.expiredAt
+            if exp.tzinfo is not None:
+                exp = exp.replace(tzinfo=None)
+            delta = exp - now_utc
+            lead_dict["days_until_expiry"] = delta.days
+        else:
+            lead_dict["days_until_expiry"] = None
+
+        lead_dict["contract_status"] = lead.contract_status
+        lead_dict["contract_amount"] = lead.contract_amount
+        lead_dict["selected_plan"] = lead.selected_plan
+        lead_dict["selected_billing"] = lead.selected_billing
+
         lead_dict["stats"] = {
             "users_total": total_users_by_lead.get(lead.id, 0),
             "users_staff": employee_users_by_lead.get(lead.id, 0),
@@ -467,6 +482,21 @@ def admin_leads():
 
         leads_data = [l for l in leads_data if _in_range(l)]
 
+    # Trial tracking summary
+    trial_counts = {"expired": 0, "expiring_soon": 0, "expiring_month": 0, "active": 0}
+    for ld in leads_data:
+        due = ld.get("days_until_expiry")
+        if due is None:
+            continue
+        if due <= 0:
+            trial_counts["expired"] += 1
+        elif due <= 7:
+            trial_counts["expiring_soon"] += 1
+        elif due <= 30:
+            trial_counts["expiring_month"] += 1
+        else:
+            trial_counts["active"] += 1
+
     return render_template(
         "admin_leads.html",
         total_users=len(assignable_users),
@@ -496,4 +526,5 @@ def admin_leads():
         f_active=f_active,
         f_login_from=f_login_from,
         f_login_to=f_login_to,
+        trial_counts=trial_counts,
     )

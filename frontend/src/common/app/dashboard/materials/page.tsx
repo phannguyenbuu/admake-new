@@ -223,7 +223,14 @@ type InventoryItemsResponse = {
 };
 
 const MaterialsDashboard: IPage["Component"] = () => {
-  const { userLeadId, canViewPermission } = useUser();
+  const {
+    userLeadId,
+    canViewPermission,
+    tmpTaskCreatedAssets,
+    tmpTaskCreatedMessages,
+    setTmpTaskCreatedAssets,
+    setTmpTaskCreatedMessages,
+  } = useUser();
   const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState<"items" | "transactions" | "reports" | "locations" | "config">("items");
   const itemStatuses = useItemStatuses(userLeadId);
@@ -436,6 +443,8 @@ const MaterialsDashboard: IPage["Component"] = () => {
       setSpecRows([]);
       setSpecAddOpen(false);
       setSpecDraft(emptySpecDraft());
+      setTmpTaskCreatedAssets((prev) => prev.filter((item) => item.type !== "material"));
+      setTmpTaskCreatedMessages((prev) => prev.filter((item) => item.type !== "material"));
       await refreshAll();
     },
     onError: (error: any) =>
@@ -534,6 +543,7 @@ const MaterialsDashboard: IPage["Component"] = () => {
 
   const apiHost = useApiHost();
   const [previewMessages, setPreviewMessages] = useState<MessageTypeProps[]>([]);
+  const [editingMessages, setEditingMessages] = useState<MessageTypeProps[]>([]);
 
   useEffect(() => {
     if (previewItem?.id) {
@@ -550,6 +560,22 @@ const MaterialsDashboard: IPage["Component"] = () => {
       setPreviewMessages([]);
     }
   }, [previewItem?.id, apiHost]);
+
+  useEffect(() => {
+    if (editingItem?.id) {
+      const token = localStorage.getItem("accessToken") || sessionStorage.getItem("accessToken") || localStorage.getItem("token") || sessionStorage.getItem("token") || "";
+      fetch(`${apiHost}/inventory/items/${editingItem.id}/messages`, {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          setEditingMessages(data.messages || []);
+        })
+        .catch(console.error);
+    } else {
+      setEditingMessages([]);
+    }
+  }, [editingItem?.id, apiHost]);
 
   const materialImages = useMemo(() => {
     return previewMessages.filter((msg) => msg.file_url && msg.file_url.trim() !== "");
@@ -830,19 +856,19 @@ const MaterialsDashboard: IPage["Component"] = () => {
                       const defaultPrice = item.average_cost || item.standard_cost || 0;
                       const draft = itemSpecDraft[item.id] || emptySpecDraft();
                       const isActive = (previewItemId ? previewItemId === item.id : items[0]?.id === item.id);
-                      const textPrimary = isActive ? "text-white" : "text-slate-700";
-                      const textSecondary = isActive ? "text-white/90" : "text-slate-600";
-                      const textMuted = isActive ? "text-white/70" : "text-slate-400";
+                      const textPrimary = isActive ? "text-white" : "text-slate-700 group-hover:text-white";
+                      const textSecondary = isActive ? "text-white/90" : "text-slate-600 group-hover:text-white/90";
+                      const textMuted = isActive ? "text-white/70" : "text-slate-400 group-hover:text-white/70";
 
                       return (
                         <React.Fragment key={item.id}>
                           <tr
-                            className={`border-b last:border-0 cursor-pointer hover:bg-slate-50/60 transition-colors group ${isActive ? "bg-[#00bba7]" : ""}`}
+                            className={`border-b last:border-0 cursor-pointer transition-colors group ${isActive ? "bg-[#00bba7]" : "bg-white hover:bg-[#00bba7]"}`}
                             onClick={() => setPreviewItemId(item.id)}
                           >
                             {/* Expand chevron */}
                             <td className="px-2 py-3 text-center" onClick={(e) => { e.stopPropagation(); toggleExpandItem(item.id); }}>
-                              <button className={`transition-colors ${isActive ? "text-white/70 hover:text-white" : "text-slate-300 hover:text-teal-600"}`}>
+                              <button className={`transition-colors ${isActive ? "text-white/70 hover:text-white" : "text-slate-300 group-hover:text-white/70 hover:text-white"}`}>
                                 {isExpanded ? <ChevronDown size={13} /> : <ChevronRight size={13} />}
                               </button>
                             </td>
@@ -889,10 +915,10 @@ const MaterialsDashboard: IPage["Component"] = () => {
                             </td>
                             <td className="px-3 py-3" onClick={(e) => e.stopPropagation()}>
                               <div className="flex items-center justify-center gap-1">
-                                <button title="Sửa" className={`p-1.5 rounded-lg transition-colors ${isActive ? "text-white/80 hover:text-white hover:bg-white/10" : "text-slate-400 hover:text-slate-600 hover:bg-slate-100"}`} onClick={() => handleOpenEdit(item)}>
+                                <button title="Sửa" className={`p-1.5 rounded-lg transition-colors ${isActive ? "text-white/80 hover:text-white hover:bg-white/10" : "text-slate-400 group-hover:text-white/80 hover:text-white hover:bg-white/10"}`} onClick={() => handleOpenEdit(item)}>
                                   <Pencil size={14} />
                                 </button>
-                                <button title="Xoá / Ngừng dùng" className={`p-1.5 rounded-lg transition-colors ${isActive ? "text-white/80 hover:text-rose-200 hover:bg-white/10" : "text-slate-400 hover:text-rose-500 hover:bg-rose-50"}`} onClick={() => toggleItemStatus(item)}>
+                                <button title="Xoá / Ngừng dùng" className={`p-1.5 rounded-lg transition-colors ${isActive ? "text-white/80 hover:text-rose-200 hover:bg-white/10" : "text-slate-400 group-hover:text-white/80 hover:text-rose-200 hover:bg-white/10"}`} onClick={() => toggleItemStatus(item)}>
                                   <Trash2 size={14} />
                                 </button>
                               </div>
@@ -1528,6 +1554,9 @@ const MaterialsDashboard: IPage["Component"] = () => {
           setSpecRows([]);
           setSpecAddOpen(false);
           setSpecDraft(emptySpecDraft());
+          // Clear draft assets when cancelling
+          setTmpTaskCreatedAssets((prev) => prev.filter((item) => item.type !== "material"));
+          setTmpTaskCreatedMessages((prev) => prev.filter((item) => item.type !== "material"));
         }}
         onOk={() => {
           const code = itemForm.code.trim().toUpperCase();
@@ -1670,6 +1699,20 @@ const MaterialsDashboard: IPage["Component"] = () => {
           <textarea className="min-h-[60px] w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
             placeholder="Ghi chú" value={itemForm.note}
             onChange={(e) => setItemForm((p) => ({ ...p, note: e.target.value }))} />
+
+          {/* Ô hình ảnh vật tư (JobAsset) */}
+          <div className="border-t border-slate-100 pt-3">
+            <div className="text-xs font-semibold text-slate-700 mb-2">Hình ảnh vật tư</div>
+            <div className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+              <JobAsset
+                taskId={editingItem?.id}
+                type="material"
+                messages={editingMessages}
+                title="Hình ảnh vật tư"
+                instantSave={editingItem ? true : false}
+              />
+            </div>
+          </div>
         </div>
       </Modal>
       <Modal

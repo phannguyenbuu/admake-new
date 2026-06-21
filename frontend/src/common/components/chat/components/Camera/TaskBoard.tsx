@@ -18,6 +18,7 @@ import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import JobDescription from "../../../dashboard/work-tables/task/JobDescription";
 import { Form, Input } from "antd";
 import JobAsset from "../../../dashboard/work-tables/task/JobAsset";
+import MaterialsTab from "../../../dashboard/work-tables/task/MaterialsTab";
 import { Tabs } from 'antd';
 import type { NotifyProps } from "../../../../@types/notify.type";
 import { CenterBox } from "../commons/TitlePanel";
@@ -221,6 +222,15 @@ const TaskBoard = ({ userId,fullName, open, onCancel }: TaskBoardProps) => {
               key: 'task',
               label: 'Tài Liệu',
               children: <JobAsset title="Tài liệu" type="task" readOnly = {true}/>,
+            },
+            {
+              key: 'materials',
+              label: 'Vật liệu',
+              children: (
+                <div style={{ backgroundColor: '#fff', padding: '12px', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
+                  <MaterialsTab />
+                </div>
+              ),
             },
             {
               key: 'comments',

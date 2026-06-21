@@ -7,6 +7,7 @@ from sqlalchemy import and_, or_
 from models import (
     AccountingDailyCash,
     AccountingDocument,
+    APBillPayment,
     ARInvoicePayment,
     DocumentCenterDocument,
     LeadPayload,
@@ -410,6 +411,19 @@ def update_daily_cash(item_id):
     if not item:
         abort(404, description="Daily cash row not found")
 
+    # Guard linked AR/AP payments from amount/direction changes
+    if data.get("amount") is not None or data.get("direction") is not None:
+        linked_ar = ARInvoicePayment.query.filter(
+            ARInvoicePayment.daily_cash_id == item_id,
+            ARInvoicePayment.deletedAt.is_(None),
+        ).first()
+        linked_ap = APBillPayment.query.filter(
+            APBillPayment.daily_cash_id == item_id,
+            APBillPayment.deletedAt.is_(None),
+        ).first()
+        if linked_ar or linked_ap:
+            abort(400, description="Không thể sửa số tiền/chiều phiếu thu chi đã liên kết thanh toán công nợ. Hãy sửa từ phía thanh toán.")
+
     if data.get("txn_date") is not None:
         parsed = _parse_date(data.get("txn_date"))
         if parsed:
@@ -455,7 +469,18 @@ def delete_daily_cash(item_id):
     item = db.session.get(AccountingDailyCash, item_id)
     if not item:
         abort(404, description="Daily cash row not found")
-    db.session.delete(item)
+    # Block if linked to AR/AP payments
+    linked_ar = ARInvoicePayment.query.filter(
+        ARInvoicePayment.daily_cash_id == item_id,
+        ARInvoicePayment.deletedAt.is_(None),
+    ).first()
+    linked_ap = APBillPayment.query.filter(
+        APBillPayment.daily_cash_id == item_id,
+        APBillPayment.deletedAt.is_(None),
+    ).first()
+    if linked_ar or linked_ap:
+        abort(400, description="Không thể xóa phiếu thu/chi đã liên kết với thanh toán công nợ. Hãy xóa thanh toán trước.")
+    item.deletedAt = datetime.utcnow()
     db.session.commit()
     return jsonify({"message": "Deleted"}), 200
 

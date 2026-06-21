@@ -228,7 +228,58 @@
     "content": "",
     "image": "public/price-2.webp",
     "imageAlt": { "vi": "Ảnh chụp giao diện phần mềm", "en": "Pricing screenshot", "zh": "价格截图" },
-    "cta": { "title": { "vi": "Tôi muốn được tư vấn", "en": "I want consultation", "zh": "我要咨询" }, "content": "", "href": "#dang-ky" }
+    "cta": { "title": { "vi": "Tôi muốn được tư vấn", "en": "I want consultation", "zh": "我要咨询" }, "content": "", "href": "#dang-ky" },
+    "plans": [
+      {
+        "id": "basic",
+        "name": { "vi": "CƠ BẢN", "en": "BASIC", "zh": "基础版" },
+        "color": "#22d3ee",
+        "price6": 2000000,
+        "price12": 3000000,
+        "priceYearly": 0,
+        "storageGB": 10,
+        "recommended": false,
+        "features": ["reports","gps_attendance","tasks","orders","crm","contract_piece","hr","subcontractors","payroll","chat","rating","contracts"]
+      },
+      {
+        "id": "professional",
+        "name": { "vi": "CHUYÊN NGHIỆP", "en": "PROFESSIONAL", "zh": "专业版" },
+        "color": "#189bb4",
+        "price6": 2500000,
+        "price12": 4000000,
+        "priceYearly": 0,
+        "storageGB": 20,
+        "recommended": true,
+        "features": ["reports","gps_attendance","tasks","orders","crm","contract_piece","hr","subcontractors","payroll","chat","rating","contracts","inventory","quotations"]
+      },
+      {
+        "id": "specialized",
+        "name": { "vi": "CHUYÊN DỤNG 3D", "en": "3D SPECIALIZED", "zh": "3D 专业版" },
+        "color": "#f59e0b",
+        "price6": 0,
+        "price12": 0,
+        "priceYearly": 2000000,
+        "storageGB": 50,
+        "recommended": false,
+        "features": ["reports","gps_attendance","tasks","orders","crm","inventory","quotations"]
+      }
+    ],
+    "featureList": [
+      { "id": "reports",         "name": { "vi": "Báo Cáo & Phân Tích",    "en": "Reports & Analytics",           "zh": "报表与分析" } },
+      { "id": "gps_attendance",  "name": { "vi": "Chấm Công GPS",           "en": "GPS Time Attendance",           "zh": "GPS 考勤" } },
+      { "id": "tasks",           "name": { "vi": "Giao Việc",               "en": "Task Assignment",               "zh": "任务分配" } },
+      { "id": "orders",          "name": { "vi": "Quản Lý Đơn Hàng",        "en": "Order Management",              "zh": "订单管理" } },
+      { "id": "crm",             "name": { "vi": "Quản Lý Khách Hàng",      "en": "Customer Management",           "zh": "客户管理" } },
+      { "id": "contract_piece",  "name": { "vi": "Cơ Chế Khoán",            "en": "Contract & Piece-rate",         "zh": "承包机制" } },
+      { "id": "hr",              "name": { "vi": "Quản Lý Nhân Sự",         "en": "HR Management",                 "zh": "人力管理" } },
+      { "id": "subcontractors",  "name": { "vi": "Quản Lý Thầu Phụ",        "en": "Subcontractor Management",      "zh": "分包管理" } },
+      { "id": "payroll",         "name": { "vi": "Bảng Lương",              "en": "Payroll & Compensation",        "zh": "薪资" } },
+      { "id": "chat",            "name": { "vi": "Chat Nhóm",               "en": "Group Chat",                    "zh": "群聊" } },
+      { "id": "rating",          "name": { "vi": "Chấm Sao",               "en": "Star Ratings",                  "zh": "评星" } },
+      { "id": "contracts",       "name": { "vi": "Giấy Tờ Hợp Đồng",        "en": "Contract Documents",            "zh": "合同文件" } },
+      { "id": "inventory",       "name": { "vi": "Vật Tư - Tồn Kho",        "en": "Materials & Inventory",         "zh": "物料库存" }, "special": true },
+      { "id": "quotations",      "name": { "vi": "Báo Giá",                 "en": "Quotation Generation",          "zh": "报价" }, "special": true }
+    ]
   },
   "reasons": {
     "title": { "vi": "Tại sao nên lựa chọn giải pháp ADMAKE?", "en": "Why choose ADMAKE?", "zh": "为什么选择 ADMAKE？" },

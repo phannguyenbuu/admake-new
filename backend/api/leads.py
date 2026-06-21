@@ -265,3 +265,185 @@ def get_lead_detail(lead_id):
     if not lead:
         abort(404, description="lead not found")
     return jsonify(lead.tdict())
+
+
+# ── Contract Flow ───────────────────────────────────────────────
+
+PRICING = {
+    "basic":        {"6": 2000000, "12": 3000000},
+    "professional": {"6": 2500000, "12": 4000000},
+    "specialized":  {"yearly": 2000000},
+}
+
+
+def _calc_contract_amount(plan, billing):
+    """Return total VND including 10% VAT."""
+    plan_prices = PRICING.get(plan, {})
+    base = plan_prices.get(billing, 0)
+    return int(base * 1.1)
+
+
+@lead_bp.route("/contract", methods=["POST"])
+def submit_contract():
+    """Landing page submits full contract form (13 fields + plan/billing)."""
+    import datetime as dt
+    data = request.get_json() or {}
+
+    # Required fields
+    name = (data.get("name") or "").strip()
+    phone = (data.get("phone") or "").strip()
+    if not name or not phone:
+        return jsonify({"error": "name and phone are required"}), 400
+
+    plan = data.get("selected_plan", "")
+    billing = data.get("selected_billing", "")
+
+    # Try to find existing lead by phone or email
+    email = (data.get("email") or "").strip()
+    lead = None
+    if phone:
+        lead = LeadPayload.query.filter_by(phone=phone).first()
+    if not lead and email:
+        lead = LeadPayload.query.filter_by(email=email).first()
+
+    if lead:
+        # Update existing lead with contract fields
+        for field in [
+            "name", "company", "address", "email", "industry",
+            "companySize", "description", "tax_code", "legal_rep",
+            "legal_rep_position", "invoice_email", "promo_code",
+        ]:
+            val = data.get(field)
+            if val is not None:
+                setattr(lead, field, val.strip() if isinstance(val, str) else val)
+    else:
+        # Create new lead
+        lead_fields = {}
+        for field in [
+            "name", "phone", "email", "company", "address",
+            "industry", "companySize", "description", "tax_code",
+            "legal_rep", "legal_rep_position", "invoice_email", "promo_code",
+        ]:
+            val = data.get(field)
+            if val is not None:
+                lead_fields[field] = val.strip() if isinstance(val, str) else val
+        lead = LeadPayload(**lead_fields)
+        db.session.add(lead)
+
+    # Set plan + contract info
+    lead.selected_plan = plan
+    lead.selected_billing = billing
+    amount = data.get("contract_amount")
+    if amount:
+        lead.contract_amount = int(amount)
+    else:
+        lead.contract_amount = _calc_contract_amount(plan, billing)
+    lead.contract_status = "submitted"
+    lead.contract_submitted_at = dt.datetime.utcnow()
+
+    db.session.commit()
+
+    return jsonify(lead.tdict()), 201
+
+
+@lead_bp.route("/<int:lead_id>/confirm-payment", methods=["PUT"])
+def confirm_payment(lead_id):
+    """Admin confirms payment → activate account + set expiry."""
+    import datetime as dt
+    lead = db.session.get(LeadPayload, lead_id)
+    if not lead:
+        abort(404, description="Lead not found")
+
+    lead.contract_status = "paid"
+    lead.payment_confirmed_at = dt.datetime.utcnow()
+    lead.isActivated = True
+
+    if not lead.trial_started_at:
+        lead.trial_started_at = dt.datetime.utcnow()
+
+    # Set expiredAt based on billing period
+    billing = lead.selected_billing or "12"
+    if billing == "yearly":
+        months = 12
+    else:
+        try:
+            months = int(billing)
+        except (TypeError, ValueError):
+            months = 12
+
+    lead.expiredAt = dt.datetime.utcnow() + dt.timedelta(days=months * 30)
+
+    db.session.commit()
+    return jsonify({"success": True, "lead": lead.tdict()})
+
+
+@lead_bp.route("/<int:lead_id>/amount", methods=["PUT"])
+def update_amount(lead_id):
+    """Admin sets custom contract amount."""
+    data = request.get_json() or {}
+    amount = data.get("amount")
+    if amount is None:
+        return jsonify({"error": "amount is required"}), 400
+    try:
+        amount = int(amount)
+    except (TypeError, ValueError):
+        return jsonify({"error": "Invalid amount"}), 400
+
+    lead = db.session.get(LeadPayload, lead_id)
+    if not lead:
+        abort(404, description="Lead not found")
+
+    lead.contract_amount = amount
+    db.session.commit()
+    return jsonify({"success": True, "amount": amount})
+
+
+@lead_bp.route("/trial-summary", methods=["GET"])
+def trial_summary():
+    """Return trial/subscription tracking summary."""
+    import datetime as dt
+    now = dt.datetime.utcnow()
+
+    leads = LeadPayload.query.filter(
+        LeadPayload.isActivated == True
+    ).all()
+
+    expired = []
+    expiring_soon = []    # ≤ 7 days
+    expiring_month = []   # ≤ 30 days
+    active = []
+
+    for lead in leads:
+        lead_data = lead.tdict()
+        if lead.expiredAt:
+            exp = lead.expiredAt
+            if exp.tzinfo is not None:
+                exp = exp.replace(tzinfo=None)
+            delta = exp - now
+            days_remaining = delta.days
+            lead_data["days_remaining"] = days_remaining
+
+            if days_remaining <= 0:
+                expired.append(lead_data)
+            elif days_remaining <= 7:
+                expiring_soon.append(lead_data)
+            elif days_remaining <= 30:
+                expiring_month.append(lead_data)
+            else:
+                active.append(lead_data)
+        else:
+            lead_data["days_remaining"] = None
+            active.append(lead_data)
+
+    return jsonify({
+        "expired": expired,
+        "expiring_soon": expiring_soon,
+        "expiring_month": expiring_month,
+        "active": active,
+        "counts": {
+            "expired": len(expired),
+            "expiring_soon": len(expiring_soon),
+            "expiring_month": len(expiring_month),
+            "active": len(active),
+        }
+    })

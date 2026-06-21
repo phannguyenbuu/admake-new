@@ -5,6 +5,7 @@ import { useCallback } from "react";
 import type { WorkSpace } from "../../../../@types/work-space.type";
 import { useApiHost } from "../../../../common/hooks/useApiHost";
 import { useUser } from "../../../../common/hooks/useUser";
+import { TOKEN_LABEL } from "../../../../common/config";
 
 const { Title, Text } = Typography;
 
@@ -29,8 +30,15 @@ export default function ModalDeleteWorkSpace({
   const handleDelete = useCallback(() => {
     if (!deletingWorkspace?.id) return;
 
+    const token = localStorage.getItem(TOKEN_LABEL) || sessionStorage.getItem(TOKEN_LABEL);
+    const headers: HeadersInit = {};
+    if (token) {
+      headers["Authorization"] = `Bearer ${token}`;
+    }
+
     fetch(`${useApiHost()}/workspace/${deletingWorkspace.id}`, {
       method: 'DELETE',
+      headers,
     })
       .then((response) => {
         if (!response.ok) {

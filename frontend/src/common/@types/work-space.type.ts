@@ -72,6 +72,7 @@ export interface UserSearchProps {
   phone: string,
   workAddress: string,
   salary?: number,
+  email?: string,
 }
 
 export interface MaterialTask {
@@ -99,13 +100,14 @@ export interface Task extends BaseEntity {
   status?: string; // có thể thu hẹp thành "OPEN" | "DONE" | ...
   reward?: number; // số tiền thưởng
   amount?: number;
+  prepayment?: number;
   type?: "MONTHLY" | "REWARD" | string;
   assign_ids?: ZipUserSearchProps[]; // id của user
   workspace_id?: string; // id của workspace
   workspace?: string;
   icon?: string;
   tempIcon?: string;
-  customer_id?: string; // id của customer
+  customer_id?: string | { id: string; name: string; phone?: string; address?: string; email?: string } | null; // id hoặc thông tin khách hàng
   materials?: TaskMaterialItem[]; // danh sách vật liệu công việc
   start_time?: Dayjs | null; // Thời gian bắt đầu
   end_time?: Dayjs | null; // Thời gian kết thúc

@@ -39,6 +39,7 @@ export type InventoryItem = {
   quantity_on_hand?: number;
   inventory_value?: number;
   below_min_stock?: boolean;
+  preview_material?: string | null;
 };
 
 export type StockTransaction = {

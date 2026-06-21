@@ -13,6 +13,7 @@ import { useApiHost } from "../../../common/hooks/useApiHost";
 import type { WorkSpace } from "../../../@types/work-space.type";
 import { useUser } from "../../../common/hooks/useUser";
 import UnPermissionBoard from "../unPermissionBoard";
+import { CustomerService } from "../../../services/customer.service";
 
 
 const CustomerDashboard: IPage["Component"] = () => {
@@ -60,28 +61,18 @@ const CustomerDashboard: IPage["Component"] = () => {
   };
 
 
-const handleDeleteCustomer = () => {
-    // console.log("DELETE", customer);
-    if (!customer || !customer.owner_id) return;
+  const handleDeleteCustomer = () => {
+    if (!customer || !customer.id) return;
 
-    fetch(`${useApiHost()}/customer/${customer.id}`, {
-      method: 'DELETE',
-    })
-      .then((response) => {
-        if (!response.ok) {
-          notification.error({message:`Không xóa được khách hàng`});
-        }else
-          notification.success({message:`Xóa khách hàng ${customer.name} thành công`});
-        return response.json();
-      })
+    CustomerService.deleteCustomer(customer.id)
       .then(() => {
-        
+        notification.success({ message: `Xóa khách hàng ${customer.name} thành công` });
         refetch();
       })
-      .catch((error) => {
-        notification.error({message:`Delete error: ${error}`});
+      .catch((error: any) => {
+        notification.error({ message: `Delete error: ${error?.response?.data?.message || error.message || error}` });
       });
-  }
+  };
 
 
 

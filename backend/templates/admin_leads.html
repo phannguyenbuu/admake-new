@@ -580,7 +580,7 @@
     }
 
     .landing-section[data-section="pricing"] {
-      grid-column: span 1;
+      grid-column: 1 / -1;
     }
 
     .landing-section[data-section="categories"] {
@@ -591,9 +591,8 @@
       grid-column: 1 / -1;
     }
 
-    .landing-section[data-section="pricing"],
     .landing-section[data-section="pricing-image"] {
-      grid-column: span 1;
+      grid-column: 1 / -1;
     }
 
     .landing-section[data-section="categories"] .landing-fields {
@@ -838,6 +837,130 @@
         justify-content: flex-end;
       }
     }
+
+    /* Custom Premium Pricing Editor */
+    .pricing-editor-container {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-top: 10px;
+    }
+    .pricing-header-fields {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      background: #fdfcf9;
+      border: 1px dashed rgba(15, 23, 42, 0.12);
+      padding: 16px;
+      border-radius: 12px;
+    }
+    .pricing-plans-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+      margin-top: 10px;
+    }
+    .pricing-plan-card {
+      background: #ffffff;
+      border-radius: 16px;
+      border: 2px solid #e2e8f0;
+      padding: 16px;
+      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      position: relative;
+    }
+    .pricing-plan-card.is-recommended {
+      border-color: #f59e0b;
+      box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.15), 0 12px 24px rgba(15, 23, 42, 0.08);
+    }
+    .pricing-plan-card-header {
+      font-weight: 800;
+      font-size: 14px;
+      border-bottom: 1px solid #f1f5f9;
+      padding-bottom: 8px;
+      margin-bottom: 4px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .pricing-plan-card-body {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      flex: 1;
+    }
+    .pricing-plan-features-list {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 8px 12px;
+      max-height: 200px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .pricing-plan-feature-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+    }
+    .pricing-plan-feature-item input {
+      accent-color: var(--accent);
+      cursor: pointer;
+    }
+    .pricing-plan-feature-item.is-special {
+      font-weight: 700;
+      color: #c0392b;
+    }
+    .feature-list-editor {
+      background: #fdfcf9;
+      border: 1px dashed rgba(15, 23, 42, 0.12);
+      padding: 16px;
+      border-radius: 12px;
+      margin-top: 14px;
+    }
+    .feature-list-editor-title {
+      font-weight: 700;
+      font-size: 14px;
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .feature-list-editor-grid {
+      display: grid;
+      grid-template-columns: repeat(1, minmax(0, 1fr));
+      gap: 6px;
+      max-height: 250px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+    .feature-list-editor-row {
+      display: grid;
+      grid-template-columns: 80px 1fr 1fr 1fr 60px 40px;
+      gap: 6px;
+      align-items: center;
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 6px;
+    }
+    .feature-list-editor-row input {
+      font-size: 12px;
+      padding: 3px 6px;
+      border-radius: 4px;
+      border: 1px solid #cbd5e1;
+    }
+    .feature-list-editor-row input[type="checkbox"] {
+      width: 14px;
+      height: 14px;
+      margin: auto;
+    }
   </style>
 </head>
 
@@ -854,6 +977,7 @@
       <div class="sidebar-nav">
         <button class="sidebar-link is-active" type="button" data-tab-target="leadManageTab">Lead manage</button>
         <button class="sidebar-link" type="button" data-tab-target="landingPageTab">Landing page</button>
+        <button class="sidebar-link" type="button" data-tab-target="priceSettingTab">Price setting</button>
       </div>
     </aside>
 
@@ -1021,6 +1145,14 @@
             </div>
           </form>
 
+          <!-- Trial Tracking Banner -->
+          <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px;">
+            <div style="padding:8px 16px;border-radius:8px;background:#fef2f2;border:1px solid #fecaca;font-size:13px;font-weight:600;color:#dc2626;">🔴 Hết hạn: {{ trial_counts.expired }}</div>
+            <div style="padding:8px 16px;border-radius:8px;background:#fff7ed;border:1px solid #fed7aa;font-size:13px;font-weight:600;color:#ea580c;">🟠 Sắp hết (≤7 ngày): {{ trial_counts.expiring_soon }}</div>
+            <div style="padding:8px 16px;border-radius:8px;background:#fefce8;border:1px solid #fde68a;font-size:13px;font-weight:600;color:#ca8a04;">🟡 Gần hết (≤30 ngày): {{ trial_counts.expiring_month }}</div>
+            <div style="padding:8px 16px;border-radius:8px;background:#f0fdf4;border:1px solid #bbf7d0;font-size:13px;font-weight:600;color:#16a34a;">🟢 Còn hạn: {{ trial_counts.active }}</div>
+          </div>
+
           <!-- ═══ COLUMN HEADERS (sortable) ═══ -->
           {% macro sort_link(col, label) %}
           {% set next_dir = 'desc' if (sort_by == col and sort_dir == 'asc') else 'asc' %}
@@ -1083,6 +1215,19 @@
                     <span
                       style="font-size:11px;color:#64748b;background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;padding:2px 8px;white-space:nowrap;">🟢
                       {{ lead.days_since_login }} ngày trước</span>
+                    {% endif %}
+                  </div>
+
+                  <!-- Expiry badge -->
+                  <div style="width:180px;flex-shrink:0;">
+                    {% if lead.days_until_expiry is not none %}
+                      {% if lead.days_until_expiry <= 0 %}
+                      <span style="font-size:11px;color:#dc2626;background:#fef2f2;border:1px solid #fecaca;border-radius:6px;padding:2px 8px;white-space:nowrap;font-weight:600;">🔴 Hết hạn {{ (-lead.days_until_expiry)|int }} ngày</span>
+                      {% elif lead.days_until_expiry <= 7 %}
+                      <span style="font-size:11px;color:#ea580c;background:#fff7ed;border:1px solid #fed7aa;border-radius:6px;padding:2px 8px;white-space:nowrap;font-weight:600;">🟠 Còn {{ lead.days_until_expiry }} ngày</span>
+                      {% elif lead.days_until_expiry <= 30 %}
+                      <span style="font-size:11px;color:#ca8a04;background:#fefce8;border:1px solid #fde68a;border-radius:6px;padding:2px 8px;white-space:nowrap;">🟡 Còn {{ lead.days_until_expiry }} ngày</span>
+                      {% endif %}
                     {% endif %}
                   </div>
                 </div>
@@ -1202,6 +1347,34 @@
                     <div class="lead-meta">{{ labels.label_expires or "Expires" }}: <span class="value"
                         style="color: #c0392b;">{{ lead.expiredAt }}</span></div>
                   </div>
+                  <div class="lead-block" style="grid-column:1/-1;">
+                    <div class="label">💰 Thanh toán & Hợp đồng</div>
+                    <div style="display:flex;gap:24px;align-items:flex-start;flex-wrap:wrap;">
+                      <div>
+                        <div class="lead-meta">Gói: <span class="value">{{ lead.selected_plan or 'Chưa chọn' }}</span></div>
+                        <div class="lead-meta">Thời hạn: <span class="value">{{ lead.selected_billing or 'N/A' }}{% if lead.selected_billing and lead.selected_billing != 'yearly' %} tháng{% endif %}</span></div>
+                        <div class="lead-meta">Trạng thái HĐ: <span class="value" style="{% if lead.contract_status == 'paid' %}color:#16a34a{% elif lead.contract_status == 'submitted' %}color:#ea580c{% endif %}">{{ lead.contract_status or 'Chưa có' }}</span></div>
+                        <div class="lead-meta" style="margin-top:8px;">
+                          <label style="font-size:12px;color:#64748b;">Số tiền (VNĐ):</label>
+                          <div style="display:flex;gap:6px;align-items:center;margin-top:2px;">
+                            <input type="number" class="inline-edit contract-amount-input" data-lead-id="{{ lead.id }}" value="{{ lead.contract_amount or 0 }}" style="width:140px;font-weight:600;" />
+                            <button type="button" class="btn btn-sm btn-outline-primary save-amount-btn" data-lead-id="{{ lead.id }}" style="padding:2px 8px;font-size:11px;">Lưu</button>
+                          </div>
+                        </div>
+                      </div>
+                      <div style="text-align:center;">
+                        <div style="font-size:11px;color:#64748b;margin-bottom:4px;">QR Thanh toán</div>
+                        <img class="vietqr-img" data-lead-id="{{ lead.id }}" src="https://img.vietqr.io/image/COOPBANK-6600300837884477-compact2.png?amount={{ lead.contract_amount or 0 }}&addInfo=ADMAKE-{{ lead.id }}&accountName=CONG%20TY%20TNHH%20MTV%20CONG%20NGHE%20ADMAKE" style="width:180px;height:auto;border-radius:8px;border:1px solid #e2e8f0;" />
+                        <div style="font-size:10px;color:#94a3b8;margin-top:4px;">COOPBANK · 6600300837884477</div>
+                        <div style="display:flex;gap:4px;margin-top:6px;justify-content:center;">
+                          <button type="button" class="btn btn-sm btn-outline-secondary copy-qr-btn" data-lead-id="{{ lead.id }}" style="font-size:10px;padding:2px 8px;">📋 Copy QR link</button>
+                          {% if lead.contract_status != 'paid' %}
+                          <button type="button" class="btn btn-sm btn-success confirm-payment-btn" data-lead-id="{{ lead.id }}" style="font-size:10px;padding:2px 8px;">✅ Xác nhận TT</button>
+                          {% endif %}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </article>
@@ -1226,6 +1399,25 @@
           </div>
           <div class="landing-save-status" id="landingSaveStatus"></div>
           <div class="landing-editor" id="landingContentEditor"></div>
+        </section>
+
+        <section class="tab-panel" id="priceSettingTab">
+          <div class="landing-header">
+            <div>
+              <h2>Price Setting</h2>
+              <p class="text-muted mb-0">Edit pricing plans, features and save to content.json.</p>
+            </div>
+            <div class="landing-controls">
+              <select id="pricingLangSelect" aria-label="Language">
+                <option value="vi">Vietnamese</option>
+                <option value="en">English</option>
+                <option value="zh">Chinese</option>
+              </select>
+              <button class="btn btn-primary btn-sm" type="button" id="pricingSaveBtn">Save</button>
+            </div>
+          </div>
+          <div class="landing-save-status" id="pricingSaveStatus"></div>
+          <div class="landing-editor" id="pricingContentEditor" style="display:block;max-width:100%;"></div>
         </section>
       </main>
     </div>
@@ -1736,6 +1928,444 @@
         }
       };
 
+      const renderCustomPricingEditor = (container) => {
+        if (!landingContent || !landingContent.pricing) return;
+        const pricing = landingContent.pricing;
+
+        const wrap = document.createElement('div');
+        wrap.className = 'pricing-editor-container';
+
+        const headerSection = document.createElement('div');
+        headerSection.className = 'pricing-header-fields';
+
+        const createLocalizedField = (parent, labelText, basePath) => {
+          const field = document.createElement('div');
+          field.className = 'landing-field';
+          
+          const label = document.createElement('div');
+          label.className = 'landing-label';
+          label.textContent = labelText;
+
+          const pathEl = document.createElement('div');
+          pathEl.className = 'landing-path';
+          pathEl.textContent = basePath.join('.');
+
+          const inputWrap = document.createElement('div');
+          inputWrap.className = 'landing-input';
+
+          const input = document.createElement('input');
+          input.type = 'text';
+          input.value = getPathValue(landingContent, basePath.concat([currentLang])) || '';
+
+          input.addEventListener('input', () => {
+            setPathValue(landingContent, basePath.concat([currentLang]), input.value);
+          });
+
+          inputWrap.appendChild(input);
+          field.appendChild(label);
+          field.appendChild(pathEl);
+          field.appendChild(inputWrap);
+          parent.appendChild(field);
+        };
+
+        const createStandardField = (parent, labelText, basePath, type = 'text') => {
+          const field = document.createElement('div');
+          field.className = 'landing-field';
+
+          const label = document.createElement('div');
+          label.className = 'landing-label';
+          label.textContent = labelText;
+
+          const pathEl = document.createElement('div');
+          pathEl.className = 'landing-path';
+          pathEl.textContent = basePath.join('.');
+
+          const inputWrap = document.createElement('div');
+          inputWrap.className = 'landing-input';
+
+          const input = document.createElement('input');
+          input.type = type;
+          input.value = getPathValue(landingContent, basePath) || '';
+
+          input.addEventListener('input', () => {
+            let val = input.value;
+            if (type === 'number') val = val === '' ? 0 : Number(val);
+            setPathValue(landingContent, basePath, val);
+          });
+
+          inputWrap.appendChild(input);
+          field.appendChild(label);
+          field.appendChild(pathEl);
+          field.appendChild(inputWrap);
+          parent.appendChild(field);
+        };
+
+        createLocalizedField(headerSection, 'Bảng Giá Title', ['pricing', 'title']);
+        createLocalizedField(headerSection, 'Image Alt', ['pricing', 'imageAlt']);
+        createLocalizedField(headerSection, 'CTA Button Text', ['pricing', 'cta', 'title']);
+        createStandardField(headerSection, 'CTA Href Target', ['pricing', 'cta', 'href']);
+
+        wrap.appendChild(headerSection);
+
+        const plansTitle = document.createElement('div');
+        plansTitle.className = 'landing-block-title';
+        plansTitle.textContent = 'Pricing Plans';
+        wrap.appendChild(plansTitle);
+
+        const plansGrid = document.createElement('div');
+        plansGrid.className = 'pricing-plans-grid';
+
+        if (Array.isArray(pricing.plans)) {
+          pricing.plans.forEach((plan, planIndex) => {
+            const card = document.createElement('div');
+            card.className = 'pricing-plan-card' + (plan.recommended ? ' is-recommended' : '');
+
+            const recToggle = document.createElement('input');
+            recToggle.type = 'checkbox';
+            recToggle.checked = Boolean(plan.recommended);
+            recToggle.title = 'Recommended Plan';
+            recToggle.addEventListener('change', () => {
+              pricing.plans.forEach((p, idx) => {
+                p.recommended = (idx === planIndex) ? recToggle.checked : false;
+              });
+              renderLandingEditor();
+            });
+
+            const header = document.createElement('div');
+            header.className = 'pricing-plan-card-header';
+            header.style.color = plan.color || 'var(--ink-900)';
+            
+            const titleSpan = document.createElement('span');
+            titleSpan.textContent = getPathValue(plan, ['name', currentLang]) || plan.id.toUpperCase();
+            header.appendChild(titleSpan);
+
+            const recLabel = document.createElement('label');
+            recLabel.style.fontSize = '10px';
+            recLabel.style.display = 'flex';
+            recLabel.style.alignItems = 'center';
+            recLabel.style.gap = '4px';
+            recLabel.style.cursor = 'pointer';
+            recLabel.appendChild(recToggle);
+            recLabel.appendChild(document.createTextNode('Recommended'));
+            header.appendChild(recLabel);
+
+            card.appendChild(header);
+
+            const body = document.createElement('div');
+            body.className = 'pricing-plan-card-body';
+
+            const planNameField = document.createElement('div');
+            planNameField.style.display = 'flex';
+            planNameField.style.flexDirection = 'column';
+            planNameField.style.gap = '2px';
+            const planNameLabel = document.createElement('label');
+            planNameLabel.style.fontSize = '10px';
+            planNameLabel.style.fontWeight = 'bold';
+            planNameLabel.textContent = 'Tên Gói (' + currentLang.toUpperCase() + ')';
+            const planNameInput = document.createElement('input');
+            planNameInput.type = 'text';
+            planNameInput.className = 'form-control form-control-sm';
+            planNameInput.value = getPathValue(plan, ['name', currentLang]) || '';
+            planNameInput.addEventListener('input', () => {
+              setPathValue(plan, ['name', currentLang], planNameInput.value);
+              titleSpan.textContent = planNameInput.value || plan.id.toUpperCase();
+            });
+            planNameField.appendChild(planNameLabel);
+            planNameField.appendChild(planNameInput);
+            body.appendChild(planNameField);
+
+            const colorField = document.createElement('div');
+            colorField.style.display = 'flex';
+            colorField.style.flexDirection = 'column';
+            colorField.style.gap = '2px';
+            const colorLabel = document.createElement('label');
+            colorLabel.style.fontSize = '10px';
+            colorLabel.style.fontWeight = 'bold';
+            colorLabel.textContent = 'Màu Sắc (HEX)';
+            const colorInputWrap = document.createElement('div');
+            colorInputWrap.style.display = 'flex';
+            colorInputWrap.style.gap = '4px';
+            const colorInput = document.createElement('input');
+            colorInput.type = 'text';
+            colorInput.className = 'form-control form-control-sm';
+            colorInput.style.flex = '1';
+            colorInput.value = plan.color || '#000000';
+            const colorPicker = document.createElement('input');
+            colorPicker.type = 'color';
+            colorPicker.style.width = '30px';
+            colorPicker.style.height = '30px';
+            colorPicker.style.border = 'none';
+            colorPicker.style.padding = '0';
+            colorPicker.style.cursor = 'pointer';
+            colorPicker.value = plan.color || '#000000';
+            colorInput.addEventListener('input', () => {
+              plan.color = colorInput.value;
+              colorPicker.value = colorInput.value;
+              header.style.color = plan.color;
+            });
+            colorPicker.addEventListener('input', () => {
+              plan.color = colorPicker.value;
+              colorInput.value = colorPicker.value;
+              header.style.color = plan.color;
+            });
+            colorInputWrap.appendChild(colorInput);
+            colorInputWrap.appendChild(colorPicker);
+            colorField.appendChild(colorLabel);
+            colorField.appendChild(colorInputWrap);
+            body.appendChild(colorField);
+
+            if (plan.id !== 'specialized') {
+              const price6Field = document.createElement('div');
+              price6Field.style.display = 'flex';
+              price6Field.style.flexDirection = 'column';
+              price6Field.style.gap = '2px';
+              const price6Label = document.createElement('label');
+              price6Label.style.fontSize = '10px';
+              price6Label.style.fontWeight = 'bold';
+              price6Label.textContent = 'Giá 6 Tháng (VND)';
+              const price6Input = document.createElement('input');
+              price6Input.type = 'number';
+              price6Input.className = 'form-control form-control-sm';
+              price6Input.value = plan.price6 || 0;
+              price6Input.addEventListener('input', () => {
+                plan.price6 = Number(price6Input.value);
+              });
+              price6Field.appendChild(price6Label);
+              price6Field.appendChild(price6Input);
+              body.appendChild(price6Field);
+
+              const price12Field = document.createElement('div');
+              price12Field.style.display = 'flex';
+              price12Field.style.flexDirection = 'column';
+              price12Field.style.gap = '2px';
+              const price12Label = document.createElement('label');
+              price12Label.style.fontSize = '10px';
+              price12Label.style.fontWeight = 'bold';
+              price12Label.textContent = 'Giá 12 Tháng (VND)';
+              const price12Input = document.createElement('input');
+              price12Input.type = 'number';
+              price12Input.className = 'form-control form-control-sm';
+              price12Input.value = plan.price12 || 0;
+              price12Input.addEventListener('input', () => {
+                plan.price12 = Number(price12Input.value);
+              });
+              price12Field.appendChild(price12Label);
+              price12Field.appendChild(price12Input);
+              body.appendChild(price12Field);
+            } else {
+              const priceYearlyField = document.createElement('div');
+              priceYearlyField.style.display = 'flex';
+              priceYearlyField.style.flexDirection = 'column';
+              priceYearlyField.style.gap = '2px';
+              const priceYearlyLabel = document.createElement('label');
+              priceYearlyLabel.style.fontSize = '10px';
+              priceYearlyLabel.style.fontWeight = 'bold';
+              priceYearlyLabel.textContent = 'Giá 1 Năm (VND)';
+              const priceYearlyInput = document.createElement('input');
+              priceYearlyInput.type = 'number';
+              priceYearlyInput.className = 'form-control form-control-sm';
+              priceYearlyInput.value = plan.priceYearly || 0;
+              priceYearlyInput.addEventListener('input', () => {
+                plan.priceYearly = Number(priceYearlyInput.value);
+              });
+              priceYearlyField.appendChild(priceYearlyLabel);
+              priceYearlyField.appendChild(priceYearlyInput);
+              body.appendChild(priceYearlyField);
+            }
+
+            const storageField = document.createElement('div');
+            storageField.style.display = 'flex';
+            storageField.style.flexDirection = 'column';
+            storageField.style.gap = '2px';
+            const storageLabel = document.createElement('label');
+            storageLabel.style.fontSize = '10px';
+            storageLabel.style.fontWeight = 'bold';
+            storageLabel.textContent = 'Dung Lượng (GB)';
+            const storageInput = document.createElement('input');
+            storageInput.type = 'number';
+            storageInput.className = 'form-control form-control-sm';
+            storageInput.value = plan.storageGB || 0;
+            storageInput.addEventListener('input', () => {
+              plan.storageGB = Number(storageInput.value);
+            });
+            storageField.appendChild(storageLabel);
+            storageField.appendChild(storageInput);
+            body.appendChild(storageField);
+
+            const featuresHeader = document.createElement('div');
+            featuresHeader.style.fontSize = '10px';
+            featuresHeader.style.fontWeight = 'bold';
+            featuresHeader.style.marginTop = '4px';
+            featuresHeader.textContent = 'Features Included:';
+            body.appendChild(featuresHeader);
+
+            const featuresListContainer = document.createElement('div');
+            featuresListContainer.className = 'pricing-plan-features-list';
+
+            if (Array.isArray(pricing.featureList)) {
+              pricing.featureList.forEach(f => {
+                const item = document.createElement('div');
+                item.className = 'pricing-plan-feature-item' + (f.special ? ' is-special' : '');
+
+                const chk = document.createElement('input');
+                chk.type = 'checkbox';
+                chk.checked = Array.isArray(plan.features) && plan.features.includes(f.id);
+                chk.addEventListener('change', () => {
+                  if (!Array.isArray(plan.features)) {
+                    plan.features = [];
+                  }
+                  if (chk.checked) {
+                    if (!plan.features.includes(f.id)) {
+                      plan.features.push(f.id);
+                    }
+                  } else {
+                    plan.features = plan.features.filter(fid => fid !== f.id);
+                  }
+                });
+
+                const label = document.createElement('span');
+                const pickName = (val) => {
+                  if (!val) return '';
+                  if (typeof val === 'string') return val;
+                  return val[currentLang] || val.vi || val.en || '';
+                };
+                label.textContent = pickName(f.name) || f.id;
+
+                item.appendChild(chk);
+                item.appendChild(label);
+                featuresListContainer.appendChild(item);
+              });
+            }
+
+            body.appendChild(featuresListContainer);
+            card.appendChild(body);
+            plansGrid.appendChild(card);
+          });
+        }
+
+        wrap.appendChild(plansGrid);
+
+        const featureListEditor = document.createElement('div');
+        featureListEditor.className = 'feature-list-editor';
+
+        const featureHeader = document.createElement('div');
+        featureHeader.className = 'feature-list-editor-title';
+
+        const featureTitleText = document.createElement('span');
+        featureTitleText.textContent = 'Feature List Definition';
+        featureHeader.appendChild(featureTitleText);
+
+        const addFeatureBtn = document.createElement('button');
+        addFeatureBtn.type = 'button';
+        addFeatureBtn.className = 'btn btn-outline-dark btn-sm';
+        addFeatureBtn.textContent = '+ Add Feature';
+        addFeatureBtn.addEventListener('click', () => {
+          if (!Array.isArray(pricing.featureList)) {
+            pricing.featureList = [];
+          }
+          pricing.featureList.push({
+            id: 'new_feature_' + Date.now(),
+            name: { vi: 'Tính năng mới', en: 'New Feature', zh: '新功能' },
+            special: false
+          });
+          renderLandingEditor();
+        });
+        featureHeader.appendChild(addFeatureBtn);
+        featureListEditor.appendChild(featureHeader);
+
+        const featureGrid = document.createElement('div');
+        featureGrid.className = 'feature-list-editor-grid';
+
+        if (Array.isArray(pricing.featureList)) {
+          pricing.featureList.forEach((f, idx) => {
+            const row = document.createElement('div');
+            row.className = 'feature-list-editor-row';
+
+            const idInput = document.createElement('input');
+            idInput.type = 'text';
+            idInput.value = f.id || '';
+            idInput.placeholder = 'ID';
+            idInput.addEventListener('input', () => {
+              const oldId = f.id;
+              f.id = idInput.value;
+              if (Array.isArray(pricing.plans)) {
+                pricing.plans.forEach(p => {
+                  if (Array.isArray(p.features)) {
+                    p.features = p.features.map(fid => fid === oldId ? f.id : fid);
+                  }
+                });
+              }
+            });
+            row.appendChild(idInput);
+
+            const viInput = document.createElement('input');
+            viInput.type = 'text';
+            viInput.value = f.name?.vi || '';
+            viInput.placeholder = 'Vietnamese';
+            viInput.addEventListener('input', () => {
+              if (!f.name) f.name = {};
+              f.name.vi = viInput.value;
+            });
+            row.appendChild(viInput);
+
+            const enInput = document.createElement('input');
+            enInput.type = 'text';
+            enInput.value = f.name?.en || '';
+            enInput.placeholder = 'English';
+            enInput.addEventListener('input', () => {
+              if (!f.name) f.name = {};
+              f.name.en = enInput.value;
+            });
+            row.appendChild(enInput);
+
+            const zhInput = document.createElement('input');
+            zhInput.type = 'text';
+            zhInput.value = f.name?.zh || '';
+            zhInput.placeholder = 'Chinese';
+            zhInput.addEventListener('input', () => {
+              if (!f.name) f.name = {};
+              f.name.zh = zhInput.value;
+            });
+            row.appendChild(zhInput);
+
+            const specialToggle = document.createElement('input');
+            specialToggle.type = 'checkbox';
+            specialToggle.checked = Boolean(f.special);
+            specialToggle.title = 'Special feature';
+            specialToggle.addEventListener('change', () => {
+              f.special = specialToggle.checked;
+              renderLandingEditor();
+            });
+            row.appendChild(specialToggle);
+
+            const delBtn = document.createElement('button');
+            delBtn.type = 'button';
+            delBtn.className = 'btn btn-outline-danger btn-sm';
+            delBtn.style.padding = '2px 6px';
+            delBtn.textContent = 'Delete';
+            delBtn.addEventListener('click', () => {
+              pricing.featureList.splice(idx, 1);
+              if (Array.isArray(pricing.plans)) {
+                pricing.plans.forEach(p => {
+                  if (Array.isArray(p.features)) {
+                    p.features = p.features.filter(fid => fid !== f.id);
+                  }
+                });
+              }
+              renderLandingEditor();
+            });
+            row.appendChild(delBtn);
+
+            featureGrid.appendChild(row);
+          });
+        }
+
+        featureListEditor.appendChild(featureGrid);
+        wrap.appendChild(featureListEditor);
+
+        container.appendChild(wrap);
+      };
+
       const renderLandingEditor = () => {
         if (!landingEditor || !landingContent) return;
         landingEditor.innerHTML = '';
@@ -1747,6 +2377,10 @@
         });
         entries.forEach(([sectionKey, sectionValue]) => {
           if (sectionKey === 'form') {
+            return;
+          }
+          if (sectionKey === 'pricing') {
+            // Pricing is now rendered in the separate Price Setting tab
             return;
           }
           if (sectionKey === 'reasons' && sectionValue && typeof sectionValue === 'object' && !Array.isArray(sectionValue)) {
@@ -1776,9 +2410,6 @@
           }
           section.appendChild(fields);
           landingEditor.appendChild(section);
-          if (sectionKey === 'pricing') {
-            landingEditor.appendChild(createPricingUploadSection());
-          }
         });
       };
 
@@ -1813,6 +2444,7 @@
             try {
               landingContent = data;
               renderLandingEditor();
+              renderPricingTab();
               bindPricingUpload();
               const { pricingImagePath } = getPricingElements();
               if (pricingImagePath) {
@@ -1831,8 +2463,11 @@
       if (landingLangSelect) {
         landingLangSelect.addEventListener('change', () => {
           currentLang = landingLangSelect.value;
+          // Sync pricing lang select too
+          if (pricingLangSelect) pricingLangSelect.value = currentLang;
           if (landingContent) {
-            updateLanguageInputs();
+            renderLandingEditor();
+            renderPricingTab();
           }
         });
       }
@@ -1861,6 +2496,82 @@
             })
             .finally(() => {
               landingSaveBtn.disabled = false;
+            });
+        });
+      }
+
+      // ── Pricing Tab ────────────────────────────────────────────
+      const pricingEditor = document.getElementById('pricingContentEditor');
+      const pricingSaveBtn = document.getElementById('pricingSaveBtn');
+      const pricingLangSelect = document.getElementById('pricingLangSelect');
+      const pricingSaveStatus = document.getElementById('pricingSaveStatus');
+
+      const setPricingSaveStatus = (message, tone) => {
+        if (!pricingSaveStatus) return;
+        pricingSaveStatus.textContent = message;
+        pricingSaveStatus.className = 'landing-save-status' + (tone ? ` is-${tone}` : '');
+      };
+
+      const renderPricingTab = () => {
+        if (!pricingEditor || !landingContent) return;
+        pricingEditor.innerHTML = '';
+
+        // Pricing section – full width, no image upload panel
+        if (landingContent.pricing) {
+          const section = document.createElement('div');
+          section.className = 'landing-section';
+          section.dataset.section = 'pricing';
+          section.style.maxWidth = '100%';
+          section.style.width = '100%';
+          const title = document.createElement('div');
+          title.className = 'landing-section-title';
+          title.textContent = 'Pricing Plans';
+          section.appendChild(title);
+
+          const customFieldsContainer = document.createElement('div');
+          renderCustomPricingEditor(customFieldsContainer);
+          section.appendChild(customFieldsContainer);
+
+          pricingEditor.appendChild(section);
+        }
+      };
+
+      if (pricingLangSelect) {
+        pricingLangSelect.addEventListener('change', () => {
+          currentLang = pricingLangSelect.value;
+          // Sync landing lang select too
+          if (landingLangSelect) landingLangSelect.value = currentLang;
+          if (landingContent) {
+            renderLandingEditor();
+            renderPricingTab();
+          }
+        });
+      }
+
+      if (pricingSaveBtn) {
+        pricingSaveBtn.addEventListener('click', () => {
+          if (!landingContent) return;
+          setPricingSaveStatus('Saving...', null);
+          pricingSaveBtn.disabled = true;
+          fetch('/api/lead/content/', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(landingContent),
+          })
+            .then(response => {
+              if (!response.ok) {
+                throw new Error('Save failed');
+              }
+              return response.json();
+            })
+            .then(() => {
+              setPricingSaveStatus('Saved successfully.', 'success');
+            })
+            .catch(() => {
+              setPricingSaveStatus('Save failed. Please retry.', 'error');
+            })
+            .finally(() => {
+              pricingSaveBtn.disabled = false;
             });
         });
       }
@@ -2297,6 +3008,62 @@
                 console.error(err);
                 alert('Lỗi hệ thống khi xoá.');
               });
+          }
+        });
+      });
+
+      // Save custom amount
+      document.querySelectorAll('.save-amount-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          var leadId = this.dataset.leadId;
+          var input = document.querySelector('.contract-amount-input[data-lead-id="' + leadId + '"]');
+          var amount = parseInt(input.value) || 0;
+          fetch('/api/lead/' + leadId + '/amount', {
+            method: 'PUT',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({amount: amount})
+          }).then(function(r) { return r.json(); }).then(function(d) {
+            if (d.success) {
+              // Update QR image
+              var img = document.querySelector('.vietqr-img[data-lead-id="' + leadId + '"]');
+              if (img) img.src = 'https://img.vietqr.io/image/COOPBANK-6600300837884477-compact2.png?amount=' + amount + '&addInfo=ADMAKE-' + leadId + '&accountName=CONG%20TY%20TNHH%20MTV%20CONG%20NGHE%20ADMAKE';
+              btn.textContent = '✓ Đã lưu';
+              setTimeout(function() { btn.textContent = 'Lưu'; }, 2000);
+            }
+          });
+        });
+      });
+
+      // Confirm payment
+      document.querySelectorAll('.confirm-payment-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          var leadId = this.dataset.leadId;
+          if (!confirm('Xác nhận đã nhận thanh toán cho lead #' + leadId + '?')) return;
+          fetch('/api/lead/' + leadId + '/confirm-payment', {
+            method: 'PUT',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({})
+          }).then(function(r) { return r.json(); }).then(function(d) {
+            if (d.success) {
+              btn.textContent = '✅ Đã xác nhận';
+              btn.disabled = true;
+              btn.classList.remove('btn-success');
+              btn.classList.add('btn-outline-success');
+            }
+          });
+        });
+      });
+
+      // Copy QR link
+      document.querySelectorAll('.copy-qr-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          var leadId = this.dataset.leadId;
+          var img = document.querySelector('.vietqr-img[data-lead-id="' + leadId + '"]');
+          if (img) {
+            navigator.clipboard.writeText(img.src).then(function() {
+              btn.textContent = '✓ Đã copy';
+              setTimeout(function() { btn.textContent = '📋 Copy QR link'; }, 2000);
+            });
           }
         });
       });

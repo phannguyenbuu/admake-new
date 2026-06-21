@@ -6,12 +6,14 @@ import { LineChart } from "@mui/x-charts/LineChart";
 import { CaretDownOutlined, CaretUpOutlined } from "@ant-design/icons";
 import { useUser } from "../../../common/hooks/useUser";
 import { useApiHost } from "../../../common/hooks/useApiHost";
+import { TOKEN_LABEL } from "../../../common/config";
 import UnPermissionBoard from "../unPermissionBoard";
 
 const tabs = [
   { key: "cong-viec", label: "Thống kê công việc" },
   { key: "chi-phi", label: "Thống kê chi phí" },
   { key: "nhan-su", label: "Thống kê nhân sự/khách hàng" },
+  { key: "dung-luong", label: "Dung lượng hệ thống" },
 ];
 
 type StatsResponse = {
@@ -70,6 +72,13 @@ type StatsResponse = {
     department_ratio: Array<{ label: string; value: number; color: string }>;
     top_staff: Array<{ name: string; salary: number; tasks: number; customers: number }>;
   };
+  capacity?: {
+    days_used: number;
+    total_members: number;
+    total_tasks: number;
+    total_workpoints: number;
+    total_workspaces: number;
+  };
 };
 
 const fmtCurrency = (value: number) =>
@@ -108,7 +117,11 @@ const StatisticDashboard: IPage["Component"] = () => {
         from_month: fromMonth,
         to_month: toMonth,
       });
-      const response = await fetch(`${apiHost}/statistics/dashboard?${params.toString()}`);
+      const token = localStorage.getItem(TOKEN_LABEL) || sessionStorage.getItem(TOKEN_LABEL) || "";
+      const headers: Record<string, string> = token ? { Authorization: `Bearer ${token}` } : {};
+      const response = await fetch(`${apiHost}/statistics/dashboard?${params.toString()}`, {
+        headers,
+      });
       if (!response.ok) {
         throw new Error(`Không thể tải thống kê: ${response.status}`);
       }
@@ -609,6 +622,84 @@ const StatisticDashboard: IPage["Component"] = () => {
                       )}
                     </tbody>
                   </table>
+                </div>
+              </div>
+            </div>
+          </>
+        )}
+
+        {!loading && !error && data && activeTab === "dung-luong" && (
+          <>
+            <h2 className="text-xl font-semibold text-teal-600 mb-4">Dung lượng hệ thống</h2>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+              {[
+                {
+                  label: "Số ngày đã sử dụng tài khoản",
+                  value: `${(data.capacity?.days_used ?? 0).toLocaleString("vi-VN")} ngày`,
+                  delta: "Tổng thời gian hoạt động",
+                  accent: "text-teal-600",
+                },
+                {
+                  label: "Tổng số nhân sự",
+                  value: `${(data.capacity?.total_members ?? 0).toLocaleString("vi-VN")} nhân sự`,
+                  delta: "Bao gồm cả thầu phụ",
+                  accent: "text-purple-600",
+                },
+                {
+                  label: "Tổng số công việc (Task)",
+                  value: `${(data.capacity?.total_tasks ?? 0).toLocaleString("vi-VN")} tasks`,
+                  delta: "Lũy kế tất cả các workspace",
+                  accent: "text-orange-500",
+                },
+                {
+                  label: "Tổng số lượt chấm công",
+                  value: `${(data.capacity?.total_workpoints ?? 0).toLocaleString("vi-VN")} lượt`,
+                  delta: "Lịch sử check-in/out",
+                  accent: "text-teal-600",
+                },
+              ].map((card) => (
+                <div key={card.label} className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4 flex flex-col gap-3">
+                  <div className="text-sm text-slate-500 font-medium">{card.label}</div>
+                  <div className={`text-2xl font-semibold ${card.accent}`}>{card.value}</div>
+                  <div className="flex items-center gap-2 text-xs text-slate-400">
+                    <span className="px-2 py-1 rounded-lg bg-slate-50 text-slate-500">{card.delta}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-6 bg-white rounded-2xl border border-slate-100 shadow-sm p-6 flex flex-col gap-4">
+              <h3 className="text-md font-semibold text-slate-700 border-b pb-2">Thông tin tài nguyên sử dụng</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm text-slate-600">
+                <div className="flex flex-col gap-3">
+                  <div className="flex justify-between items-center bg-slate-50 px-4 py-3 rounded-xl border border-slate-100">
+                    <span className="font-semibold text-slate-700">Thời gian đồng hành cùng Admake:</span>
+                    <span className="text-teal-600 font-bold">{(data.capacity?.days_used ?? 0).toLocaleString("vi-VN")} ngày</span>
+                  </div>
+                  <div className="flex justify-between items-center bg-slate-50 px-4 py-3 rounded-xl border border-slate-100">
+                    <span className="font-semibold text-slate-700">Tổng số nhóm công việc (Workspaces):</span>
+                    <span className="text-purple-600 font-bold">{(data.capacity?.total_workspaces ?? 0).toLocaleString("vi-VN")} nhóm</span>
+                  </div>
+                  <div className="flex justify-between items-center bg-slate-50 px-4 py-3 rounded-xl border border-slate-100">
+                    <span className="font-semibold text-slate-700">Số lượng nhân viên và đối tác:</span>
+                    <span className="text-teal-600 font-bold">{(data.capacity?.total_members ?? 0).toLocaleString("vi-VN")} thành viên</span>
+                  </div>
+                </div>
+
+                <div className="flex flex-col gap-3">
+                  <div className="flex justify-between items-center bg-slate-50 px-4 py-3 rounded-xl border border-slate-100">
+                    <span className="font-semibold text-slate-700">Tổng khối lượng dự án đã triển khai:</span>
+                    <span className="text-orange-500 font-bold">{(data.capacity?.total_tasks ?? 0).toLocaleString("vi-VN")} công việc</span>
+                  </div>
+                  <div className="flex justify-between items-center bg-slate-50 px-4 py-3 rounded-xl border border-slate-100">
+                    <span className="font-semibold text-slate-700">Số lượt chấm công / điểm danh hệ thống:</span>
+                    <span className="text-teal-600 font-bold">{(data.capacity?.total_workpoints ?? 0).toLocaleString("vi-VN")} lượt</span>
+                  </div>
+                  <div className="flex justify-between items-center bg-slate-50 px-4 py-3 rounded-xl border border-slate-100">
+                    <span className="font-semibold text-slate-700">Trạng thái hệ thống:</span>
+                    <span className="bg-emerald-100 text-emerald-800 font-bold text-xs px-2.5 py-1 rounded-full border border-emerald-200">Hoạt động ổn định</span>
+                  </div>
                 </div>
               </div>
             </div>

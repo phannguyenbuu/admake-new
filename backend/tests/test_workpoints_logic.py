@@ -17,14 +17,24 @@ except ModuleNotFoundError:
 
 @unittest.skipIf(_actual_overtime_hours is None, "backend dependencies are not installed")
 class WorkpointLogicTest(unittest.TestCase):
-    def test_actual_overtime_requires_checkout(self):
+    def test_actual_overtime_falls_back_without_checkout(self):
         self.assertEqual(
             _actual_overtime_hours(
                 {
                     "in": {"time": "2026-04-01T18:00:00"},
                 }
             ),
-            0.0,
+            4.0,
+        )
+
+    def test_actual_overtime_timezone_aware(self):
+        self.assertEqual(
+            _actual_overtime_hours(
+                {
+                    "in": {"time": "2026-04-01T11:00:00Z"},
+                }
+            ),
+            4.0,
         )
 
     def test_actual_overtime_uses_real_checkout_when_present(self):
@@ -83,6 +93,7 @@ class WorkpointLogicTest(unittest.TestCase):
                 "allowance": 20_000,
                 "bhyt": 10_000,
                 "bhxh": 30_000,
+                "carry_forward": 0,
                 "net": 80_000,
             },
         )

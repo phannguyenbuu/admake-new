@@ -48,21 +48,44 @@
 /* Mobile responsive improvements */
 @media (max-width: 640px) {
     .ant-row {
-    margin-left: -6px !important;
-    margin-right: -6px !important;
+        margin-left: -6px !important;
+        margin-right: -6px !important;
     }
-    
+
     .ant-col {
-    padding-left: 6px !important;
-    padding-right: 6px !important;
+        padding-left: 6px !important;
+        padding-right: 6px !important;
     }
-    
+
     .ant-card {
-    margin-bottom: 8px;
+        margin-bottom: 8px;
     }
-    
+
     .task-card {
-    margin-bottom: 8px !important;
+        margin-bottom: 8px !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+    }
+
+    /* Prevent ANY element from escaping card width on mobile */
+    .task-card * {
+        max-width: 100% !important;
+        word-break: break-word !important;
+        overflow-wrap: anywhere !important;
+    }
+
+    /* Avatar in task card: shrink to save space on mobile */
+    .task-card .MuiAvatar-root {
+        width: 50px !important;
+        height: 50px !important;
+        flex-shrink: 0 !important;
+    }
+
+    /* Stack container inside task card */
+    .task-card .MuiStack-root {
+        overflow: hidden !important;
+        width: 100% !important;
     }
 }
 

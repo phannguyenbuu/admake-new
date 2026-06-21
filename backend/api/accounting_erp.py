@@ -193,7 +193,7 @@ def _apply_ar_invoice_snapshot(invoice: ARInvoice):
     snapshot = _build_ar_invoice_snapshot(invoice)
     invoice.paid_amount = snapshot["paid_amount"]
     invoice.balance_amount = snapshot["balance_amount"]
-    invoice.status = _recompute_receivable_status(invoice.status, invoice.balance_amount, invoice.due_date, date.today())
+    invoice.status = _recompute_receivable_status(invoice.status, invoice.balance_amount, snapshot["effective_total_amount"], invoice.due_date, date.today())
     invoice.updated_by = _current_user_id()
     return snapshot
 
@@ -214,7 +214,7 @@ def _refresh_ar_invoice_metrics(lead_id: int):
     changed = False
     for row in rows:
         snapshot = _build_ar_invoice_snapshot(row)
-        next_status = _recompute_receivable_status(row.status, snapshot["balance_amount"], row.due_date, date.today())
+        next_status = _recompute_receivable_status(row.status, snapshot["balance_amount"], snapshot["effective_total_amount"], row.due_date, date.today())
         if (
             _round_money(row.paid_amount or 0) != snapshot["paid_amount"]
             or _round_money(row.balance_amount or 0) != snapshot["balance_amount"]
@@ -272,6 +272,52 @@ def _soft_delete_ar_payment_links(payment: ARInvoicePayment):
                     line.deletedAt = deleted_at
 
 
+def _soft_delete_ap_payment_links(payment: APBillPayment):
+    """Mirror of _soft_delete_ar_payment_links for AP payments."""
+    deleted_at = datetime.utcnow()
+    if payment.daily_cash_id:
+        cash_row = db.session.get(AccountingDailyCash, payment.daily_cash_id)
+        if cash_row and not cash_row.deletedAt:
+            cash_row.deletedAt = deleted_at
+    if payment.journal_entry_id:
+        entry = db.session.get(JournalEntry, payment.journal_entry_id)
+        if entry and not entry.deletedAt:
+            entry.deletedAt = deleted_at
+            entry.updated_by = _current_user_id()
+            for line in entry.lines:
+                if not line.deletedAt:
+                    line.deletedAt = deleted_at
+
+
+def _sync_ap_payment_links(payment: APBillPayment, bill: APBill):
+    """Mirror of _sync_ar_payment_links for AP payments."""
+    if payment.daily_cash_id:
+        cash_row = db.session.get(AccountingDailyCash, payment.daily_cash_id)
+        if cash_row and not cash_row.deletedAt:
+            cash_row.txn_date = payment.payment_date
+            cash_row.amount = payment.amount
+            cash_row.counterparty_name = bill.supplier_name
+            cash_row.payment_method = payment.payment_method
+            cash_row.doc_ref = bill.code
+            cash_row.note = payment.note
+    if payment.journal_entry_id:
+        entry = db.session.get(JournalEntry, payment.journal_entry_id)
+        if entry and not entry.deletedAt:
+            entry.entry_date = payment.payment_date
+            entry.reference_no = bill.code
+            entry.description = f"Thanh to\u00e1n c\u00f4ng n\u1ee3 {bill.code}"
+            entry.updated_by = _current_user_id()
+            for line in entry.lines:
+                if line.deletedAt:
+                    continue
+                if _round_money(line.debit or 0) > 0:
+                    line.debit = payment.amount
+                    line.credit = 0
+                elif _round_money(line.credit or 0) > 0:
+                    line.debit = 0
+                    line.credit = payment.amount
+
+
 def _require_lead(lead_id: int):
     lead = db.session.get(LeadPayload, lead_id)
     if not lead or lead.deletedAt:
@@ -299,7 +345,7 @@ def validate_journal_balance(lines: list[dict]):
     credit = _round_money(sum(_to_float(item.get("credit"), 0) for item in lines))
     if debit <= 0 and credit <= 0:
         abort(400, description="Journal entry lines are empty")
-    if debit != credit:
+    if abs(debit - credit) > 0.01:
         abort(400, description=f"Journal entry is unbalanced: debit={debit}, credit={credit}")
     return debit, credit
 
@@ -319,18 +365,22 @@ def compute_aging_bucket(balance_amount: float, due_date_value: date | None, as_
     return "90_plus"
 
 
-def _recompute_receivable_status(current_status: str, balance_amount: float, due_date_value: date | None, as_of: date):
+def _recompute_receivable_status(current_status: str, balance_amount: float, effective_total_amount: float, due_date_value: date | None, as_of: date):
     if current_status == "cancelled":
         return "cancelled"
+    if current_status == "draft":
+        return "draft"
     if balance_amount <= 0:
         return "paid"
     if due_date_value and due_date_value < as_of:
         return "overdue"
-    return "partially_paid" if current_status in {"partially_paid", "paid", "overdue"} else "confirmed"
+    if effective_total_amount > 0 and balance_amount < effective_total_amount:
+        return "partially_paid"
+    return "confirmed"
 
 
-def _recompute_payable_status(current_status: str, balance_amount: float, due_date_value: date | None, as_of: date):
-    return _recompute_receivable_status(current_status, balance_amount, due_date_value, as_of)
+def _recompute_payable_status(current_status: str, balance_amount: float, total_amount: float, due_date_value: date | None, as_of: date):
+    return _recompute_receivable_status(current_status, balance_amount, total_amount, due_date_value, as_of)
 
 
 def _build_running_code(model, lead_id: int, prefix: str, date_value: date):
@@ -649,7 +699,7 @@ def _update_bill_balances(bill: APBill):
     paid_amount = _round_money(sum(item.amount or 0 for item in bill.payments if not item.deletedAt))
     bill.paid_amount = paid_amount
     bill.balance_amount = _round_money((bill.total_amount or 0) - paid_amount)
-    bill.status = _recompute_payable_status(bill.status, bill.balance_amount, bill.due_date, date.today())
+    bill.status = _recompute_payable_status(bill.status, bill.balance_amount, bill.total_amount or 0, bill.due_date, date.today())
     bill.updated_by = _current_user_id()
 
 
@@ -1241,10 +1291,36 @@ def cancel_ar_invoice(invoice_id):
     item = ARInvoice.query.filter(ARInvoice.id == invoice_id, ARInvoice.deletedAt.is_(None)).first()
     if not item:
         abort(404, description="AR invoice not found")
-    if item.paid_amount > 0 or item.journal_entry_id:
-        abort(400, description="Cannot cancel invoice with payment or journal")
+    
+    active_payments = [p for p in item.payments if not p.deletedAt]
+    if active_payments:
+        abort(400, description="Không thể huỷ hoá đơn còn các bút toán phát sinh. Vui lòng xoá các bút toán trước.")
+    
+    if item.journal_entry_id:
+        je = db.session.get(JournalEntry, item.journal_entry_id)
+        if je:
+            if je.status == "posted":
+                abort(400, description="Không thể huỷ hoá đơn đã ghi sổ (posted).")
+            je.deletedAt = datetime.utcnow()
+            for line in je.lines:
+                line.deletedAt = datetime.utcnow()
+            
+            # soft delete link
+            links = AccountingLink.query.filter(
+                AccountingLink.lead_id == item.lead_id,
+                AccountingLink.deletedAt.is_(None),
+                or_(
+                    and_(AccountingLink.source_type == "ar_invoice", AccountingLink.source_id == item.id),
+                    and_(AccountingLink.target_type == "ar_invoice", AccountingLink.target_id == item.id)
+                )
+            ).all()
+            for link in links:
+                link.deletedAt = datetime.utcnow()
+        item.journal_entry_id = None
+
     item.status = "cancelled"
     item.cancelled_at = datetime.utcnow()
+    item.deletedAt = datetime.utcnow()
     item.updated_by = _current_user_id()
     db.session.commit()
     return jsonify(item.tdict()), 200
@@ -1534,10 +1610,34 @@ def cancel_ap_bill(bill_id):
     item = APBill.query.filter(APBill.id == bill_id, APBill.deletedAt.is_(None)).first()
     if not item:
         abort(404, description="AP bill not found")
-    if item.paid_amount > 0 or item.journal_entry_id:
-        abort(400, description="Cannot cancel bill with payment or journal")
+    if item.paid_amount > 0:
+        abort(400, description="Không thể huỷ hoá đơn mua hàng đã có thanh toán. Vui lòng xoá các thanh toán trước.")
+    
+    if item.journal_entry_id:
+        je = db.session.get(JournalEntry, item.journal_entry_id)
+        if je:
+            if je.status == "posted":
+                abort(400, description="Không thể huỷ hoá đơn mua hàng đã ghi sổ (posted).")
+            je.deletedAt = datetime.utcnow()
+            for line in je.lines:
+                line.deletedAt = datetime.utcnow()
+            
+            # soft delete link
+            links = AccountingLink.query.filter(
+                AccountingLink.lead_id == item.lead_id,
+                AccountingLink.deletedAt.is_(None),
+                or_(
+                    and_(AccountingLink.source_type == "ap_bill", AccountingLink.source_id == item.id),
+                    and_(AccountingLink.target_type == "ap_bill", AccountingLink.target_id == item.id)
+                )
+            ).all()
+            for link in links:
+                link.deletedAt = datetime.utcnow()
+        item.journal_entry_id = None
+
     item.status = "cancelled"
     item.cancelled_at = datetime.utcnow()
+    item.deletedAt = datetime.utcnow()
     item.updated_by = _current_user_id()
     db.session.commit()
     return jsonify(item.tdict()), 200
@@ -1594,6 +1694,7 @@ def update_ap_bill_payment(bill_id, payment_id):
         if new_amt > 0:
             payment.amount = new_amt
             _update_bill_balances(item)
+    _sync_ap_payment_links(payment, item)
     payment.updated_by = _current_user_id()
     db.session.commit()
     return jsonify(payment.tdict()), 200
@@ -1613,6 +1714,7 @@ def delete_ap_bill_payment(bill_id, payment_id):
     if not payment:
         abort(404, description="Payment not found")
     payment.deletedAt = datetime.utcnow()
+    _soft_delete_ap_payment_links(payment)
     _update_bill_balances(item)
     db.session.commit()
     return jsonify({"ok": True}), 200
@@ -1771,7 +1873,7 @@ def trial_balance():
             JournalEntryLine.deletedAt.is_(None),
             JournalEntry.deletedAt.is_(None),
             JournalEntryLine.lead_id == lead_id,
-            JournalEntry.status == "posted",
+            # JournalEntry.status == "posted",
         )
         .group_by(JournalEntryLine.account_code, JournalEntryLine.account_name)
     )
@@ -1799,7 +1901,7 @@ def _sum_posted_by_prefix(lead_id: int, prefixes: list[str], from_date: date | N
         .filter(
             JournalEntryLine.deletedAt.is_(None),
             JournalEntry.deletedAt.is_(None),
-            JournalEntry.status == "posted",
+            # JournalEntry.status == "posted",
             JournalEntryLine.lead_id == lead_id,
             or_(*[JournalEntryLine.account_code.like(f"{prefix}%") for prefix in prefixes]),
         )
@@ -1818,21 +1920,65 @@ def profit_and_loss():
     from_date = _parse_date(request.args.get("from_date"))
     to_date = _parse_date(request.args.get("to_date"))
     _require_lead(lead_id)
+
+    # --- Double-entry journal sums ---
     rev_debit, rev_credit = _sum_posted_by_prefix(lead_id, ["511"], from_date, to_date)
     cogs_debit, cogs_credit = _sum_posted_by_prefix(lead_id, ["632"], from_date, to_date)
     sell_debit, sell_credit = _sum_posted_by_prefix(lead_id, ["641"], from_date, to_date)
     admin_debit, admin_credit = _sum_posted_by_prefix(lead_id, ["642"], from_date, to_date)
-    revenue = _round_money(rev_credit - rev_debit)
-    cogs = _round_money(cogs_debit - cogs_credit)
-    selling = _round_money(sell_debit - sell_credit)
-    admin = _round_money(admin_debit - admin_credit)
-    return jsonify({"data": [
-        {"label": "Doanh thu bán hàng", "amount": revenue},
-        {"label": "Giá vốn hàng bán", "amount": cogs},
-        {"label": "Chi phí bán hàng", "amount": selling},
-        {"label": "Chi phí quản lý doanh nghiệp", "amount": admin},
-        {"label": "Lợi nhuận thuần", "amount": _round_money(revenue - cogs - selling - admin)},
-    ]}), 200
+    je_revenue = _round_money(rev_credit - rev_debit)
+    je_cogs = _round_money(cogs_debit - cogs_credit)
+    je_selling = _round_money(sell_debit - sell_credit)
+    je_admin = _round_money(admin_debit - admin_credit)
+
+    # --- Daily cash fallback when no journal entries exist ---
+    cash_q = (
+        AccountingDailyCash.query
+        .outerjoin(
+            ARInvoicePayment,
+            and_(
+                ARInvoicePayment.daily_cash_id == AccountingDailyCash.id,
+                ARInvoicePayment.deletedAt.is_(None),
+            ),
+        )
+        .filter(
+            AccountingDailyCash.deletedAt.is_(None),
+            AccountingDailyCash.lead_id == lead_id,
+            or_(ARInvoicePayment.id.is_(None), ARInvoicePayment.payment_type != "phat_sinh"),
+        )
+    )
+    if from_date:
+        cash_q = cash_q.filter(AccountingDailyCash.txn_date >= from_date)
+    if to_date:
+        cash_q = cash_q.filter(AccountingDailyCash.txn_date <= to_date)
+    cash_rows = cash_q.all()
+    dc_income = _round_money(sum(r.amount or 0 for r in cash_rows if r.direction == "income"))
+    dc_expense = _round_money(sum(r.amount or 0 for r in cash_rows if r.direction == "expense"))
+
+    # Use journal data if available, otherwise fall back to daily cash totals
+    has_je_data = (je_revenue + je_cogs + je_selling + je_admin) != 0
+    if has_je_data:
+        revenue = je_revenue
+        cogs = je_cogs
+        selling = je_selling
+        admin = je_admin
+        rows = [
+            {"label": "Doanh thu bán hàng", "amount": revenue},
+            {"label": "Giá vốn hàng bán", "amount": cogs},
+            {"label": "Chi phí bán hàng", "amount": selling},
+            {"label": "Chi phí quản lý doanh nghiệp", "amount": admin},
+            {"label": "Lợi nhuận thuần", "amount": _round_money(revenue - cogs - selling - admin)},
+        ]
+    else:
+        # Simpler daily-cash based P&L
+        net = _round_money(dc_income - dc_expense)
+        rows = [
+            {"label": "Doanh thu (Thu tiền)", "amount": dc_income},
+            {"label": "Chi phí (Chi tiền)", "amount": dc_expense},
+            {"label": "Lợi nhuận thuần", "amount": net},
+        ]
+
+    return jsonify({"data": rows, "source": "journal" if has_je_data else "daily_cash"}), 200
 
 
 @accounting_erp_bp.route("/reports/balance-sheet", methods=["GET"])

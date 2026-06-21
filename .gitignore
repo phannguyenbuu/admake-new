@@ -26,7 +26,16 @@ backend/__pycache__/
 backend/api/__pycache__/
 __pycache__/
 
+# Build output
+frontend/dist/
+
+# Python compiled
+*.pyc
+
 # Temp
 .codex_tmp/
 .dev-logs/
 frontend/.dev-logs/
+backup_static/
+*.sh
+.agents/

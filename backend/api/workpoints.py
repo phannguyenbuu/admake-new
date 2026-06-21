@@ -119,6 +119,7 @@ PAYROLL_ADJUSTMENT_SIGNS = {
     "bhyt": -1,
     "bhxh": -1,
     "carry_forward": 1,
+    "completed": 0,
 }
 
 
@@ -167,6 +168,9 @@ def _workhour_from_period(period_data: dict, period_name: str) -> float:
     if not in_time:
         return 0.0
 
+    if in_time.endswith("Z"):
+        in_time = in_time[:-1] + "+00:00"
+
     try:
         in_dt = datetime.fromisoformat(in_time)
     except Exception:
@@ -176,19 +180,28 @@ def _workhour_from_period(period_data: dict, period_name: str) -> float:
     out_time = out_data.get("time")
 
     if out_time:
+        if out_time.endswith("Z"):
+            out_time = out_time[:-1] + "+00:00"
         try:
             out_dt = datetime.fromisoformat(out_time)
         except Exception:
             return 0.0
     else:
+        import pytz
+        vn_tz = pytz.timezone("Asia/Ho_Chi_Minh")
         end_hour = _default_out_time(period_name)
-        out_dt = in_dt.replace(hour=end_hour, minute=0, second=0, microsecond=0)
+        if in_dt.tzinfo is not None:
+            in_dt_vn = in_dt.astimezone(vn_tz)
+            out_dt_vn = in_dt_vn.replace(hour=end_hour, minute=0, second=0, microsecond=0)
+            out_dt = out_dt_vn.astimezone(in_dt.tzinfo)
+        else:
+            out_dt = in_dt.replace(hour=end_hour, minute=0, second=0, microsecond=0)
 
     diff_hours = (out_dt - in_dt).total_seconds() / 3600
     return diff_hours if diff_hours > 0 else 0.0
 
 
-def _actual_overtime_hours(period_data: dict) -> float:
+def _actual_overtime_hours(period_data: dict, period_name: str = "evening") -> float:
     if not period_data or "in" not in period_data:
         return 0.0
 
@@ -200,14 +213,34 @@ def _actual_overtime_hours(period_data: dict) -> float:
     out_data = period_data.get("out") or {}
     in_time = in_data.get("time")
     out_time = out_data.get("time")
-    if not in_time or not out_time:
+    if not in_time:
         return 0.0
+
+    if in_time.endswith("Z"):
+        in_time = in_time[:-1] + "+00:00"
 
     try:
         in_dt = datetime.fromisoformat(in_time)
-        out_dt = datetime.fromisoformat(out_time)
     except Exception:
         return 0.0
+
+    if out_time:
+        if out_time.endswith("Z"):
+            out_time = out_time[:-1] + "+00:00"
+        try:
+            out_dt = datetime.fromisoformat(out_time)
+        except Exception:
+            return 0.0
+    else:
+        import pytz
+        vn_tz = pytz.timezone("Asia/Ho_Chi_Minh")
+        end_hour = _default_out_time(period_name)
+        if in_dt.tzinfo is not None:
+            in_dt_vn = in_dt.astimezone(vn_tz)
+            out_dt_vn = in_dt_vn.replace(hour=end_hour, minute=0, second=0, microsecond=0)
+            out_dt = out_dt_vn.astimezone(in_dt.tzinfo)
+        else:
+            out_dt = in_dt.replace(hour=end_hour, minute=0, second=0, microsecond=0)
 
     diff_hours = (out_dt - in_dt).total_seconds() / 3600
     return diff_hours if diff_hours > 0 else 0.0
@@ -279,6 +312,175 @@ def _parse_entry_date(value: str | None) -> date | None:
         return None
 
 
+def _calculate_user_month_payroll_net(user_id, month_dt, lead_id, workpoint_setting, carry_forward_val=0.0):
+    user = db.session.get(User, user_id)
+    if not user:
+        return 0.0, False
+    
+    month_start, month_end = _month_start_end(month_dt)
+    
+    wps = Workpoint.query.filter(
+        Workpoint.user_id == user_id,
+        Workpoint.createdAt >= month_start,
+        Workpoint.createdAt <= month_end
+    ).all()
+    
+    month_max_hours = _max_working_hours(month_dt.month, month_dt.year, workpoint_setting)
+    salary = float(user.salary or 0)
+    salary_unit = (salary / month_max_hours) if month_max_hours > 0 else 0
+    
+    night_overtime_ratio = float(getattr(workpoint_setting, "multiply_in_night_overtime", 1.5) or 1.5)
+    sunday_overtime_ratio = float(getattr(workpoint_setting, "multiply_in_sun_overtime", 2.0) or 2.0)
+    work_in_sunday = bool(getattr(workpoint_setting, "work_in_sunday", False))
+    
+    month_period_work = 0
+    month_night_overtime_hours = 0.0
+    month_sunday_overtime_hours = 0.0
+    
+    for wp in wps:
+        checklist = wp.checklist or {}
+        is_sunday = wp.createdAt.weekday() == 6
+        morning = checklist.get("morning")
+        noon = checklist.get("noon")
+        evening = checklist.get("evening")
+        
+        if is_sunday and not work_in_sunday:
+            for period_data, period_name in [(morning, "morning"), (noon, "noon"), (evening, "evening")]:
+                if isinstance(period_data, dict) and period_data.get("in"):
+                    overtime_value = _actual_overtime_hours(period_data, period_name)
+                    month_sunday_overtime_hours += overtime_value
+        else:
+            if isinstance(morning, dict) and morning.get("in"):
+                month_period_work += 1
+            if isinstance(noon, dict) and noon.get("in"):
+                month_period_work += 1
+            if isinstance(evening, dict) and evening.get("in"):
+                overtime_value = _actual_overtime_hours(evening, "evening")
+                month_night_overtime_hours += overtime_value
+                
+    base_salary_total = salary_unit * 4 * month_period_work
+    overtime_salary_total = (
+        salary_unit * night_overtime_ratio * month_night_overtime_hours +
+        salary_unit * sunday_overtime_ratio * month_sunday_overtime_hours
+    )
+    
+    msgs = Message.query.filter(
+        Message.user_id == user_id,
+        Message.createdAt >= month_start,
+        Message.createdAt <= month_end,
+        or_(
+            Message.type.like("%cash:%"),
+            Message.type.like("%cash"),
+            Message.type.like("bonus-cash"),
+            Message.type.like("advance-salary-cash"),
+        )
+    ).all()
+    
+    bonus = 0.0
+    punish = 0.0
+    advance = 0.0
+    for msg in msgs:
+        amount = float(_extract_cash_amount(msg.text))
+        msg_type = (msg.type or "").strip()
+        if msg_type == "advance-salary-cash":
+            advance += amount
+        elif "cash" in msg_type:
+            if amount >= 0:
+                bonus += amount
+            else:
+                punish += amount
+                
+    tasks = Task.query.filter(
+        Task.isDelete.is_(False),
+        Task.status == "REWARD",
+        Task.end_time.isnot(None),
+        Task.end_time >= month_start.date(),
+        Task.end_time <= month_end.date()
+    ).all()
+    
+    task_reward = 0.0
+    for task in tasks:
+        assign_ids = task.assign_ids or []
+        if isinstance(assign_ids, list) and user_id in assign_ids:
+            valid_users = User.query.filter(User.id.in_(assign_ids), User.lead_id == lead_id).all()
+            total_agent_salary = sum(float(u.salary or 0) for u in valid_users)
+            if total_agent_salary > 0:
+                task_reward += float(task.reward or 0) * salary / total_agent_salary
+                
+    total_bonus = bonus + task_reward
+    allowance = float(getattr(user, "allowance", 0) or 0)
+    bhyt = float(getattr(user, "bhyt", 0) or 0)
+    bhxh = float(getattr(user, "bhxh", 0) or 0)
+    
+    net_salary = base_salary_total + overtime_salary_total + total_bonus + allowance + punish - advance - bhyt - bhxh
+    
+    adjs = PayrollAdjustment.query.filter(
+        PayrollAdjustment.lead_id == lead_id,
+        PayrollAdjustment.user_id == user_id,
+        PayrollAdjustment.deletedAt.is_(None),
+        PayrollAdjustment.entry_date >= month_start.date(),
+        PayrollAdjustment.entry_date <= month_end.date()
+    ).all()
+    
+    adj_totals = {
+        "bonus": 0.0,
+        "punish": 0.0,
+        "advance": 0.0,
+        "commission": 0.0,
+        "allowance": 0.0,
+        "bhyt": 0.0,
+        "bhxh": 0.0,
+        "carry_forward": 0.0,
+        "completed": 0.0,
+        "net": 0.0
+    }
+    for item in adjs:
+        adjustment_type = _normalize_payroll_adjustment_type(getattr(item, "adjustment_type", None))
+        if adjustment_type:
+            amount = float(getattr(item, "amount", 0) or 0)
+            adj_totals[adjustment_type] += amount
+            adj_totals["net"] += amount * PAYROLL_ADJUSTMENT_SIGNS[adjustment_type]
+            
+    is_completed = adj_totals["completed"] > 0
+    final_net = net_salary + adj_totals["net"] + carry_forward_val
+    
+    return final_net, is_completed
+
+
+def _calculate_automatic_carry_forward(user_id, target_month_dt, lead_id, workpoint_setting):
+    # Find the earliest workpoint month for this user to scan full history
+    earliest_wp = (
+        Workpoint.query
+        .filter(Workpoint.user_id == user_id, Workpoint.lead_id == lead_id, Workpoint.deletedAt.is_(None))
+        .order_by(Workpoint.createdAt.asc())
+        .first()
+    )
+    if not earliest_wp or not earliest_wp.createdAt:
+        return 0.0
+
+    # Build list of all months from earliest workpoint to the month before target
+    earliest_month = earliest_wp.createdAt.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+    history_months = []
+    curr = earliest_month
+    target_first = target_month_dt.replace(day=1)
+    while curr < target_first:
+        history_months.append(curr)
+        curr = curr + relativedelta(months=1)
+
+    if not history_months:
+        return 0.0
+
+    carry_forward_val = 0.0
+    for m in history_months:
+        net, is_completed = _calculate_user_month_payroll_net(user_id, m, lead_id, workpoint_setting, carry_forward_val)
+        if is_completed or round(net, 0) == 0:
+            carry_forward_val = 0.0
+        else:
+            carry_forward_val = net
+            
+    return round(carry_forward_val, 0)
+
+
 def _normalize_payroll_adjustment_type(value: str | None) -> str | None:
     normalized = (value or "").strip().lower()
     if normalized in PAYROLL_ADJUSTMENT_SIGNS:
@@ -300,6 +502,7 @@ def _sum_payroll_adjustments(items) -> dict:
         "bhyt": 0.0,
         "bhxh": 0.0,
         "carry_forward": 0.0,
+        "completed": 0.0,
         "net": 0.0,
     }
     for item in items or []:
@@ -307,6 +510,8 @@ def _sum_payroll_adjustments(items) -> dict:
         if not adjustment_type:
             continue
         amount = float(getattr(item, "amount", 0) or 0)
+        if adjustment_type not in totals:
+            totals[adjustment_type] = 0.0
         totals[adjustment_type] += amount
         totals["net"] += amount * PAYROLL_ADJUSTMENT_SIGNS[adjustment_type]
     return totals
@@ -511,7 +716,7 @@ def get_payroll_summary():
                     for period_data, period_name in [(morning, "morning"), (noon, "noon"), (evening, "evening")]:
                         if isinstance(period_data, dict) and period_data.get("in"):
                             # Chỉ tính giờ nếu có check-out, nếu không có thì dùng default
-                            overtime_value = _actual_overtime_hours(period_data)
+                            overtime_value = _actual_overtime_hours(period_data, period_name)
                             month_overtime_hours += overtime_value
                             month_sunday_overtime_hours += overtime_value
                 else:
@@ -526,7 +731,7 @@ def get_payroll_summary():
                     # Tối (evening): CHỈ tính tăng ca nếu có check-in TỐI (màu vàng)
                     # Check-in tối không check-out → vẫn nhân hệ số (đây là trường hợp tăng ca thực sự)
                     if isinstance(evening, dict) and evening.get("in"):
-                        overtime_value = _actual_overtime_hours(evening)
+                        overtime_value = _actual_overtime_hours(evening, "evening")
                         month_overtime_hours += overtime_value
                         month_night_overtime_hours += overtime_value
 
@@ -557,6 +762,10 @@ def get_payroll_summary():
         total_bonus = bonus + task_reward
         net_salary = base_salary_total + overtime_salary_total + total_bonus + allowance + punish - advance - bhyt - bhxh
 
+        auto_carry = 0
+        if not is_supplier:
+            auto_carry = _calculate_automatic_carry_forward(user.id, from_month_dt, lead_id, workpoint_setting)
+            
         row = {
             "user_id": user.id,
             "full_name": user.fullName or user.username,
@@ -576,10 +785,12 @@ def get_payroll_summary():
             "allowance": round(allowance, 0),
             "bhyt": round(bhyt, 0),
             "bhxh": round(bhxh, 0),
-            "carry_forward": 0,
-            "net_salary": round(net_salary, 0),
+            "carry_forward": auto_carry,
+            "net_salary": round(net_salary + auto_carry, 0),
         }
-        row = _apply_payroll_adjustments(row, _sum_payroll_adjustments(adjustments_by_user.get(user.id, [])))
+        user_adjs = adjustments_by_user.get(user.id, [])
+        row = _apply_payroll_adjustments(row, _sum_payroll_adjustments(user_adjs))
+        row["is_completed"] = any(item.adjustment_type == "completed" for item in user_adjs)
         rows.append(row)
 
         summary["total_people"] += 1

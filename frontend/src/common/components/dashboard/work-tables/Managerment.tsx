@@ -413,7 +413,7 @@ export default function ManagermentBoard() {
         // @ts-ignore
         users={workspaceData?.users}
         // @ts-ignore
-        // customers = {workspaceData?.customers}
+        customers={workspaceData?.customers}
         updateTaskStatus={updateTaskStatus}
       />
 

@@ -1,0 +1,1 @@
+ALTER TABLE inventory_items ADD COLUMN IF NOT EXISTS spec_rows JSONB DEFAULT '[]'::JSONB;

@@ -10,8 +10,47 @@ import {
   type TaxCode,
 } from "../../../services/accounting-erp.service";
 import { SummaryCard } from "./shared";
+import { InventoryService, type InventoryItem } from "../../../services/inventory.service";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
+function getMaterialRowPrice(row: any, items: any[]): number {
+  for (const item of items) {
+    const specs = item.spec_rows || [];
+    if (specs.length > 0) {
+      for (const spec of specs) {
+        const specStr = [spec.color, spec.spec].filter(Boolean).join(" - ");
+        const formattedName = `${item.name} - ${specStr}`;
+        if (row.ten === formattedName || (row.ten === item.name && row.quy_cach === specStr)) {
+          return Number(spec.price) || 0;
+        }
+      }
+    }
+    if (row.ten === item.name) {
+      return item.standard_cost || item.average_cost || 0;
+    }
+    if (item.name && row.ten && row.ten.startsWith(item.name)) {
+      if (specs.length > 0) {
+        for (const spec of specs) {
+          const specStr = [spec.color, spec.spec].filter(Boolean).join(" - ");
+          if (row.ten.includes(specStr) || row.quy_cach === specStr) {
+            return Number(spec.price) || 0;
+          }
+        }
+      }
+      return item.standard_cost || item.average_cost || 0;
+    }
+  }
+  return 0;
+}
+
+function getTaskMaterialCost(task: any, items: any[]): number {
+  const materials = task.materials || [];
+  return materials.reduce((sum: number, row: any) => {
+    const qty = parseFloat(row.so_luong) || 0;
+    const price = getMaterialRowPrice(row, items);
+    return sum + qty * price;
+  }, 0);
+}
 const fmt = (v: number | undefined | null) =>
   Number(v || 0).toLocaleString("vi-VN", { maximumFractionDigits: 0 });
 const parseMoney = (s: string) => parseFloat(s.replace(/[^0-9.-]/g, "")) || 0;
@@ -40,7 +79,7 @@ function MoneyInput({ value, onChange, onEnter, placeholder = "Số tiền...", 
 // ─── InlineVAT ────────────────────────────────────────────────────────────────
 function InlineVAT({ value, taxCodes, onSave }: { value: number; taxCodes: TaxCode[]; onSave: (rate: number, taxCodeId: string | null) => void }) {
   const [editing, setEditing] = useState(false);
-  const inputCodes = taxCodes.filter((t) => t.direction === "input" || t.direction === "both");
+  const inputCodes = Array.isArray(taxCodes) ? taxCodes.filter((t) => t.direction === "input" || t.direction === "both") : [];
   const matched = inputCodes.find((t) => t.rate === value);
   const label = matched ? `${matched.code} (${value}%)` : `${value}%`;
   if (editing) return <select autoFocus value={matched?.id || ""} className="text-xs border border-teal-400 rounded-md px-1 py-1 outline-none bg-teal-50 w-full" onBlur={() => setEditing(false)} onChange={(e) => { setEditing(false); const c = inputCodes.find((t) => t.id === e.target.value); if (c) onSave(c.rate, c.id); }}><option value="">-- Chọn thuế --</option>{inputCodes.map((t) => <option key={t.id} value={t.id}>{t.code} – {t.name} ({t.rate}%)</option>)}</select>;
@@ -223,7 +262,18 @@ export default function AccountsPayableTab() {
     queryKey: ["tasks-inlead", userLeadId], enabled: !!userLeadId, staleTime: 5 * 60 * 1000,
     queryFn: async () => { const { default: axiosClient } = await import("../../../services/axiosClient"); const data = await axiosClient.get(`/task/inlead/${userLeadId}`); return (data.data || []) as { id: string; title: string }[]; },
   });
-  const tasks = taskQuery.data || [];
+  const tasks = (taskQuery.data || []) as any[];
+
+  const inventoryQuery = useQuery({
+    queryKey: ["inventory-items", userLeadId],
+    enabled: !!userLeadId,
+    queryFn: async () => {
+      const res = await InventoryService.listItems({ lead: userLeadId, limit: 1000 });
+      return (res.data?.data || []) as InventoryItem[];
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+  const inventoryItems = inventoryQuery.data || [];
 
   const dailyCashQuery = useQuery({
     queryKey: ["daily-cash-list", userLeadId, month], enabled: !!userLeadId, staleTime: 2 * 60 * 1000,
@@ -372,7 +422,7 @@ export default function AccountsPayableTab() {
         <div className="flex flex-wrap gap-2 items-center">
           <select value={filterVat} onChange={(e) => { setFilterVat(e.target.value); setPage(1); }} className="border border-slate-200 rounded-lg px-3 py-1.5 text-xs bg-white text-slate-600">
             <option value="">VAT: Tất cả</option>
-            {taxCodes.filter((t) => t.direction === "input" || t.direction === "both").map((tc) => (
+            {(Array.isArray(taxCodes) ? taxCodes.filter((t) => t.direction === "input" || t.direction === "both") : []).map((tc) => (
               <option key={tc.id} value={String(tc.rate ?? 0)}>{tc.code} ({tc.rate ?? 0}%)</option>
             ))}
           </select>
@@ -436,6 +486,23 @@ export default function AccountsPayableTab() {
                     <td className="px-3 py-2 min-w-[180px]">
                       <InlineText value={row.supplier_name || ""} placeholder="Nhà cung cấp" onSave={(v) => handleInlineUpdate(row, "supplier_name", v)} />
                       <select title="Gắn công việc" value={tasks.find((t) => t.title === row.description)?.id || ""} onChange={(e) => { const t = tasks.find((x) => x.id === e.target.value); handleInlineUpdate(row, "description", t ? t.title : ""); }} className="mt-0.5 w-full text-[11px] text-slate-600 border border-slate-200 rounded px-1 py-0.5 bg-white hover:border-rose-400 cursor-pointer"><option value="">{tasks.length ? "-- Chọn công việc --" : "(Chưa có task)"}</option>{tasks.map((t) => <option key={t.id} value={t.id}>{t.title}</option>)}</select>
+                      {(() => {
+                        const linkedTask = tasks.find((t) => t.title === row.description);
+                        if (!linkedTask) return null;
+                        const matCost = getTaskMaterialCost(linkedTask, inventoryItems);
+                        return (
+                          <div className="flex flex-wrap gap-1 mt-1 text-[10px]">
+                            <span className="bg-purple-50 text-purple-700 px-1 py-0.5 rounded font-medium">
+                              Nhân công: {fmt(linkedTask.reward)}đ
+                            </span>
+                            {matCost > 0 && (
+                              <span className="bg-teal-50 text-teal-700 px-1 py-0.5 rounded font-medium">
+                                Vật tư: {fmt(matCost)}đ
+                              </span>
+                            )}
+                          </div>
+                        );
+                      })()}
                     </td>
                     <td className="px-3 py-2"><InlineVAT value={row.tax_rate ?? 0} taxCodes={taxCodes} onSave={(rate, taxCodeId) => handleVATChange(row, rate, taxCodeId)} /></td>
                     <td className="px-3 py-2">

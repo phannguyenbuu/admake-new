@@ -130,7 +130,13 @@ def get_task_by_id(id):
     if task.customer_id:
         customer = db.session.get(User, task.customer_id)
         if customer:
-            result["customer_id"] = {"id":task.customer_id,"name": customer.fullName}
+            result["customer_id"] = {
+                "id": task.customer_id,
+                "name": customer.fullName,
+                "phone": customer.phone,
+                "address": customer.address,
+                "email": customer.email
+            }
         else:
             result["customer_id"] = None
 
@@ -162,7 +168,8 @@ def update_task(id):
 
     task.type = data.get("type", task.type)
     task.reward = data.get("reward", task.reward)
-    task.amount = data.get("amount", task.amount)
+    task.amount = int(data.get("amount") or 0) if "amount" in data else task.amount
+    task.prepayment = int(data.get("prepayment") or 0) if "prepayment" in data else task.prepayment
     task.salary_type = data.get("salary_type", task.salary_type)
 
     if "icon" in data:
@@ -171,6 +178,7 @@ def update_task(id):
     flag_modified(task, "assign_ids")
     
     db.session.add(task)
+    sync_task_to_ar_invoice(task)
     db.session.commit()
 
     task = Task.query.get(id)
@@ -606,6 +614,7 @@ def create_task():
     task = Task.create_item(data)
 
     db.session.add(task)
+    sync_task_to_ar_invoice(task)
     db.session.commit()
 
     return jsonify(task.tdict()), 201
@@ -678,6 +687,7 @@ def delete_task(id):
         abort(404, description="Task not found")
 
     task.isDelete = True
+    sync_task_to_ar_invoice(task)
 
     # db.session.delete(task)
     db.session.commit()
@@ -692,6 +702,7 @@ def restore_task(id):
         abort(404, description="Task not found")
 
     task.isDelete = False
+    sync_task_to_ar_invoice(task)
 
     # db.session.delete(task)
     db.session.commit()
@@ -705,6 +716,9 @@ def delete_task_forever(id):
     if not task:
         print("Task not found", id)
         abort(404, description="Task not found")
+
+    task.isDelete = True
+    sync_task_to_ar_invoice(task)
 
     db.session.delete(task)
     db.session.commit()
@@ -739,6 +753,8 @@ def clear_trash_by_lead(lead_id):
     ).all()
 
     for task in tasks:
+        task.isDelete = True
+        sync_task_to_ar_invoice(task)
         db.session.delete(task)
 
     db.session.commit()
@@ -747,3 +763,120 @@ def clear_trash_by_lead(lead_id):
         "message": "Trash cleared",
         "deleted": len(tasks)
     }), 200
+
+
+def sync_task_to_ar_invoice(task):
+    try:
+        from models import ARInvoice, ARInvoicePayment, User, db
+        from api.accounting_erp import _build_running_code, _record_ar_payment, _soft_delete_ar_payment_links, _update_invoice_balances
+        import datetime
+    except ImportError as e:
+        print("Skipping AR sync due to import error:", e)
+        return
+
+    # 1. If task is deleted, soft-delete all linked AR invoices and payments
+    if getattr(task, "isDelete", False):
+        invoices = ARInvoice.query.filter(ARInvoice.task_id == task.id, ARInvoice.deletedAt.is_(None)).all()
+        for invoice in invoices:
+            invoice.deletedAt = datetime.datetime.utcnow()
+            payments = ARInvoicePayment.query.filter(
+                ARInvoicePayment.invoice_id == invoice.id,
+                ARInvoicePayment.deletedAt.is_(None)
+            ).all()
+            for p in payments:
+                p.deletedAt = datetime.datetime.utcnow()
+                _soft_delete_ar_payment_links(p)
+        return
+
+    # 2. Check if there are any financials
+    has_financials = bool(task.customer_id) or bool(task.amount and task.amount > 0) or bool(task.prepayment and task.prepayment > 0)
+    
+    invoice = ARInvoice.query.filter(ARInvoice.task_id == task.id, ARInvoice.deletedAt.is_(None)).first()
+
+    if not has_financials:
+        # If exists but task financials cleared, delete it
+        if invoice:
+            invoice.deletedAt = datetime.datetime.utcnow()
+            payments = ARInvoicePayment.query.filter(
+                ARInvoicePayment.invoice_id == invoice.id,
+                ARInvoicePayment.deletedAt.is_(None)
+            ).all()
+            for p in payments:
+                p.deletedAt = datetime.datetime.utcnow()
+                _soft_delete_ar_payment_links(p)
+        return
+
+    # 3. Resolve customer name
+    customer = None
+    if task.customer_id:
+        customer = db.session.get(User, task.customer_id)
+    customer_name = customer.fullName if customer else "Khách hàng vãng lai"
+
+    invoice_date = datetime.date.today()
+
+    if not invoice:
+        # Create new AR invoice (draft status by default)
+        invoice_code = _build_running_code(ARInvoice, task.lead_id, "AR", invoice_date)
+        invoice = ARInvoice(
+            id=generate_datetime_id(),
+            lead_id=task.lead_id,
+            task_id=task.id,
+            code=invoice_code,
+            customer_id=task.customer_id,
+            customer_name=customer_name,
+            invoice_date=invoice_date,
+            due_date=None,
+            base_amount=float(task.amount or 0),
+            tax_rate=0.0,
+            tax_amount=0.0,
+            total_amount=float(task.amount or 0),
+            paid_amount=0.0,
+            balance_amount=float(task.amount or 0),
+            status="draft",
+            description=task.title,
+        )
+        db.session.add(invoice)
+        db.session.flush()
+    else:
+        # Update existing AR invoice if it's not locked by accountant
+        is_locked = invoice.confirmed_at is not None or invoice.status == "cancelled" or invoice.journal_entry_id is not None
+        if not is_locked:
+            invoice.customer_id = task.customer_id
+            invoice.customer_name = customer_name
+            invoice.base_amount = float(task.amount or 0)
+            invoice.total_amount = float(task.amount or 0)
+            invoice.description = task.title
+        else:
+            invoice.description = task.title
+
+    # 4. Synchronize prepayments if invoice not locked
+    is_locked = invoice.confirmed_at is not None or invoice.status == "cancelled" or invoice.journal_entry_id is not None
+    if not is_locked:
+        target_prepayment = float(task.prepayment or 0)
+        existing_payments = ARInvoicePayment.query.filter(
+            ARInvoicePayment.invoice_id == invoice.id,
+            ARInvoicePayment.payment_type == "tam_ung",
+            ARInvoicePayment.deletedAt.is_(None)
+        ).all()
+
+        current_prepayment_sum = sum(p.amount or 0 for p in existing_payments)
+
+        if abs(current_prepayment_sum - target_prepayment) > 0.01:
+            for p in existing_payments:
+                p.deletedAt = datetime.datetime.utcnow()
+                _soft_delete_ar_payment_links(p)
+
+            if target_prepayment > 0:
+                # Cap the recorded prepayment at total_amount to prevent error if input exceeds total_amount
+                amt_to_record = min(target_prepayment, invoice.total_amount)
+                if amt_to_record > 0:
+                    _record_ar_payment(
+                        invoice=invoice,
+                        payment_date=invoice_date,
+                        amount=amt_to_record,
+                        payment_method="cash",
+                        note=f"Tạm ứng cho công việc: {task.title}",
+                        payment_type="tam_ung"
+                    )
+
+            _update_invoice_balances(invoice)

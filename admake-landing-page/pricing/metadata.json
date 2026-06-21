@@ -1,0 +1,6 @@
+{
+  "name": "Trang Tính Giá & So Sánh Gói Cước",
+  "description": "Bảng so sánh gói dịch vụ Cơ bản và Chuyên nghiệp kèm bộ tính toán giá trực quan, hỗ trợ đa ngôn ngữ và đồ họa SVG tương tác.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

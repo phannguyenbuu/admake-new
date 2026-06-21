@@ -10,6 +10,7 @@ import {
   type TaxCode,
 } from "../../../services/accounting-erp.service";
 import { SummaryCard } from "./shared";
+import { InventoryService, type InventoryItem } from "../../../services/inventory.service";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -29,7 +30,8 @@ const getArRowTotals = (row: ArInvoice, payments?: Payment[]) => {
   if (payments) {
     const phatSinhAmount = sumPaymentsByType(payments, "phat_sinh");
     const tamUngAmount = sumPaymentsByType(payments, "tam_ung");
-    const effectiveTotalAmount = Math.round((row.total_amount || 0) + phatSinhAmount * (1 + (row.tax_rate || 0) / 100));
+    const extraTotal = Math.round(phatSinhAmount * (1 + (row.tax_rate || 0) / 100) * 100) / 100;
+    const effectiveTotalAmount = Math.round(((row.total_amount || 0) + extraTotal) * 100) / 100;
     return {
       phatSinhAmount,
       tamUngAmount,
@@ -40,7 +42,8 @@ const getArRowTotals = (row: ArInvoice, payments?: Payment[]) => {
 
   const phatSinhAmount = row.phat_sinh_amount || 0;
   const tamUngAmount = row.tam_ung_amount ?? row.paid_amount ?? 0;
-  const effectiveTotalAmount = row.effective_total_amount ?? Math.round((row.total_amount || 0) + phatSinhAmount * (1 + (row.tax_rate || 0) / 100));
+  const extraTotal = Math.round(phatSinhAmount * (1 + (row.tax_rate || 0) / 100) * 100) / 100;
+  const effectiveTotalAmount = row.effective_total_amount ?? Math.round(((row.total_amount || 0) + extraTotal) * 100) / 100;
   const remainingAmount = row.balance_amount ?? (effectiveTotalAmount - tamUngAmount);
   return {
     phatSinhAmount,
@@ -49,6 +52,45 @@ const getArRowTotals = (row: ArInvoice, payments?: Payment[]) => {
     remainingAmount,
   };
 };
+
+function getMaterialRowPrice(row: any, items: any[]): number {
+  for (const item of items) {
+    const specs = item.spec_rows || [];
+    if (specs.length > 0) {
+      for (const spec of specs) {
+        const specStr = [spec.color, spec.spec].filter(Boolean).join(" - ");
+        const formattedName = `${item.name} - ${specStr}`;
+        if (row.ten === formattedName || (row.ten === item.name && row.quy_cach === specStr)) {
+          return Number(spec.price) || 0;
+        }
+      }
+    }
+    if (row.ten === item.name) {
+      return item.standard_cost || item.average_cost || 0;
+    }
+    if (item.name && row.ten && row.ten.startsWith(item.name)) {
+      if (specs.length > 0) {
+        for (const spec of specs) {
+          const specStr = [spec.color, spec.spec].filter(Boolean).join(" - ");
+          if (row.ten.includes(specStr) || row.quy_cach === specStr) {
+            return Number(spec.price) || 0;
+          }
+        }
+      }
+      return item.standard_cost || item.average_cost || 0;
+    }
+  }
+  return 0;
+}
+
+function getTaskMaterialCost(task: any, items: any[]): number {
+  const materials = task.materials || [];
+  return materials.reduce((sum: number, row: any) => {
+    const qty = parseFloat(row.so_luong) || 0;
+    const price = getMaterialRowPrice(row, items);
+    return sum + qty * price;
+  }, 0);
+}
 
 // ─── Inline text cell ─────────────────────────────────────────────────────────
 
@@ -167,9 +209,9 @@ function InlineVAT({
 }) {
   const [editing, setEditing] = useState(false);
 
-  const outputCodes = taxCodes.filter(
+  const outputCodes = Array.isArray(taxCodes) ? taxCodes.filter(
     (t) => t.direction === "output" || t.direction === "both"
-  );
+  ) : [];
 
   const matched = outputCodes.find((t) => t.rate === value);
   const label = matched ? `${matched.code} (${value}%)` : `${value}%`;
@@ -785,7 +827,18 @@ export default function AccountsReceivableTab() {
     },
     staleTime: 5 * 60 * 1000,
   });
-  const tasks = taskQuery.data || [];
+  const tasks = (taskQuery.data || []) as any[];
+
+  const inventoryQuery = useQuery({
+    queryKey: ["inventory-items", userLeadId],
+    enabled: !!userLeadId,
+    queryFn: async () => {
+      const res = await InventoryService.listItems({ lead: userLeadId, limit: 1000 });
+      return (res.data?.data || []) as InventoryItem[];
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+  const inventoryItems = inventoryQuery.data || [];
 
   // ── Daily Cash list (cùng tháng, dùng để link phếu TC vào payment) ──────────
   const dailyCashQuery = useQuery({
@@ -958,9 +1011,9 @@ export default function AccountsReceivableTab() {
   const allRows = (listQuery.data?.data || []) as ArInvoice[];
   const summary = listQuery.data?.summary || {};
 
-  const outputTaxCodes = taxCodes.filter(
+  const outputTaxCodes = Array.isArray(taxCodes) ? taxCodes.filter(
     (t) => t.direction === "output" || t.direction === "both"
-  );
+  ) : [];
 
   // ── Client-side filter + sort + paginate ────────────────────────────
   let filteredRows = allRows;
@@ -1267,6 +1320,23 @@ export default function AccountsReceivableTab() {
                           <option key={t.id} value={t.id}>{t.title}</option>
                         ))}
                       </select>
+                      {(() => {
+                        const linkedTask = tasks.find((t) => t.title === row.description);
+                        if (!linkedTask) return null;
+                        const matCost = getTaskMaterialCost(linkedTask, inventoryItems);
+                        return (
+                          <div className="flex flex-wrap gap-1 mt-1 text-[10px]">
+                            <span className="bg-purple-50 text-purple-700 px-1 py-0.5 rounded font-medium">
+                              Nhân công: {fmt(linkedTask.reward)}đ
+                            </span>
+                            {matCost > 0 && (
+                              <span className="bg-teal-50 text-teal-700 px-1 py-0.5 rounded font-medium">
+                                Vật tư: {fmt(matCost)}đ
+                              </span>
+                            )}
+                          </div>
+                        );
+                      })()}
                     </td>
 
                     {/* VAT dropdown */}
@@ -1491,6 +1561,23 @@ export default function AccountsReceivableTab() {
                 <option key={t.id} value={t.id}>{t.title}</option>
               ))}
             </select>
+            {(() => {
+              const linkedTask = tasks.find((t) => t.title === form.description);
+              if (!linkedTask) return null;
+              const matCost = getTaskMaterialCost(linkedTask, inventoryItems);
+              return (
+                <div className="flex flex-wrap gap-2 mt-1.5 text-xs">
+                  <span className="bg-purple-50 text-purple-700 px-2 py-0.5 rounded font-medium">
+                    Nhân công: {fmt(linkedTask.reward)}đ
+                  </span>
+                  {matCost > 0 && (
+                    <span className="bg-teal-50 text-teal-700 px-2 py-0.5 rounded font-medium">
+                      Vật tư: {fmt(matCost)}đ
+                    </span>
+                  )}
+                </div>
+              );
+            })()}
           </div>
 
           <div className="grid grid-cols-2 gap-2">
