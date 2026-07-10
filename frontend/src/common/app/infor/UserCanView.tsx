@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useUser } from '../../common/hooks/useUser';
 import { useApiHost } from '../../common/hooks/useApiHost';
+import { TOKEN_LABEL } from '../../common/config';
 import { Button, Form, Input, notification, Checkbox } from "antd";
 import { Stack } from '@mui/material';
 import { Select } from 'antd';
@@ -110,9 +111,14 @@ const UserCanViewForm: React.FC<UserCanViewFormProps> = (props) => {
       password: values.password,
     };
     try {
+      const token = localStorage.getItem(TOKEN_LABEL) || sessionStorage.getItem(TOKEN_LABEL) || "";
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
       const response = await fetch(`${useApiHost()}/user/${selectedUser}/can-view`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify(jsonData),
       });
       if (!response.ok) throw new Error('Update failed');

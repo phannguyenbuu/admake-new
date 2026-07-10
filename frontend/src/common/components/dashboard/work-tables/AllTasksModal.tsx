@@ -40,6 +40,14 @@ function getAuthHeaders(): HeadersInit {
   return accessToken ? { Authorization: `Bearer ${accessToken}` } : {};
 }
 
+const removeAccents = (str: string): string => {
+  return str
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/đ/g, "d")
+    .replace(/Đ/g, "D");
+};
+
 export default function AllTasksModal() {
   const [clearTrashVisible, setClearTrashVisible] = useState(false);
 
@@ -49,6 +57,7 @@ export default function AllTasksModal() {
   const context = useContext(UpdateButtonContext);
   const {userLeadId, workspaces, isMobile} = useUser();
   const [searchText, setSearchText] = useState("");
+  const [searchCustomer, setSearchCustomer] = useState("");
 
   if (!context) throw new Error("UpdateButtonContext not found");
 
@@ -88,25 +97,26 @@ export default function AllTasksModal() {
   };
 
 
-  const handleSearch = (value: string, startDate?: Dayjs | null, endDate?: Dayjs | null) => {
-    setSearchText(value);
+  const handleSearch = (taskVal: string, customerVal: string) => {
+    setSearchText(taskVal);
+    setSearchCustomer(customerVal);
     let filtered = tasksData;
 
-    if (value) {
+    if (taskVal) {
+      const lowerTaskVal = removeAccents(taskVal).toLowerCase();
       filtered = filtered.filter((el) =>
-        el?.title?.toLowerCase().includes(value.toLowerCase()) 
-      ||el?.workspace?.toLowerCase().includes(value.toLowerCase())
-      ||el?.description?.toLowerCase().includes(value.toLowerCase())
+        removeAccents(el?.title || "").toLowerCase().includes(lowerTaskVal)
+        || removeAccents(el?.workspace || "").toLowerCase().includes(lowerTaskVal)
+        || removeAccents(el?.description || "").toLowerCase().includes(lowerTaskVal)
       );
-      setFilteredItems(filtered);
     }
 
-    if (startDate) {
-      filtered = filtered.filter(el => el.start_time && dayjs(el.start_time).isSameOrAfter(startDate, 'day'));
-    }
-    
-    if (endDate) {
-      filtered = filtered.filter(el => el.end_time && dayjs(el.end_time).isSameOrBefore(endDate, 'day'));
+    if (customerVal) {
+      const lowerCustVal = removeAccents(customerVal).toLowerCase();
+      filtered = filtered.filter((el) => {
+        const custName = (el?.customer_id as any)?.name || (el as any)?.customer?.name || "";
+        return removeAccents(custName).toLowerCase().includes(lowerCustVal);
+      });
     }
 
     setFilteredItems(filtered);
@@ -262,34 +272,20 @@ export default function AllTasksModal() {
               placeholder="Tìm kiếm công việc"
               value={searchText}
               prefix={<SearchOutlined className="!text-cyan-500 !text-xs sm:!text-sm" />}  // Biểu tượng search
-              onChange={(e) => handleSearch(e.target.value)}
+              onChange={(e) => handleSearch(e.target.value, searchCustomer)}
               style={{ marginBottom: 8,width: 300 }}
             />
 
-            { false &&
-            <Stack style={{marginTop:isMobile?0:-20}} direction="row" spacing={2}>
-              <DateFormPicker
-                mode="start_time"
-                title="Từ ngày"
-                timeValue={startDate}
-                onChange={(date) => {
-                  setStartDate(date);
-                  handleSearch(searchText, date, endDate);
-                }}
-                form={form}
-              />
-            
-              <DateFormPicker
-                mode="end_time"
-                title="Đến ngày"
-                timeValue={endDate}
-                onChange={(date) => {
-                  setEndDate(date);
-                  handleSearch(searchText, startDate, date);
-                }}
-                form={form}
-              />
-            </Stack>}
+            <AntdInput
+              allowClear  
+              placeholder="Tìm kiếm theo tên khách hàng"
+              value={searchCustomer}
+              prefix={<SearchOutlined className="!text-cyan-500 !text-xs sm:!text-sm" />}
+              onChange={(e) => handleSearch(searchText, e.target.value)}
+              style={{ marginBottom: 8,width: 300 }}
+            />
+
+
           </Stack>
         </Form>
         }

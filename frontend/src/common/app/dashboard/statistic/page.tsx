@@ -78,7 +78,20 @@ type StatsResponse = {
     total_tasks: number;
     total_workpoints: number;
     total_workspaces: number;
+    storage_usage?: number;
+    storage_limit?: number;
+    allow_negative_storage?: boolean;
+    is_locked?: boolean;
   };
+};
+
+const formatBytes = (bytes?: number) => {
+  if (bytes === undefined || bytes === null) return "0 Bytes";
+  if (bytes === 0) return "0 Bytes";
+  const k = 1024;
+  const sizes = ["Bytes", "KB", "MB", "GB", "TB"];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return `${parseFloat((bytes / Math.pow(k, i)).toFixed(2))} ${sizes[i]}`;
 };
 
 const fmtCurrency = (value: number) =>
@@ -669,6 +682,63 @@ const StatisticDashboard: IPage["Component"] = () => {
               ))}
             </div>
 
+            {/* Storage Progress Section */}
+            <div className="mt-6 bg-white rounded-2xl border border-slate-100 shadow-sm p-6 flex flex-col gap-4">
+              <h3 className="text-md font-semibold text-slate-700 border-b pb-2">💾 Dung lượng lưu trữ dữ liệu</h3>
+              
+              {data.capacity?.is_locked && (
+                <div className="p-4 rounded-xl bg-red-50 border border-red-200 text-red-700 font-semibold text-sm">
+                  ⚠️ Tài khoản của bạn đã bị khóa bởi quản trị viên. Mọi hoạt động lưu trữ và chỉnh sửa đã bị tạm dừng. Vui lòng liên hệ ban quản trị Admake để thanh toán/mở khóa.
+                </div>
+              )}
+
+              {!data.capacity?.is_locked && data.capacity?.storage_usage !== undefined && data.capacity?.storage_limit !== undefined && (
+                <>
+                  {data.capacity.storage_usage >= data.capacity.storage_limit && (
+                    <div className={`p-4 rounded-xl text-sm font-medium ${data.capacity.allow_negative_storage ? "bg-amber-50 border border-amber-200 text-amber-800" : "bg-red-50 border border-red-200 text-red-800"}`}>
+                      {data.capacity.allow_negative_storage ? (
+                        <span>⚠️ Cảnh báo: Dung lượng của bạn đã vượt quá giới hạn cho phép. Bạn đang được hỗ trợ dùng âm dung lượng, vui lòng thanh toán phí dịch vụ để tiếp tục sử dụng ổn định.</span>
+                      ) : (
+                        <span>🚫 Giới hạn bộ nhớ: Dung lượng lưu trữ của bạn đã đầy! Không thể tải lên thêm tệp tin hoặc lưu tài liệu mới. Vui lòng xóa bớt tài liệu cũ hoặc nâng cấp dung lượng.</span>
+                      )}
+                    </div>
+                  )}
+
+                  <div className="flex flex-col gap-2">
+                    <div className="flex justify-between items-center text-sm font-semibold text-slate-600">
+                      <span>Dung lượng đã sử dụng: {formatBytes(data.capacity.storage_usage)}</span>
+                      <span>Hạn mức: {formatBytes(data.capacity.storage_limit)}</span>
+                    </div>
+
+                    <div className="w-full bg-slate-100 rounded-full h-4 overflow-hidden border border-slate-200">
+                      <div
+                        className={`h-full rounded-full transition-all duration-500 ${
+                          data.capacity.storage_usage >= data.capacity.storage_limit
+                            ? data.capacity.allow_negative_storage
+                              ? "bg-amber-500 animate-pulse"
+                              : "bg-red-500"
+                            : data.capacity.storage_usage / data.capacity.storage_limit >= 0.8
+                            ? "bg-amber-500"
+                            : "bg-teal-500"
+                        }`}
+                        style={{
+                          width: `${Math.min(
+                            100,
+                            (data.capacity.storage_usage / (data.capacity.storage_limit || 1)) * 100
+                          )}%`,
+                        }}
+                      />
+                    </div>
+
+                    <div className="flex justify-between text-xs text-slate-400">
+                      <span>Tỷ lệ: {((data.capacity.storage_usage / (data.capacity.storage_limit || 1)) * 100).toFixed(1)}%</span>
+                      <span>Dùng âm dung lượng: <strong className={data.capacity.allow_negative_storage ? "text-emerald-600" : "text-slate-500"}>{data.capacity.allow_negative_storage ? "BẬT (Cho phép)" : "TẮT (Chặn lưu)"}</strong></span>
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+
             <div className="mt-6 bg-white rounded-2xl border border-slate-100 shadow-sm p-6 flex flex-col gap-4">
               <h3 className="text-md font-semibold text-slate-700 border-b pb-2">Thông tin tài nguyên sử dụng</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm text-slate-600">
@@ -685,6 +755,10 @@ const StatisticDashboard: IPage["Component"] = () => {
                     <span className="font-semibold text-slate-700">Số lượng nhân viên và đối tác:</span>
                     <span className="text-teal-600 font-bold">{(data.capacity?.total_members ?? 0).toLocaleString("vi-VN")} thành viên</span>
                   </div>
+                  <div className="flex justify-between items-center bg-slate-50 px-4 py-3 rounded-xl border border-slate-100">
+                    <span className="font-semibold text-slate-700">Dung lượng đã sử dụng:</span>
+                    <span className="text-teal-600 font-bold">{formatBytes(data.capacity?.storage_usage)}</span>
+                  </div>
                 </div>
 
                 <div className="flex flex-col gap-3">
@@ -697,8 +771,18 @@ const StatisticDashboard: IPage["Component"] = () => {
                     <span className="text-teal-600 font-bold">{(data.capacity?.total_workpoints ?? 0).toLocaleString("vi-VN")} lượt</span>
                   </div>
                   <div className="flex justify-between items-center bg-slate-50 px-4 py-3 rounded-xl border border-slate-100">
+                    <span className="font-semibold text-slate-700">Hạn mức dung lượng:</span>
+                    <span className="text-teal-600 font-bold">{formatBytes(data.capacity?.storage_limit)}</span>
+                  </div>
+                  <div className="flex justify-between items-center bg-slate-50 px-4 py-3 rounded-xl border border-slate-100">
                     <span className="font-semibold text-slate-700">Trạng thái hệ thống:</span>
-                    <span className="bg-emerald-100 text-emerald-800 font-bold text-xs px-2.5 py-1 rounded-full border border-emerald-200">Hoạt động ổn định</span>
+                    {data.capacity?.is_locked ? (
+                      <span className="bg-red-100 text-red-800 font-bold text-xs px-2.5 py-1 rounded-full border border-red-200">Đã khóa tài khoản</span>
+                    ) : data.capacity?.storage_usage !== undefined && data.capacity?.storage_limit !== undefined && data.capacity.storage_usage >= data.capacity.storage_limit ? (
+                      <span className="bg-amber-100 text-amber-800 font-bold text-xs px-2.5 py-1 rounded-full border border-amber-200">Đầy dung lượng</span>
+                    ) : (
+                      <span className="bg-emerald-100 text-emerald-800 font-bold text-xs px-2.5 py-1 rounded-full border border-emerald-200">Hoạt động ổn định</span>
+                    )}
                   </div>
                 </div>
               </div>

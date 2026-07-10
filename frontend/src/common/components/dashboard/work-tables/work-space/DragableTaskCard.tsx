@@ -52,6 +52,19 @@ function getAuthHeaders(): HeadersInit {
   return accessToken ? { Authorization: `Bearer ${accessToken}` } : {};
 }
 
+const stripHtml = (html: string): string => {
+  if (!html) return "";
+  let doc = html.replace(/<\/?[^>]+(>|$)/g, " ");
+  doc = doc.replace(/\s+/g, " ").trim();
+  doc = doc
+    .replace(/&nbsp;/gi, " ")
+    .replace(/&amp;/gi, "&")
+    .replace(/&lt;/gi, "<")
+    .replace(/&gt;/gi, ">")
+    .replace(/&quot;/gi, '"');
+  return doc;
+};
+
 // Component nhận props theo kiểu object 1 lần
 const DragableTaskCard: React.FC<DragableTaskCardProps> = ({
   task,
@@ -262,13 +275,24 @@ export const CardItem: React.FC<CardItemProps> = ({
                     whiteSpace: 'normal',
                   }}
                 >
-                  {task.description}
+                  {stripHtml(task.description)}
                 </p>
               )}
               {task.reward && (
                 <div className="flex items-center gap-1 text-xs text-green-600 font-semibold">
                   <span>💰</span>
                   <span className="truncate">{task.reward.toLocaleString()} VNĐ</span>
+                </div>
+              )}
+              {task.customer_id && (
+                <div className="flex items-center gap-1 mt-1">
+                  <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold ${
+                    task.invoice?.status === "paid"
+                      ? "bg-green-50 text-green-700 border border-green-200"
+                      : "bg-amber-50 text-amber-700 border border-amber-200"
+                  }`}>
+                    {task.invoice?.status === "paid" ? "● Đã thanh toán" : "○ Chờ thanh toán"}
+                  </span>
                 </div>
               )}
             </div>

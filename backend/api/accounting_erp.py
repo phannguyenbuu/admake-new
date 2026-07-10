@@ -200,7 +200,7 @@ def _apply_ar_invoice_snapshot(invoice: ARInvoice):
 
 def _enrich_ar_invoice_dict(invoice: ARInvoice, data: dict | None = None):
     snapshot = _build_ar_invoice_snapshot(invoice)
-    payload = data or invoice.tdict()
+    payload = data or invoice.tdict(include_payments=True)
     payload["phat_sinh_amount"] = snapshot["phat_sinh_amount"]
     payload["tam_ung_amount"] = snapshot["tam_ung_amount"]
     payload["paid_amount"] = snapshot["paid_amount"]
@@ -226,6 +226,72 @@ def _refresh_ar_invoice_metrics(lead_id: int):
             changed = True
     if changed:
         db.session.commit()
+
+
+def _sum_ap_bill_payments(bill: APBill, payment_type: str | None = None):
+    return _round_money(
+        sum(
+            item.amount or 0
+            for item in bill.payments
+            if not item.deletedAt and (payment_type is None or getattr(item, "payment_type", "tam_ung") == payment_type)
+        )
+    )
+
+
+def _build_ap_bill_snapshot(bill: APBill):
+    phat_sinh_amount = _sum_ap_bill_payments(bill, "phat_sinh")
+    tam_ung_amount = _sum_ap_bill_payments(bill, "tam_ung")
+    tax_rate = _to_float(bill.tax_rate, 0)
+    extra_total_amount = _round_money(phat_sinh_amount * (1 + tax_rate / 100.0))
+    effective_total_amount = _round_money((bill.total_amount or 0) + extra_total_amount)
+    balance_amount = _round_money(effective_total_amount - tam_ung_amount)
+    return {
+        "phat_sinh_amount": phat_sinh_amount,
+        "tam_ung_amount": tam_ung_amount,
+        "paid_amount": tam_ung_amount,
+        "effective_total_amount": effective_total_amount,
+        "balance_amount": balance_amount,
+    }
+
+
+def _apply_ap_bill_snapshot(bill: APBill):
+    snapshot = _build_ap_bill_snapshot(bill)
+    bill.paid_amount = snapshot["paid_amount"]
+    bill.balance_amount = snapshot["balance_amount"]
+    bill.status = _recompute_payable_status(bill.status, bill.balance_amount, snapshot["effective_total_amount"], bill.due_date, date.today())
+    bill.updated_by = _current_user_id()
+    return snapshot
+
+
+def _enrich_ap_bill_dict(bill: APBill, data: dict | None = None):
+    snapshot = _build_ap_bill_snapshot(bill)
+    payload = data or bill.tdict()
+    payload["phat_sinh_amount"] = snapshot["phat_sinh_amount"]
+    payload["tam_ung_amount"] = snapshot["tam_ung_amount"]
+    payload["paid_amount"] = snapshot["paid_amount"]
+    payload["effective_total_amount"] = snapshot["effective_total_amount"]
+    payload["balance_amount"] = snapshot["balance_amount"]
+    return payload
+
+
+def _refresh_ap_bill_metrics(lead_id: int):
+    rows = APBill.query.filter(APBill.deletedAt.is_(None), APBill.lead_id == lead_id).all()
+    changed = False
+    for row in rows:
+        snapshot = _build_ap_bill_snapshot(row)
+        next_status = _recompute_payable_status(row.status, snapshot["balance_amount"], snapshot["effective_total_amount"], row.due_date, date.today())
+        if (
+            _round_money(row.paid_amount or 0) != snapshot["paid_amount"]
+            or _round_money(row.balance_amount or 0) != snapshot["balance_amount"]
+            or row.status != next_status
+        ):
+            row.paid_amount = snapshot["paid_amount"]
+            row.balance_amount = snapshot["balance_amount"]
+            row.status = next_status
+            changed = True
+    if changed:
+        db.session.commit()
+
 
 
 def _sync_ar_payment_links(payment: ARInvoicePayment, invoice: ARInvoice):
@@ -696,11 +762,7 @@ def _update_invoice_balances(invoice: ARInvoice):
 
 
 def _update_bill_balances(bill: APBill):
-    paid_amount = _round_money(sum(item.amount or 0 for item in bill.payments if not item.deletedAt))
-    bill.paid_amount = paid_amount
-    bill.balance_amount = _round_money((bill.total_amount or 0) - paid_amount)
-    bill.status = _recompute_payable_status(bill.status, bill.balance_amount, bill.total_amount or 0, bill.due_date, date.today())
-    bill.updated_by = _current_user_id()
+    _apply_ap_bill_snapshot(bill)
 
 
 def _generate_ar_confirm_entry(invoice: ARInvoice):
@@ -875,53 +937,63 @@ def _record_ar_payment(invoice: ARInvoice, payment_date: date, amount: float, pa
     _update_invoice_balances(invoice)
     return payment
 
-def _record_ap_payment(bill: APBill, payment_date: date, amount: float, payment_method: str, note: str | None):
-    if bill.status not in {"confirmed", "partially_paid", "overdue"}:
-        abort(400, description="Bill is not ready for payment")
+def _record_ap_payment(bill: APBill, payment_date: date, amount: float, payment_method: str, note: str | None, payment_type: str = "phat_sinh"):
+    READY_STATUSES = {"confirmed", "partially_paid", "overdue"}
+    if bill.status == "cancelled":
+        abort(400, description="Khong the ghi nhan thanh toan cho cong no da huy")
+    if payment_type == "phat_sinh":
+        if bill.status not in READY_STATUSES:
+            abort(400, description="Cong no chua duoc xac nhan, chi co the them tam ung o trang thai nay")
     if amount <= 0:
         abort(400, description="amount must be > 0")
-    if amount - bill.balance_amount > 0.0001:
-        abort(400, description="Payment exceeds outstanding balance")
-    cash_row = _create_daily_cash_row(
-        lead_id=bill.lead_id,
-        direction="expense",
-        payment_date=payment_date,
-        amount=amount,
-        counterparty_name=bill.supplier_name,
-        description=f"Thanh toán NCC {bill.code}",
-        payment_method=payment_method,
-        doc_ref=bill.code,
-        source_type="ap_bill",
-        source_id=bill.id,
-    )
-    entry = _create_journal_entry(
-        lead_id=bill.lead_id,
-        entry_date=payment_date,
-        description=f"Thanh toán công nợ {bill.code}",
-        source_type="ap_payment",
-        source_id=bill.id,
-        reference_no=bill.code,
-        lines=[
-            {
-                "account_code": "331",
-                "partner_type": "supplier",
-                "partner_id": bill.supplier_id,
-                "partner_name": bill.supplier_name,
-                "debit": amount,
-                "credit": 0,
-            },
-            {
-                "account_code": _cash_account_by_method(payment_method),
-                "partner_type": "supplier",
-                "partner_id": bill.supplier_id,
-                "partner_name": bill.supplier_name,
-                "debit": 0,
-                "credit": amount,
-            },
-        ],
-        status="draft",
-    )
-    cash_row.journal_entry_id = entry.id
+
+    cash_row = None
+    entry = None
+    if payment_type == "tam_ung":
+        snapshot = _build_ap_bill_snapshot(bill)
+        if amount - snapshot["balance_amount"] > 0.0001:
+            abort(400, description="Payment exceeds outstanding balance")
+        cash_row = _create_daily_cash_row(
+            lead_id=bill.lead_id,
+            direction="expense",
+            payment_date=payment_date,
+            amount=amount,
+            counterparty_name=bill.supplier_name,
+            description=f"Thanh toán NCC {bill.code}",
+            payment_method=payment_method,
+            doc_ref=bill.code,
+            source_type="ap_bill",
+            source_id=bill.id,
+        )
+        entry = _create_journal_entry(
+            lead_id=bill.lead_id,
+            entry_date=payment_date,
+            description=f"Thanh toán công nợ {bill.code}",
+            source_type="ap_payment",
+            source_id=bill.id,
+            reference_no=bill.code,
+            lines=[
+                {
+                    "account_code": "331",
+                    "partner_type": "supplier",
+                    "partner_id": bill.supplier_id,
+                    "partner_name": bill.supplier_name,
+                    "debit": amount,
+                    "credit": 0,
+                },
+                {
+                    "account_code": _cash_account_by_method(payment_method),
+                    "partner_type": "supplier",
+                    "partner_id": bill.supplier_id,
+                    "partner_name": bill.supplier_name,
+                    "debit": 0,
+                    "credit": amount,
+                },
+            ],
+            status="draft",
+        )
+        cash_row.journal_entry_id = entry.id
+
     payment = APBillPayment(
         id=generate_datetime_id(),
         bill_id=bill.id,
@@ -929,18 +1001,20 @@ def _record_ap_payment(bill: APBill, payment_date: date, amount: float, payment_
         payment_date=payment_date,
         amount=amount,
         payment_method=payment_method,
-        daily_cash_id=cash_row.id,
-        journal_entry_id=entry.id,
+        payment_type=payment_type if payment_type in ("tam_ung", "phat_sinh") else "phat_sinh",
+        daily_cash_id=cash_row.id if cash_row else None,
+        journal_entry_id=entry.id if entry else None,
         note=_clean_text(note),
         created_by=_current_user_id(),
         updated_by=_current_user_id(),
     )
     db.session.add(payment)
     db.session.flush()
-    _upsert_link(bill.lead_id, "ap_bill", bill.id, "daily_cash", cash_row.id, "payment")
-    _upsert_link(bill.lead_id, "ap_bill", bill.id, "journal_entry", entry.id, "payment")
-    _upsert_link(bill.lead_id, "daily_cash", cash_row.id, "journal_entry", entry.id, "payment_entry")
-    _update_bill_balances(bill)
+    if cash_row and entry:
+        _upsert_link(bill.lead_id, "ap_bill", bill.id, "daily_cash", cash_row.id, "payment")
+        _upsert_link(bill.lead_id, "ap_bill", bill.id, "journal_entry", entry.id, "payment")
+        _upsert_link(bill.lead_id, "daily_cash", cash_row.id, "journal_entry", entry.id, "payment_entry")
+    _apply_ap_bill_snapshot(bill)
     return payment
 
 
@@ -1292,9 +1366,17 @@ def cancel_ar_invoice(invoice_id):
     if not item:
         abort(404, description="AR invoice not found")
     
+    force_delete_payments = request.args.get("force_delete_payments", "0") == "1"
+    
     active_payments = [p for p in item.payments if not p.deletedAt]
     if active_payments:
-        abort(400, description="Không thể huỷ hoá đơn còn các bút toán phát sinh. Vui lòng xoá các bút toán trước.")
+        if force_delete_payments:
+            for p in active_payments:
+                p.deletedAt = datetime.utcnow()
+                _soft_delete_ar_payment_links(p)
+            _update_invoice_balances(item)
+        else:
+            abort(400, description="Không thể huỷ hoá đơn còn các bút toán phát sinh. Vui lòng xoá các bút toán trước.")
     
     if item.journal_entry_id:
         je = db.session.get(JournalEntry, item.journal_entry_id)
@@ -1481,7 +1563,7 @@ def list_ap_bills():
         ),
     }
     return jsonify({
-        "data": [item.tdict() for item in pagination.items],
+        "data": [_enrich_ap_bill_dict(item) for item in pagination.items],
         "pagination": {"page": page, "per_page": limit, "pages": pagination.pages, "total": pagination.total},
         "summary": summary,
     }), 200
@@ -1527,7 +1609,7 @@ def create_ap_bill():
     if item.document_id:
         _upsert_link(lead_id, "ap_bill", item.id, "document", item.document_id, "source_document")
         db.session.commit()
-    return jsonify(item.tdict()), 201
+    return jsonify(_enrich_ap_bill_dict(item)), 201
 
 
 @accounting_erp_bp.route("/ap-bills/<string:bill_id>", methods=["GET"])
@@ -1535,7 +1617,7 @@ def get_ap_bill_detail(bill_id):
     item = APBill.query.filter(APBill.id == bill_id, APBill.deletedAt.is_(None)).first()
     if not item:
         abort(404, description="AP bill not found")
-    payload = item.tdict(include_payments=True)
+    payload = _enrich_ap_bill_dict(item, item.tdict(include_payments=True))
     payload["journal_entry"] = _serialize_entry(item.journal_entry)
     payload["links"] = _trace_bidirectional(item.lead_id, "ap_bill", item.id)
     return jsonify(payload), 200
@@ -1581,7 +1663,7 @@ def update_ap_bill(bill_id):
         item.description = _clean_text(data.get("description"))
     item.updated_by = _current_user_id()
     db.session.commit()
-    return jsonify(item.tdict()), 200
+    return jsonify(_enrich_ap_bill_dict(item)), 200
 
 
 @accounting_erp_bp.route("/ap-bills/<string:bill_id>/confirm", methods=["POST"])
@@ -1602,7 +1684,7 @@ def confirm_ap_bill(bill_id):
     except Exception:
         db.session.rollback()
         raise
-    return jsonify(item.tdict()), 200
+    return jsonify(_enrich_ap_bill_dict(item)), 200
 
 
 @accounting_erp_bp.route("/ap-bills/<string:bill_id>/cancel", methods=["POST"])
@@ -1640,7 +1722,7 @@ def cancel_ap_bill(bill_id):
     item.deletedAt = datetime.utcnow()
     item.updated_by = _current_user_id()
     db.session.commit()
-    return jsonify(item.tdict()), 200
+    return jsonify(_enrich_ap_bill_dict(item)), 200
 
 
 @accounting_erp_bp.route("/ap-bills/<string:bill_id>/payments", methods=["POST"])
@@ -1652,8 +1734,9 @@ def record_ap_bill_payment(bill_id):
     payment_date = _parse_date(data.get("payment_date")) or date.today()
     payment_method = _validate_enum("payment_method", data.get("payment_method"), PAYMENT_METHODS, "cash")
     amount = _round_money(data.get("amount"))
+    payment_type = _clean_text(data.get("payment_type")) or "phat_sinh"
     try:
-        payment = _record_ap_payment(item, payment_date, amount, payment_method, _clean_text(data.get("note")))
+        payment = _record_ap_payment(item, payment_date, amount, payment_method, _clean_text(data.get("note")), payment_type)
         db.session.commit()
     except Exception:
         db.session.rollback()

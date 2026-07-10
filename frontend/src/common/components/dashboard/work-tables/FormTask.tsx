@@ -1,5 +1,5 @@
 import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
-import { Form, Modal, Typography, notification, Tabs, InputNumber } from "antd";
+import { Form, Modal, Typography, notification, Tabs, InputNumber, Tag, DatePicker, Select, Button, Upload } from "antd";
 import {
   FileTextOutlined,
   InboxOutlined,
@@ -17,6 +17,7 @@ import { useUser } from "../../../common/hooks/useUser";
 import { fixedColumns } from "./Managerment";
 import TaskHeader from "./task/FormTaskHeader";
 import JobAgentInfo from "./task/JobAgentInfo";
+import { useCustomerQuery } from "../../../common/hooks/customer.hook";
 import JobAsset from "./task/JobAsset";
 import JobDescription from "./task/JobDescription";
 import JobInfoCard from "./task/JobInfoCard";
@@ -95,6 +96,19 @@ export default function FormTask({
     useUser();
   const { taskDetail, setTaskDetail } = useTaskContext();
 
+  const { data: customerRes } = useCustomerQuery({ limit: 1000 });
+  const globalCustomers = useMemo(() => {
+    const rawList = customerRes?.data?.data || [];
+    return rawList.map((c: any) => ({
+      fullName: c.fullName || c.name || "",
+      user_id: c.owner_id || c.id || c.user_id || "",
+      role: c.role || "customer",
+      phone: c.phone || "",
+      workAddress: c.workAddress || c.address || "",
+      email: c.email || "",
+    })) as UserSearchProps[];
+  }, [customerRes]);
+
   const context = useContext(UpdateButtonContext);
   if (!context) throw new Error("UpdateButtonContext not found");
   const { setShowUpdateButton } = context;
@@ -116,6 +130,14 @@ export default function FormTask({
     setTmpTaskCreatedAssets([]);
     setTmpTaskCreatedMessages([]);
   }, [setTmpTaskCreatedAssets, setTmpTaskCreatedMessages]);
+
+  const [formSessionId, setFormSessionId] = useState<string>("");
+
+  useEffect(() => {
+    if (open) {
+      setFormSessionId(Math.random().toString(36).substring(2, 9));
+    }
+  }, [open]);
 
   useEffect(() => {
     console.log("Open", taskDetail);
@@ -156,6 +178,99 @@ export default function FormTask({
       ];
     });
   }, [userSelected]);
+  
+  // Payment management states & handlers
+  const [isAddingPayment, setIsAddingPayment] = useState(false);
+  const [newPaymentAmount, setNewPaymentAmount] = useState<number | null>(null);
+  const [newPaymentMethod, setNewPaymentMethod] = useState<string>("bank");
+  const [newPaymentNote, setNewPaymentNote] = useState<string>("");
+  const [newPaymentFile, setNewPaymentFile] = useState<any>(null);
+  const [isSavingPayment, setIsSavingPayment] = useState(false);
+
+  const resetAddPaymentState = () => {
+    setIsAddingPayment(false);
+    setNewPaymentAmount(null);
+    setNewPaymentMethod("bank");
+    setNewPaymentNote("");
+    setNewPaymentFile(null);
+  };
+
+  const handleSavePayment = async () => {
+    if (!newPaymentAmount || newPaymentAmount <= 0) {
+      notification.error({ message: "Vui lòng nhập số tiền hợp lệ!" });
+      return;
+    }
+    setIsSavingPayment(true);
+    try {
+      const formData = new FormData();
+      formData.append("amount", newPaymentAmount.toString());
+      formData.append("payment_method", newPaymentMethod);
+      formData.append("note", newPaymentNote);
+      formData.append("task_amount", (form.getFieldValue("amount") || 0).toString());
+      formData.append("customer_id", form.getFieldValue("customer_id") || "");
+      if (newPaymentFile) {
+        formData.append("file", newPaymentFile);
+      }
+
+      const token = getAccessToken();
+      const response = await fetch(`${apiHost}/task/${taskDetail?.id}/payments`, {
+        method: "POST",
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const errJson = await response.json();
+        throw new Error(errJson.description || "Lưu thanh toán thất bại");
+      }
+
+      const resJson = await response.json();
+      if (resJson.data) {
+        setTaskDetail(resJson.data);
+        form.setFieldsValue({
+          prepayment: resJson.data.prepayment,
+        });
+      }
+      notification.success({ message: "Đã thêm khoản thanh toán thành công!" });
+      resetAddPaymentState();
+    } catch (error: any) {
+      notification.error({ message: "Lỗi lưu thanh toán", description: error.message });
+    } finally {
+      setIsSavingPayment(false);
+    }
+  };
+
+  const handleDeletePayment = async (paymentId: string) => {
+    Modal.confirm({
+      title: "Xác nhận xóa",
+      content: "Bạn có chắc chắn muốn xóa khoản thanh toán này?",
+      onOk: async () => {
+        try {
+          const token = getAccessToken();
+          const response = await fetch(`${apiHost}/task/${taskDetail?.id}/payments/${paymentId}`, {
+            method: "DELETE",
+            headers: token ? { Authorization: `Bearer ${token}` } : {},
+          });
+
+          if (!response.ok) {
+            const errJson = await response.json();
+            throw new Error(errJson.description || "Xóa thanh toán thất bại");
+          }
+
+          const resJson = await response.json();
+          if (resJson.data) {
+            setTaskDetail(resJson.data);
+            form.setFieldsValue({
+              prepayment: resJson.data.prepayment,
+            });
+          }
+          notification.success({ message: "Đã xóa khoản thanh toán thành công!" });
+        } catch (error: any) {
+          notification.error({ message: "Lỗi xóa thanh toán", description: error.message });
+        }
+      },
+    });
+  };
 
   const apiHost = useApiHost();
 
@@ -361,6 +476,7 @@ export default function FormTask({
     const printHtml = `
       <html>
       <head>
+        <meta charset="utf-8" />
         <title>Báo giá / Bill - ${taskTitle}</title>
         <style>
           @page {
@@ -368,7 +484,7 @@ export default function FormTask({
             margin: 20mm;
           }
           body {
-            font-family: Arial, sans-serif;
+            font-family: Arial, Tahoma, sans-serif;
             margin: 0;
             padding: 0;
             color: #334155;
@@ -585,6 +701,27 @@ export default function FormTask({
     });
   }, [computedWorkDays, form, userList]);
 
+  // Fetch detailed task info when modal opens to get latest invoice/payment data
+  useEffect(() => {
+    if (open && taskDetail?.id) {
+      const fetchDetail = async () => {
+        try {
+          const token = getAccessToken();
+          const response = await fetch(`${apiHost}/task/${taskDetail.id}`, {
+            headers: token ? { Authorization: `Bearer ${token}` } : {},
+          });
+          const json = await response.json();
+          if (json.data) {
+            setTaskDetail(json.data);
+          }
+        } catch (error) {
+          console.error("Failed to fetch task details:", error);
+        }
+      };
+      fetchDetail();
+    }
+  }, [open, taskDetail?.id, apiHost, setTaskDetail]);
+
   useEffect(() => {
     if (!open) {
       initializedTaskIdRef.current = undefined;
@@ -625,7 +762,9 @@ export default function FormTask({
     } else {
       const custObj = taskDetail?.customer_id;
       const custId = typeof custObj === "object" && custObj ? custObj.id : (custObj ?? null);
-      const custName = typeof custObj === "object" && custObj ? custObj.name : null;
+      
+      const matchedCustomer = globalCustomers.find((c) => c.user_id === custId);
+      const custName = typeof custObj === "object" && custObj ? custObj.name : (matchedCustomer?.fullName ?? null);
 
       form.setFieldsValue({
         workspace_id: workspaceId,
@@ -637,19 +776,19 @@ export default function FormTask({
         customer: custName,
       });
 
-      if (custObj) {
+      if (custId) {
         setCustomerSelected({
           user_id: custId,
           fullName: custName ?? "",
-          phone: typeof custObj === "object" ? custObj.phone : "",
-          workAddress: typeof custObj === "object" ? custObj.address : "",
-          email: typeof custObj === "object" ? custObj.email : "",
+          phone: typeof custObj === "object" && custObj ? custObj.phone : (matchedCustomer?.phone ?? ""),
+          workAddress: typeof custObj === "object" && custObj ? custObj.address : (matchedCustomer?.workAddress ?? ""),
+          email: typeof custObj === "object" && custObj ? custObj.email : (matchedCustomer?.email ?? ""),
         } as any);
       } else {
         setCustomerSelected(null);
       }
     }
-  }, [clearTemporaryTaskDraft, form, open, taskDetail, workspaceId]);
+  }, [clearTemporaryTaskDraft, form, open, taskDetail, workspaceId, globalCustomers]);
 
   useEffect(() => {
     if (customerSelected) {
@@ -830,7 +969,7 @@ export default function FormTask({
                       <div className="mb-5 text-xs font-bold uppercase tracking-wider text-slate-500">
                         THÔNG TIN CÔNG VIỆC
                       </div>
-                      <Stack spacing={3} className="w-full flex-grow">
+                      <Stack key={`${taskDetail?.id || 'new'}-${formSessionId}`} spacing={3} className="w-full flex-grow">
                         <JobInfoCard
                           taskDetail={taskDetail ?? null}
                           currentStatus={taskDetail?.status ?? ""}
@@ -929,6 +1068,11 @@ export default function FormTask({
                             <Text strong className="!text-sm !text-slate-800 sm:!text-base whitespace-nowrap">
                               Khách hàng & Thanh toán
                             </Text>
+                            {taskDetail?.id && (
+                              <Tag color={taskDetail.invoice?.status === "paid" ? "success" : "warning"} className="!m-0 !font-semibold">
+                                {taskDetail.invoice?.status === "paid" ? "Đã thanh toán" : "Chờ thanh toán"}
+                              </Tag>
+                            )}
                           </div>
                         </div>
 
@@ -940,7 +1084,7 @@ export default function FormTask({
                             <JobAgentInfo
                               form={form}
                               mode="customer"
-                              users={customers}
+                              users={globalCustomers}
                               searchValue={customerSearch}
                               setSearchValue={setCustomerSearch}
                               selectedAgent={customerSelected}
@@ -982,6 +1126,7 @@ export default function FormTask({
                                 formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                                 parser={(value) => value!.replace(/\$\s?|(,*)/g, "") as any}
                                 style={{ width: "100%" }}
+                                disabled={true}
                               />
                             </Form.Item>
                           </div>
@@ -994,6 +1139,149 @@ export default function FormTask({
                             >
                               🖨️ In Báo Giá / Bill
                             </button>
+                          )}
+
+                          {/* Lịch sử thanh toán & Thêm thanh toán */}
+                          {taskDetail?.id && customerSelected && (
+                            <div className="mt-4 border-t border-slate-100 pt-4">
+                              <div className="mb-3 flex items-center justify-between">
+                                <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                                  Lịch sử thanh toán
+                                </span>
+                                <Button
+                                  type="primary"
+                                  size="small"
+                                  className="!rounded-md !bg-teal-600 hover:!bg-teal-700"
+                                  onClick={() => setIsAddingPayment(true)}
+                                >
+                                  + Thêm thanh toán
+                                </Button>
+                              </div>
+
+                              {/* Form Thêm thanh toán (Inline) */}
+                              {isAddingPayment && (
+                                <div className="mb-4 rounded-lg border border-teal-100 bg-teal-50/20 p-3">
+                                  <div className="grid grid-cols-2 gap-2 mb-2">
+                                    <div>
+                                      <span className="block mb-1 text-[11px] font-semibold text-slate-500">Số tiền *</span>
+                                      <InputNumber
+                                        className="w-full !rounded-md"
+                                        placeholder="Nhập số tiền"
+                                        value={newPaymentAmount}
+                                        onChange={(val) => setNewPaymentAmount(val)}
+                                        formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                                        parser={(value) => value!.replace(/\$\s?|(,*)/g, "") as any}
+                                      />
+                                    </div>
+                                    <div>
+                                      <span className="block mb-1 text-[11px] font-semibold text-slate-500">Hình thức</span>
+                                      <Select
+                                        className="w-full"
+                                        value={newPaymentMethod}
+                                        onChange={(val) => setNewPaymentMethod(val)}
+                                        options={[
+                                          { value: "bank", label: "Chuyển khoản" },
+                                          { value: "cash", label: "Tiền mặt" },
+                                        ]}
+                                      />
+                                    </div>
+                                  </div>
+                                  <div className="mb-2">
+                                    <span className="block mb-1 text-[11px] font-semibold text-slate-500">Ghi chú</span>
+                                    <input
+                                      className="w-full rounded-md border border-slate-200 px-2 py-1 text-sm outline-none focus:border-teal-500"
+                                      placeholder="Nhập ghi chú"
+                                      value={newPaymentNote}
+                                      onChange={(e) => setNewPaymentNote(e.target.value)}
+                                    />
+                                  </div>
+                                  <div className="mb-3">
+                                    <span className="block mb-1 text-[11px] font-semibold text-slate-500">Ảnh chứng từ</span>
+                                    <Upload
+                                      beforeUpload={(file) => {
+                                        setNewPaymentFile(file);
+                                        return false; // Chặn tự động tải lên
+                                      }}
+                                      onRemove={() => setNewPaymentFile(null)}
+                                      fileList={newPaymentFile ? [newPaymentFile as any] : []}
+                                      maxCount={1}
+                                      listType="picture"
+                                    >
+                                      <Button size="small" icon={<span>📁</span>}>Chọn ảnh</Button>
+                                    </Upload>
+                                  </div>
+                                  <div className="flex justify-end gap-2">
+                                    <Button size="small" onClick={() => resetAddPaymentState()}>
+                                      Hủy
+                                    </Button>
+                                    <Button
+                                      type="primary"
+                                      size="small"
+                                      loading={isSavingPayment}
+                                      onClick={handleSavePayment}
+                                      className="!bg-teal-600 hover:!bg-teal-700"
+                                    >
+                                      Lưu
+                                    </Button>
+                                  </div>
+                                </div>
+                              )}
+
+                              {/* Danh sách các lần thanh toán */}
+                              <div className="flex flex-col gap-2 max-h-[200px] overflow-y-auto pr-1">
+                                {taskDetail.invoice?.payments && taskDetail.invoice.payments.length > 0 ? (
+                                  taskDetail.invoice.payments.map((p: any) => (
+                                    <div key={p.id} className="flex items-center justify-between rounded-lg border border-slate-100 bg-slate-50 p-2">
+                                      <div className="flex items-center gap-2">
+                                        {p.file_url ? (
+                                          <a
+                                            href={`${apiHost.replace("/api", "")}/static/uploads/${p.file_url}`}
+                                            target="_blank"
+                                            rel="noreferrer"
+                                            className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded border border-slate-200 bg-white"
+                                          >
+                                            <img
+                                              src={`${apiHost.replace("/api", "")}/static/uploads/${p.file_url}`}
+                                              alt="receipt"
+                                              className="h-full w-full object-cover"
+                                            />
+                                          </a>
+                                        ) : (
+                                          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded border border-dashed border-slate-200 bg-white text-xs text-slate-400">
+                                            Không ảnh
+                                          </div>
+                                        )}
+                                        <div className="min-w-0">
+                                          <span className="block text-xs font-bold text-slate-700">
+                                            {p.amount?.toLocaleString()} VNĐ
+                                          </span>
+                                          <span className="block text-[10px] text-slate-400">
+                                            {p.payment_method === "bank" ? "Chuyển khoản" : "Tiền mặt"} • {dayjs(p.payment_date).format("DD/MM/YYYY")}
+                                          </span>
+                                          {p.note && (
+                                            <span className="block text-[10px] text-slate-500 truncate max-w-[180px]" title={p.note}>
+                                              {p.note}
+                                            </span>
+                                          )}
+                                        </div>
+                                      </div>
+                                      <Button
+                                        type="text"
+                                        danger
+                                        size="small"
+                                        onClick={() => handleDeletePayment(p.id)}
+                                        icon={<span>🗑️</span>}
+                                        className="hover:!bg-red-50"
+                                      />
+                                    </div>
+                                  ))
+                                ) : (
+                                  <div className="py-4 text-center text-xs text-slate-400 italic">
+                                    Chưa có khoản thanh toán nào.
+                                  </div>
+                                )}
+                              </div>
+                            </div>
                           )}
                         </div>
                       </div>

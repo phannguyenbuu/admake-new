@@ -195,6 +195,23 @@ def upload_file():
 
 from PIL import Image
 def upload_a_file_to_vps(file):
+    # Check lead storage and lock status before uploading
+    try:
+        from flask import request
+        from permission_utils import resolve_request_user
+        from models import db, User, check_lead_storage_limit
+        user = resolve_request_user()
+        if not user:
+            user_id = request.form.get("userId") or request.form.get("user_id") or request.headers.get("X-User-Id")
+            if user_id:
+                user = db.session.get(User, str(user_id))
+        if user and user.lead_id:
+            check_lead_storage_limit(user.lead_id)
+    except Exception as e:
+        if hasattr(e, "code") and e.code == 403:
+            raise e
+        print("Error checking storage limit during upload:", e)
+
     name, ext = os.path.splitext(file.filename)
     filename = file.filename
     upload_folder = app.config['UPLOAD_FOLDER']

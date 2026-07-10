@@ -65,6 +65,22 @@ CORS(
 
 
 def upload_a_file_to_vps(file):
+    # Check lead storage and lock status before uploading
+    try:
+        from flask import request
+        from permission_utils import resolve_request_user
+        user = resolve_request_user()
+        if not user:
+            user_id = request.form.get("userId") or request.form.get("user_id") or request.headers.get("X-User-Id")
+            if user_id:
+                user = db.session.get(User, str(user_id))
+        if user and user.lead_id:
+            check_lead_storage_limit(user.lead_id)
+    except Exception as e:
+        if hasattr(e, "code") and e.code == 403:
+            raise e
+        print("Error checking storage limit during upload:", e)
+
     name, ext = os.path.splitext(file.filename)
     filename = file.filename
     upload_folder = app.config['UPLOAD_FOLDER']
@@ -559,6 +575,23 @@ class Task(BaseModel):
         if workspace and not workspace.null_workspace:
             result['workspace'] = workspace.name
 
+        if self.customer_id:
+            customer = db.session.get(User, self.customer_id)
+            if customer:
+                result['customer'] = {
+                    "id": self.customer_id,
+                    "name": customer.fullName,
+                    "phone": customer.phone,
+                    "address": customer.address,
+                    "email": customer.email
+                }
+
+        invoice = ARInvoice.query.filter(ARInvoice.task_id == self.id, ARInvoice.deletedAt.is_(None)).first()
+        if invoice:
+            result["invoice"] = invoice.tdict(include_payments=True)
+        else:
+            result["invoice"] = None
+
         return result
 
     @staticmethod
@@ -589,6 +622,7 @@ class Task(BaseModel):
 
         return Task(
             id=generate_datetime_id(),
+            lead_id=data.get("lead_id"),
             workspace_id = data.get("workspace_id", ''),
             title= data.get("title", ''),
             description=data.get("description", ''),
@@ -1003,6 +1037,7 @@ class ARInvoicePayment(BaseModel):
     daily_cash_id = db.Column(db.String(50), db.ForeignKey("accounting_daily_cash.id"), nullable=True)
     journal_entry_id = db.Column(db.String(50), db.ForeignKey("journal_entries.id"), nullable=True)
     note = db.Column(db.Text, nullable=True)
+    file_url = db.Column(db.String(255), nullable=True)
     created_by = db.Column(db.String(50), nullable=True)
     updated_by = db.Column(db.String(50), nullable=True)
 
@@ -1120,6 +1155,7 @@ class APBillPayment(BaseModel):
     payment_date = db.Column(db.Date, nullable=False)
     amount = db.Column(db.Float, default=0)
     payment_method = db.Column(db.String(30), default="cash")
+    payment_type = db.Column(db.String(30), default="phat_sinh")  # tam_ung | phat_sinh
     daily_cash_id = db.Column(db.String(50), db.ForeignKey("accounting_daily_cash.id"), nullable=True)
     journal_entry_id = db.Column(db.String(50), db.ForeignKey("journal_entries.id"), nullable=True)
     note = db.Column(db.Text, nullable=True)
@@ -1928,6 +1964,11 @@ class LeadPayload(BaseModel):
     isInvited = db.Column(db.Boolean, default = False)
     isActivated = db.Column(db.Boolean, default = False)
 
+    # Storage limit & locking fields
+    storage_limit = db.Column(db.BigInteger, default=10 * 1024 * 1024 * 1024) # Default 10GB
+    allow_negative_storage = db.Column(db.Boolean, default=False)
+    is_locked = db.Column(db.Boolean, default=False)
+
     # Contract info fields
     tax_code = db.Column(db.String(50))
     legal_rep = db.Column(db.String(255))
@@ -2256,3 +2297,57 @@ def get_query_page_users(lead_id, page, limit, search, role_id = 0, only_active 
     users = [c.tdict() for c in pagination.items]
 
     return users, pagination
+
+def get_lead_storage_usage(lead_id):
+    total_size = 0
+    static_root = os.path.join(os.getcwd(), "static")
+    
+    # 1. Sum files from Message table
+    messages = Message.query.filter(
+        Message.lead_id == lead_id,
+        Message.file_url.isnot(None),
+        Message.file_url != ""
+    ).all()
+    
+    for msg in messages:
+        filename = msg.file_url
+        if filename:
+            filepath = os.path.join(static_root, filename)
+            if os.path.exists(filepath):
+                try:
+                    total_size += os.path.getsize(filepath)
+                except OSError:
+                    pass
+            # count thumbnail if it exists
+            if msg.thumb_url:
+                thumb_filepath = os.path.join(static_root, msg.thumb_url)
+                if os.path.exists(thumb_filepath):
+                    try:
+                        total_size += os.path.getsize(thumb_filepath)
+                    except OSError:
+                        pass
+
+    # 2. Sum files from DocumentCenterAttachment
+    attachments = db.session.query(DocumentCenterAttachment.size).join(
+        DocumentCenterDocument, DocumentCenterDocument.id == DocumentCenterAttachment.document_id
+    ).filter(
+        DocumentCenterDocument.lead_id == lead_id,
+        DocumentCenterAttachment.size.isnot(None)
+    ).all()
+    
+    for att in attachments:
+        total_size += att.size or 0
+        
+    return total_size
+
+def check_lead_storage_limit(lead_id):
+    from flask import abort
+    lead = db.session.get(LeadPayload, lead_id)
+    if lead:
+        if getattr(lead, "is_locked", False):
+            abort(403, description="Tài khoản của bạn đã bị khóa. Vui lòng thanh toán hoặc liên hệ với ban quản trị.")
+        if not getattr(lead, "allow_negative_storage", False):
+            current_usage = get_lead_storage_usage(lead_id)
+            limit = getattr(lead, "storage_limit", 10 * 1024 * 1024 * 1024) or (10 * 1024 * 1024 * 1024)
+            if current_usage >= limit:
+                abort(403, description="Dung lượng bộ nhớ đã đầy. Vui lòng liên hệ Admake để nâng cấp.")

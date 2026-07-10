@@ -41,6 +41,12 @@ def login_user_form(username, password):
         print('Login:', username, password, user.lead_id) 
         # if user and check_password_hash(user.password, password):
         if user.password == password:
+            if user.lead_id:
+                from models import LeadPayload
+                lead = db.session.get(LeadPayload, user.lead_id)
+                if lead and getattr(lead, "is_locked", False):
+                    return jsonify({"error": "Tài khoản của bạn đã bị khóa. Vui lòng thanh toán hoặc liên hệ với ban quản trị."}), 403
+
             print('Start login')
             login_user(user)  # tạo session cho user
             session.permanent = True

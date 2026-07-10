@@ -130,7 +130,7 @@ export const AccountingErpService = {
   getArInvoice: (id: string) => axiosClient.get(`/accounting/ar-invoices/${id}`),
   updateArInvoice: (id: string, payload: Record<string, any>) => axiosClient.put(`/accounting/ar-invoices/${id}`, payload),
   confirmArInvoice: (id: string) => axiosClient.post(`/accounting/ar-invoices/${id}/confirm`, {}),
-  cancelArInvoice: (id: string) => axiosClient.post(`/accounting/ar-invoices/${id}/cancel`, {}),
+  cancelArInvoice: (id: string, force_delete_payments?: boolean) => axiosClient.post(`/accounting/ar-invoices/${id}/cancel${force_delete_payments ? '?force_delete_payments=1' : ''}`, {}),
   recordArPayment: (id: string, payload: Record<string, any>) => axiosClient.post(`/accounting/ar-invoices/${id}/payments`, payload),
   updateArPayment: (invoiceId: string, paymentId: string, payload: Record<string, any>) => axiosClient.patch(`/accounting/ar-invoices/${invoiceId}/payments/${paymentId}`, payload),
   deleteArPayment: (invoiceId: string, paymentId: string) => axiosClient.delete(`/accounting/ar-invoices/${invoiceId}/payments/${paymentId}`),

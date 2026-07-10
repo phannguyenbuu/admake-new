@@ -130,15 +130,32 @@ def get_task_by_id(id):
     if task.customer_id:
         customer = db.session.get(User, task.customer_id)
         if customer:
+            from models import Workspace as DBWorkspace
+            cust_name = customer.fullName
+            if not cust_name:
+                ws = DBWorkspace.query.filter(DBWorkspace.owner_id == customer.id).first()
+                if ws:
+                    cust_name = ws.name
+            if not cust_name:
+                cust_name = getattr(customer, "username", None) or "Khách hàng vãng lai"
+
             result["customer_id"] = {
                 "id": task.customer_id,
-                "name": customer.fullName,
+                "name": cust_name,
                 "phone": customer.phone,
                 "address": customer.address,
                 "email": customer.email
             }
         else:
             result["customer_id"] = None
+
+    # Lấy thông tin hoá đơn AR và các khoản thanh toán
+    from models import ARInvoice
+    invoice = ARInvoice.query.filter(ARInvoice.task_id == task.id, ARInvoice.deletedAt.is_(None)).first()
+    if invoice:
+        result["invoice"] = invoice.tdict(include_payments=True)
+    else:
+        result["invoice"] = None
 
     # print('Task detail', result)
     
@@ -767,7 +784,7 @@ def clear_trash_by_lead(lead_id):
 
 def sync_task_to_ar_invoice(task):
     try:
-        from models import ARInvoice, ARInvoicePayment, User, db
+        from models import ARInvoice, ARInvoicePayment, User, Workspace as DBWorkspace, db
         from api.accounting_erp import _build_running_code, _record_ar_payment, _soft_delete_ar_payment_links, _update_invoice_balances
         import datetime
     except ImportError as e:
@@ -807,10 +824,28 @@ def sync_task_to_ar_invoice(task):
         return
 
     # 3. Resolve customer name
+    if not task.lead_id:
+        if task.workspace_id:
+            workspace = db.session.get(DBWorkspace, task.workspace_id)
+            if workspace:
+                task.lead_id = workspace.lead_id
+        if not task.lead_id:
+            ws = DBWorkspace.query.filter(DBWorkspace.lead_id.isnot(None)).first()
+            if ws:
+                task.lead_id = ws.lead_id
+
     customer = None
     if task.customer_id:
         customer = db.session.get(User, task.customer_id)
-    customer_name = customer.fullName if customer else "Khách hàng vãng lai"
+    customer_name = "Khách hàng vãng lai"
+    if customer:
+        customer_name = customer.fullName
+        if not customer_name:
+            ws = DBWorkspace.query.filter(DBWorkspace.owner_id == customer.id).first()
+            if ws:
+                customer_name = ws.name
+        if not customer_name:
+            customer_name = getattr(customer, "username", None) or "Khách hàng vãng lai"
 
     invoice_date = datetime.date.today()
 
@@ -880,3 +915,157 @@ def sync_task_to_ar_invoice(task):
                     )
 
             _update_invoice_balances(invoice)
+
+
+@task_bp.route("/<string:id>/payments", methods=["POST"])
+def add_task_payment(id):
+    from models import Task, ARInvoice, ARInvoicePayment, db, generate_datetime_id, upload_a_file_to_vps
+    from api.accounting_erp import _record_ar_payment, _update_invoice_balances
+    import datetime
+
+    task = db.session.get(Task, id)
+    if not task:
+        abort(404, description="Task not found")
+
+    # Cập nhật thông tin task nếu gửi kèm từ form
+    task_amount_str = request.form.get("task_amount")
+    if task_amount_str is not None:
+        task.amount = float(task_amount_str or 0)
+    customer_id = request.form.get("customer_id")
+    if customer_id is not None:
+        task.customer_id = customer_id if customer_id != "" else None
+    db.session.commit()
+
+    # Luôn đồng bộ sang hóa đơn trước để ghi nhận số tiền mới
+    sync_task_to_ar_invoice(task)
+    db.session.commit()
+
+    invoice = ARInvoice.query.filter(ARInvoice.task_id == task.id, ARInvoice.deletedAt.is_(None)).first()
+    if not invoice:
+        abort(400, description="Không thể tạo hoá đơn phải thu cho công việc này")
+
+    amount = float(request.form.get("amount") or 0)
+    payment_method = request.form.get("payment_method") or "bank"
+    note = request.form.get("note") or ""
+
+    file = request.files.get("file")
+    file_url = None
+    if file and file.filename != "":
+        filename, filepath, thumb_url = upload_a_file_to_vps(file)
+        if filename:
+            file_url = filename
+
+    try:
+        payment = _record_ar_payment(
+            invoice=invoice,
+            payment_date=datetime.date.today(),
+            amount=amount,
+            payment_method=payment_method,
+            note=note,
+            payment_type="tam_ung"
+        )
+        if file_url:
+            payment.file_url = file_url
+            
+        actor_id = g.permission_actor.id if hasattr(g, "permission_actor") and g.permission_actor else None
+        payment.created_by = actor_id
+        payment.updated_by = actor_id
+
+        db.session.commit()
+
+        _update_invoice_balances(invoice)
+        task.prepayment = sum(p.amount or 0 for p in invoice.payments if not p.deletedAt and p.payment_type == "tam_ung")
+        db.session.commit()
+
+    except Exception as e:
+        db.session.rollback()
+        abort(400, description=str(e))
+
+    # Return updated task details (including extended customer_id and invoice)
+    result = task.tdict()
+    if task.customer_id:
+        from models import User, Workspace as DBWorkspace
+        customer = db.session.get(User, task.customer_id)
+        if customer:
+            cust_name = customer.fullName
+            if not cust_name:
+                ws = DBWorkspace.query.filter(DBWorkspace.owner_id == customer.id).first()
+                if ws:
+                    cust_name = ws.name
+            if not cust_name:
+                cust_name = getattr(customer, "username", None) or "Khách hàng vãng lai"
+
+            result["customer_id"] = {
+                "id": task.customer_id,
+                "name": cust_name,
+                "phone": customer.phone,
+                "address": customer.address,
+                "email": customer.email
+            }
+        else:
+            result["customer_id"] = None
+
+    result["invoice"] = invoice.tdict(include_payments=True)
+    return jsonify({"message": "Success", "data": result}), 200
+
+
+@task_bp.route("/<string:id>/payments/<string:payment_id>", methods=["DELETE"])
+def delete_task_payment(id, payment_id):
+    from models import Task, ARInvoice, ARInvoicePayment, db
+    from api.accounting_erp import _soft_delete_ar_payment_links, _update_invoice_balances
+    import datetime
+
+    task = db.session.get(Task, id)
+    if not task:
+        abort(404, description="Task not found")
+
+    invoice = ARInvoice.query.filter(ARInvoice.task_id == task.id, ARInvoice.deletedAt.is_(None)).first()
+    if not invoice:
+        abort(404, description="AR invoice not found")
+
+    payment = ARInvoicePayment.query.filter(
+        ARInvoicePayment.id == payment_id,
+        ARInvoicePayment.invoice_id == invoice.id,
+        ARInvoicePayment.deletedAt.is_(None),
+    ).first()
+    if not payment:
+        abort(404, description="Payment not found")
+
+    # Xóa mềm
+    _soft_delete_ar_payment_links(payment)
+    payment.deletedAt = datetime.datetime.utcnow()
+    payment.updated_by = g.permission_actor.id if hasattr(g, "permission_actor") and g.permission_actor else None
+
+    db.session.commit()
+
+    _update_invoice_balances(invoice)
+    task.prepayment = sum(p.amount or 0 for p in invoice.payments if not p.deletedAt and p.payment_type == "tam_ung")
+    db.session.commit()
+
+    # Trả về kết quả tdict chi tiết của Task (bao gồm customer_id được mở rộng và invoice)
+    result = task.tdict()
+    if task.customer_id:
+        from models import User, Workspace as DBWorkspace
+        customer = db.session.get(User, task.customer_id)
+        if customer:
+            cust_name = customer.fullName
+            if not cust_name:
+                ws = DBWorkspace.query.filter(DBWorkspace.owner_id == customer.id).first()
+                if ws:
+                    cust_name = ws.name
+            if not cust_name:
+                cust_name = getattr(customer, "username", None) or "Khách hàng vãng lai"
+
+            result["customer_id"] = {
+                "id": task.customer_id,
+                "name": cust_name,
+                "phone": customer.phone,
+                "address": customer.address,
+                "email": customer.email
+            }
+        else:
+            result["customer_id"] = None
+
+    result["invoice"] = invoice.tdict(include_payments=True)
+    return jsonify({"message": "Success", "data": result}), 200
+

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
-import { notification, Select, ConfigProvider, type FormInstance } from "antd";
+import { notification, Select, ConfigProvider, type FormInstance, AutoComplete, Input } from "antd";
 import { Trash2, Plus, ChevronDown } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useTaskContext } from "../../../../common/hooks/useTask";
@@ -14,31 +14,46 @@ function uid() {
     return Math.random().toString(36).slice(2) + Date.now().toString(36);
 }
 
+function parseFraction(str: string): number | null {
+    if (!str) return null;
+    const match = str.trim().match(/^(\d+)\s*\/\s*(\d+)/);
+    if (match) {
+        const num = parseInt(match[1], 10);
+        const den = parseInt(match[2], 10);
+        if (den !== 0) return num / den;
+    }
+    return null;
+}
+
 function getMaterialRowPrice(row: any, items: any[]): number {
     for (const item of items) {
         const specs = item.spec_rows || [];
+        
+        // 1. Direct match with spec string
         if (specs.length > 0) {
             for (const spec of specs) {
                 const specStr = [spec.color, spec.spec].filter(Boolean).join(" - ");
                 const formattedName = `${item.name} - ${specStr}`;
-                if (row.ten === formattedName || (row.ten === item.name && row.quy_cach === specStr)) {
+                if (
+                    row.ten === formattedName || 
+                    (row.ten === item.name && row.quy_cach === specStr) ||
+                    (row.ten === item.name && row.quy_cach === spec.spec)
+                ) {
                     return Number(spec.price) || 0;
                 }
             }
         }
-        if (row.ten === item.name) {
-            return item.standard_cost || item.average_cost || 0;
-        }
-        if (item.name && row.ten && row.ten.startsWith(item.name)) {
-            if (specs.length > 0) {
-                for (const spec of specs) {
-                    const specStr = [spec.color, spec.spec].filter(Boolean).join(" - ");
-                    if (row.ten.includes(specStr) || row.quy_cach === specStr) {
-                        return Number(spec.price) || 0;
-                    }
+
+        // 2. Fractional calculation if main item matches
+        if (row.ten === item.name || (item.name && row.ten && row.ten.startsWith(item.name))) {
+            const mainPrice = item.standard_cost || item.average_cost || 0;
+            if (row.quy_cach) {
+                const fraction = parseFraction(row.quy_cach);
+                if (fraction !== null) {
+                    return Math.round(mainPrice * fraction);
                 }
             }
-            return item.standard_cost || item.average_cost || 0;
+            return mainPrice;
         }
     }
     return 0;
@@ -137,16 +152,17 @@ function MaterialsGrid({ form }: MaterialsGridProps) {
         const items = resItems || [];
         return items.flatMap(item => {
             const specs: any[] = (item as any).spec_rows || [];
-            if (specs.filter(s => s.spec || s.color).length === 0) {
-                return [{
-                    label: `${item.name}${item.code ? ` (${item.code})` : ''}`,
-                    ten: item.name,
-                    quy_cach: item.unit || "",
-                    dia_diem: item.default_warehouse_name || "Kho VTU",
-                    unit: item.unit || ""
-                }];
-            }
-            return specs.filter(s => s.spec || s.color).map(spec => {
+            
+            // Always return the main item
+            const mainOpt = {
+                label: `${item.name}${item.code ? ` (${item.code})` : ''}`,
+                ten: item.name,
+                quy_cach: item.unit || "",
+                dia_diem: item.default_warehouse_name || "Kho VTU",
+                unit: item.unit || ""
+            };
+
+            const specOpts = specs.filter(s => s.spec || s.color).map(spec => {
                 const specStr = [spec.color, spec.spec].filter(Boolean).join(" - ");
                 const labelStr = `${item.name} - ${specStr}`;
                 return {
@@ -157,6 +173,8 @@ function MaterialsGrid({ form }: MaterialsGridProps) {
                     unit: spec.unit || item.unit || ""
                 };
             });
+
+            return [mainOpt, ...specOpts];
         });
     }, [resItems]);
 
@@ -287,14 +305,39 @@ function MaterialsGrid({ form }: MaterialsGridProps) {
                                     className={inputCls}
                                 />
 
-                                {/* Quy cách (Read-only) */}
-                                <input
-                                    readOnly
-                                    value={row.quy_cach}
-                                    placeholder="Tự động..."
-                                    className={readOnlyCls}
-                                    title="Lấy tự động từ thư viện"
-                                />
+                                {/* Quy cách (AutoComplete / Editable) */}
+                                {(() => {
+                                    const item = (resItems || []).find(it => it.name === row.ten || (row.ten && row.ten.startsWith(it.name)));
+                                    const specs: any[] = (item as any)?.spec_rows || [];
+                                    const optionsSet = new Set<string>();
+                                    specs.forEach(s => {
+                                        if (s.spec) optionsSet.add(s.spec);
+                                        if (s.color) optionsSet.add(s.color);
+                                        const specStr = [s.color, s.spec].filter(Boolean).join(" - ");
+                                        if (specStr) optionsSet.add(specStr);
+                                    });
+                                    const itemSpecs = Array.from(optionsSet);
+
+                                    return (
+                                        <AutoComplete
+                                            value={row.quy_cach}
+                                            options={itemSpecs.map(spec => ({ value: spec }))}
+                                            onChange={(val) => handleChange(row.id, "quy_cach", val)}
+                                            filterOption={(inputValue, option) =>
+                                                (((option as any)?.value as string) || "").toLowerCase().includes(inputValue.toLowerCase())
+                                            }
+                                            placeholder="Quy cách..."
+                                            style={{ width: "100%" }}
+                                        >
+                                            <input
+                                                type="text"
+                                                placeholder="Quy cách..."
+                                                className={inputCls}
+                                                onKeyDown={(e) => handleKeyDown(e, rowIdx, 1)}
+                                            />
+                                        </AutoComplete>
+                                    );
+                                })()}
 
                                 {/* Số lượng + đơn vị */}
                                 <input

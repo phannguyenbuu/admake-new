@@ -601,12 +601,19 @@ def get_statistics_dashboard():
         Workpoint.user_id.in_([u.id for u in users])
     ).count() if users else 0
 
+    from models import get_lead_storage_usage
+    storage_usage = get_lead_storage_usage(lead_id)
+
     capacity_data = {
         "days_used": max(days_used, 1),
         "total_members": len(users),
         "total_tasks": total_tasks_all_time,
         "total_workpoints": total_workpoints_all_time,
         "total_workspaces": len(workspaces),
+        "storage_usage": storage_usage,
+        "storage_limit": getattr(lead, "storage_limit", 10 * 1024 * 1024 * 1024) or (10 * 1024 * 1024 * 1024),
+        "allow_negative_storage": getattr(lead, "allow_negative_storage", False),
+        "is_locked": getattr(lead, "is_locked", False),
     }
 
     result = {

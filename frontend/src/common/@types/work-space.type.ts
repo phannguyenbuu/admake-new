@@ -114,6 +114,11 @@ export interface Task extends BaseEntity {
   assets?: MessageTypeProps[];
   check_reward?: Boolean | false;
   rate?: number;
+  invoice?: {
+    id: string;
+    status: string;
+    payments?: any[];
+  } | null;
 }
 
 export interface TaskGroup {

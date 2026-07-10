@@ -91,6 +91,13 @@ def require_authenticated_user() -> User:
     user = resolve_request_user()
     if not user:
         abort(401, description="Authentication required")
+    
+    # Check if lead is locked
+    if user.lead_id:
+        from models import LeadPayload
+        lead = db.session.get(LeadPayload, user.lead_id)
+        if lead and getattr(lead, "is_locked", False):
+            abort(403, description="Tài khoản của bạn đã bị khóa. Vui lòng thanh toán hoặc liên hệ với ban quản trị.")
     return user
 
 

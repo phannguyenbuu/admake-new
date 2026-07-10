@@ -1,5 +1,14 @@
 import React, { useState, useRef } from "react";
-import { Modal, notification, Popconfirm } from "antd";
+import { Modal, notification, Popconfirm, AutoComplete } from "antd";
+import { useCustomerQuery } from "../../../common/hooks/customer.hook";
+
+const removeAccents = (str: string): string => {
+  return str
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/đ/g, "d")
+    .replace(/Đ/g, "D");
+};
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import dayjs from "dayjs";
 import { Trash2, ChevronDown, ChevronRight, Pencil, Check, X } from "lucide-react";
@@ -136,6 +145,70 @@ function InlineText({
     <span
       title="Nhấp để sửa"
       onClick={() => { setLocal(String(value ?? "")); setEditing(true); }}
+      className={`inline-block w-full cursor-pointer rounded px-1 hover:bg-slate-100 transition-colors text-sm ${className}`}
+    >
+      {value !== "" && value !== null && value !== undefined
+        ? value
+        : <span className="text-slate-300 italic">{placeholder || "—"}</span>}
+    </span>
+  );
+}
+
+function InlineCustomerSelect({
+  value,
+  onSave,
+  className = "",
+  placeholder = "",
+  customerNames = [],
+}: {
+  value: string;
+  onSave: (v: string) => void;
+  className?: string;
+  placeholder?: string;
+  customerNames: string[];
+}) {
+  const [editing, setEditing] = useState(false);
+  const [local, setLocal] = useState(value);
+
+  const commit = (val: string) => {
+    setEditing(false);
+    if (val !== value) onSave(val);
+  };
+
+  if (editing) {
+    return (
+      <AutoComplete
+        value={local}
+        options={customerNames.map((name: string) => ({ value: name }))}
+        onChange={(val: string) => setLocal(val)}
+        onSelect={(val: string) => commit(val)}
+        filterOption={(inputValue: string, option: any) =>
+          (((option?.value as string) || "").toLowerCase().includes(inputValue.toLowerCase()))
+        }
+        style={{ width: "100%" }}
+        defaultOpen
+      >
+        <input
+          type="text"
+          autoFocus
+          onBlur={() => {
+            setTimeout(() => commit(local), 200);
+          }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") commit(local);
+            if (e.key === "Escape") setEditing(false);
+          }}
+          className={`w-full px-2 py-1 border border-teal-400 rounded-md text-sm outline-none bg-teal-50 ${className}`}
+          placeholder={placeholder}
+        />
+      </AutoComplete>
+    );
+  }
+
+  return (
+    <span
+      title="Nhấp để sửa"
+      onClick={() => { setLocal(value); setEditing(true); }}
       className={`inline-block w-full cursor-pointer rounded px-1 hover:bg-slate-100 transition-colors text-sm ${className}`}
     >
       {value !== "" && value !== null && value !== undefined
@@ -923,13 +996,27 @@ export default function AccountsReceivableTab() {
 
 
   const deleteMutation = useMutation({
-    mutationFn: (row: ArInvoice) => AccountingErpService.cancelArInvoice(row.id),
+    mutationFn: ({ row, force }: { row: ArInvoice, force?: boolean }) => AccountingErpService.cancelArInvoice(row.id, force),
     onSuccess: async () => {
       notification.success({ message: "Đã xoá công nợ" });
       await invalidate();
     },
-    onError: (e: any) =>
-      notification.error({ message: e?.response?.data?.description || "Xoá thất bại" }),
+    onError: (e: any, variables) => {
+      const msg = e?.response?.data?.description || "Xoá thất bại";
+      if (msg.includes("bút toán phát sinh")) {
+        Modal.confirm({
+          title: "Công nợ này đang có các khoản thanh toán",
+          content: `Hiện có ${variables.row.payments?.length || 0} hóa đơn trong công nợ này, bạn có chắc chắn muốn xóa hết không ?`,
+          okText: "Đồng ý",
+          cancelText: "Hủy",
+          onOk: () => {
+            deleteMutation.mutate({ row: variables.row, force: true });
+          }
+        });
+      } else {
+        notification.error({ message: msg });
+      }
+    },
   });
 
   const paymentMutation = useMutation({
@@ -1007,6 +1094,10 @@ export default function AccountsReceivableTab() {
       } catch { /* ignore */ }
     }
   };
+
+  const { data: customerRes } = useCustomerQuery({ limit: 1000 });
+  const customers = customerRes?.data?.data || [];
+  const customerNames = Array.from(new Set(customers.map((c: any) => c.name).filter(Boolean))) as string[];
 
   const allRows = (listQuery.data?.data || []) as ArInvoice[];
   const summary = listQuery.data?.summary || {};
@@ -1300,10 +1391,11 @@ export default function AccountsReceivableTab() {
 
                     {/* Nội dung: chỉ task dropdown */}
                     <td className="px-3 py-2 min-w-[180px]">
-                      <InlineText
+                      <InlineCustomerSelect
                         value={row.customer_name || ""}
                         placeholder="Khách hàng"
                         onSave={(v) => handleInlineUpdate(row, "customer_name", v)}
+                        customerNames={customerNames}
                       />
                       {/* Task dropdown — 1 task duy nhất, lưu vào description */}
                       <select
@@ -1392,7 +1484,7 @@ export default function AccountsReceivableTab() {
                         okText="Xoá"
                         cancelText="Huỷ"
                         okButtonProps={{ danger: true }}
-                        onConfirm={() => deleteMutation.mutate(row)}
+                        onConfirm={() => deleteMutation.mutate({ row })}
                       >
                         <button
                           title="Xoá"
@@ -1530,12 +1622,20 @@ export default function AccountsReceivableTab() {
         <div className="grid grid-cols-1 gap-3 pt-2">
           <div>
             <label className="text-xs text-slate-500 mb-1 block">Nội dung / Khách hàng *</label>
-            <input
+            <AutoComplete
               value={form.customer_name}
-              onChange={(e) => setForm((p) => ({ ...p, customer_name: e.target.value }))}
-              placeholder="Tên khách hàng hoặc nội dung"
-              className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm"
-            />
+              options={customerNames.map((name: string) => ({ value: name }))}
+              onChange={(val: string) => setForm((p) => ({ ...p, customer_name: val }))}
+              filterOption={(inputValue: string, option: any) =>
+                (((option?.value as string) || "").toLowerCase().includes(inputValue.toLowerCase()))
+              }
+              style={{ width: "100%" }}
+            >
+              <input
+                placeholder="Tên khách hàng hoặc nội dung"
+                className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm"
+              />
+            </AutoComplete>
           </div>
           <div>
             <label className="text-xs text-slate-500 mb-1 block">Diễn giải (Kế toán/thuế)</label>

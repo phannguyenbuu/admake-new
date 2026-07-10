@@ -24,6 +24,25 @@ import type { NotifyProps } from "../../../../@types/notify.type";
 import { CenterBox } from "../commons/TitlePanel";
 const { TextArea } = Input;
 
+const htmlToPlainText = (html: string): string => {
+  if (!html) return "";
+  let text = html;
+  text = text.replace(/<br\s*\/?>/gi, "\n");
+  text = text.replace(/<\/p>/gi, "\n");
+  text = text.replace(/<\/div>/gi, "\n");
+  text = text.replace(/<p[^>]*>/gi, "");
+  text = text.replace(/<div[^>]*>/gi, "");
+  text = text.replace(/<\/?[^>]+(>|$)/g, "");
+  text = text
+    .replace(/&nbsp;/gi, " ")
+    .replace(/&amp;/gi, "&")
+    .replace(/&lt;/gi, "<")
+    .replace(/&gt;/gi, ">")
+    .replace(/&quot;/gi, '"');
+  text = text.replace(/\n{3,}/g, "\n\n");
+  return text.trim();
+};
+
 const fetchTaskByUser = async (userId: string): Promise<Task[]> => {
   const response = await fetch(`${useApiHost()}/task/${userId}/by_user`);
   if (!response.ok) {
@@ -191,7 +210,7 @@ const TaskBoard = ({ userId,fullName, open, onCancel }: TaskBoardProps) => {
         </Stack>
         <TextArea
           readOnly
-          value={el?.description}
+          value={htmlToPlainText(el?.description ?? "")}
           rows={3}
           showCount
           maxLength={1000}

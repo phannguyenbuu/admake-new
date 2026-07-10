@@ -37,6 +37,16 @@ def update_inline(lead_id):
         lead.company = data["company"]
     if "phone" in data:
         lead.phone = data["phone"]
+    if "storage_limit" in data:
+        try:
+            # We assume value is passed in GB, convert to bytes
+            lead.storage_limit = int(float(data["storage_limit"]) * 1024 * 1024 * 1024)
+        except (ValueError, TypeError):
+            pass
+    if "allow_negative_storage" in data:
+        lead.allow_negative_storage = bool(data["allow_negative_storage"])
+    if "is_locked" in data:
+        lead.is_locked = bool(data["is_locked"])
 
     db.session.commit()
     return jsonify({"success": True})
@@ -411,6 +421,13 @@ def admin_leads():
     for lead in pagination.items:
         lead_dict = lead.tdict()
         lead_dict["user_id_str"] = str(lead.user_id) if lead.user_id else None
+
+        # Compute storage usage and settings for lead
+        from models import get_lead_storage_usage
+        lead_dict["storage_usage"] = get_lead_storage_usage(lead.id)
+        lead_dict["storage_limit"] = getattr(lead, "storage_limit", 10 * 1024 * 1024 * 1024) or (10 * 1024 * 1024 * 1024)
+        lead_dict["allow_negative_storage"] = getattr(lead, "allow_negative_storage", False)
+        lead_dict["is_locked"] = getattr(lead, "is_locked", False)
 
         lu_at = last_user_at.get(lead.id)      # datetime or None
         days = _days_since(lu_at)

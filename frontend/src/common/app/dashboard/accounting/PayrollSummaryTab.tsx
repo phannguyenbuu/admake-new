@@ -1473,11 +1473,11 @@ const PAYROLL_EXPANDABLE_TONES: Record<
   },
 };
 
-const getPayrollExpandableDraft = (row?: Partial<BonusPunishRow>): PayrollExpandableDraft => ({
+const getPayrollExpandableDraft = (row?: Partial<BonusPunishRow>, defaultPeriod?: string): PayrollExpandableDraft => ({
   type: isPayrollExpandableType(row?.type) ? row.type : "bonus",
   note: typeof row?.note === "string" ? row.note : "",
   amount: Number(row?.amount || 0),
-  entry_date: typeof row?.entry_date === "string" ? row.entry_date : dayjs().format("YYYY-MM-DD"),
+  entry_date: typeof row?.entry_date === "string" ? row.entry_date : (defaultPeriod ? dayjs(`${defaultPeriod}-01`).format("YYYY-MM-DD") : dayjs().format("YYYY-MM-DD")),
 });
 
 function PayrollAdjustmentRow({
@@ -1898,19 +1898,25 @@ function PayrollTableLocalOld({
 
 function PayrollAdjustmentSubRow({
   userId,
+  period,
   adjustmentRows,
   onCreateAdjustment,
   onUpdateAdjustment,
   onDeleteAdjustment,
 }: {
   userId: string;
+  period: string;
   adjustmentRows: BonusPunishRow[];
   onCreateAdjustment: PayrollAdjustmentHandlers["onCreateAdjustment"];
   onUpdateAdjustment: PayrollAdjustmentHandlers["onUpdateAdjustment"];
   onDeleteAdjustment: PayrollAdjustmentHandlers["onDeleteAdjustment"];
 }) {
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [addForm, setAddForm] = useState<PayrollExpandableDraft>(() => getPayrollExpandableDraft());
+  const [addForm, setAddForm] = useState<PayrollExpandableDraft>(() => getPayrollExpandableDraft(undefined, period));
+
+  useEffect(() => {
+    setAddForm(getPayrollExpandableDraft(undefined, period));
+  }, [period]);
 
   const rows = useMemo(
     () => adjustmentRows.filter((item): item is PayrollExpandableRow => isPayrollExpandableType(item.type)),
@@ -1925,7 +1931,7 @@ function PayrollAdjustmentSubRow({
       return;
     }
     await onCreateAdjustment(userId, addForm);
-    setAddForm(getPayrollExpandableDraft());
+    setAddForm(getPayrollExpandableDraft(undefined, period));
     setEditingId(null);
   };
 
@@ -2009,6 +2015,7 @@ function PayrollAdjustmentSubRow({
 function PayrollTableRow({
   row,
   index,
+  period,
   adjustmentRows,
   isExpanded,
   onToggleExpand,
@@ -2019,6 +2026,7 @@ function PayrollTableRow({
 }: {
   row: PayrollRow;
   index: number;
+  period: string;
   adjustmentRows: BonusPunishRow[];
   isExpanded: boolean;
   onToggleExpand: (userId: string) => void;
@@ -2081,6 +2089,7 @@ function PayrollTableRow({
           <td colSpan={19} className="p-0">
             <PayrollAdjustmentSubRow
               userId={row.user_id}
+              period={period}
               adjustmentRows={adjustmentRows}
               onCreateAdjustment={onCreateAdjustment}
               onUpdateAdjustment={onUpdateAdjustment}
@@ -2201,6 +2210,7 @@ function PayrollTable({
                   key={row.user_id}
                   row={row}
                   index={index}
+                  period={period}
                   adjustmentRows={getUserAdjustmentRows(adjustments, row.user_id)}
                   isExpanded={expanded.has(row.user_id)}
                   onToggleExpand={toggleExpand}
