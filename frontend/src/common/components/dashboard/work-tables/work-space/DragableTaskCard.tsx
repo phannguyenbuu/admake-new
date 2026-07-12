@@ -238,7 +238,12 @@ export const CardItem: React.FC<CardItemProps> = ({
         <Stack direction="row" sx={{ height: '100%', overflow: 'hidden', width: '100%' }}>
             {getPrimaryTaskIcon(task?.icon) && 
             <Avatar
-                src={`${useApiStatic()}/${getPrimaryTaskIcon(task?.icon)}`}
+                src={(() => {
+                  const icon = getPrimaryTaskIcon(task?.icon);
+                  if (!icon) return '';
+                  const path = icon.startsWith('thumb_') && !icon.startsWith('thumbs/') ? `thumbs/${icon}` : icon;
+                  return `${useApiStatic()}/${path}`;
+                })()}
                 alt="Task icon"
                 sx={{ width: 70, height: 70, borderRadius: 0, flexShrink: 0 }}
             />}

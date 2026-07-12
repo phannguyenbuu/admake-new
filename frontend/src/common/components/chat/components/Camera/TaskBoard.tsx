@@ -85,14 +85,18 @@ const TaskBoard = ({ userId,fullName, open, onCancel }: TaskBoardProps) => {
       if (path.startsWith("/")) {
         return path;
       }
-      return `${staticBase}/${path}`;
+      let finalPath = path;
+      if (finalPath.startsWith("thumb_") && !finalPath.startsWith("thumbs/")) {
+        finalPath = `thumbs/${finalPath}`;
+      }
+      return `${staticBase}/${finalPath}`;
     };
 
     const getOriginalImagePath = (path?: string | null) => {
       if (!path) return "";
-      return path.startsWith("thumbs/thumb_")
-        ? path.replace("thumbs/thumb_", "")
-        : path;
+      if (path.startsWith("thumbs/thumb_")) return path.replace("thumbs/thumb_", "");
+      if (path.startsWith("thumb_")) return path.replace("thumb_", "");
+      return path;
     };
 
     const handleFinishWarning = () => {
