@@ -1,7 +1,8 @@
 import type { IPage } from "../../../@types/common.type";
 import React, { useEffect, useMemo, useState, Suspense, useDeferredValue } from "react";
 import { Pencil, Trash2, Plus, X, Check, ChevronDown, ChevronRight } from "lucide-react";
-import { Modal, notification } from "antd";
+import { Modal, notification, Popconfirm, Dropdown } from "antd";
+import type { MenuProps } from "antd";
 import dayjs from "dayjs";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useUser } from "../../../common/hooks/useUser";
@@ -15,6 +16,8 @@ import {
   type Warehouse,
 } from "../../../services/inventory.service";
 import { UserService } from "../../../services/user.service";
+import { CustomerService } from "../../../services/customer.service";
+import { SupplierService } from "../../../services/supplier.service";
 import StorageLocationsTab from "./StorageLocationsTab";
 import ItemConfigTab, { useItemStatuses, useItemUnits } from "./ItemConfigTab";
 import type { ItemStatus } from "./ItemConfigTab";
@@ -242,6 +245,7 @@ const MaterialsDashboard: IPage["Component"] = () => {
   const [txTypeFilter, setTxTypeFilter] = useState("");
   const [month, setMonth] = useState(dayjs().format("YYYY-MM"));
   const [itemPage, setItemPage] = useState(1);
+  const [itemLimit, setItemLimit] = useState(25);
   const [itemModalOpen, setItemModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<InventoryItem | null>(null);
   const [detailTx, setDetailTx] = useState<StockTransaction | null>(null);
@@ -337,6 +341,36 @@ const MaterialsDashboard: IPage["Component"] = () => {
     queryFn: async () => (await UserService.getAll({ lead_id: userLeadId, limit: 1000 } as any)).data.data as any[],
   });
 
+  const customersQuery = useQuery({
+    queryKey: ["inventory-customers", userLeadId],
+    enabled: userLeadId > 0,
+    queryFn: async () => {
+      try {
+        const res = await CustomerService.getCustomers({ limit: 1000 } as any);
+        const raw = (res as any)?.data?.data || (res as any)?.data || [];
+        return Array.isArray(raw) ? raw : [];
+      } catch (err) {
+        console.error("Failed to fetch customers for inventory", err);
+        return [];
+      }
+    },
+  });
+
+  const suppliersQuery = useQuery({
+    queryKey: ["inventory-suppliers", userLeadId],
+    enabled: userLeadId > 0,
+    queryFn: async () => {
+      try {
+        const res = await SupplierService.getAll({ limit: 1000 } as any);
+        const raw = (res as any)?.data?.data || (res as any)?.data || [];
+        return Array.isArray(raw) ? raw : [];
+      } catch (err) {
+        console.error("Failed to fetch suppliers for inventory", err);
+        return [];
+      }
+    },
+  });
+
   const summaryQuery = useQuery({
     queryKey: ["inventory-summary", userLeadId, month],
     enabled: userLeadId > 0,
@@ -344,7 +378,7 @@ const MaterialsDashboard: IPage["Component"] = () => {
   });
 
   const itemsQuery = useQuery({
-    queryKey: ["inventory-items", userLeadId, search, statusFilter, categoryFilter, warehouseFilter, itemPage],
+    queryKey: ["inventory-items", userLeadId, search, statusFilter, categoryFilter, warehouseFilter, itemPage, itemLimit],
     enabled: userLeadId > 0,
     queryFn: async () =>
       (await InventoryService.listItems({
@@ -354,7 +388,7 @@ const MaterialsDashboard: IPage["Component"] = () => {
         category_id: categoryFilter || undefined,
         warehouse_id: warehouseFilter || undefined,
         page: itemPage,
-        limit: ITEM_PAGE_SIZE,
+        limit: itemLimit,
       })).data as InventoryItemsResponse,
   });
 
@@ -364,14 +398,14 @@ const MaterialsDashboard: IPage["Component"] = () => {
     queryFn: async () =>
       (await InventoryService.listTransactions({
         ...paramsBase,
-        from_date: `${month}-01`,
-        to_date: dayjs(`${month}-01`).endOf("month").format("YYYY-MM-DD"),
+        from_date: month ? `${month}-01` : undefined,
+        to_date: month ? dayjs(`${month}-01`).endOf("month").format("YYYY-MM-DD") : undefined,
         status: txStatusFilter || undefined,
         transaction_type: txTypeFilter || undefined,
         warehouse_id: warehouseFilter || undefined,
         search: search || undefined,
         page: 1,
-        limit: 200,
+        limit: 500,
       })).data.data as StockTransaction[],
   });
 
@@ -392,6 +426,28 @@ const MaterialsDashboard: IPage["Component"] = () => {
   const categories = categoriesQuery.data || [];
   const warehouses = warehousesQuery.data || [];
   const users = usersQuery.data || [];
+  const customers = customersQuery.data || [];
+  const suppliers = suppliersQuery.data || [];
+
+  const customerList = useMemo(() => {
+    return customers
+      .map((c: any) => {
+        const name = (c.name || c.title || c.owner_name || "").trim();
+        const phone = c.phone || c.owner_phone || "";
+        return { id: c.id, name, phone };
+      })
+      .filter((c: any) => Boolean(c.name));
+  }, [customers]);
+
+  const supplierList = useMemo(() => {
+    return suppliers
+      .map((s: any) => {
+        const name = (s.fullName || s.username || s.name || "").trim();
+        const phone = s.phone || "";
+        return { id: s.id, name, phone };
+      })
+      .filter((s: any) => Boolean(s.name));
+  }, [suppliers]);
   const summary = summaryQuery.data || {
     active_items: 0,
     transaction_count: 0,
@@ -718,6 +774,29 @@ const MaterialsDashboard: IPage["Component"] = () => {
                         <div>Giá bình quân: {money(previewItem.average_cost || previewItem.standard_cost)} đ</div>
                         <div>Tồn hiện tại: {money(previewItem.quantity_on_hand || 0)}</div>
                       </div>
+
+                      {/* ĐẠI LÝ VẬT TƯ HIGHLIGHT VÀNG SÁNG GÂY CHÚ Ý */}
+                      {previewItem.default_supplier_name || (previewItem as any).supplier_link ? (
+                        <div className="mt-3 bg-yellow-300 text-yellow-950 border-2 border-yellow-400 font-medium shadow-md px-3.5 py-2.5 rounded-xl flex items-center gap-2.5 text-xs animate-pulse">
+                          <span className="text-base">🏪</span>
+                          <div className="flex-1">
+                            <span className="block text-[10px] uppercase tracking-wider text-yellow-900 font-medium opacity-90">ĐẠI LÝ VẬT TƯ</span>
+                            {(previewItem as any).supplier_link ? (
+                              <a
+                                href={(previewItem as any).supplier_link.startsWith("http") ? (previewItem as any).supplier_link : `https://${(previewItem as any).supplier_link}`}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="text-sm font-medium text-yellow-950 underline hover:text-blue-900 flex items-center gap-1 mt-0.5"
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                {previewItem.default_supplier_name || "Xem Website Đại Lý"} ↗
+                              </a>
+                            ) : (
+                              <span className="text-sm font-medium text-yellow-950">{previewItem.default_supplier_name}</span>
+                            )}
+                          </div>
+                        </div>
+                      ) : null}
                     </div>
 
                     {/* 3D Material Lab & Photos Viewer */}
@@ -883,6 +962,25 @@ const MaterialsDashboard: IPage["Component"] = () => {
                               )}
                               <div className="font-medium">{item.name}</div>
                               {item.sku && <div className={`text-xs ${textMuted}`}>{item.sku}</div>}
+                              {item.default_supplier_name && (
+                                <div className="mt-1">
+                                  {(item as any).supplier_link ? (
+                                    <a
+                                      href={(item as any).supplier_link.startsWith("http") ? (item as any).supplier_link : `https://${(item as any).supplier_link}`}
+                                      target="_blank"
+                                      rel="noreferrer"
+                                      className="bg-yellow-300 hover:bg-yellow-400 text-yellow-950 font-medium px-2 py-0.5 rounded text-[11px] inline-flex items-center gap-1 border border-yellow-400 shadow-2xs underline cursor-pointer"
+                                      onClick={(e) => e.stopPropagation()}
+                                    >
+                                      🏪 Đại lý: {item.default_supplier_name} ↗
+                                    </a>
+                                  ) : (
+                                    <span className="bg-yellow-300 text-yellow-950 font-medium px-2 py-0.5 rounded text-[11px] inline-flex items-center gap-1 border border-yellow-400 shadow-2xs">
+                                      🏪 Đại lý: {item.default_supplier_name}
+                                    </span>
+                                  )}
+                                </div>
+                              )}
                             </td>
                             <td className={`px-3 py-3 ${textSecondary}`}>
                               <div>{item.default_warehouse_name || "-"}</div>
@@ -1142,32 +1240,89 @@ const MaterialsDashboard: IPage["Component"] = () => {
               </div>
 
               <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-100 bg-white px-4 py-3 text-xs text-slate-500 shadow-sm">
-                <div>
-                  Hiển thị{" "}
-                  {itemsPagination?.total
-                    ? `${(itemPage - 1) * ITEM_PAGE_SIZE + 1}-${Math.min(itemPage * ITEM_PAGE_SIZE, itemsPagination.total)}`
-                    : "0-0"}{" "}
-                  / {itemsPagination?.total || 0} vật tư
+                <div className="flex items-center gap-3">
+                  <div>
+                    Hiển thị{" "}
+                    <span className="font-semibold text-slate-700">
+                      {itemsPagination?.total
+                        ? `${(itemPage - 1) * itemLimit + 1} - ${Math.min(itemPage * itemLimit, itemsPagination.total)}`
+                        : "0 - 0"}
+                    </span>{" "}
+                    / <span className="font-semibold text-slate-700">{itemsPagination?.total || 0}</span> vật tư
+                  </div>
+                  <div className="flex items-center gap-1.5 border-l border-slate-200 pl-3">
+                    <span>Mỗi trang:</span>
+                    <select
+                      className="rounded-lg border border-slate-200 bg-white px-2 py-1 text-xs font-medium text-slate-700 focus:outline-none"
+                      value={itemLimit}
+                      onChange={(e) => {
+                        setItemLimit(Number(e.target.value));
+                        setItemPage(1);
+                      }}
+                    >
+                      <option value={15}>15</option>
+                      <option value={25}>25</option>
+                      <option value={50}>50</option>
+                      <option value={100}>100</option>
+                    </select>
+                  </div>
                 </div>
-                <div className="flex items-center gap-2">
+
+                <div className="flex items-center gap-1">
                   <button
                     type="button"
-                    className="rounded-lg border border-slate-200 px-3 py-1.5 text-slate-600 disabled:cursor-not-allowed disabled:opacity-50"
+                    className="rounded-lg border border-slate-200 px-2.5 py-1 text-slate-600 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
                     disabled={itemPage <= 1}
                     onClick={() => setItemPage((prev) => Math.max(1, prev - 1))}
+                    title="Trang trước"
                   >
-                    Trước
+                    &laquo;
                   </button>
-                  <div className="min-w-[92px] text-center font-medium text-slate-600">
-                    Trang {itemsPagination?.page || 1}/{itemsPagination?.pages || 1}
-                  </div>
+
+                  {(() => {
+                    const totalPages = itemsPagination?.pages || 1;
+                    const pageNumbers: number[] = [];
+                    for (let p = 1; p <= totalPages; p++) {
+                      if (p === 1 || p === totalPages || Math.abs(p - itemPage) <= 2) {
+                        pageNumbers.push(p);
+                      } else if (p === itemPage - 3 || p === itemPage + 3) {
+                        pageNumbers.push(-1);
+                      }
+                    }
+
+                    return pageNumbers.map((p, idx) => {
+                      if (p === -1) {
+                        return (
+                          <span key={`ellipsis-${idx}`} className="px-1 text-slate-400">
+                            ...
+                          </span>
+                        );
+                      }
+                      return (
+                        <button
+                          key={p}
+                          type="button"
+                          className={`min-w-[28px] h-7 rounded-lg border text-xs font-medium transition-colors ${
+                            p === itemPage
+                              ? "border-teal-600 bg-teal-600 text-white"
+                              : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
+                          }`}
+                          onClick={() => setItemPage(p)}
+                        >
+                          {p}
+                        </button>
+                      );
+                    });
+                  })()}
+
                   <button
                     type="button"
-                    className="rounded-lg border border-slate-200 px-3 py-1.5 text-slate-600 disabled:cursor-not-allowed disabled:opacity-50"
+                    className="rounded-lg border border-slate-200 px-2.5 py-1 text-slate-600 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
                     disabled={!itemsPagination || itemPage >= itemsPagination.pages}
                     onClick={() => setItemPage((prev) => prev + 1)}
+                    title="Trang sau"
                   >
-                    Sau
+                    &raquo;
                   </button>
                 </div>
               </div>
@@ -1176,12 +1331,12 @@ const MaterialsDashboard: IPage["Component"] = () => {
         )}
 
         {activeTab === "transactions" && (
-          <div className="grid grid-cols-1 gap-5 xl:grid-cols-[380px_1fr]">
-            <div className="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm">
-              <div className="mb-3 text-sm font-semibold text-slate-700">Tạo giao dịch kho</div>
-              <div className="space-y-2">
+          <div className="grid grid-cols-1 gap-5 xl:grid-cols-[285px_1fr]">
+            <div className="rounded-2xl border border-slate-100 bg-white p-3.5 shadow-sm max-w-[285px]">
+              <div className="mb-2.5 text-sm font-semibold text-slate-700">Tạo giao dịch kho</div>
+              <div className="space-y-2 text-xs">
                 <select
-                  className="w-full rounded-lg border border-slate-200 px-3 py-2"
+                  className="w-full rounded-lg border border-slate-200 px-2.5 py-1.5 text-xs"
                   value={txForm.transaction_type}
                   onChange={(e) => setTxForm((prev) => ({ ...prev, transaction_type: e.target.value }))}
                 >
@@ -1193,12 +1348,12 @@ const MaterialsDashboard: IPage["Component"] = () => {
                 </select>
                 <input
                   type="date"
-                  className="w-full rounded-lg border border-slate-200 px-3 py-2"
+                  className="w-full rounded-lg border border-slate-200 px-2.5 py-1.5 text-xs"
                   value={txForm.transaction_date}
                   onChange={(e) => setTxForm((prev) => ({ ...prev, transaction_date: e.target.value }))}
                 />
                 <select
-                  className="w-full rounded-lg border border-slate-200 px-3 py-2"
+                  className="w-full rounded-lg border border-slate-200 px-2.5 py-1.5 text-xs"
                   value={txForm.warehouse_id}
                   onChange={(e) => setTxForm((prev) => ({ ...prev, warehouse_id: e.target.value }))}
                 >
@@ -1211,7 +1366,7 @@ const MaterialsDashboard: IPage["Component"] = () => {
                 </select>
                 {txForm.transaction_type === "transfer" && (
                   <select
-                    className="w-full rounded-lg border border-slate-200 px-3 py-2"
+                    className="w-full rounded-lg border border-slate-200 px-2.5 py-1.5 text-xs"
                     value={txForm.destination_warehouse_id}
                     onChange={(e) =>
                       setTxForm((prev) => ({ ...prev, destination_warehouse_id: e.target.value }))
@@ -1226,7 +1381,7 @@ const MaterialsDashboard: IPage["Component"] = () => {
                   </select>
                 )}
                 <select
-                  className="w-full rounded-lg border border-slate-200 px-3 py-2"
+                  className="w-full rounded-lg border border-slate-200 px-2.5 py-1.5 text-xs"
                   value={txForm.item_id}
                   onChange={(e) => setTxForm((prev) => ({ ...prev, item_id: e.target.value }))}
                 >
@@ -1239,20 +1394,20 @@ const MaterialsDashboard: IPage["Component"] = () => {
                 </select>
                 <input
                   type="number"
-                  className="w-full rounded-lg border border-slate-200 px-3 py-2"
+                  className="w-full rounded-lg border border-slate-200 px-2.5 py-1.5 text-xs"
                   placeholder="Số lượng"
                   value={txForm.quantity}
                   onChange={(e) => setTxForm((prev) => ({ ...prev, quantity: Number(e.target.value) }))}
                 />
                 <input
                   type="number"
-                  className="w-full rounded-lg border border-slate-200 px-3 py-2"
+                  className="w-full rounded-lg border border-slate-200 px-2.5 py-1.5 text-xs"
                   placeholder="Đơn giá"
                   value={txForm.unit_cost}
                   onChange={(e) => setTxForm((prev) => ({ ...prev, unit_cost: Number(e.target.value) }))}
                 />
                 <select
-                  className="w-full rounded-lg border border-slate-200 px-3 py-2"
+                  className="w-full rounded-lg border border-slate-200 px-2.5 py-1.5 text-xs"
                   value={txForm.storekeeper_id || ""}
                   onChange={(e) => setTxForm((prev) => ({ ...prev, storekeeper_id: e.target.value }))}
                 >
@@ -1263,27 +1418,120 @@ const MaterialsDashboard: IPage["Component"] = () => {
                     </option>
                   ))}
                 </select>
+                {/* Đối tác / Khách hàng / Nhà cung cấp - Hiển thị theo loại giao dịch */}
+                {txForm.transaction_type === "sales_issue" || txForm.transaction_type === "sales_return" ? (
+                  <div className="space-y-1 bg-cyan-50/50 p-2 rounded-xl border border-cyan-200/80">
+                    <div className="flex items-center justify-between text-[11px] font-semibold text-cyan-800">
+                      <span>Khách hàng:</span>
+                      {txForm.partner_name && (
+                        <button
+                          type="button"
+                          onClick={() => setTxForm((prev) => ({ ...prev, partner_name: "" }))}
+                          className="text-red-500 hover:underline text-[10px]"
+                        >
+                          Xóa chọn
+                        </button>
+                      )}
+                    </div>
+
+                    <select
+                      className="w-full rounded-lg border border-cyan-300 bg-white px-2.5 py-1.5 text-xs font-semibold text-slate-800 focus:outline-none focus:border-cyan-500 shadow-xs"
+                      value={txForm.partner_name}
+                      onChange={(e) => setTxForm((prev) => ({ ...prev, partner_name: e.target.value }))}
+                    >
+                      <option value="">-- Chọn từ Danh sách Khách hàng --</option>
+                      {customerList.map((c, i) => (
+                        <option key={`cust-${i}`} value={c.name}>
+                          👤 {c.name} {c.phone ? `(${c.phone})` : ""}
+                        </option>
+                      ))}
+                    </select>
+
+                    <div className="relative pt-0.5">
+                      <input
+                        list="inventory-customer-suggestions"
+                        className="w-full rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs focus:outline-none focus:border-cyan-500"
+                        placeholder="Hoặc gõ tìm / nhập tên Khách hàng..."
+                        value={txForm.partner_name}
+                        onChange={(e) => setTxForm((prev) => ({ ...prev, partner_name: e.target.value }))}
+                      />
+                      <datalist id="inventory-customer-suggestions">
+                        {customerList.map((c, i) => (
+                          <option key={`dl-c-${i}`} value={c.name}>
+                            {c.name} {c.phone ? `(${c.phone})` : ""}
+                          </option>
+                        ))}
+                      </datalist>
+                    </div>
+                  </div>
+                ) : txForm.transaction_type === "purchase_receipt" ? (
+                  <div className="space-y-1 bg-amber-50/50 p-2 rounded-xl border border-amber-200/80">
+                    <div className="flex items-center justify-between text-[11px] font-semibold text-amber-800">
+                      <span>Nhà cung cấp:</span>
+                      {txForm.partner_name && (
+                        <button
+                          type="button"
+                          onClick={() => setTxForm((prev) => ({ ...prev, partner_name: "" }))}
+                          className="text-red-500 hover:underline text-[10px]"
+                        >
+                          Xóa chọn
+                        </button>
+                      )}
+                    </div>
+
+                    <select
+                      className="w-full rounded-lg border border-amber-300 bg-white px-2.5 py-1.5 text-xs font-semibold text-slate-800 focus:outline-none focus:border-amber-500 shadow-xs"
+                      value={txForm.partner_name}
+                      onChange={(e) => setTxForm((prev) => ({ ...prev, partner_name: e.target.value }))}
+                    >
+                      <option value="">-- Chọn từ Danh sách Nhà cung cấp --</option>
+                      {supplierList.map((s, i) => (
+                        <option key={`supp-${i}`} value={s.name}>
+                          🏪 {s.name} {s.phone ? `(${s.phone})` : ""}
+                        </option>
+                      ))}
+                    </select>
+
+                    <div className="relative pt-0.5">
+                      <input
+                        list="inventory-supplier-suggestions"
+                        className="w-full rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs focus:outline-none focus:border-amber-500"
+                        placeholder="Hoặc gõ tìm / nhập tên Nhà cung cấp..."
+                        value={txForm.partner_name}
+                        onChange={(e) => setTxForm((prev) => ({ ...prev, partner_name: e.target.value }))}
+                      />
+                      <datalist id="inventory-supplier-suggestions">
+                        {supplierList.map((s, i) => (
+                          <option key={`dl-s-${i}`} value={s.name}>
+                            {s.name} {s.phone ? `(${s.phone})` : ""}
+                          </option>
+                        ))}
+                      </datalist>
+                    </div>
+                  </div>
+                ) : txForm.transaction_type === "internal_issue" || txForm.transaction_type === "task_issue" ? (
+                  <input
+                    className="w-full rounded-lg border border-slate-200 px-2.5 py-1.5 text-xs"
+                    placeholder="Đối tác / Bộ phận / Công trình (Không bắt buộc)"
+                    value={txForm.partner_name}
+                    onChange={(e) => setTxForm((prev) => ({ ...prev, partner_name: e.target.value }))}
+                  />
+                ) : null}
                 <input
-                  className="w-full rounded-lg border border-slate-200 px-3 py-2"
-                  placeholder="Đối tác"
-                  value={txForm.partner_name}
-                  onChange={(e) => setTxForm((prev) => ({ ...prev, partner_name: e.target.value }))}
-                />
-                <input
-                  className="w-full rounded-lg border border-slate-200 px-3 py-2"
+                  className="w-full rounded-lg border border-slate-200 px-2.5 py-1.5 text-xs"
                   placeholder="Task ID"
                   value={txForm.task_id}
                   onChange={(e) => setTxForm((prev) => ({ ...prev, task_id: e.target.value }))}
                 />
                 <input
-                  className="w-full rounded-lg border border-slate-200 px-3 py-2"
+                  className="w-full rounded-lg border border-slate-200 px-2.5 py-1.5 text-xs"
                   placeholder="Công trình / Workspace ID"
                   value={txForm.project_id}
                   onChange={(e) => setTxForm((prev) => ({ ...prev, project_id: e.target.value }))}
                 />
-                <div className="grid grid-cols-[120px_1fr] gap-2">
+                <div className="grid grid-cols-[90px_1fr] gap-1.5">
                   <select
-                    className="rounded-lg border border-slate-200 px-3 py-2"
+                    className="rounded-lg border border-slate-200 px-2 py-1.5 text-xs"
                     value={txForm.reference_type}
                     onChange={(e) => setTxForm((prev) => ({ ...prev, reference_type: e.target.value }))}
                   >
@@ -1296,28 +1544,28 @@ const MaterialsDashboard: IPage["Component"] = () => {
                     <option value="manual">Manual</option>
                   </select>
                   <input
-                    className="rounded-lg border border-slate-200 px-3 py-2"
+                    className="rounded-lg border border-slate-200 px-2.5 py-1.5 text-xs"
                     placeholder="Reference ID"
                     value={txForm.reference_id}
                     onChange={(e) => setTxForm((prev) => ({ ...prev, reference_id: e.target.value }))}
                   />
                 </div>
                 <textarea
-                  className="min-h-[84px] w-full rounded-lg border border-slate-200 px-3 py-2"
+                  className="min-h-[72px] w-full rounded-lg border border-slate-200 px-2.5 py-1.5 text-xs"
                   placeholder="Ghi chú"
                   value={txForm.note}
                   onChange={(e) => setTxForm((prev) => ({ ...prev, note: e.target.value }))}
                 />
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-2 gap-2 pt-1">
                   <button
-                    className="rounded-lg border border-slate-200 px-3 py-2 text-sm font-semibold text-slate-600"
+                    className="rounded-lg border border-slate-200 px-2.5 py-1.5 text-xs font-semibold text-slate-600 hover:bg-slate-50 cursor-pointer"
                     onClick={() => transactionMutation.mutate("draft")}
                     disabled={transactionMutation.isPending}
                   >
                     Lưu nháp
                   </button>
                   <button
-                    className="rounded-lg bg-teal-500 px-3 py-2 text-sm font-semibold text-white"
+                    className="rounded-lg bg-teal-500 px-2.5 py-1.5 text-xs font-semibold text-white hover:bg-teal-600 cursor-pointer"
                     onClick={() => transactionMutation.mutate("confirm")}
                     disabled={transactionMutation.isPending}
                   >
@@ -1328,7 +1576,27 @@ const MaterialsDashboard: IPage["Component"] = () => {
             </div>
 
             <div className="flex flex-col gap-4">
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap items-center gap-2">
+                <div className="flex items-center gap-1.5 border-r border-slate-200 pr-3">
+                  <span className="text-xs text-slate-500 font-medium">Tháng:</span>
+                  <input
+                    type="month"
+                    value={month}
+                    onChange={(e) => setMonth(e.target.value)}
+                    className="rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs text-slate-700 focus:outline-none"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setMonth("")}
+                    className={`rounded-lg border px-2.5 py-1.5 text-xs font-medium transition-colors ${
+                      !month
+                        ? "border-teal-600 bg-teal-600 text-white"
+                        : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
+                    }`}
+                  >
+                    Tất cả tháng
+                  </button>
+                </div>
                 <select
                   className="rounded-lg border border-slate-200 px-3 py-2 text-sm"
                   value={txTypeFilter}
@@ -1354,91 +1622,154 @@ const MaterialsDashboard: IPage["Component"] = () => {
               </div>
 
               <div className="overflow-x-auto rounded-2xl border border-slate-100 bg-white shadow-sm">
-                <table className="min-w-[1280px] w-full text-sm">
+                <table className="min-w-[960px] w-full text-sm">
                   <thead>
                     <tr className="border-b bg-slate-50 text-left text-xs text-slate-500">
-                      <th className="px-3 py-3">Ngày</th>
-                      <th className="px-3 py-3">Mã giao dịch</th>
-                      <th className="px-3 py-3">Loại</th>
-                      <th className="px-3 py-3">Vật tư</th>
-                      <th className="px-3 py-3">Kho</th>
-                      <th className="px-3 py-3">Nhập</th>
-                      <th className="px-3 py-3">Xuất</th>
-                      <th className="px-3 py-3">Đơn giá</th>
-                      <th className="px-3 py-3">Thành tiền</th>
-                      <th className="px-3 py-3">Đối tượng / task</th>
-                      <th className="px-3 py-3">Tham chiếu</th>
-                      <th className="px-3 py-3">Thủ kho</th>
-                      <th className="px-3 py-3">Trạng thái</th>
-                      <th className="px-3 py-3 text-center">Thao tác</th>
+                      <th className="px-3 py-3 whitespace-nowrap">Mã & Ngày GD</th>
+                      <th className="px-3 py-3 whitespace-nowrap">Vật tư & Loại</th>
+                      <th className="px-3 py-3 whitespace-nowrap">Kho</th>
+                      <th className="px-3 py-3 whitespace-nowrap">Nhập</th>
+                      <th className="px-3 py-3 whitespace-nowrap">Xuất</th>
+                      <th className="px-3 py-3 whitespace-nowrap">Đơn giá</th>
+                      <th className="px-3 py-3 whitespace-nowrap">Thành tiền</th>
+                      <th className="px-3 py-3 whitespace-nowrap">Thông tin thêm</th>
+                      <th className="px-3 py-3 whitespace-nowrap">Trạng thái</th>
+                      <th className="px-3 py-3 text-center whitespace-nowrap">Thao tác</th>
                     </tr>
                   </thead>
                   <tbody>
                     {transactions.map((tx) => {
                       const storekeeper = users.find((u: any) => String(u.id) === String(tx.storekeeper_id));
-                      const storekeeperName = storekeeper ? (storekeeper.fullName || storekeeper.username) : (tx.storekeeper_id || "-");
+                      const storekeeperName = storekeeper ? (storekeeper.fullName || storekeeper.username) : (tx.storekeeper_id || "");
+
+                      const partnerInfo = tx.partner_name || tx.task_id || tx.project_id || "";
+                      const refInfo = tx.reference_code || tx.reference_id || "";
+
+                      const actionMenuItems: MenuProps["items"] = [
+                        {
+                          key: "detail",
+                          label: "👁️ Xem chi tiết",
+                          onClick: async () => setDetailTx((await InventoryService.getTransaction(tx.id)).data),
+                        },
+                        ...(tx.status === "draft"
+                          ? [
+                              {
+                                key: "confirm",
+                                label: "✅ Xác nhận",
+                                onClick: async () => {
+                                  await InventoryService.confirmTransaction(tx.id);
+                                  notification.success({ message: "Đã xác nhận giao dịch" });
+                                  await refreshAll();
+                                },
+                              },
+                            ]
+                          : []),
+                        ...(tx.status !== "cancelled"
+                          ? [
+                              {
+                                key: "cancel",
+                                label: "🚫 Hủy giao dịch",
+                                onClick: async () => {
+                                  await InventoryService.cancelTransaction(tx.id);
+                                  notification.warning({ message: "Đã hủy giao dịch" });
+                                  await refreshAll();
+                                },
+                              },
+                            ]
+                          : []),
+                        {
+                          type: "divider" as const,
+                        },
+                        {
+                          key: "delete",
+                          danger: true,
+                          label: "🗑️ Xóa hoàn toàn",
+                          onClick: () => {
+                            Modal.confirm({
+                              title: "Xóa hoàn toàn giao dịch",
+                              content: "Bạn có chắc chắn muốn xóa vĩnh viễn giao dịch kho này?",
+                              okText: "Xóa",
+                              cancelText: "Quay lại",
+                              okButtonProps: { danger: true },
+                              onOk: async () => {
+                                await InventoryService.deleteTransaction(tx.id);
+                                notification.success({ message: "Đã xóa giao dịch thành công" });
+                                await refreshAll();
+                              },
+                            });
+                          },
+                        },
+                      ];
+
                       return (
-                      <tr key={tx.id} className="border-b last:border-0">
-                        <td className="px-3 py-3 text-slate-600">{dayjs(tx.transaction_date).format("DD/MM/YYYY")}</td>
-                        <td className="px-3 py-3 font-medium text-slate-700">{tx.transaction_code}</td>
-                        <td className="px-3 py-3 text-slate-600">{TX_TYPE_LABEL[tx.transaction_type] || tx.transaction_type}</td>
-                        <td className="px-3 py-3 text-slate-600">{tx.item_code} - {tx.item_name}</td>
-                        <td className="px-3 py-3 text-slate-600">
-                          {tx.warehouse_name || "-"}
-                          {tx.destination_warehouse_name ? ` -> ${tx.destination_warehouse_name}` : ""}
+                      <tr key={tx.id} className="border-b last:border-0 hover:bg-slate-50/50">
+                        {/* Cột 1: Mã & Ngày giao dịch */}
+                        <td className="px-3 py-3">
+                          <div className="font-semibold text-slate-800">{tx.transaction_code}</div>
+                          <div className="text-xs text-slate-500 mt-0.5">{dayjs(tx.transaction_date).format("DD/MM/YYYY")}</div>
                         </td>
-                        <td className="px-3 py-3 text-emerald-700">{tx.direction === "in" ? money(tx.quantity) : "-"}</td>
-                        <td className="px-3 py-3 text-rose-700">
+
+                        {/* Cột 2: Vật tư & Loại */}
+                        <td className="px-3 py-3">
+                          <div className="font-medium text-slate-800">{tx.item_code} - {tx.item_name}</div>
+                          <div className="mt-0.5 inline-block rounded bg-teal-50 px-1.5 py-0.5 text-[11px] font-semibold text-teal-700 border border-teal-200">
+                            {TX_TYPE_LABEL[tx.transaction_type] || tx.transaction_type}
+                          </div>
+                        </td>
+
+                        {/* Cột 3: Kho */}
+                        <td className="px-3 py-3 text-slate-600">
+                          <div>{tx.warehouse_name || "-"}</div>
+                          {tx.destination_warehouse_name && (
+                            <div className="text-xs text-slate-500">➜ {tx.destination_warehouse_name}</div>
+                          )}
+                        </td>
+
+                        {/* Cột 4: Nhập */}
+                        <td className="px-3 py-3 font-semibold text-emerald-700">
+                          {tx.direction === "in" ? money(tx.quantity) : "-"}
+                        </td>
+
+                        {/* Cột 5: Xuất */}
+                        <td className="px-3 py-3 font-semibold text-rose-700">
                           {tx.direction === "out" || tx.direction === "transfer" ? money(tx.quantity) : "-"}
                         </td>
+
+                        {/* Cột 6: Đơn giá */}
                         <td className="px-3 py-3 text-slate-600">{money(tx.unit_cost)} đ</td>
-                        <td className="px-3 py-3 text-slate-700">{money(tx.total_cost)} đ</td>
-                        <td className="px-3 py-3 text-slate-600">{tx.partner_name || tx.task_id || tx.project_id || "-"}</td>
-                        <td className="px-3 py-3 text-slate-600">{tx.reference_code || tx.reference_id || "-"}</td>
-                        <td className="px-3 py-3 text-slate-600">{storekeeperName}</td>
+
+                        {/* Cột 7: Thành tiền */}
+                        <td className="px-3 py-3 font-medium text-slate-800">{money(tx.total_cost)} đ</td>
+
+                        {/* Cột 8: Đối tượng + Tham chiếu + Thủ kho */}
+                        <td className="px-3 py-3 text-xs text-slate-600">
+                          {partnerInfo && <div><span className="text-slate-400">ĐT:</span> {partnerInfo}</div>}
+                          {refInfo && <div><span className="text-slate-400">TC:</span> {refInfo}</div>}
+                          {storekeeperName && <div><span className="text-slate-400">Kho:</span> {storekeeperName}</div>}
+                          {!partnerInfo && !refInfo && !storekeeperName && <span>-</span>}
+                        </td>
+
+                        {/* Cột 9: Trạng thái */}
                         <td className="px-3 py-3">
-                          <span className={`rounded-md border px-2 py-1 text-xs ${STATUS_BADGE[tx.status] || STATUS_BADGE.draft}`}>
+                          <span className={`rounded-md border px-2 py-1 text-xs whitespace-nowrap ${STATUS_BADGE[tx.status] || STATUS_BADGE.draft}`}>
                             {STATUS_LABEL[tx.status] || tx.status}
                           </span>
                         </td>
-                        <td className="px-3 py-3">
-                          <div className="flex items-center justify-center gap-2">
-                            <button
-                              className="rounded-md border border-slate-200 px-2 py-1 text-xs text-slate-600"
-                              onClick={async () => setDetailTx((await InventoryService.getTransaction(tx.id)).data)}
-                            >
-                              Chi tiết
+
+                        {/* Cột 10: Thao tác Dropdown */}
+                        <td className="px-3 py-3 text-center">
+                          <Dropdown menu={{ items: actionMenuItems }} trigger={["click"]}>
+                            <button className="rounded-lg border border-slate-200 bg-white px-2.5 py-1 text-xs font-medium text-slate-700 hover:bg-slate-50 cursor-pointer shadow-sm">
+                              Thao tác ▾
                             </button>
-                            {tx.status === "draft" && (
-                              <button
-                                className="rounded-md border border-emerald-200 px-2 py-1 text-xs text-emerald-700"
-                                onClick={async () => {
-                                  await InventoryService.confirmTransaction(tx.id);
-                                  await refreshAll();
-                                }}
-                              >
-                                Xác nhận
-                              </button>
-                            )}
-                            {tx.status !== "cancelled" && (
-                              <button
-                                className="rounded-md border border-rose-200 px-2 py-1 text-xs text-rose-700"
-                                onClick={async () => {
-                                  await InventoryService.cancelTransaction(tx.id);
-                                  await refreshAll();
-                                }}
-                              >
-                                Hủy
-                              </button>
-                            )}
-                          </div>
+                          </Dropdown>
                         </td>
                       </tr>
                       );
                     })}
                     {transactions.length === 0 && (
                       <tr>
-                        <td colSpan={13} className="px-3 py-8 text-center text-sm text-slate-500">
+                        <td colSpan={10} className="px-3 py-8 text-center text-sm text-slate-500">
                           Chưa có giao dịch kho.
                         </td>
                       </tr>
@@ -1660,9 +1991,18 @@ const MaterialsDashboard: IPage["Component"] = () => {
           <input className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm" placeholder="Tên vật tư"
             value={itemForm.name} onChange={(e) => setItemForm((p) => ({ ...p, name: e.target.value }))} />
 
-          {/* Nhà cung cấp */}
-          <input className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm" placeholder="Nhà cung cấp"
-            value={itemForm.default_supplier_name} onChange={(e) => setItemForm((p) => ({ ...p, default_supplier_name: e.target.value }))} />
+          {/* Nhà cung cấp - HIGHLIGHT VÀNG SÁNG GÂY CHÚ Ý */}
+          <div className="flex flex-col gap-1 rounded-xl bg-yellow-100/90 border-2 border-yellow-400 p-3 shadow-sm">
+            <label className="text-xs font-extrabold text-yellow-950 uppercase tracking-wide flex items-center gap-1.5">
+              💡 GỢI Ý NHÀ CUNG CẤP (HIGHLIGHT VÀNG SÁNG):
+            </label>
+            <input
+              className="w-full rounded-lg border-2 border-yellow-300 bg-white focus:bg-white px-3 py-2 text-sm font-extrabold text-yellow-950 focus:border-yellow-500 focus:outline-none focus:ring-2 focus:ring-yellow-400/50 shadow-inner"
+              placeholder="Nhập tên nhà cung cấp gợi ý (VD: Công ty Alu Triều Chen, Mica Chochen...)"
+              value={itemForm.default_supplier_name}
+              onChange={(e) => setItemForm((p) => ({ ...p, default_supplier_name: e.target.value }))}
+            />
+          </div>
 
           {/* Đơn giá trung bình + Đơn vị tính */}
           <div className="grid grid-cols-2 gap-3">

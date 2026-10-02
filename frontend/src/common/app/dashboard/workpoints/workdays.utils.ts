@@ -40,17 +40,22 @@ export const buildMonthlyStatuses = ({
   const totalHour: WorkHourSummary = { morning: 0, noon: 0, evening: 0 };
 
   items?.forEach((item) => {
-    const dateObj = new Date(item.createdAt);
-    const localTime = new Date(dateObj.getTime() + 7 * 60 * 60 * 1000);
+    if (!item.createdAt || !item.checklist) return;
 
-    if (!item.checklist) return;
-    if (localTime.getFullYear() !== year || localTime.getMonth() !== month) return;
+    const dateParts = item.createdAt.slice(0, 10).split("-");
+    if (dateParts.length !== 3) return;
+    const itemYear = parseInt(dateParts[0], 10);
+    const itemMonth = parseInt(dateParts[1], 10) - 1;
+    const itemDay = parseInt(dateParts[2], 10);
 
-    const dayIndex = localTime.getDate() - 1;
+    if (itemYear !== year || itemMonth !== month) return;
+
+    const dayIndex = itemDay - 1;
     if (dayIndex < 0 || dayIndex >= daysInMonth || !statuses[dayIndex]) return;
 
     // Chủ nhật (0) mà không cấu hình làm CN → toàn bộ buổi là tăng ca
-    const isSunday = localTime.getDay() === 0;
+    const itemDate = new Date(itemYear, itemMonth, itemDay);
+    const isSunday = itemDate.getDay() === 0;
     const isDayOvertime = isSunday && !workInSunday;
 
     (Object.keys(item.checklist) as (keyof Checklist)[]).forEach((period) => {

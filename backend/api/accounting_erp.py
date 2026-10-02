@@ -858,21 +858,14 @@ def _generate_ap_confirm_entry(bill: APBill):
 
 
 def _record_ar_payment(invoice: ARInvoice, payment_date: date, amount: float, payment_method: str, note: str | None, payment_type: str = "phat_sinh"):
-    READY_STATUSES = {"confirmed", "partially_paid", "overdue"}
     if invoice.status == "cancelled":
         abort(400, description="Khong the ghi nhan thanh toan cho cong no da huy")
-    if payment_type == "phat_sinh":
-        if invoice.status not in READY_STATUSES:
-            abort(400, description="Cong no chua duoc xac nhan, chi co the them tam ung o trang thai nay")
     if amount <= 0:
         abort(400, description="So tien phai lon hon 0")
 
     cash_row = None
     entry = None
     if payment_type == "tam_ung":
-        snapshot = _build_ar_invoice_snapshot(invoice)
-        if amount - snapshot["balance_amount"] > 0.0001:
-            abort(400, description="So tien tam ung vuot qua so con phai thu")
         cash_row = _create_daily_cash_row(
             lead_id=invoice.lead_id,
             direction="income",
@@ -938,21 +931,14 @@ def _record_ar_payment(invoice: ARInvoice, payment_date: date, amount: float, pa
     return payment
 
 def _record_ap_payment(bill: APBill, payment_date: date, amount: float, payment_method: str, note: str | None, payment_type: str = "phat_sinh"):
-    READY_STATUSES = {"confirmed", "partially_paid", "overdue"}
     if bill.status == "cancelled":
         abort(400, description="Khong the ghi nhan thanh toan cho cong no da huy")
-    if payment_type == "phat_sinh":
-        if bill.status not in READY_STATUSES:
-            abort(400, description="Cong no chua duoc xac nhan, chi co the them tam ung o trang thai nay")
     if amount <= 0:
         abort(400, description="amount must be > 0")
 
     cash_row = None
     entry = None
     if payment_type == "tam_ung":
-        snapshot = _build_ap_bill_snapshot(bill)
-        if amount - snapshot["balance_amount"] > 0.0001:
-            abort(400, description="Payment exceeds outstanding balance")
         cash_row = _create_daily_cash_row(
             lead_id=bill.lead_id,
             direction="expense",
@@ -1207,7 +1193,7 @@ def list_ar_invoices():
         query = query.filter(or_(ARInvoice.due_date.is_(None), ARInvoice.due_date >= date.today()))
     if search:
         like = f"%{search}%"
-        query = query.filter(or_(ARInvoice.code.ilike(like), ARInvoice.customer_name.ilike(like), ARInvoice.description.ilike(like)))
+        query = query.filter(or_(ARInvoice.code.ilike(like), ARInvoice.customer_name.ilike(like), ARInvoice.description.ilike(like), ARInvoice.note.ilike(like)))
     pagination = query.order_by(ARInvoice.invoice_date.desc(), ARInvoice.createdAt.desc()).paginate(
         page=page, per_page=limit, error_out=False
     )
@@ -1257,6 +1243,7 @@ def create_ar_invoice():
         currency=_clean_text(data.get("currency")) or "VND",
         status="draft",
         description=_clean_text(data.get("description")),
+        note=_clean_text(data.get("note")),
         created_by=_current_user_id(),
         updated_by=_current_user_id(),
     )
@@ -1302,6 +1289,8 @@ def update_ar_invoice(invoice_id):
         item.due_date = _parse_date(data.get("due_date"))
     if data.get("description") is not None:
         item.description = _clean_text(data.get("description"))
+    if data.get("note") is not None:
+        item.note = _clean_text(data.get("note"))
     if data.get("document_id") is not None:
         item.document_id = _clean_text(data.get("document_id"))
     if data.get("currency") is not None:
@@ -1462,12 +1451,7 @@ def update_ar_invoice_payment(invoice_id, payment_id):
         new_amt = _round_money(data["amount"])
         if new_amt > 0:
             next_amount = new_amt
-    if payment.payment_type == "tam_ung":
-        snapshot = _build_ar_invoice_snapshot(item)
-        max_amount = _round_money(snapshot["balance_amount"] + (payment.amount or 0))
-        if next_amount - max_amount > 0.0001:
-            abort(400, description="So tien tam ung vuot qua so con phai thu")
-    elif payment.daily_cash_id or payment.journal_entry_id:
+    if payment.payment_type != "tam_ung" and (payment.daily_cash_id or payment.journal_entry_id):
         _soft_delete_ar_payment_links(payment)
         payment.daily_cash_id = None
         payment.journal_entry_id = None
@@ -1551,11 +1535,11 @@ def list_ap_bills():
         query = query.filter(or_(APBill.due_date.is_(None), APBill.due_date >= date.today()))
     if search:
         like = f"%{search}%"
-        query = query.filter(or_(APBill.code.ilike(like), APBill.supplier_name.ilike(like), APBill.description.ilike(like)))
+        query = query.filter(or_(APBill.code.ilike(like), APBill.supplier_name.ilike(like), APBill.description.ilike(like), APBill.note.ilike(like)))
     pagination = query.order_by(APBill.bill_date.desc(), APBill.createdAt.desc()).paginate(page=page, per_page=limit, error_out=False)
     rows = query.all()
     summary = {
-        "total_payable": _round_money(sum(item.total_amount or 0 for item in rows)),
+        "total_payable": _round_money(sum(_build_ap_bill_snapshot(item)["effective_total_amount"] for item in rows)),
         "paid_amount": _round_money(sum(item.paid_amount or 0 for item in rows)),
         "outstanding_amount": _round_money(sum(item.balance_amount or 0 for item in rows)),
         "overdue_amount": _round_money(
@@ -1601,6 +1585,7 @@ def create_ap_bill():
         currency=_clean_text(data.get("currency")) or "VND",
         status="draft",
         description=_clean_text(data.get("description")),
+        note=_clean_text(data.get("note")),
         created_by=_current_user_id(),
         updated_by=_current_user_id(),
     )
@@ -1642,6 +1627,10 @@ def update_ap_bill(bill_id):
         item.bill_date = parsed
     if data.get("due_date") is not None:
         item.due_date = _parse_date(data.get("due_date"))
+    if data.get("description") is not None:
+        item.description = _clean_text(data.get("description"))
+    if data.get("note") is not None:
+        item.note = _clean_text(data.get("note"))
     if data.get("document_id") is not None:
         item.document_id = _clean_text(data.get("document_id"))
     if data.get("tax_code_id") is not None:
@@ -1777,6 +1766,10 @@ def update_ap_bill_payment(bill_id, payment_id):
         if new_amt > 0:
             payment.amount = new_amt
             _update_bill_balances(item)
+    if payment.payment_type != "tam_ung" and (payment.daily_cash_id or payment.journal_entry_id):
+        _soft_delete_ap_payment_links(payment)
+        payment.daily_cash_id = None
+        payment.journal_entry_id = None
     _sync_ap_payment_links(payment, item)
     payment.updated_by = _current_user_id()
     db.session.commit()

@@ -1,9 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { notification } from "antd";
 import { useApiHost } from "./useApiHost";
 import { useUser } from "./useUser";
-// import { useLocation } from "react-router-dom";
-import { useParams } from 'react-router-dom';
 
 interface DefaultState {
   morning_in_hour: number;
@@ -31,20 +28,22 @@ interface WorkpointSettingContextType {
 
 const WorkpointSettingContext = createContext<WorkpointSettingContextType | undefined>(undefined);
 
-export const WorkpointSettingProvider = ({ children }: {children: React.ReactNode}) => {
+export const WorkpointSettingProvider = ({ children }: { children: React.ReactNode }) => {
   const [workpointSetting, setWorkpointSetting] = useState<DefaultState | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-    const {userLeadId, userId, setUserLeadId } = useUser();
-    // const { workpointEl, fetchWorkpointEl } = useWorkpointInfor();
-
-    console.log('LeadId', userLeadId);
-
-    
+  const { userLeadId } = useUser();
+  const apiHost = useApiHost();
 
   const fetchWorkpointSetting = () => {
-    const accessToken = localStorage.getItem("accessToken");
-    if (!accessToken || !userLeadId) {
+    const accessToken =
+      localStorage.getItem("accessToken") ||
+      localStorage.getItem("token") ||
+      sessionStorage.getItem("accessToken") ||
+      sessionStorage.getItem("token") ||
+      "";
+
+    if (!userLeadId) {
       setWorkpointSetting(null);
       setLoading(false);
       setError(null);
@@ -52,25 +51,26 @@ export const WorkpointSettingProvider = ({ children }: {children: React.ReactNod
     }
 
     setLoading(true);
-    
-    fetch(`${useApiHost()}/workpoint/setting/${userLeadId}/`, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    })
-      .then(res => {
+
+    const headers: Record<string, string> = {};
+    if (accessToken) {
+      headers["Authorization"] = `Bearer ${accessToken}`;
+    }
+
+    fetch(`${apiHost}/workpoint/setting/${userLeadId}/`, { headers })
+      .then((res) => {
         if (!res.ok) {
-          notification.error({ message: 'Không lấy được dữ liệu setting' });
-          throw new Error('Fetch error');
+          throw new Error("Fetch error");
         }
         return res.json();
       })
-      .then(data => {
+      .then((data) => {
         setWorkpointSetting(data);
-        console.log('Setting Data', data);
+        console.log("Setting Data", data);
         setError(null);
       })
-      .catch(err => {
+      .catch((err) => {
+        console.warn("Workpoint setting notice:", err);
         setError(err.message);
       })
       .finally(() => {
@@ -78,15 +78,8 @@ export const WorkpointSettingProvider = ({ children }: {children: React.ReactNod
       });
   };
 
-  
-
   useEffect(() => {
-    const route = window.location.href.split('/')[1];
-
-    
-    console.log('Setting', location, userLeadId);
-
-    if (userLeadId && localStorage.getItem("accessToken")) {
+    if (userLeadId) {
       fetchWorkpointSetting();
     } else {
       setWorkpointSetting(null);
@@ -95,9 +88,15 @@ export const WorkpointSettingProvider = ({ children }: {children: React.ReactNod
   }, [userLeadId]);
 
   return (
-    <WorkpointSettingContext.Provider value={{ 
-            workpointSetting, setWorkpointSetting, 
-            reloadWorkpointSetting: fetchWorkpointSetting, loading, error }}>
+    <WorkpointSettingContext.Provider
+      value={{
+        workpointSetting,
+        setWorkpointSetting,
+        reloadWorkpointSetting: fetchWorkpointSetting,
+        loading,
+        error,
+      }}
+    >
       {children}
     </WorkpointSettingContext.Provider>
   );

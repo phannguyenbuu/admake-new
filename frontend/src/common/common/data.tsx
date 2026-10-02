@@ -87,39 +87,62 @@ export const columnsCustomer = [
     dataIndex: "name",
     key: "name",
     width: 200,
-    render: (text: string, record: WorkSpace) => (
-      <div>
-        <div>{text}</div>
-        {/* <span className="!text-cyan-700" style={{fontSize:12,fontStyle:'italic'}}>{record?.fullName}</span> */}
-      </div>
-    ),
+    render: (text: string, record: any) => {
+      const comp = record?.companyName || record?.company_name;
+      return (
+        <div>
+          <div className="font-light text-slate-800 text-sm" style={{ fontWeight: 300 }}>{text}</div>
+          {comp && (
+            <div className="text-xs text-[#0891b2] font-normal truncate max-w-[220px]" style={{ fontWeight: 300 }}>
+              🏢 {comp}
+            </div>
+          )}
+        </div>
+      );
+    },
+  },
+  {
+    title: "Mã số thuế (MST)",
+    dataIndex: "tax_code",
+    key: "tax_code",
+    width: 150,
+    render: (_: any, record: any) => {
+      const mst = record?.taxCode || record?.tax_code;
+      return mst ? (
+        <span className="font-mono font-medium text-slate-700 bg-slate-100 px-2 py-0.5 rounded text-xs">
+          {mst}
+        </span>
+      ) : (
+        <span className="text-slate-400 text-xs italic">-</span>
+      );
+    },
   },
   {
     title: "Số điện thoại",
     dataIndex: "phone",
     key: "phone",
-    width: 150,
+    width: 130,
     render: (phone: string) => (
-      <span className="!line-clamp-1 !text-base">{phone}</span>
+      <span className="!line-clamp-1 !text-sm font-medium text-slate-700">{phone}</span>
     ),
   },
   {
     title: "Địa chỉ",
     dataIndex: "address",
     key: "address",
-    width: 300,
+    width: 250,
     render: (text: string) => (
-      <span className="!line-clamp-2 !w-[280px] !text-base">{text}</span>
+      <span className="!line-clamp-2 !text-xs text-slate-600">{text || "-"}</span>
     ),
   },
   {
     title: "Doanh số",
     dataIndex: "workPrice",
     key: "workPrice",
-    width: 150,
+    width: 130,
     render: (price: number | string) => (
-      <span className="!text-base">
-        {typeof price === "number" ? price.toLocaleString("vi-VN") : price}
+      <span className="!text-sm font-medium">
+        {typeof price === "number" ? price.toLocaleString("vi-VN") : price || 0}
       </span>
     ),
   }

@@ -123,6 +123,7 @@ export const InventoryService = {
   updateTransaction: (id: string, payload: Record<string, any>) => axiosClient.put(`/inventory/transactions/${id}`, payload),
   confirmTransaction: (id: string) => axiosClient.post(`/inventory/transactions/${id}/confirm`, {}),
   cancelTransaction: (id: string) => axiosClient.post(`/inventory/transactions/${id}/cancel`, {}),
+  deleteTransaction: (id: string) => axiosClient.delete(`/inventory/transactions/${id}`),
 
   getBalances: (params: Record<string, any>) => axiosClient.get("/inventory/balances", { params }),
   getStockCard: (params: Record<string, any>) => axiosClient.get("/inventory/stock-card", { params }),

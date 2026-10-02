@@ -87,6 +87,8 @@ export type PayrollAdjustmentRow = {
   note?: string | null;
   amount: number;
   entry_date: string;
+  status?: string;
+  file_url?: string | null;
   createdAt?: string;
   updatedAt?: string;
 };

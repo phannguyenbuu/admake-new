@@ -1,20 +1,18 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useMemo } from "react";
 import { 
-  Plus, 
   Trash2, 
   Calendar, 
   CreditCard, 
-  FileText, 
   Image as ImageIcon, 
   X, 
   Upload, 
   Wallet, 
   Coins, 
-  ChevronRight, 
   Check, 
-  AlertCircle 
+  Save
 } from "lucide-react";
-import { notification, Image, Modal } from "antd";
+import { notification, Image } from "antd";
+import dayjs from "dayjs";
 import type { MessageTypeProps } from "../../../../@types/chat.type";
 import { TOKEN_LABEL } from "../../../../common/config";
 import { useApiHost, useApiStatic } from "../../../../common/hooks/useApiHost";
@@ -27,9 +25,23 @@ interface AdvanceSalaryAssetProps {
   type?: string;
   readOnly?: boolean;
   messages?: MessageTypeProps[];
+  adjustments?: any[];
   targetUserId?: string;
   senderName?: string;
   reloadAll?: () => Promise<void>;
+}
+
+interface AdvanceHistoryItem {
+  id: string;
+  source: "adjustment" | "message";
+  amount: number;
+  amountStr: string;
+  dateStr: string;
+  method: string;
+  account: string;
+  note: string;
+  file_url?: string;
+  status: "PENDING" | "APPROVED" | "REJECTED";
 }
 
 function getAccessToken(): string {
@@ -54,13 +66,14 @@ const AdvanceSalaryAsset: React.FC<AdvanceSalaryAssetProps> = ({
   type = "advance-salary-cash",
   readOnly = false,
   messages = [],
+  adjustments = [],
   targetUserId,
   senderName,
   reloadAll
 }) => {
   const apiHost = useApiHost();
   const apiStatic = useApiStatic();
-  const { userId, username, fullName } = useUser();
+  const { userId, username, fullName, userLeadId } = useUser();
 
   // Form states
   const [amount, setAmount] = useState<string>("");
@@ -73,10 +86,11 @@ const AdvanceSalaryAsset: React.FC<AdvanceSalaryAssetProps> = ({
 
   // Upload/Paste image states
   const [uploading, setUploading] = useState<boolean>(false);
+  const [saving, setSaving] = useState<boolean>(false);
   const [attachedFileUrl, setAttachedFileUrl] = useState<string>("");
   const [attachedFileName, setAttachedFileName] = useState<string>("");
 
-  // Parse cash advance entry safely
+  // Parse cash advance entry safely from legacy message text
   const parseAdvanceText = (text?: string) => {
     if (!text) return { amountRaw: "", dateStr: "", account: "", method: "", note: "" };
     const parts = text.split("/");
@@ -108,7 +122,10 @@ const AdvanceSalaryAsset: React.FC<AdvanceSalaryAssetProps> = ({
       const fileUrl = data.message?.file_url || "";
       setAttachedFileUrl(fileUrl);
       setAttachedFileName(file.name);
-      notification.success({ message: "Đã tải lên minh chứng thành công!" });
+      notification.success({ 
+        message: "Đã tải lên ảnh minh chứng!", 
+        description: "Vui lòng bấm 'Lưu phiếu ứng tiền' để hoàn tất lưu thông tin." 
+      });
     } catch (error) {
       console.error(error);
       notification.error({ message: "Lỗi tải ảnh minh chứng", description: (error as Error).message });
@@ -142,39 +159,83 @@ const AdvanceSalaryAsset: React.FC<AdvanceSalaryAssetProps> = ({
     }
   };
 
+  const parseMoneyInput = (val: string): number => {
+    if (!val) return 0;
+    const clean = val.trim().toLowerCase();
+    if (clean.endsWith("k")) {
+      const numStr = clean.slice(0, -1).replace(/[^\d.,]/g, "").replace(/\./g, "").replace(/,/g, "");
+      const num = parseFloat(numStr);
+      return isNaN(num) ? 0 : Math.round(num * 1000);
+    }
+    if (clean.endsWith("tr") || clean.endsWith("m")) {
+      const numStr = clean.replace(/tr|m/g, "").replace(/[^\d.,]/g, "").replace(/\./g, "").replace(/,/g, "");
+      const num = parseFloat(numStr);
+      return isNaN(num) ? 0 : Math.round(num * 1000000);
+    }
+    const numStr = clean.replace(/[^\d]/g, "");
+    return Number(numStr) || 0;
+  };
+
   // Submit cash advance to backend
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const numAmount = Number(amount.replace(/,/g, ""));
+    const numAmount = parseMoneyInput(amount);
     if (!numAmount || numAmount <= 0) {
       notification.warning({ message: "Vui lòng nhập số tiền ứng hợp lệ!" });
       return;
     }
 
+    setSaving(true);
     const formattedAmount = numAmount.toLocaleString("vi-VN");
-    // Format text string compatible with backend parsing
-    // Format: <amount> / <date> / <account> / <bank_or_cash> [ / <customNote>]
+    const formattedNote = `${bankName}${bankAccount.trim() ? ` - TK: ${bankAccount.trim()}` : ""}${customNote.trim() ? ` - ${customNote.trim()}` : ""}`;
     const textValue = `${formattedAmount} / ${transferDate.replace("T", " ")} / ${bankAccount.trim() || "N/A"} / ${bankName}${customNote.trim() ? " / " + customNote.trim() : ""}`;
-
-    const formData = new FormData();
-    formData.append("type", type);
-    formData.append("user_id", targetUserId || userId || "");
-    formData.append("username", senderName || fullName || username || "");
-    formData.append("text", textValue);
-    if (attachedFileUrl) {
-      formData.append("file_url", attachedFileUrl);
-    }
-    formData.append("time", new Date().toISOString());
+    const entryDateStr = transferDate ? transferDate.slice(0, 10) : dayjs().format("YYYY-MM-DD");
 
     try {
-      const response = await fetch(`${apiHost}/workpoint/message`, {
+      // 1. Lưu vào bảng payroll_adjustments (nguồn chuẩn cho Bảng lương và nhân sự)
+      const adjPayload = {
+        user_id: targetUserId || userId,
+        lead_id: userLeadId,
+        type: "advance",
+        amount: numAmount,
+        entry_date: entryDateStr,
+        note: formattedNote,
+        status: "APPROVED",
+        file_url: attachedFileUrl || null
+      };
+
+      const resAdj = await fetch(`${apiHost}/workpoint/payroll-adjustments`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...buildAuthHeaders()
+        },
+        body: JSON.stringify(adjPayload)
+      });
+
+      // 2. Đồng thời lưu message để tương thích với các view cũ
+      const formData = new FormData();
+      formData.append("type", type);
+      formData.append("user_id", targetUserId || userId || "");
+      formData.append("username", senderName || fullName || username || "");
+      formData.append("text", textValue);
+      if (attachedFileUrl) {
+        formData.append("file_url", attachedFileUrl);
+      }
+      formData.append("time", transferDate ? new Date(transferDate).toISOString() : new Date().toISOString());
+
+      await fetch(`${apiHost}/workpoint/message`, {
         method: "POST",
         headers: buildAuthHeaders(),
         body: formData
       });
-      if (!response.ok) throw new Error("Gửi yêu cầu thất bại");
+
+      if (!resAdj.ok) {
+        const errJson = await resAdj.json().catch(() => ({}));
+        throw new Error(errJson.description || errJson.message || "Lưu phiếu ứng thất bại");
+      }
       
-      notification.success({ message: "Đã thêm phiếu ứng tiền thành công!" });
+      notification.success({ message: "Đã lưu phiếu ứng tiền thành công!" });
       
       // Reset form
       setAmount("");
@@ -190,18 +251,27 @@ const AdvanceSalaryAsset: React.FC<AdvanceSalaryAssetProps> = ({
     } catch (error) {
       console.error(error);
       notification.error({ message: "Lỗi lưu phiếu ứng tiền", description: (error as Error).message });
+    } finally {
+      setSaving(false);
     }
   };
 
   // Delete cash advance
-  const handleDeleteAdvance = async (messageId: string | number | undefined) => {
-    if (!messageId) return;
+  const handleDeleteAdvance = async (item: AdvanceHistoryItem) => {
     try {
-      const response = await fetch(`${apiHost}/message/${messageId}`, {
-        method: "DELETE",
-        headers: buildAuthHeaders()
-      });
-      if (!response.ok) throw new Error("Xóa thất bại");
+      if (item.source === "adjustment") {
+        const response = await fetch(`${apiHost}/workpoint/payroll-adjustments/${item.id}`, {
+          method: "DELETE",
+          headers: buildAuthHeaders()
+        });
+        if (!response.ok) throw new Error("Xóa phiếu thất bại");
+      } else {
+        const response = await fetch(`${apiHost}/message/${item.id}`, {
+          method: "DELETE",
+          headers: buildAuthHeaders()
+        });
+        if (!response.ok) throw new Error("Xóa thất bại");
+      }
       notification.success({ message: "Đã xóa phiếu ứng tiền!" });
       if (reloadAll) {
         await reloadAll();
@@ -212,8 +282,41 @@ const AdvanceSalaryAsset: React.FC<AdvanceSalaryAssetProps> = ({
     }
   };
 
+  // Approve pending advance
+  const handleApproveAdvance = async (adjustmentId: string) => {
+    try {
+      const res = await fetch(`${apiHost}/workpoint/payroll-adjustments/${adjustmentId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          ...buildAuthHeaders()
+        },
+        body: JSON.stringify({ status: "APPROVED" })
+      });
+      if (!res.ok) throw new Error("Duyệt thất bại");
+      notification.success({ message: "Đã duyệt phiếu ứng tiền thành công!" });
+      if (reloadAll) {
+        await reloadAll();
+      }
+    } catch (error) {
+      notification.error({ message: "Lỗi duyệt phiếu", description: (error as Error).message });
+    }
+  };
+
   // Format currency helper
   const handleAmountChange = (val: string) => {
+    if (!val) {
+      setAmount("");
+      return;
+    }
+    const lower = val.toLowerCase();
+    if (lower.endsWith("k") || lower.endsWith("tr") || lower.endsWith("m")) {
+      const parsed = parseMoneyInput(val);
+      if (parsed > 0) {
+        setAmount(parsed.toLocaleString("vi-VN"));
+        return;
+      }
+    }
     const rawVal = val.replace(/[^\d]/g, "");
     if (rawVal === "") {
       setAmount("");
@@ -222,6 +325,57 @@ const AdvanceSalaryAsset: React.FC<AdvanceSalaryAssetProps> = ({
     const formatted = Number(rawVal).toLocaleString("vi-VN");
     setAmount(formatted);
   };
+
+  // Unified history items (combine adjustments + legacy messages)
+  const historyItems: AdvanceHistoryItem[] = useMemo(() => {
+    const items: AdvanceHistoryItem[] = [];
+    const adjIds = new Set<string>();
+
+    // 1. Add adjustments
+    for (const adj of adjustments || []) {
+      const amt = Number(adj.amount || 0);
+      adjIds.add(adj.id);
+      items.push({
+        id: adj.id,
+        source: "adjustment",
+        amount: amt,
+        amountStr: amt.toLocaleString("vi-VN"),
+        dateStr: adj.entry_date ? dayjs(adj.entry_date).format("YYYY-MM-DD") : "",
+        method: adj.note?.includes("Tiền mặt") ? "Tiền mặt" : "Chuyển khoản",
+        account: "",
+        note: adj.note || "Tạm ứng lương",
+        file_url: adj.file_url,
+        status: adj.status || "APPROVED"
+      });
+    }
+
+    // 2. Add legacy messages that are not duplicated
+    for (const msg of messages || []) {
+      const { amountRaw, dateStr, account, method, note } = parseAdvanceText(msg.text);
+      const amt = Number(amountRaw.replace(/[^\d]/g, "")) || 0;
+      // Skip if exactly matches an adjustment already listed
+      items.push({
+        id: msg.message_id || "",
+        source: "message",
+        amount: amt,
+        amountStr: amountRaw,
+        dateStr: dateStr || (msg.createdAt ? dayjs(msg.createdAt).format("YYYY-MM-DD") : ""),
+        method: method || "Tiền mặt",
+        account: account,
+        note: note,
+        file_url: msg.file_url,
+        status: "APPROVED"
+      });
+    }
+
+    return items.sort((a, b) => (b.dateStr || "").localeCompare(a.dateStr || ""));
+  }, [adjustments, messages]);
+
+  const totalAdvance = useMemo(() => {
+    return historyItems
+      .filter((i) => i.status !== "REJECTED")
+      .reduce((sum, item) => sum + item.amount, 0);
+  }, [historyItems]);
 
   return (
     <div 
@@ -234,9 +388,14 @@ const AdvanceSalaryAsset: React.FC<AdvanceSalaryAssetProps> = ({
           onSubmit={handleSubmit}
           className="bg-gradient-to-br from-slate-50 to-teal-50/30 border border-slate-200/80 rounded-2xl p-5 shadow-sm transition-all duration-300 hover:shadow-md"
         >
-          <div className="text-sm font-semibold text-teal-800 mb-4 flex items-center gap-2">
-            <Coins className="w-4 h-4 text-teal-600 animate-pulse" />
-            Tạo phiếu ứng tiền nhân viên
+          <div className="text-sm font-semibold text-teal-800 mb-4 flex items-center justify-between">
+            <span className="flex items-center gap-2">
+              <Coins className="w-4 h-4 text-teal-600 animate-pulse" />
+              Tạo phiếu ứng tiền nhân viên
+            </span>
+            <span className="text-[11px] text-slate-400 font-normal">
+              * Điền số tiền và bấm &quot;Lưu phiếu ứng tiền&quot;
+            </span>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -312,62 +471,76 @@ const AdvanceSalaryAsset: React.FC<AdvanceSalaryAssetProps> = ({
             </div>
 
             {/* Upload Zone */}
-            <div className="flex items-center gap-2">
-              <input
-                type="file"
-                accept="image/*"
-                id="advance-image-upload"
-                onChange={handleFileChange}
-                className="hidden"
-              />
-              <label 
-                htmlFor="advance-image-upload"
-                className="flex items-center gap-2 px-4 py-2 border border-dashed border-teal-300 rounded-xl bg-teal-50/50 hover:bg-teal-50 text-teal-700 cursor-pointer text-xs font-semibold transition-all"
-              >
-                {uploading ? (
-                  <span className="w-4 h-4 border-2 border-teal-600 border-t-transparent rounded-full animate-spin"></span>
-                ) : (
-                  <Upload className="w-4 h-4" />
-                )}
-                Tải ảnh minh chứng
-              </label>
+            <div className="flex flex-col gap-1">
+              <div className="flex items-center gap-2">
+                <input
+                  type="file"
+                  accept="image/*"
+                  id="advance-image-upload"
+                  onChange={handleFileChange}
+                  className="hidden"
+                />
+                <label 
+                  htmlFor="advance-image-upload"
+                  className="flex items-center gap-2 px-4 py-2 border border-dashed border-teal-400 rounded-xl bg-teal-50/50 hover:bg-teal-100/60 text-teal-800 cursor-pointer text-xs font-semibold transition-all shadow-xs"
+                >
+                  {uploading ? (
+                    <span className="w-4 h-4 border-2 border-teal-600 border-t-transparent rounded-full animate-spin"></span>
+                  ) : (
+                    <Upload className="w-4 h-4" />
+                  )}
+                  Tải ảnh minh chứng
+                </label>
 
-              {/* Paste notification hint */}
-              <div className="text-[10px] text-slate-400 hidden lg:block italic">
-                (Hoặc bấm Ctrl+V để dán ảnh trực tiếp)
+                {/* Paste notification hint */}
+                <div className="text-[10px] text-slate-400 hidden lg:block italic">
+                  (Hoặc Ctrl+V dán ảnh)
+                </div>
               </div>
             </div>
 
-            {/* Submit button */}
+            {/* Submit / Save button */}
             <button
               type="submit"
-              className="ml-auto flex items-center gap-1.5 bg-teal-600 hover:bg-teal-700 text-white font-semibold text-xs px-5 py-2.5 rounded-xl shadow-sm hover:shadow transition-all"
+              disabled={saving || uploading}
+              className="ml-auto flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-bold text-sm px-6 py-2.5 rounded-xl shadow-md hover:shadow-lg transition-all cursor-pointer disabled:opacity-50"
             >
-              <Plus className="w-4 h-4" />
-              Thêm ứng tiền
+              {saving ? (
+                <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+              ) : (
+                <Save className="w-4 h-4" />
+              )}
+              Lưu phiếu ứng tiền
             </button>
           </div>
 
           {/* Attached Image Preview */}
           {attachedFileUrl && (
-            <div className="mt-3 flex items-center gap-3 bg-white p-2.5 rounded-xl border border-slate-100 w-fit">
-              <div className="relative group w-12 h-12 rounded-lg overflow-hidden border border-slate-200">
-                <img 
-                  src={getFullUrl(apiStatic, attachedFileUrl)} 
-                  alt="Attachment Preview" 
-                  className="w-full h-full object-cover"
-                />
-                <button
-                  type="button"
-                  onClick={() => { setAttachedFileUrl(""); setAttachedFileName(""); }}
-                  className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white transition-opacity duration-200"
-                >
-                  <X className="w-4 h-4" />
-                </button>
+            <div className="mt-3 flex flex-col gap-1.5 bg-emerald-50/60 p-3 rounded-xl border border-emerald-200/80 w-fit">
+              <div className="flex items-center gap-3">
+                <div className="relative group w-14 h-14 rounded-lg overflow-hidden border border-emerald-300">
+                  <img 
+                    src={getFullUrl(apiStatic, attachedFileUrl)} 
+                    alt="Attachment Preview" 
+                    className="w-full h-full object-cover"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => { setAttachedFileUrl(""); setAttachedFileName(""); }}
+                    className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white transition-opacity duration-200"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-xs font-bold text-slate-700 truncate max-w-[240px]">{attachedFileName || "anh_minh_chung.jpg"}</span>
+                  <span className="text-[11px] text-emerald-600 font-semibold flex items-center gap-1">
+                    <Check className="w-3.5 h-3.5 stroke-[3]" /> Đã đính kèm ảnh
+                  </span>
+                </div>
               </div>
-              <div className="flex flex-col">
-                <span className="text-xs font-semibold text-slate-700 truncate max-w-[200px]">{attachedFileName || "ảnh_minh_chứng.jpg"}</span>
-                <span className="text-[10px] text-slate-400">Đã đính kèm</span>
+              <div className="text-[11px] text-emerald-800 font-medium bg-white/80 px-2 py-1 rounded-md border border-emerald-100">
+                👉 Nhấn nút <b>&quot;Lưu phiếu ứng tiền&quot;</b> ở trên để hoàn tất lưu vào hệ thống.
               </div>
             </div>
           )}
@@ -377,45 +550,60 @@ const AdvanceSalaryAsset: React.FC<AdvanceSalaryAssetProps> = ({
       {/* History log */}
       <div className="flex flex-col gap-3">
         <div className="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center justify-between">
-          <span>Lịch sử ứng lương ({messages.length})</span>
-          {messages.length > 0 && (
-            <span className="text-teal-600 font-bold lowercase">
-              tổng ứng: {messages.reduce((sum, msg) => {
-                const { amountRaw } = parseAdvanceText(msg.text);
-                const val = Number(amountRaw.replace(/[^\d]/g, ""));
-                return sum + (isNaN(val) ? 0 : val);
-              }, 0).toLocaleString("vi-VN")}đ
+          <span>Lịch sử ứng lương ({historyItems.length})</span>
+          {historyItems.length > 0 && (
+            <span className="text-teal-700 font-bold lowercase bg-teal-50 px-2.5 py-0.5 rounded-full border border-teal-200">
+              tổng ứng: {totalAdvance.toLocaleString("vi-VN")}đ
             </span>
           )}
         </div>
 
-        {messages.length === 0 ? (
+        {historyItems.length === 0 ? (
           <div className="text-center py-10 bg-slate-50 border border-dashed border-slate-200 rounded-2xl flex flex-col items-center gap-2">
             <Wallet className="w-8 h-8 text-slate-300" />
             <span className="text-xs text-slate-400">Chưa có bản ghi ứng lương nào được lưu.</span>
           </div>
         ) : (
-          <div className="flex flex-col gap-2.5 max-h-[400px] overflow-y-auto pr-1">
-            {messages.map((message) => {
-              const { amountRaw, dateStr, account, method, note } = parseAdvanceText(message.text);
+          <div className="flex flex-col gap-2.5 max-h-[420px] overflow-y-auto pr-1">
+            {historyItems.map((item) => {
+              const isPending = item.status === "PENDING";
               return (
                 <div 
-                  key={message.message_id}
-                  className="bg-white border border-slate-100 rounded-xl p-3.5 flex items-center justify-between gap-4 shadow-sm hover:border-slate-200 transition-all"
+                  key={item.id}
+                  className={`bg-white border rounded-xl p-3.5 flex items-center justify-between gap-4 shadow-sm hover:border-slate-300 transition-all ${
+                    isPending ? "border-red-300 bg-red-50/20" : "border-slate-100"
+                  }`}
                 >
                   <div className="flex items-center gap-3.5 flex-1 min-w-0">
                     {/* Method icon indicator */}
-                    <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${
-                      method === "Tiền mặt" ? "bg-amber-50 text-amber-600" : "bg-blue-50 text-blue-600"
+                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
+                      isPending 
+                        ? "bg-red-50 text-red-600 border border-red-200"
+                        : item.method === "Tiền mặt" 
+                          ? "bg-amber-50 text-amber-600" 
+                          : "bg-blue-50 text-blue-600"
                     }`}>
-                      {method === "Tiền mặt" ? <Wallet className="w-4.5 h-4.5" /> : <CreditCard className="w-4.5 h-4.5" />}
+                      {item.method === "Tiền mặt" ? <Wallet className="w-5 h-5" /> : <CreditCard className="w-5 h-5" />}
                     </div>
 
                     <div className="flex-1 min-w-0 grid grid-cols-1 md:grid-cols-4 gap-2 md:gap-4 items-center">
-                      {/* Amount */}
+                      {/* Amount & Status badge */}
                       <div className="flex flex-col">
                         <span className="text-xs font-bold text-slate-400 uppercase tracking-wide text-[9px]">Số tiền</span>
-                        <span className="text-sm font-bold text-rose-600">-{amountRaw}đ</span>
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <span className={`text-sm font-bold ${isPending ? "text-red-600" : "text-rose-600"}`}>
+                            -{item.amountStr}đ
+                          </span>
+                          {isPending ? (
+                            <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-red-500 text-white animate-pulse">
+                              Chưa duyệt
+                            </span>
+                          ) : (
+                            <span className="px-1.5 py-0.5 rounded text-[9px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                              Đã duyệt
+                            </span>
+                          )}
+                        </div>
                       </div>
 
                       {/* Date */}
@@ -423,32 +611,45 @@ const AdvanceSalaryAsset: React.FC<AdvanceSalaryAssetProps> = ({
                         <span className="text-xs font-bold text-slate-400 uppercase tracking-wide text-[9px]">Ngày chuyển</span>
                         <span className="text-xs font-semibold text-slate-700 flex items-center gap-1">
                           <Calendar className="w-3.5 h-3.5 text-slate-400" />
-                          {dateStr || "—"}
+                          {item.dateStr || "—"}
                         </span>
                       </div>
 
-                      {/* Account & Method */}
+                      {/* Details & Note */}
                       <div className="flex flex-col col-span-1 md:col-span-2 min-w-0">
                         <span className="text-xs font-bold text-slate-400 uppercase tracking-wide text-[9px]">Chi tiết</span>
                         <div className="text-xs font-medium text-slate-600 truncate">
-                          <span className="font-bold text-slate-800">{method}</span>
-                          {account && account !== "N/A" && ` • TK: ${account}`}
-                          {note && <span className="text-teal-600 block text-[10px] mt-0.5 font-semibold">📝 {note}</span>}
+                          <span className="font-bold text-slate-800">{item.method}</span>
+                          {item.account && item.account !== "N/A" && ` • TK: ${item.account}`}
+                          {item.note && <span className="text-teal-700 block text-[10px] mt-0.5 font-semibold">📝 {item.note}</span>}
                         </div>
                       </div>
                     </div>
                   </div>
 
-                  {/* Attachment & Action button */}
+                  {/* Attachment, Approve button & Action button */}
                   <div className="flex items-center gap-2 shrink-0">
+                    {/* Approve button if pending */}
+                    {isPending && !readOnly && (
+                      <button
+                        type="button"
+                        onClick={() => handleApproveAdvance(item.id)}
+                        className="flex items-center gap-1 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-bold text-xs px-3 py-1.5 rounded-lg shadow-sm transition-all"
+                        title="Duyệt khoản ứng tiền này"
+                      >
+                        <Check className="w-3.5 h-3.5 stroke-[3]" />
+                        Duyệt
+                      </button>
+                    )}
+
                     {/* Attachment Thumbnail */}
-                    {message.file_url ? (
-                      <div className="relative group w-9 h-9 rounded-lg overflow-hidden border border-slate-200 cursor-pointer">
+                    {item.file_url ? (
+                      <div className="relative group w-10 h-10 rounded-lg overflow-hidden border border-slate-200 cursor-pointer shadow-xs">
                         <Image
-                          src={getFullUrl(apiStatic, message.file_url)}
+                          src={getFullUrl(apiStatic, item.file_url)}
                           alt="Minh chứng"
-                          width={36}
-                          height={36}
+                          width={40}
+                          height={40}
                           className="object-cover w-full h-full"
                           preview={{
                             mask: <div className="text-[10px] font-bold">Xem</div>
@@ -456,7 +657,7 @@ const AdvanceSalaryAsset: React.FC<AdvanceSalaryAssetProps> = ({
                         />
                       </div>
                     ) : (
-                      <div className="w-9 h-9 rounded-lg border border-dashed border-slate-200 flex items-center justify-center text-slate-300" title="Không có minh chứng">
+                      <div className="w-10 h-10 rounded-lg border border-dashed border-slate-200 flex items-center justify-center text-slate-300" title="Không có minh chứng">
                         <ImageIcon className="w-4 h-4" />
                       </div>
                     )}
@@ -464,8 +665,8 @@ const AdvanceSalaryAsset: React.FC<AdvanceSalaryAssetProps> = ({
                     {/* Trash Delete button */}
                     {!readOnly && (
                       <DeleteConfirm
-                        elId={message.message_id || ""}
-                        onDelete={handleDeleteAdvance}
+                        elId={item.id}
+                        onDelete={() => handleDeleteAdvance(item)}
                         text="phiếu ứng tiền"
                       />
                     )}

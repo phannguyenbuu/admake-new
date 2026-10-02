@@ -86,6 +86,7 @@ const JobTimeAndProcess: React.FC<JobTimeAndProcessProps> = ({ form }) => {
 
   const handleTypeChange = (value: string) => {
     setTaskDetail(prev => prev ? { ...prev, type: value } : prev);
+    form.setFieldsValue({ type: value });
   };
 
   const { isMobile } = useUser();
@@ -208,6 +209,7 @@ const JobTimeAndProcess: React.FC<JobTimeAndProcessProps> = ({ form }) => {
                     const numValue = valueStr.replace(/\./g, "");
                     const parsedValue = Number(numValue) || 0;
                     setTaskDetail(prev => prev ? { ...prev, reward: parsedValue } : prev);
+                    form.setFieldsValue({ reward: parsedValue });
                   }}
                 />
               </Form.Item>

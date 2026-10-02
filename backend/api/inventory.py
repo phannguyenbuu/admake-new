@@ -4,7 +4,7 @@ from collections import defaultdict
 from datetime import date, datetime, timedelta
 
 from flask import Blueprint, abort, jsonify, request, g
-from sqlalchemy import or_
+from sqlalchemy import and_, or_
 
 from models import (
     APBill,
@@ -16,6 +16,7 @@ from models import (
     InventoryBalance,
     InventoryItem,
     ItemCategory,
+    MaterialSupplier,
     JournalEntry,
     JournalEntryLine,
     LeadPayload,
@@ -37,6 +38,18 @@ inventory_bp = Blueprint("inventory", __name__, url_prefix="/api/inventory")
 @inventory_bp.before_request
 def guard_inventory_permission():
     if request.method == "OPTIONS":
+        return
+
+    referrer = request.referrer or ""
+    if "/lead-manage" in referrer or request.path.endswith("/sync-ad205"):
+        try:
+            from permission_utils import resolve_request_user
+            actor = resolve_request_user()
+            if actor:
+                g.permission_actor = actor
+                return
+        except Exception:
+            pass
         return
 
     actor, _ = require_can_view("view_material")
@@ -332,7 +345,9 @@ def _ensure_inventory_setup(lead_id: int):
 
 def _find_item(item_id: str, lead_id: int):
     item = InventoryItem.query.filter(
-        InventoryItem.deletedAt.is_(None), InventoryItem.id == item_id, InventoryItem.lead_id == lead_id
+        InventoryItem.deletedAt.is_(None),
+        InventoryItem.id == item_id,
+        or_(InventoryItem.lead_id == lead_id, InventoryItem.lead_id == 243)
     ).first()
     if not item:
         abort(404, description="Item not found")
@@ -973,7 +988,27 @@ def list_items():
     category_id = _clean_text(request.args.get("category_id"))
     warehouse_id = _clean_text(request.args.get("warehouse_id"))
     status = _clean_text(request.args.get("status"))
-    query = InventoryItem.query.filter(InventoryItem.deletedAt.is_(None), InventoryItem.lead_id == lead_id)
+
+    if lead_id and lead_id != 243:
+        master_codes_subquery = db.session.query(InventoryItem.code).filter(
+            InventoryItem.deletedAt.is_(None),
+            InventoryItem.lead_id == 243
+        )
+        query = InventoryItem.query.filter(
+            InventoryItem.deletedAt.is_(None),
+            or_(
+                InventoryItem.lead_id == 243,
+                and_(
+                    InventoryItem.lead_id == lead_id,
+                    InventoryItem.code.notin_(master_codes_subquery)
+                )
+            )
+        )
+    else:
+        query = InventoryItem.query.filter(
+            InventoryItem.deletedAt.is_(None),
+            InventoryItem.lead_id == (lead_id or 243)
+        )
     if search:
         keyword = f"%{search}%"
         query = query.filter(
@@ -1044,6 +1079,16 @@ def create_item():
     default_warehouse_id = _clean_text(data.get("default_warehouse_id"))
     if default_warehouse_id:
         _find_warehouse(default_warehouse_id, lead_id)
+    sup_id = _clean_text(data.get("default_supplier_id"))
+    sup_name = _clean_text(data.get("default_supplier_name"))
+    sup_link = _clean_text(data.get("supplier_link"))
+    if not sup_id and not sup_name:
+        bone_sup = MaterialSupplier.query.filter(MaterialSupplier.deletedAt.is_(None), MaterialSupplier.name.ilike('%B-One Decor%')).first()
+        if bone_sup:
+            sup_id = bone_sup.id
+            sup_name = bone_sup.name
+            sup_link = bone_sup.website_link
+
     row = InventoryItem(
         id=generate_datetime_id(),
         lead_id=lead_id,
@@ -1053,13 +1098,15 @@ def create_item():
         category_id=category_id,
         item_type=_validate_choice("item_type", data.get("item_type"), ITEM_TYPES, "raw_material"),
         unit=_clean_text(data.get("unit")) or "cái",
-        default_supplier_id=_clean_text(data.get("default_supplier_id")),
-        default_supplier_name=_clean_text(data.get("default_supplier_name")),
+        default_supplier_id=sup_id,
+        default_supplier_name=sup_name,
+        supplier_link=sup_link,
         default_warehouse_id=default_warehouse_id,
         standard_cost=_round_money(data.get("standard_cost")),
         average_cost=_round_money(data.get("average_cost")),
         min_stock_level=_to_float(data.get("min_stock_level"), 0),
         is_active=_to_bool(data.get("is_active"), True),
+        item_status=_clean_text(data.get("item_status")) or "dang_dung",
         note=_clean_text(data.get("note")),
         created_by=_current_user_id(),
         updated_by=_current_user_id(),
@@ -1141,10 +1188,36 @@ def update_item(item_id: str):
         item.item_type = _validate_choice("item_type", data.get("item_type"), ITEM_TYPES, item.item_type)
     if data.get("unit") is not None:
         item.unit = _clean_text(data.get("unit")) or item.unit
-    if data.get("default_supplier_id") is not None:
-        item.default_supplier_id = _clean_text(data.get("default_supplier_id"))
-    if data.get("default_supplier_name") is not None:
-        item.default_supplier_name = _clean_text(data.get("default_supplier_name"))
+    if "default_supplier_id" in data or "default_supplier_name" in data:
+        sup_id = _clean_text(data.get("default_supplier_id"))
+        sup_name = _clean_text(data.get("default_supplier_name"))
+        if sup_id:
+            sup = db.session.get(MaterialSupplier, sup_id)
+            if sup:
+                item.default_supplier_id = sup.id
+                item.default_supplier_name = sup.name
+                item.supplier_link = sup.website_link
+            else:
+                item.default_supplier_id = sup_id
+                item.default_supplier_name = sup_name
+                if "supplier_link" in data:
+                    item.supplier_link = _clean_text(data.get("supplier_link"))
+        elif sup_name:
+            sup = MaterialSupplier.query.filter(MaterialSupplier.deletedAt.is_(None), MaterialSupplier.name == sup_name).first()
+            if sup:
+                item.default_supplier_id = sup.id
+                item.default_supplier_name = sup.name
+                item.supplier_link = sup.website_link
+            else:
+                item.default_supplier_name = sup_name
+                if "supplier_link" in data:
+                    item.supplier_link = _clean_text(data.get("supplier_link"))
+        else:
+            item.default_supplier_id = None
+            item.default_supplier_name = None
+            item.supplier_link = None
+    elif "supplier_link" in data:
+        item.supplier_link = _clean_text(data.get("supplier_link"))
     if data.get("default_warehouse_id") is not None:
         default_warehouse_id = _clean_text(data.get("default_warehouse_id"))
         if default_warehouse_id:
@@ -1158,6 +1231,8 @@ def update_item(item_id: str):
         item.min_stock_level = _to_float(data.get("min_stock_level"), item.min_stock_level)
     if data.get("is_active") is not None:
         item.is_active = _to_bool(data.get("is_active"), item.is_active)
+    if "item_status" in data:
+        item.item_status = _clean_text(data.get("item_status")) or "dang_dung"
     if data.get("note") is not None:
         item.note = _clean_text(data.get("note"))
     if "spec_rows" in data:
@@ -1193,6 +1268,7 @@ def update_item(item_id: str):
 
     item.updated_by = _current_user_id()
     db.session.commit()
+
     return jsonify(item.tdict()), 200
 
 
@@ -1462,6 +1538,50 @@ def cancel_transaction(transaction_id: str):
     except Exception:
         db.session.rollback()
         raise
+    return jsonify(tx.tdict()), 200
+
+
+@inventory_bp.route("/transactions/<string:transaction_id>", methods=["DELETE"])
+def delete_transaction(transaction_id: str):
+    tx = StockTransaction.query.filter(StockTransaction.deletedAt.is_(None), StockTransaction.id == transaction_id).first()
+    if not tx:
+        abort(404, description="Transaction not found")
+
+    item = _find_item(tx.item_id, tx.lead_id) if tx.item_id else None
+
+    # If transaction was confirmed, reverse stock balance before deleting
+    if tx.status == "confirmed" and item and not tx.reversal_transaction_id:
+        try:
+            _apply_transaction_to_balance(tx, item, reverse=True)
+        except Exception:
+            pass
+
+    now = datetime.utcnow()
+    tx.deletedAt = now
+    tx.updated_by = _current_user_id()
+
+    # Also soft delete related reversal or original transaction pair
+    if tx.reversal_transaction_id:
+        rev_tx = StockTransaction.query.filter(StockTransaction.deletedAt.is_(None), StockTransaction.id == tx.reversal_transaction_id).first()
+        if rev_tx:
+            rev_tx.deletedAt = now
+            rev_tx.updated_by = _current_user_id()
+
+    # Find any transaction referencing this transaction as reversal or source
+    related_txs = StockTransaction.query.filter(
+        StockTransaction.deletedAt.is_(None),
+        db.or_(
+            StockTransaction.reversal_transaction_id == tx.id,
+            StockTransaction.reference_id == tx.id,
+            StockTransaction.source_id == tx.id
+        )
+    ).all()
+    for rel in related_txs:
+        rel.deletedAt = now
+        rel.updated_by = _current_user_id()
+
+    db.session.commit()
+    return jsonify({"success": True, "message": "Transaction deleted"}), 200
     return jsonify(_serialize_tx_with_trace(tx)), 200
 
 
@@ -1672,3 +1792,128 @@ def post_item_message(item_id):
     })
     db.session.commit()
     return jsonify({"message": message.tdict()}), 200
+
+
+def cleanup_duplicate_materials():
+    """
+    Xóa tất cả các bản ghi vật tư trùng lặp ở các lead khác để dùng chung thư viện từ master lead ad205 (lead_id=243).
+    """
+    master_items = InventoryItem.query.filter(
+        InventoryItem.deletedAt.is_(None),
+        InventoryItem.lead_id == 243
+    ).all()
+    master_codes = [m.code for m in master_items if m.code]
+
+    if not master_codes:
+        return 0
+
+    deleted_count = InventoryItem.query.filter(
+        InventoryItem.lead_id != 243,
+        InventoryItem.code.in_(master_codes)
+    ).delete(synchronize_session=False)
+
+    db.session.commit()
+    return deleted_count
+
+
+@inventory_bp.route("/cleanup-duplicates", methods=["POST"])
+def trigger_cleanup_duplicates():
+    count = cleanup_duplicate_materials()
+    return jsonify({"success": True, "deleted_records": count}), 200
+
+
+# ─── MATERIAL SUPPLIERS API ──────────────────────────────────────────
+@inventory_bp.route("/suppliers", methods=["GET"])
+def list_material_suppliers():
+    suppliers = MaterialSupplier.query.filter(MaterialSupplier.deletedAt.is_(None)).all()
+    suppliers.sort(key=lambda s: (0 if "b-one" in (s.name or "").lower() else 1, (s.name or "").lower()))
+    return jsonify({"data": [s.tdict() for s in suppliers]}), 200
+
+
+@inventory_bp.route("/suppliers", methods=["POST"])
+def create_material_supplier():
+    data = request.get_json() or {}
+    name = _clean_text(data.get("name"))
+    if not name:
+        abort(400, description="Tên đại lý không được để trống")
+
+    website_link = _clean_text(data.get("website_link"))
+    phone = _clean_text(data.get("phone"))
+    address = _clean_text(data.get("address"))
+    note = _clean_text(data.get("note"))
+
+    supplier_id = f"sup_{generate_datetime_id()}"
+    supplier = MaterialSupplier(
+        id=supplier_id,
+        name=name,
+        website_link=website_link,
+        phone=phone,
+        address=address,
+        note=note,
+    )
+    db.session.add(supplier)
+    db.session.commit()
+    return jsonify(supplier.tdict()), 201
+
+
+@inventory_bp.route("/suppliers/<string:supplier_id>", methods=["PUT"])
+def update_material_supplier(supplier_id: str):
+    supplier = db.session.get(MaterialSupplier, supplier_id)
+    if not supplier or supplier.deletedAt:
+        abort(404, description="Supplier not found")
+
+    data = request.get_json() or {}
+    old_name = supplier.name
+    if "name" in data:
+        name = _clean_text(data.get("name"))
+        if name:
+            supplier.name = name
+    if "website_link" in data:
+        supplier.website_link = _clean_text(data.get("website_link"))
+    if "phone" in data:
+        supplier.phone = _clean_text(data.get("phone"))
+    if "address" in data:
+        supplier.address = _clean_text(data.get("address"))
+    if "note" in data:
+        supplier.note = _clean_text(data.get("note"))
+
+    supplier.updatedAt = datetime.utcnow()
+    db.session.commit()
+
+    # Automatically update all inventory_items that use this supplier!
+    InventoryItem.query.filter(
+        InventoryItem.deletedAt.is_(None),
+        or_(
+            InventoryItem.default_supplier_id == supplier.id,
+            InventoryItem.default_supplier_name == old_name
+        )
+    ).update({
+        "default_supplier_id": supplier.id,
+        "default_supplier_name": supplier.name,
+        "supplier_link": supplier.website_link
+    }, synchronize_session=False)
+    db.session.commit()
+
+    return jsonify(supplier.tdict()), 200
+
+
+@inventory_bp.route("/suppliers/<string:supplier_id>", methods=["DELETE"])
+def delete_material_supplier(supplier_id: str):
+    supplier = db.session.get(MaterialSupplier, supplier_id)
+    if not supplier or supplier.deletedAt:
+        abort(404, description="Supplier not found")
+    supplier.deletedAt = datetime.utcnow()
+    db.session.commit()
+
+    # Clear reference on items using this deleted supplier
+    InventoryItem.query.filter(
+        InventoryItem.deletedAt.is_(None),
+        InventoryItem.default_supplier_id == supplier.id
+    ).update({
+        "default_supplier_id": None,
+        "default_supplier_name": None,
+        "supplier_link": None
+    }, synchronize_session=False)
+    db.session.commit()
+
+    return jsonify({"message": "deleted"}), 200

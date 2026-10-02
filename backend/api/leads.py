@@ -447,3 +447,113 @@ def trial_summary():
             "active": len(active),
         }
     })
+
+
+@lead_bp.route("/company-info", methods=["GET"])
+def get_lead_company_info():
+    lead_id = request.args.get("lead_id", type=int) or request.args.get("lead", type=int)
+    if not lead_id:
+        return jsonify({
+            "company": "CÔNG TY TNHH DECOR B-ONE",
+            "brand_name": "DECOR B-ONE",
+            "address": "96 Đường số 1, KDC Cityland, Phường 7, Gò Vấp, TP.HCM",
+            "phone": "0909 123 456",
+            "email": "contact@b-onedecor.vn",
+            "tax_code": "",
+            "logo_url": "",
+        })
+
+    lead = db.session.get(LeadPayload, lead_id)
+    if not lead:
+        return jsonify({
+            "company": "CÔNG TY TNHH DECOR B-ONE",
+            "brand_name": "DECOR B-ONE",
+            "address": "96 Đường số 1, KDC Cityland, Phường 7, Gò Vấp, TP.HCM",
+            "phone": "0909 123 456",
+            "email": "contact@b-onedecor.vn",
+            "tax_code": "",
+            "logo_url": "",
+        })
+
+    return jsonify({
+        "company": lead.company or "CÔNG TY TNHH DECOR B-ONE",
+        "brand_name": lead.name or "DECOR B-ONE",
+        "address": lead.address or "96 Đường số 1, KDC Cityland, Phường 7, Gò Vấp, TP.HCM",
+        "phone": lead.phone or "0909 123 456",
+        "email": lead.email or "contact@b-onedecor.vn",
+        "tax_code": lead.tax_code or "",
+        "logo_url": getattr(lead, "logo_url", None) or "",
+    })
+
+
+@lead_bp.route("/company-info", methods=["PUT"])
+def update_lead_company_info():
+    data = request.get_json() or {}
+    lead_id = data.get("lead_id") or data.get("lead")
+    if not lead_id:
+        return jsonify({"error": "lead_id is required"}), 400
+
+    lead = db.session.get(LeadPayload, lead_id)
+    if not lead:
+        return jsonify({"error": "Lead not found"}), 404
+
+    if "company" in data:
+        lead.company = data["company"]
+    if "brand_name" in data:
+        lead.name = data["brand_name"]
+    if "address" in data:
+        lead.address = data["address"]
+    if "phone" in data:
+        lead.phone = data["phone"]
+    if "email" in data:
+        lead.email = data["email"]
+    if "tax_code" in data:
+        lead.tax_code = data["tax_code"]
+    if "logo_url" in data:
+        lead.logo_url = data["logo_url"]
+
+    db.session.commit()
+    return jsonify({
+        "company": lead.company,
+        "brand_name": lead.name,
+        "address": lead.address,
+        "phone": lead.phone,
+        "email": lead.email,
+        "tax_code": lead.tax_code,
+        "logo_url": lead.logo_url or "",
+    })
+
+
+@lead_bp.route("/logo", methods=["POST"])
+def upload_lead_logo():
+    if "file" not in request.files:
+        return jsonify({"error": "No file provided"}), 400
+
+    file = request.files["file"]
+    if not file or file.filename == "":
+        return jsonify({"error": "Empty filename"}), 400
+
+    original_name = secure_filename(file.filename or "")
+    _, ext = os.path.splitext(original_name)
+    ext = ext.lower()
+    if ext not in [".jpg", ".jpeg", ".png", ".webp", ".gif", ".svg"]:
+        return jsonify({"error": "Unsupported file type"}), 400
+
+    lead_id = request.form.get("lead_id", type=int) or request.form.get("lead", type=int)
+
+    upload_folder = app.config.get("UPLOAD_FOLDER", os.path.join(app.root_path, "static", "uploads"))
+    os.makedirs(upload_folder, exist_ok=True)
+
+    filename = f"logo_lead_{lead_id or 'default'}_{int(time.time())}{ext}"
+    filepath = os.path.join(upload_folder, filename)
+    file.save(filepath)
+
+    logo_url = f"/static/uploads/{filename}"
+
+    if lead_id:
+        lead = db.session.get(LeadPayload, lead_id)
+        if lead:
+            lead.logo_url = logo_url
+            db.session.commit()
+
+    return jsonify({"success": True, "logo_url": logo_url})

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react";
 import Modal from "antd/es/modal/Modal";
+import { CheckCircleOutlined } from "@ant-design/icons";
 import JobTimeAndProcess from "../../../dashboard/work-tables/task/JobTimeAndProcess ";
 import { Stack, Box, Button, Checkbox, Typography, Avatar } from "@mui/material";
 import { useMutation } from '@tanstack/react-query';
@@ -20,6 +21,7 @@ import { Form, Input } from "antd";
 import JobAsset from "../../../dashboard/work-tables/task/JobAsset";
 import MaterialsTab from "../../../dashboard/work-tables/task/MaterialsTab";
 import { Tabs } from 'antd';
+import ImageViewerModal from "../../../modal/ImageViewerModal";
 import type { NotifyProps } from "../../../../@types/notify.type";
 import { CenterBox } from "../commons/TitlePanel";
 const { TextArea } = Input;
@@ -65,10 +67,11 @@ interface TaskBoardProps {
   fullName? : string;
   userId?: string;
   open?: boolean;
-  onCancel: () => void;
+  onCancel?: () => void;
+  isDirect?: boolean;
 }
 
-const TaskBoard = ({ userId,fullName, open, onCancel }: TaskBoardProps) => {
+const TaskBoard = ({ userId, fullName, open, onCancel, isDirect = false }: TaskBoardProps) => {
   const [activeKey, setActiveKey] = useState('task');
     const [iconPreviewOpen, setIconPreviewOpen] = useState(false);
     const { mutate, data, isPending, isError, error } = useTaskByUserMutation();
@@ -99,26 +102,64 @@ const TaskBoard = ({ userId,fullName, open, onCancel }: TaskBoardProps) => {
       return path;
     };
 
-    const handleFinishWarning = () => {
-      const notify : NotifyProps = {
+    const [isFinishing, setIsFinishing] = useState(false);
+
+    const handleCompleteTask = async (task: Task) => {
+      if (!task?.id) return;
+      setIsFinishing(true);
+      try {
+        const currentUserId = userId || JSON.parse(localStorage.getItem('Admake-User-Access') || '{}')?.user_id;
+        const res = await fetch(`${useApiHost()}/task/${task.id}/status`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            status: 'REWARD',
+            user_id: currentUserId,
+          }),
+        });
+
+        if (!res.ok) {
+          throw new Error('Cập nhật trạng thái thất bại');
+        }
+
+        setTaskDetail(prev => prev ? { ...prev, status: 'REWARD' } : prev);
+        task.status = 'REWARD';
+
+        const notify: NotifyProps = {
           id: generateDatetimeId(),
-          user_id: userId,
+          user_id: currentUserId,
           type: 'task',
-          description: taskDetail?.workspace_id,
-          text: `<${taskDetail?.workspace}/${taskDetail?.title}> hoàn thành. Vui lòng chuyển trạng thái !`,
-          target: `/work-tables/${taskDetail?.workspace_id}`,
-      };
+          description: task.workspace_id || taskDetail?.workspace_id,
+          text: `<${task.workspace || taskDetail?.workspace}/${task.title || taskDetail?.title}> hoàn thành. Đã chuyển sang Hoàn thiện!`,
+          target: `/work-tables/${task.workspace_id || taskDetail?.workspace_id}`,
+        };
+        notifyAdmin(notify);
 
-      console.log('Note', notify);
+        notification.success({
+          message: 'Hoàn thiện nhiệm vụ!',
+          description: 'Đã chuyển sang cột Hoàn thiện và gửi thông báo tới ban quản trị.',
+        });
 
-      notifyAdmin(notify);
-    } 
+        if (userId) {
+          mutate(userId);
+        }
+      } catch (err: any) {
+        notification.error({
+          message: 'Lỗi chuyển trạng thái',
+          description: err.message || 'Không thể cập nhật trạng thái lúc này',
+        });
+      } finally {
+        setIsFinishing(false);
+      }
+    }; 
 
     useEffect(() => {
         if (userId) {
           mutate(userId); // userId đã chắc chắn là string, không undefined
         }
-    },[]);
+    }, [userId]);
 
     const [currentPage, setCurrentPage] = React.useState(1);
     const pageSize = 1; // mỗi trang 1 item
@@ -145,24 +186,46 @@ const TaskBoard = ({ userId,fullName, open, onCancel }: TaskBoardProps) => {
       backgroundColor:'#00B5B4',
       whiteSpace:'nowrap', borderRadius:10};
 
-    return (
-    <Modal open={open} onCancel={onCancel} footer={null}>
+    const boardContent = (
       <CenterBox>
         
-    <div style={{ marginTop: 0, display: 'flex', justifyContent: 'center', 
-      alignItems: 'center', gap: 16 }}>
+    <div style={{ marginTop: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
+      {!isDirect && (
+        <button
+          type="button"
+          style={{
+            fontSize: '11px',
+            fontWeight: 600,
+            color: '#0891b2',
+            backgroundColor: '#ecfeff',
+            border: '1px solid #a5f3fc',
+            borderRadius: '16px',
+            padding: '4px 12px',
+            cursor: 'pointer',
+          }}
+          onClick={() => {
+            window.location.href = taskDetail?.workspace_id
+              ? `/work-tables/${taskDetail.workspace_id}`
+              : "/work-tables";
+          }}
+        >
+          Xem đầy đủ Bảng công việc (Nhiều cột) ➔
+        </button>
+      )}
 
-      <button
-        onClick={() => setCurrentPage(prev => (prev === 1 ? totalPages : prev - 1))}
-      >
-        <ArrowBackIosNewIcon fontSize="small" />
-      </button>
-      <span>Trang {currentPage} / {totalPages}</span>
-      <button
-        onClick={() => setCurrentPage(prev => (prev === totalPages ? 1 : prev + 1))}
-      >
-        <ArrowForwardIosIcon fontSize="small" />
-      </button>
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 16 }}>
+        <button
+          onClick={() => setCurrentPage(prev => (prev === 1 ? totalPages : prev - 1))}
+        >
+          <ArrowBackIosNewIcon fontSize="small" />
+        </button>
+        <span>Trang {currentPage} / {totalPages}</span>
+        <button
+          onClick={() => setCurrentPage(prev => (prev === totalPages ? 1 : prev + 1))}
+        >
+          <ArrowForwardIosIcon fontSize="small" />
+        </button>
+      </div>
     </div>
   
       <Stack spacing = {5} py={2} alignItems="flex-start" justifyContent="flex-start"
@@ -175,42 +238,81 @@ const TaskBoard = ({ userId,fullName, open, onCancel }: TaskBoardProps) => {
         borderRadius: 20,
         width: isMobile ? 340 : ''
       }}>
-        <Stack direction="row" spacing={1}>
-          <Button style={btnStyle} onClick={handleFinishWarning}>
-            <ArrowForwardIcon />
-            {getTitleByStatus(el?.status ?? '')}
-          </Button>
-
-          {el.workspace &&
-          <Stack direction="column">
-            <Typography style={{
-              marginTop: 8,
-              fontStyle: 'italic',
-              color: '#00B5B4',
-              fontSize: 10,
-              fontWeight: 500
-            }}>
-              {el?.workspace}
-            </Typography>
-
-            <Typography style={{
-            marginTop: 8,
-            fontStyle: 'italic',
-            color: '#00B5B4',
-            fontSize: 10,
-            fontWeight: 500
+        <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap">
+          {/* Badge trạng thái */}
+          <div style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            padding: '5px 12px',
+            borderRadius: '8px',
+            backgroundColor: el?.status === 'REWARD' ? '#dcfce7' : '#e0f2fe',
+            color: el?.status === 'REWARD' ? '#166534' : '#0369a1',
+            fontSize: '12px',
+            fontWeight: 600,
           }}>
-            {taskDetail?.title}
-          </Typography>
+            {getTitleByStatus(el?.status ?? '') || el?.status}
+          </div>
 
+          {/* Nút Hoàn thiện (chuyển sang cột REWARD) */}
+          {el?.status !== 'REWARD' ? (
+            <Button
+              variant="contained"
+              disabled={isFinishing}
+              onClick={() => handleCompleteTask(el)}
+              sx={{
+                borderRadius: '8px',
+                backgroundColor: '#10b981',
+                '&:hover': { backgroundColor: '#059669' },
+                color: '#fff',
+                fontSize: '12px',
+                fontWeight: 700,
+                textTransform: 'none',
+                px: 2,
+                py: 0.6,
+                boxShadow: '0 2px 4px rgba(16, 185, 129, 0.25)',
+              }}
+            >
+              <CheckCircleOutlined style={{ marginRight: 6, fontSize: '14px' }} />
+              Hoàn thiện
+            </Button>
+          ) : (
+            <div style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 4,
+              padding: '5px 12px',
+              borderRadius: '8px',
+              backgroundColor: '#10b981',
+              color: '#fff',
+              fontSize: '12px',
+              fontWeight: 700,
+            }}>
+              ✓ Đã hoàn thiện
+            </div>
+          )}
 
+          {el.workspace && (
+            <Stack direction="column" sx={{ ml: 1 }}>
+              <Typography style={{
+                marginTop: 4,
+                fontStyle: 'italic',
+                color: '#00B5B4',
+                fontSize: 10,
+                fontWeight: 500
+              }}>
+                {el?.workspace}
+              </Typography>
 
-            
-
-
-          
-          </Stack>
-          }
+              <Typography style={{
+                marginTop: 2,
+                color: '#1e293b',
+                fontSize: 12,
+                fontWeight: 700
+              }}>
+                {el?.title || taskDetail?.title}
+              </Typography>
+            </Stack>
+          )}
         </Stack>
         <TextArea
           readOnly
@@ -251,7 +353,7 @@ const TaskBoard = ({ userId,fullName, open, onCancel }: TaskBoardProps) => {
               label: 'Vật liệu',
               children: (
                 <div style={{ backgroundColor: '#fff', padding: '12px', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
-                  <MaterialsTab />
+                  <MaterialsTab userId={userId} />
                 </div>
               ),
             },
@@ -269,24 +371,28 @@ const TaskBoard = ({ userId,fullName, open, onCancel }: TaskBoardProps) => {
     )}
 
       </Stack>
-      <Modal
+      <ImageViewerModal
         open={iconPreviewOpen}
-        footer={null}
         onCancel={() => setIconPreviewOpen(false)}
-        width="auto"
-        centered
-      >
-        {primaryIcon && (
-          <img
-            src={buildStaticUrl(getOriginalImagePath(primaryIcon))}
-            alt="Task icon preview"
-            style={{ maxWidth: "80vw", maxHeight: "80vh", display: "block" }}
-          />
-        )}
-      </Modal>
+        imageUrl={primaryIcon ? buildStaticUrl(getOriginalImagePath(primaryIcon)) : null}
+        title="Xem biểu tượng công việc"
+      />
       </CenterBox>
-    </Modal>
-    )
+    );
+
+    if (isDirect) {
+      return (
+        <div style={{ width: "100%", maxWidth: 460, margin: "0 auto", padding: "0 8px 32px" }}>
+          {boardContent}
+        </div>
+      );
+    }
+
+    return (
+      <Modal open={open} onCancel={onCancel} footer={null}>
+        {boardContent}
+      </Modal>
+    );
 }
 
 export default TaskBoard;

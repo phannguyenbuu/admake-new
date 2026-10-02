@@ -40,6 +40,8 @@ from api.accounting_erp import accounting_erp_bp
 from api.inventory import inventory_bp
 from api.document_center import document_center_bp
 from api.attachments import attachments_bp
+from api.feedback import feedback_bp
+from api.ai import ai_bp
 
 app.register_blueprint(customer_bp)
 app.register_blueprint(material_bp)
@@ -64,20 +66,14 @@ app.register_blueprint(accounting_erp_bp)
 app.register_blueprint(inventory_bp)
 app.register_blueprint(document_center_bp)
 app.register_blueprint(attachments_bp)
+app.register_blueprint(feedback_bp)
+app.register_blueprint(ai_bp)
 
 from api.chat import socketio
 
 CORS(
     app,
-    resources={r"/api/*": {"origins": [
-        "https://quanly.admake.vn",
-        "https://admake.vn",
-        "http://localhost:5173",
-        "http://localhost:5174",
-        "http://localhost:5175",
-        "http://127.0.0.1:5175",
-        "http://localhost:3000",
-    ]}},
+    resources={r"/api/*": {"origins": "*"}},
     supports_credentials=True,
     methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
     allow_headers=["Content-Type", "Authorization"],
@@ -118,13 +114,13 @@ load_dotenv()  # load biến môi trường trong file .env vào process.env
 # VITE_API_HOST = os.getenv("VITE_API_HOST")
 
 if __name__ == "__main__":
-    port = int(os.environ.get('PORT', 6000))  # Lấy biến môi trường PORT hoặc mặc định 5000
-    debug = True
+    port = int(os.environ.get('PORT', 6000))
+    debug = os.environ.get('FLASK_DEBUG', 'false').lower() in ('true', '1')
     socketio.run(
         app,
         host="0.0.0.0",
         debug=debug,
-        use_reloader=debug,
+        use_reloader=False,
         port=port,
-        allow_unsafe_werkzeug=debug,
+        allow_unsafe_werkzeug=True,
     )

@@ -8,29 +8,31 @@ const axiosClient = axios.create({
     'Content-Type': 'application/json',
   },
 });
+
 axiosClient.interceptors.request.use(
   (config) => {
     // Add any request interceptors here, e.g., adding auth tokens
     const token = localStorage.getItem(TOKEN_LABEL);
-    if (token) {
+    if (token && token !== "undefined" && token !== "null" && token.trim() !== "") {
       config.headers['Authorization'] = `Bearer ${token}`;
     }
     return config;
-    },
-    (error) => {
-      // Handle request errors here
-      return Promise.reject(error);
-    }
+  },
+  (error) => {
+    // Handle request errors here
+    return Promise.reject(error);
+  }
 );
+
 axiosClient.interceptors.response.use(
   (response) => {
     // Handle successful responses here
     return response;
-    },
-    (error) => {
-        // Handle response errors here
-        return Promise.reject(error);
-    }
+  },
+  (error) => {
+    // Handle response errors here
+    return Promise.reject(error);
+  }
 );
 
 export default axiosClient;

@@ -55,6 +55,32 @@ const fmt = (v: number | undefined | null) =>
   Number(v || 0).toLocaleString("vi-VN", { maximumFractionDigits: 0 });
 const parseMoney = (s: string) => parseFloat(s.replace(/[^0-9.-]/g, "")) || 0;
 
+const getApRowTotals = (row: ApBill, payments?: Payment[]) => {
+  if (payments) {
+    const phatSinhAmount = payments.filter((p) => p.payment_type === "phat_sinh").reduce((s, p) => s + (p.amount || 0), 0);
+    const tamUngAmount = payments.filter((p) => p.payment_type === "tam_ung").reduce((s, p) => s + (p.amount || 0), 0);
+    const extraTotal = Math.round(phatSinhAmount * (1 + (row.tax_rate || 0) / 100) * 100) / 100;
+    const effectiveTotalAmount = Math.round(((row.total_amount || 0) + extraTotal) * 100) / 100;
+    return {
+      phatSinhAmount,
+      tamUngAmount,
+      effectiveTotalAmount,
+      remainingAmount: effectiveTotalAmount - tamUngAmount,
+    };
+  }
+  const phatSinhAmount = row.phat_sinh_amount || 0;
+  const tamUngAmount = row.tam_ung_amount ?? row.paid_amount ?? 0;
+  const extraTotal = Math.round(phatSinhAmount * (1 + (row.tax_rate || 0) / 100) * 100) / 100;
+  const effectiveTotalAmount = row.effective_total_amount ?? Math.round(((row.total_amount || 0) + extraTotal) * 100) / 100;
+  const remainingAmount = row.balance_amount ?? (effectiveTotalAmount - tamUngAmount);
+  return {
+    phatSinhAmount,
+    tamUngAmount,
+    effectiveTotalAmount,
+    remainingAmount,
+  };
+};
+
 // ─── Types ────────────────────────────────────────────────────────────────────
 type Payment = { id: string; payment_date: string; amount: number; payment_method: string; payment_type: string; note?: string };
 type DailyCashRef = { id: string; voucher_no: string; txn_date: string; amount: number; direction: string };
@@ -128,51 +154,124 @@ function TcDropdown({ value, onChange, list }: { value: string; onChange: (id: s
 }
 
 // ─── PaymentRow ───────────────────────────────────────────────────────────────
-function PaymentRow({ p, invoiceId, isEditing, onStartEdit, onCancelEdit, onDeleted, onUpdated, dailyCashList }: { p: Payment; invoiceId: string; isEditing: boolean; onStartEdit: () => void; onCancelEdit: () => void; onDeleted: () => void; onUpdated: (u: Payment) => void; dailyCashList: DailyCashRef[] }) {
+function PaymentRow({
+  p,
+  invoiceId,
+  isEditing,
+  onStartEdit,
+  onCancelEdit,
+  onDeleted,
+  onUpdated,
+  dailyCashList,
+}: {
+  p: Payment;
+  invoiceId: string;
+  isEditing: boolean;
+  onStartEdit: () => void;
+  onCancelEdit: () => void;
+  onDeleted: () => void;
+  onUpdated: (u: Payment) => void;
+  dailyCashList: DailyCashRef[];
+}) {
   const isTamUng = p.payment_type === "tam_ung";
   const [saving, setSaving] = useState(false);
   const [dateVal, setDateVal] = useState(p.payment_date?.slice(0, 10) || dayjs().format("YYYY-MM-DD"));
   const [amtVal, setAmtVal] = useState(p.amount || 0);
   const [noteVal, setNoteVal] = useState(p.note || "");
   const [tcRefEdit, setTcRefEdit] = useState("");
-  React.useEffect(() => { if (!isEditing) { setDateVal(p.payment_date?.slice(0, 10) || dayjs().format("YYYY-MM-DD")); setAmtVal(p.amount || 0); setNoteVal(p.note || ""); setTcRefEdit(""); } }, [p, isEditing]);
-  const handleStartEdit = () => { const m = (p.note || "").match(/^\[TC:([^\]]+)\]\s*(.*)/); setNoteVal(m ? m[2] : (p.note || "")); setTcRefEdit(""); setDateVal(p.payment_date?.slice(0, 10) || dayjs().format("YYYY-MM-DD")); setAmtVal(p.amount || 0); onStartEdit(); };
+
+  React.useEffect(() => {
+    if (!isEditing) {
+      setDateVal(p.payment_date?.slice(0, 10) || dayjs().format("YYYY-MM-DD"));
+      setAmtVal(p.amount || 0);
+      setNoteVal(p.note || "");
+      setTcRefEdit("");
+    }
+  }, [p, isEditing]);
+
+  const handleStartEdit = () => {
+    const m = (p.note || "").match(/^\[TC:([^\]]+)\]\s*(.*)/);
+    setNoteVal(m ? m[2] : (p.note || ""));
+    setTcRefEdit("");
+    setDateVal(p.payment_date?.slice(0, 10) || dayjs().format("YYYY-MM-DD"));
+    setAmtVal(p.amount || 0);
+    onStartEdit();
+  };
+
   const saveEdit = async () => {
-    if (amtVal <= 0) { notification.warning({ message: "Số tiền phải > 0" }); return; }
+    if (amtVal <= 0) {
+      notification.warning({ message: "Số tiền phải > 0" });
+      return;
+    }
     setSaving(true);
     try {
       const finalNote = tcRefEdit ? `[TC:${tcRefEdit}]${noteVal ? " " + noteVal : ""}` : noteVal;
       const res = await AccountingErpService.updateApPayment(invoiceId, p.id, { payment_date: dateVal, amount: amtVal, note: finalNote });
       onUpdated({ ...p, payment_date: res.data?.payment_date || dateVal, amount: res.data?.amount ?? amtVal, note: res.data?.note ?? finalNote });
     } catch { /* noop */ }
-    setSaving(false); onCancelEdit();
+    setSaving(false);
+    onCancelEdit();
   };
-  const handleDelete = async () => { try { await AccountingErpService.deleteApPayment(invoiceId, p.id); onDeleted(); } catch (e: any) { notification.error({ message: e?.response?.data?.description || "Xóa thất bại" }); } };
 
-  if (isEditing) return (
-    <div className={`flex flex-wrap items-center gap-2 text-xs px-3 py-2 rounded-lg border ${isTamUng ? "bg-rose-50 border-rose-300" : "bg-teal-50 border-teal-300"}`}>
-      <span className={`font-semibold px-1.5 py-0.5 rounded text-[10px] whitespace-nowrap shrink-0 ${isTamUng ? "bg-rose-200 text-rose-700" : "bg-teal-200 text-teal-700"}`}>{isTamUng ? "Tạm ứng" : "Phát sinh"}</span>
-      <input type="date" value={dateVal} onChange={(e) => setDateVal(e.target.value)} className="border border-slate-300 rounded px-1.5 py-0.5 text-xs outline-none bg-white" disabled={saving} />
-      <MoneyInput value={amtVal} onChange={setAmtVal} placeholder="Số tiền..." className="w-32" />
-      <TcDropdown value={tcRefEdit} onChange={setTcRefEdit} list={dailyCashList.filter((d) => d.direction === "expense")} />
-      <input autoFocus value={noteVal} onChange={(e) => setNoteVal(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") saveEdit(); if (e.key === "Escape") onCancelEdit(); }} placeholder="Ghi chú..." className="flex-1 min-w-[120px] border border-slate-300 rounded px-1.5 py-0.5 text-xs outline-none bg-white" disabled={saving} />
-      <button onClick={saveEdit} disabled={saving} className={isTamUng ? "text-rose-600" : "text-teal-600"}><Check size={13} /></button>
-      <button onClick={onCancelEdit} className="text-slate-400"><X size={13} /></button>
-    </div>
-  );
+  const handleDelete = async () => {
+    try {
+      await AccountingErpService.deleteApPayment(invoiceId, p.id);
+      onDeleted();
+    } catch (e: any) {
+      notification.error({ message: e?.response?.data?.description || "Xóa thất bại" });
+    }
+  };
+
+  if (isEditing) {
+    return (
+      <div className={`flex flex-wrap items-center gap-2 text-xs px-3 py-2 rounded-lg border ${isTamUng ? "bg-rose-50 border-rose-300" : "bg-teal-50 border-teal-300"}`}>
+        <span className={`font-semibold px-1.5 py-0.5 rounded text-[10px] whitespace-nowrap shrink-0 ${isTamUng ? "bg-rose-200 text-rose-700" : "bg-teal-200 text-teal-700"}`}>
+          {isTamUng ? "Thanh toán" : "Phát sinh"}
+        </span>
+        <input type="date" value={dateVal} onChange={(e) => setDateVal(e.target.value)} className="border border-slate-300 rounded px-1.5 py-0.5 text-xs outline-none bg-white" disabled={saving} />
+        <MoneyInput value={amtVal} onChange={setAmtVal} placeholder="Số tiền..." className="w-32" />
+        {isTamUng && (
+          <TcDropdown value={tcRefEdit} onChange={setTcRefEdit} list={dailyCashList.filter((d) => d.direction === "expense")} />
+        )}
+        <input autoFocus value={noteVal} onChange={(e) => setNoteVal(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") saveEdit(); if (e.key === "Escape") onCancelEdit(); }} placeholder="Ghi chú..." className="flex-1 min-w-[120px] border border-slate-300 rounded px-1.5 py-0.5 text-xs outline-none bg-white" disabled={saving} />
+        <button onClick={saveEdit} disabled={saving} className={isTamUng ? "text-rose-600 hover:text-rose-800" : "text-teal-600 hover:text-teal-800"}><Check size={13} /></button>
+        <button onClick={onCancelEdit} className="text-slate-400 hover:text-slate-600"><X size={13} /></button>
+      </div>
+    );
+  }
 
   return (
     <div className={`flex items-center gap-3 text-xs px-3 py-1.5 rounded-lg border group/row ${isTamUng ? "bg-rose-50 border-rose-200 text-rose-800" : "bg-teal-50 border-teal-200 text-teal-800"}`}>
-      <span className={`font-semibold px-1.5 py-0.5 rounded text-[10px] whitespace-nowrap ${isTamUng ? "bg-rose-200 text-rose-700" : "bg-teal-200 text-teal-700"}`}>{isTamUng ? "Tạm ứng" : "Phát sinh"}</span>
+      <span className={`font-semibold px-1.5 py-0.5 rounded text-[10px] whitespace-nowrap ${isTamUng ? "bg-rose-200 text-rose-700" : "bg-teal-200 text-teal-700"}`}>
+        {isTamUng ? "Thanh toán" : "Phát sinh"}
+      </span>
       <span className="whitespace-nowrap">{dayjs(p.payment_date).format("DD/MM/YYYY")}</span>
       <span className="font-semibold whitespace-nowrap">{fmt(p.amount)} đ</span>
       <span onClick={handleStartEdit} className="flex-1 text-slate-400 italic truncate max-w-[180px] cursor-pointer hover:text-slate-600" title="Nhấp để sửa">
-        {(() => { const m = (p.note || "").match(/^\[TC:([^\]]+)\]\s*(.*)/); if (m) return <span className="flex items-center gap-1.5"><span className={`font-mono text-[10px] px-1.5 py-0.5 rounded font-semibold ${isTamUng ? "bg-rose-200 text-rose-700" : "bg-teal-200 text-teal-700"}`}>{m[1]}</span>{m[2] && <span className="text-slate-400 italic">{m[2]}</span>}</span>; return p.note || <span className="text-slate-300 italic">Thêm ghi chú...</span>; })()}
+        {(() => {
+          const m = (p.note || "").match(/^\[TC:([^\]]+)\]\s*(.*)/);
+          if (m) {
+            return (
+              <span className="flex items-center gap-1.5">
+                <span className={`font-mono text-[10px] px-1.5 py-0.5 rounded font-semibold ${isTamUng ? "bg-rose-200 text-rose-700" : "bg-teal-200 text-teal-700"}`}>{m[1]}</span>
+                {m[2] && <span className="text-slate-400 italic">{m[2]}</span>}
+              </span>
+            );
+          }
+          return p.note || <span className="text-slate-300 italic">Thêm ghi chú...</span>;
+        })()}
       </span>
       <div className="flex items-center gap-1 opacity-0 group-hover/row:opacity-100 transition-opacity ml-auto">
-        <button onClick={handleStartEdit} className={`p-1 rounded hover:bg-white ${isTamUng ? "text-rose-400" : "text-teal-400"}`}><Pencil size={11} /></button>
-        <Popconfirm title="Xóa đợt thanh toán?" okText="Xóa" cancelText="Huỷ" okButtonProps={{ danger: true }} onConfirm={handleDelete}>
-          <button className="p-1 rounded hover:bg-white text-rose-400 hover:text-rose-600"><Trash2 size={11} /></button>
+        <button onClick={handleStartEdit} title="Sửa" className={`p-1 rounded hover:bg-white ${isTamUng ? "text-rose-400" : "text-teal-400"}`}><Pencil size={11} /></button>
+        <Popconfirm
+          title={isTamUng ? "Xóa đợt thanh toán / trả tiền này?" : "Xóa khoản phát sinh này?"}
+          description={isTamUng ? "Số tiền đã trả sẽ giảm trừ lại." : "Chi phí công nợ sẽ tự động giảm trừ lại."}
+          okText="Xóa"
+          cancelText="Huỷ"
+          okButtonProps={{ danger: true }}
+          onConfirm={handleDelete}
+        >
+          <button title="Xóa" className="p-1 rounded hover:bg-white text-rose-400 hover:text-rose-600 transition-colors"><Trash2 size={11} /></button>
         </Popconfirm>
       </div>
     </div>
@@ -180,42 +279,231 @@ function PaymentRow({ p, invoiceId, isEditing, onStartEdit, onCancelEdit, onDele
 }
 
 // ─── PaymentSubRow ────────────────────────────────────────────────────────────
-function PaymentSubRow({ payments, invoiceId, invoiceStatus, onAddPayment, addingLoading, onPaymentsChanged, dailyCashList }: { payments: Payment[]; invoiceId: string; invoiceStatus: string; onAddPayment: (p: AddPaymentForm) => void; addingLoading: boolean; onPaymentsChanged: (u: Payment[]) => void; dailyCashList: DailyCashRef[] }) {
-  const [addForm, setAddForm] = useState<AddPaymentForm>({ amount: 0, payment_type: "phat_sinh", payment_date: dayjs().format("YYYY-MM-DD"), note: "" });
+function PaymentSubRow({
+  payments,
+  invoiceId,
+  invoiceStatus,
+  onAddPayment,
+  addingLoading,
+  onPaymentsChanged,
+  dailyCashList,
+  onDeleted,
+}: {
+  payments: Payment[];
+  invoiceId: string;
+  invoiceStatus: string;
+  onAddPayment: (p: AddPaymentForm) => void;
+  addingLoading: boolean;
+  onPaymentsChanged: (u: Payment[]) => void;
+  dailyCashList: DailyCashRef[];
+  onDeleted?: () => void;
+}) {
+  const phatSinhPayments = payments.filter((p) => p.payment_type === "phat_sinh");
+  const tamUngPayments = payments.filter((p) => p.payment_type === "tam_ung");
+
   const [editingId, setEditingId] = useState<string | null>(null);
+
+  // Form thêm phát sinh
+  const [psForm, setPsForm] = useState({
+    amount: 0,
+    payment_date: dayjs().format("YYYY-MM-DD"),
+    note: "",
+  });
+
+  // Form thêm thanh toán
+  const [tuForm, setTuForm] = useState({
+    amount: 0,
+    payment_date: dayjs().format("YYYY-MM-DD"),
+    note: "",
+  });
   const [tcRef, setTcRef] = useState("");
+
   const canAdd = invoiceStatus !== "cancelled";
-  const handleAdd = (form: AddPaymentForm) => {
-    const chosen = dailyCashList.find((d) => d.id === tcRef);
-    const noteWithRef = chosen ? `[TC:${chosen.voucher_no}]${form.note ? " " + form.note : ""}` : form.note;
-    setEditingId(null); setTcRef("");
-    onAddPayment({ ...form, note: noteWithRef });
+
+  const handleAddPhatSinh = () => {
+    if (!psForm.amount || psForm.amount <= 0) {
+      notification.warning({ message: "Vui lòng nhập số tiền phát sinh > 0" });
+      return;
+    }
+    onAddPayment({
+      amount: psForm.amount,
+      payment_type: "phat_sinh",
+      payment_date: psForm.payment_date,
+      note: psForm.note,
+    });
+    setPsForm({ amount: 0, payment_date: dayjs().format("YYYY-MM-DD"), note: "" });
   };
+
+  const handleAddTamUng = () => {
+    if (!tuForm.amount || tuForm.amount <= 0) {
+      notification.warning({ message: "Vui lòng nhập số tiền thanh toán > 0" });
+      return;
+    }
+    const chosen = dailyCashList.find((d) => d.id === tcRef);
+    const noteWithRef = chosen ? `[TC:${chosen.voucher_no}]${tuForm.note ? " " + tuForm.note : ""}` : tuForm.note;
+    setTcRef("");
+    onAddPayment({
+      amount: tuForm.amount,
+      payment_type: "tam_ung",
+      payment_date: tuForm.payment_date,
+      note: noteWithRef,
+    });
+    setTuForm({ amount: 0, payment_date: dayjs().format("YYYY-MM-DD"), note: "" });
+  };
+
   return (
-    <div className="px-6 py-3 bg-slate-50/80 border-t border-slate-100">
-      <div className="flex flex-col gap-1.5">
-        {payments.length === 0 && !canAdd && <span className="text-xs text-slate-400 italic">Chưa có đợt thanh toán</span>}
-        {payments.map((p) => (
-          <PaymentRow key={p.id} p={p} invoiceId={invoiceId} dailyCashList={dailyCashList} isEditing={editingId === p.id} onStartEdit={() => setEditingId(p.id)} onCancelEdit={() => setEditingId(null)}
-            onDeleted={() => { setEditingId(null); onPaymentsChanged(payments.filter((x) => x.id !== p.id)); }}
-            onUpdated={(u) => { setEditingId(null); onPaymentsChanged(payments.map((x) => (x.id === u.id ? u : x))); }}
-          />
-        ))}
-        {canAdd && (
-          <div className="flex items-center gap-2 mt-1 flex-wrap">
-            <select value={addForm.payment_type} onChange={(e) => setAddForm((p) => ({ ...p, payment_type: e.target.value as "phat_sinh" | "tam_ung" }))} className={`text-xs border rounded-md px-2 py-1 cursor-pointer ${addForm.payment_type === "tam_ung" ? "border-rose-300 bg-rose-50 text-rose-700" : "border-teal-300 bg-teal-50 text-teal-700"}`}>
-              <option value="phat_sinh">Phát sinh</option>
-              <option value="tam_ung">Tạm ứng</option>
-            </select>
-            <input type="date" value={addForm.payment_date} onChange={(e) => setAddForm((p) => ({ ...p, payment_date: e.target.value }))} className="text-xs border border-slate-200 rounded-md px-2 py-1" />
-            <MoneyInput value={addForm.amount} onChange={(n) => setAddForm((p) => ({ ...p, amount: n }))} onEnter={() => { if (!addForm.amount || addForm.amount <= 0) { notification.warning({ message: "Vui lòng nhập số tiền > 0" }); return; } onAddPayment(addForm); setAddForm((p) => ({ ...p, amount: 0, note: "" })); }} placeholder="Số tiền..." className="w-36" />
-            <input value={addForm.note} onChange={(e) => setAddForm((p) => ({ ...p, note: e.target.value }))} placeholder="Ghi chú..." className="text-xs border border-slate-200 rounded-md px-2 py-1 flex-1 min-w-[120px]" />
-            <TcDropdown value={tcRef} onChange={setTcRef} list={dailyCashList.filter((d) => d.direction === "expense")} />
-            <button type="button" disabled={addingLoading} onClick={() => { if (!addForm.amount || addForm.amount <= 0) { notification.warning({ message: "Vui lòng nhập số tiền > 0" }); return; } handleAdd(addForm); setAddForm((p) => ({ ...p, amount: 0, note: "" })); }} className={`text-xs text-white px-3 py-1 rounded-md transition-colors whitespace-nowrap ${addingLoading ? "opacity-40 cursor-not-allowed" : ""} ${addForm.payment_type === "tam_ung" ? "bg-rose-500 hover:bg-rose-600" : "bg-teal-500 hover:bg-teal-600"}`}>
-              {addingLoading ? "Đang lưu..." : "+ Lưu"}
-            </button>
+    <div className="px-6 py-3 bg-slate-50/90 border-t border-slate-200">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        {/* Cột 1: Khoản phát sinh */}
+        <div className="bg-white p-3 rounded-xl border border-teal-200 shadow-2xs flex flex-col gap-2">
+          <div className="flex items-center justify-between pb-1 border-b border-teal-100">
+            <span className="text-xs font-bold text-teal-800 flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-teal-500"></span>
+              KHOẢN PHÁT SINH (Cộng vào chi phí)
+            </span>
+            <span className="text-xs font-bold text-teal-600">
+              +{fmt(phatSinhPayments.reduce((s, p) => s + (p.amount || 0), 0))} đ
+            </span>
           </div>
-        )}
+
+          <div className="flex flex-col gap-1.5 min-h-[36px]">
+            {phatSinhPayments.length === 0 && (
+              <span className="text-xs text-slate-400 italic py-1">Chưa có khoản phát sinh nào.</span>
+            )}
+            {phatSinhPayments.map((p) => (
+              <PaymentRow
+                key={p.id}
+                p={p}
+                invoiceId={invoiceId}
+                dailyCashList={dailyCashList}
+                isEditing={editingId === p.id}
+                onStartEdit={() => setEditingId(p.id)}
+                onCancelEdit={() => setEditingId(null)}
+                onDeleted={() => {
+                  setEditingId(null);
+                  onPaymentsChanged(payments.filter((x) => x.id !== p.id));
+                  onDeleted?.();
+                }}
+                onUpdated={(u) => {
+                  setEditingId(null);
+                  onPaymentsChanged(payments.map((x) => (x.id === u.id ? u : x)));
+                  onDeleted?.();
+                }}
+              />
+            ))}
+          </div>
+
+          {canAdd && (
+            <div className="flex items-center gap-1.5 pt-2 border-t border-slate-100 flex-wrap">
+              <input
+                type="date"
+                value={psForm.payment_date}
+                onChange={(e) => setPsForm((p) => ({ ...p, payment_date: e.target.value }))}
+                className="text-xs border border-slate-200 rounded-md px-2 py-1 bg-white"
+              />
+              <MoneyInput
+                value={psForm.amount}
+                onChange={(n) => setPsForm((p) => ({ ...p, amount: n }))}
+                onEnter={handleAddPhatSinh}
+                placeholder="Số tiền PS..."
+                className="w-28"
+              />
+              <input
+                value={psForm.note}
+                onChange={(e) => setPsForm((p) => ({ ...p, note: e.target.value }))}
+                onKeyDown={(e) => { if (e.key === "Enter") handleAddPhatSinh(); }}
+                placeholder="Nội dung phát sinh..."
+                className="text-xs border border-slate-200 rounded-md px-2 py-1 flex-1 min-w-[120px] bg-white"
+              />
+              <button
+                type="button"
+                disabled={addingLoading}
+                onClick={handleAddPhatSinh}
+                className={`text-xs text-white px-3 py-1 rounded-md font-semibold transition-colors whitespace-nowrap bg-teal-600 hover:bg-teal-700 ${addingLoading ? "opacity-50 cursor-not-allowed" : ""}`}
+              >
+                + Thêm PS
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* Cột 2: Đợt thanh toán */}
+        <div className="bg-white p-3 rounded-xl border border-rose-200 shadow-2xs flex flex-col gap-2">
+          <div className="flex items-center justify-between pb-1 border-b border-rose-100">
+            <span className="text-xs font-bold text-rose-800 flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-rose-500"></span>
+              ĐỢT THANH TOÁN / TRẢ TIỀN (Trừ vào còn lại)
+            </span>
+            <span className="text-xs font-bold text-rose-600">
+              Đã trả: {fmt(tamUngPayments.reduce((s, p) => s + (p.amount || 0), 0))} đ
+            </span>
+          </div>
+
+          <div className="flex flex-col gap-1.5 min-h-[36px]">
+            {tamUngPayments.length === 0 && (
+              <span className="text-xs text-slate-400 italic py-1">Chưa có đợt thanh toán nào.</span>
+            )}
+            {tamUngPayments.map((p) => (
+              <PaymentRow
+                key={p.id}
+                p={p}
+                invoiceId={invoiceId}
+                dailyCashList={dailyCashList}
+                isEditing={editingId === p.id}
+                onStartEdit={() => setEditingId(p.id)}
+                onCancelEdit={() => setEditingId(null)}
+                onDeleted={() => {
+                  setEditingId(null);
+                  onPaymentsChanged(payments.filter((x) => x.id !== p.id));
+                  onDeleted?.();
+                }}
+                onUpdated={(u) => {
+                  setEditingId(null);
+                  onPaymentsChanged(payments.map((x) => (x.id === u.id ? u : x)));
+                  onDeleted?.();
+                }}
+              />
+            ))}
+          </div>
+
+          {canAdd && (
+            <div className="flex items-center gap-1.5 pt-2 border-t border-slate-100 flex-wrap">
+              <input
+                type="date"
+                value={tuForm.payment_date}
+                onChange={(e) => setTuForm((p) => ({ ...p, payment_date: e.target.value }))}
+                className="text-xs border border-slate-200 rounded-md px-2 py-1 bg-white"
+              />
+              <MoneyInput
+                value={tuForm.amount}
+                onChange={(n) => setTuForm((p) => ({ ...p, amount: n }))}
+                onEnter={handleAddTamUng}
+                placeholder="Số tiền trả..."
+                className="w-28"
+              />
+              <input
+                value={tuForm.note}
+                onChange={(e) => setTuForm((p) => ({ ...p, note: e.target.value }))}
+                onKeyDown={(e) => { if (e.key === "Enter") handleAddTamUng(); }}
+                placeholder="Ghi chú thanh toán..."
+                className="text-xs border border-slate-200 rounded-md px-2 py-1 flex-1 min-w-[100px] bg-white"
+              />
+              <TcDropdown
+                value={tcRef}
+                onChange={setTcRef}
+                list={dailyCashList.filter((d) => d.direction === "expense")}
+              />
+              <button
+                type="button"
+                disabled={addingLoading}
+                onClick={handleAddTamUng}
+                className={`text-xs text-white px-3 py-1 rounded-md font-semibold transition-colors whitespace-nowrap bg-rose-600 hover:bg-rose-700 ${addingLoading ? "opacity-50 cursor-not-allowed" : ""}`}
+              >
+                + Trả tiền
+              </button>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
@@ -354,24 +642,23 @@ export default function AccountsPayableTab() {
   let filteredRows = allRows;
   if (filterVat !== "") filteredRows = filteredRows.filter((r) => String(r.tax_rate ?? "") === filterVat);
   if (filterStatus) filteredRows = filteredRows.filter((r) => r.status === filterStatus);
-  if (filterPaid === "unpaid") filteredRows = filteredRows.filter((r) => { const paid = (paymentsMap[r.id] || []).filter((p) => p.payment_type === "tam_ung").reduce((s, p) => s + (p.amount || 0), 0); return paid <= 0; });
-  else if (filterPaid === "partial") filteredRows = filteredRows.filter((r) => { const paid = (paymentsMap[r.id] || []).filter((p) => p.payment_type === "tam_ung").reduce((s, p) => s + (p.amount || 0), 0); const total = (r.base_amount || 0) * (1 + (r.tax_rate || 0) / 100); return paid > 0 && paid < total; });
-  else if (filterPaid === "paid") filteredRows = filteredRows.filter((r) => { const paid = (paymentsMap[r.id] || []).filter((p) => p.payment_type === "tam_ung").reduce((s, p) => s + (p.amount || 0), 0); const total = (r.base_amount || 0) * (1 + (r.tax_rate || 0) / 100); return paid >= total; });
+  if (filterPaid === "unpaid") filteredRows = filteredRows.filter((r) => getApRowTotals(r, paymentsMap[r.id]).tamUngAmount <= 0);
+  else if (filterPaid === "partial") filteredRows = filteredRows.filter((r) => { const t = getApRowTotals(r, paymentsMap[r.id]); return t.tamUngAmount > 0 && t.remainingAmount > 0; });
+  else if (filterPaid === "paid") filteredRows = filteredRows.filter((r) => { const t = getApRowTotals(r, paymentsMap[r.id]); return t.tamUngAmount >= t.effectiveTotalAmount; });
 
   // Sort
   const sortedRows = (() => {
     if (!sortField) return filteredRows;
     return [...filteredRows].sort((a, b) => {
       let aVal: number | string = 0, bVal: number | string = 0;
-      const pmtsA = paymentsMap[a.id] || [], pmtsB = paymentsMap[b.id] || [];
       switch (sortField) {
         case "code": aVal = a.code || ""; bVal = b.code || ""; break;
         case "date": aVal = a.bill_date || ""; bVal = b.bill_date || ""; break;
         case "desc": aVal = (a.supplier_name || "").toLowerCase(); bVal = (b.supplier_name || "").toLowerCase(); break;
         case "vat": aVal = a.tax_rate ?? 0; bVal = b.tax_rate ?? 0; break;
-        case "cost": { const psA = pmtsA.filter((p) => p.payment_type === "phat_sinh").reduce((s, p) => s + p.amount, 0); const psB = pmtsB.filter((p) => p.payment_type === "phat_sinh").reduce((s, p) => s + p.amount, 0); aVal = Math.round(((a.base_amount || 0) + psA) * (1 + (a.tax_rate || 0) / 100)); bVal = Math.round(((b.base_amount || 0) + psB) * (1 + (b.tax_rate || 0) / 100)); break; }
-        case "paid": aVal = pmtsA.filter((p) => p.payment_type === "tam_ung").reduce((s, p) => s + p.amount, 0); bVal = pmtsB.filter((p) => p.payment_type === "tam_ung").reduce((s, p) => s + p.amount, 0); break;
-        case "remaining": { const psA2 = pmtsA.filter((p) => p.payment_type === "phat_sinh").reduce((s, p) => s + p.amount, 0); const psB2 = pmtsB.filter((p) => p.payment_type === "phat_sinh").reduce((s, p) => s + p.amount, 0); const tuA = pmtsA.filter((p) => p.payment_type === "tam_ung").reduce((s, p) => s + p.amount, 0); const tuB = pmtsB.filter((p) => p.payment_type === "tam_ung").reduce((s, p) => s + p.amount, 0); aVal = Math.round(((a.base_amount || 0) + psA2) * (1 + (a.tax_rate || 0) / 100)) - tuA; bVal = Math.round(((b.base_amount || 0) + psB2) * (1 + (b.tax_rate || 0) / 100)) - tuB; break; }
+        case "cost": aVal = getApRowTotals(a, paymentsMap[a.id]).effectiveTotalAmount; bVal = getApRowTotals(b, paymentsMap[b.id]).effectiveTotalAmount; break;
+        case "paid": aVal = getApRowTotals(a, paymentsMap[a.id]).tamUngAmount; bVal = getApRowTotals(b, paymentsMap[b.id]).tamUngAmount; break;
+        case "remaining": aVal = getApRowTotals(a, paymentsMap[a.id]).remainingAmount; bVal = getApRowTotals(b, paymentsMap[b.id]).remainingAmount; break;
         case "due": aVal = a.due_date || ""; bVal = b.due_date || ""; break;
         default: break;
       }
@@ -467,18 +754,20 @@ export default function AccountsPayableTab() {
             {rows.map((row) => {
               const isExpanded = expanded.has(row.id);
               const pmts = paymentsMap[row.id] || [];
-              const psAmt = paymentsMap[row.id] ? pmts.filter((p) => p.payment_type === "phat_sinh").reduce((s, p) => s + p.amount, 0) : (row.phat_sinh_amount || 0);
-              const tuAmt = paymentsMap[row.id] ? pmts.filter((p) => p.payment_type === "tam_ung").reduce((s, p) => s + p.amount, 0) : (row.tam_ung_amount || 0);
-              const base = row.base_amount || 0;
-              const vatRate = (row.tax_rate || 0) / 100;
-              const totalCost = Math.round((base + psAmt) * (1 + vatRate));
-              const paid = tuAmt;
-              const remaining = totalCost - paid;
+              const rowTotals = getApRowTotals(row, paymentsMap[row.id]);
+              const psAmt = rowTotals.phatSinhAmount;
+              const totalCost = rowTotals.effectiveTotalAmount;
+              const paid = rowTotals.tamUngAmount;
+              const remaining = rowTotals.remainingAmount;
               const isDueSoon = row.due_date && row.status !== "paid" && row.status !== "cancelled" && dayjs(row.due_date).diff(dayjs(), "day") >= 0 && dayjs(row.due_date).diff(dayjs(), "day") <= reminderDays;
               return (
                 <React.Fragment key={row.id}>
                   <tr className={`border-b last:border-0 hover:bg-slate-50/60 group transition-colors ${isDueSoon ? "bg-amber-50/40" : ""}`}>
-                    <td className="px-3 py-3 text-center"><button onClick={() => toggleExpand(row.id)} className="text-slate-400 hover:text-rose-600 transition-colors">{isExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}</button></td>
+                    <td className="px-3 py-3 text-center">
+                      <button onClick={() => toggleExpand(row.id)} className="text-slate-400 hover:text-rose-600 transition-colors" title="Xem chi tiết phát sinh & thanh toán">
+                        {isExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+                      </button>
+                    </td>
                     <td className="px-3 py-2">
                       <div className="font-medium text-slate-700 text-xs leading-tight">{row.code}</div>
                       <InlineText type="date" value={row.bill_date || ""} onSave={(v) => handleInlineUpdate(row, "bill_date", v)} className="text-[11px] text-slate-400" />
@@ -503,29 +792,86 @@ export default function AccountsPayableTab() {
                           </div>
                         );
                       })()}
+                      {/* Input ghi chú thông tin riêng */}
+                      <div className="mt-1">
+                        <InlineText
+                          value={row.note || ""}
+                          onSave={(v) => handleInlineUpdate(row, "note", v)}
+                          placeholder="📝 Ghi chú thông tin riêng..."
+                          className="text-[11px] text-slate-500 italic bg-slate-50 hover:bg-white border border-slate-200 rounded px-1.5 py-0.5 w-full block"
+                        />
+                      </div>
                     </td>
                     <td className="px-3 py-2"><InlineVAT value={row.tax_rate ?? 0} taxCodes={taxCodes} onSave={(rate, taxCodeId) => handleVATChange(row, rate, taxCodeId)} /></td>
                     <td className="px-3 py-2">
                       <div className="flex items-center gap-1 text-xs flex-wrap">
-                        <InlineText type="text" value={fmt(row.base_amount || 0)} placeholder="0" onSave={(v) => handleInlineUpdate(row, "base_amount", parseMoney(v))} className="w-28 text-left" />
+                        <InlineText type="text" value={fmt(row.base_amount || 0)} placeholder="0" onSave={(v) => handleInlineUpdate(row, "base_amount", parseMoney(v))} className="w-24 text-left" />
                         {psAmt > 0 && <span className="text-teal-600 font-medium">+{fmt(psAmt)}</span>}
-                        <span className="text-slate-400">×(1+{row.tax_rate || 0}%)</span>
+                        {row.tax_rate > 0 && <span className="text-slate-400">×(1+{row.tax_rate}%)</span>}
                         <span className="font-semibold text-rose-700">= {fmt(totalCost)} đ</span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (!isExpanded) toggleExpand(row.id);
+                          }}
+                          className="ml-1 text-[11px] font-medium text-teal-600 hover:text-teal-800 bg-teal-50 hover:bg-teal-100 border border-teal-200 px-1.5 py-0.5 rounded transition-colors cursor-pointer whitespace-nowrap"
+                          title="Thêm hoặc quản lý các khoản phát sinh"
+                        >
+                          + PS
+                        </button>
                       </div>
                     </td>
-                    <td className="px-3 py-2 text-emerald-700 font-medium text-sm">{fmt(paid)} đ</td>
-                    <td className="px-3 py-2 text-amber-700 font-medium text-sm">{fmt(remaining)} đ</td>
+                    <td className="px-3 py-2">
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <span className="text-emerald-700 font-medium text-sm">{fmt(paid)} đ</span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (!isExpanded) toggleExpand(row.id);
+                          }}
+                          className="text-[11px] font-medium text-rose-600 hover:text-rose-800 bg-rose-50 hover:bg-rose-100 border border-rose-200 px-1.5 py-0.5 rounded transition-colors cursor-pointer whitespace-nowrap"
+                          title="Thêm hoặc quản lý đợt chi trả / thanh toán"
+                        >
+                          + Trả
+                        </button>
+                      </div>
+                    </td>
+                    <td className="px-3 py-2">
+                      {remaining < 0 ? (
+                        <div className="flex flex-col">
+                          <span className="text-blue-600 font-bold text-sm">{fmt(remaining)} đ</span>
+                          <span className="text-[10px] text-blue-500 font-medium">(Đã trả dư)</span>
+                        </div>
+                      ) : (
+                        <span className="text-amber-700 font-medium text-sm">{fmt(remaining)} đ</span>
+                      )}
+                    </td>
                     <td className="px-3 py-2"><InlineText type="date" value={row.due_date || ""} placeholder="Chưa đặt" onSave={(v) => handleInlineUpdate(row, "due_date", v)} className="text-xs" /></td>
                     <td className="px-3 py-2 text-center">
-                      <Popconfirm title="Xoá công nợ này?" description="Hành động không thể hoàn tác." okText="Xoá" cancelText="Huỷ" okButtonProps={{ danger: true }} onConfirm={() => deleteMutation.mutate(row)}>
-                        <button className="p-1.5 rounded-md border border-rose-200 text-rose-500 hover:text-rose-700 hover:border-rose-400 hover:bg-rose-50 transition-colors"><Trash2 size={13} /></button>
+                      <Popconfirm
+                        title="Xoá toàn bộ đơn công nợ này?"
+                        description="LƯU Ý: Thao tác này sẽ xoá TOÀN BỘ đơn công nợ này (bao gồm mọi phát sinh và đợt chi trả bên trong). Nếu chỉ muốn xoá một đợt phát sinh, hãy mở rộng dòng và xoá ở mục Phát sinh."
+                        okText="Xoá công nợ"
+                        cancelText="Huỷ"
+                        okButtonProps={{ danger: true }}
+                        onConfirm={() => deleteMutation.mutate(row)}
+                      >
+                        <button title="Xoá công nợ này" className="p-1.5 rounded-md border border-rose-200 text-rose-500 hover:text-rose-700 hover:border-rose-400 hover:bg-rose-50 transition-colors">
+                          <Trash2 size={13} />
+                        </button>
                       </Popconfirm>
                     </td>
                   </tr>
                   {isExpanded && (
                     <tr className="bg-slate-50/50">
                       <td colSpan={9} className="p-0">
-                        <PaymentSubRow payments={pmts} invoiceId={row.id} invoiceStatus={row.status} addingLoading={paymentMutation.isPending} dailyCashList={dailyCashList}
+                        <PaymentSubRow
+                          payments={pmts}
+                          invoiceId={row.id}
+                          invoiceStatus={row.status}
+                          addingLoading={paymentMutation.isPending}
+                          dailyCashList={dailyCashList}
+                          onDeleted={invalidate}
                           onPaymentsChanged={(updated) => setPaymentsMap((prev) => ({ ...prev, [row.id]: updated }))}
                           onAddPayment={(p) => paymentMutation.mutate({ invoiceId: row.id, payload: { payment_date: p.payment_date, amount: p.amount, payment_method: "bank_transfer", payment_type: p.payment_type, note: p.note } })}
                         />

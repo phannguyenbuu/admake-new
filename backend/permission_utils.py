@@ -91,6 +91,9 @@ def require_authenticated_user() -> User:
     user = resolve_request_user()
     if not user:
         abort(401, description="Authentication required")
+        
+    if user.is_active is False:
+        abort(403, description="Tài khoản của bạn đã bị khóa hoặc đã nghỉ việc.")
     
     # Check if lead is locked
     if user.lead_id:

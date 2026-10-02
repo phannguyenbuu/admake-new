@@ -17,6 +17,8 @@ import {
   ToolOutlined,
   EnvironmentOutlined,
   DollarOutlined,
+  BankOutlined,
+  FileTextOutlined,
 } from "@ant-design/icons";
 // import type { Customer } from "../../../@types/customer.type";
 import {
@@ -57,10 +59,14 @@ export default function FormCustomer({
   useEffect(() => {
     console.log('initialValues', initialValues, userLeadId);
     if (initialValues) {
+      const compName = (initialValues as any).companyName || (initialValues as any).company_name || "";
+      const tCode = (initialValues as any).taxCode || (initialValues as any).tax_code || "";
       form.setFieldsValue({
         ...initialValues,
-        // workStart: dayjs(initialValues.workStart),
-        // workEnd: dayjs(initialValues.workEnd),
+        companyName: compName,
+        company_name: compName,
+        taxCode: tCode,
+        tax_code: tCode,
       });
     } else {
       form.resetFields();
@@ -70,28 +76,15 @@ export default function FormCustomer({
   const onFinish = (
     values: Omit<WorkSpace, "createdAt" | "updatedAt" | "deletedAt">
   ) => {
-    
+    const compName = (values as any).companyName || (values as any).company_name || "";
+    const tCode = (values as any).taxCode || (values as any).tax_code || "";
     const formattedValues = {
       ...values,
-      lead:userLeadId,
-      // ...(values.workInfo && {
-      //   workInfo: values.workInfo,
-      // }),
-      // ...(values.workAddress && {
-      //   workAddress: values.workAddress,
-      // }),
-      // ...(values.workPrice && {
-      //   workPrice: values.workPrice,
-      // }),
-      // ...(values.status && {
-      //   status: values.status,
-      // }),
-      // ...(values.workStart && {
-      //   workStart: dayjs(values.workStart).format("YYYY-MM-DD"),
-      // }),
-      // ...(values.workEnd && {
-      //   workEnd: dayjs(values.workEnd).format("YYYY-MM-DD"),
-      // }),
+      lead: userLeadId,
+      companyName: compName,
+      company_name: compName,
+      taxCode: tCode,
+      tax_code: tCode,
     };
 
 
@@ -316,6 +309,26 @@ export default function FormCustomer({
 
 
                 <Form.Item
+                  name="companyName"
+                  label={
+                    <div className="flex items-center gap-1.5 sm:gap-2">
+                      <span className="text-gray-800 font-medium text-xs sm:text-sm">
+                        Tên CTY (thông tin xuất hóa đơn)
+                      </span>
+                      <span className="text-gray-400 text-xs font-normal">(Tùy chọn)</span>
+                    </div>
+                  }
+                  className="!mb-0"
+                >
+                  <Input
+                    placeholder="Nhập tên công ty xuất hóa đơn VAT..."
+                    className="!h-9 sm:!h-10 !text-xs sm:!text-sm !rounded-lg !border !border-gray-300 focus:!border-[#00B4B6] focus:!shadow-lg hover:!border-[#00B4B6] !transition-all !duration-200 !shadow-sm"
+                    size="middle"
+                    prefix={<BankOutlined className="text-[#00B4B6] mr-2" />}
+                  />
+                </Form.Item>
+
+                <Form.Item
                   name="phone"
                   label={
                     <div className="flex items-center gap-1.5 sm:gap-2">
@@ -349,7 +362,7 @@ export default function FormCustomer({
                   <EnvironmentOutlined className="!text-purple-600 !text-xs sm:!text-sm" />
                 </div>
                 <Text strong className="!text-gray-800 !text-sm sm:!text-base">
-                  Địa chỉ
+                  Địa chỉ & Mã số thuế
                 </Text>
               </div>
 
@@ -358,9 +371,9 @@ export default function FormCustomer({
                 label={
                   <div className="flex items-center gap-1.5 sm:gap-2">
                     <div className="w-1 h-1 bg-purple-500 rounded-full"></div>
-                    {/*<span className="text-gray-800 font-medium text-xs sm:text-sm">
-                      Địa điểm thi công
-                    </span>*/}
+                    <span className="text-gray-800 font-medium text-xs sm:text-sm">
+                      Địa điểm thi công / Địa chỉ
+                    </span>
                     <span className="text-gray-400 text-xs font-normal">
                       (Tùy chọn)
                     </span>
@@ -370,8 +383,28 @@ export default function FormCustomer({
               >
                 <Input.TextArea
                   rows={2}
-                  placeholder="Nhập địa điểm thi công..."
+                  placeholder="Nhập địa điểm thi công / địa chỉ..."
                   className="!rounded-lg !border !border-gray-300 focus:!border-[#00B4B6] focus:!shadow-lg hover:!border-[#00B4B6] !transition-all !duration-200 !shadow-sm !resize-none !text-xs sm:!text-sm"
+                />
+              </Form.Item>
+
+              <Form.Item
+                name="taxCode"
+                label={
+                  <div className="flex items-center gap-1.5 sm:gap-2">
+                    <span className="text-gray-800 font-medium text-xs sm:text-sm">
+                      Mã số thuế (MST)
+                    </span>
+                    <span className="text-gray-400 text-xs font-normal">(Tùy chọn)</span>
+                  </div>
+                }
+                className="!mb-0"
+              >
+                <Input
+                  placeholder="Nhập mã số thuế công ty (ví dụ: 0312345678)..."
+                  className="!h-9 sm:!h-10 !text-xs sm:!text-sm !rounded-lg !border !border-gray-300 focus:!border-[#00B4B6] focus:!shadow-lg hover:!border-[#00B4B6] !transition-all !duration-200 !shadow-sm"
+                  size="middle"
+                  prefix={<FileTextOutlined className="text-purple-600 mr-2" />}
                 />
               </Form.Item>
 

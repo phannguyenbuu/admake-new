@@ -109,6 +109,11 @@ def update_customer(id):
     if not user:
         abort(404, description="Workspace owner not found")
 
+    if "company_name" in data:
+        data["companyName"] = data["company_name"]
+    if "tax_code" in data:
+        data["taxCode"] = data["tax_code"]
+
     user_fields = get_model_columns(User)
     workspace_fields = get_model_columns(Workspace)
 

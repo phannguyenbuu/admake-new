@@ -34,8 +34,8 @@
 - Build frontend:
 - `cd frontend && npm run build`
 - Deploy static build:
-- `scp -r frontend/dist/* root@31.97.76.62:/var/www/admake`
-- Backend production hiện được restart qua `pm2 restart admake-api`
+- `scp -r frontend/dist/* root@103.163.219.87:/var/www/admake`
+- Backend production hiện được restart qua `pm2 restart admake-api` trên `103.163.219.87`
 - Backend runs on port `6000`, proxied by Nginx for:
 - `/api/`
 - `/static/`

@@ -17,6 +17,7 @@ import {
   PieChartOutlined,
   TeamOutlined,
   UserOutlined,
+  RobotOutlined,
 } from "@ant-design/icons";
 import { Typography } from "@mui/material";
 import BaseLayout from "../common/common/layouts/base.layout";
@@ -75,6 +76,7 @@ const StatisticDashboard = lazy(() => import("../common/app/dashboard/statistic/
 const InvoiceDashboard = lazy(() => import("../common/app/dashboard/invoices/page"));
 const MaterialsDashboard = lazy(() => import("../common/app/dashboard/materials/page"));
 const AccountingDashboard = lazy(() => import("../common/app/dashboard/accounting/page"));
+const AIPricingDashboard = lazy(() => import("../common/app/dashboard/ai-pricing/page"));
 
 const DashboardIndexRedirect = () => {
   const { canViewPermission } = useUser();
@@ -248,6 +250,17 @@ const routes: TRoute = {
           requiredPermission: "view_invoice",
           title: "Báo giá",
           icon: <FileTextOutlined />,
+          ignoreInMenu: true,
+        },
+        {
+          path: "/ai-pricing",
+          element: (
+            <Suspense fallback={<div>Loading...</div>}>
+              <AIPricingDashboard />
+            </Suspense>
+          ),
+          title: "AI Báo giá (Thử nghiệm)",
+          icon: <RobotOutlined />,
           ignoreInMenu: true,
         },
         {

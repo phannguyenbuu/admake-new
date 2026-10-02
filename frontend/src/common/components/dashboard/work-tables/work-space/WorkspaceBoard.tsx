@@ -117,6 +117,26 @@ const WorkspaceBoard: React.FC<WorkspaceBoardProps> = ({
 
     return (
     <div className="relative z-10 px-4 sm:px-6 pt-3">
+      {isMobile && (
+        <div className="flex items-center gap-2 overflow-x-auto pb-3 mb-1 no-scrollbar">
+          {columns.map((col, idx) => (
+            <button
+              key={col.id}
+              type="button"
+              onClick={() => {
+                const el = document.getElementById(`col-container-${col.id}`);
+                if (el) {
+                  el.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "start" });
+                }
+              }}
+              className="px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap bg-white/90 border border-slate-200 shadow-sm text-slate-700 active:bg-cyan-600 active:text-white"
+            >
+              {colNames[idx] || col.title} ({col.tasks?.length || 0})
+            </button>
+          ))}
+        </div>
+      )}
+
             <DragDropContext
             onDragStart={onDragStart}
             onDragUpdate={onDragUpdate}
@@ -136,6 +156,7 @@ const WorkspaceBoard: React.FC<WorkspaceBoardProps> = ({
                 return (
                     <Col
                     key={col.id}
+                    id={`col-container-${col.id}`}
                     style={{
                       width: isMobile ? cardWidth : undefined,
                       minWidth: cardWidth,

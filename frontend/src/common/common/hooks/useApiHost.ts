@@ -14,7 +14,7 @@ export function useApiHost(): string {
 
 export function useApiSocket(): string {
   const raw = String(import.meta.env.VITE_APP_SOCKET || "").trim();
-  if (!raw) return "";
+  if (!raw) return "https://admake.vn";
   return normalizePathLikeUrl(raw, "");
 }
 

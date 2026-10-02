@@ -1,0 +1,1 @@
+ALTER TABLE task ADD COLUMN IF NOT EXISTS material_adjustments JSON DEFAULT '[]'::JSON;

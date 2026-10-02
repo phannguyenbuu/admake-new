@@ -89,6 +89,20 @@ export interface TaskMaterialItem {
   dia_diem: string;   // Địa điểm
 }
 
+/** Dòng điều chỉnh / bổ sung / phát sinh giảm vật liệu */
+export interface TaskMaterialAdjustmentItem {
+  id: string;             // uuid client-side
+  ten: string;            // Tên vật liệu
+  quy_cach: string;       // Quy cách
+  so_luong: string;       // Số lượng
+  type: "PLUS" | "MINUS"; // Bổ sung (+) hoặc Phát sinh giảm (-)
+  dia_diem: string;       // Địa điểm phân bổ kho
+  date: string;           // Ngày yêu cầu (YYYY-MM-DD)
+  requester_name: string; // Tên nhân viên yêu cầu
+  requester_id?: string;  // ID nhân viên yêu cầu
+  note?: string;          // Ghi chú nếu có
+}
+
 export interface ZipUserSearchProps {
   name: string,
   id: string,
@@ -109,6 +123,7 @@ export interface Task extends BaseEntity {
   tempIcon?: string;
   customer_id?: string | { id: string; name: string; phone?: string; address?: string; email?: string } | null; // id hoặc thông tin khách hàng
   materials?: TaskMaterialItem[]; // danh sách vật liệu công việc
+  material_adjustments?: TaskMaterialAdjustmentItem[]; // danh sách vật liệu bổ sung / phát sinh giảm
   start_time?: Dayjs | null; // Thời gian bắt đầu
   end_time?: Dayjs | null; // Thời gian kết thúc
   assets?: MessageTypeProps[];

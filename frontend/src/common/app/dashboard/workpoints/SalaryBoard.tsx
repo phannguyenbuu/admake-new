@@ -52,10 +52,11 @@ function checkWorkhour(item: PeriodData, end_time: number):number {
     const diffMs = new Date(item.out.time).getTime() 
                 - new Date(item.in.time).getTime();
     const diffHours = diffMs / (1000 * 60 * 60);
-    item.workhour = diffHours;
+    item.workhour = Math.min(diffHours, 6.0);
   }
   
-  return item?.workhour && item.workhour > 1 ? item.workhour : 0;
+  const val = item?.workhour && item.workhour > 0 ? item.workhour : 0;
+  return Math.min(val, 6.0);
 }
 
 const formatMoney: (n: number) => string = (n) => {
@@ -344,8 +345,7 @@ const SalaryBoard: React.FC<SalaryBoardProps> = ({
       return;
     }
 
-    let bonus = 0, advance = 0, punish = 0;
-    
+    let bonus = 0, msgAdvance = 0, punish = 0;
     taskDetail.assets.forEach(el => {
       if(el.text !== '' && el.text)
       {
@@ -356,15 +356,23 @@ const SalaryBoard: React.FC<SalaryBoardProps> = ({
           punish += v < 0 ? v : 0;
         }
         else if(el.type === "advance-salary-cash") 
-          advance += Number(el.text.split('/')[0].replace(/\./g, ''));
+          msgAdvance += Number(el.text.split('/')[0].replace(/\./g, ''));
       }
     });
 
-    setAdvanceSalary(advance);
+    // Đồng bộ với phần nhập tạm ứng từ Kế toán (payroll_adjustments & payrollRow)
+    const adjAdvance = adjustments
+      .filter((a: any) => a.adjustment_type === "advance")
+      .reduce((s: number, a: any) => s + (Number(a.amount) || 0), 0);
+
+    const totalAdv = msgAdvance + adjAdvance;
+    const finalAdv = payrollRow?.advance_total && payrollRow.advance_total > totalAdv ? payrollRow.advance_total : totalAdv;
+
+    setAdvanceSalary(finalAdv);
     setPunishSalary(punish);
     setCustomBonusSalary(bonus);
 
-  },[taskDetail])
+  },[taskDetail, adjustments, payrollRow])
 
   const handleChange = (_event: React.SyntheticEvent, newIndex: number) => {
     setTabIndex(newIndex);
@@ -496,7 +504,7 @@ const SalaryBoard: React.FC<SalaryBoardProps> = ({
           const configTime = inTime.hour(morningInHour).minute(morningInMin).second(0).millisecond(0);
           const diff = inTime.diff(configTime, 'minute');
           if (diff > 0) {
-            late += diff;
+            late += Math.min(diff, 120);
           }
         }
         
@@ -509,7 +517,7 @@ const SalaryBoard: React.FC<SalaryBoardProps> = ({
           const configTime = inTime.hour(noonInHour).minute(noonInMin).second(0).millisecond(0);
           const diff = inTime.diff(configTime, 'minute');
           if (diff > 0) {
-            late += diff;
+            late += Math.min(diff, 120);
           }
         }
         
@@ -742,7 +750,9 @@ const SalaryBoard: React.FC<SalaryBoardProps> = ({
                 
                 <TableRow>
                   <TableCell>Số phút đi trễ</TableCell>
-                  <TableCell className="font-semibold text-rose-600">{lateMinutes} phút</TableCell>
+                  <TableCell className="font-semibold text-rose-600">
+                    {lateMinutes} phút {lateMinutes >= 60 ? `(~${(lateMinutes / 60).toFixed(1)} giờ)` : ""}
+                  </TableCell>
                 </TableRow>
 
                 <TableRow>
@@ -796,6 +806,7 @@ const SalaryBoard: React.FC<SalaryBoardProps> = ({
         <AdvanceSalaryAsset key="cash-assets" 
           targetUserId = {selectedRecord?.user_id}
           messages={dataMessages.filter(el => el.type === "advance-salary-cash")}
+          adjustments={adjustments.filter((a: any) => a.adjustment_type === "advance")}
           title = 'Ứng tiền cho nhân viên' 
           type="advance-salary-cash" 
           readOnly={!isAdmin}

@@ -12,7 +12,7 @@ import {
   TableContainer, TableHead, TableRow, Paper
 } from "@mui/material";
 
-import { useApiHost } from "../../../../common/hooks/useApiHost";
+import { useApiHost, useApiStatic } from "../../../../common/hooks/useApiHost";
 import type { User } from "../../../../@types/user.type";
 import { CenterBox } from "../commons/TitlePanel";
 import { LogoAdmake } from "../Conversation/Header";
@@ -26,6 +26,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useWorkpointInfor } from "../../../../common/hooks/useWorpointInfor";
 import SalaryBoard from "../../../../app/dashboard/workpoints/SalaryBoard";
 import { useUser } from "../../../../common/hooks/useUser";
+import AdvanceSalaryModal from "./AdvanceSalaryModal";
 
 interface CameraDialogProps {
   userEl: User | null;
@@ -79,12 +80,96 @@ const CameraDialog: React.FC<CameraDialogProps> = ({userEl}) => {
   const [workpoint, setWorkpoint] = useState<Workpoint | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [openWork, setOpenWork] = useState(userEl?.role && userEl?.role?.name !== "Thầu phụ");
+  const isSupplier = userEl?.role?.name === "Thầu phụ";
+  const [openWork, setOpenWork] = useState(false);
   const [openHoliday, setOpenHoliday] = useState(false);
   const [hasCamera, setHasCamera] = useState(false);
   const {workpointEl, fetchWorkpointEl } = useWorkpointInfor();
   const [modalVisible, setModalVisible] = useState(false);
+  const [openAdvanceModal, setOpenAdvanceModal] = useState(false);
   const {userLeadId, setUserLeadId, setUserId} = useUser();
+  const apiHost = useApiHost();
+
+  useEffect(() => {
+    if (!userEl?.id) return;
+    const checkUserNotify = async () => {
+      try {
+        const res = await fetch(`${apiHost}/notify/user/${userEl.id}`);
+        if (res.ok) {
+          const data = await res.json();
+          const notifs = data.data || [];
+          const approved = notifs.find((n: any) => n.type === "advance-approved" && !n.isDelete);
+          if (approved) {
+            notification.success({
+              message: "🎉 Đề xuất tạm ứng đã được duyệt!",
+              description: approved.text || approved.description,
+              duration: 10,
+            });
+            await fetch(`${apiHost}/notify/${approved.id}`, { method: "DELETE" });
+          }
+        }
+      } catch (e) {
+        console.error("Check user notify error:", e);
+      }
+    };
+    checkUserNotify();
+  }, [userEl?.id, apiHost]);
+
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(userEl?.avatar || null);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const avatarInputRef = useRef<HTMLInputElement | null>(null);
+
+  useEffect(() => {
+    if (userEl?.avatar) {
+      setAvatarUrl(userEl.avatar);
+    }
+  }, [userEl]);
+
+  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !userEl?.id) return;
+    const formData = new FormData();
+    formData.append("file", file);
+    setUploadingAvatar(true);
+    try {
+      const res = await fetch(`${useApiHost()}/workpoint/avatar/${userEl.id}`, {
+        method: "POST",
+        body: formData,
+      });
+      const data = await res.json();
+      if (data.success && data.avatar) {
+        setAvatarUrl(data.avatar);
+        notification.success({ message: "Đã cập nhật ảnh đại diện!" });
+      } else {
+        notification.error({ message: data.error || "Tải ảnh thất bại" });
+      }
+    } catch (err: any) {
+      notification.error({ message: "Lỗi tải ảnh: " + err.message });
+    } finally {
+      setUploadingAvatar(false);
+    }
+  };
+
+  const handleClearAvatar = async () => {
+    if (!userEl?.id) return;
+    setUploadingAvatar(true);
+    try {
+      const res = await fetch(`${useApiHost()}/workpoint/avatar/${userEl.id}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+      if (data.success) {
+        setAvatarUrl(null);
+        notification.success({ message: "Đã xóa ảnh đại diện!" });
+      } else {
+        notification.error({ message: data.error || "Xóa ảnh thất bại" });
+      }
+    } catch (err: any) {
+      notification.error({ message: "Lỗi xóa ảnh: " + err.message });
+    } finally {
+      setUploadingAvatar(false);
+    }
+  };
   
   useEffect(() => {
     console.log("UserEL", userEl);
@@ -160,6 +245,7 @@ const CameraDialog: React.FC<CameraDialogProps> = ({userEl}) => {
   },[]);
 
   useEffect(() => {
+    if (isSupplier) return;
     const setupCamera = async () => {
       try {
         if (stream) {
@@ -425,154 +511,360 @@ async function postWorkpointCheck(imgUrl: string, lat:string, long:string) {
     setOpenHoliday(true);
   }
 
-  const isSupplier = userEl?.role?.name === "Thầu phụ";
+  const getFirstNameInitial = (fullName?: string) => {
+    if (!fullName) return "U";
+    const parts = fullName.trim().split(/\s+/);
+    const firstName = parts[parts.length - 1];
+    return firstName.charAt(0).toUpperCase();
+  };
 
+  const getNextAction = (): { label: string; isOvertime: boolean } => {
+    const chk = workpoint?.checklist || {};
+    const mIn = !!chk.morning?.in;
+    const mOut = !!chk.morning?.out;
+    const nIn = !!chk.noon?.in;
+    const nOut = !!chk.noon?.out;
+    const eIn = !!chk.evening?.in;
+    const eOut = !!chk.evening?.out;
+
+    const now = new Date();
+    const hour = now.getHours();
+
+    if (eIn && !eOut) return { label: "Điểm danh: Ra ca Tối (Tăng ca)", isOvertime: true };
+    if (nIn && !nOut) return { label: "Điểm danh: Ra ca Chiều", isOvertime: false };
+    if (mIn && !mOut && hour < 12) return { label: "Điểm danh: Ra ca Sáng", isOvertime: false };
+
+    if (nIn && nOut) {
+      if (!eIn) return { label: "Điểm danh: Vào ca Tối (Tăng ca)", isOvertime: true };
+      if (!eOut) return { label: "Điểm danh: Ra ca Tối (Tăng ca)", isOvertime: true };
+      return { label: "Đã hoàn thành các ca hôm nay ✓", isOvertime: false };
+    }
+
+    if (hour >= 17) {
+      if (!eIn) return { label: "Điểm danh: Vào ca Tối (Tăng ca)", isOvertime: true };
+      if (!eOut) return { label: "Điểm danh: Ra ca Tối (Tăng ca)", isOvertime: true };
+      return { label: "Đã hoàn thành các ca hôm nay ✓", isOvertime: false };
+    }
+
+    if (hour >= 12) {
+      if (!nIn) return { label: "Điểm danh: Vào ca Chiều", isOvertime: false };
+      if (!nOut) return { label: "Điểm danh: Ra ca Chiều", isOvertime: false };
+      return { label: "Điểm danh: Vào ca Tối (Tăng ca)", isOvertime: true };
+    }
+
+    if (!mIn) return { label: "Điểm danh: Vào ca Sáng", isOvertime: false };
+    if (!mOut) return { label: "Điểm danh: Ra ca Sáng", isOvertime: false };
+    return { label: "Điểm danh: Vào ca Chiều", isOvertime: false };
+  };
 
   return (
-    <Stack p={1} height='100vh' spacing={1}>
-      <Stack direction="row" spacing={0} style={{width:'90vw', marginLeft:10}}>
+    <Stack
+      p={1}
+      spacing={1}
+      style={{
+        position: "relative",
+        zIndex: 1,
+        minHeight: "100vh",
+        height: isSupplier ? "auto" : "100vh",
+        overflowY: "auto",
+      }}
+    >
+      {/* Avatar Background Image (width 50vw, opacity 50%, centered behind attendance table) */}
+      {avatarUrl && (
+        <div
+          style={{
+            position: "absolute",
+            top: "320px",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: "50vw",
+            height: "50vw",
+            maxWidth: "450px",
+            maxHeight: "450px",
+            borderRadius: "50%",
+            overflow: "hidden",
+            opacity: 0.5,
+            pointerEvents: "none",
+            zIndex: 0,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <img
+            src={
+              avatarUrl.startsWith("http")
+                ? avatarUrl
+                : avatarUrl.startsWith("/static/")
+                ? `${useApiStatic()}${avatarUrl.substring(7)}`
+                : `${useApiStatic()}/${avatarUrl.replace(/^\/+/, "")}`
+            }
+            alt="Avatar Background"
+            style={{ width: "100%", height: "100%", objectFit: "cover" }}
+          />
+        </div>
+      )}
+
+      <Stack direction="row" alignItems="center" spacing={1} style={{width:'90vw', marginLeft:10, marginTop: 5}}>
         <LogoAdmake/>
-        <Box style={{width:'50vw', fontWeight:500, marginTop: 10, marginLeft: 20}}>
+        
+        {/* Nút Chọn & Xóa Avatar */}
+        <div style={{ display: "flex", alignItems: "center", gap: 6, marginLeft: 15 }}>
+          <input
+            type="file"
+            ref={avatarInputRef}
+            onChange={handleAvatarChange}
+            accept="image/*"
+            style={{ display: "none" }}
+          />
+          <button
+            onClick={() => avatarInputRef.current?.click()}
+            disabled={uploadingAvatar}
+            style={{
+              width: 36,
+              height: 36,
+              borderRadius: "50%",
+              backgroundColor: "#0284c7",
+              color: "#ffffff",
+              fontWeight: 700,
+              fontSize: 16,
+              border: "2px solid #38bdf8",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              cursor: "pointer",
+              boxShadow: "0 2px 4px rgba(0,0,0,0.15)",
+              flexShrink: 0,
+            }}
+            title="Bấm để chọn / đổi ảnh đại diện"
+          >
+            {uploadingAvatar ? "..." : getFirstNameInitial(userEl?.fullName)}
+          </button>
+
+          {avatarUrl && (
+            <button
+              onClick={handleClearAvatar}
+              disabled={uploadingAvatar}
+              style={{
+                width: 22,
+                height: 22,
+                borderRadius: "50%",
+                backgroundColor: "#f43f5e",
+                color: "#ffffff",
+                fontWeight: 700,
+                fontSize: 11,
+                border: "none",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                cursor: "pointer",
+                boxShadow: "0 1px 3px rgba(0,0,0,0.2)",
+                flexShrink: 0,
+              }}
+              title="Xóa ảnh đại diện"
+            >
+              ✕
+            </button>
+          )}
+        </div>
+
+        <Box style={{ fontWeight: 600, fontSize: 15, color: "#1e293b", marginLeft: 10 }}>
           {userEl?.fullName}
         </Box>
-         
       </Stack>
 
       
       
-      {step === 1 && (
+      {isSupplier ? (
+        <TaskBoard isDirect userId={userEl?.id} fullName={userEl?.fullName} />
+      ) : (
         <>
-        
-        <CenterBox>
-          
-           {!isSupplier &&
-           <>
-            <CurrentDateTime />
-           
-            
-            <Button variant="contained"  
+          {step === 1 && (
+            <CenterBox>
+              <CurrentDateTime />
+
+              {(() => {
+                const nextAction = getNextAction();
+                return (
+                  <Button
+                    variant="contained"
+                    sx={{
+                      backgroundColor: nextAction.isOvertime ? "#f59e0b" : "orange",
+                      borderRadius: 20,
+                      mt: 1,
+                      minHeight: 50,
+                      px: 3,
+                      maxWidth: 360,
+                      mb: 1,
+                      fontSize: 14,
+                      fontWeight: 600,
+                      textTransform: "none",
+                      boxShadow: nextAction.isOvertime ? "0 2px 8px rgba(245,158,11,0.4)" : "0 2px 8px rgba(255,165,0,0.3)",
+                    }}
+                    onClick={capturePhoto}
+                  >
+                    <img src="/alarm-svgrepo-com.svg" alt="ADMAKE" style={{ width: 36, marginRight: 8 }} />
+                    {nextAction.label}
+                  </Button>
+                );
+              })()}
+
+              <WorkpointGrid workpoint={workpoint} fetchWorkpoint={fetchWorkpoint} />
+
+              <Stack direction="row" spacing={1} p={1}>
+                <Button
+                  variant="contained"
                   sx={{
-                    backgroundColor:"orange",borderRadius:20,
-                      mt: 1, height: 50,maxWidth:300, mb:1 }} onClick={capturePhoto}>
-                <img src="/alarm-svgrepo-com.svg" alt="ADMAKE" style={{width:40}}/>
-                Điểm danh nhé !
-            </Button>
-             
+                    borderRadius: 40,
+                    backgroundColor: "#00B4B6",
+                    fontSize: 10,
+                    whiteSpace: "nowrap",
+                    mt: 1,
+                    height: 50,
+                    maxWidth: 300,
+                    mb: 1,
+                  }}
+                  onClick={handleHolidayClick}
+                >
+                  <img src="/holiday-island-tourism-svgrepo-com.svg" alt="ADMAKE" style={{ width: 32 }} />
+                  Nghỉ phép
+                </Button>
 
-            <WorkpointGrid workpoint={workpoint} fetchWorkpoint={fetchWorkpoint}/>
-            
-          </>
-          
-           }
+                <Button
+                  variant="contained"
+                  sx={{
+                    borderRadius: 40,
+                    backgroundColor: "#00B4B6",
+                    fontSize: 10,
+                    textAlign: "left",
+                    whiteSpace: "nowrap",
+                    mt: 1,
+                    height: 50,
+                    maxWidth: 300,
+                    mb: 1,
+                  }}
+                  onClick={handleTaskClick}
+                >
+                  <img src="/task-done-svgrepo-com.svg" alt="ADMAKE" style={{ width: 32 }} />
+                  Nhiệm vụ
+                </Button>
 
-          <Stack direction="row" spacing={1} p={1}>
+                <Button
+                  variant="contained"
+                  sx={{
+                    borderRadius: 40,
+                    backgroundColor: "#0891b2",
+                    fontSize: 10,
+                    textAlign: "left",
+                    whiteSpace: "nowrap",
+                    mt: 1,
+                    height: 50,
+                    maxWidth: 300,
+                    mb: 1,
+                  }}
+                  onClick={() => {
+                    setOpenAdvanceModal(true);
+                  }}
+                >
+                  <img src="/pay-svgrepo-com.svg" alt="Đề xuất ứng tiền" style={{ width: 30 }} />
+                  Đề xuất ứng tiền
+                </Button>
 
-            {!isSupplier &&
+                <Button
+                  sx={{
+                    borderRadius: 40,
+                    color: "#fff",
+                    fontSize: 10,
+                    backgroundColor: "#00B4B6",
+                    textAlign: "left",
+                    whiteSpace: "nowrap",
+                    mt: 1,
+                    height: 50,
+                    maxWidth: 300,
+                    mb: 1,
+                  }}
+                  onClick={() => setModalVisible(true)}
+                >
+                  <img src="/pay-svgrepo-com.svg" alt="ADMAKE" style={{ width: 32 }} />
+                  Bảng lương
+                </Button>
+              </Stack>
+
+              <video
+                ref={videoRef}
+                width="100%"
+                height="auto"
+                autoPlay
+                playsInline
+                style={{ borderRadius: 8, backgroundColor: "#000", width: "100%", maxWidth: 400 }}
+              />
+            </CenterBox>
+          )}
+
+          {step === 2 && (
             <>
- 
-              <Button variant="contained"  
-                  sx={{borderRadius:40,
-                    backgroundColor:"#00B4B6",fontSize:10,whiteSpace:'nowrap',
-                      mt: 1, height: 50,maxWidth:300, mb:1 }} onClick={handleHolidayClick}>
-                <img src="/holiday-island-tourism-svgrepo-com.svg" alt="ADMAKE" style={{width:32}}/>
-                Nghỉ phép
-              </Button>
-              </>}
-          
-            <Button variant="contained"  
-                sx={{borderRadius:40,
-                  backgroundColor:"#00B4B6",fontSize:10,textAlign:'left',whiteSpace:'nowrap',
-                    mt: 1, height: 50,maxWidth:300, mb:1 }} onClick={handleTaskClick}>
-              <img src="/task-done-svgrepo-com.svg" alt="ADMAKE" style={{width:32}}/>
-              Nhiệm vụ
-            </Button>
+              <CenterBox>
+                <Box sx={{ textAlign: "center", mt: 1 }}>
+                  {imageURL && (
+                    <img
+                      src={imageURL}
+                      alt="Ảnh đã chụp"
+                      style={{ maxWidth: "100%", borderRadius: 8, height: "60vh" }}
+                    />
+                  )}
+                  {position.latitude && position.longitude && (
+                    <Typography sx={{ mt: 1 }}>{statusMsg}</Typography>
+                  )}
+                </Box>
+                {error && (
+                  <Typography color="error" sx={{ mt: 1 }}>
+                    {error}
+                  </Typography>
+                )}
+              </CenterBox>
 
-                  {!isSupplier &&
-            <Button 
-              // sx={{
-              //     // backgroundColor:"#ccc",
-              //     border:'1px solid #666', color:'#000',
-              //     mt: 0.5, height: 20, maxWidth: 300, mb:1 }} 
+              <Stack
+                spacing={2}
+                direction="row"
                 sx={{
-                  borderRadius:40,
-                   color:'#fff',fontSize:10,
-                    backgroundColor:"#00B4B6",textAlign:'left',whiteSpace:'nowrap',
-                      mt: 1, height: 50,maxWidth:300, mb:1 }}
-                onClick={() => setModalVisible(true)}>
-              <img src="/pay-svgrepo-com.svg" alt="ADMAKE" style={{width:32}}/>
-              Bảng lương
-            </Button>}
-          </Stack>
-          
-          {!isSupplier &&
-          <video
-            ref={videoRef}
-            width="100%"
-            height="auto"
-            autoPlay
-            playsInline
-            style={{ borderRadius: 8, backgroundColor: "#000", width:'100%', maxWidth:400 }}
-          />}
-          </CenterBox>
+                  position: "fixed",
+                  bottom: 50,
+                  left: "50%",
+                  transform: "translateX(-50%)",
+                }}
+              >
+                <Button onClick={handleSend} variant="contained" sx={{ backgroundColor: "#00B4B6" }}>
+                  Gửi
+                </Button>
+                <Button onClick={handleBack}>Chụp lại</Button>
+              </Stack>
+            </>
+          )}
+
+          <canvas ref={canvasRef} style={{ display: "none" }} />
+
+          <TaskBoard
+            open={openWork}
+            userId={userEl?.id}
+            fullName={userEl?.fullName}
+            onCancel={handleWorkBoardCancel}
+          />
+
+          <LeaveBoard open={openHoliday} userId={userEl?.id} onCancel={handleHolidayBoardCancel} />
+
+          <SalaryBoard
+            selectedRecord={workpointEl}
+            modalVisible={modalVisible}
+            handleOk={handleCloseModal}
+          />
+
+          <AdvanceSalaryModal
+            open={openAdvanceModal}
+            onCancel={() => setOpenAdvanceModal(false)}
+            userEl={userEl}
+          />
         </>
       )}
-
-      {step === 2 && (
-        <>
-          <CenterBox>
-            <Box sx={{ textAlign: "center", mt: 1 }}>
-              {imageURL && (
-                <img
-                  src={imageURL}
-                  alt="Ảnh đã chụp"
-                  style={{ maxWidth: "100%", borderRadius: 8, height:'60vh' }}
-                />
-              )}
-              {position.latitude && position.longitude && (
-                <Typography sx={{ mt: 1 }}>
-                  {statusMsg}
-                </Typography>
-              )}
-            </Box>
-            {error && (
-              <Typography color="error" sx={{ mt: 1 }}>
-                {error}
-              </Typography>
-            )}
-          </CenterBox>
-      
-          <Stack spacing={2} direction="row" sx={{position:'fixed', bottom:50, left: '50%',
-            transform: 'translateX(-50%)',}}>
-              <Button onClick={handleSend} variant="contained" 
-                sx={{ backgroundColor:"#00B4B6" }}>
-                Gửi
-              </Button>
-
-              <Button onClick={handleBack}>Chụp lại</Button>
-          </Stack>
-        </>)
-      }
-          <canvas ref={canvasRef} style={{ display: "none" }} />
-        
-
-        {/* {!isSupplier && sendSuccessMsg && (
-          <Typography
-            sx={{ position:'fixed',mt: 2, mx: 2, top: 80, fontSize: 10, color: "green", wordBreak: "break-word" }}
-          >
-            {sendSuccessMsg}
-          </Typography>
-        )} */}
-      
-      
-      <TaskBoard open={openWork} userId={userEl?.id} fullName={userEl?.fullName} onCancel={handleWorkBoardCancel}/>
-
-      {!isSupplier &&
-        <LeaveBoard open={openHoliday} userId={userEl?.id} onCancel={handleHolidayBoardCancel}/>}
-      
-      <SalaryBoard 
-        selectedRecord={workpointEl} 
-        modalVisible={modalVisible}
-        handleOk={handleCloseModal} />
     </Stack>
   );
 };

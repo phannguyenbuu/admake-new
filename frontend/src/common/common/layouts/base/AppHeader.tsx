@@ -1,5 +1,5 @@
-import { Button, Layout, Dropdown, Avatar, Popover, Modal, message, notification } from "antd";
-import { BellOutlined, UserOutlined, LogoutOutlined } from "@ant-design/icons";
+import { Button, Layout, Dropdown, Avatar, Popover, Modal, message, notification, Tooltip } from "antd";
+import { BellOutlined, UserOutlined, LogoutOutlined, FormOutlined, GiftOutlined } from "@ant-design/icons";
 // import NotificationDropdown from "../../../components/NotificationDropdown";
 import { useNavigate } from "react-router-dom";
 import { useInfo } from "../../hooks/info.hook";
@@ -16,6 +16,8 @@ import { useLocation } from "react-router-dom";
 import { ChatGroupProvider } from "../../../components/chat/ProviderChat";
 import NoteWorkpointModal from "./NoteWorkpointModal";
 import NotifyModal from "./NotifyModal";
+import FeedbackModal from "./FeedbackModal";
+import AffiliateModal from "./AffiliateModal";
 import SearchIcon from '@mui/icons-material/Search';
 
 const { Header } = Layout;
@@ -26,6 +28,8 @@ export default function AppHeader() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [notificationOpen, setNotificationOpen] = useState(false);
+  const [feedbackOpen, setFeedbackOpen] = useState(false);
+  const [affiliateOpen, setAffiliateOpen] = useState(false);
   const { username, userId, userRole, userRoleId, userLeadId, workspaces, setWorkspaces, fullName } = useUser();
   const [questionOpen, setQuestionOpen] = useState(false);
   const { getNotifyList, notifyList } = useUser();
@@ -87,6 +91,12 @@ export default function AppHeader() {
   };
 
   const avatarMenuItems = [
+    {
+      key: "affiliate",
+      label: "🎁 Affiliate / Giới thiệu nhận quà",
+      icon: <GiftOutlined className="text-amber-500" />,
+      onClick: () => setAffiliateOpen(true),
+    },
     ...(userRoleId === -2
       ? [
           {
@@ -129,6 +139,21 @@ export default function AppHeader() {
             {/* Menu Chat Group List */}
             <ChatGroupList />
 
+            {/* Nút Góp ý Admake */}
+            <Tooltip title="Góp ý Admake">
+              <button
+                type="button"
+                onClick={() => setFeedbackOpen(true)}
+                className="flex items-center justify-center cursor-pointer transition-transform duration-200 hover:scale-110 border-none bg-transparent p-0"
+                title="Góp ý Admake"
+                style={{ width: 44, height: 44 }}
+              >
+                <div className="h-9 w-9 rounded-full bg-amber-50 hover:bg-amber-100 border border-amber-300 text-amber-600 flex items-center justify-center shadow-2xs">
+                  <FormOutlined className="text-base" />
+                </div>
+              </button>
+            </Tooltip>
+
             {/* Admin role text */}
             <div className="hidden md:flex items-center">
               <span className="text-gray-700 font-semibold text-sm px-3 py-1.5 bg-gray-100 rounded-full">
@@ -165,6 +190,11 @@ export default function AppHeader() {
         </Header>
       </ChatGroupProvider>
 
+      {/* Modal Góp ý Admake */}
+      <FeedbackModal open={feedbackOpen} onCancel={() => setFeedbackOpen(false)} />
+
+      {/* Modal Affiliate Giới thiệu Admake */}
+      <AffiliateModal open={affiliateOpen} onCancel={() => setAffiliateOpen(false)} />
     </>
   );
 }

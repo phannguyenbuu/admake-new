@@ -6,6 +6,7 @@ import {
   PlusOutlined,
   TeamOutlined,
   StarFilled,
+  CheckOutlined,
 } from "@ant-design/icons";
 import type { WorkSpace } from "../../common/@types/work-space.type";
 import { useUser } from "../../common/common/hooks/useUser";
@@ -38,6 +39,42 @@ export default function FooterMenuBar({
   const [showPrimaryGroupModal, setShowPrimaryGroupModal] = useState(false);
   const [showMoreModal, setShowMoreModal] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const [completedWorkspaceIds, setCompletedWorkspaceIds] = useState<Set<string>>(() => {
+    try {
+      const saved = localStorage.getItem("completed_workspace_ids");
+      return saved ? new Set(JSON.parse(saved)) : new Set();
+    } catch {
+      return new Set();
+    }
+  });
+
+  const toggleWorkspaceCompleted = (id: string) => {
+    setCompletedWorkspaceIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      try {
+        localStorage.setItem("completed_workspace_ids", JSON.stringify(Array.from(next)));
+      } catch (e) {
+        console.error("Failed to save completed workspaces", e);
+      }
+      return next;
+    });
+  };
+
+  const sortedWorkspaces = [...(workspaces || [])].sort((a: WorkSpace, b: WorkSpace) => {
+    const aDone = completedWorkspaceIds.has(String(a.id));
+    const bDone = completedWorkspaceIds.has(String(b.id));
+    if (aDone !== bDone) {
+      return aDone ? 1 : -1;
+    }
+    if (a.pinned !== b.pinned) return a.pinned ? -1 : 1;
+    return 0;
+  });
 
   const findMenuByKey = (key: string) =>
     allMenuItems.find((item) => item.key === key) ||
@@ -150,27 +187,49 @@ export default function FooterMenuBar({
           </div>
         ) : (
           <>
-            {workspaces.map((workspace: WorkSpace) => (
-              <div
-                key={workspace.id}
-                className="flex items-center gap-3 py-2 px-2 rounded-lg hover:bg-white/10 transition-all duration-200 cursor-pointer"
-                onClick={() => {
-                  navigate(`/work-tables/${workspace.id}`);
-                  setShowMobileWorkspaceModal(false);
-                }}
-              >
-                <div style={{ padding: 0, background: "none", border: "none", color: "yellow" }}>
-                  {workspace.pinned && <StarFilled />}
-                </div>
-
-                <span
-                  className="text-sm font-semibold text-white truncate flex-1 min-w-0"
-                  style={{ color: workspace.status === "FREE" ? "yellow" : "#fff" }}
+            {sortedWorkspaces.map((workspace: WorkSpace) => {
+              const isDone = completedWorkspaceIds.has(String(workspace.id));
+              return (
+                <div
+                  key={workspace.id}
+                  className="flex items-center justify-between gap-3 py-2 px-2 rounded-lg hover:bg-white/10 transition-all duration-200 cursor-pointer group"
+                  onClick={() => {
+                    navigate(`/work-tables/${workspace.id}`);
+                    setShowMobileWorkspaceModal(false);
+                  }}
                 >
-                  {workspace.name}
-                </span>
-              </div>
-            ))}
+                  <div className="flex items-center gap-2 flex-1 min-w-0">
+                    <div style={{ padding: 0, background: "none", border: "none", color: "yellow" }}>
+                      {workspace.pinned && <StarFilled />}
+                    </div>
+
+                    <span
+                      className={`text-sm font-semibold truncate flex-1 min-w-0 ${isDone ? "line-through opacity-60" : ""}`}
+                      style={{ color: workspace.status === "FREE" ? "yellow" : "#fff" }}
+                    >
+                      {workspace.name}
+                    </span>
+                  </div>
+
+                  <button
+                    type="button"
+                    title={isDone ? "Đánh dấu chưa xong" : "Đánh dấu đã xong"}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      e.preventDefault();
+                      toggleWorkspaceCompleted(String(workspace.id));
+                    }}
+                    className={`flex h-6 w-6 shrink-0 items-center justify-center rounded border transition-all cursor-pointer ${
+                      isDone
+                        ? "border-emerald-500 bg-emerald-500 text-white shadow-sm"
+                        : "border-white/30 bg-white/10 text-white/50 hover:border-emerald-400 hover:text-emerald-400 hover:bg-white/20"
+                    }`}
+                  >
+                    <CheckOutlined className={`text-xs font-bold ${isDone ? "" : "opacity-70"}`} />
+                  </button>
+                </div>
+              );
+            })}
 
             <button
               onClick={() => {

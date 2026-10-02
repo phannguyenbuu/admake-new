@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify, abort, g
-from models import db, app, Workpoint, WorkpointSetting, Message, User, Task, dateStr, generate_datetime_id, Leave, LeadPayload, PayrollAdjustment, Role
+from models import db, app, Workpoint, WorkpointSetting, Message, User, Task, dateStr, generate_datetime_id, Leave, LeadPayload, PayrollAdjustment, Role, Notify
 from api.chat import socketio
 from sqlalchemy import desc
 from datetime import datetime, time, date, timedelta
@@ -8,7 +8,7 @@ from api.users import get_query_page_users
 from collections import defaultdict
 from dateutil.relativedelta import relativedelta
 from sqlalchemy import and_, or_
-from permission_utils import ensure_resource_lead, require_authenticated_user, require_can_view, require_self_or_lead
+from permission_utils import ensure_resource_lead, require_authenticated_user, require_can_view, require_self_or_lead, resolve_request_user
 
 workpoint_bp = Blueprint('workpoint', __name__, url_prefix='/api/workpoint')
 
@@ -53,14 +53,14 @@ def guard_workpoint_permission():
             ensure_resource_lead(target_user, actor, "user")
         return
 
-    if endpoint in {"workpoint.get_workpoint_setting"}:
-        actor = require_authenticated_user()
+    if endpoint in {"workpoint.get_workpoint_setting", "workpoint.update_workpoint_setting"}:
+        actor = require_authenticated_user() if request.method == "PUT" else resolve_request_user()
         g.permission_actor = actor
         lead_id = int(view_args.get("lead_id") or 0)
         lead = db.session.get(LeadPayload, lead_id)
         if not lead:
             abort(404, description="Lead not found")
-        if lead_id and int(actor.lead_id or 0) != lead_id:
+        if actor and lead_id and getattr(actor, "role_id", None) not in (1, 2) and int(actor.lead_id or 0) != lead_id:
             abort(403, description="You do not have access to this lead")
         return
 
@@ -70,6 +70,7 @@ def guard_workpoint_permission():
         "workpoint.post_workpoint_by_user_and_date",
         "workpoint.remove_workpoint_checklist",
         "workpoint.get_single_workpoint_detail",
+        "workpoint.upload_user_avatar",
     }:
         target_user = _require_public_workpoint_user(view_args.get("user_id"))
         g.permission_actor = target_user
@@ -97,6 +98,11 @@ def guard_workpoint_permission():
             target_user = db.session.get(User, target_user_id)
             if target_user:
                 ensure_resource_lead(target_user, actor, "user")
+        return
+
+    if endpoint == "workpoint.create_advance_request":
+        actor = resolve_request_user()
+        g.permission_actor = actor
         return
 
     actor, _ = require_can_view("view_workpoint")
@@ -161,7 +167,8 @@ def _workhour_from_period(period_data: dict, period_name: str) -> float:
 
     workhour = period_data.get("workhour")
     if isinstance(workhour, (int, float)) and workhour > 0:
-        return float(workhour)
+        val = float(workhour)
+        return min(val, 6.0)
 
     in_data = period_data.get("in") or {}
     in_time = in_data.get("time")
@@ -198,7 +205,9 @@ def _workhour_from_period(period_data: dict, period_name: str) -> float:
             out_dt = in_dt.replace(hour=end_hour, minute=0, second=0, microsecond=0)
 
     diff_hours = (out_dt - in_dt).total_seconds() / 3600
-    return diff_hours if diff_hours > 0 else 0.0
+    if diff_hours > 0:
+        return min(diff_hours, 6.0)
+    return 0.0
 
 
 def _actual_overtime_hours(period_data: dict, period_name: str = "evening") -> float:
@@ -207,7 +216,8 @@ def _actual_overtime_hours(period_data: dict, period_name: str = "evening") -> f
 
     workhour = period_data.get("workhour")
     if isinstance(workhour, (int, float)) and workhour > 0:
-        return float(workhour)
+        val = float(workhour)
+        return min(val, 6.0)
 
     in_data = period_data.get("in") or {}
     out_data = period_data.get("out") or {}
@@ -243,7 +253,9 @@ def _actual_overtime_hours(period_data: dict, period_name: str = "evening") -> f
             out_dt = in_dt.replace(hour=end_hour, minute=0, second=0, microsecond=0)
 
     diff_hours = (out_dt - in_dt).total_seconds() / 3600
-    return diff_hours if diff_hours > 0 else 0.0
+    if diff_hours > 0:
+        return min(diff_hours, 6.0)
+    return 0.0
 
 
 def _max_working_hours(month: int, year: int, setting: WorkpointSetting | None) -> int:
@@ -506,6 +518,9 @@ def _sum_payroll_adjustments(items) -> dict:
         "net": 0.0,
     }
     for item in items or []:
+        status = getattr(item, "status", None)
+        if status in ("PENDING", "REJECTED"):
+            continue
         adjustment_type = _normalize_payroll_adjustment_type(getattr(item, "adjustment_type", None))
         if not adjustment_type:
             continue
@@ -910,6 +925,9 @@ def create_payroll_adjustment():
     if not entry_date:
         abort(400, description="Invalid entry date")
 
+    status = str(data.get("status") or "APPROVED").strip().upper()
+    file_url = str(data.get("file_url") or "").strip() or None
+
     adjustment = PayrollAdjustment(
         id=generate_datetime_id(),
         lead_id=lead_id,
@@ -918,6 +936,8 @@ def create_payroll_adjustment():
         entry_date=entry_date,
         amount=amount,
         note=(str(data.get("note") or "").strip() or None),
+        status=status,
+        file_url=file_url,
     )
     db.session.add(adjustment)
     db.session.commit()
@@ -952,8 +972,82 @@ def update_payroll_adjustment(adjustment_id):
     if "note" in data:
         adjustment.note = str(data.get("note") or "").strip() or None
 
+    if "status" in data:
+        old_status = adjustment.status
+        new_status = str(data.get("status") or "").strip().upper()
+        adjustment.status = new_status
+        if old_status != "APPROVED" and new_status == "APPROVED":
+            # Send notification to employee
+            user = db.session.get(User, adjustment.user_id)
+            user_name = user.fullName if user else adjustment.user_id
+            notify_text = f"Đề xuất tạm ứng {int(adjustment.amount):,}đ của bạn đã được duyệt!"
+            notify = Notify(
+                id=generate_datetime_id(),
+                user_id=adjustment.user_id,
+                lead_id=adjustment.lead_id,
+                text=notify_text,
+                description=f"Khoản tạm ứng ngày {adjustment.entry_date} đã được phê duyệt.",
+                type="advance-approved",
+                target="/point"
+            )
+            db.session.add(notify)
+
+    if "file_url" in data:
+        adjustment.file_url = str(data.get("file_url") or "").strip() or None
+
     db.session.commit()
     return jsonify(_serialize_payroll_adjustment(adjustment)), 200
+
+
+@workpoint_bp.route("/advance-request", methods=["POST"])
+def create_advance_request():
+    data = request.get_json(silent=True) or {}
+    user_id = str(data.get("user_id") or "").strip()
+    if not user_id and getattr(g, "permission_actor", None):
+        user_id = str(g.permission_actor.id)
+
+    user = db.session.get(User, user_id)
+    if not user:
+        abort(404, description="User not found")
+
+    amount = float(data.get("amount") or 0)
+    if amount <= 0:
+        abort(400, description="Số tiền ứng phải lớn hơn 0")
+
+    note = str(data.get("note") or "").strip()
+    file_url = str(data.get("file_url") or "").strip() or None
+    entry_date = _parse_entry_date(data.get("entry_date")) or datetime.now().date()
+
+    adjustment = PayrollAdjustment(
+        id=generate_datetime_id(),
+        lead_id=user.lead_id,
+        user_id=user.id,
+        adjustment_type="advance",
+        entry_date=entry_date,
+        amount=amount,
+        note=note or "Đề xuất tạm ứng lương",
+        status="PENDING",
+        file_url=file_url,
+        created_by=user.fullName or user.username
+    )
+    db.session.add(adjustment)
+
+    # Notify admin
+    user_display = user.fullName or user.username or user.id
+    notify_text = f"Nhân viên {user_display} vừa gửi đề xuất tạm ứng {int(amount):,}đ"
+    notify = Notify(
+        id=generate_datetime_id(),
+        user_id=user.id,
+        lead_id=user.lead_id,
+        text=notify_text,
+        description=f"Lý do: {note or 'Không có ghi chú'}",
+        type="advance-request",
+        target="/account"
+    )
+    db.session.add(notify)
+
+    db.session.commit()
+    return jsonify(_serialize_payroll_adjustment(adjustment)), 201
 
 
 @workpoint_bp.route("/payroll-adjustments/<adjustment_id>", methods=["DELETE"])
@@ -995,7 +1089,7 @@ def get_workpoints():
 def get_workpoint_today_detail(user_id):
     workpoint, _, _ = get_workpoint_today(user_id)
     if not workpoint:
-        abort(404, description="workpoint not found")
+        return jsonify(None)
     return jsonify(workpoint.tdict())
 
 @workpoint_bp.route("/<string:user_id>", methods=["GET"])
@@ -1032,20 +1126,32 @@ def post_workpoint_message():
     type = request.form.get("type")
     text = request.form.get("text")
     file_url = request.form.get("file_url")
+    time_val = request.form.get("time")
 
-    message = Message.create_item({"message_id": generate_datetime_id(),
-                                   "type": type,
-                                    "user_id":user_id, 
-                                    "text":text, 
-                                    "file_url": file_url,
-                                    })
-    
+    user = db.session.get(User, user_id) if user_id else None
+    lead_id = user.lead_id if user else None
+
+    params = {
+        "message_id": generate_datetime_id(),
+        "type": type,
+        "user_id": user_id,
+        "lead_id": lead_id,
+        "text": text,
+        "file_url": file_url,
+    }
+    if time_val:
+        try:
+            params["createdAt"] = datetime.fromisoformat(time_val.replace("Z", "+00:00"))
+        except Exception:
+            pass
+
+    message = Message.create_item(params)
     print("Workpoint message", message.tdict())
 
     return jsonify({
         'text': text,
         'message': message.tdict()
-        })
+    })
 
 
 
@@ -1285,10 +1391,49 @@ def get_workpoint_checkpoint(user_id):
 
     if not user:
         return jsonify({"error": "User not found"}), 405
+        
+    if getattr(user, 'is_active', True) is False:
+        return jsonify({"error": "User is inactive"}), 403
     
     result = user.tdict()
     
     return jsonify({"valid":True,"data":result})
+
+
+@workpoint_bp.route('/avatar/<string:user_id>', methods=['POST', 'DELETE'])
+def upload_user_avatar(user_id):
+    user = db.session.get(User, user_id)
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+        
+    if request.method == 'DELETE':
+        user.avatar = None
+        db.session.commit()
+        return jsonify({"success": True, "avatar": None}), 200
+
+    if 'file' not in request.files:
+        return jsonify({"error": "No file provided"}), 400
+        
+    file = request.files['file']
+    if not file or file.filename == '':
+        return jsonify({"error": "Empty filename"}), 400
+        
+    import os
+    from werkzeug.utils import secure_filename
+    
+    upload_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'static', 'uploads', 'avatars')
+    os.makedirs(upload_dir, exist_ok=True)
+    
+    ext = os.path.splitext(file.filename)[1] or ".jpg"
+    filename = f"avatar_{user_id}{ext}"
+    filepath = os.path.join(upload_dir, filename)
+    file.save(filepath)
+    
+    avatar_url = f"/static/uploads/avatars/{filename}"
+    user.avatar = avatar_url
+    db.session.commit()
+    
+    return jsonify({"success": True, "avatar": avatar_url}), 200
 
 
 from datetime import datetime, time, timedelta
@@ -1305,7 +1450,7 @@ def filter_by_date(query, model_field, date_to_compare):
 
 
 def get_all_workpoints(user_id):
-    workpoints = Workpoint.query.filter(Workpoint.user_id == user_id).all()
+    workpoints = Workpoint.query.filter(Workpoint.user_id == user_id).order_by(Workpoint.createdAt.desc()).all()
     return workpoints
 
 def get_workpoint_today(user_id):
@@ -1318,11 +1463,22 @@ def get_workpoint_today(user_id):
     workpoints_same_date = [wp for wp in workpoints if wp.get_date() == today]
     workpoint = workpoints_same_date[0] if workpoints_same_date else None
 
+    # Nếu rạng sáng (00:00 - 05:00) mà hôm nay chưa có điểm danh,
+    # nhưng hôm qua có ca tối chưa check-out, thì lấy ca của hôm qua để hiển thị và cho check-out
+    if not workpoint and now.time() < time(5, 0):
+        yesterday = today - timedelta(days=1)
+        yesterday_wps = [wp for wp in workpoints if wp.get_date() == yesterday]
+        if yesterday_wps:
+            y_wp = yesterday_wps[0]
+            y_chk = y_wp.checklist or {}
+            if "evening" in y_chk and "in" in y_chk["evening"] and "out" not in y_chk["evening"]:
+                workpoint = y_wp
+
     return workpoint, now, tz
 
 @workpoint_bp.route('/check/<string:user_id>/', methods=['POST'])
 def post_workpoint_by_user_and_date(user_id):
-    data = request.get_json()
+    data = request.get_json() or {}
     img_url = data.get("img")
     lat = data.get("lat")
     long = data.get("long")
@@ -1332,7 +1488,6 @@ def post_workpoint_by_user_and_date(user_id):
     # print('work_point', workpoint, now)
 
     if not workpoint:
-        
         workpoint = Workpoint(
             id=generate_datetime_id(),
             user_id=user_id,
@@ -1342,17 +1497,43 @@ def post_workpoint_by_user_and_date(user_id):
         db.session.commit()
 
     current_time = now.time()
+    checklist = workpoint.checklist or {}
 
-    morning_start = time(5, 0)
-    morning_end = time(12, 0)
-    noon_end = time(18, 0)
+    morning_in = bool(checklist.get("morning", {}).get("in"))
+    morning_out = bool(checklist.get("morning", {}).get("out"))
+    noon_in = bool(checklist.get("noon", {}).get("in"))
+    noon_out = bool(checklist.get("noon", {}).get("out"))
+    evening_in = bool(checklist.get("evening", {}).get("in"))
+    evening_out = bool(checklist.get("evening", {}).get("out"))
 
-    if morning_start <= current_time < morning_end:
-        period = "morning"
-    elif current_time < noon_end:
-        period = "noon"
+    requested_period = data.get("period")
+    if requested_period in ["morning", "noon", "evening"]:
+        period = requested_period
+    elif current_time < time(12, 0) and not (noon_in or evening_in):
+        # Buổi sáng (trước 12:00)
+        # Nếu ca sáng đã hoàn tất cả vào và ra, và giờ đã >= 11:30 -> cho phép vào ca chiều
+        if morning_in and morning_out and current_time >= time(11, 30):
+            period = "noon"
+        else:
+            period = "morning"
     else:
-        period = "evening"
+        # Từ 12:00 trưa trở đi hoặc đã có ca chiều/tối:
+        # 1. Đang trong ca tối (đã vào tối mà chưa ra tối) -> Check-out ca tối
+        if evening_in and not evening_out:
+            period = "evening"
+        # 2. Đang trong ca chiều (đã vào chiều mà chưa ra chiều) -> Check-out ca chiều
+        elif noon_in and not noon_out:
+            period = "noon"
+        # 3. Đã hoàn tất ca chiều (cả vào và ra) -> Bất kỳ lần bấm tiếp theo nào đều là ca TỐI (TĂNG CA)
+        elif noon_in and noon_out:
+            period = "evening"
+        # 4. Ca chiều chưa vào:
+        #    Nếu từ 17:00 trở đi -> Tự động nhận diện là ca TỐI (TĂNG CA)
+        #    Nếu trước 17:00 -> Nhận diện là ca CHIỀU
+        elif current_time >= time(17, 0):
+            period = "evening"
+        else:
+            period = "noon"
 
     # print('period',period, workpoint.checklist)
 
@@ -1367,9 +1548,13 @@ def post_workpoint_by_user_and_date(user_id):
 
     if "in" in workpoint.checklist[period] and "out" not in workpoint.checklist[period]:
         check_in_time_str = workpoint.checklist[period]["in"]["time"]
-        check_in_time = datetime.fromisoformat(check_in_time_str).astimezone(tz)
+        check_in_time = datetime.fromisoformat(check_in_time_str)
+        if check_in_time.tzinfo is None:
+            check_in_time = tz.localize(check_in_time)
+        else:
+            check_in_time = check_in_time.astimezone(tz)
         diff = now - check_in_time
-        work_hours = diff.total_seconds() / 3600
+        work_hours = max(0.0, min(diff.total_seconds() / 3600.0, 6.0))
 
         workpoint.checklist[period]["out"] = {
             "time": now.isoformat(),

@@ -27,5 +27,6 @@
   {"code":"BaoVietBank", "name":"NH TMCP Bảo Việt (BaoVietBank)"},
   {"code":"Eximbank", "name":"NH TMCP Xuất Nhập Khẩu Việt Nam (Eximbank)"},
   {"code":"Kienlongbank", "name":"NH TMCP Kiên Long (Kienlongbank)"},
-  {"code":"MBV", "name":"NH TMCP Việt Nam Hiện Đại (MBV)"}
+  {"code":"MBV", "name":"NH TMCP Việt Nam Hiện Đại (MBV)"},
+  {"code":"MOMO", "name":"Ví điện tử MoMo (MoMo)"}
 ]

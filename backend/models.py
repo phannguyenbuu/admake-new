@@ -130,9 +130,12 @@ class BaseModel(db.Model):
     version = db.Column(db.Integer)
 
     def get_date(self):
-        tz = pytz.timezone("Asia/Ho_Chi_Minh")  # múi giờ GMT+7
-        # now = datetime.utcnow().replace(tzinfo=pytz.utc).astimezone(tz)
-        return self.createdAt.replace(tzinfo=pytz.utc).astimezone(tz).date()
+        if not self.createdAt:
+            return None
+        if self.createdAt.tzinfo is not None:
+            tz = pytz.timezone("Asia/Ho_Chi_Minh")
+            return self.createdAt.astimezone(tz).date()
+        return self.createdAt.date()
 
 
 class Material(BaseModel):
@@ -472,6 +475,8 @@ class Workspace(BaseModel):
                     # print(f"DEBUG: Column {column.name} value type: {type(value)}")
                     if not isinstance(value, (datetime.datetime, datetime.date)):
                         result[column.name] = value
+            result["company_name"] = getattr(user, "companyName", None) or result.get("companyName")
+            result["tax_code"] = getattr(user, "taxCode", None) or result.get("taxCode")
         return result
 
     @staticmethod
@@ -512,6 +517,42 @@ class Notify(BaseModel):
         db.session.commit()
         return item
 
+
+class Feedback(BaseModel):
+    __tablename__ = "feedback"
+    __table_args__ = {'extend_existing': True}
+
+    id = db.Column(db.String(50), primary_key=True)
+    title = db.Column(db.String(255))
+    user_id = db.Column(db.String(50))
+    user_name = db.Column(db.String(255))
+    lead_id = db.Column(db.Integer, nullable=True)
+    lead_name = db.Column(db.String(255))
+    content = db.Column(db.Text, nullable=False)
+    images = db.Column(db.JSON, default=[])
+    is_read = db.Column(db.Boolean, default=False)
+    createdAt = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+
+    def tdict(self):
+        created_at_str = ""
+        if self.createdAt:
+            if isinstance(self.createdAt, (datetime.datetime, datetime.date)):
+                created_at_str = self.createdAt.strftime("%Y-%m-%d %H:%M:%S")
+            else:
+                created_at_str = str(self.createdAt)
+        return {
+            "id": self.id,
+            "title": self.title or "",
+            "user_id": self.user_id,
+            "user_name": self.user_name or "Khách hàng",
+            "lead_id": self.lead_id,
+            "lead_name": self.lead_name or "",
+            "content": self.content or "",
+            "images": self.images or [],
+            "is_read": bool(self.is_read),
+            "createdAt": created_at_str,
+        }
+
     
 class Task(BaseModel):
     __tablename__ = "task"
@@ -534,6 +575,8 @@ class Task(BaseModel):
     end_time = db.Column(db.Date)
     start_time = db.Column(db.Date)
     materials = db.Column(db.JSON, default=[])
+    material_adjustments = db.Column(db.JSON, default=[])
+    extra_costs = db.Column(db.JSON, default=[])
 
     check_reward = db.Column(db.Boolean, default = False)
     lead_id = db.Column(db.Integer, db.ForeignKey('lead.id'))
@@ -637,7 +680,9 @@ class Task(BaseModel):
             prepayment = data.get("prepayment"),
             salary_type = data.get("salary_type", ''),
             assets = assets,
-            icon = icon_value
+            icon = icon_value,
+            materials = data.get("materials", []),
+            material_adjustments = data.get("material_adjustments", [])
         )
     # @staticmethod
     # def create_item(params):
@@ -665,7 +710,7 @@ class Message(BaseModel):
     is_favourite = db.Column(db.Boolean, default=False)
 
     react = db.Column(db.JSON)
-    type = db.Column(db.String(10), nullable=True)
+    type = db.Column(db.String(80), nullable=True)
     
     user = db.relationship('User', foreign_keys=[user_id])
     lead_id = db.Column(db.Integer, db.ForeignKey('lead.id'))
@@ -992,6 +1037,7 @@ class ARInvoice(BaseModel):
     currency = db.Column(db.String(10), default="VND")
     status = db.Column(db.String(30), default="draft")
     description = db.Column(db.Text, nullable=True)
+    note = db.Column(db.Text, nullable=True)
     journal_entry_id = db.Column(db.String(50), db.ForeignKey("journal_entries.id"), nullable=True)
     confirmed_at = db.Column(db.DateTime, nullable=True)
     cancelled_at = db.Column(db.DateTime, nullable=True)
@@ -1071,6 +1117,8 @@ class PayrollAdjustment(BaseModel):
     entry_date = db.Column(db.Date, nullable=False)
     amount = db.Column(db.Float, default=0)
     note = db.Column(db.Text, nullable=True)
+    status = db.Column(db.String(20), default="APPROVED")
+    file_url = db.Column(db.String(255), nullable=True)
     created_by = db.Column(db.String(50), nullable=True)
     updated_by = db.Column(db.String(50), nullable=True)
 
@@ -1115,6 +1163,7 @@ class APBill(BaseModel):
     currency = db.Column(db.String(10), default="VND")
     status = db.Column(db.String(30), default="draft")
     description = db.Column(db.Text, nullable=True)
+    note = db.Column(db.Text, nullable=True)
     journal_entry_id = db.Column(db.String(50), db.ForeignKey("journal_entries.id"), nullable=True)
     confirmed_at = db.Column(db.DateTime, nullable=True)
     cancelled_at = db.Column(db.DateTime, nullable=True)
@@ -1417,6 +1466,32 @@ class Warehouse(BaseModel):
         return result
 
 
+class MaterialSupplier(db.Model):
+    __tablename__ = "material_suppliers"
+
+    id = db.Column(db.String(80), primary_key=True)
+    name = db.Column(db.String(255), nullable=False)
+    website_link = db.Column(db.Text, nullable=True)
+    phone = db.Column(db.String(50), nullable=True)
+    address = db.Column(db.String(550), nullable=True)
+    note = db.Column(db.Text, nullable=True)
+    deletedAt = db.Column(db.DateTime, nullable=True)
+    createdAt = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+    updatedAt = db.Column(db.DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
+
+    def tdict(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "website_link": self.website_link,
+            "phone": self.phone,
+            "address": self.address,
+            "note": self.note,
+            "createdAt": self.createdAt.isoformat() if self.createdAt else None,
+            "updatedAt": self.updatedAt.isoformat() if self.updatedAt else None,
+        }
+
+
 class InventoryItem(BaseModel):
     __tablename__ = "inventory_items"
 
@@ -1430,11 +1505,13 @@ class InventoryItem(BaseModel):
     unit = db.Column(db.String(50), nullable=False, default="cái")
     default_supplier_id = db.Column(db.String(80), nullable=True)
     default_supplier_name = db.Column(db.String(255), nullable=True)
+    supplier_link = db.Column(db.Text, nullable=True)
     default_warehouse_id = db.Column(db.String(50), db.ForeignKey("warehouses.id"), nullable=True)
     standard_cost = db.Column(db.Float, default=0)
     average_cost = db.Column(db.Float, default=0)
     min_stock_level = db.Column(db.Float, default=0)
     is_active = db.Column(db.Boolean, default=True)
+    item_status = db.Column(db.String(50), nullable=True, default="dang_dung")
     note = db.Column(db.Text, nullable=True)
     created_by = db.Column(db.String(50), nullable=True)
     updated_by = db.Column(db.String(50), nullable=True)
@@ -1975,6 +2052,7 @@ class LeadPayload(BaseModel):
     legal_rep_position = db.Column(db.String(100))
     invoice_email = db.Column(db.String(255))
     promo_code = db.Column(db.String(50))
+    logo_url = db.Column(db.String(500), nullable=True)
 
     # Plan selection
     selected_plan = db.Column(db.String(50))
@@ -2061,6 +2139,10 @@ def create_workspace_method(data, has_owner = True):
     if has_owner:
         user_fields = get_model_columns(User)
         user_data = {k: v for k, v in data.items() if k in user_fields and k != 'lead_id'}
+        if "company_name" in data and "companyName" not in user_data:
+            user_data["companyName"] = data["company_name"]
+        if "tax_code" in data and "taxCode" not in user_data:
+            user_data["taxCode"] = data["tax_code"]
 
         new_user = User(
             id=generate_datetime_id(),   # ✅ bắt buộc gán id string

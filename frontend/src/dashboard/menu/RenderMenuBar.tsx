@@ -1,7 +1,7 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Menu } from "antd";
-import { PlusOutlined, StarFilled } from "@ant-design/icons";
+import { PlusOutlined, StarFilled, CheckOutlined } from "@ant-design/icons";
 import type { WorkSpace } from "../../common/@types/work-space.type";
 import { useUser } from "../../common/common/hooks/useUser";
 import ModalCreateSpace from "../../common/components/dashboard/work-tables/work-space/ModalCreateSpace";
@@ -44,6 +44,32 @@ export default function RenderMenuBar() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isTabletWorkspaceModalOpen, setIsTabletWorkspaceModalOpen] = useState(false);
   const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
+
+  const [completedWorkspaceIds, setCompletedWorkspaceIds] = useState<Set<string>>(() => {
+    try {
+      const saved = localStorage.getItem("completed_workspace_ids");
+      return saved ? new Set(JSON.parse(saved)) : new Set();
+    } catch {
+      return new Set();
+    }
+  });
+
+  const toggleWorkspaceCompleted = (id: string) => {
+    setCompletedWorkspaceIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      try {
+        localStorage.setItem("completed_workspace_ids", JSON.stringify(Array.from(next)));
+      } catch (e) {
+        console.error("Failed to save completed workspaces", e);
+      }
+      return next;
+    });
+  };
 
   const isMobile = width <= 768;
   const allMenuItems = getMainMenuItems(pathname, canViewPermission);
@@ -95,6 +121,17 @@ export default function RenderMenuBar() {
         const hasChildren = item.key === "/work-tables";
 
         if (hasChildren && canViewPermission?.view_workspace) {
+          const rawWorkspaces = workspaces || [];
+          const sortedWorkspaces = [...rawWorkspaces].sort((a: WorkSpace, b: WorkSpace) => {
+            const aDone = completedWorkspaceIds.has(String(a.id));
+            const bDone = completedWorkspaceIds.has(String(b.id));
+            if (aDone !== bDone) {
+              return aDone ? 1 : -1;
+            }
+            if (a.pinned !== b.pinned) return a.pinned ? -1 : 1;
+            return 0;
+          });
+
           return {
             key: item.key,
             icon: item.icon,
@@ -115,23 +152,44 @@ export default function RenderMenuBar() {
                 </div>
               </div>
             ),
-            children: (workspaces || []).map((workspace: WorkSpace) => ({
-              id: workspace.id,
-              key: `/work-tables/${workspace.id}`,
-              label: (
-                <div className="flex items-center gap-2 py-0.5 px-1 rounded-md hover:bg-white/10 transition-all duration-200">
-                  <div style={{ padding: 0, background: "none", border: "none", color: "yellow" }}>
-                    {workspace.pinned && <StarFilled />}
+            children: sortedWorkspaces.map((workspace: WorkSpace) => {
+              const isDone = completedWorkspaceIds.has(String(workspace.id));
+              return {
+                id: workspace.id,
+                key: `/work-tables/${workspace.id}`,
+                label: (
+                  <div className="flex items-center justify-between gap-1.5 py-0.5 px-1 rounded-md hover:bg-white/10 transition-all duration-200 w-full group">
+                    <div className="flex items-center gap-2 min-w-0 flex-1">
+                      <div style={{ padding: 0, background: "none", border: "none", color: "yellow" }}>
+                        {workspace.pinned && <StarFilled />}
+                      </div>
+                      <span
+                        className={`text-xs font-medium truncate flex-1 min-w-0 ${isDone ? "line-through opacity-60" : ""}`}
+                        style={{ color: workspace.status === "FREE" ? "yellow" : "#fff" }}
+                      >
+                        {workspace.name}
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      title={isDone ? "Đánh dấu chưa xong" : "Đánh dấu đã xong"}
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        event.preventDefault();
+                        toggleWorkspaceCompleted(String(workspace.id));
+                      }}
+                      className={`flex h-5 w-5 shrink-0 items-center justify-center rounded border transition-all cursor-pointer ${
+                        isDone
+                          ? "border-emerald-500 bg-emerald-500 text-white shadow-sm"
+                          : "border-white/30 bg-white/10 text-white/50 hover:border-emerald-400 hover:text-emerald-400 hover:bg-white/20"
+                      }`}
+                    >
+                      <CheckOutlined className={`text-[10px] font-bold ${isDone ? "" : "opacity-0 group-hover:opacity-100"}`} />
+                    </button>
                   </div>
-                  <span
-                    className="text-xs font-medium text-white truncate flex-1 min-w-0"
-                    style={{ color: workspace.status === "FREE" ? "yellow" : "#fff" }}
-                  >
-                    {workspace.name}
-                  </span>
-                </div>
-              ),
-            })),
+                ),
+              };
+            }),
           };
         }
 

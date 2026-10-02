@@ -17,6 +17,7 @@ export type ArInvoice = {
   currency?: string;
   status: string;
   description?: string | null;
+  note?: string | null;
   payments?: ArInvoicePayment[];
   phat_sinh_amount?: number; // từ list endpoint: tổng phát sinh
   tam_ung_amount?: number;   // từ list endpoint: tổng tạm ứng
@@ -49,8 +50,10 @@ export type ApBill = {
   currency?: string;
   status: string;
   description?: string | null;
+  note?: string | null;
   phat_sinh_amount?: number;
   tam_ung_amount?: number;
+  effective_total_amount?: number;
 };
 
 

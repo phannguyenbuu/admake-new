@@ -3,11 +3,12 @@ import React from "react";
 import { PieChart } from "@mui/x-charts/PieChart";
 import { BarChart } from "@mui/x-charts/BarChart";
 import { LineChart } from "@mui/x-charts/LineChart";
-import { CaretDownOutlined, CaretUpOutlined } from "@ant-design/icons";
+import { CaretDownOutlined, CaretUpOutlined, RobotOutlined } from "@ant-design/icons";
 import { useUser } from "../../../common/hooks/useUser";
 import { useApiHost } from "../../../common/hooks/useApiHost";
 import { TOKEN_LABEL } from "../../../common/config";
 import UnPermissionBoard from "../unPermissionBoard";
+import { AIAssistantModal } from "../../../components/ai-pricing/AIAssistantModal";
 
 const tabs = [
   { key: "cong-viec", label: "Thống kê công việc" },
@@ -119,6 +120,7 @@ const StatisticDashboard: IPage["Component"] = () => {
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<string>("");
   const [data, setData] = React.useState<StatsResponse | null>(null);
+  const [aiModalOpen, setAiModalOpen] = React.useState(false);
 
   const fetchStats = React.useCallback(async () => {
     if (!userLeadId || userLeadId <= 0) return;
@@ -184,20 +186,36 @@ const StatisticDashboard: IPage["Component"] = () => {
   return canViewPermission?.view_statistic ? (
     <div className="w-full flex flex-col gap-6 pb-10">
       <section className="bg-white/90 rounded-2xl shadow-md border border-slate-100 p-6">
-        <div className="flex flex-wrap gap-2 border-b border-slate-200 mb-4">
-          {tabs.map((tab) => (
-            <button
-              key={tab.key}
-              onClick={() => setActiveTab(tab.key)}
-              className={`px-4 py-2 text-sm font-semibold rounded-t-lg border border-b-0 ${
-                activeTab === tab.key
-                  ? "bg-teal-50 text-teal-600 border-teal-200"
-                  : "bg-white text-slate-500 border-transparent"
-              }`}
-            >
-              {tab.label}
-            </button>
-          ))}
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 mb-4 pb-2">
+          <div className="flex flex-wrap gap-2">
+            {tabs.map((tab) => (
+              <button
+                key={tab.key}
+                onClick={() => setActiveTab(tab.key)}
+                className={`px-4 py-2 text-sm font-semibold rounded-t-lg border border-b-0 ${
+                  activeTab === tab.key
+                    ? "bg-teal-50 text-teal-600 border-teal-200"
+                    : "bg-white text-slate-500 border-transparent"
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Nút AI Báo giá Beta chỉ xuất hiện trong tab Phân tích */}
+          <button
+            type="button"
+            onClick={() => setAiModalOpen(true)}
+            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-gradient-to-r from-cyan-500 via-teal-500 to-emerald-500 hover:from-cyan-600 hover:to-emerald-600 text-white font-bold text-xs shadow-sm hover:shadow-md transition-all cursor-pointer border-none hover:scale-105 active:scale-95"
+            title="Mở Trợ lý AI Bóc tách & Báo giá Bảng hiệu (Thử nghiệm)"
+          >
+            <RobotOutlined className="text-sm" />
+            <span>AI Báo giá</span>
+            <span className="text-[10px] px-1.5 py-0.2 bg-white/25 rounded-full uppercase font-extrabold tracking-wider">
+              Beta
+            </span>
+          </button>
         </div>
 
         <div className="flex flex-col lg:flex-row gap-3 lg:items-center lg:justify-between mb-4">
@@ -790,6 +808,9 @@ const StatisticDashboard: IPage["Component"] = () => {
           </>
         )}
       </section>
+
+      {/* Modal Trợ lý AI Báo giá Bảng hiệu */}
+      <AIAssistantModal open={aiModalOpen} onCancel={() => setAiModalOpen(false)} />
     </div>
   ) : <UnPermissionBoard />;
 };

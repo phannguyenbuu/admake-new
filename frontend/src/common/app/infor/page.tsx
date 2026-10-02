@@ -87,7 +87,7 @@ export const InforDashboard: IPage["Component"] = () => {
             },
           });
           const users = response.data.data;
-          setFilteredUsers(users.filter(u => u.id !== userId));
+          setFilteredUsers(users.filter(u => u.id !== userId && u.is_active !== false));
           notification.success({message:'Get users done!'});
         } catch (error) {
           notification.error({message:'Error fetching users', 

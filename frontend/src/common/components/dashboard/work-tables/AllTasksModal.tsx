@@ -48,6 +48,19 @@ const removeAccents = (str: string): string => {
     .replace(/Đ/g, "D");
 };
 
+const stripHtml = (html: string): string => {
+  if (!html) return "";
+  let doc = html.replace(/<\/?[^>]+(>|$)/g, " ");
+  doc = doc.replace(/\s+/g, " ").trim();
+  doc = doc
+    .replace(/&nbsp;/gi, " ")
+    .replace(/&amp;/gi, "&")
+    .replace(/&lt;/gi, "<")
+    .replace(/&gt;/gi, ">")
+    .replace(/&quot;/gi, '"');
+  return doc;
+};
+
 export default function AllTasksModal() {
   const [clearTrashVisible, setClearTrashVisible] = useState(false);
 
@@ -455,7 +468,7 @@ export const CardStaticItem: React.FC<CardStaticItemProps> = ({
           <p>:: {task.workspace} ::</p>
 
           {task.description && (
-            <p className="text-gray-500 text-xs line-clamp-2 leading-relaxed">{task.description}</p>
+            <p className="text-gray-500 text-xs line-clamp-2 leading-relaxed">{stripHtml(task.description)}</p>
           )}
           {task.reward && task.reward !== 0 && (
             <div className="flex items-center gap-1 text-xs text-green-600 font-semibold">

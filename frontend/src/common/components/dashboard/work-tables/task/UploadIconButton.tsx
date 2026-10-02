@@ -15,6 +15,7 @@ import { useTaskContext } from '../../../../common/hooks/useTask';
 import { useUser } from '../../../../common/hooks/useUser';
 import { TOKEN_LABEL } from '../../../../common/config';
 import { notification, Modal } from 'antd';
+import ImageViewerModal from '../../../modal/ImageViewerModal';
 
 interface UploadIconButtonProps {
   taskDetail: Task | null;
@@ -239,48 +240,12 @@ const UploadIconButton = forwardRef<UploadIconButtonHandle, UploadIconButtonProp
       </div>
 
       {/* ── Lightbox preview modal ─────────────────────────────────────── */}
-      <Modal
+      <ImageViewerModal
         open={lightboxOpen}
         onCancel={() => setLightboxOpen(false)}
-        footer={null}
-        centered
-        closable={false}
-        width="auto"
-        styles={{
-          body: {
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            padding: 0,
-            background: 'transparent',
-          },
-          content: {
-            background: 'transparent',
-            boxShadow: 'none',
-            padding: 0,
-          },
-          mask: {
-            background: 'rgba(0, 0, 0, 0.8)',
-            backdropFilter: 'blur(5px)',
-          },
-        }}
-      >
-        {preview && (
-          <img
-            src={preview.replace('thumbs/thumb_', '')}
-            alt="Xem ảnh gốc"
-            onClick={() => setLightboxOpen(false)}
-            style={{
-              maxWidth: '90vw',
-              maxHeight: '85vh',
-              objectFit: 'contain',
-              borderRadius: 8,
-              cursor: 'pointer',
-              boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
-            }}
-          />
-        )}
-      </Modal>
+        imageUrl={preview ? preview.replace('thumbs/thumb_', '') : null}
+        title="Xem ảnh công việc"
+      />
     </>
   );
 });

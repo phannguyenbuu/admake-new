@@ -200,13 +200,17 @@ export default function WorkDays({ record, selectedMonth }: ParamWorkDaysProps) 
                         const periodKey = ["morning", "noon", "evening"][periodIndex] as keyof Checklist;
 
                         for (const item of mainData) {
-                          const itemCreateDate = new Date(item.createdAt);
-                          const itemDate = new Date(itemCreateDate.getTime() + 7 * 60 * 60 * 1000);
+                          if (!item.createdAt) continue;
+                          const dateParts = item.createdAt.slice(0, 10).split("-");
+                          if (dateParts.length !== 3) continue;
+                          const itemYear = parseInt(dateParts[0], 10);
+                          const itemMonth = parseInt(dateParts[1], 10) - 1;
+                          const itemDay = parseInt(dateParts[2], 10);
 
                           if (
-                            itemDate.getDate() === date.getDate() &&
-                            itemDate.getMonth() === date.getMonth() &&
-                            itemDate.getFullYear() === date.getFullYear()
+                            itemDay === date.getDate() &&
+                            itemMonth === date.getMonth() &&
+                            itemYear === date.getFullYear()
                           ) {
                             const periodData = item.checklist?.[periodKey];
                             if (periodData) {

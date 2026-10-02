@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useMemo } from "react";
 import { Modal, notification, Popconfirm, AutoComplete } from "antd";
 import { useCustomerQuery } from "../../../common/hooks/customer.hook";
 
@@ -633,7 +633,8 @@ function PaymentRow({
           <Pencil size={11} />
         </button>
         <Popconfirm
-          title="Xóa đợt thanh toán này?"
+          title={isTamUng ? "Xóa đợt tạm ứng / thu tiền này?" : "Xóa khoản phát sinh này?"}
+          description={isTamUng ? "Số tiền đã thu sẽ giảm trừ lại." : "Doanh thu công nợ sẽ tự động giảm trừ lại."}
           okText="Xóa"
           cancelText="Huỷ"
           okButtonProps={{ danger: true }}
@@ -665,6 +666,7 @@ function PaymentSubRow({
   addingLoading,
   onPaymentsChanged,
   dailyCashList,
+  onDeleted,
 }: {
   payments: Payment[];
   invoiceId: string;
@@ -673,135 +675,216 @@ function PaymentSubRow({
   addingLoading: boolean;
   onPaymentsChanged: (updated: Payment[]) => void;
   dailyCashList: DailyCashRef[];
+  onDeleted?: () => void;
 }) {
-  const [addForm, setAddForm] = useState<AddPaymentForm>({
+  const phatSinhPayments = payments.filter((p) => p.payment_type === "phat_sinh");
+  const tamUngPayments = payments.filter((p) => p.payment_type === "tam_ung");
+
+  const [editingId, setEditingId] = useState<string | null>(null);
+
+  // Form thêm phát sinh
+  const [psForm, setPsForm] = useState({
     amount: 0,
-    payment_type: "phat_sinh",
     payment_date: dayjs().format("YYYY-MM-DD"),
     note: "",
   });
 
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [tcRef, setTcRef] = useState(""); // selected daily-cash id
-
-  const handleAdd = (form: AddPaymentForm) => {
-    const chosen = form.payment_type === "tam_ung" ? dailyCashList.find((d) => d.id === tcRef) : undefined;
-    const noteWithRef = chosen
-      ? `[TC:${chosen.voucher_no}]${form.note ? " " + form.note : ""}`
-      : form.note;
-    setEditingId(null);
-    setTcRef("");
-    onAddPayment({ ...form, note: noteWithRef });
-  };
+  // Form thêm tạm ứng
+  const [tuForm, setTuForm] = useState({
+    amount: 0,
+    payment_date: dayjs().format("YYYY-MM-DD"),
+    note: "",
+  });
+  const [tcRef, setTcRef] = useState("");
 
   const canAdd = invoiceStatus !== "cancelled";
 
+  const handleAddPhatSinh = () => {
+    if (!psForm.amount || psForm.amount <= 0) {
+      notification.warning({ message: "Vui lòng nhập số tiền phát sinh > 0" });
+      return;
+    }
+    onAddPayment({
+      amount: psForm.amount,
+      payment_type: "phat_sinh",
+      payment_date: psForm.payment_date,
+      note: psForm.note,
+    });
+    setPsForm({ amount: 0, payment_date: dayjs().format("YYYY-MM-DD"), note: "" });
+  };
+
+  const handleAddTamUng = () => {
+    if (!tuForm.amount || tuForm.amount <= 0) {
+      notification.warning({ message: "Vui lòng nhập số tiền tạm ứng > 0" });
+      return;
+    }
+    const chosen = dailyCashList.find((d) => d.id === tcRef);
+    const noteWithRef = chosen
+      ? `[TC:${chosen.voucher_no}]${tuForm.note ? " " + tuForm.note : ""}`
+      : tuForm.note;
+    setTcRef("");
+    onAddPayment({
+      amount: tuForm.amount,
+      payment_type: "tam_ung",
+      payment_date: tuForm.payment_date,
+      note: noteWithRef,
+    });
+    setTuForm({ amount: 0, payment_date: dayjs().format("YYYY-MM-DD"), note: "" });
+  };
+
   return (
-    <div className="px-6 py-3 bg-slate-50/80 border-t border-slate-100">
-      <div className="flex flex-col gap-1.5">
-        {payments.length === 0 && !canAdd && (
-          <span className="text-xs text-slate-400 italic">Chưa có đợt thanh toán</span>
-        )}
+    <div className="px-6 py-3 bg-slate-50/90 border-t border-slate-200">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        {/* Cột 1: Khoản phát sinh */}
+        <div className="bg-white p-3 rounded-xl border border-teal-200 shadow-2xs flex flex-col gap-2">
+          <div className="flex items-center justify-between pb-1 border-b border-teal-100">
+            <span className="text-xs font-bold text-teal-800 flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-teal-500"></span>
+              KHOẢN PHÁT SINH (Cộng vào doanh thu)
+            </span>
+            <span className="text-xs font-bold text-teal-600">
+              +{fmt(phatSinhPayments.reduce((s, p) => s + (p.amount || 0), 0))} đ
+            </span>
+          </div>
 
-        {payments.map((p) => (
-          <PaymentRow
-            key={p.id}
-            p={p}
-            invoiceId={invoiceId}
-            dailyCashList={dailyCashList}
-            isEditing={editingId === p.id}
-            onStartEdit={() => setEditingId(p.id)}
-            onCancelEdit={() => setEditingId(null)}
-            onDeleted={() => {
-              setEditingId(null);
-              onPaymentsChanged(payments.filter((x) => x.id !== p.id));
-            }}
-            onUpdated={(updated) => {
-              setEditingId(null);
-              onPaymentsChanged(payments.map((x) => (x.id === updated.id ? updated : x)));
-            }}
-          />
-        ))}
+          <div className="flex flex-col gap-1.5 min-h-[36px]">
+            {phatSinhPayments.length === 0 && (
+              <span className="text-xs text-slate-400 italic py-1">Chưa có khoản phát sinh nào.</span>
+            )}
+            {phatSinhPayments.map((p) => (
+              <PaymentRow
+                key={p.id}
+                p={p}
+                invoiceId={invoiceId}
+                dailyCashList={dailyCashList}
+                isEditing={editingId === p.id}
+                onStartEdit={() => setEditingId(p.id)}
+                onCancelEdit={() => setEditingId(null)}
+                onDeleted={() => {
+                  setEditingId(null);
+                  onPaymentsChanged(payments.filter((x) => x.id !== p.id));
+                  onDeleted?.();
+                }}
+                onUpdated={(updated) => {
+                  setEditingId(null);
+                  onPaymentsChanged(payments.map((x) => (x.id === updated.id ? updated : x)));
+                  onDeleted?.();
+                }}
+              />
+            ))}
+          </div>
 
-        {/* Quick-add row */}
-        {canAdd && (
-          <div className="flex items-center gap-2 mt-1 flex-wrap">
-            <select
-              value={addForm.payment_type}
-              onChange={(e) => {
-                const nextType = e.target.value as "phat_sinh" | "tam_ung";
-                setAddForm((p) => ({ ...p, payment_type: nextType }));
-                if (nextType !== "tam_ung") setTcRef("");
-              }}
-              className={`text-xs border rounded-md px-2 py-1 cursor-pointer ${addForm.payment_type === "tam_ung"
-                ? "border-rose-300 bg-rose-50 text-rose-700"
-                : "border-teal-300 bg-teal-50 text-teal-700"
-                }`}
-            >
-              <option value="phat_sinh">Phát sinh</option>
-              <option value="tam_ung">Tạm ứng</option>
-            </select>
+          {canAdd && (
+            <div className="flex items-center gap-1.5 pt-2 border-t border-slate-100 flex-wrap">
+              <input
+                type="date"
+                value={psForm.payment_date}
+                onChange={(e) => setPsForm((p) => ({ ...p, payment_date: e.target.value }))}
+                className="text-xs border border-slate-200 rounded-md px-2 py-1 bg-white"
+              />
+              <MoneyInput
+                value={psForm.amount}
+                onChange={(n) => setPsForm((p) => ({ ...p, amount: n }))}
+                onEnter={handleAddPhatSinh}
+                placeholder="Số tiền PS..."
+                className="w-28"
+              />
+              <input
+                value={psForm.note}
+                onChange={(e) => setPsForm((p) => ({ ...p, note: e.target.value }))}
+                onKeyDown={(e) => { if (e.key === "Enter") handleAddPhatSinh(); }}
+                placeholder="Nội dung phát sinh..."
+                className="text-xs border border-slate-200 rounded-md px-2 py-1 flex-1 min-w-[120px] bg-white"
+              />
+              <button
+                type="button"
+                disabled={addingLoading}
+                onClick={handleAddPhatSinh}
+                className={`text-xs text-white px-3 py-1 rounded-md font-semibold transition-colors whitespace-nowrap bg-teal-600 hover:bg-teal-700 ${addingLoading ? "opacity-50 cursor-not-allowed" : ""}`}
+              >
+                + Thêm PS
+              </button>
+            </div>
+          )}
+        </div>
 
-            <input
-              type="date"
-              value={addForm.payment_date}
-              onChange={(e) => setAddForm((p) => ({ ...p, payment_date: e.target.value }))}
-              className="text-xs border border-slate-200 rounded-md px-2 py-1"
-            />
+        {/* Cột 2: Đợt thanh toán / Tạm ứng */}
+        <div className="bg-white p-3 rounded-xl border border-rose-200 shadow-2xs flex flex-col gap-2">
+          <div className="flex items-center justify-between pb-1 border-b border-rose-100">
+            <span className="text-xs font-bold text-rose-800 flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-rose-500"></span>
+              ĐỢT TẠM ỨNG / THU TIỀN (Trừ vào còn lại)
+            </span>
+            <span className="text-xs font-bold text-rose-600">
+              Đã thu: {fmt(tamUngPayments.reduce((s, p) => s + (p.amount || 0), 0))} đ
+            </span>
+          </div>
 
-            {/* Amount with thousand separator */}
-            <MoneyInput
-              value={addForm.amount}
-              onChange={(n) => setAddForm((p) => ({ ...p, amount: n }))}
-              onEnter={() => {
-                if (!addForm.amount || addForm.amount <= 0) {
-                  notification.warning({ message: "Vui lòng nhập số tiền > 0" });
-                  return;
-                }
-                onAddPayment(addForm);
-                setAddForm((p) => ({ ...p, amount: 0, note: "" }));
-              }}
-              placeholder="Số tiền..."
-              className="w-36"
-            />
+          <div className="flex flex-col gap-1.5 min-h-[36px]">
+            {tamUngPayments.length === 0 && (
+              <span className="text-xs text-slate-400 italic py-1">Chưa có đợt thu tiền nào.</span>
+            )}
+            {tamUngPayments.map((p) => (
+              <PaymentRow
+                key={p.id}
+                p={p}
+                invoiceId={invoiceId}
+                dailyCashList={dailyCashList}
+                isEditing={editingId === p.id}
+                onStartEdit={() => setEditingId(p.id)}
+                onCancelEdit={() => setEditingId(null)}
+                onDeleted={() => {
+                  setEditingId(null);
+                  onPaymentsChanged(payments.filter((x) => x.id !== p.id));
+                  onDeleted?.();
+                }}
+                onUpdated={(updated) => {
+                  setEditingId(null);
+                  onPaymentsChanged(payments.map((x) => (x.id === updated.id ? updated : x)));
+                  onDeleted?.();
+                }}
+              />
+            ))}
+          </div>
 
-            <input
-              value={addForm.note}
-              onChange={(e) => setAddForm((p) => ({ ...p, note: e.target.value }))}
-              placeholder="Ghi chú..."
-              className="text-xs border border-slate-200 rounded-md px-2 py-1 flex-1 min-w-[120px]"
-            />
-
-            {/* Custom dropdown link phiếu thu chi */}
-            {addForm.payment_type === "tam_ung" && (
+          {canAdd && (
+            <div className="flex items-center gap-1.5 pt-2 border-t border-slate-100 flex-wrap">
+              <input
+                type="date"
+                value={tuForm.payment_date}
+                onChange={(e) => setTuForm((p) => ({ ...p, payment_date: e.target.value }))}
+                className="text-xs border border-slate-200 rounded-md px-2 py-1 bg-white"
+              />
+              <MoneyInput
+                value={tuForm.amount}
+                onChange={(n) => setTuForm((p) => ({ ...p, amount: n }))}
+                onEnter={handleAddTamUng}
+                placeholder="Số tiền thu..."
+                className="w-28"
+              />
+              <input
+                value={tuForm.note}
+                onChange={(e) => setTuForm((p) => ({ ...p, note: e.target.value }))}
+                onKeyDown={(e) => { if (e.key === "Enter") handleAddTamUng(); }}
+                placeholder="Ghi chú thu tiền..."
+                className="text-xs border border-slate-200 rounded-md px-2 py-1 flex-1 min-w-[100px] bg-white"
+              />
               <TcDropdown
                 value={tcRef}
                 onChange={setTcRef}
                 list={dailyCashList.filter((d) => d.direction === "income")}
               />
-            )}
-
-            <button
-              type="button"
-              disabled={addingLoading}
-              onClick={() => {
-                if (!addForm.amount || addForm.amount <= 0) {
-                  notification.warning({ message: "Vui lòng nhập số tiền > 0" });
-                  return;
-                }
-                handleAdd(addForm);
-                setAddForm((p) => ({ ...p, amount: 0, note: "" }));
-              }}
-              className={`text-xs text-white px-3 py-1 rounded-md transition-colors whitespace-nowrap ${addingLoading ? "opacity-40 cursor-not-allowed" : ""
-                } ${addForm.payment_type === "tam_ung"
-                  ? "bg-rose-500 hover:bg-rose-600"
-                  : "bg-teal-500 hover:bg-teal-600"
-                }`}
-            >
-              {addingLoading ? "Đang lưu..." : "+ Lưu"}
-            </button>
-          </div>
-        )}
+              <button
+                type="button"
+                disabled={addingLoading}
+                onClick={handleAddTamUng}
+                className={`text-xs text-white px-3 py-1 rounded-md font-semibold transition-colors whitespace-nowrap bg-rose-600 hover:bg-rose-700 ${addingLoading ? "opacity-50 cursor-not-allowed" : ""}`}
+              >
+                + Thu tiền
+              </button>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
@@ -945,7 +1028,11 @@ export default function AccountsReceivableTab() {
   };
 
   const createMutation = useMutation({
-    mutationFn: (payload: Record<string, any>) => AccountingErpService.createArInvoice(payload),
+    mutationFn: (payload: Record<string, any>) =>
+      AccountingErpService.createArInvoice({
+        lead_id: userLeadId,
+        ...payload,
+      }),
     onSuccess: async () => {
       notification.success({ message: "Đã tạo công nợ phải thu" });
       setOpen(false);
@@ -1173,6 +1260,38 @@ export default function AccountsReceivableTab() {
   const safePage = Math.min(page, Math.max(1, totalPages));
   const rows = pageSize === 0 ? sortedRows : sortedRows.slice((safePage - 1) * pageSize, safePage * pageSize);
 
+  const [collapsedCustomers, setCollapsedCustomers] = useState<Set<string>>(new Set());
+
+  const toggleCollapseCustomer = (custName: string) => {
+    setCollapsedCustomers((prev) => {
+      const next = new Set(prev);
+      if (next.has(custName)) next.delete(custName);
+      else next.add(custName);
+      return next;
+    });
+  };
+
+  const customerGroups = useMemo(() => {
+    const map = new Map<string, ArInvoice[]>();
+    for (const r of rows) {
+      const key = (r.customer_name || "(Chưa có tên khách)").trim();
+      if (!map.has(key)) map.set(key, []);
+      map.get(key)!.push(r);
+    }
+    return Array.from(map.entries()).map(([custName, items]) => {
+      let totalReceivable = 0;
+      let collected = 0;
+      let remaining = 0;
+      for (const item of items) {
+        const t = getArRowTotals(item, paymentsMap[item.id]);
+        totalReceivable += t.effectiveTotalAmount;
+        collected += t.tamUngAmount;
+        remaining += t.remainingAmount;
+      }
+      return { customerName: custName, items, totalReceivable, collected, remaining };
+    });
+  }, [rows, paymentsMap]);
+
   return (
     <div className="flex flex-col gap-4">
       {/* Due-soon banner */}
@@ -1348,183 +1467,292 @@ export default function AccountsReceivableTab() {
             </tr>
           </thead>
           <tbody>
-            {rows.map((row) => {
-              const isExpanded = expanded.has(row.id);
-              const pmts = paymentsMap[row.id] || [];
-
-              // Phát sinh + Tạm ứng (từ list API hoặc local payments)
-              const rowTotals = getArRowTotals(row, paymentsMap[row.id]);
-              const psAmt = rowTotals.phatSinhAmount;
-
-              // Doanh thu = (base + phát sinh) × (1 + VAT%)
-              const totalReceivable = rowTotals.effectiveTotalAmount;
-              // Đã thu = tổng tạm ứng
-              const collected = rowTotals.tamUngAmount;
-              // Còn lại = doanh thu − đã thu
-              const remaining = rowTotals.remainingAmount;
-
+            {customerGroups.map((group: any) => {
+              const isCollapsed = collapsedCustomers.has(group.customerName);
               return (
-                <React.Fragment key={row.id}>
-                  <tr className="border-b last:border-0 hover:bg-slate-50/60 group transition-colors">
-
-                    {/* Expand */}
-                    <td className="px-3 py-3 text-center">
+                <React.Fragment key={`cust-group-${group.customerName}`}>
+                  {/* Row tổng hợp Khách hàng */}
+                  <tr className="bg-slate-100/90 border-b border-slate-200 font-semibold text-slate-800 hover:bg-slate-200/60 transition-colors">
+                    <td className="px-3 py-2 text-center">
                       <button
-                        onClick={() => toggleExpand(row.id)}
-                        className="text-slate-400 hover:text-teal-600 transition-colors"
-                        title="Xem đợt thanh toán"
+                        onClick={() => toggleCollapseCustomer(group.customerName)}
+                        className="text-slate-600 hover:text-teal-600 font-bold text-sm cursor-pointer"
+                        title={isCollapsed ? "Mở rộng đơn hàng" : "Thu gọn"}
                       >
-                        {isExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+                        {isCollapsed ? "▶" : "▼"}
                       </button>
                     </td>
-
-                    {/* Mã / Ngày */}
-                    <td className="px-3 py-2">
-                      <div className="font-medium text-slate-700 text-xs leading-tight">{row.code}</div>
-                      <InlineText
-                        type="date"
-                        value={row.invoice_date || ""}
-                        onSave={(v) => handleInlineUpdate(row, "invoice_date", v)}
-                        className="text-[11px] text-slate-400"
-                      />
-                    </td>
-
-                    {/* Nội dung: chỉ task dropdown */}
-                    <td className="px-3 py-2 min-w-[180px]">
-                      <InlineCustomerSelect
-                        value={row.customer_name || ""}
-                        placeholder="Khách hàng"
-                        onSave={(v) => handleInlineUpdate(row, "customer_name", v)}
-                        customerNames={customerNames}
-                      />
-                      {/* Task dropdown — 1 task duy nhất, lưu vào description */}
-                      <select
-                        title="Gắn công việc"
-                        value={tasks.find((t) => t.title === row.description)?.id || ""}
-                        onChange={(e) => {
-                          const t = tasks.find((x) => x.id === e.target.value);
-                          handleInlineUpdate(row, "description", t ? t.title : "");
-                        }}
-                        className="mt-0.5 w-full text-[11px] text-slate-600 border border-slate-200 rounded px-1 py-0.5 bg-white hover:border-teal-400 cursor-pointer"
-                      >
-                        <option value="">{tasks.length ? "-- Chọn công việc --" : "(Chưa có task)"}</option>
-                        {tasks.map((t) => (
-                          <option key={t.id} value={t.id}>{t.title}</option>
-                        ))}
-                      </select>
-                      {(() => {
-                        const linkedTask = tasks.find((t) => t.title === row.description);
-                        if (!linkedTask) return null;
-                        const matCost = getTaskMaterialCost(linkedTask, inventoryItems);
-                        return (
-                          <div className="flex flex-wrap gap-1 mt-1 text-[10px]">
-                            <span className="bg-purple-50 text-purple-700 px-1 py-0.5 rounded font-medium">
-                              Nhân công: {fmt(linkedTask.reward)}đ
-                            </span>
-                            {matCost > 0 && (
-                              <span className="bg-teal-50 text-teal-700 px-1 py-0.5 rounded font-medium">
-                                Vật tư: {fmt(matCost)}đ
-                              </span>
-                            )}
-                          </div>
-                        );
-                      })()}
-                    </td>
-
-                    {/* VAT dropdown */}
-                    <td className="px-3 py-2">
-                      <InlineVAT
-                        value={row.tax_rate ?? 0}
-                        taxCodes={taxCodes}
-                        onSave={(rate, taxCodeId) => handleVATChange(row, rate, taxCodeId)}
-                      />
-                    </td>
-
-                    {/* Amount block: (base + PS) × (1+VAT%) */}
-                    <td className="px-3 py-2">
-                      <div className="flex items-center gap-1 text-xs flex-wrap">
-                        <InlineText
-                          type="text"
-                          value={fmt(row.base_amount || 0)}
-                          placeholder="0"
-                          onSave={(v) => handleInlineUpdate(row, "base_amount", parseMoney(v))}
-                          className="w-28 text-left"
-                        />
-                        {psAmt > 0 && (
-                          <span className="text-teal-600 font-medium">+{fmt(psAmt)}</span>
-                        )}
-                        <span className="text-slate-400">×(1+{row.tax_rate || 0}%)</span>
-                        <span className="font-semibold text-teal-700">=&nbsp;{fmt(totalReceivable)} đ</span>
+                    <td colSpan={2} className="px-3 py-2">
+                      <div className="flex items-center gap-2">
+                        <span className="text-teal-900 font-bold text-sm">{group.customerName}</span>
+                        <span className="text-[11px] bg-teal-100 text-teal-800 px-2 py-0.5 rounded-full font-medium">
+                          {group.items.length} đơn hàng
+                        </span>
                       </div>
                     </td>
-
-
-                    {/* Đã thu = tạm ứng */}
-                    <td className="px-3 py-2 text-emerald-700 font-medium text-sm">{fmt(collected)} đ</td>
-
-                    {/* Còn lại */}
-                    <td className="px-3 py-2 text-amber-700 font-medium text-sm">{fmt(remaining)} đ</td>
-
-                    {/* Hạn TT */}
-                    <td className="px-3 py-2">
-                      <InlineText
-                        type="date"
-                        value={row.due_date || ""}
-                        placeholder="Chưa đặt"
-                        onSave={(v) => handleInlineUpdate(row, "due_date", v)}
-                        className="text-xs"
-                      />
-                    </td>
-
-                    {/* Xoá — luôn hiển thị */}
-                    <td className="px-3 py-2 text-center">
-                      <Popconfirm
-                        title="Xoá công nợ này?"
-                        description="Hành động không thể hoàn tác."
-                        okText="Xoá"
-                        cancelText="Huỷ"
-                        okButtonProps={{ danger: true }}
-                        onConfirm={() => deleteMutation.mutate({ row })}
+                    <td className="px-3 py-2 text-slate-500 text-xs font-normal">Tổng nhóm KH:</td>
+                    <td className="px-3 py-2 font-bold text-teal-700 text-sm">{fmt(group.totalReceivable)} đ</td>
+                    <td className="px-3 py-2 font-bold text-emerald-700 text-sm">{fmt(group.collected)} đ</td>
+                    <td className="px-3 py-2 font-bold text-amber-700 text-sm">{fmt(group.remaining)} đ</td>
+                    <td colSpan={2} className="px-3 py-2 text-right">
+                      <button
+                        onClick={() => {
+                          createMutation.mutate({
+                            lead_id: userLeadId,
+                            customer_name: group.customerName === "(Chưa có tên khách)" ? "" : group.customerName,
+                            base_amount: 0,
+                            tax_rate: 0,
+                            invoice_date: dayjs().format("YYYY-MM-DD"),
+                          });
+                        }}
+                        className="inline-flex items-center gap-1 bg-teal-600 hover:bg-teal-700 text-white text-xs font-medium px-2.5 py-1 rounded-md transition-colors cursor-pointer shadow-sm"
+                        title="Tạo đơn hàng / công nợ mới riêng biệt cho khách hàng này"
                       >
-                        <button
-                          title="Xoá"
-                          className="p-1.5 rounded-md border border-rose-200 text-rose-500 hover:text-rose-700 hover:border-rose-400 hover:bg-rose-50 transition-colors"
-                        >
-                          <Trash2 size={13} />
-                        </button>
-                      </Popconfirm>
+                        + Tạo đơn mới
+                      </button>
                     </td>
                   </tr>
 
-                  {/* Sub-row: payments */}
-                  {isExpanded && (
-                    <tr className="bg-slate-50/50">
-                      <td colSpan={9} className="p-0">
-                        <PaymentSubRow
-                          payments={pmts}
-                          invoiceId={row.id}
-                          invoiceStatus={row.status}
-                          addingLoading={paymentMutation.isPending}
-                          dailyCashList={dailyCashList}
-                          onPaymentsChanged={(updated) =>
-                            setPaymentsMap((prev) => ({ ...prev, [row.id]: updated }))
-                          }
-                          onAddPayment={(p) =>
-                            paymentMutation.mutate({
-                              invoiceId: row.id,
-                              payload: {
-                                payment_date: p.payment_date,
-                                amount: p.amount,
-                                payment_method: "bank_transfer",
-                                payment_type: p.payment_type,
-                                note: p.note,
-                              },
-                            })
-                          }
-                        />
-                      </td>
-                    </tr>
-                  )}
+                  {/* Danh sách các đơn hàng của Khách hàng này khi mở rộng */}
+                  {!isCollapsed && group.items.map((row: ArInvoice) => {
+                    const isExpanded = expanded.has(row.id);
+                    const pmts = paymentsMap[row.id] || [];
+
+                    // Phát sinh + Tạm ứng (từ list API hoặc local payments)
+                    const rowTotals = getArRowTotals(row, paymentsMap[row.id]);
+                    const psAmt = rowTotals.phatSinhAmount;
+
+                    // Doanh thu = (base + phát sinh) × (1 + VAT%)
+                    const totalReceivable = rowTotals.effectiveTotalAmount;
+                    // Đã thu = tổng tạm ứng
+                    const collected = rowTotals.tamUngAmount;
+                    // Còn lại = doanh thu − đã thu
+                    const remaining = rowTotals.remainingAmount;
+
+                    return (
+                      <React.Fragment key={row.id}>
+                        <tr className="border-b last:border-0 hover:bg-slate-50/60 group transition-colors">
+
+                          {/* Expand */}
+                          <td className="px-3 py-3 text-center pl-6">
+                            <button
+                              onClick={() => toggleExpand(row.id)}
+                              className="text-slate-400 hover:text-teal-600 transition-colors"
+                              title="Xem chi tiết phát sinh & đợt thu tiền"
+                            >
+                              {isExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+                            </button>
+                          </td>
+
+                          {/* Mã / Ngày */}
+                          <td className="px-3 py-2">
+                            <div className="font-medium text-slate-700 text-xs leading-tight">{row.code}</div>
+                            <InlineText
+                              type="date"
+                              value={row.invoice_date || ""}
+                              onSave={(v) => handleInlineUpdate(row, "invoice_date", v)}
+                              className="text-[11px] text-slate-400"
+                            />
+                          </td>
+
+                          {/* Nội dung */}
+                          <td className="px-3 py-2 min-w-[200px]">
+                            <InlineCustomerSelect
+                              value={row.customer_name || ""}
+                              placeholder="Khách hàng"
+                              onSave={(v) => handleInlineUpdate(row, "customer_name", v)}
+                              customerNames={customerNames}
+                            />
+                            {/* Task dropdown — 1 task duy nhất, lưu vào description */}
+                            <select
+                              title="Gắn công việc"
+                              value={tasks.find((t) => t.title === row.description)?.id || ""}
+                              onChange={(e) => {
+                                const t = tasks.find((x) => x.id === e.target.value);
+                                const newTitle = t ? t.title : "";
+                                if (newTitle && row.customer_name) {
+                                  const isDuplicate = allRows.some(
+                                    (r) => r.id !== row.id && r.customer_name === row.customer_name && r.description === newTitle
+                                  );
+                                  if (isDuplicate) {
+                                    notification.warning({
+                                      message: "⚠️ Cảnh báo trùng tên đơn hàng",
+                                      description: `Khách hàng "${row.customer_name}" đã có đơn hàng "${newTitle}". Vui lòng kiểm tra lại để tránh nhầm lẫn!`,
+                                      duration: 6,
+                                    });
+                                  }
+                                }
+                                handleInlineUpdate(row, "description", newTitle);
+                              }}
+                              className="mt-0.5 w-full text-[11px] text-slate-600 border border-slate-200 rounded px-1 py-0.5 bg-white hover:border-teal-400 cursor-pointer"
+                            >
+                              <option value="">{tasks.length ? "-- Chọn công việc --" : "(Chưa có task)"}</option>
+                              {tasks.map((t) => (
+                                <option key={t.id} value={t.id}>{t.title}</option>
+                              ))}
+                            </select>
+                            {(() => {
+                              const linkedTask = tasks.find((t) => t.title === row.description);
+                              if (!linkedTask) return null;
+                              const matCost = getTaskMaterialCost(linkedTask, inventoryItems);
+                              return (
+                                <div className="flex flex-wrap gap-1 mt-1 text-[10px]">
+                                  <span className="bg-purple-50 text-purple-700 px-1 py-0.5 rounded font-medium">
+                                    Nhân công: {fmt(linkedTask.reward)}đ
+                                  </span>
+                                  {matCost > 0 && (
+                                    <span className="bg-teal-50 text-teal-700 px-1 py-0.5 rounded font-medium">
+                                      Vật tư: {fmt(matCost)}đ
+                                    </span>
+                                  )}
+                                </div>
+                              );
+                            })()}
+                            {/* Input ghi chú thông tin riêng */}
+                            <div className="mt-1">
+                              <InlineText
+                                value={row.note || ""}
+                                onSave={(v) => handleInlineUpdate(row, "note", v)}
+                                placeholder="📝 Ghi chú thông tin riêng..."
+                                className="text-[11px] text-slate-500 italic bg-slate-50 hover:bg-white border border-slate-200 rounded px-1.5 py-0.5 w-full block"
+                              />
+                            </div>
+                          </td>
+
+                          {/* VAT dropdown */}
+                          <td className="px-3 py-2">
+                            <InlineVAT
+                              value={row.tax_rate ?? 0}
+                              taxCodes={taxCodes}
+                              onSave={(rate, taxCodeId) => handleVATChange(row, rate, taxCodeId)}
+                            />
+                          </td>
+
+                          {/* Amount block: (base + PS) × (1+VAT%) - chỉ hiện VAT multiplier khi tax_rate > 0 */}
+                          <td className="px-3 py-2">
+                            <div className="flex items-center gap-1 text-xs flex-wrap">
+                              <InlineText
+                                type="text"
+                                value={fmt(row.base_amount || 0)}
+                                placeholder="0"
+                                onSave={(v) => handleInlineUpdate(row, "base_amount", parseMoney(v))}
+                                className="w-24 text-left"
+                              />
+                              {psAmt > 0 && (
+                                <span className="text-teal-600 font-medium">+{fmt(psAmt)}</span>
+                              )}
+                              {row.tax_rate > 0 && (
+                                <span className="text-slate-400">×(1+{row.tax_rate}%)</span>
+                              )}
+                              <span className="font-semibold text-teal-700">=&nbsp;{fmt(totalReceivable)} đ</span>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  if (!isExpanded) toggleExpand(row.id);
+                                }}
+                                className="ml-1 text-[11px] font-medium text-teal-600 hover:text-teal-800 bg-teal-50 hover:bg-teal-100 border border-teal-200 px-1.5 py-0.5 rounded transition-colors cursor-pointer whitespace-nowrap"
+                                title="Thêm hoặc quản lý các khoản phát sinh"
+                              >
+                                + PS
+                              </button>
+                            </div>
+                          </td>
+
+                          {/* Đã thu = tạm ứng */}
+                          <td className="px-3 py-2">
+                            <div className="flex items-center gap-1.5 flex-wrap">
+                              <span className="text-emerald-700 font-medium text-sm">{fmt(collected)} đ</span>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  if (!isExpanded) toggleExpand(row.id);
+                                }}
+                                className="text-[11px] font-medium text-emerald-600 hover:text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 px-1.5 py-0.5 rounded transition-colors cursor-pointer whitespace-nowrap"
+                                title="Thêm hoặc quản lý đợt thu tiền / tạm ứng"
+                              >
+                                + Thu
+                              </button>
+                            </div>
+                          </td>
+
+                          {/* Còn lại */}
+                          <td className="px-3 py-2">
+                            {remaining < 0 ? (
+                              <div className="flex flex-col">
+                                <span className="text-blue-600 font-bold text-sm">
+                                  {fmt(remaining)} đ
+                                </span>
+                                <span className="text-[10px] text-blue-500 font-medium">(Khách nộp dư)</span>
+                              </div>
+                            ) : (
+                              <span className="text-amber-700 font-medium text-sm">{fmt(remaining)} đ</span>
+                            )}
+                          </td>
+
+                          {/* Hạn TT */}
+                          <td className="px-3 py-2">
+                            <InlineText
+                              type="date"
+                              value={row.due_date || ""}
+                              placeholder="Chưa đặt"
+                              onSave={(v) => handleInlineUpdate(row, "due_date", v)}
+                              className="text-xs"
+                            />
+                          </td>
+
+                          {/* Xoá — luôn hiển thị */}
+                          <td className="px-3 py-2 text-center">
+                            <Popconfirm
+                              title="Xoá toàn bộ đơn công nợ này?"
+                              description="LƯU Ý: Thao tác này sẽ xoá TOÀN BỘ đơn hàng này (bao gồm mọi phát sinh và đợt thu tiền bên trong). Nếu chỉ muốn xoá một đợt phát sinh, hãy mở rộng dòng và xoá ở mục Phát sinh."
+                              okText="Xoá đơn hàng"
+                              cancelText="Huỷ"
+                              okButtonProps={{ danger: true }}
+                              onConfirm={() => deleteMutation.mutate({ row })}
+                            >
+                              <button
+                                title="Xoá đơn hàng này"
+                                className="p-1.5 rounded-md border border-rose-200 text-rose-500 hover:text-rose-700 hover:border-rose-400 hover:bg-rose-50 transition-colors"
+                              >
+                                <Trash2 size={13} />
+                              </button>
+                            </Popconfirm>
+                          </td>
+                        </tr>
+
+                        {/* Sub-row: payments */}
+                        {isExpanded && (
+                          <tr className="bg-slate-50/50">
+                            <td colSpan={9} className="p-0">
+                              <PaymentSubRow
+                                payments={pmts}
+                                invoiceId={row.id}
+                                invoiceStatus={row.status}
+                                addingLoading={paymentMutation.isPending}
+                                dailyCashList={dailyCashList}
+                                onDeleted={invalidate}
+                                onPaymentsChanged={(updated) =>
+                                  setPaymentsMap((prev) => ({ ...prev, [row.id]: updated }))
+                                }
+                                onAddPayment={(p) =>
+                                  paymentMutation.mutate({
+                                    invoiceId: row.id,
+                                    payload: {
+                                      payment_date: p.payment_date,
+                                      amount: p.amount,
+                                      payment_method: "bank_transfer",
+                                      payment_type: p.payment_type,
+                                      note: p.note,
+                                    },
+                                  })
+                                }
+                              />
+                            </td>
+                          </tr>
+                        )}
+                      </React.Fragment>
+                    );
+                  })}
                 </React.Fragment>
               );
             })}

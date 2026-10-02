@@ -22,43 +22,43 @@ def get_notifies_all():
 
 @notify_bp.route("/<int:lead_id>", methods=["GET"])
 def get_notifies(lead_id):
-    print('Lead', lead_id)
-    notifies = Notify.query.filter(Notify.lead_id==lead_id).order_by(Notify.updatedAt).all()
-    # data = [notify.tdict() for notify in notifies]
-
-
-    # notifies = Notify.query.all()
+    notifies = Notify.query.filter(
+        Notify.lead_id == lead_id,
+        Notify.isDelete.isnot(True)
+    ).order_by(Notify.createdAt.desc()).limit(50).all()
 
     result = []
-
     for notify in notifies:
-        target = notify.target
-
+        target = notify.target or ""
         if '/work-tables/' in target:
             link = target.split('/')[-1]
-
             if len(link) > 10:
                 work = db.session.get(Workspace, link)
-                
                 if work:
                     infor = notify.tdict()
                     infor['description'] = work.name
-
                     if notify.user_id:
                         user = db.session.get(User, notify.user_id)
-
                         if user:
                             infor['description'] += "_" + user.fullName
-
                     result.append(infor)
-    
+                    continue
+        result.append(notify.tdict())
+
     return jsonify({
         "data": result,
     })
 
+
+@notify_bp.route("/user/<string:user_id>", methods=["GET"])
+def get_user_notifies(user_id):
+    notifies = Notify.query.filter(
+        Notify.user_id == user_id,
+        Notify.isDelete.isnot(True)
+    ).order_by(Notify.createdAt.desc()).limit(20).all()
     return jsonify({
-        "data": data,
-    })
+        "data": [n.tdict() for n in notifies]
+    }), 200
 
 @notify_bp.route("/", methods=["POST"])
 def create_notifies():

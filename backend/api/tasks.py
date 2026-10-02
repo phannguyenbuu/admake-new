@@ -45,13 +45,18 @@ def guard_task_permission():
         g.permission_actor = target_user
         return
 
-    if endpoint in {"task.update_task_message", "task.update_task_assets"}:
+    if endpoint in {"task.update_task_message", "task.update_task_assets", "task.update_task", "task.update_task_status"}:
         try:
             actor, _ = require_can_view("view_workspace")
             g.permission_actor = actor
             return
         except Exception:
-            user_id = request.form.get("user_id")
+            user_id = None
+            if request.is_json:
+                body = request.get_json(silent=True) or {}
+                user_id = body.get("user_id")
+            if not user_id:
+                user_id = request.form.get("user_id") or request.args.get("user_id") or request.headers.get("X-User-Id")
             if user_id:
                 target_user = _require_public_task_user(user_id)
                 g.permission_actor = target_user
@@ -176,9 +181,21 @@ def update_task(id):
     task.assign_ids = data.get("assign_ids", task.assign_ids)
     task.customer_id = data.get("customer_id", task.customer_id)
 
+    if data.get("workspace_id"):
+        task.workspace_id = str(data.get("workspace_id"))
+        target_ws = db.session.get(Workspace, task.workspace_id)
+        if target_ws and target_ws.lead_id:
+            task.lead_id = target_ws.lead_id
+
     if data.get("materials") is not None:
         task.materials = data.get("materials")
         flag_modified(task, "materials")
+    if data.get("material_adjustments") is not None:
+        task.material_adjustments = data.get("material_adjustments")
+        flag_modified(task, "material_adjustments")
+    if data.get("extra_costs") is not None:
+        task.extra_costs = data.get("extra_costs")
+        flag_modified(task, "extra_costs")
     task.start_time = data.get("start_time", task.start_time)
     
     task.end_time = data.get("end_time", task.end_time)

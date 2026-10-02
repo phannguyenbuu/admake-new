@@ -54,19 +54,25 @@ def get_role(user):
         return ""
 
 def get_all_users_by_lead_id(lead_id):
-
     if lead_id == 0:
         return []
+
+    inactive_statuses = {"inactive", "off", "quit", "disabled", "nghi", "nghỉ", "resigned", "nghỉ việc", "đã nghỉ việc"}
 
     users = [{
         "fullName": user.fullName,
         "user_id": user.id,
         "role": get_role(user),
         "phone": user.phone,
-        "salary": user.salary or 0
-        } for user in User.query.all() if user.lead_id == lead_id and user.role_id and user.role_id > 0]
+        "salary": user.salary or 0,
+        "status": user.status,
+        "is_active": user.is_active
+        } for user in User.query.all()
+        if user.lead_id == lead_id and user.role_id and user.role_id > 0
+        and (user.status or "").strip().lower() not in inactive_statuses
+        and user.is_active is not False
+    ]
 
-    
     return users
 
 @workspace_bp.route("/<string:id>", methods=["PUT"])

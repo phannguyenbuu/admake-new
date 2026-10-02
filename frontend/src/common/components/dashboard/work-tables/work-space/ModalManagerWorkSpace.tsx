@@ -4,6 +4,7 @@ import {
   TeamOutlined,
   EditOutlined,
   DeleteOutlined,
+  CheckOutlined,
 } from "@ant-design/icons";
 import type { WorkSpace } from "../../../../@types/work-space.type";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -32,6 +33,42 @@ export default function ModalManagerWorkSpace({
   // const adminMode = useCheckPermission();
   const { pathname } = useLocation();
   const navigate = useNavigate();
+
+  const [completedWorkspaceIds, setCompletedWorkspaceIds] = useState<Set<string>>(() => {
+    try {
+      const saved = localStorage.getItem("completed_workspace_ids");
+      return saved ? new Set(JSON.parse(saved)) : new Set();
+    } catch {
+      return new Set();
+    }
+  });
+
+  const toggleWorkspaceCompleted = (id: string) => {
+    setCompletedWorkspaceIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      try {
+        localStorage.setItem("completed_workspace_ids", JSON.stringify(Array.from(next)));
+      } catch (e) {
+        console.error("Failed to save completed workspaces", e);
+      }
+      return next;
+    });
+  };
+
+  const sortedWorkspaces = [...(workSpaces || [])].sort((a: WorkSpace, b: WorkSpace) => {
+    const aDone = completedWorkspaceIds.has(String(a.id));
+    const bDone = completedWorkspaceIds.has(String(b.id));
+    if (aDone !== bDone) {
+      return aDone ? 1 : -1;
+    }
+    if (a.pinned !== b.pinned) return a.pinned ? -1 : 1;
+    return 0;
+  });
 
   // useEffect(() => {
   //   console.log('workSpaces',workSpaces);
@@ -188,14 +225,16 @@ export default function ModalManagerWorkSpace({
                 </div>
               ) : (
                 /* @ts-ignore */
-                workSpaces?.map((workspace: WorkSpace, index: number) => (
+                sortedWorkspaces?.map((workspace: WorkSpace, index: number) => {
+                  const isDone = completedWorkspaceIds.has(String(workspace.id));
+                  return (
                   <div
                     key={workspace.id}
                     className={`group relative flex items-center gap-5 p-5 rounded-2xl border-2 transition-all duration-300 cursor-pointer hover:shadow-xl hover:-translate-y-1 ${
                       pathname === `/work-tables/${workspace.id}`
                         ? "border-[#0891b2] bg-gradient-to-r from-[#0891b2]/8 to-[#0891b2]/4 shadow-lg shadow-[#0891b2]/20"
                         : "border-gray-200 hover:border-[#0891b2]/40 bg-white hover:bg-gradient-to-r hover:from-gray-50 hover:to-white"
-                    }`}
+                    } ${isDone ? "opacity-60 bg-gray-50/80" : ""}`}
                     style={{
                       animationDelay: `${index * 50}ms`,
                     }}
@@ -232,7 +271,7 @@ export default function ModalManagerWorkSpace({
                             `/work-tables/${workspace.id}`
                               ? "text-[#0891b2]"
                               : "text-gray-900 group-hover:text-[#0891b2]"
-                          }`}
+                          } ${isDone ? "line-through" : ""}`}
                         >
                           {workspace.name}
                         </Text>
@@ -243,14 +282,26 @@ export default function ModalManagerWorkSpace({
                         </Text>
                         <div className="w-1 h-1 rounded-full bg-gray-300"></div>
                         <Text className="text-gray-400 text-xs">
-                          Cập nhật gần đây
+                          {isDone ? "Đã xong" : "Cập nhật gần đây"}
                         </Text>
                       </div>
                     </div>
 
-                    {/* Action Buttons - chỉ hiện khi là admin */}
-                    
-                      <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    {/* Action Buttons */}
+                      <div className="flex items-center gap-2 transition-opacity duration-300">
+                        <Button
+                          type="text"
+                          icon={<CheckOutlined className={isDone ? "!text-emerald-600 font-bold" : "!text-gray-400"} />}
+                          size="small"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            toggleWorkspaceCompleted(String(workspace.id));
+                          }}
+                          className={isDone ? "!text-emerald-700 !bg-emerald-100 !border !border-emerald-300 !rounded-lg !px-3 !py-1 !h-8 shadow-sm" : "!text-gray-600 hover:!text-emerald-600 hover:!bg-emerald-50 !rounded-lg !px-3 !py-1 !h-8 !border !border-gray-200"}
+                          title={isDone ? "Đánh dấu chưa xong" : "Đánh dấu đã xong"}
+                        >
+                          <span className="text-xs font-semibold">{isDone ? "Đã xong" : "Xong"}</span>
+                        </Button>
                         <Button
                           type="text"
                           icon={<EditOutlined />}
@@ -309,7 +360,8 @@ export default function ModalManagerWorkSpace({
                     {/* Hover effect overlay */}
                     <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-[#0891b2]/0 to-[#0891b2]/0 group-hover:from-[#0891b2]/5 group-hover:to-transparent transition-all duration-300 pointer-events-none"></div>
                   </div>
-                ))
+                );
+              })
               )}
             </div>
           </div>

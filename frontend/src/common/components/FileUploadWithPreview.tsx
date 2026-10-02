@@ -4,6 +4,7 @@ import DescriptionIcon from "@mui/icons-material/Description";
 import Modal from "antd/es/modal/Modal";
 import type { MessageTypeProps } from "../@types/chat.type";
 import { useApiStatic } from "../common/hooks/useApiHost";
+import ImageViewerModal from "./modal/ImageViewerModal";
 
 interface FileUploadWithPreviewProps {
   message: MessageTypeProps;
@@ -113,19 +114,12 @@ const FileUploadWithPreview: React.FC<FileUploadWithPreviewProps> = ({ message }
         </a>
       </div>
 
-      <Modal
+      <ImageViewerModal
         open={previewOpen}
-        footer={null}
         onCancel={() => setPreviewOpen(false)}
-        width="auto"
-        centered
-      >
-        <img
-          src={previewFileSrc || previewImageSrc}
-          alt="preview"
-          style={{ maxWidth: "80vw", maxHeight: "80vh", display: "block" }}
-        />
-      </Modal>
+        imageUrl={previewFileSrc || previewImageSrc}
+        title="Xem chi tiết tập tin"
+      />
     </>
   );
 };

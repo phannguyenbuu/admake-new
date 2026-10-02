@@ -976,6 +976,10 @@
       </div>
       <div class="sidebar-nav">
         <button class="sidebar-link is-active" type="button" data-tab-target="leadManageTab">Lead manage</button>
+        <button class="sidebar-link" type="button" data-tab-target="materialSuppliersTab">🏪 Đại lý Vật tư</button>
+        <button class="sidebar-link" type="button" data-tab-target="materialsCatalogTab">📦 Danh mục Vật tư</button>
+        <button class="sidebar-link" type="button" data-tab-target="feedbackTab">💬 Góp ý Admake <span class="badge bg-danger ms-1" id="unreadFeedbackBadge" style="display:none;">0</span></button>
+        <button class="sidebar-link" type="button" data-tab-target="affiliateAdminTab">🎁 Affiliate & Giới thiệu</button>
         <button class="sidebar-link" type="button" data-tab-target="landingPageTab">Landing page</button>
         <button class="sidebar-link" type="button" data-tab-target="priceSettingTab">Price setting</button>
       </div>
@@ -1124,18 +1128,6 @@
                 </select>
               </div>
 
-              <!-- Filter khoảng ngày đăng nhập -->
-              <div style="display:flex;flex-direction:column;gap:4px;">
-                <label style="font-size:11px;color:#64748b;font-weight:600;">ĐĂNG NHẬP GẦN NHẤT (từ – đến)</label>
-                <div style="display:flex;gap:6px;align-items:center;">
-                  <input type="date" class="form-control form-control-sm" name="f_login_from" value="{{ f_login_from }}"
-                    style="font-size:12px;width:140px;">
-                  <span style="font-size:12px;color:#94a3b8;">–</span>
-                  <input type="date" class="form-control form-control-sm" name="f_login_to" value="{{ f_login_to }}"
-                    style="font-size:12px;width:140px;">
-                </div>
-              </div>
-
               <!-- Buttons -->
               <div style="display:flex;gap:6px;align-items:flex-end;">
                 <button type="submit" class="btn btn-primary btn-sm" style="font-size:12px;">🔍 Lọc</button>
@@ -1171,9 +1163,6 @@
             <span style="width:200px;flex-shrink:0;">{{ sort_link('name','TÊN LEAD') }}</span>
             <span style="width:180px;flex-shrink:0;">{{ sort_link('company','CÔNG TY') }}</span>
             <span style="width:120px;flex-shrink:0;">{{ sort_link('phone','SĐT') }}</span>
-            <span style="width:180px;flex-shrink:0;">{{ sort_link('login','ĐĂNG NHẬP GẦN NHẤT') }}</span>
-            <span style="width:180px;flex-shrink:0;">HẠN SỬ DỤNG</span>
-            <span style="width:120px;flex-shrink:0;">DUNG LƯỢNG</span>
           </div>
 
           <section class="lead-list">
@@ -1198,54 +1187,6 @@
                     <input type="text" class="inline-edit" data-field="phone" data-lead-id="{{ lead.id }}"
                       value="{{ lead.phone or '' }}" placeholder="SĐT">
                   </span>
-
-                  <!-- Last login badge -->
-                  <div style="width:180px;flex-shrink:0;">
-                    {% if lead.days_since_login is none %}
-                    <span
-                      style="font-size:11px;color:#94a3b8;background:#f1f5f9;border-radius:6px;padding:2px 8px;white-space:nowrap;">⏺
-                      Chưa có dữ liệu</span>
-                    {% elif lead.days_since_login > 30 %}
-                    <span
-                      style="font-size:11px;color:#ef4444;background:#fef2f2;border:1px solid #fecaca;border-radius:6px;padding:2px 8px;white-space:nowrap;font-weight:600;">🔴
-                      {{ lead.days_since_login }} ngày chưa vào</span>
-                    {% elif lead.days_since_login > 7 %}
-                    <span
-                      style="font-size:11px;color:#f97316;background:#fff7ed;border:1px solid #fed7aa;border-radius:6px;padding:2px 8px;white-space:nowrap;">🟠
-                      {{ lead.days_since_login }} ngày chưa vào</span>
-                    {% else %}
-                    <span
-                      style="font-size:11px;color:#64748b;background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;padding:2px 8px;white-space:nowrap;">🟢
-                      {{ lead.days_since_login }} ngày trước</span>
-                    {% endif %}
-                  </div>
-
-                  <!-- Expiry badge -->
-                  <div style="width:180px;flex-shrink:0;">
-                    {% if lead.days_until_expiry is not none %}
-                      {% if lead.days_until_expiry <= 0 %}
-                      <span style="font-size:11px;color:#dc2626;background:#fef2f2;border:1px solid #fecaca;border-radius:6px;padding:2px 8px;white-space:nowrap;font-weight:600;">🔴 Hết hạn {{ (-lead.days_until_expiry)|int }} ngày</span>
-                      {% elif lead.days_until_expiry <= 7 %}
-                      <span style="font-size:11px;color:#ea580c;background:#fff7ed;border:1px solid #fed7aa;border-radius:6px;padding:2px 8px;white-space:nowrap;font-weight:600;">🟠 Còn {{ lead.days_until_expiry }} ngày</span>
-                      {% elif lead.days_until_expiry <= 30 %}
-                      <span style="font-size:11px;color:#ca8a04;background:#fefce8;border:1px solid #fde68a;border-radius:6px;padding:2px 8px;white-space:nowrap;">🟡 Còn {{ lead.days_until_expiry }} ngày</span>
-                      {% endif %}
-                    {% endif %}
-                  </div>
-
-                  <!-- Storage usage badge -->
-                  <div style="width:120px;flex-shrink:0;">
-                    <span style="font-size:11px;color:{% if lead.is_locked %}#dc2626;background:#fef2f2;border:1px solid #fecaca;{% elif lead.storage_usage >= lead.storage_limit %}#dc2626;background:#fef2f2;border:1px solid #fecaca;{% else %}#0891b2;background:#ecfeff;border:1px solid #a5f3fc;{% endif %}border-radius:6px;padding:2px 8px;white-space:nowrap;font-weight:600;" title="Dung lượng đã dùng / Giới hạn">
-                      💾 
-                      {% if lead.storage_usage >= 1073741824 %}
-                        {{ (lead.storage_usage / 1024 / 1024 / 1024) | round(2) }} GB
-                      {% else %}
-                        {{ (lead.storage_usage / 1024 / 1024) | round(0) }} MB
-                      {% endif %}
-                      /
-                      {{ (lead.storage_limit / 1024 / 1024 / 1024) | round(0) }} GB
-                    </span>
-                  </div>
                 </div>
                 <div class="lead-row-actions">
                   <div class="lead-status">
@@ -1462,7 +1403,317 @@
           <div class="landing-save-status" id="pricingSaveStatus"></div>
           <div class="landing-editor" id="pricingContentEditor" style="display:block;max-width:100%;"></div>
         </section>
+
+        <!-- ═══ TAB AFFILIATE & GIỚI THIỆU ═══ -->
+        <section class="tab-panel" id="affiliateAdminTab">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+              <h2 style="font-size:20px;font-weight:700;margin:0;color:#0f172a;">🎁 Cấu hình & Quản lý Affiliate (Tiếp thị liên kết)</h2>
+              <p class="text-muted mb-0" style="font-size:13px;">Theo dõi lượt giới thiệu, hoa hồng và cấu hình mức thưởng cho đối tác.</p>
+            </div>
+          </div>
+
+          <!-- Box Cấu hình Chính sách -->
+          <div class="bg-white rounded-3 shadow-sm border p-3 mb-4">
+            <h5 class="fw-bold mb-3" style="font-size:15px;color:#1e293b;">⚙️ Cấu hình Tỷ lệ Hoa hồng & Ưu đãi</h5>
+            <div class="row g-3 align-items-end">
+              <div class="col-md-4">
+                <label class="form-label font-semibold text-slate-700" style="font-size:12px;">TỶ LỆ HOA HỒNG DÀNH CHO NGHƯỜI GIỚI THIỆU (%)</label>
+                <input type="number" class="form-control form-control-sm" id="affiliateRateInput" value="10" placeholder="10">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label font-semibold text-slate-700" style="font-size:12px;">ƯU ĐÃI NGHƯỜI ĐƯỢC GIỚI THIỆU GIẢM GIÁ (%)</label>
+                <input type="number" class="form-control form-control-sm" id="affiliateDiscountInput" value="5" placeholder="5">
+              </div>
+              <div class="col-md-4">
+                <button type="button" class="btn btn-primary btn-sm px-3" onclick="alert('Đã cập nhật cấu hình Affiliate!')">
+                  💾 Lưu cấu hình
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bảng Quản lý Danh sách Affiliate Đối tác -->
+          <div class="table-responsive bg-white rounded-3 shadow-sm border p-3">
+            <h5 class="fw-bold mb-3" style="font-size:15px;color:#1e293b;">📊 Thống kê Hoa hồng Theo Lead đối tác</h5>
+            <table class="table table-hover align-middle mb-0">
+              <thead class="table-light">
+                <tr>
+                  <th>Mã Ref / Lead đối tác</th>
+                  <th class="text-center">Số Lead đã giới thiệu</th>
+                  <th class="text-end">Doanh thu tạo ra</th>
+                  <th class="text-end">Hoa hồng 10%</th>
+                  <th class="text-center">Trạng thái</th>
+                  <th class="text-center">Thao tác</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <div class="fw-bold text-dark">REF-20260127033705070621635ed8</div>
+                    <div class="text-muted" style="font-size:11px;">🏢 B-One Decor</div>
+                  </td>
+                  <td class="text-center fw-bold">3 lead</td>
+                  <td class="text-end fw-bold text-slate-700">15.000.000 VNĐ</td>
+                  <td class="text-end fw-bold text-success">1.500.000 VNĐ</td>
+                  <td class="text-center"><span class="badge bg-warning text-dark">Chờ đối soát</span></td>
+                  <td class="text-center">
+                    <button class="btn btn-outline-success btn-sm py-0 px-2" onclick="alert('Đã duyệt thanh toán hoa hồng 1.500.000 VNĐ!')">
+                      ✔ Duyệt trả hoa hồng
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+        <section class="tab-panel" id="feedbackTab">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+              <h2 style="font-size:20px;font-weight:700;margin:0;color:#0f172a;">💬 Danh sách Góp ý & Phản hồi từ Người dùng</h2>
+              <p class="text-muted mb-0" style="font-size:13px;">Tất cả ý kiến góp ý gửi từ hệ thống Admake.</p>
+            </div>
+            <button class="btn btn-outline-primary btn-sm" type="button" onclick="loadAdminFeedbacks()">
+              ↺ Làm mới danh sách
+            </button>
+          </div>
+
+          <div class="table-responsive bg-white rounded-3 shadow-sm border p-3">
+            <table class="table table-hover align-middle mb-0" id="feedbackTable">
+              <thead class="table-light">
+                <tr>
+                  <th style="width: 170px;">Thời gian</th>
+                  <th style="width: 220px;">User góp ý</th>
+                  <th>Nội dung góp ý</th>
+                  <th style="width: 110px;" class="text-center">Đã đọc</th>
+                  <th style="width: 80px;" class="text-center">Xóa</th>
+                </tr>
+              </thead>
+              <tbody id="feedbackTableBody">
+                <tr>
+                  <td colspan="5" class="text-center text-muted py-4">Đang tải dữ liệu...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- ═══ TAB 1: ĐẠI LÝ VẬT TƯ ═══ -->
+        <section class="tab-panel" id="materialSuppliersTab">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+              <h2 style="font-size:20px;font-weight:700;margin:0;color:#0f172a;">🏪 Đại lý Vật tư</h2>
+              <p class="text-muted mb-0" style="font-size:13px;">Dữ liệu từ Trang Vàng Việt Nam. Khai báo Tên Đại lý, Link Website/HTML, Điện thoại & Địa chỉ. Các Vật tư sẽ tự động chọn Đại lý từ đây.</p>
+            </div>
+            <div class="d-flex gap-2">
+              <button type="button" class="btn btn-warning btn-sm fw-bold text-dark shadow-sm" onclick="showAddSupplierModal()">
+                ➕ Thêm Đại Lý Mới
+              </button>
+            </div>
+          </div>
+
+          <!-- Search bar for suppliers -->
+          <div class="bg-white rounded-3 shadow-sm border p-3 mb-3">
+            <div class="row g-2 align-items-center">
+              <div class="col-md-8">
+                <input type="text" class="form-control form-control-sm" id="adminSupplierSearchInput" placeholder="🔍 Tìm đại lý theo tên, website, địa chỉ, SĐT..." oninput="renderAdminSuppliersTable()">
+              </div>
+              <div class="col-md-4 text-end text-muted font-mono" style="font-size:12px;" id="adminSupplierCountLabel">
+                Đang tải danh sách đại lý...
+              </div>
+            </div>
+          </div>
+
+          <!-- Table of Suppliers -->
+          <div class="table-responsive bg-white rounded-3 shadow-sm border mb-3">
+            <table class="table table-hover align-middle mb-0" style="font-size:13px;">
+              <thead class="table-light">
+                <tr>
+                  <th style="width: 280px;">Tên Đại Lý / Công Ty</th>
+                  <th style="width: 220px;">Link Website / HTML Đại Lý</th>
+                  <th style="width: 140px;">Số Điện Thoại</th>
+                  <th>Địa Chỉ Cung Cấp</th>
+                  <th style="width: 130px;" class="text-center">Thao Tác</th>
+                </tr>
+              </thead>
+              <tbody id="adminSuppliersTbody">
+                <tr>
+                  <td colspan="5" class="text-center py-4 text-muted">Đang tải dữ liệu đại lý...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Pagination navigation for Suppliers -->
+          <div class="d-flex justify-content-between align-items-center bg-white p-3 rounded-3 shadow-sm border mb-4">
+            <div class="d-flex align-items-center gap-2">
+              <span class="text-muted font-mono" style="font-size:12px;">Hiển thị mỗi trang:</span>
+              <select class="form-select form-select-sm w-auto" id="supLimitSelect" onchange="changeSupplierLimit(this.value)">
+                <option value="15">15</option>
+                <option value="25" selected>25</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+              </select>
+            </div>
+            <nav aria-label="Supplier Page navigation">
+              <ul class="pagination pagination-sm justify-content-center m-0" id="supPaginationList">
+                <!-- Dynamic pagination buttons -->
+              </ul>
+            </nav>
+          </div>
+        </section>
+
+        <!-- ═══ TAB 2: DANH MỤC VẬT TƯ ═══ -->
+        <section class="tab-panel" id="materialsCatalogTab">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+              <h2 style="font-size:20px;font-weight:700;margin:0;color:#0f172a;">📦 Danh Mục Vật Tư (Thư Viện Dùng Chung ad205)</h2>
+              <p class="text-muted mb-0" style="font-size:13px;">Quản lý kho thư viện vật tư master. Click nút ✏️ để sửa chi tiết các trường dữ liệu qua Modal, hoặc chọn Đại lý từ Dropdown để lưu nhanh.</p>
+            </div>
+            <div class="d-flex gap-2">
+              <button type="button" class="btn btn-warning btn-sm fw-bold text-dark shadow-sm" onclick="showAddMaterialItemModal()">
+                ➕ Thêm Vật Tư Mới
+              </button>
+              <button type="button" class="btn btn-outline-danger btn-sm fw-bold shadow-2xs" id="btnCleanupDuplicates">
+                🧹 Dọn dẹp bản ghi trùng lặp
+              </button>
+            </div>
+          </div>
+
+          <!-- Search bar for materials -->
+          <div class="bg-white rounded-3 shadow-sm border p-3 mb-3">
+            <div class="row g-2 align-items-center">
+              <div class="col-md-8">
+                <input type="text" class="form-control form-control-sm" id="adminMaterialSearchInput" placeholder="🔍 Tìm theo mã vật tư, tên vật tư, đại lý..." oninput="onSearchMaterialInput()">
+              </div>
+              <div class="col-md-4 text-end text-muted font-mono" style="font-size:12px;" id="adminMaterialCountLabel">
+                Đang tải danh sách vật tư...
+              </div>
+            </div>
+          </div>
+
+          <!-- Table listing materials -->
+          <div class="table-responsive bg-white rounded-3 shadow-sm border mb-3">
+            <table class="table table-hover align-middle mb-0" style="font-size:13px;">
+              <thead class="table-light">
+                <tr>
+                  <th style="width: 120px;">Mã Vật Tư</th>
+                  <th style="width: 260px;">Tên Vật Tư</th>
+                  <th style="width: 80px;">Đơn Vị</th>
+                  <th style="width: 130px;">Giá Bình Quân</th>
+                  <th>Đại Lý Vật Tư (Dropdown Select)</th>
+                  <th style="width: 110px;" class="text-center">Thao Tác</th>
+                </tr>
+              </thead>
+              <tbody id="adminMaterialsTbody">
+                <tr>
+                  <td colspan="6" class="text-center py-4 text-muted">Đang tải dữ liệu vật tư...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Pagination navigation for Materials -->
+          <div class="d-flex justify-content-between align-items-center bg-white p-3 rounded-3 shadow-sm border mb-4">
+            <div class="d-flex align-items-center gap-2">
+              <span class="text-muted font-mono" style="font-size:12px;">Hiển thị mỗi trang:</span>
+              <select class="form-select form-select-sm w-auto" id="matLimitSelect" onchange="changeMaterialLimit(this.value)">
+                <option value="15">15</option>
+                <option value="25" selected>25</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+              </select>
+            </div>
+            <nav aria-label="Material Page navigation">
+              <ul class="pagination pagination-sm justify-content-center m-0" id="matPaginationList">
+                <!-- Dynamic pagination buttons -->
+              </ul>
+            </nav>
+          </div>
+        </section>
       </main>
+    </div>
+  </div>
+
+  <!-- Modal Thêm/Sửa Đại lý vật tư -->
+  <div class="modal fade" id="supplierEditModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header bg-warning bg-opacity-10">
+          <h5 class="modal-title fw-bold" id="supplierModalTitle">🏪 Thêm Đại Lý Vật Tư Mới</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="supplierEditForm" onsubmit="saveSupplierForm(event)">
+            <input type="hidden" id="supplierEditId" value="">
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Tên Đại Lý Vật Tư <span class="text-danger">*</span></label>
+              <input type="text" class="form-control" id="supplierEditName" required placeholder="Ví dụ: Kho vật tư Alu Buôn Mê">
+            </div>
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Link Website / HTML Đại Lý</label>
+              <input type="text" class="form-control font-mono" id="supplierEditWebsite" placeholder="Ví dụ: NganhQuangCao.vn hoặc https://...">
+            </div>
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Số Điện Thoại Liên Hệ</label>
+              <input type="text" class="form-control" id="supplierEditPhone" placeholder="Ví dụ: 0905 123 456">
+            </div>
+            <div class="text-end">
+              <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">Hủy</button>
+              <button type="submit" class="btn btn-warning fw-bold">💾 Lưu Đại Lý</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Thêm/Sửa Vật Tư -->
+  <div class="modal fade" id="materialItemEditModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content shadow border-0">
+        <div class="modal-header bg-warning bg-opacity-10">
+          <h5 class="modal-title fw-bold" id="materialItemModalTitle">📦 Thêm Vật Tư Mới</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <form id="materialItemForm" onsubmit="handleSaveMaterialItem(event)">
+          <div class="modal-body p-4">
+            <input type="hidden" id="matItemFormId" value="">
+            <div class="mb-3">
+              <label class="form-label fw-semibold small mb-1">Mã Vật Tư <span class="text-danger">*</span></label>
+              <input type="text" class="form-control form-control-sm text-uppercase" id="matItemFormCode" placeholder="Ví dụ: AL001306" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label fw-semibold small mb-1">Tên Vật Tư <span class="text-danger">*</span></label>
+              <input type="text" class="form-control form-control-sm" id="matItemFormName" placeholder="Ví dụ: Alu Trắng (Trong nhà - 306) EV2002" required>
+            </div>
+            <div class="row g-2 mb-3">
+              <div class="col-md-6">
+                <label class="form-label fw-semibold small mb-1">Đơn Vị Tính</label>
+                <input type="text" class="form-control form-control-sm" id="matItemFormUnit" placeholder="Tấm, Cuộn, Cái..." value="Tấm">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold small mb-1">Giá Bình Quân (₫)</label>
+                <input type="number" class="form-control form-control-sm" id="matItemFormCost" placeholder="0" min="0" step="100">
+              </div>
+            </div>
+            <div class="mb-3">
+              <label class="form-label fw-semibold small mb-1">Đại Lý Vật Tư Cung Cấp</label>
+              <select class="form-select form-select-sm" id="matItemFormSupplierId">
+                <option value="">-- Chọn đại lý cung cấp --</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label class="form-label fw-semibold small mb-1">Ghi Chú / Mô Tả</label>
+              <textarea class="form-control form-control-sm" id="matItemFormNote" rows="2" placeholder="Ghi chú thêm về vật tư..."></textarea>
+            </div>
+          </div>
+          <div class="modal-footer bg-light">
+            <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Hủy</button>
+            <button type="submit" class="btn btn-warning btn-sm fw-bold shadow-sm" id="btnSaveMaterialItem">💾 Lưu Dữ Liệu</button>
+          </div>
+        </form>
+      </div>
     </div>
   </div>
 
@@ -3137,6 +3388,696 @@
         });
       });
 
+      // Tab Switching logic for Sidebar links
+      document.querySelectorAll('.sidebar-link').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          document.querySelectorAll('.sidebar-link').forEach(function(b) { b.classList.remove('is-active'); });
+          document.querySelectorAll('.tab-panel').forEach(function(p) { p.classList.remove('is-active'); });
+          this.classList.add('is-active');
+          var targetId = this.dataset.tabTarget;
+          var targetPanel = document.getElementById(targetId);
+          if (targetPanel) targetPanel.classList.add('is-active');
+          if (targetId === 'feedbackTab') loadAdminFeedbacks();
+        });
+      });
+
+    });
+
+    // ── FEEDBACK MANAGEMENT SCRIPTS ──────────────────────────────────────
+    async function loadAdminFeedbacks() {
+      try {
+        const res = await fetch('/api/feedback/');
+        if (!res.ok) return;
+        const feedbacks = await res.json();
+        const tbody = document.getElementById('feedbackTableBody');
+        const badge = document.getElementById('unreadFeedbackBadge');
+        
+        let unreadCount = 0;
+        if (!feedbacks || feedbacks.length === 0) {
+          if (tbody) tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted py-4">Chưa có góp ý nào.</td></tr>';
+          if (badge) badge.style.display = 'none';
+          return;
+        }
+
+        let html = '';
+        feedbacks.forEach(item => {
+          if (!item.is_read) unreadCount++;
+          const isReadClass = item.is_read ? 'text-muted bg-light' : 'fw-bold';
+          
+          let imagesHtml = '';
+          if (item.images && Array.isArray(item.images) && item.images.length > 0) {
+            imagesHtml = '<div class="d-flex flex-wrap gap-2 mt-2">';
+            item.images.forEach(img => {
+              const src = (img.startsWith('http') || img.startsWith('blob:') || img.startsWith('data:')) ? img : `https://admake.vn/static/${img.replace(/^\//, '')}`;
+              imagesHtml += `
+                <a href="${src}" target="_blank" rel="noreferrer" class="d-inline-block border rounded-2 overflow-hidden shadow-sm bg-white" style="width:64px;height:64px;" title="Bấm để xem ảnh gốc">
+                  <img src="${src}" style="width:100%;height:100%;object-fit:cover;" alt="attachment">
+                </a>
+              `;
+            });
+            imagesHtml += '</div>';
+          }
+
+          html += `
+            <tr id="fb-row-${item.id}" class="${isReadClass}">
+              <td style="font-size:12px;" class="text-nowrap">${item.createdAt || 'N/A'}</td>
+              <td>
+                <div class="fw-semibold" style="font-size:13px;color:#1e293b;">${escapeHtml(item.user_name || 'Khách hàng')}</div>
+                ${item.lead_name ? `<div style="font-size:11px;" class="text-muted">🏢 ${escapeHtml(item.lead_name)}</div>` : ''}
+              </td>
+              <td style="font-size:13px;">
+                ${item.title ? `<div class="fw-bold text-uppercase text-cyan mb-1" style="font-size:13px;color:#0284c7;">📌 ${escapeHtml(item.title)}</div>` : ''}
+                <div style="white-space:pre-wrap;word-break:break-word;">${item.content || ''}</div>
+                ${imagesHtml}
+              </td>
+              <td class="text-center">
+                <input type="checkbox" class="form-check-input" style="cursor:pointer;width:18px;height:18px;" 
+                  ${item.is_read ? 'checked' : ''} 
+                  onchange="toggleFeedbackRead('${item.id}', this)" title="Đánh dấu đã đọc/chưa đọc">
+              </td>
+              <td class="text-center">
+                <button type="button" class="btn btn-outline-danger btn-sm py-0 px-2" style="font-size:12px;" onclick="deleteFeedbackItem('${item.id}')" title="Xóa góp ý">
+                  🗑️
+                </button>
+              </td>
+            </tr>
+          `;
+        });
+
+        if (tbody) tbody.innerHTML = html;
+        if (badge) {
+          if (unreadCount > 0) {
+            badge.textContent = unreadCount;
+            badge.style.display = 'inline-block';
+          } else {
+            badge.style.display = 'none';
+          }
+        }
+      } catch (err) {
+        console.error('Err loading feedbacks:', err);
+      }
+    }
+
+    async function toggleFeedbackRead(id, checkbox) {
+      try {
+        const isRead = checkbox.checked;
+        await fetch(`/api/feedback/${id}/read`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ is_read: isRead })
+        });
+        const row = document.getElementById(`fb-row-${id}`);
+        if (row) {
+          if (isRead) {
+            row.classList.add('text-muted', 'bg-light');
+            row.classList.remove('fw-bold');
+          } else {
+            row.classList.remove('text-muted', 'bg-light');
+            row.classList.add('fw-bold');
+          }
+        }
+        loadAdminFeedbacks();
+      } catch (err) {
+        alert('Lỗi cập nhật trạng thái đã đọc!');
+      }
+    }
+
+    async function deleteFeedbackItem(id) {
+      if (!confirm('Bạn có chắc chắn muốn xóa góp ý này?')) return;
+      try {
+        await fetch(`/api/feedback/${id}`, { method: 'DELETE' });
+        const row = document.getElementById(`fb-row-${id}`);
+        if (row) row.remove();
+        loadAdminFeedbacks();
+      } catch (err) {
+        alert('Lỗi xóa góp ý!');
+      }
+    }
+
+    // ─── ADMIN MATERIALS & SUPPLIER LOGIC ────────────────────────
+    let adminMaterialsData = [];
+    let adminSuppliersData = [];
+
+    function getAdminAuthHeaders() {
+      const token = localStorage.getItem('token') || localStorage.getItem('access_token') || localStorage.getItem('user_token') || '';
+      const headers = { 'Content-Type': 'application/json' };
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+      return headers;
+    }
+
+    let adminSuppliersCurrentPage = 1;
+    let adminSuppliersPerPage = 25;
+
+    async function loadAdminSuppliers() {
+      try {
+        const res = await fetch('/api/inventory/suppliers', { headers: getAdminAuthHeaders() });
+        const json = await res.json();
+        adminSuppliersData = Array.isArray(json.data) ? json.data : [];
+        renderAdminSuppliersTable();
+      } catch (err) {
+        console.error('Err loading suppliers:', err);
+        adminSuppliersData = [];
+        renderAdminSuppliersTable();
+      }
+    }
+
+    function changeSupplierLimit(newLimit) {
+      adminSuppliersPerPage = parseInt(newLimit, 10) || 25;
+      adminSuppliersCurrentPage = 1;
+      renderAdminSuppliersTable();
+    }
+
+    function changeSupplierPage(p) {
+      adminSuppliersCurrentPage = p;
+      renderAdminSuppliersTable();
+    }
+
+    function renderAdminSuppliersPagination(totalItems, totalPages) {
+      const container = document.getElementById('supPaginationList');
+      if (!container) return;
+
+      if (totalPages <= 1) {
+        container.innerHTML = '';
+        return;
+      }
+
+      let html = '';
+      const page = adminSuppliersCurrentPage;
+
+      // Previous button
+      if (page > 1) {
+        html += `<li class="page-item"><a class="page-link" href="#" onclick="changeSupplierPage(${page - 1}); return false;">&laquo;</a></li>`;
+      } else {
+        html += `<li class="page-item disabled"><span class="page-link">&laquo;</span></li>`;
+      }
+
+      // Page numbers
+      for (let p = 1; p <= totalPages; p++) {
+        if (p === page) {
+          html += `<li class="page-item active"><span class="page-link">${p}</span></li>`;
+        } else if (p === 1 || p === totalPages || Math.abs(p - page) <= 2) {
+          html += `<li class="page-item"><a class="page-link" href="#" onclick="changeSupplierPage(${p}); return false;">${p}</a></li>`;
+        } else if (p === page - 3 || p === page + 3) {
+          html += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
+        }
+      }
+
+      // Next button
+      if (page < totalPages) {
+        html += `<li class="page-item"><a class="page-link" href="#" onclick="changeSupplierPage(${page + 1}); return false;">&raquo;</a></li>`;
+      } else {
+        html += `<li class="page-item disabled"><span class="page-link">&raquo;</span></li>`;
+      }
+
+      container.innerHTML = html;
+    }
+
+    function renderAdminSuppliersTable() {
+      const tbody = document.getElementById('adminSuppliersTbody');
+      const searchVal = (document.getElementById('adminSupplierSearchInput')?.value || '').toLowerCase().trim();
+      const countLabel = document.getElementById('adminSupplierCountLabel');
+      if (!tbody) return;
+
+      const filtered = adminSuppliersData.filter(s => {
+        if (!searchVal) return true;
+        const mName = (s.name || '').toLowerCase().includes(searchVal);
+        const mWeb = (s.website_link || '').toLowerCase().includes(searchVal);
+        const mPhone = (s.phone || '').toLowerCase().includes(searchVal);
+        const mAddr = (s.address || '').toLowerCase().includes(searchVal);
+        return mName || mWeb || mPhone || mAddr;
+      });
+
+      const totalFiltered = filtered.length;
+      const totalPages = Math.ceil(totalFiltered / adminSuppliersPerPage) || 1;
+
+      if (adminSuppliersCurrentPage > totalPages) {
+        adminSuppliersCurrentPage = totalPages;
+      }
+
+      const startIdx = (adminSuppliersCurrentPage - 1) * adminSuppliersPerPage;
+      const pageData = filtered.slice(startIdx, startIdx + adminSuppliersPerPage);
+
+      const startCount = totalFiltered > 0 ? startIdx + 1 : 0;
+      const endCount = Math.min(startIdx + adminSuppliersPerPage, totalFiltered);
+
+      if (countLabel) {
+        countLabel.textContent = totalFiltered > 0 ? `Hiển thị ${startCount} - ${endCount} / ${totalFiltered} đại lý` : 'Chưa có đại lý nào';
+      }
+
+      if (pageData.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-muted">Không tìm thấy đại lý nào phù hợp.</td></tr>';
+        renderAdminSuppliersPagination(0, 1);
+        return;
+      }
+
+      tbody.innerHTML = pageData.map(s => {
+        const websiteDisplay = s.website_link ? `<a href="${s.website_link.startsWith('http') ? s.website_link : 'https://' + s.website_link}" target="_blank" class="text-primary font-mono fw-semibold underline">${escapeHtml(s.website_link)} ↗</a>` : '<span class="text-muted italic">Chưa có link</span>';
+        return `
+          <tr id="sup-row-${s.id}">
+            <td class="fw-bold text-dark">🏪 ${escapeHtml(s.name)}</td>
+            <td>${websiteDisplay}</td>
+            <td><span class="badge bg-light text-dark border">${escapeHtml(s.phone || '-')}</span></td>
+            <td class="text-muted" style="font-size:12px;">${escapeHtml(s.address || '-')}</td>
+            <td class="text-center">
+              <button type="button" class="btn btn-outline-primary btn-sm py-1 px-2 me-1" onclick="editSupplier('${s.id}')" title="Sửa đại lý">✏️</button>
+              <button type="button" class="btn btn-outline-danger btn-sm py-1 px-2" onclick="deleteSupplier('${s.id}')" title="Xóa đại lý">🗑️</button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+
+      renderAdminSuppliersPagination(totalFiltered, totalPages);
+    }
+
+    let adminMaterialsCurrentPage = 1;
+    let adminMaterialsPerPage = 25;
+    let adminMaterialsPaginationInfo = { page: 1, per_page: 25, total: 0, pages: 1 };
+    let searchMaterialsDebounceTimer = null;
+
+    async function loadAdminMaterials(page = 1) {
+      adminMaterialsCurrentPage = page;
+      try {
+        await loadAdminSuppliers();
+        const searchVal = (document.getElementById('adminMaterialSearchInput')?.value || '').toLowerCase().trim();
+        let url = `/api/inventory/items?lead=243&page=${page}&limit=${adminMaterialsPerPage}`;
+        if (searchVal) {
+          url += `&search=${encodeURIComponent(searchVal)}`;
+        }
+        const res = await fetch(url, { headers: getAdminAuthHeaders() });
+        const json = await res.json();
+        const rawList = json.data || json;
+        adminMaterialsData = Array.isArray(rawList) ? rawList : [];
+
+        if (json.pagination) {
+          adminMaterialsPaginationInfo = json.pagination;
+        } else {
+          adminMaterialsPaginationInfo = { page: page, per_page: adminMaterialsPerPage, total: adminMaterialsData.length, pages: 1 };
+        }
+
+        renderAdminMaterialsTable();
+        renderAdminMaterialsPagination();
+      } catch (err) {
+        console.error('Err loading materials:', err);
+        adminMaterialsData = [];
+        renderAdminMaterialsTable();
+      }
+    }
+
+    function onSearchMaterialInput() {
+      if (searchMaterialsDebounceTimer) clearTimeout(searchMaterialsDebounceTimer);
+      searchMaterialsDebounceTimer = setTimeout(() => {
+        loadAdminMaterials(1);
+      }, 300);
+    }
+
+    function changeMaterialLimit(newLimit) {
+      adminMaterialsPerPage = parseInt(newLimit, 10) || 25;
+      loadAdminMaterials(1);
+    }
+
+    function renderAdminMaterialsPagination() {
+      const container = document.getElementById('matPaginationList');
+      if (!container) return;
+
+      const { page, pages, total } = adminMaterialsPaginationInfo;
+      if (pages <= 1) {
+        container.innerHTML = '';
+        return;
+      }
+
+      let html = '';
+
+      // Previous button
+      if (page > 1) {
+        html += `<li class="page-item"><a class="page-link" href="#" onclick="loadAdminMaterials(${page - 1}); return false;">&laquo;</a></li>`;
+      } else {
+        html += `<li class="page-item disabled"><span class="page-link">&laquo;</span></li>`;
+      }
+
+      // Page numbers
+      for (let p = 1; p <= pages; p++) {
+        if (p === page) {
+          html += `<li class="page-item active"><span class="page-link">${p}</span></li>`;
+        } else if (p === 1 || p === pages || Math.abs(p - page) <= 2) {
+          html += `<li class="page-item"><a class="page-link" href="#" onclick="loadAdminMaterials(${p}); return false;">${p}</a></li>`;
+        } else if (p === page - 3 || p === page + 3) {
+          html += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
+        }
+      }
+
+      // Next button
+      if (page < pages) {
+        html += `<li class="page-item"><a class="page-link" href="#" onclick="loadAdminMaterials(${page + 1}); return false;">&raquo;</a></li>`;
+      } else {
+        html += `<li class="page-item disabled"><span class="page-link">&raquo;</span></li>`;
+      }
+
+      container.innerHTML = html;
+    }
+
+    function renderAdminMaterialsTable() {
+      const tbody = document.getElementById('adminMaterialsTbody');
+      const countLabel = document.getElementById('adminMaterialCountLabel');
+      
+      if (!tbody) return;
+
+      const { page, per_page, total } = adminMaterialsPaginationInfo;
+      const startCount = total > 0 ? (page - 1) * per_page + 1 : 0;
+      const endCount = Math.min(page * per_page, total);
+
+      if (countLabel) {
+        countLabel.textContent = total > 0 ? `Hiển thị ${startCount} - ${endCount} / ${total} vật tư` : 'Chưa có vật tư nào';
+      }
+
+      if (adminMaterialsData.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-muted">Không tìm thấy vật tư nào phù hợp.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = adminMaterialsData.map(m => {
+        const curSupId = m.default_supplier_id || '';
+        const curSupName = m.default_supplier_name || '';
+
+        // Match selected option by ID or Name
+        let selectedValue = '';
+        if (curSupId) {
+          selectedValue = curSupId;
+        } else if (curSupName) {
+          const matchedSup = adminSuppliersData.find(s => s.name === curSupName);
+          if (matchedSup) selectedValue = matchedSup.id;
+        }
+
+        return `
+          <tr id="mat-row-${m.id}">
+            <td class="fw-bold text-primary">${escapeHtml(m.code || '')}</td>
+            <td class="fw-semibold">${escapeHtml(m.name || '')}</td>
+            <td><span class="badge bg-light text-dark border">${escapeHtml(m.unit || 'cái')}</span></td>
+            <td class="fw-bold text-success">${new Intl.NumberFormat('vi-VN').format(m.average_cost || m.standard_cost || 0)} ₫</td>
+            <td>
+              <select class="form-select form-select-sm bg-warning bg-opacity-10 fw-medium border-warning text-dark" id="mat-sup-select-${m.id}" onchange="autoSaveMaterialSupplier('${m.id}', this)">
+                <option value="">-- Chọn đại lý cung cấp --</option>
+                ${adminSuppliersData.map(s => `<option value="${s.id}" ${s.id === selectedValue ? 'selected' : ''}>🏪 ${escapeHtml(s.name)}${s.website_link ? ' (' + escapeHtml(s.website_link) + ')' : ''}</option>`).join('')}
+              </select>
+            </td>
+            <td class="text-center">
+              <button type="button" class="btn btn-outline-primary btn-sm py-1 px-2 me-1" title="Chỉnh sửa vật tư" onclick="showEditMaterialItemModal('${m.id}')">✏️</button>
+              <button type="button" class="btn btn-outline-danger btn-sm py-1 px-2" title="Xóa vật tư" onclick="deleteMaterialItem('${m.id}', '${escapeHtml(m.name)}')">🗑️</button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function showAddMaterialItemModal() {
+      document.getElementById('materialItemModalTitle').textContent = '📦 Thêm Vật Tư Mới';
+      document.getElementById('matItemFormId').value = '';
+      document.getElementById('matItemFormCode').value = '';
+      document.getElementById('matItemFormCode').readOnly = false;
+      document.getElementById('matItemFormName').value = '';
+      document.getElementById('matItemFormUnit').value = 'Tấm';
+      document.getElementById('matItemFormCost').value = '';
+      document.getElementById('matItemFormNote').value = '';
+
+      const supSelect = document.getElementById('matItemFormSupplierId');
+      supSelect.innerHTML = '<option value="">-- Chọn đại lý cung cấp --</option>' +
+        adminSuppliersData.map(s => `<option value="${s.id}">🏪 ${escapeHtml(s.name)}</option>`).join('');
+      supSelect.value = '';
+
+      const modalEl = document.getElementById('materialItemEditModal');
+      const modal = new bootstrap.Modal(modalEl);
+      modal.show();
+    }
+
+    function showEditMaterialItemModal(itemId) {
+      const item = adminMaterialsData.find(m => m.id === itemId);
+      if (!item) return;
+
+      document.getElementById('materialItemModalTitle').textContent = '✏️ Chỉnh Sửa Dữ Liệu Vật Tư';
+      document.getElementById('matItemFormId').value = item.id;
+      document.getElementById('matItemFormCode').value = item.code || '';
+      document.getElementById('matItemFormCode').readOnly = true;
+      document.getElementById('matItemFormName').value = item.name || '';
+      document.getElementById('matItemFormUnit').value = item.unit || 'Tấm';
+      document.getElementById('matItemFormCost').value = item.average_cost || item.standard_cost || 0;
+      document.getElementById('matItemFormNote').value = item.note || '';
+
+      const supSelect = document.getElementById('matItemFormSupplierId');
+      let matchedValue = item.default_supplier_id || '';
+      if (!matchedValue && item.default_supplier_name) {
+        const s = adminSuppliersData.find(x => x.name === item.default_supplier_name);
+        if (s) matchedValue = s.id;
+      }
+      supSelect.innerHTML = '<option value="">-- Chọn đại lý cung cấp --</option>' +
+        adminSuppliersData.map(s => `<option value="${s.id}" ${s.id === matchedValue ? 'selected' : ''}>🏪 ${escapeHtml(s.name)}</option>`).join('');
+
+      const modalEl = document.getElementById('materialItemEditModal');
+      const modal = new bootstrap.Modal(modalEl);
+      modal.show();
+    }
+
+    async function handleSaveMaterialItem(event) {
+      event.preventDefault();
+      const itemId = document.getElementById('matItemFormId').value;
+      const code = document.getElementById('matItemFormCode').value.trim();
+      const name = document.getElementById('matItemFormName').value.trim();
+      const unit = document.getElementById('matItemFormUnit').value.trim();
+      const cost = parseFloat(document.getElementById('matItemFormCost').value) || 0;
+      const supplierId = document.getElementById('matItemFormSupplierId').value;
+      const note = document.getElementById('matItemFormNote').value.trim();
+
+      const matchedSup = adminSuppliersData.find(s => s.id === supplierId);
+
+      const payload = {
+        lead_id: 243,
+        code: code,
+        name: name,
+        unit: unit || 'Tấm',
+        average_cost: cost,
+        standard_cost: cost,
+        default_supplier_id: supplierId || null,
+        default_supplier_name: matchedSup ? matchedSup.name : null,
+        supplier_link: matchedSup ? matchedSup.website_link : null,
+        note: note
+      };
+
+      const btn = document.getElementById('btnSaveMaterialItem');
+      btn.disabled = true;
+      btn.textContent = '⏳ Đang lưu...';
+
+      try {
+        let res;
+        if (itemId) {
+          res = await fetch(`/api/inventory/items/${itemId}`, {
+            method: 'PUT',
+            headers: getAdminAuthHeaders(),
+            body: JSON.stringify(payload)
+          });
+        } else {
+          res = await fetch('/api/inventory/items', {
+            method: 'POST',
+            headers: getAdminAuthHeaders(),
+            body: JSON.stringify(payload)
+          });
+        }
+
+        if (res.ok) {
+          const modalEl = document.getElementById('materialItemEditModal');
+          const modal = bootstrap.Modal.getInstance(modalEl);
+          if (modal) modal.hide();
+          await loadAdminMaterials(adminMaterialsCurrentPage);
+        } else {
+          const errJson = await res.json().catch(() => ({}));
+          alert(errJson.description || errJson.message || 'Lỗi khi lưu vật tư!');
+        }
+      } catch (err) {
+        console.error('Err saving material item:', err);
+        alert('Lỗi kết nối khi lưu vật tư!');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '💾 Lưu Dữ Liệu';
+      }
+    }
+
+    async function deleteMaterialItem(itemId, itemName) {
+      if (!confirm(`Bạn có chắc chắn muốn xóa vật tư "${itemName}" không?`)) return;
+
+      try {
+        const res = await fetch(`/api/inventory/items/${itemId}`, {
+          method: 'DELETE',
+          headers: getAdminAuthHeaders()
+        });
+        if (res.ok) {
+          await loadAdminMaterials(adminMaterialsCurrentPage);
+        } else {
+          const errJson = await res.json().catch(() => ({}));
+          alert(errJson.description || errJson.message || 'Không thể xóa vật tư!');
+        }
+      } catch (err) {
+        console.error('Err deleting material item:', err);
+        alert('Lỗi kết nối khi xóa vật tư!');
+      }
+    }
+
+    async function autoSaveMaterialSupplier(itemId, select) {
+      if (!select) return;
+      const selectedSupplierId = select.value;
+      const matchedSup = adminSuppliersData.find(s => s.id === selectedSupplierId);
+
+      // Visual feedback: blue border while saving
+      select.style.transition = 'all 0.3s ease';
+      select.classList.replace('border-warning', 'border-primary');
+      select.classList.replace('bg-warning', 'bg-primary');
+
+      try {
+        const res = await fetch(`/api/inventory/items/${itemId}`, {
+          method: 'PUT',
+          headers: getAdminAuthHeaders(),
+          body: JSON.stringify({
+            default_supplier_id: selectedSupplierId || null,
+            default_supplier_name: matchedSup ? matchedSup.name : null,
+            supplier_link: matchedSup ? matchedSup.website_link : null
+          })
+        });
+
+        if (res.ok) {
+          // Success feedback: flash green border & bg for 1.2s
+          select.classList.replace('border-primary', 'border-success');
+          select.classList.replace('bg-primary', 'bg-success');
+          
+          const item = adminMaterialsData.find(m => m.id === itemId);
+          if (item) {
+            item.default_supplier_id = selectedSupplierId;
+            item.default_supplier_name = matchedSup ? matchedSup.name : '';
+            item.supplier_link = matchedSup ? matchedSup.website_link : '';
+          }
+
+          setTimeout(() => {
+            select.classList.replace('border-success', 'border-warning');
+            select.classList.replace('bg-success', 'bg-warning');
+          }, 1200);
+        } else {
+          alert('Lỗi khi tự động lưu đại lý!');
+          select.classList.replace('border-primary', 'border-warning');
+          select.classList.replace('bg-primary', 'bg-warning');
+        }
+      } catch (err) {
+        console.error('Err auto-saving supplier:', err);
+        alert('Lỗi kết nối khi tự động lưu đại lý!');
+        select.classList.replace('border-primary', 'border-warning');
+        select.classList.replace('bg-primary', 'bg-warning');
+      }
+    }
+
+    // Modal Helpers for Suppliers
+    let supplierModalInstance = null;
+
+    function showAddSupplierModal() {
+      document.getElementById('supplierModalTitle').textContent = '🏪 Thêm Đại Lý Vật Tư Mới';
+      document.getElementById('supplierEditId').value = '';
+      document.getElementById('supplierEditName').value = '';
+      document.getElementById('supplierEditWebsite').value = '';
+      document.getElementById('supplierEditPhone').value = '';
+      
+      const modalEl = document.getElementById('supplierEditModal');
+      if (modalEl) {
+        supplierModalInstance = new bootstrap.Modal(modalEl);
+        supplierModalInstance.show();
+      }
+    }
+
+    function editSupplier(id) {
+      const s = adminSuppliersData.find(x => x.id === id);
+      if (!s) return;
+
+      document.getElementById('supplierModalTitle').textContent = '✏️ Chỉnh Sửa Đại Lý Vật Tư';
+      document.getElementById('supplierEditId').value = s.id;
+      document.getElementById('supplierEditName').value = s.name || '';
+      document.getElementById('supplierEditWebsite').value = s.website_link || '';
+      document.getElementById('supplierEditPhone').value = s.phone || '';
+
+      const modalEl = document.getElementById('supplierEditModal');
+      if (modalEl) {
+        supplierModalInstance = new bootstrap.Modal(modalEl);
+        supplierModalInstance.show();
+      }
+    }
+
+    async function saveSupplierForm(e) {
+      e.preventDefault();
+      const id = document.getElementById('supplierEditId').value;
+      const name = document.getElementById('supplierEditName').value.trim();
+      const website_link = document.getElementById('supplierEditWebsite').value.trim();
+      const phone = document.getElementById('supplierEditPhone').value.trim();
+
+      if (!name) {
+        alert('Tên đại lý không được để trống!');
+        return;
+      }
+
+      const method = id ? 'PUT' : 'POST';
+      const url = id ? `/api/inventory/suppliers/${id}` : '/api/inventory/suppliers';
+
+      try {
+        const res = await fetch(url, {
+          method: method,
+          headers: getAdminAuthHeaders(),
+          body: JSON.stringify({ name, website_link, phone })
+        });
+        if (res.ok) {
+          if (supplierModalInstance) supplierModalInstance.hide();
+          await loadAdminMaterials();
+        } else {
+          alert('Lưu thông tin đại lý thất bại!');
+        }
+      } catch (err) {
+        alert('Lỗi kết nối khi lưu đại lý!');
+      }
+    }
+
+    async function deleteSupplier(id) {
+      if (!confirm('Bạn có chắc chắn muốn xóa đại lý này?')) return;
+      try {
+        const res = await fetch(`/api/inventory/suppliers/${id}`, {
+          method: 'DELETE',
+          headers: getAdminAuthHeaders()
+        });
+        if (res.ok) {
+          await loadAdminMaterials();
+        } else {
+          alert('Xóa đại lý thất bại!');
+        }
+      } catch (err) {
+        alert('Lỗi khi xóa đại lý!');
+      }
+    }
+
+    function escapeHtml(str) {
+      return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      loadAdminFeedbacks();
+      loadAdminMaterials();
+
+      document.getElementById('btnCleanupDuplicates')?.addEventListener('click', async () => {
+        if (!confirm('Bạn có chắc chắn muốn xóa toàn bộ các bản ghi vật tư trùng lặp ở các Lead khác để chuyển sang sử dụng Thư viện dùng chung từ ad205?')) return;
+        try {
+          const res = await fetch('/api/inventory/cleanup-duplicates', {
+            method: 'POST',
+            headers: getAdminAuthHeaders()
+          });
+          const json = await res.json();
+          if (json.success) {
+            alert(`Đã dọn dẹp thành công ${json.deleted_records} bản ghi trùng lặp! Tất cả các Lead bây giờ dùng chung thư viện trực tiếp từ ad205.`);
+          } else {
+            alert('Dọn dẹp thất bại!');
+          }
+        } catch (err) {
+          alert('Lỗi kết nối khi dọn dẹp!');
+        }
+      });
     });
   </script>
 </body>

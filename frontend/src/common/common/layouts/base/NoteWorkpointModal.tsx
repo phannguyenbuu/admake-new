@@ -98,10 +98,18 @@ const NoteWorkpointModal: React.FC<NoteWorkpointModalProps> = ({
           multiply_in_sun_overtime: workpointSetting.multiply_in_sun_overtime,
         };
 
+        const accessToken = 
+          localStorage.getItem("accessToken") || 
+          localStorage.getItem("token") || 
+          sessionStorage.getItem("accessToken") || 
+          sessionStorage.getItem("token") || 
+          "";
+
         fetch(`${useApiHost()}/workpoint/setting/${userLeadId}/`, {
           method: 'PUT',
           headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {})
           },
           body: JSON.stringify(dataToSend)
         })
@@ -114,7 +122,8 @@ const NoteWorkpointModal: React.FC<NoteWorkpointModalProps> = ({
             onCancel(); // Đóng modal sau khi thành công
           })
           .catch(err => {
-            message.error(err.message || 'Lỗi mạng');
+            console.error(err);
+            onCancel();
           });
       };
 

@@ -34,14 +34,24 @@ const JobAgentInfo: React.FC<JobAgentInfoProps> = ({
   const [options, setOptions] = useState<{ value: string; label: React.ReactNode }[]>([]);
   const rolename = mode === "customer" ? "khách hàng" : "nhân viên";
 
+  const activeUsers = React.useMemo(() => {
+    return (users || []).filter((u: any) => {
+      const st = (u?.status || u?.user_status || "").toString().trim().toLowerCase();
+      if (st && ["inactive", "off", "quit", "disabled", "nghi", "nghỉ", "resigned", "nghỉ việc", "đã nghỉ việc"].includes(st)) {
+        return false;
+      }
+      if (u?.is_active === false) return false;
+      return true;
+    });
+  }, [users]);
+
   // Cập nhật options tìm kiếm khi người dùng nhập
   const handleSearch = (value: string) => {
-    // console.log('Customers', customers.length, value);
     setSearchValue(value);
 
     if (!value) {
       setOptions(
-        users.map((c) => ({
+        activeUsers.map((c) => ({
           value: (c.fullName || "") + " (" + (c.phone || c.user_id || "") + ")",
           label: (
             <div>
@@ -57,13 +67,10 @@ const JobAgentInfo: React.FC<JobAgentInfoProps> = ({
       );
       return;
     }
-    // console.log('ed1', customers);
-    // const filtered = users.filter((c) => c.fullName && c.fullName.toLowerCase().includes(value.toLowerCase()));
-    // console.log('filtered', filtered);
 
     const normalizedSearch = removeVietnameseTones(value);
 
-    const filtered = users.filter(c => {
+    const filtered = activeUsers.filter(c => {
       if (!c.fullName) return false;
       return removeVietnameseTones(c.fullName).includes(normalizedSearch);
     });
@@ -88,7 +95,7 @@ const JobAgentInfo: React.FC<JobAgentInfoProps> = ({
 
   // Khi chọn khách hàng
   const handleSelect = (value: string) => {
-    const user = users.find((c) => ((c.fullName || "") + " (" + (c.phone || c.user_id || "") + ")") === value) || null;
+    const user = activeUsers.find((c) => ((c.fullName || "") + " (" + (c.phone || c.user_id || "") + ")") === value) || null;
     setselectedAgent(user);
     // Cập nhật form field nếu form có quản lý
     form.setFieldsValue({ [mode]: user?.fullName || "" });

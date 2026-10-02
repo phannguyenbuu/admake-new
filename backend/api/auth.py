@@ -41,6 +41,9 @@ def login_user_form(username, password):
         print('Login:', username, password, user.lead_id) 
         # if user and check_password_hash(user.password, password):
         if user.password == password:
+            if user.is_active is False:
+                return jsonify({"error": "Tài khoản của bạn đã bị khóa hoặc đã nghỉ việc."}), 403
+
             if user.lead_id:
                 from models import LeadPayload
                 lead = db.session.get(LeadPayload, user.lead_id)
