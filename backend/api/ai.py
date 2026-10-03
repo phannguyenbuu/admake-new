@@ -440,8 +440,6 @@ def chat_with_ai(messages: list, engine: str = "gemini", model: str = None) -> d
     engine = (engine or "gemini").lower()
 
     if engine == "gemini":
-        if not gemini_key and gpt_key:
-            return chat_with_ai(messages, engine="gpt", model="gpt-4o-mini")
         if not gemini_key:
             raise Exception("Chưa cấu hình [GeminiKey] trong D:/vps_go.md hoặc biến môi trường GEMINI_API_KEY")
 
@@ -501,15 +499,11 @@ def chat_with_ai(messages: list, engine: str = "gemini", model: str = None) -> d
                     }
                 else:
                     err_data = resp.json().get("error", {})
-                    last_err = f"[Gemini {resp.status_code}] {err_data.get('message', resp.text)}"
+                    last_err = f"[Google Gemini {resp.status_code}] {err_data.get('message', resp.text)}"
             except Exception as e:
                 last_err = str(e)
 
-        # Fallback tự động sang GPT nếu Gemini gặp sự cố (ví dụ lỗi 403 denied)
-        if gpt_key:
-            gpt_res = chat_with_ai(messages, engine="gpt", model="gpt-4o-mini")
-            return gpt_res
-
+        # TUYỆT ĐỐI KHÔNG FALLBACK! Văng lỗi trực tiếp của Google Gemini
         raise Exception(last_err or "Lỗi không xác định khi gọi Google Gemini API")
 
     else:
@@ -1332,26 +1326,7 @@ def ai_chat():
             "ai_source": chat_res["engine"]
         }), 200
     except Exception as e:
-        err_msg = str(e)
-        # Nếu là câu hỏi về bảng hiệu và chưa có API key, fallback sang trả lời cục bộ
-        if single_msg and ("GIẢM" in single_msg.upper() or "CHIẾT KHẤU" in single_msg.upper() or "BẠT" in single_msg.upper() or "ALU" in single_msg.upper() or "VAT" in single_msg.upper()):
-            upper = single_msg.upper()
-            if "GIẢM" in upper or "CHIẾT KHẤU" in upper:
-                fallback_reply = "💡 **Gợi ý tối ưu chi phí:** Giảm biên lợi nhuận kỳ vọng, chuyển sang bạt 2 da xám hoặc tự vận chuyển lắp đặt."
-            elif "VAT" in upper:
-                fallback_reply = "📄 **Thuế VAT:** Áp dụng mức 8% hoặc 10% tùy loại hình công trình theo quy định."
-            elif "ALU" in upper:
-                fallback_reply = "🔍 **Tư vấn Alu:** Khổ tiêu chuẩn 1.22m x 2.44m dày 3mm. Lưu ý không bảo hành alu gương ngoài trời."
-            else:
-                fallback_reply = "🏷️ **Tư vấn:** Khổ bạt máy in thông dụng 3.1m. Nếu cả 2 chiều lớn hơn 3.1m thì cần hàn nối bạt."
-            return jsonify({
-                "success": True,
-                "reply": fallback_reply,
-                "ai_source": "expert_engine",
-                "usage": {"total_tokens": 50, "cost_usd": 0.0, "cost_vnd": 0}
-            }), 200
-
-        return jsonify({"success": False, "error": err_msg}), 500
+        return jsonify({"success": False, "error": str(e)}), 500
 
 
 @ai_bp.route('/api/ai/prompt/enhance', methods=['POST', 'OPTIONS'])
@@ -1399,14 +1374,7 @@ def api_ai_image_generate():
 
     try:
         if engine == "gemini":
-            try:
-                raw_im, img_usage = generate_with_gemini(effective_prompt, aspect_ratio, gemini_key)
-            except Exception as ge:
-                if gpt_key:
-                    raw_im, img_usage = generate_with_gpt(effective_prompt, aspect_ratio, gpt_key)
-                    engine = "gpt"
-                else:
-                    raise ge
+            raw_im, img_usage = generate_with_gemini(effective_prompt, aspect_ratio, gemini_key)
         else:
             raw_im, img_usage = generate_with_gpt(effective_prompt, aspect_ratio, gpt_key)
 
