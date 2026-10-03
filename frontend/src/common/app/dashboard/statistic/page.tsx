@@ -8,7 +8,8 @@ import { useUser } from "../../../common/hooks/useUser";
 import { useApiHost } from "../../../common/hooks/useApiHost";
 import { TOKEN_LABEL } from "../../../common/config";
 import UnPermissionBoard from "../unPermissionBoard";
-import { AIAssistantModal } from "../../../components/ai-pricing/AIAssistantModal";
+import { AiStudioModal } from "../../../components/ai-studio/AiStudioModal";
+import { Sparkles } from "lucide-react";
 
 const tabs = [
   { key: "cong-viec", label: "Thống kê công việc" },
@@ -203,17 +204,17 @@ const StatisticDashboard: IPage["Component"] = () => {
             ))}
           </div>
 
-          {/* Nút AI Báo giá Beta chỉ xuất hiện trong tab Phân tích */}
+          {/* Nút Toolx AI Studio 4K Pro */}
           <button
             type="button"
             onClick={() => setAiModalOpen(true)}
-            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-gradient-to-r from-cyan-500 via-teal-500 to-emerald-500 hover:from-cyan-600 hover:to-emerald-600 text-white font-bold text-xs shadow-sm hover:shadow-md transition-all cursor-pointer border-none hover:scale-105 active:scale-95"
-            title="Mở Trợ lý AI Bóc tách & Báo giá Bảng hiệu (Thử nghiệm)"
+            className="flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-gradient-to-r from-violet-600 via-indigo-600 to-emerald-500 hover:from-violet-500 hover:to-emerald-400 text-white font-bold text-xs shadow-md shadow-violet-900/30 hover:shadow-lg transition-all cursor-pointer border-none hover:scale-105 active:scale-95"
+            title="Mở Toolx AI Studio (Tạo ảnh 4K, Inpainting & Hội thoại AI)"
           >
-            <RobotOutlined className="text-sm" />
-            <span>AI Báo giá</span>
+            <Sparkles className="w-3.5 h-3.5 text-amber-300 animate-pulse" />
+            <span>AI Studio</span>
             <span className="text-[10px] px-1.5 py-0.2 bg-white/25 rounded-full uppercase font-extrabold tracking-wider">
-              Beta
+              4K Pro
             </span>
           </button>
         </div>
@@ -809,8 +810,8 @@ const StatisticDashboard: IPage["Component"] = () => {
         )}
       </section>
 
-      {/* Modal Trợ lý AI Báo giá Bảng hiệu */}
-      <AIAssistantModal open={aiModalOpen} onCancel={() => setAiModalOpen(false)} />
+      {/* Modal Toolx AI Studio 4K Pro */}
+      <AiStudioModal open={aiModalOpen} onCancel={() => setAiModalOpen(false)} />
     </div>
   ) : <UnPermissionBoard />;
 };

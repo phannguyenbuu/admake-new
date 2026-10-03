@@ -13,3 +13,4 @@ pandas
 psutil
 pytz
 eventlet
+requests

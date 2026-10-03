@@ -1,17 +1,580 @@
 import os
+import io
 import json
+import time
 import math
+import base64
+import requests
 import urllib.request
 from urllib.error import HTTPError, URLError
+from PIL import Image, ImageFilter, ImageEnhance
 from flask import Blueprint, request, jsonify
 
 ai_bp = Blueprint('ai', __name__)
 
+# ==============================================================================
+# KEY LOADING TỰ ĐỘNG TỪ D:/vps_go.md VÀ MÔI TRƯỜNG
+# ==============================================================================
+def get_ai_studio_keys():
+    """Đọc động GeminiKey và GPTKey từ vps_go.md hoặc environment variables"""
+    gemini_key = os.getenv("GEMINI_API_KEY", "") or os.getenv("GOOGLE_API_KEY", "")
+    gpt_key = os.getenv("OPENAI_API_KEY", "") or os.getenv("GPT_API_KEY", "")
+
+    candidate_paths = [
+        "D:/vps_go.md",
+        "./vps_go.md",
+        "/opt/vps_go.md",
+        "/root/vps_go.md",
+        os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "vps_go.md")
+    ]
+    for p in candidate_paths:
+        if p and os.path.exists(p):
+            try:
+                with open(p, "r", encoding="utf-8") as f:
+                    lines = [l.strip() for l in f.readlines()]
+                    for i, l in enumerate(lines):
+                        if l == "[GeminiKey]" and i + 1 < len(lines):
+                            gemini_key = lines[i + 1].strip()
+                        elif l == "[GPTKey]" and i + 1 < len(lines):
+                            gpt_key = lines[i + 1].strip()
+                if gemini_key or gpt_key:
+                    break
+            except Exception:
+                pass
+    return gemini_key, gpt_key
+
 def get_active_ai_keys():
-    """Lấy API key từ biến môi trường hoặc cấu hình"""
-    gemini_key = os.environ.get("GEMINI_API_KEY") or os.environ.get("GOOGLE_API_KEY") or ""
-    openai_key = os.environ.get("OPENAI_API_KEY") or ""
-    return gemini_key.strip(), openai_key.strip()
+    """Tương thích ngược với các hàm cũ"""
+    return get_ai_studio_keys()
+
+# ==============================================================================
+# PRO STUDIO PRESETS & PHOTOGRAPHIC FRAMEWORK
+# ==============================================================================
+RESOLUTION_MAP = {
+    "4k": {
+        "1:1": (4096, 4096),
+        "16:9": (4096, 2304),
+        "9:16": (2304, 4096),
+        "4:3": (4096, 3072),
+        "3:4": (3072, 4096),
+    },
+    "2k": {
+        "1:1": (2560, 2560),
+        "16:9": (2560, 1440),
+        "9:16": (1440, 2560),
+        "4:3": (2560, 1920),
+        "3:4": (1920, 2560),
+    },
+    "1080p": {
+        "1:1": (1920, 1920),
+        "16:9": (1920, 1080),
+        "9:16": (1080, 1920),
+        "4:3": (1920, 1440),
+        "3:4": (1440, 1920),
+    }
+}
+
+PRO_PRESETS = {
+    "style": {
+        "none": {"name": "Tự do / Theo AI", "prompt": ""},
+        "doc_realism": {"name": "📷 Chân thực đời thường", "prompt": "hyper-realistic documentary photography, authentic human candid emotion, natural skin pores and realistic micro-textures, shot on 35mm film aesthetic, no artificial retouching, authentic RAW capture"},
+        "cinematic": {"name": "🎬 Điện ảnh Cinematic", "prompt": "cinematic movie still, Panavision 35mm anamorphic lens, dramatic widescreen composition, subtle film grain, cinematic depth of field, atmospheric color grading, cinematic haze"},
+        "commercial_studio": {"name": "📸 Studio Thương mại", "prompt": "high-end commercial studio photography, crisp subject isolation, ultra-detailed tactile surfaces, elegant modern aesthetic, luxury magazine editorial quality"},
+        "vintage_film": {"name": "☕ Analog Kodak Portra", "prompt": "analog film photography, shot on Kodak Portra 400, warm organic tones, gentle film grain, nostalgic timeless mood, authentic vintage optical rendition"},
+        "oil_painting": {"name": "🎨 Tranh sơn dầu Nghệ thuật", "prompt": "classical fine art oil painting, expressive impasto brushstrokes, rich pigment layering, timeless museum masterpiece aesthetic"},
+        "packaging_mockup": {"name": "📦 Mockup Bao bì In ấn", "prompt": "ultra-clean minimalist product mockup for commercial print, studio seamless background, precise branding focus, high-fidelity tactile material textures"}
+    },
+    "lighting": {
+        "none": {"name": "Tự do / Theo AI", "prompt": ""},
+        "golden_hour": {"name": "☀️ Nắng sớm bình minh", "prompt": "bathed in warm golden hour sunlight, soft low-angle sun rays, gentle warm glow, natural lens flare, delicate rim lighting on edges"},
+        "soft_daylight": {"name": "⛅ Ánh sáng tự nhiên dịu", "prompt": "soft diffused natural daylight, gentle ambient illumination, neutral realistic color balance, seamless shadow gradients"},
+        "studio_softbox": {"name": "💡 Studio Softbox 3 điểm", "prompt": "three-point professional studio lighting with large softbox key light, subtle fill light, crisp edge separation rim light, controlled specular highlights"},
+        "sunset_dramatic": {"name": "🌆 Hoàng hôn rực rỡ", "prompt": "vibrant sunset twilight ambiance, dramatic fiery orange and magenta sky gradient, rich contrast, warm silhouettes with luminous rim light"},
+        "moody_night": {"name": "🌙 Đêm huyền bí / Ánh trăng", "prompt": "moody blue hour twilight, soft ambient moonlight, deep cinematic shadows, low-key atmospheric lighting"},
+        "neon_glow": {"name": "🏮 Đèn Neon tương phản", "prompt": "cyberpunk dramatic neon lighting, dual-tone cyan and magenta edge rim light, reflective surfaces, high visual contrast"}
+    },
+    "lens": {
+        "none": {"name": "Tự do / Theo AI", "prompt": ""},
+        "portrait_85mm": {"name": "🔍 Chân dung xóa phông (85mm f/1.4)", "prompt": "shot on 85mm f/1.4 prime lens, shallow depth of field, creamy smooth background bokeh, sharp tack focus on subject eyes and face"},
+        "natural_50mm": {"name": "👁️ Góc mắt người thật (50mm f/1.8)", "prompt": "shot on 50mm f/1.8 standard prime lens, natural human eye perspective, balanced field of view, organic depth and realistic distortion-free proportions"},
+        "wide_24mm": {"name": "🌄 Toàn cảnh góc rộng (24mm f/2.8)", "prompt": "shot on 24mm wide angle lens, deep depth of field, expansive environmental context, dynamic leading lines"},
+        "macro_100mm": {"name": "🔬 Cận cảnh vi mô (100mm Macro)", "prompt": "shot on 100mm macro lens at 1:1 reproduction ratio, extreme close-up detail, razor-sharp focus on microscopic textures and surface nuances"},
+        "drone_aerial": {"name": "🚁 Góc nhìn trên cao (Aerial Drone)", "prompt": "high-altitude aerial drone perspective, sweeping bird's-eye view, broad spatial composition, clean geometric framing"},
+        "full_body": {"name": "👤 Chụp toàn thân (Full Body)", "prompt": "full body portrait framing, standing tall, elegant head-to-toe composition, grounded spatial depth"}
+    }
+}
+
+def enhance_prompt(raw_prompt: str, use_ai_enhancer: bool, presets: dict, gpt_key: str, task_type: str = "create") -> tuple:
+    """
+    Chuẩn hóa prompt theo Tiêu chuẩn Nhiếp ảnh 5 lớp (5-Layer Photographic Framework) bằng gpt-4o-mini
+    kết hợp với bộ lọc chuyên sâu Style / Lighting / Lens.
+    """
+    raw_prompt = (raw_prompt or "").strip()
+    if not raw_prompt:
+        return "", {"total_tokens": 0, "cost_usd": 0.0}
+
+    presets = presets or {}
+    style_k = presets.get("style", "none")
+    lighting_k = presets.get("lighting", "none")
+    lens_k = presets.get("lens", "none")
+
+    style_prompt = PRO_PRESETS["style"].get(style_k, {}).get("prompt", "")
+    lighting_prompt = PRO_PRESETS["lighting"].get(lighting_k, {}).get("prompt", "")
+    lens_prompt = PRO_PRESETS["lens"].get(lens_k, {}).get("prompt", "")
+
+    preset_parts = []
+    if style_prompt:
+        preset_parts.append(f"Visual Style: {style_prompt}")
+    if lighting_prompt:
+        preset_parts.append(f"Lighting & Atmosphere: {lighting_prompt}")
+    if lens_prompt:
+        preset_parts.append(f"Camera Optics & Lens: {lens_prompt}")
+    preset_instructions = " | ".join(preset_parts)
+
+    usage = {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0, "cost_usd": 0.0}
+
+    if use_ai_enhancer and gpt_key:
+        try:
+            system_prompt = (
+                "You are a World-Class Photography Director and Prompt Engineering Master specializing in photorealistic imagery for OpenAI gpt-image-1 and Google Imagen 3.\n"
+                "Transform the user's raw prompt (in Vietnamese or English) into an elite, highly detailed, photorealistic visual description in English.\n"
+                "Strictly apply the 5-Layer Photographic Framework:\n"
+                "1. Subject & Action: Authentic expressions, natural skin texture (fine pores, natural sheen), genuine emotion, realistic fabric textures and natural posture.\n"
+                "2. Environment & Depth: Atmospheric storytelling, layered background elements, authentic environmental depth.\n"
+                "3. Lighting & Atmosphere: Masterful key/fill/rim light, natural light direction (e.g. golden hour sun, soft diffused daylight, or studio softbox), realistic soft shadows.\n"
+                "4. Optics & Gear: Professional full-frame or medium format photography (e.g. Hasselblad H6D or Canon EOS R5), realistic focal length (85mm, 50mm, 24mm), creamy bokeh, authentic RAW capture. Strictly avoid plastic skin, CGI, 3D render, cartoon, or over-smoothed AI look.\n"
+                "5. Color Grading & Texture: Natural dynamic range, rich organic tonal gradations, crisp micro-contrast.\n\n"
+                "If professional photography presets (Style, Lighting, Lens) are provided, seamlessly weave them into the prompt.\n"
+                "Output ONLY the final enhanced English prompt text, with no introductory text, quotes, or markdown wrappers."
+            )
+
+            user_msg = f"User Raw Prompt: {raw_prompt}"
+            if preset_instructions:
+                user_msg += f"\nActive Professional Presets to integrate:\n{preset_instructions}"
+            if task_type == "edit":
+                user_msg += "\nNote: This is an image editing / inpainting task. The enhanced prompt should precisely describe the modifications to blend seamlessly with the existing photo."
+
+            resp = requests.post(
+                "https://api.openai.com/v1/chat/completions",
+                headers={"Authorization": f"Bearer {gpt_key}", "Content-Type": "application/json"},
+                json={
+                    "model": "gpt-4o-mini",
+                    "messages": [
+                        {"role": "system", "content": system_prompt},
+                        {"role": "user", "content": user_msg}
+                    ],
+                    "temperature": 0.7
+                },
+                timeout=20
+            )
+            if resp.status_code == 200:
+                res_data = resp.json()
+                enhanced = res_data["choices"][0]["message"]["content"].strip()
+                u = res_data.get("usage", {})
+                p_tok = u.get("prompt_tokens", 0)
+                c_tok = u.get("completion_tokens", 0)
+                tot_tok = u.get("total_tokens", p_tok + c_tok)
+                cost_usd = round((p_tok * 0.15 + c_tok * 0.60) / 1_000_000, 6)
+                usage = {"prompt_tokens": p_tok, "completion_tokens": c_tok, "total_tokens": tot_tok, "cost_usd": cost_usd}
+                if enhanced:
+                    return enhanced, usage
+        except Exception:
+            pass
+
+    composite = [raw_prompt]
+    if preset_parts:
+        composite.append(", ".join(preset_parts))
+    return ", ".join(composite), usage
+
+def post_process_image_to_base64(raw_im: Image.Image, aspect_ratio: str = "4:3", resolution: str = "4k") -> tuple:
+    """Nâng cấp ảnh lên 4K/2K/1080p chuẩn 300 DPI và sinh thumbnail WebP nhẹ nhàng"""
+    res_key = resolution.lower() if resolution.lower() in RESOLUTION_MAP else "4k"
+    ratio_map = RESOLUTION_MAP[res_key]
+    target_w, target_h = ratio_map.get(aspect_ratio, (4096, 2304 if aspect_ratio == "16:9" else 4096))
+
+    upscaled = raw_im.resize((target_w, target_h), Image.Resampling.LANCZOS)
+    enhanced = upscaled.filter(ImageFilter.UnsharpMask(radius=2, percent=145, threshold=3))
+    sharpener = ImageEnhance.Sharpness(enhanced)
+    final_img = sharpener.enhance(1.25)
+
+    img_buf = io.BytesIO()
+    final_img.save(img_buf, format="PNG", dpi=(300, 300))
+    img_bytes = img_buf.getvalue()
+    img_b64 = "data:image/png;base64," + base64.b64encode(img_bytes).decode("utf-8")
+    size_kb = round(len(img_bytes) / 1024, 1)
+
+    thumb = final_img.copy()
+    thumb.thumbnail((400, 400), Image.Resampling.LANCZOS)
+    thumb_buf = io.BytesIO()
+    try:
+        thumb.convert("RGB").save(thumb_buf, format="WEBP", quality=82)
+        thumb_mime = "image/webp"
+    except Exception:
+        thumb.convert("RGB").save(thumb_buf, format="JPEG", quality=85)
+        thumb_mime = "image/jpeg"
+    thumb_b64 = f"data:{thumb_mime};base64," + base64.b64encode(thumb_buf.getvalue()).decode("utf-8")
+
+    return img_b64, thumb_b64, target_w, target_h, size_kb
+
+def generate_with_gpt(prompt: str, aspect_ratio: str, gpt_key: str) -> tuple:
+    """Tạo ảnh mới với OpenAI API (gpt-image-1). Trả về (Image, usage_dict)."""
+    if not gpt_key:
+        raise Exception("Không tìm thấy [GPTKey] trong D:/vps_go.md hoặc biến môi trường OPENAI_API_KEY")
+
+    is_wide = aspect_ratio in ("16:9", "4:3", "9:16", "3:4")
+    if aspect_ratio in ("16:9", "4:3"):
+        size = "1536x1024"
+    elif aspect_ratio in ("9:16", "3:4"):
+        size = "1024x1536"
+    else:
+        size = "1024x1024"
+
+    headers = {
+        "Authorization": f"Bearer {gpt_key}",
+        "Content-Type": "application/json"
+    }
+
+    models_to_try = ["gpt-image-1", "gpt-image-1-mini", "chatgpt-image-latest", "gpt-image-2"]
+    last_err = None
+
+    for model in models_to_try:
+        payload = {
+            "model": model,
+            "prompt": prompt,
+            "n": 1,
+            "size": size
+        }
+        try:
+            resp = requests.post("https://api.openai.com/v1/images/generations", headers=headers, json=payload, timeout=120)
+            if resp.status_code == 200:
+                data = resp.json()
+                img_item = data.get("data", [{}])[0]
+                u = data.get("usage", {})
+                in_tok = u.get("input_tokens", u.get("prompt_tokens", 0))
+                out_tok = u.get("output_tokens", u.get("completion_tokens", 0))
+                tot_tok = u.get("total_tokens", in_tok + out_tok)
+                if in_tok or out_tok:
+                    img_cost_usd = round((in_tok * 10.0 + out_tok * 40.0) / 1_000_000, 4)
+                elif tot_tok:
+                    img_cost_usd = round(tot_tok * 0.000040, 4)
+                else:
+                    tot_tok = 3450 if is_wide else 2000
+                    img_cost_usd = 0.138 if is_wide else 0.080
+
+                usage = {
+                    "tokens": tot_tok,
+                    "input_tokens": in_tok,
+                    "output_tokens": out_tok,
+                    "cost_usd": img_cost_usd,
+                    "engine": "gpt",
+                    "model": model
+                }
+
+                if "url" in img_item:
+                    img_resp = requests.get(img_item["url"], timeout=45)
+                    return Image.open(io.BytesIO(img_resp.content)).convert("RGB"), usage
+                elif "b64_json" in img_item:
+                    raw_bytes = base64.b64decode(img_item["b64_json"])
+                    return Image.open(io.BytesIO(raw_bytes)).convert("RGB"), usage
+            else:
+                err_data = resp.json().get("error", {})
+                err_code = err_data.get("code") or resp.status_code
+                err_msg = err_data.get("message") or resp.text
+                last_err = f"[OpenAI {err_code}] {err_msg}"
+                if "insufficient_quota" in str(err_code) or resp.status_code in (401, 429):
+                    raise Exception(last_err)
+        except Exception as e:
+            if "insufficient_quota" in str(e) or (hasattr(e, 'response') and e.response and e.response.status_code in (401, 429)):
+                raise
+            last_err = str(e)
+
+    raise Exception(last_err or "Lỗi không xác định khi gọi OpenAI API")
+
+def edit_with_gpt(image_bytes: bytes, prompt: str, mask_bytes: bytes, gpt_key: str) -> tuple:
+    """Sửa hình (Image-to-Image) hoặc Inpainting (với Mask) bằng OpenAI gpt-image-1."""
+    if not gpt_key:
+        raise Exception("Không tìm thấy [GPTKey] trong D:/vps_go.md hoặc biến môi trường OPENAI_API_KEY")
+
+    with Image.open(io.BytesIO(image_bytes)) as orig_im:
+        orig_w, orig_h = orig_im.size
+        if orig_w > orig_h * 1.2:
+            target_size = (1536, 1024)
+            size_param = "1536x1024"
+        elif orig_h > orig_w * 1.2:
+            target_size = (1024, 1536)
+            size_param = "1024x1536"
+        else:
+            target_size = (1024, 1024)
+            size_param = "1024x1024"
+
+        prep_img = orig_im.convert("RGBA").resize(target_size, Image.Resampling.LANCZOS)
+        img_buf = io.BytesIO()
+        prep_img.save(img_buf, format="PNG")
+        img_buf.seek(0)
+
+    files = {
+        "image": ("image.png", img_buf, "image/png")
+    }
+
+    if mask_bytes and len(mask_bytes) > 50:
+        mask_im = Image.open(io.BytesIO(mask_bytes)).convert("RGBA")
+        mask_im = mask_im.resize(target_size, Image.Resampling.NEAREST)
+        mask_buf = io.BytesIO()
+        mask_im.save(mask_buf, format="PNG")
+        mask_buf.seek(0)
+        files["mask"] = ("mask.png", mask_buf, "image/png")
+
+    headers = {"Authorization": f"Bearer {gpt_key}"}
+    data = {
+        "model": "gpt-image-1",
+        "prompt": prompt,
+        "size": size_param
+    }
+
+    resp = requests.post("https://api.openai.com/v1/images/edits", headers=headers, files=files, data=data, timeout=120)
+    if resp.status_code == 200:
+        res_json = resp.json()
+        item = res_json.get("data", [{}])[0]
+        u = res_json.get("usage", {})
+        in_tok = u.get("input_tokens", u.get("prompt_tokens", 0))
+        out_tok = u.get("output_tokens", u.get("completion_tokens", 0))
+        tot_tok = u.get("total_tokens", in_tok + out_tok)
+        if in_tok or out_tok:
+            img_cost_usd = round((in_tok * 10.0 + out_tok * 40.0) / 1_000_000, 4)
+        elif tot_tok:
+            img_cost_usd = round(tot_tok * 0.000040, 4)
+        else:
+            tot_tok = 3500
+            img_cost_usd = 0.140
+
+        usage = {
+            "tokens": tot_tok,
+            "input_tokens": in_tok,
+            "output_tokens": out_tok,
+            "cost_usd": img_cost_usd,
+            "engine": "gpt",
+            "model": "gpt-image-1"
+        }
+
+        if "b64_json" in item:
+            raw_bytes = base64.b64decode(item["b64_json"])
+            return Image.open(io.BytesIO(raw_bytes)).convert("RGB"), usage
+        elif "url" in item:
+            r = requests.get(item["url"], timeout=45)
+            return Image.open(io.BytesIO(r.content)).convert("RGB"), usage
+        raise Exception("Không tìm thấy dữ liệu ảnh trong kết quả trả về của OpenAI")
+    else:
+        err_data = resp.json().get("error", {})
+        err_msg = err_data.get("message") or resp.text
+        err_code = err_data.get("code") or resp.status_code
+        raise Exception(f"[OpenAI Edit Error {err_code}] {err_msg}")
+
+def generate_with_gemini(prompt: str, aspect_ratio: str, gemini_key: str) -> tuple:
+    """Tạo ảnh mới với Google Gemini / Imagen 3. Trả về (Image, usage_dict)."""
+    if not gemini_key:
+        raise Exception("Không tìm thấy [GeminiKey] trong D:/vps_go.md hoặc biến môi trường GEMINI_API_KEY")
+
+    gemini_models = ["imagen-3.0-generate-002", "imagen-3.0-generate-001", "gemini-3.1-flash-image", "gemini-2.5-flash-image"]
+    last_err = None
+
+    for model in gemini_models:
+        try:
+            if "imagen" in model:
+                url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:predict?key={gemini_key}"
+                payload = {
+                    "instances": [{"prompt": prompt}],
+                    "parameters": {
+                        "sampleCount": 1,
+                        "aspectRatio": aspect_ratio if aspect_ratio in ("1:1", "16:9", "9:16", "4:3", "3:4") else "1:1",
+                        "outputMimeType": "image/png"
+                    }
+                }
+                resp = requests.post(url, json=payload, timeout=60)
+                if resp.status_code == 200:
+                    res_json = resp.json()
+                    preds = res_json.get("predictions", [])
+                    if preds and "bytesBase64Encoded" in preds[0]:
+                        raw_bytes = base64.b64decode(preds[0]["bytesBase64Encoded"])
+                        usage = {
+                            "tokens": 1200,
+                            "cost_usd": 0.030,
+                            "engine": "gemini",
+                            "model": model
+                        }
+                        return Image.open(io.BytesIO(raw_bytes)).convert("RGB"), usage
+                else:
+                    err_json = resp.json().get("error", {})
+                    last_err = f"[Gemini {resp.status_code}] {err_json.get('message', resp.text)}"
+            else:
+                url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={gemini_key}"
+                payload = {
+                    "contents": [{"parts": [{"text": prompt}]}]
+                }
+                resp = requests.post(url, json=payload, timeout=60)
+                if resp.status_code == 200:
+                    res_json = resp.json()
+                    candidates = res_json.get("candidates", [])
+                    if candidates:
+                        parts = candidates[0].get("content", {}).get("parts", [])
+                        for p in parts:
+                            if "inlineData" in p:
+                                raw_bytes = base64.b64decode(p["inlineData"]["data"])
+                                usage = {
+                                    "tokens": 1000,
+                                    "cost_usd": 0.030,
+                                    "engine": "gemini",
+                                    "model": model
+                                }
+                                return Image.open(io.BytesIO(raw_bytes)).convert("RGB"), usage
+                else:
+                    err_json = resp.json().get("error", {})
+                    last_err = f"[Gemini {resp.status_code}] {err_json.get('message', resp.text)}"
+        except Exception as e:
+            last_err = str(e)
+
+    raise Exception(last_err or "Lỗi không xác định khi gọi Google Gemini API")
+
+def chat_with_ai(messages: list, engine: str = "gpt", model: str = None) -> dict:
+    """Xử lý hội thoại thông thường với OpenAI (GPT) hoặc Google Gemini."""
+    gemini_key, gpt_key = get_ai_studio_keys()
+    engine = (engine or "gpt").lower()
+
+    if engine == "gemini":
+        if not gemini_key and gpt_key:
+            return chat_with_ai(messages, engine="gpt", model="gpt-4o-mini")
+        if not gemini_key:
+            raise Exception("Chưa cấu hình [GeminiKey] trong D:/vps_go.md hoặc biến môi trường GEMINI_API_KEY")
+
+        target_model = model or "gemini-2.5-flash"
+        models_to_try = [target_model, "gemini-3.8-flash", "gemini-flash-latest"]
+
+        gemini_contents = []
+        system_instruction = None
+        for m in messages:
+            role = m.get("role", "user")
+            content = m.get("content", "")
+            if role == "system":
+                system_instruction = {"parts": [{"text": content}]}
+            elif role in ("assistant", "model"):
+                gemini_contents.append({"role": "model", "parts": [{"text": content}]})
+            else:
+                gemini_contents.append({"role": "user", "parts": [{"text": content}]})
+
+        if not gemini_contents:
+            gemini_contents = [{"role": "user", "parts": [{"text": "Xin chào"}]}]
+
+        last_err = None
+        for m_name in models_to_try:
+            url = f"https://generativelanguage.googleapis.com/v1beta/models/{m_name}:generateContent?key={gemini_key}"
+            payload = {
+                "contents": gemini_contents,
+                "generationConfig": {"temperature": 0.7}
+            }
+            if system_instruction:
+                payload["systemInstruction"] = system_instruction
+
+            try:
+                resp = requests.post(url, json=payload, timeout=60)
+                if resp.status_code == 200:
+                    res_json = resp.json()
+                    candidates = res_json.get("candidates", [])
+                    reply = ""
+                    if candidates:
+                        parts = candidates[0].get("content", {}).get("parts", [])
+                        reply = "".join(p.get("text", "") for p in parts)
+                    u = res_json.get("usageMetadata", {})
+                    in_tok = u.get("promptTokenCount", 0)
+                    out_tok = u.get("candidatesTokenCount", 0)
+                    tot_tok = u.get("totalTokenCount", in_tok + out_tok)
+                    cost_usd = round((in_tok * 0.075 + out_tok * 0.30) / 1_000_000, 6)
+                    return {
+                        "reply": reply,
+                        "engine": "gemini",
+                        "model": m_name,
+                        "usage": {
+                            "prompt_tokens": in_tok,
+                            "completion_tokens": out_tok,
+                            "total_tokens": tot_tok,
+                            "cost_usd": cost_usd,
+                            "cost_vnd": int(round(cost_usd * 25400))
+                        }
+                    }
+                else:
+                    err_data = resp.json().get("error", {})
+                    last_err = f"[Gemini {resp.status_code}] {err_data.get('message', resp.text)}"
+            except Exception as e:
+                last_err = str(e)
+
+        # Fallback tự động sang GPT nếu Gemini gặp sự cố (ví dụ lỗi 403 denied)
+        if gpt_key:
+            gpt_res = chat_with_ai(messages, engine="gpt", model="gpt-4o-mini")
+            return gpt_res
+
+        raise Exception(last_err or "Lỗi không xác định khi gọi Google Gemini API")
+
+    else:
+        if not gpt_key:
+            raise Exception("Chưa cấu hình [GPTKey] trong D:/vps_go.md hoặc biến môi trường OPENAI_API_KEY")
+
+        target_model = model or "gpt-4o-mini"
+        models_to_try = [target_model, "gpt-4o-mini", "gpt-4o"]
+
+        headers = {
+            "Authorization": f"Bearer {gpt_key}",
+            "Content-Type": "application/json"
+        }
+
+        cleaned_messages = []
+        for m in messages:
+            r = m.get("role", "user")
+            c = m.get("content", "")
+            if r in ("user", "assistant", "system"):
+                cleaned_messages.append({"role": r, "content": c})
+            elif r == "model":
+                cleaned_messages.append({"role": "assistant", "content": c})
+            else:
+                cleaned_messages.append({"role": "user", "content": c})
+
+        last_err = None
+        for m_name in models_to_try:
+            payload = {
+                "model": m_name,
+                "messages": cleaned_messages,
+                "temperature": 0.7
+            }
+            try:
+                resp = requests.post("https://api.openai.com/v1/chat/completions", headers=headers, json=payload, timeout=60)
+                if resp.status_code == 200:
+                    data = resp.json()
+                    choices = data.get("choices", [])
+                    reply = choices[0].get("message", {}).get("content", "") if choices else ""
+                    u = data.get("usage", {})
+                    in_tok = u.get("prompt_tokens", 0)
+                    out_tok = u.get("completion_tokens", 0)
+                    tot_tok = u.get("total_tokens", in_tok + out_tok)
+                    if "mini" in m_name:
+                        cost_usd = round((in_tok * 0.15 + out_tok * 0.60) / 1_000_000, 6)
+                    else:
+                        cost_usd = round((in_tok * 2.50 + out_tok * 10.00) / 1_000_000, 6)
+                    return {
+                        "reply": reply,
+                        "engine": "gpt",
+                        "model": m_name,
+                        "usage": {
+                            "prompt_tokens": in_tok,
+                            "completion_tokens": out_tok,
+                            "total_tokens": tot_tok,
+                            "cost_usd": cost_usd,
+                            "cost_vnd": int(round(cost_usd * 25400))
+                        }
+                    }
+                else:
+                    err_data = resp.json().get("error", {})
+                    last_err = f"[OpenAI {resp.status_code}] {err_data.get('message', resp.text)}"
+            except Exception as e:
+                last_err = str(e)
+
+        raise Exception(last_err or "Lỗi không xác định khi gọi OpenAI API")
 
 def call_gemini_api(prompt_text, system_instruction=None, api_key=None):
     """Gọi trực tiếp Google Gemini API qua REST urllib không cần thư viện ngoài"""
@@ -707,55 +1270,256 @@ def quote_signboard():
     }), 200
 
 
-@ai_bp.route('/api/ai/chat', methods=['POST'])
-def ai_chat():
-    """Xử lý hội thoại chat tiếp nối với AI về bảng hiệu"""
-    payload = request.get_json() or {}
-    user_message = payload.get("message", "").strip()
-    current_quote = payload.get("current_quote", {})
-    custom_api_key = request.headers.get("x-ai-api-key") or payload.get("api_key")
+# ==============================================================================
+# TOOLX AI STUDIO API ENDPOINTS
+# ==============================================================================
 
-    if not user_message:
-        return jsonify({"success": False, "error": "Vui lòng nhập nội dung tin nhắn."}), 400
-
-    gemini_key, openai_key = get_active_ai_keys()
-    target_key = custom_api_key or gemini_key
-
-    system_context = (
-        "Bạn là Chuyên gia bóc tách vật tư và báo giá bảng hiệu tại ADMAKE (Công ty TNHH B-One Việt Nam). "
-        "Hãy trả lời chuyên nghiệp, súc tích, đưa ra giải pháp tư vấn chính xác về vật tư, tối ưu chi phí cho khách "
-        "hoặc cảnh báo kỹ thuật theo đúng quy chuẩn ngành quảng cáo."
-    )
-    user_full_query = f"Thông số bảng hiệu hiện tại: {json.dumps(current_quote, ensure_ascii=False)}.\nCâu hỏi của tôi: {user_message}"
-
-    # Thử gọi LLM nếu có key
-    if target_key:
-        llm_resp = call_gemini_api(user_full_query, system_context, api_key=target_key)
-        if llm_resp:
-            return jsonify({"success": True, "reply": llm_resp, "ai_source": "gemini"}), 200
-
-    if custom_api_key or openai_key:
-        llm_resp = call_openai_api(user_full_query, system_context, api_key=(custom_api_key or openai_key))
-        if llm_resp:
-            return jsonify({"success": True, "reply": llm_resp, "ai_source": "openai"}), 200
-
-    # Trả lời thông minh theo ngữ cảnh (Fallback)
-    upper = user_message.upper()
-    reply = ""
-    if "GIẢM" in upper or "CHIẾT KHẤU" in upper or "BỚT" in upper:
-        reply = "💡 **Gợi ý tối ưu chi phí từ Chuyên gia AI:**\n- Nếu khách muốn giảm giá, bạn có thể điều chỉnh tỷ lệ lợi nhuận kỳ vọng từ 30% xuống 20-25%.\n- Hoặc chuyển từ bạt 3M/không gân sang bạt 2 da xám (tiết kiệm được từ 125.000 - 400.000 đ/m²).\n- Nếu khách tự lắp đặt tại xưởng, có thể trừ chi phí nhân công (120k/m²) và xe vận chuyển (200k)."
-    elif "VAT" in upper or "THUẾ" in upper:
-        reply = "📄 **Tính thuế VAT:**\n- Thuế suất thông dụng cho ngành quảng cáo/thi công là **8%** hoặc **10%**.\n- Bạn có thể chọn bật tính VAT trong modal 'Xuất Báo Giá PDF' ở góc trên màn hình để hệ thống tự động cộng vào tổng thanh toán."
-    elif "ALU" in upper:
-        reply = "🔍 **Tư vấn vật liệu Alu:**\n- Khổ tấm tiêu chuẩn là 1.22m x 2.44m (độ dày 3mm, nhôm 0.10mm).\n- Lưu ý: Tuyệt đối không bảo hành bay màu nếu khách chọn Alu gương vàng thi công ngoài trời nắng gắt."
-    elif "BẠT" in upper:
-        reply = "🏷️ **Tư vấn bạt in:**\n- Khổ máy in tối đa phổ biến là 3.1m. Nếu cả chiều dài và chiều rộng đều lớn hơn 3.1m thì buộc phải nối bạt (phụ phí nhân công hàn nối 15.000 đ/m dài).\n- Bạt 2 da đế xám chống xuyên sáng thích hợp cho bảng mặt tiền không dùng đèn hắt phía sau."
-    else:
-        reply = f"Dạ tôi đã hiểu yêu cầu: \"{user_message}\". Tôi luôn sẵn sàng hỗ trợ điều chỉnh phương án bóc tách hoặc giải đáp thêm các thắc mắc về vật tư bảng hiệu cho bạn!"
-
+@ai_bp.route('/api/ai/studio-status', methods=['GET', 'OPTIONS'])
+def api_ai_studio_status():
+    """Kiểm tra trạng thái kết nối các AI Engine và nạp cấu hình Presets"""
+    if request.method == 'OPTIONS':
+        return jsonify({"ok": True}), 200
+    gemini_key, gpt_key = get_ai_studio_keys()
     return jsonify({
         "success": True,
-        "reply": reply,
-        "ai_source": "expert_engine"
+        "has_gemini_key": bool(gemini_key),
+        "has_gpt_key": bool(gpt_key),
+        "gemini_preview": f"{gemini_key[:6]}...{gemini_key[-4:]}" if gemini_key else "",
+        "gpt_preview": f"{gpt_key[:7]}...{gpt_key[-4:]}" if gpt_key else "",
+        "presets": PRO_PRESETS,
+        "resolutions": ["4k", "2k", "1080p"],
+        "aspect_ratios": ["1:1", "16:9", "9:16", "4:3", "3:4"]
     }), 200
+
+
+@ai_bp.route('/api/ai/chat', methods=['POST', 'OPTIONS'])
+def ai_chat():
+    """Hội thoại thông minh đa năng với GPT (OpenAI) hoặc Gemini (Google)"""
+    if request.method == 'OPTIONS':
+        return jsonify({"ok": True}), 200
+
+    data = request.get_json(force=True, silent=True) or {}
+    messages = data.get("messages") or []
+    single_msg = (data.get("message") or data.get("prompt") or "").strip()
+    current_quote = data.get("current_quote")
+    engine = (data.get("engine") or "gpt").lower()
+    model = data.get("model")
+
+    if not messages and single_msg:
+        if current_quote:
+            system_ctx = (
+                "Bạn là Chuyên gia bóc tách vật tư và báo giá bảng hiệu tại ADMAKE (Công ty TNHH B-One Việt Nam). "
+                "Hãy trả lời chuyên nghiệp, súc tích, tư vấn chính xác về vật tư và cảnh báo kỹ thuật."
+            )
+            messages = [
+                {"role": "system", "content": system_ctx},
+                {"role": "user", "content": f"Thông số bảng hiệu hiện tại: {json.dumps(current_quote, ensure_ascii=False)}.\nCâu hỏi: {single_msg}"}
+            ]
+        else:
+            messages = [{"role": "user", "content": single_msg}]
+
+    if not messages:
+        return jsonify({"success": False, "error": "Vui lòng nhập nội dung câu hỏi."}), 400
+
+    try:
+        chat_res = chat_with_ai(messages, engine=engine, model=model)
+        return jsonify({
+            "success": True,
+            "reply": chat_res["reply"],
+            "engine": chat_res["engine"],
+            "model": chat_res["model"],
+            "usage": chat_res["usage"],
+            "ai_source": chat_res["engine"]
+        }), 200
+    except Exception as e:
+        err_msg = str(e)
+        # Nếu là câu hỏi về bảng hiệu và chưa có API key, fallback sang trả lời cục bộ
+        if single_msg and ("GIẢM" in single_msg.upper() or "CHIẾT KHẤU" in single_msg.upper() or "BẠT" in single_msg.upper() or "ALU" in single_msg.upper() or "VAT" in single_msg.upper()):
+            upper = single_msg.upper()
+            if "GIẢM" in upper or "CHIẾT KHẤU" in upper:
+                fallback_reply = "💡 **Gợi ý tối ưu chi phí:** Giảm biên lợi nhuận kỳ vọng, chuyển sang bạt 2 da xám hoặc tự vận chuyển lắp đặt."
+            elif "VAT" in upper:
+                fallback_reply = "📄 **Thuế VAT:** Áp dụng mức 8% hoặc 10% tùy loại hình công trình theo quy định."
+            elif "ALU" in upper:
+                fallback_reply = "🔍 **Tư vấn Alu:** Khổ tiêu chuẩn 1.22m x 2.44m dày 3mm. Lưu ý không bảo hành alu gương ngoài trời."
+            else:
+                fallback_reply = "🏷️ **Tư vấn:** Khổ bạt máy in thông dụng 3.1m. Nếu cả 2 chiều lớn hơn 3.1m thì cần hàn nối bạt."
+            return jsonify({
+                "success": True,
+                "reply": fallback_reply,
+                "ai_source": "expert_engine",
+                "usage": {"total_tokens": 50, "cost_usd": 0.0, "cost_vnd": 0}
+            }), 200
+
+        return jsonify({"success": False, "error": err_msg}), 500
+
+
+@ai_bp.route('/api/ai/prompt/enhance', methods=['POST', 'OPTIONS'])
+def api_ai_prompt_enhance():
+    """Chuẩn hóa Prompt 5 lớp chuyên sâu (Photographic Framework)"""
+    if request.method == 'OPTIONS':
+        return jsonify({"ok": True}), 200
+    data = request.get_json(force=True, silent=True) or {}
+    raw_prompt = (data.get("prompt") or "").strip()
+    presets = data.get("presets") or {}
+    task_type = data.get("task_type", "create")
+    gemini_key, gpt_key = get_ai_studio_keys()
+
+    enhanced, usage = enhance_prompt(raw_prompt, True, presets, gpt_key, task_type=task_type)
+    return jsonify({
+        "success": True,
+        "raw_prompt": raw_prompt,
+        "enhanced_prompt": enhanced,
+        "usage": usage
+    }), 200
+
+
+@ai_bp.route('/api/ai/image/generate', methods=['POST', 'OPTIONS'])
+def api_ai_image_generate():
+    """Tạo ảnh mới (Text-to-Image) chuẩn 4K / 300 DPI bằng GPT hoặc Gemini"""
+    if request.method == 'OPTIONS':
+        return jsonify({"ok": True}), 200
+    data = request.get_json(force=True, silent=True) or {}
+    raw_prompt = (data.get("prompt") or "").strip()
+    if not raw_prompt:
+        return jsonify({"success": False, "error": "Vui lòng nhập mô tả ảnh (prompt)."}), 400
+
+    engine = (data.get("engine") or "gpt").lower()
+    aspect_ratio = data.get("aspect_ratio") or "4:3"
+    resolution = (data.get("resolution") or "4k").lower()
+    use_ai_enhancer = data.get("use_ai_enhancer", True)
+    presets = data.get("presets") or {}
+
+    gemini_key, gpt_key = get_ai_studio_keys()
+
+    # Chuẩn hóa Prompt 5 lớp nếu được bật
+    effective_prompt, enhancer_usage = enhance_prompt(raw_prompt, use_ai_enhancer, presets, gpt_key, task_type="create")
+    if not effective_prompt:
+        effective_prompt = raw_prompt
+
+    try:
+        if engine == "gemini":
+            try:
+                raw_im, img_usage = generate_with_gemini(effective_prompt, aspect_ratio, gemini_key)
+            except Exception as ge:
+                if gpt_key:
+                    raw_im, img_usage = generate_with_gpt(effective_prompt, aspect_ratio, gpt_key)
+                    engine = "gpt"
+                else:
+                    raise ge
+        else:
+            raw_im, img_usage = generate_with_gpt(effective_prompt, aspect_ratio, gpt_key)
+
+        if raw_im is None:
+            return jsonify({"success": False, "error": f"Không nhận được dữ liệu ảnh từ {engine.upper()}"}), 500
+
+        # Nâng cấp độ phân giải 4K / 2K / 1080p chuẩn 300 DPI
+        img_b64, thumb_b64, w, h, size_kb = post_process_image_to_base64(raw_im, aspect_ratio, resolution)
+
+        tot_tokens = enhancer_usage.get("total_tokens", 0) + img_usage.get("tokens", 0)
+        tot_usd = round(enhancer_usage.get("cost_usd", 0.0) + img_usage.get("cost_usd", 0.0), 4)
+        tot_vnd = int(round(tot_usd * 25400))
+
+        return jsonify({
+            "success": True,
+            "image_url": img_b64,
+            "thumbnail_url": thumb_b64,
+            "prompt": raw_prompt,
+            "enhanced_prompt": effective_prompt,
+            "width": w,
+            "height": h,
+            "size_kb": size_kb,
+            "aspect_ratio": aspect_ratio,
+            "resolution": resolution.upper(),
+            "dpi": 300,
+            "engine": engine,
+            "model": img_usage.get("model", ""),
+            "usage": {
+                "total_tokens": tot_tokens,
+                "cost_usd": tot_usd,
+                "cost_vnd": tot_vnd,
+                "enhancer_tokens": enhancer_usage.get("total_tokens", 0),
+                "image_tokens": img_usage.get("tokens", 0)
+            }
+        }), 200
+
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@ai_bp.route('/api/ai/image/edit', methods=['POST', 'OPTIONS'])
+def api_ai_image_edit():
+    """Sửa ảnh & Inpainting với Mask chuẩn 4K / 300 DPI bằng OpenAI gpt-image-1"""
+    if request.method == 'OPTIONS':
+        return jsonify({"ok": True}), 200
+    data = request.get_json(force=True, silent=True) or {}
+    raw_prompt = (data.get("prompt") or "").strip()
+    if not raw_prompt:
+        return jsonify({"success": False, "error": "Vui lòng nhập mô tả chi tiết phần cần sửa (prompt)."}), 400
+
+    image_b64 = data.get("image_base64") or data.get("image")
+    if not image_b64:
+        return jsonify({"success": False, "error": "Vui lòng cung cấp ảnh gốc cần sửa."}), 400
+
+    if "base64," in image_b64:
+        image_b64 = image_b64.split("base64,")[1]
+    image_bytes = base64.b64decode(image_b64)
+
+    mask_bytes = None
+    mask_b64 = data.get("mask_base64") or data.get("mask")
+    if mask_b64:
+        if "base64," in mask_b64:
+            mask_b64 = mask_b64.split("base64,")[1]
+        mask_bytes = base64.b64decode(mask_b64)
+
+    resolution = (data.get("resolution") or "4k").lower()
+    use_ai_enhancer = data.get("use_ai_enhancer", True)
+    presets = data.get("presets") or {}
+
+    gemini_key, gpt_key = get_ai_studio_keys()
+    effective_prompt, enhancer_usage = enhance_prompt(raw_prompt, use_ai_enhancer, presets, gpt_key, task_type="edit")
+    if not effective_prompt:
+        effective_prompt = raw_prompt
+
+    try:
+        raw_im, edit_usage = edit_with_gpt(image_bytes, effective_prompt, mask_bytes, gpt_key)
+
+        aspect_ratio = "4:3"
+        if raw_im.width > raw_im.height * 1.3:
+            aspect_ratio = "16:9"
+        elif raw_im.height > raw_im.width * 1.3:
+            aspect_ratio = "9:16"
+        elif abs(raw_im.width - raw_im.height) < 50:
+            aspect_ratio = "1:1"
+
+        img_b64, thumb_b64, w, h, size_kb = post_process_image_to_base64(raw_im, aspect_ratio, resolution)
+
+        tot_tokens = enhancer_usage.get("total_tokens", 0) + edit_usage.get("tokens", 0)
+        tot_usd = round(enhancer_usage.get("cost_usd", 0.0) + edit_usage.get("cost_usd", 0.0), 4)
+        tot_vnd = int(round(tot_usd * 25400))
+
+        return jsonify({
+            "success": True,
+            "image_url": img_b64,
+            "thumbnail_url": thumb_b64,
+            "prompt": raw_prompt,
+            "enhanced_prompt": effective_prompt,
+            "width": w,
+            "height": h,
+            "size_kb": size_kb,
+            "aspect_ratio": aspect_ratio,
+            "resolution": resolution.upper(),
+            "dpi": 300,
+            "engine": "gpt",
+            "model": "gpt-image-1",
+            "task_type": "inpainting" if mask_bytes else "edit",
+            "usage": {
+                "total_tokens": tot_tokens,
+                "cost_usd": tot_usd,
+                "cost_vnd": tot_vnd
+            }
+        }), 200
+
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
 

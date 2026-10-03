@@ -1,5 +1,6 @@
 import { Button, Layout, Dropdown, Avatar, Popover, Modal, message, notification, Tooltip } from "antd";
 import { BellOutlined, UserOutlined, LogoutOutlined, FormOutlined, GiftOutlined } from "@ant-design/icons";
+import { Sparkles } from "lucide-react";
 // import NotificationDropdown from "../../../components/NotificationDropdown";
 import { useNavigate } from "react-router-dom";
 import { useInfo } from "../../hooks/info.hook";
@@ -18,6 +19,7 @@ import NoteWorkpointModal from "./NoteWorkpointModal";
 import NotifyModal from "./NotifyModal";
 import FeedbackModal from "./FeedbackModal";
 import AffiliateModal from "./AffiliateModal";
+import { AiStudioModal } from "../../../components/ai-studio/AiStudioModal";
 import SearchIcon from '@mui/icons-material/Search';
 
 const { Header } = Layout;
@@ -30,6 +32,7 @@ export default function AppHeader() {
   const [notificationOpen, setNotificationOpen] = useState(false);
   const [feedbackOpen, setFeedbackOpen] = useState(false);
   const [affiliateOpen, setAffiliateOpen] = useState(false);
+  const [aiStudioOpen, setAiStudioOpen] = useState(false);
   const { username, userId, userRole, userRoleId, userLeadId, workspaces, setWorkspaces, fullName } = useUser();
   const [questionOpen, setQuestionOpen] = useState(false);
   const { getNotifyList, notifyList } = useUser();
@@ -139,6 +142,22 @@ export default function AppHeader() {
             {/* Menu Chat Group List */}
             <ChatGroupList />
 
+            {/* Nút Toolx AI Studio 4K */}
+            <Tooltip title="Toolx AI Studio 4K (Tạo ảnh, Sửa ảnh & Hội thoại AI)">
+              <button
+                type="button"
+                onClick={() => setAiStudioOpen(true)}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gradient-to-r from-violet-600 via-indigo-600 to-emerald-500 hover:from-violet-500 hover:to-emerald-400 text-white font-bold text-xs shadow-sm hover:shadow-md transition-all cursor-pointer border-none hover:scale-105 active:scale-95"
+                title="Toolx AI Studio 4K"
+              >
+                <Sparkles className="w-3.5 h-3.5 text-amber-300 animate-pulse" />
+                <span className="hidden sm:inline">AI Studio</span>
+                <span className="text-[10px] px-1.5 py-0.2 bg-white/25 rounded-full uppercase font-extrabold tracking-wider">
+                  4K
+                </span>
+              </button>
+            </Tooltip>
+
             {/* Nút Góp ý Admake */}
             <Tooltip title="Góp ý Admake">
               <button
@@ -195,6 +214,9 @@ export default function AppHeader() {
 
       {/* Modal Affiliate Giới thiệu Admake */}
       <AffiliateModal open={affiliateOpen} onCancel={() => setAffiliateOpen(false)} />
+
+      {/* Modal Toolx AI Studio 4K */}
+      <AiStudioModal open={aiStudioOpen} onCancel={() => setAiStudioOpen(false)} />
     </>
   );
 }
