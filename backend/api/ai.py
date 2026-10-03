@@ -434,10 +434,10 @@ def generate_with_gemini(prompt: str, aspect_ratio: str, gemini_key: str) -> tup
 
     raise Exception(last_err or "Lỗi không xác định khi gọi Google Gemini API")
 
-def chat_with_ai(messages: list, engine: str = "gpt", model: str = None) -> dict:
+def chat_with_ai(messages: list, engine: str = "gemini", model: str = None) -> dict:
     """Xử lý hội thoại thông thường với OpenAI (GPT) hoặc Google Gemini."""
     gemini_key, gpt_key = get_ai_studio_keys()
-    engine = (engine or "gpt").lower()
+    engine = (engine or "gemini").lower()
 
     if engine == "gemini":
         if not gemini_key and gpt_key:
@@ -1302,7 +1302,7 @@ def ai_chat():
     messages = data.get("messages") or []
     single_msg = (data.get("message") or data.get("prompt") or "").strip()
     current_quote = data.get("current_quote")
-    engine = (data.get("engine") or "gpt").lower()
+    engine = (data.get("engine") or "gemini").lower()
     model = data.get("model")
 
     if not messages and single_msg:
@@ -1384,7 +1384,7 @@ def api_ai_image_generate():
     if not raw_prompt:
         return jsonify({"success": False, "error": "Vui lòng nhập mô tả ảnh (prompt)."}), 400
 
-    engine = (data.get("engine") or "gpt").lower()
+    engine = (data.get("engine") or "gemini").lower()
     aspect_ratio = data.get("aspect_ratio") or "4:3"
     resolution = (data.get("resolution") or "4k").lower()
     use_ai_enhancer = data.get("use_ai_enhancer", True)

@@ -52,7 +52,7 @@ export const AiEditTab: React.FC<AiEditTabProps> = ({
 
   const handleEdit = async () => {
     if (!currentImageSrc) {
-      message.warning("Vui lòng tải lên ảnh hoặc chọn ảnh từ thư viện để sửa!");
+      message.warning("Vui lòng tải lên ảnh hoặc chọn thiết kế từ thư viện để sửa!");
       return;
     }
     if (!prompt.trim()) {
@@ -208,7 +208,7 @@ export const AiEditTab: React.FC<AiEditTabProps> = ({
         </div>
       </div>
 
-      {/* Nút hành động Sửa ảnh */}
+      {/* Nút hành động Sửa Thiết Kế */}
       <button
         type="button"
         disabled={loading || !currentImageSrc || !prompt.trim()}
@@ -218,12 +218,12 @@ export const AiEditTab: React.FC<AiEditTabProps> = ({
         {loading ? (
           <>
             <Spin size="small" />
-            <span>OpenAI Đang Sửa & Nâng Cấp Ảnh 4K...</span>
+            <span>AI Đang Sửa & Nâng Cấp Thiết Kế 4K...</span>
           </>
         ) : (
           <>
             <ScissorOutlined className="text-base" />
-            <span>🎨 Thực Hiện Sửa Ảnh (Generate Edit)</span>
+            <span>🎨 Thực Hiện Sửa Thiết Kế (Generate Edit)</span>
           </>
         )}
       </button>

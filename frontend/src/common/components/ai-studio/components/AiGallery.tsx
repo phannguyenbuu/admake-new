@@ -72,7 +72,7 @@ export const AiGallery: React.FC<AiGalleryProps> = ({
             onClick={() => setFilterType("all")}
             className={`px-2.5 py-1 rounded-lg font-semibold transition-all ${
               filterType === "all"
-                ? "bg-violet-600 text-white shadow-xs"
+                ? "bg-emerald-600 text-white shadow-xs"
                 : "text-slate-400 hover:text-slate-200"
             }`}
           >
@@ -83,22 +83,22 @@ export const AiGallery: React.FC<AiGalleryProps> = ({
             onClick={() => setFilterType("create")}
             className={`px-2.5 py-1 rounded-lg font-semibold transition-all ${
               filterType === "create"
-                ? "bg-violet-600 text-white shadow-xs"
+                ? "bg-emerald-600 text-white shadow-xs"
                 : "text-slate-400 hover:text-slate-200"
             }`}
           >
-            Tạo mới
+            Tạo thiết kế
           </button>
           <button
             type="button"
             onClick={() => setFilterType("edit")}
             className={`px-2.5 py-1 rounded-lg font-semibold transition-all ${
               filterType === "edit"
-                ? "bg-violet-600 text-white shadow-xs"
+                ? "bg-emerald-600 text-white shadow-xs"
                 : "text-slate-400 hover:text-slate-200"
             }`}
           >
-            Sửa / Inpainting
+            Sửa thiết kế
           </button>
         </div>
       </div>

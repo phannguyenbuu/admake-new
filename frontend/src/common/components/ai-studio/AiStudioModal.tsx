@@ -26,7 +26,7 @@ const STORAGE_GALLERY_KEY = "TOOLX_AI_STUDIO_GALLERY";
 
 export const AiStudioModal: React.FC<AiStudioModalProps> = ({ open, onCancel }) => {
   const apiHost = useApiHost();
-  const [activeTab, setActiveTab] = useState<"create" | "edit" | "chat">("create");
+  const [activeTab, setActiveTab] = useState<"chat" | "create" | "edit">("chat");
   const [status, setStatus] = useState<StudioStatus>({
     hasGeminiKey: true,
     hasGptKey: true,
@@ -97,7 +97,7 @@ export const AiStudioModal: React.FC<AiStudioModalProps> = ({ open, onCancel }) 
   const handleSendToEdit = (img: AiStudioImageItem) => {
     setSelectedImageForEdit(img);
     setActiveTab("edit");
-    message.info("Đã chuyển ảnh sang Tab Sửa Ảnh (Inpainting)!");
+    message.info("Đã chuyển thiết kế sang Tab Sửa Thiết Kế!");
   };
 
   const handleUseChatPrompt = (promptText: string) => {
@@ -149,24 +149,37 @@ export const AiStudioModal: React.FC<AiStudioModalProps> = ({ open, onCancel }) 
                 </span>
               </div>
               <p className="text-[11px] text-slate-400 m-0">
-                Tạo Ảnh 4K • Sửa Ảnh Inpainting • Hội Thoại Chuyên Gia In Ấn & Báo Giá
+                Hội Thoại Chuyên Gia • Tạo Thiết Kế 4K • Sửa Thiết Kế Inpainting
               </p>
             </div>
           </div>
 
-          {/* Tab Navigation Center */}
+          {/* Tab Navigation Center: 1. Hội Thoại AI, 2. Tạo Thiết Kế, 3. Sửa Thiết Kế */}
           <div className="flex items-center gap-1.5 bg-slate-900 p-1 rounded-2xl border border-slate-800 text-xs">
+            <button
+              type="button"
+              onClick={() => setActiveTab("chat")}
+              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl font-bold transition-all ${
+                activeTab === "chat"
+                  ? "bg-emerald-600 text-white shadow-md shadow-emerald-900/40"
+                  : "text-slate-400 hover:text-slate-200"
+              }`}
+            >
+              <CommentOutlined />
+              <span>💬 Hội Thoại AI</span>
+            </button>
+
             <button
               type="button"
               onClick={() => setActiveTab("create")}
               className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl font-bold transition-all ${
                 activeTab === "create"
-                  ? "bg-violet-600 text-white shadow-md shadow-violet-900/40"
+                  ? "bg-emerald-600 text-white shadow-md shadow-emerald-900/40"
                   : "text-slate-400 hover:text-slate-200"
               }`}
             >
               <Sparkles className="w-3.5 h-3.5" />
-              <span>✨ Tạo Ảnh Mới</span>
+              <span>✨ Tạo Thiết Kế</span>
             </button>
 
             <button
@@ -174,42 +187,22 @@ export const AiStudioModal: React.FC<AiStudioModalProps> = ({ open, onCancel }) 
               onClick={() => setActiveTab("edit")}
               className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl font-bold transition-all ${
                 activeTab === "edit"
-                  ? "bg-violet-600 text-white shadow-md shadow-violet-900/40"
+                  ? "bg-emerald-600 text-white shadow-md shadow-emerald-900/40"
                   : "text-slate-400 hover:text-slate-200"
               }`}
             >
               <ScissorOutlined />
-              <span>🎨 Sửa Ảnh & Inpainting</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setActiveTab("chat")}
-              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl font-bold transition-all ${
-                activeTab === "chat"
-                  ? "bg-violet-600 text-white shadow-md shadow-violet-900/40"
-                  : "text-slate-400 hover:text-slate-200"
-              }`}
-            >
-              <CommentOutlined />
-              <span>💬 Hội Thoại AI</span>
+              <span>🎨 Sửa Thiết Kế</span>
             </button>
           </div>
 
-          {/* Engine Status Badges & Close Button */}
+          {/* Status Badge & Close Button */}
           <div className="flex items-center gap-3">
             <div className="hidden md:flex items-center gap-2">
-              <Tooltip title={status.hasGptKey ? "OpenAI API Key đã sẵn sàng" : "Chưa có OpenAI API Key"}>
-                <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-900 border border-slate-800 text-[11px] font-semibold text-slate-300">
-                  <span className={`h-2 w-2 rounded-full ${status.hasGptKey ? "bg-violet-400 animate-pulse" : "bg-red-400"}`} />
-                  <span>OpenAI GPT</span>
-                </div>
-              </Tooltip>
-
-              <Tooltip title={status.hasGeminiKey ? "Google Gemini API Key đã sẵn sàng" : "Chưa có Gemini API Key"}>
-                <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-900 border border-slate-800 text-[11px] font-semibold text-slate-300">
-                  <span className={`h-2 w-2 rounded-full ${status.hasGeminiKey ? "bg-emerald-400 animate-pulse" : "bg-red-400"}`} />
-                  <span>Gemini</span>
+              <Tooltip title="Mô hình AI: Google Gemini">
+                <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-900 border border-emerald-500/30 text-[11px] font-semibold text-emerald-300">
+                  <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
+                  <span>Google (Gemini)</span>
                 </div>
               </Tooltip>
             </div>

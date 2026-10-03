@@ -64,7 +64,7 @@ export const AiCreateTab: React.FC<AiCreateTabProps> = ({
   onImageCreated,
   externalPrompt,
 }) => {
-  const [engine, setEngine] = useState<AiEngine>("gpt");
+  const [engine] = useState<AiEngine>("gemini");
   const [prompt, setPrompt] = useState<string>(externalPrompt || "");
   const [aspectRatio, setAspectRatio] = useState<AspectRatio>("4:3");
   const [resolution, setResolution] = useState<Resolution>("4k");
@@ -114,7 +114,7 @@ export const AiCreateTab: React.FC<AiCreateTabProps> = ({
 
   const handleGenerate = async () => {
     if (!prompt.trim()) {
-      message.warning("Vui lòng nhập mô tả ảnh cần tạo!");
+      message.warning("Vui lòng nhập mô tả thiết kế cần tạo!");
       return;
     }
 
@@ -135,7 +135,7 @@ export const AiCreateTab: React.FC<AiCreateTabProps> = ({
 
       const data = await res.json();
       if (!res.ok || !data.success) {
-        throw new Error(data.error || "Lỗi khi tạo ảnh");
+        throw new Error(data.error || "Lỗi khi tạo thiết kế");
       }
 
       const newImage: AiStudioImageItem = {
@@ -160,9 +160,9 @@ export const AiCreateTab: React.FC<AiCreateTabProps> = ({
       };
 
       onImageCreated(newImage);
-      message.success(`Tạo ảnh ${resolution.toUpperCase()} 300 DPI thành công!`);
+      message.success(`Tạo thiết kế ${resolution.toUpperCase()} 300 DPI thành công!`);
     } catch (err: any) {
-      message.error(err.message || "Lỗi tạo ảnh AI");
+      message.error(err.message || "Lỗi tạo thiết kế AI");
     } finally {
       setLoading(false);
     }
@@ -170,48 +170,11 @@ export const AiCreateTab: React.FC<AiCreateTabProps> = ({
 
   return (
     <div className="flex flex-col gap-4 text-slate-200">
-      {/* Chọn AI Engine */}
-      <div className="flex flex-col gap-1.5">
-        <label className="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center justify-between">
-          <span>1. Chọn AI Engine Tạo Ảnh</span>
-          <span className="text-[11px] font-normal text-slate-400">
-            {engine === "gpt" ? "OpenAI gpt-image-1" : "Google Imagen 3"}
-          </span>
-        </label>
-        <div className="grid grid-cols-2 gap-2.5">
-          <button
-            type="button"
-            onClick={() => setEngine("gpt")}
-            className={`flex items-center justify-center gap-2 p-2.5 rounded-xl border font-bold text-xs transition-all ${
-              engine === "gpt"
-                ? "bg-violet-600/30 border-violet-500 text-violet-200 shadow-md shadow-violet-900/40"
-                : "bg-slate-900/80 border-slate-800 text-slate-400 hover:border-slate-700"
-            }`}
-          >
-            <span className="h-2 w-2 rounded-full bg-violet-400 animate-pulse" />
-            <span>🟣 GPT (OpenAI)</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setEngine("gemini")}
-            className={`flex items-center justify-center gap-2 p-2.5 rounded-xl border font-bold text-xs transition-all ${
-              engine === "gemini"
-                ? "bg-emerald-600/30 border-emerald-500 text-emerald-200 shadow-md shadow-emerald-900/40"
-                : "bg-slate-900/80 border-slate-800 text-slate-400 hover:border-slate-700"
-            }`}
-          >
-            <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-            <span>🟢 Gemini (Google)</span>
-          </button>
-        </div>
-      </div>
-
       {/* Nhập Prompt */}
       <div className="flex flex-col gap-1.5">
         <div className="flex items-center justify-between">
           <label className="text-xs font-bold text-slate-300 uppercase tracking-wider">
-            2. Mô Tả Ảnh Cần Tạo (Prompt)
+            1. Mô Tả Thiết Kế Cần Tạo (Prompt)
           </label>
           <span className="text-[11px] text-slate-400">Tiếng Việt hoặc English</span>
         </div>
@@ -377,22 +340,22 @@ export const AiCreateTab: React.FC<AiCreateTabProps> = ({
         </div>
       </div>
 
-      {/* Nút hành động Tạo Ảnh */}
+      {/* Nút hành động Tạo Thiết Kế */}
       <button
         type="button"
         disabled={loading || !prompt.trim()}
         onClick={handleGenerate}
-        className="w-full py-3.5 px-4 rounded-xl font-extrabold text-sm text-white bg-gradient-to-r from-violet-600 via-indigo-600 to-emerald-600 hover:from-violet-500 hover:to-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-violet-950/50 transition-all hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2 cursor-pointer border-none"
+        className="w-full py-3.5 px-4 rounded-xl font-extrabold text-sm text-white bg-gradient-to-r from-emerald-600 via-teal-600 to-indigo-600 hover:from-emerald-500 hover:to-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-emerald-950/50 transition-all hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2 cursor-pointer border-none"
       >
         {loading ? (
           <>
             <Spin size="small" />
-            <span>AI Đang Xử Lý & Xuất Ảnh {resolution.toUpperCase()} 300 DPI...</span>
+            <span>AI Đang Xử Lý & Xuất Thiết Kế {resolution.toUpperCase()} 300 DPI...</span>
           </>
         ) : (
           <>
             <ThunderboltOutlined className="text-base text-yellow-300" />
-            <span>✨ Tiến Hành Tạo Ảnh {resolution.toUpperCase()} (300 DPI)</span>
+            <span>✨ Tiến Hành Tạo Thiết Kế {resolution.toUpperCase()} (300 DPI)</span>
           </>
         )}
       </button>

@@ -46,8 +46,8 @@ export const AiChatTab: React.FC<AiChatTabProps> = ({
   hasGptKey,
   onUseAsPrompt,
 }) => {
-  const [engine, setEngine] = useState<AiEngine>("gpt");
-  const [model, setModel] = useState<string>("gpt-4o-mini");
+  const [engine] = useState<AiEngine>("gemini");
+  const [model] = useState<string>("gemini-2.5-flash");
   const [messages, setMessages] = useState<ChatMessage[]>([DEFAULT_WELCOME]);
   const [inputText, setInputText] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
@@ -137,7 +137,7 @@ export const AiChatTab: React.FC<AiChatTabProps> = ({
     }
 
     onUseAsPrompt(promptIdea);
-    message.success("✨ Đã chuyển nội dung sang ô Tạo Ảnh!");
+    message.success("✨ Đã chuyển nội dung sang ô Tạo Thiết Kế!");
   };
 
   const totalChatTokens = messages.reduce((s, m) => s + (m.tokens || 0), 0);
@@ -145,38 +145,11 @@ export const AiChatTab: React.FC<AiChatTabProps> = ({
 
   return (
     <div className="flex flex-col h-[70vh] text-slate-200">
-      {/* Engine & Model Selector */}
+      {/* Header Info Bar */}
       <div className="flex flex-wrap items-center justify-between gap-3 p-3 bg-slate-950/90 rounded-xl border border-slate-800 text-xs shrink-0">
         <div className="flex items-center gap-2">
-          <span className="text-slate-400 font-bold uppercase text-[10px]">AI Engine:</span>
-          <button
-            type="button"
-            onClick={() => {
-              setEngine("gpt");
-              setModel("gpt-4o-mini");
-            }}
-            className={`px-3 py-1 rounded-lg font-bold text-xs transition-all ${
-              engine === "gpt"
-                ? "bg-violet-600 text-white shadow-xs"
-                : "bg-slate-900 text-slate-400 hover:text-slate-200"
-            }`}
-          >
-            🟣 OpenAI (GPT)
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              setEngine("gemini");
-              setModel("gemini-2.5-flash");
-            }}
-            className={`px-3 py-1 rounded-lg font-bold text-xs transition-all ${
-              engine === "gemini"
-                ? "bg-emerald-600 text-white shadow-xs"
-                : "bg-slate-900 text-slate-400 hover:text-slate-200"
-            }`}
-          >
-            🟢 Google (Gemini)
-          </button>
+          <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
+          <span className="text-slate-200 font-bold text-xs">Trợ Lý AI Chuyên Gia In Ấn & Báo Giá (Google Gemini)</span>
         </div>
 
         <div className="flex items-center gap-3">
@@ -248,7 +221,7 @@ export const AiChatTab: React.FC<AiChatTabProps> = ({
                         className="px-2 py-0.5 rounded bg-violet-950 hover:bg-violet-900 text-violet-300 border border-violet-800/50 transition-colors flex items-center gap-1 font-bold"
                       >
                         <Sparkles className="w-3 h-3 text-amber-400" />
-                        <span>Làm Prompt tạo ảnh</span>
+                        <span>Làm Prompt tạo thiết kế</span>
                       </button>
                     </div>
                   </div>
