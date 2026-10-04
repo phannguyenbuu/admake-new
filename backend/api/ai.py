@@ -443,8 +443,8 @@ def chat_with_ai(messages: list, engine: str = "gemini", model: str = None) -> d
         if not gemini_key:
             raise Exception("Chưa cấu hình [GeminiKey] trong D:/vps_go.md hoặc biến môi trường GEMINI_API_KEY")
 
-        target_model = model or "gemini-2.5-flash"
-        models_to_try = [target_model, "gemini-3.8-flash", "gemini-flash-latest"]
+        target_model = model or "gemini-3.6-flash"
+        models_to_try = [target_model, "gemini-3.5-flash", "gemini-3.1-flash-lite", "gemini-2.5-flash", "gemini-3.8-flash", "gemini-flash-latest"]
 
         gemini_contents = []
         system_instruction = None
@@ -1265,7 +1265,7 @@ def quote_signboard():
 
 
 # ==============================================================================
-# TOOLX AI STUDIO API ENDPOINTS
+# ADMAKE AI STUDIO API ENDPOINTS
 # ==============================================================================
 
 @ai_bp.route('/api/ai/studio-status', methods=['GET', 'OPTIONS'])

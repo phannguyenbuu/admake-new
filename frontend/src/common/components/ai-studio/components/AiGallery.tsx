@@ -38,7 +38,7 @@ export const AiGallery: React.FC<AiGalleryProps> = ({
     e.stopPropagation();
     const link = document.createElement("a");
     link.href = img.url;
-    link.download = `toolx_ai_${img.id}.png`;
+    link.download = `admake_ai_${img.id}.png`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);

@@ -204,12 +204,12 @@ const StatisticDashboard: IPage["Component"] = () => {
             ))}
           </div>
 
-          {/* Nút Toolx AI Studio 4K Pro */}
+          {/* Nút ADMAKE AI Studio 4K Pro */}
           <button
             type="button"
             onClick={() => setAiModalOpen(true)}
             className="flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-gradient-to-r from-violet-600 via-indigo-600 to-emerald-500 hover:from-violet-500 hover:to-emerald-400 text-white font-bold text-xs shadow-md shadow-violet-900/30 hover:shadow-lg transition-all cursor-pointer border-none hover:scale-105 active:scale-95"
-            title="Mở Toolx AI Studio (Tạo ảnh 4K, Inpainting & Hội thoại AI)"
+            title="Mở ADMAKE AI Studio (Hội thoại AI, Tạo thiết kế 4K & Sửa thiết kế)"
           >
             <Sparkles className="w-3.5 h-3.5 text-amber-300 animate-pulse" />
             <span>AI Studio</span>
@@ -810,7 +810,7 @@ const StatisticDashboard: IPage["Component"] = () => {
         )}
       </section>
 
-      {/* Modal Toolx AI Studio 4K Pro */}
+      {/* Modal ADMAKE AI Studio 4K Pro */}
       <AiStudioModal open={aiModalOpen} onCancel={() => setAiModalOpen(false)} />
     </div>
   ) : <UnPermissionBoard />;

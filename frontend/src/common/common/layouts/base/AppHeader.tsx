@@ -142,13 +142,13 @@ export default function AppHeader() {
             {/* Menu Chat Group List */}
             <ChatGroupList />
 
-            {/* Nút Toolx AI Studio 4K */}
-            <Tooltip title="Toolx AI Studio 4K (Tạo ảnh, Sửa ảnh & Hội thoại AI)">
+            {/* Nút ADMAKE AI Studio 4K */}
+            <Tooltip title="ADMAKE AI Studio 4K (Hội thoại AI, Tạo thiết kế & Sửa thiết kế)">
               <button
                 type="button"
                 onClick={() => setAiStudioOpen(true)}
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gradient-to-r from-violet-600 via-indigo-600 to-emerald-500 hover:from-violet-500 hover:to-emerald-400 text-white font-bold text-xs shadow-sm hover:shadow-md transition-all cursor-pointer border-none hover:scale-105 active:scale-95"
-                title="Toolx AI Studio 4K"
+                title="ADMAKE AI Studio 4K"
               >
                 <Sparkles className="w-3.5 h-3.5 text-amber-300 animate-pulse" />
                 <span className="hidden sm:inline">AI Studio</span>
@@ -215,7 +215,7 @@ export default function AppHeader() {
       {/* Modal Affiliate Giới thiệu Admake */}
       <AffiliateModal open={affiliateOpen} onCancel={() => setAffiliateOpen(false)} />
 
-      {/* Modal Toolx AI Studio 4K */}
+      {/* Modal ADMAKE AI Studio 4K */}
       <AiStudioModal open={aiStudioOpen} onCancel={() => setAiStudioOpen(false)} />
     </>
   );

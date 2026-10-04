@@ -23,13 +23,13 @@ const DEFAULT_WELCOME: ChatMessage = {
   id: "welcome",
   role: "assistant",
   content:
-    "Xin chào! Tôi là Trợ Lý Chuyên Gia AI Studio của Admake & Toolx. Tôi có thể hỗ trợ bạn:\n\n" +
+    "Xin chào! Tôi là Trợ Lý Chuyên Gia AI Studio của ADMAKE. Tôi có thể hỗ trợ bạn:\n\n" +
     "• Tư vấn quy cách kỹ thuật, vật tư in ấn, bảng hiệu quảng cáo (Alu, Mica, Bạt 3M, LED).\n" +
-    "• Lên ý tưởng thiết kế, phối màu và soạn Prompt chi tiết để tạo ảnh 4K.\n" +
+    "• Lên ý tưởng thiết kế, phối màu và soạn Prompt chi tiết để tạo thiết kế 4K.\n" +
     "• Giải đáp mọi thắc mắc kỹ thuật ngành in và marketing thương hiệu.\n\n" +
     "Bạn muốn tìm hiểu hoặc lên ý tưởng gì hôm nay?",
-  engine: "gpt",
-  model: "gpt-4o-mini",
+  engine: "gemini",
+  model: "gemini-3.6-flash",
   timestamp: new Date().toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" }),
 };
 

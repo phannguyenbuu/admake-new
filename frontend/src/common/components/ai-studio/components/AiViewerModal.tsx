@@ -31,7 +31,7 @@ export const AiViewerModal: React.FC<AiViewerModalProps> = ({
   const handleDownload = () => {
     const link = document.createElement("a");
     link.href = image.url;
-    link.download = `toolx_ai_${image.id}_${image.resolution}_300dpi.png`;
+    link.download = `admake_ai_${image.id}_${image.resolution}_300dpi.png`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);

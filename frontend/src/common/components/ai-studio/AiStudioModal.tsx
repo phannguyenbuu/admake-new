@@ -22,7 +22,7 @@ interface AiStudioModalProps {
   onCancel: () => void;
 }
 
-const STORAGE_GALLERY_KEY = "TOOLX_AI_STUDIO_GALLERY";
+const STORAGE_GALLERY_KEY = "ADMAKE_AI_STUDIO_GALLERY";
 
 export const AiStudioModal: React.FC<AiStudioModalProps> = ({ open, onCancel }) => {
   const apiHost = useApiHost();
@@ -142,7 +142,7 @@ export const AiStudioModal: React.FC<AiStudioModalProps> = ({ open, onCancel }) 
             <div>
               <div className="flex items-center gap-2">
                 <span className="font-extrabold text-sm sm:text-base text-transparent bg-clip-text bg-gradient-to-r from-violet-400 via-indigo-300 to-emerald-400 tracking-wide">
-                  TOOLX AI STUDIO
+                  ADMAKE AI STUDIO
                 </span>
                 <span className="text-[9px] px-1.5 py-0.5 rounded font-extrabold bg-violet-500/20 text-violet-300 border border-violet-500/30 uppercase tracking-widest">
                   PRO 4K
