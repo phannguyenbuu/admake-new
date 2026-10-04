@@ -149,7 +149,7 @@ export const AiChatTab: React.FC<AiChatTabProps> = ({
       <div className="flex flex-wrap items-center justify-between gap-3 p-3 bg-slate-950/90 rounded-xl border border-slate-800 text-xs shrink-0">
         <div className="flex items-center gap-2">
           <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-          <span className="text-slate-200 font-bold text-xs">Trợ Lý AI Chuyên Gia In Ấn & Báo Giá (Google Gemini)</span>
+          <span className="text-slate-200 font-bold text-xs">Trợ Lý AI Chuyên Gia In Ấn & Báo Giá</span>
         </div>
 
         <div className="flex items-center gap-3">

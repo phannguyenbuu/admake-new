@@ -196,16 +196,8 @@ export const AiStudioModal: React.FC<AiStudioModalProps> = ({ open, onCancel }) 
             </button>
           </div>
 
-          {/* Status Badge & Close Button */}
+          {/* Close Button */}
           <div className="flex items-center gap-3">
-            <div className="hidden md:flex items-center gap-2">
-              <Tooltip title="Mô hình AI: Google Gemini">
-                <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-900 border border-emerald-500/30 text-[11px] font-semibold text-emerald-300">
-                  <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-                  <span>Google (Gemini)</span>
-                </div>
-              </Tooltip>
-            </div>
 
             <button
               type="button"
