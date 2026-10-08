@@ -16,6 +16,7 @@ import { AiEditTab } from "./tabs/AiEditTab";
 import { AiChatTab } from "./tabs/AiChatTab";
 import { AiGallery } from "./components/AiGallery";
 import { AiViewerModal } from "./components/AiViewerModal";
+import { Signboard3DStudio } from "../ai-pricing/Signboard3DStudio";
 
 interface AiStudioModalProps {
   open: boolean;
@@ -26,7 +27,7 @@ const STORAGE_GALLERY_KEY = "ADMAKE_AI_STUDIO_GALLERY";
 
 export const AiStudioModal: React.FC<AiStudioModalProps> = ({ open, onCancel }) => {
   const apiHost = useApiHost();
-  const [activeTab, setActiveTab] = useState<"chat" | "create" | "edit">("chat");
+  const [activeTab, setActiveTab] = useState<"3d_workflow" | "chat" | "create" | "edit">("3d_workflow");
   const [status, setStatus] = useState<StudioStatus>({
     hasGeminiKey: true,
     hasGptKey: true,
@@ -154,8 +155,21 @@ export const AiStudioModal: React.FC<AiStudioModalProps> = ({ open, onCancel }) 
             </div>
           </div>
 
-          {/* Tab Navigation Center: 1. Hội Thoại AI, 2. Tạo Thiết Kế, 3. Sửa Thiết Kế */}
+          {/* Tab Navigation Center: 1. 3D & Báo Giá (GenAI), 2. Hội Thoại AI, 3. Tạo Thiết Kế, 4. Sửa Thiết Kế */}
           <div className="flex items-center gap-1.5 bg-slate-900 p-1 rounded-2xl border border-slate-800 text-xs">
+            <button
+              type="button"
+              onClick={() => setActiveTab("3d_workflow")}
+              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl font-bold transition-all ${
+                activeTab === "3d_workflow"
+                  ? "bg-gradient-to-r from-cyan-600 to-indigo-600 text-white shadow-md shadow-cyan-900/40"
+                  : "text-slate-400 hover:text-slate-200"
+              }`}
+            >
+              <Sparkles className="w-3.5 h-3.5 animate-pulse text-cyan-300" />
+              <span>🧊 3D & Báo Giá (GenAI)</span>
+            </button>
+
             <button
               type="button"
               onClick={() => setActiveTab("chat")}
@@ -209,48 +223,54 @@ export const AiStudioModal: React.FC<AiStudioModalProps> = ({ open, onCancel }) 
           </div>
         </div>
 
-        {/* Studio Workspace Content (2 Cột) */}
-        <div className="flex-1 overflow-hidden p-4 grid grid-cols-1 lg:grid-cols-12 gap-4 bg-slate-950">
-          {/* Cột Trái: Tab Nội Dung Đang Kích Hoạt (5/12) */}
-          <div className="lg:col-span-5 h-full overflow-y-auto pr-1 bg-slate-900/50 rounded-2xl border border-slate-800/80 p-4">
-            {activeTab === "create" && (
-              <AiCreateTab
-                apiHost={apiHost}
-                hasGeminiKey={status.hasGeminiKey}
-                hasGptKey={status.hasGptKey}
-                onImageCreated={handleImageCreated}
-                externalPrompt={promptFromChat}
-              />
-            )}
-
-            {activeTab === "edit" && (
-              <AiEditTab
-                apiHost={apiHost}
-                sourceImage={selectedImageForEdit}
-                onImageCreated={handleImageCreated}
-              />
-            )}
-
-            {activeTab === "chat" && (
-              <AiChatTab
-                apiHost={apiHost}
-                hasGeminiKey={status.hasGeminiKey}
-                hasGptKey={status.hasGptKey}
-                onUseAsPrompt={handleUseChatPrompt}
-              />
-            )}
+        {/* Studio Workspace Content */}
+        {activeTab === "3d_workflow" ? (
+          <div className="flex-1 overflow-y-auto p-4 bg-slate-950">
+            <Signboard3DStudio />
           </div>
+        ) : (
+          <div className="flex-1 overflow-hidden p-4 grid grid-cols-1 lg:grid-cols-12 gap-4 bg-slate-950">
+            {/* Cột Trái: Tab Nội Dung Đang Kích Hoạt (5/12) */}
+            <div className="lg:col-span-5 h-full overflow-y-auto pr-1 bg-slate-900/50 rounded-2xl border border-slate-800/80 p-4">
+              {activeTab === "create" && (
+                <AiCreateTab
+                  apiHost={apiHost}
+                  hasGeminiKey={status.hasGeminiKey}
+                  hasGptKey={status.hasGptKey}
+                  onImageCreated={handleImageCreated}
+                  externalPrompt={promptFromChat}
+                />
+              )}
 
-          {/* Cột Phải: Thư Viện Ảnh & Xem Trước (7/12) */}
-          <div className="lg:col-span-7 h-full overflow-hidden">
-            <AiGallery
-              images={galleryImages}
-              onSelectImage={(img) => setViewingImage(img)}
-              onSendToEdit={handleSendToEdit}
-              onDeleteImage={handleDeleteImage}
-            />
+              {activeTab === "edit" && (
+                <AiEditTab
+                  apiHost={apiHost}
+                  sourceImage={selectedImageForEdit}
+                  onImageCreated={handleImageCreated}
+                />
+              )}
+
+              {activeTab === "chat" && (
+                <AiChatTab
+                  apiHost={apiHost}
+                  hasGeminiKey={status.hasGeminiKey}
+                  hasGptKey={status.hasGptKey}
+                  onUseAsPrompt={handleUseChatPrompt}
+                />
+              )}
+            </div>
+
+            {/* Cột Phải: Thư Viện Ảnh & Xem Trước (7/12) */}
+            <div className="lg:col-span-7 h-full overflow-hidden">
+              <AiGallery
+                images={galleryImages}
+                onSelectImage={(img) => setViewingImage(img)}
+                onSendToEdit={handleSendToEdit}
+                onDeleteImage={handleDeleteImage}
+              />
+            </div>
           </div>
-        </div>
+        )}
       </Modal>
 
       {/* Modal Xem Phóng To Siêu Nét 4K */}

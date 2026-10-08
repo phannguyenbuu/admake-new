@@ -71,7 +71,7 @@ def api_ai_chat():
     if engine == "gemini":
         if not gemini_key:
             return jsonify({"error": "Chưa cấu hình [GeminiKey] trong D:/vps_go.md"}), 400
-        target_model = model or "gemini-2.5-flash"
+        target_model = model or "gemini-3.8-flash"
         gemini_contents = []
         for m in messages:
             role = "model" if m.get("role") in ("assistant", "model") else "user"

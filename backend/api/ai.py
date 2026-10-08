@@ -21,10 +21,15 @@ def get_ai_studio_keys():
     gpt_key = os.getenv("OPENAI_API_KEY", "") or os.getenv("GPT_API_KEY", "")
 
     candidate_paths = [
+        "D:/vps.md",
         "D:/vps_go.md",
+        "./vps.md",
         "./vps_go.md",
+        "/opt/vps.md",
         "/opt/vps_go.md",
+        "/root/vps.md",
         "/root/vps_go.md",
+        os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "vps.md"),
         os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "vps_go.md")
     ]
     for p in candidate_paths:
@@ -1490,4 +1495,383 @@ def api_ai_image_edit():
 
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
+
+
+# ==============================================================================
+# GENAI TOOLXPRINT API INTEGRATION & 3D SIGNBOARD WORKFLOW
+# ==============================================================================
+GENAI_BASE_URL = "https://genai.toolxprint.com"
+
+SIGNBOARD_HINTS = [
+    # 1. BẢNG NHỎ & BIỂN VẪY
+    {
+        "id": "mini_vaccum_circle",
+        "category": "mini",
+        "title": "Biển vẫy Mica hút nổi tròn (D80cm)",
+        "badge": "Bảng nhỏ",
+        "dimensions": {"width": 0.8, "height": 0.8, "depth": 0.15},
+        "description": "Biển vẫy tròn 2 mặt mica Đài Loan hút nổi 3D, viền nhôm định hình sơn đen nhám, chân sắt uốn chữ L gắn tường, đèn LED đúc chống nước siêu sáng.",
+        "materials": {
+            "iron_type": "vuong_20",
+            "surface_type": "bat_khong_gan_uv",
+            "has_led": True,
+            "has_sheet_backing": False
+        },
+        "prompt": "Biển vẫy tròn mica hút nổi D80cm 2 mặt sáng bóng, viền nhôm đen sang trọng gắn tường mặt tiền quán cafe hiện đại."
+    },
+    {
+        "id": "mini_slim_lightbox",
+        "category": "mini",
+        "title": "Hộp đèn siêu mỏng nắp hít (0.6m x 1.2m)",
+        "badge": "Bảng nhỏ",
+        "dimensions": {"width": 0.6, "height": 1.2, "depth": 0.04},
+        "description": "Hộp đèn siêu mỏng dày 2.8cm, khung nhôm nắp hít nam châm cao cấp, mặt mica trong suốt dẫn sáng đều, tranh in Backlit film độ nét cao, đèn LED thanh viền cạnh.",
+        "materials": {
+            "iron_type": "vuong_20",
+            "surface_type": "mica_2_3mm",
+            "has_led": True,
+            "has_sheet_backing": False
+        },
+        "prompt": "Hộp đèn siêu mỏng nắp hít sang trọng kích thước 0.6m x 1.2m hiển thị menu đồ uống cho quán trà sữa/spa."
+    },
+    {
+        "id": "mini_inox_gold_office",
+        "category": "mini",
+        "title": "Biển công ty Inox vàng gương ăn mòn (0.4m x 0.6m)",
+        "badge": "Bảng nhỏ",
+        "dimensions": {"width": 0.6, "height": 0.4, "depth": 0.03},
+        "description": "Biển tên công ty Inox 304 mạ vàng gương ăn mòn chìm tinh xảo sơn màu sắc nét, vát cạnh 45 độ, đệm formex hoặc mica phía sau.",
+        "materials": {
+            "iron_type": "vuong_20",
+            "surface_type": "alu_guong_vang",
+            "has_led": False,
+            "has_sheet_backing": False
+        },
+        "prompt": "Biển công ty inox vàng gương 304 vát cạnh sáng bóng 0.4m x 0.6m gắn cửa văn phòng cao cấp."
+    },
+
+    # 2. BẢNG HIỆU MẶT TIỀN TRUNG BÌNH & LỚN
+    {
+        "id": "store_alu_mica_led",
+        "category": "storefront",
+        "title": "Mặt tiền Alu 3mm chữ nổi Mica LED sáng mặt (6m x 2.5m)",
+        "badge": "Mặt tiền",
+        "dimensions": {"width": 6.0, "height": 2.5, "depth": 0.25},
+        "description": "Bảng hiệu mặt tiền ốp Alu Alcorest 3mm 0.10 ngoài trời, khung sắt hộp 25x25 đan ô nhịp 1.2m, chữ nổi Mica Đài Loan uốn chân viền formex, gắn LED cụm 3 bóng siêu sáng.",
+        "materials": {
+            "iron_type": "vuong_25",
+            "surface_type": "alu_3mm",
+            "has_led": True,
+            "has_sheet_backing": True
+        },
+        "prompt": "Mặt tiền cửa hàng showroom 6m x 2.5m ốp alu xám đen cao cấp, chữ nổi mica màu trắng cam phát sáng LED rực rỡ buổi tối."
+    },
+    {
+        "id": "store_3m_uv_lightbox",
+        "category": "storefront",
+        "title": "Hộp đèn Bạt 3M in UV cao cấp không gân (8m x 2.8m)",
+        "badge": "Mặt tiền",
+        "dimensions": {"width": 8.0, "height": 2.8, "depth": 0.3},
+        "description": "Bảng hiệu hộp đèn bạt 3M nhập khẩu in UV sắc nét, không lộ gân khi chiếu sáng, khung sắt hộp 30x30 mã kẽm dày 1.2mm, bố trí hệ thống đèn LED module rọi đều chống chóa.",
+        "materials": {
+            "iron_type": "vuong_30",
+            "surface_type": "bat_3m_uv",
+            "has_led": True,
+            "has_sheet_backing": True
+        },
+        "prompt": "Bảng hiệu hộp đèn bạt 3M in UV khổ lớn 8m x 2.8m phẳng mịn không gân cho ngân hàng hoặc chuỗi bán lẻ hiện đại."
+    },
+    {
+        "id": "store_inox_gold_wood",
+        "category": "storefront",
+        "title": "Mặt dựng Lam sóng giả gỗ + Chữ Inox vàng gương hắt chân (7m x 3m)",
+        "badge": "Mặt tiền",
+        "dimensions": {"width": 7.0, "height": 3.0, "depth": 0.3},
+        "description": "Mặt tiền ốp thanh lam sóng composite giả gỗ ngoài trời chống nước chống cháy, bộ chữ nổi Inox 304 vàng gương sáng bóng hắt chân đèn LED vàng ấm 3000K sang trọng.",
+        "materials": {
+            "iron_type": "vuong_30",
+            "surface_type": "alu_guong_vang",
+            "has_led": True,
+            "has_sheet_backing": True
+        },
+        "prompt": "Mặt tiền nhà hàng sang trọng 7m x 3m ốp lam sóng gỗ ấm áp, chữ nổi inox vàng gương hắt ánh sáng chân vàng ấm lung linh."
+    },
+
+    # 3. PANO TẤM LỚN & BILLBOARD KHỔNG LỒ
+    {
+        "id": "pano_wall_interchange",
+        "category": "billboard",
+        "title": "Pano ốp tường góc ngã tư lớn (12m x 6m)",
+        "badge": "Pano lớn",
+        "dimensions": {"width": 12.0, "height": 6.0, "depth": 0.4},
+        "description": "Pano quảng cáo tấm lớn 72m2 ốp mặt hông tòa nhà góc ngã tư giao lộ, khung giàn sắt hộp đan kép 30x30 và V4 gia cố chịu gió mạnh, bạt 2 da xám chống xuyên sáng, dàn 6 đèn pha LED 100W vươn ra ngoài.",
+        "materials": {
+            "iron_type": "vuong_30",
+            "surface_type": "bat_2da",
+            "has_led": True,
+            "has_sheet_backing": False
+        },
+        "prompt": "Pano tấm lớn 12m x 6m ốp hông tòa nhà ngã tư đông đúc, căng bạt phẳng tuyệt đối, đèn pha chiếu sáng rực rỡ nhìn từ xa."
+    },
+    {
+        "id": "billboard_giant_pillar",
+        "category": "billboard",
+        "title": "Billboard Cột thép tròn khổng lồ cao tốc (15m x 8m cao 18m)",
+        "badge": "Billboard khổng lồ",
+        "dimensions": {"width": 15.0, "height": 8.0, "depth": 1.5},
+        "description": "Biển quảng cáo tấm lớn một cột trụ thép tròn D1000 dày 14mm, kết cấu giàn không gian 2 mặt 120m2/mặt, móng bê tông đúc chịu bão cấp 12, sàn thao tác kiểm tra an toàn, 10 đèn pha LED 200W.",
+        "materials": {
+            "iron_type": "vuong_30",
+            "surface_type": "bat_3m_uv",
+            "has_led": True,
+            "has_sheet_backing": False
+        },
+        "prompt": "Billboard khổng lồ một cột trụ thép cao 18m kích thước bảng 15m x 8m bên cạnh tuyến đường cao tốc thông thoáng."
+    }
+]
+
+@ai_bp.route('/api/ai/genai/status', methods=['GET', 'OPTIONS'])
+def api_genai_status():
+    """Proxy kiểm tra trạng thái từ GenAI Toolxprint Bridge"""
+    if request.method == 'OPTIONS':
+        return jsonify({"ok": True}), 200
+    try:
+        r = requests.get(f"{GENAI_BASE_URL}/api/status", timeout=10)
+        return jsonify(r.json()), r.status_code
+    except Exception as e:
+        return jsonify({"status": "offline", "error": str(e), "service": "GenAI Bridge"}), 502
+
+@ai_bp.route('/api/ai/genai/prompt-hints', methods=['GET', 'OPTIONS'])
+def api_genai_prompt_hints():
+    """Lấy danh sách Prompt Hints kết hợp giữa GenAI và bộ Hint quảng cáo Admake"""
+    if request.method == 'OPTIONS':
+        return jsonify({"ok": True}), 200
+    try:
+        remote_hints = []
+        try:
+            r = requests.get(f"{GENAI_BASE_URL}/api/prompt_hints", timeout=6)
+            if r.status_code == 200:
+                remote_hints = r.json()
+        except Exception:
+            pass
+
+        return jsonify({
+            "success": True,
+            "signboard_hints": SIGNBOARD_HINTS,
+            "remote_hints": remote_hints
+        }), 200
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+@ai_bp.route('/api/ai/genai/jobs/create', methods=['POST', 'OPTIONS'])
+def api_genai_job_create():
+    """Tạo tác vụ sinh ảnh phối cảnh thực tế từ GenAI Toolxprint"""
+    if request.method == 'OPTIONS':
+        return jsonify({"ok": True}), 200
+    data = request.get_json(force=True, silent=True) or {}
+    try:
+        r = requests.post(f"{GENAI_BASE_URL}/api/jobs/create", json=data, timeout=30)
+        return jsonify(r.json()), r.status_code
+    except Exception as e:
+        return jsonify({"error": f"Lỗi kết nối GenAI Bridge: {str(e)}"}), 502
+
+@ai_bp.route('/api/ai/genai/jobs/edit-full', methods=['POST', 'OPTIONS'])
+def api_genai_job_edit_full():
+    """Chỉnh sửa toàn bộ ảnh phối cảnh theo yêu cầu mới qua GenAI"""
+    if request.method == 'OPTIONS':
+        return jsonify({"ok": True}), 200
+    data = request.get_json(force=True, silent=True) or {}
+    try:
+        r = requests.post(f"{GENAI_BASE_URL}/api/jobs/edit-full", json=data, timeout=30)
+        return jsonify(r.json()), r.status_code
+    except Exception as e:
+        return jsonify({"error": f"Lỗi kết nối GenAI Bridge: {str(e)}"}), 502
+
+@ai_bp.route('/api/ai/genai/jobs/edit-inpaint', methods=['POST', 'OPTIONS'])
+def api_genai_job_edit_inpaint():
+    """Chỉnh sửa cục bộ (Inpaint với tọa độ pins) qua GenAI"""
+    if request.method == 'OPTIONS':
+        return jsonify({"ok": True}), 200
+    data = request.get_json(force=True, silent=True) or {}
+    try:
+        r = requests.post(f"{GENAI_BASE_URL}/api/jobs/edit-inpaint", json=data, timeout=30)
+        return jsonify(r.json()), r.status_code
+    except Exception as e:
+        return jsonify({"error": f"Lỗi kết nối GenAI Bridge: {str(e)}"}), 502
+
+@ai_bp.route('/api/ai/genai/jobs/<job_id>', methods=['GET', 'OPTIONS'])
+def api_genai_job_get(job_id):
+    """Polling lấy trạng thái và URL kết quả ảnh của job"""
+    if request.method == 'OPTIONS':
+        return jsonify({"ok": True}), 200
+    try:
+        r = requests.get(f"{GENAI_BASE_URL}/api/jobs/{job_id}", timeout=10)
+        return jsonify(r.json()), r.status_code
+    except Exception as e:
+        return jsonify({"error": f"Lỗi lấy trạng thái job: {str(e)}"}), 502
+
+@ai_bp.route('/api/ai/genai/gallery', methods=['GET', 'OPTIONS'])
+def api_genai_gallery():
+    """Lấy danh sách ảnh đã tạo từ GenAI Gallery"""
+    if request.method == 'OPTIONS':
+        return jsonify({"ok": True}), 200
+    try:
+        r = requests.get(f"{GENAI_BASE_URL}/api/gallery", timeout=15)
+        return jsonify(r.json()), r.status_code
+    except Exception as e:
+        return jsonify({"error": f"Lỗi lấy gallery: {str(e)}"}), 502
+
+@ai_bp.route('/api/ai/3d/hints', methods=['GET', 'OPTIONS'])
+def api_ai_3d_hints():
+    """Lấy danh sách Hint chuyên dụng về quảng cáo từ bảng nhỏ đến bảng khổng lồ"""
+    if request.method == 'OPTIONS':
+        return jsonify({"ok": True}), 200
+    return jsonify({
+        "success": True,
+        "hints": SIGNBOARD_HINTS
+    }), 200
+
+@ai_bp.route('/api/ai/3d/generate', methods=['POST', 'OPTIONS'])
+def api_ai_3d_generate():
+    """Phân tích yêu cầu khách hàng và sinh mô hình 3D + bóc tách vật tư bằng Google Gemini"""
+    if request.method == 'OPTIONS':
+        return jsonify({"ok": True}), 200
+
+    data = request.get_json(force=True, silent=True) or {}
+    user_prompt = (data.get("prompt") or "").strip()
+    hint_id = data.get("hint_id")
+    custom_dim = data.get("dimensions") or {}
+    custom_mat = data.get("materials") or {}
+
+    selected_hint = next((h for h in SIGNBOARD_HINTS if h["id"] == hint_id), None)
+    if not user_prompt and selected_hint:
+        user_prompt = selected_hint["prompt"]
+
+    if not user_prompt:
+        return jsonify({"success": False, "error": "Vui lòng nhập mô tả yêu cầu hoặc chọn một mẫu Hint quảng cáo."}), 400
+
+    gemini_key, _ = get_ai_studio_keys()
+    if not gemini_key:
+        return jsonify({"success": False, "error": "Không tìm thấy [GeminiKey] trong D:/vps.md hoặc D:/vps_go.md"}), 500
+
+    system_instruction = (
+        "Bạn là Kỹ Sư Trưởng Thiết Kế Kết Cấu 3D & Bóc Tách Dự Toán Biển Bảng Quảng Cáo tại ADMAKE.\n"
+        "Nhiệm vụ của bạn là nhận yêu cầu của khách hàng (từ bảng nhỏ, hộp đèn, biển vẫy, mặt tiền, đến pano tấm lớn và billboard khổng lồ), "
+        "sau đó tính toán quy chuẩn kết cấu và trả về DUY NHẤT một chuỗi JSON hợp lệ (không chứa markdown, không có ```json).\n\n"
+        "Định dạng JSON bắt buộc:\n"
+        "{\n"
+        "  \"name\": \"Tên công trình bảng hiệu\",\n"
+        "  \"category\": \"mini\" | \"storefront\" | \"billboard\",\n"
+        "  \"category_label\": \"Bảng hiệu mặt tiền\" (hoặc Biển vẫy/Hộp đèn, Pano tấm lớn Billboard, Màn hình LED),\n"
+        "  \"description\": \"Mô tả kỹ thuật kết cấu và quy cách hoàn thiện\",\n"
+        "  \"dimensions\": {\"width\": 6.0, \"height\": 2.5, \"depth\": 0.25},\n"
+        "  \"elements\": [\n"
+        "    {\"name\": \"Khung sắt hộp 25x25\", \"type\": \"box\", \"position\": [0, 0, 0], \"scale\": [6.0, 2.5, 0.05], \"color\": \"#475569\"},\n"
+        "    {\"name\": \"Mặt bảng Alu 3mm\", \"type\": \"box\", \"position\": [0, 0, 0.03], \"scale\": [6.0, 2.5, 0.01], \"color\": \"#1e293b\"},\n"
+        "    {\"name\": \"Chữ nổi Mica LED sáng mặt\", \"type\": \"box\", \"position\": [0, 0.2, 0.08], \"scale\": [4.2, 0.7, 0.08], \"color\": \"#f59e0b\"},\n"
+        "    {\"name\": \"Slogan phụ\", \"type\": \"box\", \"position\": [0, -0.4, 0.06], \"scale\": [3.0, 0.3, 0.04], \"color\": \"#ffffff\"}\n"
+        "  ],\n"
+        "  \"materials_spec\": {\n"
+        "    \"iron_type\": \"vuong_25\",\n"
+        "    \"surface_type\": \"alu_3mm\",\n"
+        "    \"has_led\": true,\n"
+        "    \"has_sheet_backing\": true\n"
+        "  },\n"
+        "  \"render_prompt\": \"Photorealistic commercial photography of a modern storefront signboard...\"\n"
+        "}\n\n"
+        "Lưu ý quan trọng cho 3D Elements:\n"
+        "- Nếu là Billboard khổng lồ một cột trụ: Thêm 1 element type 'cylinder' cho cột trụ lớn ở vị trí [0, -height/2, 0], scale [1.0, 10.0, 1.0], color '#334155'.\n"
+        "- Nếu là bảng mặt tiền: Khung xương sắt đan ô, mặt bảng phẳng và chữ 3D nổi ra phía trước trục Z dương (+Z).\n"
+        "- Kích thước (dimensions.width, height, depth) tính bằng mét.\n"
+        "- Tọa độ position và scale tính bằng mét."
+    )
+
+    models_to_try = ["gemini-3.5-flash", "gemini-3.1-flash-lite", "gemini-3.6-flash", "gemini-2.5-flash"]
+    parsed_result = None
+    last_err = None
+
+    for m_name in models_to_try:
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/{m_name}:generateContent?key={gemini_key}"
+        payload = {
+            "contents": [{"parts": [{"text": f"Yêu cầu khách hàng: {user_prompt}\nThông tin bổ sung nếu có: Kích thước: {json.dumps(custom_dim)}, Vật tư: {json.dumps(custom_mat)}"}]}],
+            "generationConfig": {
+                "temperature": 0.3,
+                "responseMimeType": "application/json"
+            },
+            "systemInstruction": {"parts": [{"text": system_instruction}]}
+        }
+        try:
+            resp = requests.post(url, json=payload, timeout=40)
+            if resp.status_code == 200:
+                raw_text = resp.json()["candidates"][0]["content"]["parts"][0]["text"].strip()
+                if raw_text.startswith("```"):
+                    raw_text = raw_text.strip("`")
+                    if raw_text.startswith("json"):
+                        raw_text = raw_text[4:].strip()
+                parsed_result = json.loads(raw_text)
+                break
+            else:
+                last_err = f"Gemini {m_name} status {resp.status_code}: {resp.text[:200]}"
+        except Exception as e:
+            last_err = str(e)
+
+    # Nếu AI chưa trả về được thì dùng cấu hình mặc định từ Hint hoặc tạo cấu trúc fallback chuẩn xác
+    if not parsed_result:
+        w = float(custom_dim.get("width") or (selected_hint["dimensions"]["width"] if selected_hint else 6.0))
+        h = float(custom_dim.get("height") or (selected_hint["dimensions"]["height"] if selected_hint else 2.5))
+        d = float(custom_dim.get("depth") or (selected_hint["dimensions"]["depth"] if selected_hint else 0.25))
+        cat = selected_hint["category"] if selected_hint else ("billboard" if w >= 10 else "storefront")
+        
+        elements = [
+            {"name": "Khung xương sắt hộp", "type": "box", "position": [0, 0, 0], "scale": [w, h, 0.05], "color": "#475569"},
+            {"name": "Mặt bảng ốp dựng", "type": "box", "position": [0, 0, 0.03], "scale": [w, h, 0.01], "color": "#1e293b"},
+            {"name": "Bộ chữ nổi thương hiệu", "type": "box", "position": [0, 0.2, 0.08], "scale": [round(w * 0.7, 2), round(h * 0.35, 2), 0.08], "color": "#f59e0b"},
+            {"name": "Slogan phụ phát sáng", "type": "box", "position": [0, -round(h * 0.25, 2), 0.06], "scale": [round(w * 0.5, 2), round(h * 0.15, 2), 0.04], "color": "#ffffff"}
+        ]
+        if cat == "billboard":
+            elements.insert(0, {
+                "name": "Cột trụ thép tròn chịu lực",
+                "type": "cylinder",
+                "position": [0, -round(h * 1.2, 2), -0.2],
+                "scale": [1.0, round(h * 2.4, 2), 1.0],
+                "color": "#334155"
+            })
+
+        parsed_result = {
+            "name": selected_hint["title"] if selected_hint else "Bảng hiệu thiết kế 3D ADMAKE",
+            "category": cat,
+            "category_label": selected_hint["badge"] if selected_hint else "Bảng hiệu mặt tiền",
+            "description": selected_hint["description"] if selected_hint else f"Bảng hiệu kết cấu chuẩn kỹ thuật kích thước {w}m x {h}m.",
+            "dimensions": {"width": w, "height": h, "depth": d},
+            "elements": elements,
+            "materials_spec": {
+                "iron_type": "vuong_25" if w < 10 else "vuong_30",
+                "surface_type": "alu_3mm" if w < 10 else "bat_3m_uv",
+                "has_led": True,
+                "has_sheet_backing": True
+            },
+            "render_prompt": f"Professional realistic architectural photograph of {user_prompt}, photorealistic signboard render, 4k ultra high resolution, perfectly detailed."
+        }
+
+    # Tính toán bảng bóc tách vật tư & nhân công thực tế bằng calculate_signboard
+    dim_w = float(parsed_result.get("dimensions", {}).get("width") or 6.0)
+    dim_h = float(parsed_result.get("dimensions", {}).get("height") or 2.5)
+    mat_spec = parsed_result.get("materials_spec") or {}
+
+    calc_input = {
+        "width": dim_w,
+        "height": dim_h,
+        "iron_type": mat_spec.get("iron_type") or "vuong_25",
+        "surface_type": mat_spec.get("surface_type") or "alu_3mm",
+        "has_sheet_backing": mat_spec.get("has_sheet_backing", True),
+        "profit_margin": 30
+    }
+    calc_quote = calculate_signboard(calc_input)
+    parsed_result["quotation"] = calc_quote
+
+    return jsonify({
+        "success": True,
+        "data": parsed_result
+    }), 200
+
 
