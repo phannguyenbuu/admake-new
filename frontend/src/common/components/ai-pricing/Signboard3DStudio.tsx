@@ -49,6 +49,7 @@ import {
   Lightbulb,
   ClipboardList,
   Check,
+  X,
 } from "lucide-react";
 
 const WORKFLOW_STEPS = [
@@ -102,7 +103,11 @@ const WORKFLOW_STEPS = [
   },
 ];
 
-export const Signboard3DStudio: React.FC = () => {
+export interface Signboard3DStudioProps {
+  onClose?: () => void;
+}
+
+export const Signboard3DStudio: React.FC<Signboard3DStudioProps> = ({ onClose }) => {
   // Navigation Steps
   const [currentStep, setCurrentStep] = useState<number>(1);
 
@@ -432,8 +437,9 @@ export const Signboard3DStudio: React.FC = () => {
   return (
     <div className="flex flex-col h-full bg-white text-slate-800 rounded-2xl border border-slate-200 p-4 md:p-6 shadow-xs space-y-6">
       {/* Chevron Arrow Timeline Stepper (Timeline phong cách mũi tên đa sắc) */}
-      <div className="flex items-center justify-center w-full pb-3 border-b border-slate-200 overflow-x-auto">
-        <div className="flex items-center py-1 px-1">
+      <div className="flex items-center justify-between w-full pb-3 border-b border-slate-200">
+        <div className="flex-1 flex items-center justify-center overflow-x-auto py-1 px-1">
+          <div className="flex items-center">
             {WORKFLOW_STEPS.map((item, index) => {
               const Icon = item.icon;
               const isActive = currentStep === item.step;
@@ -491,6 +497,18 @@ export const Signboard3DStudio: React.FC = () => {
             })}
           </div>
         </div>
+
+        {onClose && (
+          <button
+            type="button"
+            onClick={onClose}
+            className="ml-3 p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-800 transition-colors border border-slate-200 cursor-pointer shrink-0"
+            title="Đóng AI Studio"
+          >
+            <X className="w-4 h-4 font-bold" />
+          </button>
+        )}
+      </div>
 
       {/* Main Content Area based on currentStep */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 min-h-[550px]">
