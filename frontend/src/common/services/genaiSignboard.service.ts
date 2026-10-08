@@ -227,6 +227,167 @@ class GenAISignboardService {
           { name: "Chân đệm nổi 15mm tạo bóng đổ", type: "box", position: [0.15, 0, 0.005], scale: [2.2, 0.7, 0.015], color: "#cbd5e1" }
         ]
       },
+      // 7. Biển công ty mica trong suốt 4 ốc chân kính Inox (Ảnh Acrylic-Sign-Board-1.jpg)
+      {
+        id: "sample_acrylic_transparent",
+        category: "mini",
+        title: "Biển công ty mica trong suốt 4 ốc chân kính Inox (1.0m x 0.8m)",
+        badge: "Biển công ty",
+        image_url: "/signs/sign_acrylic_transparent.jpg",
+        dimensions: { width: 1.0, height: 0.8, depth: 0.05 },
+        description: "Tấm acrylic / mica trong suốt cao cấp dày 8mm mài bóng cạnh kim cương, bắt 4 ốc chân kính Inox 304 giữ cách tường 25mm, in UV mặt sau logo HealthWave sắc nét.",
+        materials: { iron_type: "vuong_20", surface_type: "mica_2_3mm", has_led: false, has_sheet_backing: false },
+        prompt: "Biển tên công ty chăm sóc sức khỏe HealthWave 1.0m x 0.8m tấm nền mica trong suốt bắt 4 ốc chân kính inox sáng loáng gắn tường sảnh hiện đại.",
+        elements: [
+          { name: "Tấm nền mica trong suốt dày 8mm", type: "box", position: [0, 0, 0.02], scale: [1.0, 0.8, 0.012], color: "#e2e8f0" },
+          { name: "Ốc chân kính Inox góc trên trái", type: "cylinder", position: [-0.44, 0.34, 0.015], scale: [0.035, 0.035, 0.035], color: "#cbd5e1" },
+          { name: "Ốc chân kính Inox góc trên phải", type: "cylinder", position: [0.44, 0.34, 0.015], scale: [0.035, 0.035, 0.035], color: "#cbd5e1" },
+          { name: "Ốc chân kính Inox góc dưới trái", type: "cylinder", position: [-0.44, -0.34, 0.015], scale: [0.035, 0.035, 0.035], color: "#cbd5e1" },
+          { name: "Ốc chân kính Inox góc dưới phải", type: "cylinder", position: [0.44, -0.34, 0.015], scale: [0.035, 0.035, 0.035], color: "#cbd5e1" },
+          { name: "Logo mầm cây cam & xanh", type: "box", position: [0, 0.12, 0.03], scale: [0.32, 0.32, 0.01], color: "#ea580c" },
+          { name: "Chữ thương hiệu HealthWave", type: "box", position: [0, -0.16, 0.03], scale: [0.65, 0.14, 0.01], color: "#0f172a" },
+          { name: "Dòng slogan YOUR BUSINESS TAGLINE", type: "box", position: [0, -0.26, 0.03], scale: [0.55, 0.05, 0.008], color: "#475569" }
+        ]
+      },
+      // 8. Hộp đèn mặt tiền chuỗi kem trà sữa Mixue (Ảnh images.jfif)
+      {
+        id: "sample_mixue_red_facade",
+        category: "storefront",
+        title: "Hộp đèn mặt tiền chuỗi kem trà sữa Mixue (6.5m x 1.4m)",
+        badge: "Mặt tiền chuỗi",
+        image_url: "/signs/sign_mixue_red_facade.jpg",
+        dimensions: { width: 6.5, height: 1.4, depth: 0.25 },
+        description: "Hộp đèn mặt tiền chuỗi kem trà sữa Mixue, mặt bạt 3M hoặc bạt không gân in UV màu đỏ tươi rực rỡ, chiếu sáng xuyên đèn LED mô đun siêu sáng bên trong, logo Người tuyết và chữ MIXUE phát sáng trắng.",
+        materials: { iron_type: "vuong_25", surface_type: "bat_3m_uv", has_led: true, has_sheet_backing: true },
+        prompt: "Bảng hiệu hộp đèn mặt tiền chuỗi kem trà sữa Mixue 6.5m x 1.4m màu đỏ rực rỡ ban đêm, logo Người tuyết đội vương miện cầm kem và chữ MIXUE sáng rực.",
+        elements: [
+          { name: "Khung xương sắt hộp 25x25", type: "box", position: [0, 0, -0.05], scale: [6.5, 1.4, 0.06], color: "#334155" },
+          { name: "Hộp đèn mặt bạt đỏ rực phát sáng", type: "box", position: [0, 0, 0], scale: [6.5, 1.4, 0.22], color: "#dc2626" },
+          { name: "Logo Người tuyết Mixue (Trái)", type: "box", position: [-2.0, 0, 0.12], scale: [0.9, 1.1, 0.02], color: "#ffffff" },
+          { name: "Vương miện & Cây kem", type: "box", position: [-2.3, 0.2, 0.13], scale: [0.2, 0.5, 0.02], color: "#facc15" },
+          { name: "Cụm chữ MIXUE nổi bật màu trắng", type: "box", position: [0.8, 0.18, 0.12], scale: [3.6, 0.65, 0.02], color: "#ffffff" },
+          { name: "Dòng chữ SINCE 1997 ICE CREAM & TEA", type: "box", position: [0.8, -0.28, 0.12], scale: [3.4, 0.2, 0.015], color: "#ffffff" },
+          { name: "Biển vẫy phụ bên hông", type: "box", position: [3.45, 0.1, 0.4], scale: [0.5, 0.9, 0.12], color: "#b91c1c" }
+        ]
+      },
+      // 9. Hộp đèn đỏ mặt tiền kèm dàn 5 đèn rọi Gooseneck (Ảnh images (1).jfif)
+      {
+        id: "sample_lightbox_spotlights",
+        category: "storefront",
+        title: "Hộp đèn đỏ mặt tiền kèm dàn 5 đèn rọi Gooseneck (4.2m x 1.2m)",
+        badge: "Hộp đèn + Đèn rọi",
+        image_url: "/signs/sign_lightbox_spotlights.jpg",
+        dimensions: { width: 4.2, height: 1.2, depth: 0.25 },
+        description: "Hộp đèn mặt tiền ốp alu đỏ tươi kết hợp đèn LED bên trong, phía trên gắn dàn 5 cần đèn rọi spotlight kim loại uốn cong rọi thẳng vào bề mặt bảng hiệu tạo hiệu ứng kiến trúc cao cấp.",
+        materials: { iron_type: "vuong_25", surface_type: "alu_3mm", has_led: true, has_sheet_backing: true },
+        prompt: "Bảng hiệu hộp đèn màu đỏ tươi 4.2m x 1.2m gắn trên tường tôn xám đen sang trọng, phía trên có dàn 5 đèn rọi spotlight vươn ra chiếu sáng rực rỡ chữ Sign Board Mockup.",
+        elements: [
+          { name: "Nền tường ốp tôn xám than", type: "box", position: [0, 0, -0.1], scale: [5.2, 2.0, 0.05], color: "#1e293b" },
+          { name: "Hộp đèn alu đỏ", type: "box", position: [0, 0, 0], scale: [4.2, 1.2, 0.22], color: "#dc2626" },
+          { name: "Chữ Sign Board (Dòng 1)", type: "box", position: [-0.6, 0.22, 0.12], scale: [2.2, 0.35, 0.02], color: "#ffffff" },
+          { name: "Chữ Mockup (Dòng 2)", type: "box", position: [-0.7, -0.15, 0.12], scale: [1.9, 0.32, 0.02], color: "#ffffff" },
+          { name: "Đèn rọi 1", type: "box", position: [-1.6, 0.72, 0.15], scale: [0.08, 0.18, 0.3], color: "#0f172a" },
+          { name: "Đèn rọi 2", type: "box", position: [-0.8, 0.72, 0.15], scale: [0.08, 0.18, 0.3], color: "#0f172a" },
+          { name: "Đèn rọi 3", type: "box", position: [0.0, 0.72, 0.15], scale: [0.08, 0.18, 0.3], color: "#0f172a" },
+          { name: "Đèn rọi 4", type: "box", position: [0.8, 0.72, 0.15], scale: [0.08, 0.18, 0.3], color: "#0f172a" },
+          { name: "Đèn rọi 5", type: "box", position: [1.6, 0.72, 0.15], scale: [0.08, 0.18, 0.3], color: "#0f172a" }
+        ]
+      },
+      // 10. Biển vẫy treo thanh giằng sắt nghệ thuật Châu Âu (Ảnh images (2).jfif)
+      {
+        id: "sample_blade_hanging_vintage",
+        category: "mini",
+        title: "Biển vẫy treo thanh giằng sắt nghệ thuật Châu Âu (0.7m x 0.9m)",
+        badge: "Biển vẫy Vintage",
+        image_url: "/signs/sign_blade_hanging_vintage.jpg",
+        dimensions: { width: 0.7, height: 0.9, depth: 0.08 },
+        description: "Biển vẫy phong cách cổ điển Châu Âu thả treo từ thanh sắt hộp ngang gắn vuông góc tường đá, mặt biển tấm kim loại/alu màu đen nhám hình chữ nhật đứng, chữ trắng tinh tế sang trọng.",
+        materials: { iron_type: "vuong_20", surface_type: "alu_3mm", has_led: false, has_sheet_backing: false },
+        prompt: "Biển vẫy treo tường thanh sắt ngang phong cách Châu Âu cổ điển 0.7m x 0.9m màu đen nhám mờ, chữ trắng Storefront SIGNS gắn trên mặt tiền phố cổ Paris.",
+        elements: [
+          { name: "Bát sắt gắn tường", type: "box", position: [-0.42, 0.48, 0], scale: [0.06, 0.25, 0.12], color: "#18181b" },
+          { name: "Thanh treo sắt ngang chịu lực", type: "box", position: [0, 0.5, 0], scale: [0.85, 0.05, 0.05], color: "#18181b" },
+          { name: "Móc treo thả biển (Trái)", type: "box", position: [-0.22, 0.42, 0], scale: [0.03, 0.12, 0.03], color: "#27272a" },
+          { name: "Móc treo thả biển (Phải)", type: "box", position: [0.22, 0.42, 0], scale: [0.03, 0.12, 0.03], color: "#27272a" },
+          { name: "Tấm biển đen nhám đứng", type: "box", position: [0, -0.08, 0], scale: [0.7, 0.9, 0.04], color: "#18181b" },
+          { name: "Chữ Storefront SIGNS", type: "box", position: [0, -0.05, 0.025], scale: [0.55, 0.3, 0.01], color: "#f8fafc" },
+          { name: "Logo tagline nhỏ phía dưới", type: "box", position: [0, -0.38, 0.025], scale: [0.3, 0.05, 0.008], color: "#94a3b8" }
+        ]
+      },
+      // 11. Bảng hiệu chữ Inox vàng gương hắt chân hào quang LED nền xanh ngọc (Ảnh images (3).jfif)
+      {
+        id: "sample_halo_gold_green",
+        category: "storefront",
+        title: "Bảng hiệu chữ Inox vàng gương hắt chân hào quang LED nền xanh ngọc (2.8m x 1.4m)",
+        badge: "LED Hào quang",
+        image_url: "/signs/sign_halo_gold_green.jpg",
+        dimensions: { width: 2.8, height: 1.4, depth: 0.15 },
+        description: "Mặt bảng hiệu ốp tấm màu xanh ngọc / ngọc lục bảo mờ cao cấp, bộ chữ nổi nghệ thuật uốn inox vàng gương chân mica cháo hắt hào quang ánh sáng vàng ấm 3000K tỏa xung quanh chân chữ.",
+        materials: { iron_type: "vuong_25", surface_type: "alu_guong_vang", has_led: true, has_sheet_backing: true },
+        prompt: "Bảng hiệu chữ nổi inox mạ vàng gương 3D uốn cong mềm mại phát sáng hào quang LED vàng ấm tỏa quanh chân chữ trên nền xanh ngọc lục bảo sang trọng tuyệt đẹp.",
+        elements: [
+          { name: "Nền tấm bảng màu xanh ngọc", type: "box", position: [0, 0, 0], scale: [2.8, 1.4, 0.04], color: "#34d399" },
+          { name: "Lớp hào quang LED vàng ấm hắt chân", type: "box", position: [0, 0.02, 0.025], scale: [2.3, 0.95, 0.015], color: "#fef08a" },
+          { name: "Bộ chữ Inox vàng gương Skywow", type: "box", position: [0, 0.02, 0.06], scale: [2.15, 0.85, 0.05], color: "#eab308" },
+          { name: "Biểu tượng ống kính vàng gương", type: "cylinder", position: [-0.1, 0.22, 0.08], scale: [0.15, 0.45, 0.15], color: "#ca8a04" }
+        ]
+      },
+      // 12. Hộp đèn Alu phay xước khoét CNC lộng âm mica phát sáng (Ảnh images (4).jfif)
+      {
+        id: "sample_cnc_cutout_industrial",
+        category: "mini",
+        title: "Hộp đèn Alu phay xước khoét CNC lộng âm mica phát sáng (0.7m x 0.55m)",
+        badge: "Alu CNC lộng âm",
+        image_url: "/signs/sign_cnc_cutout_industrial.jpg",
+        dimensions: { width: 0.7, height: 0.55, depth: 0.12 },
+        description: "Hộp đèn kim loại phong cách công nghiệp (Industrial Vintage), vỏ alu xám đen phay xước khoét CNC chính xác logo THEGARA và thông tin giờ mở cửa, lót mica sữa trắng xuyên sáng từ dàn LED bên trong.",
+        materials: { iron_type: "vuong_20", surface_type: "alu_3mm", has_led: true, has_sheet_backing: true },
+        prompt: "Hộp đèn phong cách công nghiệp alu đen mờ phay xước khoét CNC lộng âm chữ THEGARA phát sáng trắng xuyên đèn LED trong đêm.",
+        elements: [
+          { name: "Thùng hộp đèn alu đen phay xước", type: "box", position: [0, 0, 0], scale: [0.7, 0.55, 0.12], color: "#27272a" },
+          { name: "Cụm chữ THEGARA CNC lộng âm phát sáng", type: "box", position: [0, 0.1, 0.062], scale: [0.55, 0.15, 0.005], color: "#ffffff" },
+          { name: "Dòng chữ CURATED GARMENTS & COLLECTIBLES", type: "box", position: [0, 0.02, 0.062], scale: [0.48, 0.04, 0.005], color: "#f1f5f9" },
+          { name: "Thông tin giờ mở cửa TUES - SUN 11AM - 9PM", type: "box", position: [0, -0.14, 0.062], scale: [0.28, 0.08, 0.005], color: "#e2e8f0" }
+        ]
+      },
+      // 13. Biển vẫy chữ nhật viền nhôm trắng mặt đỏ san hô (Ảnh images (5).jfif)
+      {
+        id: "sample_blade_coral_white",
+        category: "mini",
+        title: "Biển vẫy chữ nhật viền nhôm trắng mặt đỏ san hô (1.1m x 0.55m)",
+        badge: "Biển vẫy hiện đại",
+        image_url: "/signs/sign_blade_coral_white.jpg",
+        dimensions: { width: 1.1, height: 0.55, depth: 0.15 },
+        description: "Biển vẫy 2 mặt hộp đèn chữ nhật nằm ngang phong cách hiện đại, khung viền nhôm định hình sơn trắng sứ bo viền sang trọng, mặt mica màu đỏ san hô phát sáng 2 mặt, chân bát bát giữ hông tường/kính.",
+        materials: { iron_type: "vuong_20", surface_type: "mica_2_3mm", has_led: true, has_sheet_backing: false },
+        prompt: "Biển vẫy hộp đèn chữ nhật nằm ngang 1.1m x 0.55m viền nhôm trắng sữa tinh tế, mặt mica đỏ san hô sáng rực chữ SignBoard Storefront Mockup gắn mặt tiền phố hiện đại.",
+        elements: [
+          { name: "Bát gắn tường/kính chịu lực", type: "box", position: [-0.58, 0, 0], scale: [0.06, 0.35, 0.18], color: "#e2e8f0" },
+          { name: "Khung viền nhôm định hình sơn trắng", type: "box", position: [0, 0, 0], scale: [1.12, 0.57, 0.15], color: "#ffffff" },
+          { name: "Mặt mica đỏ san hô (Mặt trước)", type: "box", position: [0, 0, 0.076], scale: [1.08, 0.53, 0.01], color: "#f43f5e" },
+          { name: "Mặt mica đỏ san hô (Mặt sau)", type: "box", position: [0, 0, -0.076], scale: [1.08, 0.53, 0.01], color: "#f43f5e" },
+          { name: "Chữ SignBoard Storefront Mockup (Mặt trước)", type: "box", position: [0, 0.02, 0.082], scale: [0.75, 0.28, 0.01], color: "#ffffff" },
+          { name: "Chữ SignBoard Storefront Mockup (Mặt sau)", type: "box", position: [0, 0.02, -0.082], scale: [0.75, 0.28, 0.01], color: "#ffffff" }
+        ]
+      },
+      // 14. Hộp đèn mặt tiền màu cam đỏ gắn tường gạch hiện đại (Ảnh images (6).jfif)
+      {
+        id: "sample_facade_orange_brick",
+        category: "storefront",
+        title: "Hộp đèn mặt tiền màu cam đỏ gắn tường gạch hiện đại (2.6m x 0.95m)",
+        badge: "Mặt tiền hộp đèn",
+        image_url: "/signs/sign_facade_orange_brick.jpg",
+        dimensions: { width: 2.6, height: 0.95, depth: 0.2 },
+        description: "Hộp đèn mặt tiền chữ nhật nằm ngang trên nền tường gạch xám hiện đại, khung kim loại màu xám than sang trọng, bề mặt mica/bạt 3M màu cam đỏ phát sáng ấm áp, chữ trắng SignBoard Mockup nổi bật.",
+        materials: { iron_type: "vuong_25", surface_type: "bat_3m_uv", has_led: true, has_sheet_backing: true },
+        prompt: "Bảng hiệu hộp đèn mặt tiền nằm ngang màu cam đỏ rực rỡ 2.6m x 0.95m chữ trắng SignBoard Mockup gắn trên tường gạch xám hiện đại lúc hoàng hôn.",
+        elements: [
+          { name: "Nền tường gạch xám", type: "box", position: [0, 0, -0.12], scale: [3.4, 1.6, 0.05], color: "#78716c" },
+          { name: "Khung hộp đèn xám than", type: "box", position: [0, 0, 0], scale: [2.64, 0.99, 0.2], color: "#292524" },
+          { name: "Mặt hộp đèn màu cam đỏ phát sáng", type: "box", position: [0, 0, 0.102], scale: [2.58, 0.93, 0.01], color: "#f97316" },
+          { name: "Bộ chữ SignBoard Mockup trắng nổi bật", type: "box", position: [0, 0, 0.115], scale: [1.8, 0.35, 0.02], color: "#ffffff" }
+        ]
+      },
       // Các mẫu bổ sung khác
       {
         id: "pano_wall_interchange",

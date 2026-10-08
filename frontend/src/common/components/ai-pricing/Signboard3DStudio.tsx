@@ -542,7 +542,7 @@ export const Signboard3DStudio: React.FC<Signboard3DStudioProps> = ({ onClose })
                 <label className="text-xs text-slate-600 font-semibold block">
                   Hoặc chọn nhanh từ Thư viện Mẫu Bảng Hiệu Tham Khảo:
                 </label>
-                <div className="max-h-[300px] overflow-y-auto space-y-2 pr-1 custom-scrollbar">
+                <div className="max-h-[420px] overflow-y-auto space-y-2 pr-1 custom-scrollbar">
                   {hints.map((hint) => (
                     <div
                       key={hint.id}
