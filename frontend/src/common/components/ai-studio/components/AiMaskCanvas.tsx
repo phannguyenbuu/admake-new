@@ -187,15 +187,15 @@ export const AiMaskCanvas: React.FC<AiMaskCanvasProps> = ({
   return (
     <div className="flex flex-col gap-3 w-full" ref={containerRef}>
       {/* Thanh công cụ vẽ cọ Mask */}
-      <div className="flex flex-wrap items-center justify-between gap-3 px-3 py-2 bg-slate-900/90 rounded-xl border border-slate-800 text-xs">
+      <div className="flex flex-wrap items-center justify-between gap-3 px-3 py-2 bg-white rounded-xl border border-slate-200 text-xs shadow-xs">
         <div className="flex items-center gap-2">
           <button
             type="button"
             onClick={() => setToolMode("brush")}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-semibold transition-all ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-semibold transition-all cursor-pointer ${
               toolMode === "brush"
-                ? "bg-red-500 text-white shadow-sm shadow-red-500/30"
-                : "bg-slate-800 text-slate-300 hover:bg-slate-700"
+                ? "bg-rose-500 text-white shadow-xs"
+                : "bg-slate-100 text-slate-600 hover:bg-slate-200"
             }`}
           >
             <EditOutlined />
@@ -205,10 +205,10 @@ export const AiMaskCanvas: React.FC<AiMaskCanvasProps> = ({
           <button
             type="button"
             onClick={() => setToolMode("eraser")}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-semibold transition-all ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-semibold transition-all cursor-pointer ${
               toolMode === "eraser"
-                ? "bg-indigo-600 text-white shadow-sm shadow-indigo-600/30"
-                : "bg-slate-800 text-slate-300 hover:bg-slate-700"
+                ? "bg-blue-600 text-white shadow-xs"
+                : "bg-slate-100 text-slate-600 hover:bg-slate-200"
             }`}
           >
             <ScissorOutlined />
@@ -218,7 +218,7 @@ export const AiMaskCanvas: React.FC<AiMaskCanvasProps> = ({
 
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2 min-w-[140px]">
-            <span className="text-slate-400 text-[11px] whitespace-nowrap">Cọ: {brushSize}px</span>
+            <span className="text-slate-500 text-[11px] whitespace-nowrap">Cọ: {brushSize}px</span>
             <Slider
               min={8}
               max={80}
@@ -233,7 +233,7 @@ export const AiMaskCanvas: React.FC<AiMaskCanvasProps> = ({
               type="button"
               onClick={handleUndo}
               disabled={history.length <= 1}
-              className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 disabled:opacity-40 text-slate-300 transition-colors"
+              className="p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 disabled:opacity-40 text-slate-600 transition-colors cursor-pointer"
             >
               <UndoOutlined />
             </button>
@@ -244,7 +244,7 @@ export const AiMaskCanvas: React.FC<AiMaskCanvasProps> = ({
               type="button"
               onClick={handleClear}
               disabled={!hasMask}
-              className="p-1.5 rounded-lg bg-slate-800 hover:bg-red-950/60 disabled:opacity-40 text-rose-400 transition-colors"
+              className="p-1.5 rounded-lg bg-slate-100 hover:bg-rose-50 disabled:opacity-40 text-rose-600 transition-colors cursor-pointer"
             >
               <DeleteOutlined />
             </button>
@@ -253,7 +253,7 @@ export const AiMaskCanvas: React.FC<AiMaskCanvasProps> = ({
       </div>
 
       {/* Vùng Canvas vẽ trực quan chồng lên ảnh gốc */}
-      <div className="relative mx-auto flex items-center justify-center bg-slate-950/80 rounded-2xl border border-slate-800 overflow-hidden shadow-2xl p-1">
+      <div className="relative mx-auto flex items-center justify-center bg-slate-100 rounded-2xl border border-slate-200 overflow-hidden shadow-xs p-1">
         {/* Ảnh nền */}
         <img
           src={imageUrl}
@@ -282,7 +282,7 @@ export const AiMaskCanvas: React.FC<AiMaskCanvasProps> = ({
         />
 
         {!hasMask && (
-          <div className="absolute bottom-3 left-1/2 -translate-x-1/2 bg-slate-900/90 text-slate-300 text-[11px] px-3 py-1 rounded-full border border-slate-700 pointer-events-none shadow-lg backdrop-blur-sm">
+          <div className="absolute bottom-3 left-1/2 -translate-x-1/2 bg-white/95 text-slate-700 text-[11px] px-3 py-1 rounded-full border border-slate-200 pointer-events-none shadow-md backdrop-blur-xs">
             💡 Dùng chuột hoặc ngón tay tô lên vùng muốn AI vẽ lại
           </div>
         )}

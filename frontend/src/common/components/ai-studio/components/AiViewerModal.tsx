@@ -56,30 +56,30 @@ export const AiViewerModal: React.FC<AiViewerModalProps> = ({
       destroyOnClose
       styles={{
         content: {
-          backgroundColor: "#030712",
-          border: "1px solid #1f2937",
+          backgroundColor: "#ffffff",
+          border: "1px solid #e2e8f0",
           borderRadius: "20px",
           padding: 0,
           overflow: "hidden",
-          boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.8)",
+          boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1)",
         },
         body: { padding: 0 },
       }}
     >
-      <div className="flex flex-col h-[88vh] text-slate-200">
+      <div className="flex flex-col h-[88vh] text-slate-800">
         {/* Header Bar */}
-        <div className="flex items-center justify-between px-6 py-3.5 bg-slate-900/90 border-b border-slate-800 backdrop-blur-md">
+        <div className="flex items-center justify-between px-6 py-3.5 bg-white border-b border-slate-200">
           <div className="flex items-center gap-3">
-            <span className="text-base font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-emerald-400">
+            <span className="text-base font-extrabold text-slate-800">
               TRÌNH XEM ẢNH SIÊU NÉT 4K
             </span>
-            <span className="px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+            <span className="px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-emerald-50 text-emerald-700 border border-emerald-200">
               300 DPI
             </span>
-            <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-violet-500/20 text-violet-300 border border-violet-500/30">
+            <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-blue-50 text-blue-700 border border-blue-200">
               {image.resolution} ({image.width} × {image.height} px)
             </span>
-            <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-slate-800 text-slate-400 border border-slate-700 uppercase">
+            <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-slate-100 text-slate-600 border border-slate-200 uppercase">
               {image.engine}
             </span>
           </div>
@@ -89,19 +89,19 @@ export const AiViewerModal: React.FC<AiViewerModalProps> = ({
               <button
                 type="button"
                 onClick={() => setScale((s) => Math.max(0.4, s - 0.25))}
-                className="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition-colors"
+                className="p-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 transition-colors cursor-pointer"
               >
                 <ZoomOutOutlined />
               </button>
             </Tooltip>
-            <span className="text-xs font-mono text-slate-400 w-12 text-center">
+            <span className="text-xs font-mono text-slate-600 w-12 text-center">
               {Math.round(scale * 100)}%
             </span>
             <Tooltip title="Phóng to">
               <button
                 type="button"
                 onClick={() => setScale((s) => Math.min(4, s + 0.25))}
-                className="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition-colors"
+                className="p-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 transition-colors cursor-pointer"
               >
                 <ZoomInOutlined />
               </button>
@@ -110,7 +110,7 @@ export const AiViewerModal: React.FC<AiViewerModalProps> = ({
               <button
                 type="button"
                 onClick={() => setScale(1)}
-                className="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition-colors"
+                className="p-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 transition-colors cursor-pointer"
               >
                 <ReloadOutlined />
               </button>
@@ -123,7 +123,7 @@ export const AiViewerModal: React.FC<AiViewerModalProps> = ({
                   onSendToEdit(image);
                   onClose();
                 }}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-violet-600 hover:bg-violet-500 text-white transition-colors"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-indigo-600 hover:bg-indigo-500 text-white transition-colors cursor-pointer"
               >
                 <ScissorOutlined />
                 <span>Sửa ảnh này (Inpainting)</span>
@@ -133,7 +133,7 @@ export const AiViewerModal: React.FC<AiViewerModalProps> = ({
             <button
               type="button"
               onClick={handleDownload}
-              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-bold bg-emerald-600 hover:bg-emerald-500 text-white transition-colors shadow-lg shadow-emerald-600/30"
+              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-bold bg-blue-600 hover:bg-blue-500 text-white transition-colors shadow-xs cursor-pointer"
             >
               <DownloadOutlined />
               <span>Tải PNG gốc</span>
@@ -142,7 +142,7 @@ export const AiViewerModal: React.FC<AiViewerModalProps> = ({
             <button
               type="button"
               onClick={onClose}
-              className="p-2 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white transition-colors ml-2"
+              className="p-2 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-700 transition-colors ml-2 cursor-pointer"
             >
               <CloseOutlined />
             </button>
@@ -150,14 +150,14 @@ export const AiViewerModal: React.FC<AiViewerModalProps> = ({
         </div>
 
         {/* Viewport Zoom & Pan */}
-        <div className="flex-1 overflow-auto flex items-center justify-center p-6 bg-radial-gradient from-slate-950 to-black">
+        <div className="flex-1 overflow-auto flex items-center justify-center p-6 bg-slate-100">
           <div
             style={{
               transform: `scale(${scale})`,
               transformOrigin: "center center",
               transition: "transform 0.15s ease-out",
             }}
-            className="relative shadow-2xl rounded-xl overflow-hidden border border-slate-800/80"
+            className="relative shadow-lg rounded-xl overflow-hidden border border-slate-200 bg-white"
           >
             <img
               src={image.url}
@@ -168,19 +168,19 @@ export const AiViewerModal: React.FC<AiViewerModalProps> = ({
         </div>
 
         {/* Footer info & prompt */}
-        <div className="px-6 py-3.5 bg-slate-900/95 border-t border-slate-800 flex items-center justify-between gap-4 text-xs">
-          <div className="flex-1 line-clamp-2 text-slate-300">
-            <span className="font-bold text-violet-400 mr-2">Prompt:</span>
+        <div className="px-6 py-3.5 bg-white border-t border-slate-200 flex items-center justify-between gap-4 text-xs">
+          <div className="flex-1 line-clamp-2 text-slate-700">
+            <span className="font-bold text-blue-600 mr-2">Prompt:</span>
             {image.enhancedPrompt || image.prompt}
           </div>
           <div className="flex items-center gap-3 shrink-0">
-            <span className="text-slate-400 font-mono text-[11px]">
+            <span className="text-slate-500 font-mono text-[11px]">
               {image.tokens} tokens • ${image.costUsd.toFixed(4)} ({image.costVnd.toLocaleString("vi-VN")} đ)
             </span>
             <button
               type="button"
               onClick={handleCopyPrompt}
-              className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition-colors"
+              className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors cursor-pointer"
             >
               <CopyOutlined />
               <span>Sao chép Prompt</span>

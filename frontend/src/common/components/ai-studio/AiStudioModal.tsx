@@ -117,56 +117,52 @@ export const AiStudioModal: React.FC<AiStudioModalProps> = ({ open, onCancel }) 
         destroyOnClose
         styles={{
           content: {
-            backgroundColor: "#030712",
-            border: "1px solid #1f2937",
+            backgroundColor: "#ffffff",
+            border: "1px solid #e2e8f0",
             borderRadius: "24px",
             padding: 0,
             overflow: "hidden",
-            boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.85)",
+            boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)",
           },
           body: {
             padding: 0,
             height: "90vh",
             display: "flex",
             flexDirection: "column",
+            backgroundColor: "#f8fafc",
           },
         }}
         title={null}
       >
         {/* Header Bar */}
-        <div className="flex flex-wrap items-center justify-between px-6 py-3.5 bg-slate-950 border-b border-slate-800 text-slate-100">
-          {/* Logo & Brand */}
+        <div className="flex flex-wrap items-center justify-between px-6 py-3.5 bg-white border-b border-slate-200 text-slate-800">
+          {/* Logo & Brand Admake */}
           <div className="flex items-center gap-3">
-            <div className="h-9 w-9 rounded-xl bg-gradient-to-tr from-violet-600 to-emerald-500 flex items-center justify-center text-white shadow-lg shadow-violet-900/40">
-              <Sparkles className="w-5 h-5 text-white" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="font-extrabold text-sm sm:text-base text-transparent bg-clip-text bg-gradient-to-r from-violet-400 via-indigo-300 to-emerald-400 tracking-wide">
-                  ADMAKE AI STUDIO
-                </span>
-                <span className="text-[9px] px-1.5 py-0.5 rounded font-extrabold bg-violet-500/20 text-violet-300 border border-violet-500/30 uppercase tracking-widest">
-                  PRO 4K
-                </span>
-              </div>
-              <p className="text-[11px] text-slate-400 m-0">
-                Hội Thoại Chuyên Gia • Tạo Thiết Kế 4K • Sửa Thiết Kế Inpainting
-              </p>
+            <img
+              src="/logo.jpg"
+              alt="Admake Logo"
+              className="w-9 h-9 rounded-xl object-contain shadow-xs border border-slate-200"
+            />
+            <div className="flex items-center gap-2">
+              <img src="/ADMAKE.svg" alt="ADMAKE" className="h-7" />
+              <span className="text-[10px] px-2 py-0.5 rounded-full font-extrabold bg-blue-50 text-blue-700 border border-blue-200 uppercase tracking-wider">
+                AI STUDIO
+              </span>
             </div>
           </div>
 
           {/* Tab Navigation Center: 1. 3D & Báo Giá (GenAI), 2. Hội Thoại AI, 3. Tạo Thiết Kế, 4. Sửa Thiết Kế */}
-          <div className="flex items-center gap-1.5 bg-slate-900 p-1 rounded-2xl border border-slate-800 text-xs">
+          <div className="flex items-center gap-1.5 bg-slate-100 p-1.5 rounded-2xl border border-slate-200 text-xs">
             <button
               type="button"
               onClick={() => setActiveTab("3d_workflow")}
               className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl font-bold transition-all ${
                 activeTab === "3d_workflow"
-                  ? "bg-gradient-to-r from-cyan-600 to-indigo-600 text-white shadow-md shadow-cyan-900/40"
-                  : "text-slate-400 hover:text-slate-200"
+                  ? "bg-blue-600 text-white shadow-xs"
+                  : "text-slate-600 hover:text-slate-900"
               }`}
             >
-              <Sparkles className="w-3.5 h-3.5 animate-pulse text-cyan-300" />
+              <Sparkles className="w-3.5 h-3.5 animate-pulse text-amber-300" />
               <span>🧊 3D & Báo Giá (GenAI)</span>
             </button>
 
@@ -175,8 +171,8 @@ export const AiStudioModal: React.FC<AiStudioModalProps> = ({ open, onCancel }) 
               onClick={() => setActiveTab("chat")}
               className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl font-bold transition-all ${
                 activeTab === "chat"
-                  ? "bg-emerald-600 text-white shadow-md shadow-emerald-900/40"
-                  : "text-slate-400 hover:text-slate-200"
+                  ? "bg-blue-600 text-white shadow-xs"
+                  : "text-slate-600 hover:text-slate-900"
               }`}
             >
               <CommentOutlined />
@@ -188,8 +184,8 @@ export const AiStudioModal: React.FC<AiStudioModalProps> = ({ open, onCancel }) 
               onClick={() => setActiveTab("create")}
               className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl font-bold transition-all ${
                 activeTab === "create"
-                  ? "bg-emerald-600 text-white shadow-md shadow-emerald-900/40"
-                  : "text-slate-400 hover:text-slate-200"
+                  ? "bg-blue-600 text-white shadow-xs"
+                  : "text-slate-600 hover:text-slate-900"
               }`}
             >
               <Sparkles className="w-3.5 h-3.5" />
@@ -201,8 +197,8 @@ export const AiStudioModal: React.FC<AiStudioModalProps> = ({ open, onCancel }) 
               onClick={() => setActiveTab("edit")}
               className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl font-bold transition-all ${
                 activeTab === "edit"
-                  ? "bg-emerald-600 text-white shadow-md shadow-emerald-900/40"
-                  : "text-slate-400 hover:text-slate-200"
+                  ? "bg-blue-600 text-white shadow-xs"
+                  : "text-slate-600 hover:text-slate-900"
               }`}
             >
               <ScissorOutlined />
@@ -212,11 +208,10 @@ export const AiStudioModal: React.FC<AiStudioModalProps> = ({ open, onCancel }) 
 
           {/* Close Button */}
           <div className="flex items-center gap-3">
-
             <button
               type="button"
               onClick={onCancel}
-              className="p-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-white transition-colors border border-slate-800"
+              className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-800 transition-colors border border-slate-200"
             >
               <CloseOutlined className="text-sm" />
             </button>
@@ -225,13 +220,13 @@ export const AiStudioModal: React.FC<AiStudioModalProps> = ({ open, onCancel }) 
 
         {/* Studio Workspace Content */}
         {activeTab === "3d_workflow" ? (
-          <div className="flex-1 overflow-y-auto p-4 bg-slate-950">
+          <div className="flex-1 overflow-y-auto p-4 bg-slate-50">
             <Signboard3DStudio />
           </div>
         ) : (
-          <div className="flex-1 overflow-hidden p-4 grid grid-cols-1 lg:grid-cols-12 gap-4 bg-slate-950">
+          <div className="flex-1 overflow-hidden p-4 grid grid-cols-1 lg:grid-cols-12 gap-4 bg-slate-50">
             {/* Cột Trái: Tab Nội Dung Đang Kích Hoạt (5/12) */}
-            <div className="lg:col-span-5 h-full overflow-y-auto pr-1 bg-slate-900/50 rounded-2xl border border-slate-800/80 p-4">
+            <div className="lg:col-span-5 h-full overflow-y-auto pr-1 bg-white rounded-2xl border border-slate-200 p-4 shadow-xs">
               {activeTab === "create" && (
                 <AiCreateTab
                   apiHost={apiHost}

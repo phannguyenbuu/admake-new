@@ -169,14 +169,14 @@ export const AiCreateTab: React.FC<AiCreateTabProps> = ({
   };
 
   return (
-    <div className="flex flex-col gap-4 text-slate-200">
+    <div className="flex flex-col gap-4 text-slate-800">
       {/* Nhập Prompt */}
       <div className="flex flex-col gap-1.5">
         <div className="flex items-center justify-between">
-          <label className="text-xs font-bold text-slate-300 uppercase tracking-wider">
+          <label className="text-xs font-bold text-slate-700 uppercase tracking-wider">
             1. Mô Tả Thiết Kế Cần Tạo (Prompt)
           </label>
-          <span className="text-[11px] text-slate-400">Tiếng Việt hoặc English</span>
+          <span className="text-[11px] text-slate-500">Tiếng Việt hoặc English</span>
         </div>
 
         <TextArea
@@ -184,18 +184,18 @@ export const AiCreateTab: React.FC<AiCreateTabProps> = ({
           value={prompt}
           onChange={(e) => setPrompt(e.target.value)}
           placeholder="Ví dụ: Bảng hiệu alu chữ nổi mica đèn LED sáng chân quán cafe phong cách tối giản..."
-          className="!bg-slate-950/90 !text-slate-100 !border-slate-800 focus:!border-violet-500 !rounded-xl !text-xs !p-3"
+          className="!bg-white !text-slate-800 !border-slate-300 focus:!border-blue-500 !rounded-xl !text-xs !p-3 shadow-2xs"
         />
 
         {/* Gợi ý Prompt nhanh */}
         <div className="flex flex-wrap gap-1.5 pt-1">
-          <span className="text-[10px] text-slate-500 uppercase font-bold mr-1 self-center">Gợi ý:</span>
+          <span className="text-[10px] text-slate-400 uppercase font-bold mr-1 self-center">Gợi ý:</span>
           {QUICK_TAGS.map((tag, idx) => (
             <button
               key={idx}
               type="button"
               onClick={() => setPrompt(tag)}
-              className="text-[10px] px-2 py-0.5 rounded-md bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-slate-200 border border-slate-800 truncate max-w-[280px] transition-colors"
+              className="text-[10px] px-2 py-0.5 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-900 border border-slate-200 truncate max-w-[280px] transition-colors cursor-pointer"
             >
               {tag}
             </button>
@@ -204,11 +204,11 @@ export const AiCreateTab: React.FC<AiCreateTabProps> = ({
       </div>
 
       {/* AI Prompt Enhancer (5-Layer Photographic Framework) */}
-      <div className="p-3 bg-slate-950/90 rounded-xl border border-slate-800 flex flex-col gap-2.5">
+      <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 flex flex-col gap-2.5">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Sparkles className="w-4 h-4 text-amber-400" />
-            <span className="text-xs font-bold text-slate-200">
+            <Sparkles className="w-4 h-4 text-amber-500" />
+            <span className="text-xs font-bold text-slate-800">
               AI Tự Động Chuẩn Hóa Prompt (5-Layer Framework)
             </span>
           </div>
@@ -216,20 +216,19 @@ export const AiCreateTab: React.FC<AiCreateTabProps> = ({
             checked={useEnhancer}
             onChange={(checked) => setUseEnhancer(checked)}
             size="small"
-            className="bg-slate-800"
           />
         </div>
 
         {useEnhancer && (
           <>
-            <p className="text-[11px] text-slate-400 m-0 leading-relaxed">
+            <p className="text-[11px] text-slate-500 m-0 leading-relaxed">
               Tự động viết lại chi tiết theo tiêu chuẩn nhiếp ảnh: Chủ thể, Bối cảnh, Ánh sáng, Quang học Ống kính & Xử lý màu sắc bằng GPT-4o-mini.
             </p>
 
             {/* Presets Chuyên Nghiệp */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-1">
               <div>
-                <label className="text-[10px] font-semibold text-slate-400 block mb-1">Phong Cách</label>
+                <label className="text-[10px] font-semibold text-slate-500 block mb-1">Phong Cách</label>
                 <Select
                   value={presets.style}
                   onChange={(val) => setPresets((p) => ({ ...p, style: val }))}
@@ -240,7 +239,7 @@ export const AiCreateTab: React.FC<AiCreateTabProps> = ({
               </div>
 
               <div>
-                <label className="text-[10px] font-semibold text-slate-400 block mb-1">Ánh Sáng</label>
+                <label className="text-[10px] font-semibold text-slate-500 block mb-1">Ánh Sáng</label>
                 <Select
                   value={presets.lighting}
                   onChange={(val) => setPresets((p) => ({ ...p, lighting: val }))}
@@ -251,7 +250,7 @@ export const AiCreateTab: React.FC<AiCreateTabProps> = ({
               </div>
 
               <div>
-                <label className="text-[10px] font-semibold text-slate-400 block mb-1">Ống Kính</label>
+                <label className="text-[10px] font-semibold text-slate-500 block mb-1">Ống Kính</label>
                 <Select
                   value={presets.lens}
                   onChange={(val) => setPresets((p) => ({ ...p, lens: val }))}
@@ -267,7 +266,7 @@ export const AiCreateTab: React.FC<AiCreateTabProps> = ({
                 type="button"
                 onClick={handlePreviewEnhance}
                 disabled={previewingEnhance || !prompt.trim()}
-                className="text-[11px] text-violet-400 hover:text-violet-300 flex items-center gap-1 font-semibold disabled:opacity-50"
+                className="text-[11px] text-blue-600 hover:text-blue-700 flex items-center gap-1 font-semibold disabled:opacity-50 cursor-pointer"
               >
                 {previewingEnhance ? <Spin size="small" /> : <EyeOutlined />}
                 <span>Xem thử prompt tiếng Anh được AI viết lại</span>
@@ -275,8 +274,8 @@ export const AiCreateTab: React.FC<AiCreateTabProps> = ({
             </div>
 
             {enhancedPreviewText && (
-              <div className="p-2.5 bg-slate-900 rounded-lg border border-slate-800 text-[11px] text-slate-300 font-mono leading-relaxed">
-                <span className="text-violet-400 font-bold block mb-1">Enhanced Prompt:</span>
+              <div className="p-2.5 bg-white rounded-lg border border-slate-200 text-[11px] text-slate-700 font-mono leading-relaxed shadow-2xs">
+                <span className="text-blue-600 font-bold block mb-1">Enhanced Prompt:</span>
                 {enhancedPreviewText}
               </div>
             )}
@@ -288,19 +287,19 @@ export const AiCreateTab: React.FC<AiCreateTabProps> = ({
       <div className="grid grid-cols-2 gap-3">
         {/* Tỷ lệ khung hình */}
         <div className="flex flex-col gap-1.5">
-          <label className="text-xs font-bold text-slate-300 uppercase tracking-wider">
+          <label className="text-xs font-bold text-slate-700 uppercase tracking-wider">
             3. Tỷ Lệ Khung Hình
           </label>
-          <div className="grid grid-cols-5 gap-1 bg-slate-950 p-1 rounded-xl border border-slate-800 text-xs">
+          <div className="grid grid-cols-5 gap-1 bg-slate-100 p-1 rounded-xl border border-slate-200 text-xs">
             {(["1:1", "16:9", "9:16", "4:3", "3:4"] as AspectRatio[]).map((ratio) => (
               <button
                 key={ratio}
                 type="button"
                 onClick={() => setAspectRatio(ratio)}
-                className={`py-1.5 rounded-lg font-bold text-[11px] transition-all ${
+                className={`py-1.5 rounded-lg font-bold text-[11px] transition-all cursor-pointer ${
                   aspectRatio === ratio
-                    ? "bg-violet-600 text-white shadow-xs"
-                    : "text-slate-400 hover:text-slate-200"
+                    ? "bg-blue-600 text-white shadow-xs"
+                    : "text-slate-600 hover:text-slate-900"
                 }`}
               >
                 {ratio}
@@ -311,11 +310,11 @@ export const AiCreateTab: React.FC<AiCreateTabProps> = ({
 
         {/* Độ phân giải xuất file */}
         <div className="flex flex-col gap-1.5">
-          <label className="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center justify-between">
+          <label className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center justify-between">
             <span>4. Độ Phân Giải</span>
-            <span className="text-emerald-400 font-bold text-[10px]">300 DPI In Ấn</span>
+            <span className="text-emerald-600 font-bold text-[10px]">300 DPI In Ấn</span>
           </label>
-          <div className="grid grid-cols-3 gap-1 bg-slate-950 p-1 rounded-xl border border-slate-800 text-xs">
+          <div className="grid grid-cols-3 gap-1 bg-slate-100 p-1 rounded-xl border border-slate-200 text-xs">
             {(
               [
                 { val: "4k", label: "4K UHD" },
@@ -327,10 +326,10 @@ export const AiCreateTab: React.FC<AiCreateTabProps> = ({
                 key={item.val}
                 type="button"
                 onClick={() => setResolution(item.val)}
-                className={`py-1.5 rounded-lg font-bold text-[11px] transition-all ${
+                className={`py-1.5 rounded-lg font-bold text-[11px] transition-all cursor-pointer ${
                   resolution === item.val
-                    ? "bg-emerald-600 text-white shadow-xs"
-                    : "text-slate-400 hover:text-slate-200"
+                    ? "bg-blue-600 text-white shadow-xs"
+                    : "text-slate-600 hover:text-slate-900"
                 }`}
               >
                 {item.label}
@@ -345,7 +344,7 @@ export const AiCreateTab: React.FC<AiCreateTabProps> = ({
         type="button"
         disabled={loading || !prompt.trim()}
         onClick={handleGenerate}
-        className="w-full py-3.5 px-4 rounded-xl font-extrabold text-sm text-white bg-gradient-to-r from-emerald-600 via-teal-600 to-indigo-600 hover:from-emerald-500 hover:to-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-emerald-950/50 transition-all hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2 cursor-pointer border-none"
+        className="w-full py-3.5 px-4 rounded-xl font-extrabold text-sm text-white bg-gradient-to-r from-blue-600 via-indigo-600 to-emerald-600 hover:from-blue-500 hover:to-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed shadow-xs transition-all hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2 cursor-pointer border-none"
       >
         {loading ? (
           <>

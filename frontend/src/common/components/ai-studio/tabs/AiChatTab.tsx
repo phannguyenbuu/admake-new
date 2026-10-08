@@ -144,17 +144,17 @@ export const AiChatTab: React.FC<AiChatTabProps> = ({
   const totalChatCostUsd = messages.reduce((s, m) => s + (m.costUsd || 0), 0);
 
   return (
-    <div className="flex flex-col h-[70vh] text-slate-200">
+    <div className="flex flex-col h-[70vh] text-slate-800">
       {/* Header Info Bar */}
-      <div className="flex flex-wrap items-center justify-between gap-3 p-3 bg-slate-950/90 rounded-xl border border-slate-800 text-xs shrink-0">
+      <div className="flex flex-wrap items-center justify-between gap-3 p-3 bg-white rounded-xl border border-slate-200 text-xs shrink-0 shadow-xs">
         <div className="flex items-center gap-2">
-          <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-          <span className="text-slate-200 font-bold text-xs">Trợ Lý AI Chuyên Gia In Ấn & Báo Giá</span>
+          <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+          <span className="text-slate-800 font-bold text-xs">Trợ Lý AI Chuyên Gia In Ấn & Báo Giá</span>
         </div>
 
         <div className="flex items-center gap-3">
           {totalChatTokens > 0 && (
-            <span className="text-[11px] font-mono text-slate-400">
+            <span className="text-[11px] font-mono text-slate-500">
               {totalChatTokens} tok • ${totalChatCostUsd.toFixed(4)}
             </span>
           )}
@@ -162,7 +162,7 @@ export const AiChatTab: React.FC<AiChatTabProps> = ({
             <button
               type="button"
               onClick={() => setMessages([DEFAULT_WELCOME])}
-              className="p-1.5 rounded-lg bg-slate-800 hover:bg-red-950/60 text-slate-400 hover:text-rose-400 transition-colors"
+              className="p-1.5 rounded-lg bg-slate-100 hover:bg-rose-50 text-slate-500 hover:text-rose-600 transition-colors cursor-pointer"
             >
               <DeleteOutlined />
             </button>
@@ -182,8 +182,8 @@ export const AiChatTab: React.FC<AiChatTabProps> = ({
               <div
                 className={`h-7 w-7 rounded-full flex items-center justify-center text-xs shrink-0 font-bold ${
                   isUser
-                    ? "bg-gradient-to-tr from-violet-600 to-indigo-600 text-white"
-                    : "bg-slate-800 text-emerald-400 border border-emerald-500/30"
+                    ? "bg-gradient-to-tr from-blue-600 to-indigo-600 text-white"
+                    : "bg-blue-50 text-blue-600 border border-blue-200"
                 }`}
               >
                 {isUser ? <UserOutlined /> : <RobotOutlined />}
@@ -192,15 +192,15 @@ export const AiChatTab: React.FC<AiChatTabProps> = ({
               <div
                 className={`max-w-[85%] rounded-2xl p-3.5 text-xs leading-relaxed ${
                   isUser
-                    ? "bg-violet-600 text-white rounded-tr-xs shadow-md shadow-violet-900/30"
-                    : "bg-slate-950/90 text-slate-200 border border-slate-800/90 rounded-tl-xs shadow-md"
+                    ? "bg-blue-600 text-white rounded-tr-xs shadow-xs"
+                    : "bg-white text-slate-800 border border-slate-200 rounded-tl-xs shadow-xs"
                 }`}
               >
                 <div className="whitespace-pre-wrap">{m.content}</div>
 
                 {/* Footer metadata & actions */}
                 {!isUser && m.id !== "welcome" && (
-                  <div className="mt-2.5 pt-2 border-t border-slate-900 flex items-center justify-between gap-3 text-[10px] text-slate-400">
+                  <div className="mt-2.5 pt-2 border-t border-slate-100 flex items-center justify-between gap-3 text-[10px] text-slate-400">
                     <span className="font-mono">
                       {m.engine?.toUpperCase()} ({m.model}) • {m.tokens || 0} tok
                     </span>
@@ -209,7 +209,7 @@ export const AiChatTab: React.FC<AiChatTabProps> = ({
                       <button
                         type="button"
                         onClick={() => handleCopy(m.content)}
-                        className="px-2 py-0.5 rounded bg-slate-900 hover:bg-slate-800 text-slate-300 transition-colors flex items-center gap-1"
+                        className="px-2 py-0.5 rounded bg-slate-100 hover:bg-slate-200 text-slate-600 transition-colors flex items-center gap-1 cursor-pointer"
                       >
                         <CopyOutlined />
                         <span>Sao chép</span>
@@ -218,9 +218,9 @@ export const AiChatTab: React.FC<AiChatTabProps> = ({
                       <button
                         type="button"
                         onClick={() => handleUsePrompt(m.content)}
-                        className="px-2 py-0.5 rounded bg-violet-950 hover:bg-violet-900 text-violet-300 border border-violet-800/50 transition-colors flex items-center gap-1 font-bold"
+                        className="px-2 py-0.5 rounded bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 transition-colors flex items-center gap-1 font-bold cursor-pointer"
                       >
-                        <Sparkles className="w-3 h-3 text-amber-400" />
+                        <Sparkles className="w-3 h-3 text-amber-500" />
                         <span>Làm Prompt tạo thiết kế</span>
                       </button>
                     </div>
@@ -232,7 +232,7 @@ export const AiChatTab: React.FC<AiChatTabProps> = ({
         })}
 
         {loading && (
-          <div className="flex items-center gap-2 text-xs text-slate-400 bg-slate-950/80 p-3 rounded-2xl w-fit border border-slate-800">
+          <div className="flex items-center gap-2 text-xs text-slate-500 bg-white p-3 rounded-2xl w-fit border border-slate-200 shadow-2xs">
             <Spin size="small" />
             <span>AI đang suy nghĩ và phản hồi...</span>
           </div>
@@ -248,7 +248,7 @@ export const AiChatTab: React.FC<AiChatTabProps> = ({
             key={idx}
             type="button"
             onClick={() => handleSend(s)}
-            className="text-[10px] px-2.5 py-1 rounded-full bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-slate-200 border border-slate-800 transition-colors cursor-pointer"
+            className="text-[10px] px-2.5 py-1 rounded-full bg-white hover:bg-slate-100 text-slate-600 hover:text-slate-900 border border-slate-200 transition-colors cursor-pointer shadow-2xs"
           >
             {s}
           </button>
@@ -256,7 +256,7 @@ export const AiChatTab: React.FC<AiChatTabProps> = ({
       </div>
 
       {/* Input box */}
-      <div className="flex items-end gap-2 p-2 bg-slate-950 rounded-2xl border border-slate-800 shrink-0">
+      <div className="flex items-end gap-2 p-2 bg-white rounded-2xl border border-slate-300 shadow-xs shrink-0 focus-within:border-blue-500">
         <TextArea
           rows={2}
           value={inputText}
@@ -268,14 +268,14 @@ export const AiChatTab: React.FC<AiChatTabProps> = ({
             }
           }}
           placeholder="Nhập câu hỏi hoặc yêu cầu tư vấn vật liệu, báo giá, ý tưởng bảng hiệu (Enter để gửi)..."
-          className="!bg-transparent !text-slate-100 !border-none !text-xs !resize-none focus:!shadow-none"
+          className="!bg-transparent !text-slate-800 !border-none !text-xs !resize-none focus:!shadow-none"
         />
 
         <button
           type="button"
           disabled={loading || !inputText.trim()}
           onClick={() => handleSend()}
-          className="p-2.5 rounded-xl bg-violet-600 hover:bg-violet-500 disabled:opacity-40 text-white font-bold transition-all shadow-md cursor-pointer border-none shrink-0"
+          className="p-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 disabled:opacity-40 text-white font-bold transition-all shadow-xs cursor-pointer border-none shrink-0"
         >
           <SendOutlined className="text-sm" />
         </button>

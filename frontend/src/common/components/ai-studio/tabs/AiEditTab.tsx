@@ -110,11 +110,11 @@ export const AiEditTab: React.FC<AiEditTabProps> = ({
   };
 
   return (
-    <div className="flex flex-col gap-4 text-slate-200">
+    <div className="flex flex-col gap-4 text-slate-800">
       {/* Vùng chọn / nạp ảnh */}
       <div className="flex items-center justify-between">
-        <label className="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
-          <PictureOutlined className="text-violet-400" />
+        <label className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
+          <PictureOutlined className="text-blue-600" />
           <span>1. Ảnh Nguồn Cần Sửa</span>
         </label>
 
@@ -125,7 +125,7 @@ export const AiEditTab: React.FC<AiEditTabProps> = ({
         >
           <button
             type="button"
-            className="flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition-colors cursor-pointer"
+            className="flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 transition-colors cursor-pointer"
           >
             <UploadOutlined />
             <span>Tải ảnh khác lên</span>
@@ -144,12 +144,12 @@ export const AiEditTab: React.FC<AiEditTabProps> = ({
           accept="image/*"
           showUploadList={false}
           beforeUpload={handleFileUpload}
-          className="!bg-slate-950/60 !border-slate-800 hover:!border-violet-500 !rounded-2xl p-6"
+          className="!bg-slate-50 !border-slate-300 hover:!border-blue-500 !rounded-2xl p-6"
         >
-          <div className="flex flex-col items-center justify-center gap-2 text-slate-400">
-            <UploadOutlined className="text-3xl text-violet-400" />
-            <span className="font-bold text-sm text-slate-200">Kéo thả ảnh hoặc bấm để tải lên</span>
-            <span className="text-xs text-slate-500">
+          <div className="flex flex-col items-center justify-center gap-2 text-slate-500">
+            <UploadOutlined className="text-3xl text-blue-600" />
+            <span className="font-bold text-sm text-slate-700">Kéo thả ảnh hoặc bấm để tải lên</span>
+            <span className="text-xs text-slate-400">
               Hoặc bấm nút "Sửa ảnh này" trên bất kỳ ảnh nào trong thư viện bên phải
             </span>
           </div>
@@ -158,15 +158,15 @@ export const AiEditTab: React.FC<AiEditTabProps> = ({
 
       {/* Trạng thái Mask */}
       {currentImageSrc && (
-        <div className="flex items-center justify-between px-3 py-2 bg-slate-950 rounded-xl border border-slate-800 text-xs">
-          <span className="text-slate-400">Chế độ sửa:</span>
+        <div className="flex items-center justify-between px-3 py-2 bg-white rounded-xl border border-slate-200 text-xs shadow-2xs">
+          <span className="text-slate-500 font-medium">Chế độ sửa:</span>
           {maskBase64 ? (
-            <span className="text-rose-400 font-bold flex items-center gap-1">
+            <span className="text-rose-600 font-bold flex items-center gap-1">
               <CheckCircleOutlined />
               <span>Inpainting (Chỉ sửa phần tô màu đỏ, giữ nguyên phần còn lại)</span>
             </span>
           ) : (
-            <span className="text-indigo-400 font-medium">
+            <span className="text-blue-600 font-medium">
               Image-to-Image (Sửa toàn bộ ảnh theo phong cách prompt mới)
             </span>
           )}
@@ -175,7 +175,7 @@ export const AiEditTab: React.FC<AiEditTabProps> = ({
 
       {/* Mô tả chỉnh sửa (Prompt) */}
       <div className="flex flex-col gap-1.5">
-        <label className="text-xs font-bold text-slate-300 uppercase tracking-wider">
+        <label className="text-xs font-bold text-slate-700 uppercase tracking-wider">
           2. Mô Tả Nội Dung Cần Sửa (Prompt)
         </label>
         <TextArea
@@ -183,23 +183,23 @@ export const AiEditTab: React.FC<AiEditTabProps> = ({
           value={prompt}
           onChange={(e) => setPrompt(e.target.value)}
           placeholder="Ví dụ: Thay đổi chữ bảng hiệu thành 'ADMAKE STUDIO', thêm hiệu ứng đèn LED hắt sáng xung quanh..."
-          className="!bg-slate-950/90 !text-slate-100 !border-slate-800 focus:!border-violet-500 !rounded-xl !text-xs !p-3"
+          className="!bg-white !text-slate-800 !border-slate-300 focus:!border-blue-500 !rounded-xl !text-xs !p-3 shadow-2xs"
         />
       </div>
 
       {/* Độ phân giải xuất file */}
-      <div className="flex items-center justify-between px-3 py-2 bg-slate-950 rounded-xl border border-slate-800 text-xs">
-        <span className="text-slate-400 font-semibold uppercase text-[11px]">Độ phân giải:</span>
+      <div className="flex items-center justify-between px-3 py-2 bg-white rounded-xl border border-slate-200 text-xs shadow-2xs">
+        <span className="text-slate-600 font-semibold uppercase text-[11px]">Độ phân giải:</span>
         <div className="flex items-center gap-1">
           {(["4k", "2k", "1080p"] as Resolution[]).map((r) => (
             <button
               key={r}
               type="button"
               onClick={() => setResolution(r)}
-              className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${
+              className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                 resolution === r
-                  ? "bg-emerald-600 text-white shadow-xs"
-                  : "text-slate-400 hover:text-slate-200"
+                  ? "bg-blue-600 text-white shadow-xs"
+                  : "text-slate-600 hover:text-slate-900"
               }`}
             >
               {r.toUpperCase()} {r === "4k" && "(300 DPI)"}
@@ -213,7 +213,7 @@ export const AiEditTab: React.FC<AiEditTabProps> = ({
         type="button"
         disabled={loading || !currentImageSrc || !prompt.trim()}
         onClick={handleEdit}
-        className="w-full py-3.5 px-4 rounded-xl font-extrabold text-sm text-white bg-gradient-to-r from-red-600 via-violet-600 to-indigo-600 hover:from-red-500 hover:to-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-red-950/50 transition-all hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2 cursor-pointer border-none"
+        className="w-full py-3.5 px-4 rounded-xl font-extrabold text-sm text-white bg-gradient-to-r from-blue-600 via-indigo-600 to-emerald-600 hover:from-blue-500 hover:to-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed shadow-xs transition-all hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2 cursor-pointer border-none"
       >
         {loading ? (
           <>

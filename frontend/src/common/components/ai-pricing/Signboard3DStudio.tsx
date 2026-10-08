@@ -333,27 +333,33 @@ export const Signboard3DStudio: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col h-full bg-slate-950 text-slate-100 rounded-2xl border border-slate-800 p-4 md:p-6 shadow-2xl space-y-6">
+    <div className="flex flex-col h-full bg-white text-slate-800 rounded-2xl border border-slate-200 p-4 md:p-6 shadow-xs space-y-6">
       {/* Header Studio & Workflow Stepper */}
-      <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-slate-800">
-        <div>
-          <div className="flex items-center gap-2">
-            <span className="p-2 rounded-xl bg-gradient-to-tr from-cyan-600 to-indigo-600 text-white shadow-lg shadow-cyan-900/40">
-              <Sparkles className="w-5 h-5 animate-pulse" />
-            </span>
-            <div>
-              <h1 className="text-lg md:text-xl font-black bg-gradient-to-r from-cyan-400 via-indigo-300 to-emerald-400 bg-clip-text text-transparent">
-                ADMAKE 3D SIGNBOARD AI STUDIO
+      <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-slate-200">
+        <div className="flex items-center gap-3">
+          <img
+            src="/logo.jpg"
+            alt="Admake Logo"
+            className="w-10 h-10 rounded-xl object-contain shadow-xs border border-slate-200"
+          />
+          <div>
+            <div className="flex items-center gap-2">
+              <img src="/ADMAKE.svg" alt="ADMAKE" className="h-7" />
+              <h1 className="text-base md:text-lg font-black text-slate-800 tracking-tight m-0">
+                3D SIGNBOARD AI STUDIO
               </h1>
-              <p className="text-xs text-slate-400 m-0">
-                Quy trình tự động hóa: Hint Quảng Cáo → Mô Hình 3D → Vật Liệu Admake → Render GenAI → Tinh Chỉnh → Báo Giá
-              </p>
+              <span className="text-[10px] px-2 py-0.5 rounded-full font-bold bg-blue-50 text-blue-700 border border-blue-200">
+                GENAI 4K
+              </span>
             </div>
+            <p className="text-xs text-slate-500 m-0">
+              Quy trình tự động hóa: Hint Quảng Cáo → Mô Hình 3D → Vật Liệu Admake → Render GenAI → Tinh Chỉnh → Báo Giá
+            </p>
           </div>
         </div>
 
         {/* Stepper Buttons */}
-        <div className="flex items-center gap-1 bg-slate-900/90 p-1.5 rounded-2xl border border-slate-800 text-xs overflow-x-auto">
+        <div className="flex items-center gap-1 bg-slate-100 p-1.5 rounded-2xl border border-slate-200 text-xs overflow-x-auto">
           {[
             { step: 1, label: "1. Khảo sát & Hint", icon: Lightbulb },
             { step: 2, label: "2. Mô hình 3D", icon: Box },
@@ -369,10 +375,10 @@ export const Signboard3DStudio: React.FC = () => {
                 key={item.step}
                 type="button"
                 onClick={() => setCurrentStep(item.step)}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-bold transition-all whitespace-nowrap ${
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-bold transition-all whitespace-nowrap cursor-pointer ${
                   active
-                    ? "bg-gradient-to-r from-cyan-600 to-indigo-600 text-white shadow-md shadow-cyan-900/40"
-                    : "text-slate-400 hover:text-slate-200"
+                    ? "bg-blue-600 text-white shadow-xs"
+                    : "text-slate-600 hover:text-slate-900"
                 }`}
               >
                 <Icon className="w-3.5 h-3.5" />
@@ -386,19 +392,19 @@ export const Signboard3DStudio: React.FC = () => {
       {/* Main Content Area based on currentStep */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 min-h-[550px]">
         {/* Left Column (Controls & Inputs) */}
-        <div className="lg:col-span-5 flex flex-col space-y-5 bg-slate-900/50 p-4 md:p-5 rounded-2xl border border-slate-800/80">
+        <div className="lg:col-span-5 flex flex-col space-y-5 bg-slate-50/70 p-4 md:p-5 rounded-2xl border border-slate-200">
           {/* STEP 1: YÊU CẦU & HINT CHUYÊN DỤNG */}
           {currentStep === 1 && (
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-cyan-400 uppercase tracking-wider flex items-center gap-1.5">
+                <span className="text-xs font-bold text-blue-600 uppercase tracking-wider flex items-center gap-1.5">
                   <Lightbulb className="w-4 h-4" /> 1. Yêu Cầu Khách Hàng & Hint Quảng Cáo
                 </span>
-                <Tag color="cyan">Từ Bảng Nhỏ Đến Billboard</Tag>
+                <Tag color="blue">Từ Bảng Nhỏ Đến Billboard</Tag>
               </div>
 
               <div>
-                <label className="text-xs text-slate-300 font-semibold mb-1 block">
+                <label className="text-xs text-slate-700 font-semibold mb-1 block">
                   Nhập tự do yêu cầu của khách hàng:
                 </label>
                 <Input.TextArea
@@ -406,13 +412,13 @@ export const Signboard3DStudio: React.FC = () => {
                   value={clientPrompt}
                   onChange={(e) => setClientPrompt(e.target.value)}
                   placeholder="VD: Làm bảng hiệu cafe Highlands mặt tiền 6m x 2.5m, ốp alu đen nhám, chữ nổi mica led sáng mặt..."
-                  className="bg-slate-950 border-slate-700 text-slate-100 rounded-xl"
+                  className="bg-white border-slate-300 text-slate-800 rounded-xl focus:border-blue-500"
                 />
               </div>
 
               {/* Categorized Hints List */}
               <div className="space-y-2">
-                <label className="text-xs text-slate-400 font-semibold block">
+                <label className="text-xs text-slate-600 font-semibold block">
                   Hoặc chọn nhanh từ Thư viện Hint chuyên dụng:
                 </label>
                 <div className="max-h-[300px] overflow-y-auto space-y-2 pr-1 custom-scrollbar">
@@ -425,17 +431,17 @@ export const Signboard3DStudio: React.FC = () => {
                       }}
                       className={`p-3 rounded-xl border text-xs cursor-pointer transition-all ${
                         selectedHintId === hint.id
-                          ? "bg-cyan-950/60 border-cyan-500/80 text-cyan-200 shadow-md shadow-cyan-950"
-                          : "bg-slate-950/60 border-slate-800 text-slate-300 hover:border-slate-700"
+                          ? "bg-blue-50 border-blue-500 text-blue-900 shadow-xs ring-1 ring-blue-300"
+                          : "bg-white border-slate-200 text-slate-700 hover:border-blue-300 hover:bg-slate-50"
                       }`}
                     >
                       <div className="flex items-center justify-between mb-1">
-                        <span className="font-bold text-slate-100">{hint.title}</span>
-                        <span className="text-[10px] px-2 py-0.5 rounded font-extrabold bg-slate-800 text-cyan-400">
+                        <span className="font-bold text-slate-800">{hint.title}</span>
+                        <span className="text-[10px] px-2 py-0.5 rounded font-extrabold bg-slate-100 text-slate-700">
                           {hint.badge}
                         </span>
                       </div>
-                      <p className="text-[11px] text-slate-400 m-0 line-clamp-2">{hint.description}</p>
+                      <p className="text-[11px] text-slate-500 m-0 line-clamp-2">{hint.description}</p>
                     </div>
                   ))}
                 </div>
@@ -446,7 +452,7 @@ export const Signboard3DStudio: React.FC = () => {
                 size="large"
                 loading={isGenerating3D}
                 onClick={() => handleGenerate3D()}
-                className="w-full bg-gradient-to-r from-cyan-600 via-indigo-600 to-emerald-600 font-bold h-11 rounded-xl shadow-lg shadow-cyan-900/40"
+                className="w-full bg-gradient-to-r from-blue-600 via-indigo-600 to-emerald-600 hover:from-blue-500 hover:to-emerald-500 font-bold h-11 rounded-xl shadow-xs border-none cursor-pointer"
               >
                 ⚡ Phân Tích & Sinh Mô Hình 3D (Gemini AI)
               </Button>
@@ -457,17 +463,17 @@ export const Signboard3DStudio: React.FC = () => {
           {(currentStep === 2 || currentStep === 3) && (
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-cyan-400 uppercase tracking-wider flex items-center gap-1.5">
+                <span className="text-xs font-bold text-blue-600 uppercase tracking-wider flex items-center gap-1.5">
                   <Layers className="w-4 h-4" /> Chọn Vật Liệu Từ Kho Admake
                 </span>
-                <span className="text-[11px] text-slate-400">
+                <span className="text-[11px] text-slate-500 font-semibold">
                   {model3D?.dimensions.width}m × {model3D?.dimensions.height}m
                 </span>
               </div>
 
               {/* Chọn Khung Sắt */}
               <div>
-                <label className="text-xs text-slate-300 font-semibold mb-1.5 block">
+                <label className="text-xs text-slate-700 font-semibold mb-1.5 block">
                   1. Khung chịu lực & Trụ đỡ:
                 </label>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
@@ -476,10 +482,10 @@ export const Signboard3DStudio: React.FC = () => {
                       key={iron.key}
                       type="button"
                       onClick={() => handleMaterialChange("iron", iron.key)}
-                      className={`p-2 rounded-xl border text-left text-xs transition-all ${
+                      className={`p-2 rounded-xl border text-left text-xs transition-all cursor-pointer ${
                         selectedIron === iron.key
-                          ? "bg-cyan-950/70 border-cyan-500 text-cyan-200 shadow-sm"
-                          : "bg-slate-950 border-slate-800 text-slate-400 hover:text-slate-200"
+                          ? "bg-blue-50 border-blue-500 text-blue-900 shadow-xs font-bold"
+                          : "bg-white border-slate-200 text-slate-700 hover:bg-slate-50"
                       }`}
                     >
                       <div className="font-bold">{iron.name}</div>
@@ -491,7 +497,7 @@ export const Signboard3DStudio: React.FC = () => {
 
               {/* Chọn Mặt Bảng */}
               <div>
-                <label className="text-xs text-slate-300 font-semibold mb-1.5 block">
+                <label className="text-xs text-slate-700 font-semibold mb-1.5 block">
                   2. Mặt bảng & Ốp dựng:
                 </label>
                 <div className="grid grid-cols-2 gap-2 max-h-[160px] overflow-y-auto pr-1">
@@ -500,10 +506,10 @@ export const Signboard3DStudio: React.FC = () => {
                       key={surf.key}
                       type="button"
                       onClick={() => handleMaterialChange("surface", surf.key)}
-                      className={`p-2 rounded-xl border text-left text-xs transition-all ${
+                      className={`p-2 rounded-xl border text-left text-xs transition-all cursor-pointer ${
                         selectedSurface === surf.key
-                          ? "bg-cyan-950/70 border-cyan-500 text-cyan-200 shadow-sm"
-                          : "bg-slate-950 border-slate-800 text-slate-400 hover:text-slate-200"
+                          ? "bg-blue-50 border-blue-500 text-blue-900 shadow-xs font-bold"
+                          : "bg-white border-slate-200 text-slate-700 hover:bg-slate-50"
                       }`}
                     >
                       <div className="font-bold truncate">{surf.name}</div>
@@ -518,8 +524,10 @@ export const Signboard3DStudio: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setHasLed(!hasLed)}
-                  className={`px-3 py-1.5 rounded-lg border text-xs font-semibold transition-all ${
-                    hasLed ? "bg-amber-950/60 border-amber-500 text-amber-300" : "bg-slate-950 border-slate-800 text-slate-400"
+                  className={`px-3 py-1.5 rounded-lg border text-xs font-semibold transition-all cursor-pointer ${
+                    hasLed
+                      ? "bg-amber-50 border-amber-500 text-amber-800 font-bold"
+                      : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50"
                   }`}
                 >
                   💡 Đèn LED Chiếu Sáng: {hasLed ? "Bật" : "Tắt"}
@@ -527,8 +535,10 @@ export const Signboard3DStudio: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setHasSheetBacking(!hasSheetBacking)}
-                  className={`px-3 py-1.5 rounded-lg border text-xs font-semibold transition-all ${
-                    hasSheetBacking ? "bg-cyan-950/60 border-cyan-500 text-cyan-300" : "bg-slate-950 border-slate-800 text-slate-400"
+                  className={`px-3 py-1.5 rounded-lg border text-xs font-semibold transition-all cursor-pointer ${
+                    hasSheetBacking
+                      ? "bg-blue-50 border-blue-500 text-blue-800 font-bold"
+                      : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50"
                   }`}
                 >
                   🛡️ Tôn Lót Mặt Sau: {hasSheetBacking ? "Có" : "Không"}
@@ -542,7 +552,7 @@ export const Signboard3DStudio: React.FC = () => {
                   size="large"
                   onClick={handleRenderGenAI}
                   loading={isRendering}
-                  className="w-full bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 font-bold h-11 rounded-xl shadow-lg shadow-emerald-900/30"
+                  className="w-full bg-gradient-to-r from-emerald-600 via-teal-600 to-blue-600 hover:from-emerald-500 hover:to-blue-500 font-bold h-11 rounded-xl shadow-xs text-white border-none cursor-pointer"
                 >
                   🎨 Tiến Hành Render Phối Cảnh Thực Tế Bằng GenAI
                 </Button>
@@ -554,7 +564,7 @@ export const Signboard3DStudio: React.FC = () => {
           {(currentStep === 4 || currentStep === 5) && (
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
+                <span className="text-xs font-bold text-blue-600 uppercase tracking-wider flex items-center gap-1.5">
                   <Edit3 className="w-4 h-4" /> Chỉnh Sửa Phối Cảnh Liên Tục (GenAI)
                 </span>
                 <Tag color={isPinMode ? "orange" : "blue"}>{isPinMode ? "Đang Cắm Mốc (Pins)" : "Sửa Toàn Bộ"}</Tag>
@@ -563,11 +573,11 @@ export const Signboard3DStudio: React.FC = () => {
               {/* Tùy chọn Tỷ lệ & Phong cách */}
               <div className="grid grid-cols-2 gap-2 text-xs">
                 <div>
-                  <label className="text-slate-400 mb-1 block">Tỷ lệ khung hình:</label>
+                  <label className="text-slate-600 mb-1 block font-semibold">Tỷ lệ khung hình:</label>
                   <select
                     value={aspectRatio}
                     onChange={(e) => setAspectRatio(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-slate-200"
+                    className="w-full bg-white border border-slate-300 rounded-lg p-2 text-slate-700 focus:border-blue-500"
                   >
                     <option value="16:9">16:9 (Toàn cảnh rộng)</option>
                     <option value="4:3">4:3 (Tiêu chuẩn)</option>
@@ -576,11 +586,11 @@ export const Signboard3DStudio: React.FC = () => {
                   </select>
                 </div>
                 <div>
-                  <label className="text-slate-400 mb-1 block">Ánh sáng / Phối cảnh:</label>
+                  <label className="text-slate-600 mb-1 block font-semibold">Ánh sáng / Phối cảnh:</label>
                   <select
                     value={renderStyle}
                     onChange={(e) => setRenderStyle(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-slate-200"
+                    className="w-full bg-white border border-slate-300 rounded-lg p-2 text-slate-700 focus:border-blue-500"
                   >
                     <option value="Photorealistic Architectural">Kiến trúc chân thực</option>
                     <option value="Night Lights Neon">Đêm rực rỡ đèn LED</option>
@@ -592,7 +602,7 @@ export const Signboard3DStudio: React.FC = () => {
 
               {/* Input Chỉnh Sửa Tiếp */}
               <div>
-                <label className="text-xs text-slate-300 font-semibold mb-1 block">
+                <label className="text-xs text-slate-700 font-semibold mb-1 block">
                   Nhập yêu cầu sửa ảnh (Prompt Update):
                 </label>
                 <Input.TextArea
@@ -600,14 +610,14 @@ export const Signboard3DStudio: React.FC = () => {
                   value={customEditPrompt}
                   onChange={(e) => setCustomEditPrompt(e.target.value)}
                   placeholder="VD: Đổi chữ nổi sang màu vàng gold, thêm xe cộ và người đi bộ trên vỉa hè..."
-                  className="bg-slate-950 border-slate-700 text-slate-100 rounded-xl"
+                  className="bg-white border-slate-300 text-slate-800 rounded-xl focus:border-blue-500"
                 />
               </div>
 
               {/* Nút bật chế độ Cắm mốc (Inpainting Pins) */}
-              <div className="flex items-center justify-between bg-slate-950 p-2.5 rounded-xl border border-slate-800">
-                <span className="text-xs text-slate-300">
-                  Cắm mốc sửa cục bộ: <span className="font-bold text-amber-400">{pins.length} điểm</span>
+              <div className="flex items-center justify-between bg-white p-2.5 rounded-xl border border-slate-200 shadow-2xs">
+                <span className="text-xs text-slate-700">
+                  Cắm mốc sửa cục bộ: <span className="font-bold text-amber-600">{pins.length} điểm</span>
                 </span>
                 <div className="flex gap-2">
                   {pins.length > 0 && (
@@ -631,7 +641,7 @@ export const Signboard3DStudio: React.FC = () => {
                 size="large"
                 loading={isEditing || isRendering}
                 onClick={handleContinuousEdit}
-                className="w-full bg-gradient-to-r from-emerald-600 to-indigo-600 font-bold h-11 rounded-xl shadow-lg"
+                className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 font-bold h-11 rounded-xl shadow-xs text-white border-none cursor-pointer"
               >
                 ✨ Áp Dụng Thay Đổi & Sinh Bản Mới (GenAI)
               </Button>
@@ -642,17 +652,17 @@ export const Signboard3DStudio: React.FC = () => {
           {currentStep === 6 && (
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
+                <span className="text-xs font-bold text-blue-600 uppercase tracking-wider flex items-center gap-1.5">
                   <FileSpreadsheet className="w-4 h-4" /> Báo Giá & Điều Chỉnh Lợi Nhuận
                 </span>
                 <Tag color="green">Dự Toán AI</Tag>
               </div>
 
               {/* Điều chỉnh Tỷ Lệ Lợi Nhuận */}
-              <div className="bg-slate-950 p-3 rounded-xl border border-slate-800">
+              <div className="bg-white p-3 rounded-xl border border-slate-200 shadow-2xs">
                 <div className="flex justify-between items-center text-xs mb-1">
-                  <span className="text-slate-400">Tỷ lệ lợi nhuận kỳ vọng:</span>
-                  <span className="font-bold text-amber-400">{profitMargin}%</span>
+                  <span className="text-slate-600 font-semibold">Tỷ lệ lợi nhuận kỳ vọng:</span>
+                  <span className="font-bold text-amber-600">{profitMargin}%</span>
                 </div>
                 <Slider
                   min={10}
@@ -675,24 +685,24 @@ export const Signboard3DStudio: React.FC = () => {
 
               {/* Tóm Tắt Chi Phí */}
               {quoteResult && (
-                <div className="space-y-2 bg-slate-950 p-3.5 rounded-xl border border-slate-800 text-xs">
-                  <div className="flex justify-between text-slate-300">
+                <div className="space-y-2 bg-white p-3.5 rounded-xl border border-slate-200 text-xs shadow-xs text-slate-700">
+                  <div className="flex justify-between text-slate-600">
                     <span>Tổng Chi Phí Vật Tư (A):</span>
-                    <span className="font-mono">{formatVND(quoteResult.materials.total_materials_cost)}</span>
+                    <span className="font-mono font-semibold">{formatVND(quoteResult.materials.total_materials_cost)}</span>
                   </div>
-                  <div className="flex justify-between text-slate-300">
+                  <div className="flex justify-between text-slate-600">
                     <span>Tổng Chi Phí Nhân Công (B):</span>
-                    <span className="font-mono">{formatVND(quoteResult.operations.total_operations_cost)}</span>
+                    <span className="font-mono font-semibold">{formatVND(quoteResult.operations.total_operations_cost)}</span>
                   </div>
-                  <div className="flex justify-between text-slate-400 border-t border-slate-800/80 pt-1.5">
+                  <div className="flex justify-between text-slate-600 border-t border-slate-200 pt-1.5">
                     <span>Giá Vốn Sản Xuất (A + B):</span>
-                    <span className="font-mono font-bold">{formatVND(quoteResult.summary.cost_price)}</span>
+                    <span className="font-mono font-bold text-slate-800">{formatVND(quoteResult.summary.cost_price)}</span>
                   </div>
-                  <div className="flex justify-between text-amber-400 font-bold">
+                  <div className="flex justify-between text-amber-600 font-bold">
                     <span>Lợi Nhuận Kỳ Vọng ({profitMargin}%):</span>
                     <span className="font-mono">+{formatVND(quoteResult.summary.profit_amount)}</span>
                   </div>
-                  <div className="flex justify-between text-emerald-400 font-extrabold text-sm border-t border-slate-800 pt-2">
+                  <div className="flex justify-between text-blue-700 font-extrabold text-base border-t border-slate-200 pt-2">
                     <span>Tổng Giá Báo Khách:</span>
                     <span className="font-mono text-base">{formatVND(quoteResult.summary.quote_price)}</span>
                   </div>
@@ -703,14 +713,14 @@ export const Signboard3DStudio: React.FC = () => {
               <div className="grid grid-cols-2 gap-2 pt-2">
                 <Button
                   onClick={handleCopyZaloQuote}
-                  className="bg-slate-800 hover:bg-slate-700 text-slate-200 border-slate-700 font-bold rounded-xl h-10"
+                  className="bg-white hover:bg-slate-50 text-slate-700 border-slate-300 hover:border-blue-500 hover:text-blue-600 font-bold rounded-xl h-10 shadow-2xs"
                 >
                   📋 Sao Chép Báo Giá
                 </Button>
                 <Button
                   type="primary"
                   onClick={() => window.print()}
-                  className="bg-emerald-600 hover:bg-emerald-500 font-bold rounded-xl h-10"
+                  className="bg-blue-600 hover:bg-blue-700 font-bold rounded-xl h-10 text-white shadow-xs"
                 >
                   🖨️ In Bảng Dự Toán
                 </Button>
@@ -722,17 +732,17 @@ export const Signboard3DStudio: React.FC = () => {
         {/* Right Column (Visual Display: 3D Canvas / GenAI Render / Result Card) */}
         <div className="lg:col-span-7 flex flex-col space-y-4">
           {/* Main Visualizer Box */}
-          <div className="relative flex-1 bg-slate-900/60 rounded-2xl border border-slate-800 overflow-hidden flex flex-col min-h-[480px]">
+          <div className="relative flex-1 bg-slate-100 rounded-2xl border border-slate-200 overflow-hidden flex flex-col min-h-[480px]">
             {/* View Switcher Tabs: 3D View vs. GenAI Render */}
-            <div className="flex items-center justify-between px-4 py-3 bg-slate-950/80 border-b border-slate-800 text-xs shrink-0">
+            <div className="flex items-center justify-between px-4 py-3 bg-white border-b border-slate-200 text-xs shrink-0">
               <div className="flex items-center gap-2">
                 <button
                   type="button"
                   onClick={() => setCurrentStep(2)}
-                  className={`px-3 py-1 rounded-lg font-bold transition-all ${
+                  className={`px-3 py-1 rounded-lg font-bold transition-all cursor-pointer ${
                     currentStep <= 3
-                      ? "bg-cyan-600 text-white shadow-sm"
-                      : "text-slate-400 hover:text-slate-200"
+                      ? "bg-blue-600 text-white shadow-xs"
+                      : "text-slate-600 hover:text-slate-900"
                   }`}
                 >
                   🧊 Mô Hình 3D WebGL
@@ -740,10 +750,10 @@ export const Signboard3DStudio: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setCurrentStep(4)}
-                  className={`px-3 py-1 rounded-lg font-bold transition-all ${
+                  className={`px-3 py-1 rounded-lg font-bold transition-all cursor-pointer ${
                     currentStep >= 4
-                      ? "bg-emerald-600 text-white shadow-sm"
-                      : "text-slate-400 hover:text-slate-200"
+                      ? "bg-blue-600 text-white shadow-xs"
+                      : "text-slate-600 hover:text-slate-900"
                   }`}
                 >
                   🎨 Phối Cảnh Thực Tế GenAI
@@ -752,10 +762,10 @@ export const Signboard3DStudio: React.FC = () => {
 
               {genAiJob && (
                 <div className="flex items-center gap-2">
-                  <span className="text-[11px] text-slate-400">
-                    Trạng thái: <strong className="text-cyan-300">{genAiJob.current_step}</strong>
+                  <span className="text-[11px] text-slate-500">
+                    Trạng thái: <strong className="text-blue-600">{genAiJob.current_step}</strong>
                   </span>
-                  <span className="text-slate-500">({genAiJob.progress}%)</span>
+                  <span className="text-slate-400">({genAiJob.progress}%)</span>
                 </div>
               )}
             </div>
@@ -778,7 +788,7 @@ export const Signboard3DStudio: React.FC = () => {
                 // GenAI Rendered Image Display with Inpainting Pin support
                 <div
                   onClick={handleImageClick}
-                  className={`relative max-w-full max-h-[500px] rounded-xl overflow-hidden shadow-2xl border border-slate-800 ${
+                  className={`relative max-w-full max-h-[500px] rounded-xl overflow-hidden shadow-md border border-slate-200 ${
                     isPinMode ? "cursor-crosshair" : "cursor-default"
                   }`}
                 >
@@ -803,15 +813,15 @@ export const Signboard3DStudio: React.FC = () => {
 
                   {/* Progress overlay when rendering */}
                   {(isRendering || isEditing) && (
-                    <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-sm flex flex-col items-center justify-center space-y-3 p-4">
+                    <div className="absolute inset-0 bg-white/85 backdrop-blur-xs flex flex-col items-center justify-center space-y-3 p-4">
                       <Spin size="large" />
-                      <div className="text-sm font-bold text-cyan-300">
+                      <div className="text-sm font-bold text-blue-600">
                         {genAiJob?.current_step || "Đang xử lý qua GenAI..."}
                       </div>
                       <Progress
                         percent={genAiJob?.progress || 20}
                         status="active"
-                        strokeColor={{ "0%": "#06b6d4", "100%": "#10b981" }}
+                        strokeColor={{ "0%": "#2563eb", "100%": "#10b981" }}
                         className="w-64"
                       />
                     </div>
@@ -822,14 +832,14 @@ export const Signboard3DStudio: React.FC = () => {
 
             {/* History Thumbnails Carousel */}
             {renderHistory.length > 0 && (
-              <div className="p-3 bg-slate-950/80 border-t border-slate-800 flex items-center gap-2 overflow-x-auto">
-                <span className="text-[11px] text-slate-400 font-bold shrink-0">Lịch sử render:</span>
+              <div className="p-3 bg-white border-t border-slate-200 flex items-center gap-2 overflow-x-auto">
+                <span className="text-[11px] text-slate-500 font-bold shrink-0">Lịch sử render:</span>
                 {renderHistory.map((url, idx) => (
                   <div
                     key={idx}
                     onClick={() => setActiveRenderUrl(url)}
                     className={`h-14 w-20 rounded-lg overflow-hidden border-2 cursor-pointer shrink-0 transition-all ${
-                      activeRenderUrl === url ? "border-emerald-500 scale-105" : "border-slate-800 opacity-60 hover:opacity-100"
+                      activeRenderUrl === url ? "border-blue-600 scale-105" : "border-slate-200 opacity-70 hover:opacity-100"
                     }`}
                   >
                     <img src={url} alt={`Version ${idx + 1}`} className="w-full h-full object-cover" />
@@ -841,21 +851,21 @@ export const Signboard3DStudio: React.FC = () => {
 
           {/* Quick Summary Pill at Bottom */}
           {quoteResult && (
-            <div className="flex flex-wrap items-center justify-between gap-3 p-3 bg-slate-900/80 rounded-xl border border-slate-800 text-xs text-slate-300">
+            <div className="flex flex-wrap items-center justify-between gap-3 p-3 bg-white rounded-xl border border-slate-200 text-xs text-slate-700 shadow-xs">
               <div className="flex items-center gap-2">
-                <span className="text-slate-400">Quy cách:</span>
-                <span className="font-bold text-slate-100">{quoteResult.materials.surface.name}</span>
-                <span className="text-slate-500">•</span>
-                <span className="font-bold text-slate-100">{quoteResult.materials.iron_frame.name}</span>
+                <span className="text-slate-500">Quy cách:</span>
+                <span className="font-bold text-slate-800">{quoteResult.materials.surface.name}</span>
+                <span className="text-slate-400">•</span>
+                <span className="font-bold text-slate-800">{quoteResult.materials.iron_frame.name}</span>
               </div>
               <div className="flex items-center gap-3">
                 <span>
-                  Đơn giá/m²: <strong className="text-amber-400">{formatVND(quoteResult.summary.price_per_sqm)}</strong>
+                  Đơn giá/m²: <strong className="text-amber-600">{formatVND(quoteResult.summary.price_per_sqm)}</strong>
                 </span>
                 <span>
-                  Tổng thành tiền: <strong className="text-emerald-400 text-sm">{formatVND(quoteResult.summary.quote_price)}</strong>
+                  Tổng thành tiền: <strong className="text-blue-700 text-sm font-bold">{formatVND(quoteResult.summary.quote_price)}</strong>
                 </span>
-                <Button size="small" type="primary" onClick={() => setCurrentStep(6)}>
+                <Button size="small" type="primary" onClick={() => setCurrentStep(6)} className="bg-blue-600">
                   Xem Báo Giá
                 </Button>
               </div>

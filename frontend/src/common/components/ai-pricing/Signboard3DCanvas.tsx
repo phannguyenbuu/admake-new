@@ -292,15 +292,15 @@ export const Signboard3DCanvas: React.FC<Signboard3DCanvasProps> = ({
       )}
 
       {/* Floating Control Toolbar */}
-      <div className="absolute top-3 right-3 flex items-center gap-1.5 bg-slate-900/85 backdrop-blur-md p-1.5 rounded-xl border border-slate-700/80 shadow-lg">
+      <div className="absolute top-3 right-3 flex items-center gap-1.5 bg-white/95 backdrop-blur-md p-1.5 rounded-xl border border-slate-200 shadow-sm text-slate-700">
         <Tooltip title={nightMode ? "Chuyển sang Ban Ngày" : "Bật Chế Độ Đêm (LED Phát Sáng)"}>
           <button
             type="button"
             onClick={() => setNightMode(!nightMode)}
             className={`p-1.5 rounded-lg text-xs font-semibold flex items-center gap-1 transition-all ${
               nightMode
-                ? "bg-amber-500/20 text-amber-300 border border-amber-500/40"
-                : "text-slate-400 hover:text-slate-200"
+                ? "bg-amber-100 text-amber-800 border border-amber-300"
+                : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
             }`}
           >
             <BulbOutlined />
@@ -314,8 +314,8 @@ export const Signboard3DCanvas: React.FC<Signboard3DCanvasProps> = ({
             onClick={() => setWireframeMode(!wireframeMode)}
             className={`p-1.5 rounded-lg text-xs font-semibold flex items-center gap-1 transition-all ${
               wireframeMode
-                ? "bg-cyan-500/20 text-cyan-300 border border-cyan-500/40"
-                : "text-slate-400 hover:text-slate-200"
+                ? "bg-blue-100 text-blue-800 border border-blue-300"
+                : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
             }`}
           >
             <EyeOutlined />
@@ -323,14 +323,14 @@ export const Signboard3DCanvas: React.FC<Signboard3DCanvasProps> = ({
           </button>
         </Tooltip>
 
-        <div className="w-[1px] h-4 bg-slate-700 mx-1" />
+        <div className="w-[1px] h-4 bg-slate-200 mx-1" />
 
         <Tooltip title="Góc nhìn chính diện">
           <button
             type="button"
             onClick={() => setCameraAngle("front")}
             className={`px-2 py-1 rounded text-[11px] font-bold transition-all ${
-              viewAngle === "front" ? "bg-cyan-600 text-white" : "text-slate-400 hover:text-slate-200"
+              viewAngle === "front" ? "bg-blue-600 text-white" : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
             }`}
           >
             Mặt
@@ -342,7 +342,7 @@ export const Signboard3DCanvas: React.FC<Signboard3DCanvasProps> = ({
             type="button"
             onClick={() => setCameraAngle("perspective")}
             className={`px-2 py-1 rounded text-[11px] font-bold transition-all ${
-              viewAngle === "perspective" ? "bg-cyan-600 text-white" : "text-slate-400 hover:text-slate-200"
+              viewAngle === "perspective" ? "bg-blue-600 text-white" : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
             }`}
           >
             3D
@@ -353,7 +353,7 @@ export const Signboard3DCanvas: React.FC<Signboard3DCanvasProps> = ({
           <button
             type="button"
             onClick={handleCaptureSnapshot}
-            className="p-1.5 rounded-lg bg-emerald-600/80 hover:bg-emerald-500 text-white text-xs font-bold flex items-center gap-1 transition-all"
+            className="p-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold flex items-center gap-1 transition-all shadow-xs"
           >
             <CameraOutlined />
             <span className="hidden sm:inline">Lấy Mẫu 3D</span>
@@ -362,7 +362,7 @@ export const Signboard3DCanvas: React.FC<Signboard3DCanvasProps> = ({
       </div>
 
       {/* Guide hint at bottom */}
-      <div className="absolute bottom-2 left-3 text-[10px] text-slate-500 pointer-events-none">
+      <div className="absolute bottom-2 left-3 text-[10px] text-slate-500 bg-white/90 backdrop-blur-xs px-2.5 py-1 rounded-md border border-slate-200 shadow-2xs pointer-events-none">
         Chuột trái: Xoay 360° • Cuộn chuột: Phóng to/Thu nhỏ • Chuột phải: Di chuyển
       </div>
     </div>
