@@ -1843,37 +1843,6 @@ SIGNBOARD_HINTS = [
             {"name": "Mặt hộp đèn màu cam đỏ phát sáng", "type": "box", "position": [0, 0, 0.102], "scale": [2.58, 0.93, 0.01], "color": "#f97316"},
             {"name": "Bộ chữ SignBoard Mockup trắng nổi bật", "type": "box", "position": [0, 0, 0.115], "scale": [1.8, 0.35, 0.02], "color": "#ffffff"}
         ]
-    },
-    # --- CÁC MẪU BỔ SUNG (PANO TẤM LỚN & BILLBOARD) ---
-    {
-        "id": "pano_wall_interchange",
-        "category": "billboard",
-        "title": "Pano ốp tường góc ngã tư lớn (12m x 6m)",
-        "badge": "Pano lớn",
-        "dimensions": {"width": 12.0, "height": 6.0, "depth": 0.4},
-        "description": "Pano quảng cáo tấm lớn 72m2 ốp mặt hông tòa nhà góc ngã tư giao lộ, khung giàn sắt hộp đan kép 30x30 và V4 gia cố chịu gió mạnh, bạt 2 da xám chống xuyên sáng, dàn 6 đèn pha LED 100W vươn ra ngoài.",
-        "materials": {
-            "iron_type": "vuong_30",
-            "surface_type": "bat_2da",
-            "has_led": True,
-            "has_sheet_backing": False
-        },
-        "prompt": "Pano tấm lớn 12m x 6m ốp hông tòa nhà ngã tư đông đúc, căng bạt phẳng tuyệt đối, đèn pha chiếu sáng rực rỡ nhìn từ xa."
-    },
-    {
-        "id": "billboard_giant_pillar",
-        "category": "billboard",
-        "title": "Billboard Cột thép tròn khổng lồ cao tốc (15m x 8m cao 18m)",
-        "badge": "Billboard khổng lồ",
-        "dimensions": {"width": 15.0, "height": 8.0, "depth": 1.5},
-        "description": "Biển quảng cáo tấm lớn một cột trụ thép tròn D1000 dày 14mm, kết cấu giàn không gian 2 mặt 120m2/mặt, móng bê tông đúc chịu bão cấp 12, sàn thao tác kiểm tra an toàn, 10 đèn pha LED 200W.",
-        "materials": {
-            "iron_type": "vuong_30",
-            "surface_type": "bat_3m_uv",
-            "has_led": True,
-            "has_sheet_backing": False
-        },
-        "prompt": "Billboard khổng lồ một cột trụ thép cao 18m kích thước bảng 15m x 8m bên cạnh tuyến đường cao tốc thông thoáng."
     }
 ]
 
