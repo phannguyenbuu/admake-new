@@ -387,6 +387,201 @@ class GenAISignboardService {
           { name: "Mặt hộp đèn màu cam đỏ phát sáng", type: "box", position: [0, 0, 0.102], scale: [2.58, 0.93, 0.01], color: "#f97316" },
           { name: "Bộ chữ SignBoard Mockup trắng nổi bật", type: "box", position: [0, 0, 0.115], scale: [1.8, 0.35, 0.02], color: "#ffffff" }
         ]
+      },
+      // 15. Billboard cao tốc 1 cột thép tròn giàn không gian (Ảnh 1.webp)
+      {
+        id: "sample_billboard_highway_green",
+        category: "billboard",
+        title: "Billboard cao tốc 1 cột thép tròn giàn không gian (14m x 7m cao 16m)",
+        badge: "Billboard cao tốc",
+        image_url: "/signs/sign_billboard_highway_green.jpg",
+        dimensions: { width: 14.0, height: 7.0, depth: 1.2 },
+        description: "Biển quảng cáo tấm lớn một cột trụ thép tròn D1200 sơn trắng chịu bão cấp 12, giàn không gian thép đan chéo đỡ sàn catwalk kỹ thuật, mặt bạt 3M hoặc màn hình LED xanh lá cây chroma key, có dàn 6 đèn pha LED 200W chiếu sáng đỉnh.",
+        materials: { iron_type: "vuong_30", surface_type: "bat_3m_uv", has_led: true, has_sheet_backing: false },
+        prompt: "Billboard tấm lớn một cột trụ thép trắng tròn cao 16m kích thước 14m x 7m bên cạnh đường cao tốc trên cao, giàn không gian kim loại vững chắc.",
+        elements: [
+          { name: "Cột trụ thép tròn D1200", type: "cylinder", position: [0, -4.5, -0.3], scale: [1.2, 9.0, 1.2], color: "#f1f5f9" },
+          { name: "Giàn không gian thép đỡ sàn", type: "box", position: [0, -0.2, -0.2], scale: [14.2, 0.8, 1.2], color: "#94a3b8" },
+          { name: "Mặt bảng pano bạt 3M", type: "box", position: [0, 3.8, 0], scale: [14.0, 7.0, 0.05], color: "#22c55e" },
+          { name: "Viền nẹp khung kim loại", type: "box", position: [0, 3.8, -0.05], scale: [14.3, 7.3, 0.2], color: "#e2e8f0" },
+          { name: "Đèn pha 1", type: "box", position: [-5.0, 7.6, 0.4], scale: [0.2, 0.2, 0.4], color: "#334155" },
+          { name: "Đèn pha 2", type: "box", position: [-3.0, 7.6, 0.4], scale: [0.2, 0.2, 0.4], color: "#334155" },
+          { name: "Đèn pha 3", type: "box", position: [-1.0, 7.6, 0.4], scale: [0.2, 0.2, 0.4], color: "#334155" },
+          { name: "Đèn pha 4", type: "box", position: [1.0, 7.6, 0.4], scale: [0.2, 0.2, 0.4], color: "#334155" },
+          { name: "Đèn pha 5", type: "box", position: [3.0, 7.6, 0.4], scale: [0.2, 0.2, 0.4], color: "#334155" },
+          { name: "Đèn pha 6", type: "box", position: [5.0, 7.6, 0.4], scale: [0.2, 0.2, 0.4], color: "#334155" }
+        ]
+      },
+      // 16. Billboard cao tốc 2 cột trụ tròn giàn giằng thép (Ảnh blank-billboards-advertising-highway-blue-sky-85391792.webp)
+      {
+        id: "sample_billboard_double_pole_sky",
+        category: "billboard",
+        title: "Billboard cao tốc 2 cột trụ tròn giàn giằng thép (16m x 7.5m cao 15m)",
+        badge: "Billboard 2 cột",
+        image_url: "/signs/sign_billboard_double_pole_sky.jpg",
+        dimensions: { width: 16.0, height: 7.5, depth: 1.4 },
+        description: "Billboard tấm lớn 2 cột trụ thép tròn D1000 sơn trắng xanh chân đế bê tông, kết cấu giàn giằng thép hộp 2 đầu hồi và sàn thao tác đan chéo chịu gió lốc, mặt bạt trắng phẳng tuyệt đối.",
+        materials: { iron_type: "vuong_30", surface_type: "bat_3m_uv", has_led: true, has_sheet_backing: false },
+        prompt: "Billboard tấm lớn hai cột trụ thép tròn đứng cạnh đường quốc lộ cao tốc trên nền trời xanh mây trắng trong lành.",
+        elements: [
+          { name: "Cột trụ trái D1000", type: "cylinder", position: [-4.5, -4.0, -0.2], scale: [1.0, 8.0, 1.0], color: "#0284c7" },
+          { name: "Cột trụ phải D1000", type: "cylinder", position: [4.5, -4.0, -0.2], scale: [1.0, 8.0, 1.0], color: "#0284c7" },
+          { name: "Giàn dầm thép ngang liên kết", type: "box", position: [0, -0.1, -0.2], scale: [16.2, 0.8, 1.4], color: "#1e293b" },
+          { name: "Giàn giằng đầu hồi trái", type: "box", position: [-8.1, 4.0, -0.2], scale: [0.2, 7.5, 1.4], color: "#334155" },
+          { name: "Mặt bảng pano trắng phẳng", type: "box", position: [0, 4.0, 0], scale: [16.0, 7.5, 0.05], color: "#ffffff" }
+        ]
+      },
+      // 17. Billboard cổng vòm 2 cột trụ bắc qua cao tốc (Ảnh blank-highway-billboard-sign-in-an-outdoor-display-showing-a-road-CWWCJA.jpg)
+      {
+        id: "sample_billboard_highway_gantry",
+        category: "billboard",
+        title: "Billboard cổng vòm 2 cột trụ bắc qua cao tốc (15m x 5.5m cao 12m)",
+        badge: "Cổng vòm cao tốc",
+        image_url: "/signs/sign_billboard_highway_gantry.jpg",
+        dimensions: { width: 15.0, height: 5.5, depth: 1.2 },
+        description: "Kết cấu cổng vòm biển quảng cáo Pano bắc ngang qua toàn bộ mặt đường cao tốc (Overhead Highway Gantry), 2 cột trụ thép tròn 2 bên lề đường, dầm giàn không gian chịu lực vượt nhịp 15m, sàn thao tác bảo dưỡng.",
+        materials: { iron_type: "vuong_30", surface_type: "bat_3m_uv", has_led: true, has_sheet_backing: false },
+        prompt: "Cổng pano quảng cáo kết cấu thép bắc ngang qua đường cao tốc xuyên đồng cỏ xanh, mặt bảng trắng tinh dưới bầu trời xanh ngắt.",
+        elements: [
+          { name: "Cột trụ biên trái", type: "cylinder", position: [-7.0, -3.0, 0], scale: [0.9, 6.5, 0.9], color: "#64748b" },
+          { name: "Cột trụ biên phải", type: "cylinder", position: [7.0, -3.0, 0], scale: [0.9, 6.5, 0.9], color: "#64748b" },
+          { name: "Dầm giàn thép ngang vượt nhịp", type: "box", position: [0, 0.2, 0], scale: [15.5, 0.6, 1.2], color: "#475569" },
+          { name: "Mặt bảng pano ở giữa", type: "box", position: [0, 3.2, 0.1], scale: [15.0, 5.5, 0.05], color: "#ffffff" },
+          { name: "Khung đỡ đỉnh", type: "box", position: [0, 6.1, 0], scale: [15.2, 0.3, 0.3], color: "#334155" }
+        ]
+      },
+      // 18. Billboard Unipole 1 trụ thép mạ kẽm sàn thao tác (Ảnh highway-hoarding-board-500x500.webp)
+      {
+        id: "sample_billboard_hoarding_printer",
+        category: "billboard",
+        title: "Billboard Unipole 1 trụ thép mạ kẽm sàn thao tác (12m x 6m cao 14m)",
+        badge: "Billboard Unipole",
+        image_url: "/signs/sign_billboard_hoarding_printer.jpg",
+        dimensions: { width: 12.0, height: 6.0, depth: 1.0 },
+        description: "Billboard quảng cáo ngoài trời tấm lớn Unipole 1 trụ thép tròn D800 mạ kẽm nhúng nóng, sàn catwalk lan can an toàn bên dưới, mặt bạt in Hiflex/2 da khổ lớn in ấn thương hiệu Concept Design & Printer.",
+        materials: { iron_type: "vuong_30", surface_type: "bat_2da", has_led: true, has_sheet_backing: false },
+        prompt: "Billboard ngoài trời một trụ thép mạ kẽm tròn cao 14m kích thước 12m x 6m in nội dung quảng cáo in ấn rực rỡ dưới bầu trời xanh.",
+        elements: [
+          { name: "Trụ thép tròn mạ kẽm D800", type: "cylinder", position: [0, -4.0, -0.15], scale: [0.8, 8.0, 0.8], color: "#94a3b8" },
+          { name: "Sàn catwalk lan can an toàn", type: "box", position: [0, -0.15, -0.15], scale: [12.4, 0.45, 1.0], color: "#475569" },
+          { name: "Mặt bảng bạt in rực rỡ", type: "box", position: [0, 3.0, 0], scale: [12.0, 6.0, 0.05], color: "#ffffff" },
+          { name: "Dải màu gradient quảng cáo", type: "box", position: [0, 1.2, 0.03], scale: [11.8, 2.2, 0.01], color: "#f97316" }
+        ]
+      },
+      // 19. Billboard cao tốc ven sông kiến trúc hiện đại (Ảnh travel-advertising-billboard-on-highway-3d-rendering-mockup-T1MA74.jpg)
+      {
+        id: "sample_billboard_travel_modern",
+        category: "billboard",
+        title: "Billboard cao tốc ven sông kiến trúc hiện đại (14m x 6.5m cao 15m)",
+        badge: "Kiến trúc hiện đại",
+        image_url: "/signs/sign_billboard_travel_modern.jpg",
+        dimensions: { width: 14.0, height: 6.5, depth: 1.2 },
+        description: "Biển quảng cáo pano phong cách kiến trúc hiện đại bên tuyến đường cao tốc đô thị ven sông, một trụ thép tròn, giàn dầm vát chéo, mặt bạt 3M in hình ảnh du lịch Travel & Inspire Your Life sang trọng.",
+        materials: { iron_type: "vuong_30", surface_type: "bat_3m_uv", has_led: true, has_sheet_backing: false },
+        prompt: "Photorealistic 3D architectural rendering of a high-end billboard on an urban waterfront highway, modern steel structure, crisp lighting.",
+        elements: [
+          { name: "Trụ thép tròn D1000", type: "cylinder", position: [-1.5, -4.5, -0.2], scale: [1.0, 9.0, 1.0], color: "#64748b" },
+          { name: "Cụm giàn dầm vát chéo đỡ sàn", type: "box", position: [0, 0, -0.2], scale: [14.2, 0.8, 1.2], color: "#334155" },
+          { name: "Mặt bảng pano du lịch", type: "box", position: [0, 3.5, 0], scale: [14.0, 6.5, 0.05], color: "#f8fafc" },
+          { name: "Mảng hình ảnh du lịch biển xanh", type: "box", position: [2.5, 3.5, 0.03], scale: [8.5, 6.3, 0.01], color: "#0284c7" },
+          { name: "Cột đèn chiếu sáng đô thị chân cầu", type: "box", position: [3.5, -1.5, 0.8], scale: [0.15, 3.0, 0.15], color: "#18181b" }
+        ]
+      },
+      // 20. Billboard Unipole sườn đồi cao tốc (Ảnh images (14).jfif)
+      {
+        id: "sample_billboard_hillside_orange",
+        category: "billboard",
+        title: "Billboard Unipole sườn đồi cao tốc (12m x 5m cao 12m)",
+        badge: "Sườn đồi cao tốc",
+        image_url: "/signs/sign_billboard_hillside_orange.jpg",
+        dimensions: { width: 12.0, height: 5.0, depth: 1.0 },
+        description: "Biển quảng cáo tấm lớn một trụ thép sơn xanh dương lắp đặt tại sườn đồi đường cao tốc quanh co, kết cấu thép giàn đáy chịu gió núi, mặt pano bạt màu cam nổi bật từ xa.",
+        materials: { iron_type: "vuong_30", surface_type: "bat_2da", has_led: true, has_sheet_backing: false },
+        prompt: "Billboard Unipole tấm lớn một trụ thép tròn đứng bên sườn đồi cao tốc có xe chạy, mặt bảng màu cam rực rỡ.",
+        elements: [
+          { name: "Trụ thép tròn sơn xanh", type: "cylinder", position: [0, -3.5, -0.2], scale: [0.9, 7.0, 0.9], color: "#0369a1" },
+          { name: "Giàn thép đáy chịu lực", type: "box", position: [0, 0, -0.2], scale: [12.2, 0.5, 1.0], color: "#475569" },
+          { name: "Mặt bảng màu cam rực rỡ", type: "box", position: [0, 2.6, 0], scale: [12.0, 5.0, 0.05], color: "#ea580c" }
+        ]
+      },
+      // 21. Billboard vuông dãy liên hoàn dải phân cách quốc lộ (Ảnh images (15).jfif)
+      {
+        id: "sample_billboard_square_series",
+        category: "billboard",
+        title: "Billboard vuông dãy liên hoàn dải phân cách quốc lộ (6m x 6m cao 10m)",
+        badge: "Billboard vuông",
+        image_url: "/signs/sign_billboard_square_series.jpg",
+        dimensions: { width: 6.0, height: 6.0, depth: 0.8 },
+        description: "Billboard quảng cáo ngoài trời khổ vuông 6m x 6m bố trí theo dãy liên hoàn dọc tuyến đường quốc lộ / đại lộ, trụ thép tròn đơn vững chắc, mặt ốp alu hoặc bạt căng khung vuông, 3 đèn pha rọi đỉnh.",
+        materials: { iron_type: "vuong_25", surface_type: "alu_3mm", has_led: true, has_sheet_backing: true },
+        prompt: "Dãy biển quảng cáo ngoài trời khổ vuông 6m x 6m một cột trụ tròn bố trí dọc dải phân cách đường cao tốc đại lộ dưới trời xanh.",
+        elements: [
+          { name: "Cột trụ tròn thép D600", type: "cylinder", position: [0, -3.0, -0.1], scale: [0.6, 6.0, 0.6], color: "#475569" },
+          { name: "Khung viền bảng vuông", type: "box", position: [0, 1.8, 0], scale: [6.2, 6.2, 0.15], color: "#334155" },
+          { name: "Mặt bảng quảng cáo trắng", type: "box", position: [0, 1.8, 0.08], scale: [5.8, 5.8, 0.02], color: "#ffffff" },
+          { name: "Đèn pha 1", type: "box", position: [-1.8, 4.95, 0.3], scale: [0.15, 0.15, 0.35], color: "#18181b" },
+          { name: "Đèn pha 2", type: "box", position: [0.0, 4.95, 0.3], scale: [0.15, 0.15, 0.35], color: "#18181b" },
+          { name: "Đèn pha 3", type: "box", position: [1.8, 4.95, 0.3], scale: [0.15, 0.15, 0.35], color: "#18181b" }
+        ]
+      },
+      // 22. Billboard siêu rộng 2 cột trụ tròn qua sông (Ảnh images (16).jfif)
+      {
+        id: "sample_billboard_superwide_double_pole",
+        category: "billboard",
+        title: "Billboard siêu rộng 2 cột trụ tròn qua sông (18m x 6m cao 18m)",
+        badge: "Billboard siêu rộng",
+        image_url: "/signs/sign_billboard_superwide_double_pole.jpg",
+        dimensions: { width: 18.0, height: 6.0, depth: 1.5 },
+        description: "Billboard quảng cáo tấm lớn siêu rộng 18m cao 18m hai cột trụ thép tròn D1200 bắc qua khúc sông ven đường cao tốc đô thị, kết cấu giàn thép không gian đan chéo dày dặn, mặt bạt đỏ rực JAYALAKSHMI, dàn 8 đèn pha rọi.",
+        materials: { iron_type: "vuong_30", surface_type: "bat_3m_uv", has_led: true, has_sheet_backing: false },
+        prompt: "Billboard khổng lồ siêu rộng 18m hai cột trụ thép cao 18m màu đỏ rực rỡ đứng cạnh dòng sông và đường cao tốc trên cao.",
+        elements: [
+          { name: "Cột trụ tròn trái D1200", type: "cylinder", position: [-5.5, -6.0, -0.3], scale: [1.2, 12.0, 1.2], color: "#475569" },
+          { name: "Cột trụ tròn phải D1200", type: "cylinder", position: [5.5, -6.0, -0.3], scale: [1.2, 12.0, 1.2], color: "#475569" },
+          { name: "Giàn giằng không gian đan chéo", type: "box", position: [0, -0.3, -0.3], scale: [18.4, 0.9, 1.5], color: "#1e293b" },
+          { name: "Mặt bảng pano đỏ rực 18m", type: "box", position: [0, 3.2, 0], scale: [18.0, 6.0, 0.05], color: "#dc2626" },
+          { name: "Dòng chữ lớn JAYALAKSHMI trắng", type: "box", position: [0, 3.0, 0.03], scale: [14.0, 2.8, 0.02], color: "#ffffff" }
+        ]
+      },
+      // 23. Cổng Pano giàn thép hộp vắt ngang cầu cao tốc (Ảnh images (17).jfif)
+      {
+        id: "sample_gantry_overhead_bridge",
+        category: "billboard",
+        title: "Cổng Pano giàn thép hộp vắt ngang cầu cao tốc (16m x 4.5m cao 10m)",
+        badge: "Cổng vòm cầu cao tốc",
+        image_url: "/signs/sign_gantry_overhead_bridge.jpg",
+        dimensions: { width: 16.0, height: 4.5, depth: 0.8 },
+        description: "Cổng bảng hiệu Pano quảng cáo khung giàn thép hộp chữ nhật vượt khẩu độ 16m vắt ngang qua cầu cạn cao tốc, 2 cột trụ thép tròn 2 bên lề cầu, mặt bạt in UV xuyên sáng 3M phẳng căng.",
+        materials: { iron_type: "vuong_30", surface_type: "bat_3m_uv", has_led: true, has_sheet_backing: false },
+        prompt: "Cổng chào pano quảng cáo khung thép vắt ngang qua cây cầu đường cao tốc thông thoáng hướng nhìn từ cabin xe ô tô.",
+        elements: [
+          { name: "Cột trụ thép tròn lề trái", type: "cylinder", position: [-7.8, -2.5, 0], scale: [0.7, 5.0, 0.7], color: "#94a3b8" },
+          { name: "Cột trụ thép tròn lề phải", type: "cylinder", position: [7.8, -2.5, 0], scale: [0.7, 5.0, 0.7], color: "#94a3b8" },
+          { name: "Khung dầm hộp chịu lực", type: "box", position: [0, 0.1, 0], scale: [16.2, 4.8, 0.4], color: "#cbd5e1" },
+          { name: "Mặt bảng pano bạt 3M", type: "box", position: [0, 0.1, 0.05], scale: [15.6, 4.2, 0.02], color: "#38bdf8" }
+        ]
+      },
+      // 24. Billboard Unipole 4 đèn pha rọi chân trời xanh (Ảnh images (7).jfif)
+      {
+        id: "sample_billboard_unipole_spotlights",
+        category: "billboard",
+        title: "Billboard Unipole 4 đèn pha rọi chân trời xanh (10m x 5m cao 12m)",
+        badge: "Unipole 4 đèn pha",
+        image_url: "/signs/sign_billboard_unipole_spotlights.jpg",
+        dimensions: { width: 10.0, height: 5.0, depth: 1.0 },
+        description: "Biển quảng cáo tấm lớn một cột trụ thép tròn Unipole truyền thống, giá đỡ kim loại vát chữ Y, dàn 4 cần đèn pha LED chiếu rọi từ trên cao, mặt bạt in quảng cáo trung tâm thương mại ABAD Food Court.",
+        materials: { iron_type: "vuong_30", surface_type: "bat_2da", has_led: true, has_sheet_backing: false },
+        prompt: "Billboard Unipole ngoài trời một cột trụ thép tròn cao 12m kích thước 10m x 5m có 4 cần đèn rọi vươn ra trên nền trời xanh mây trắng trong veo.",
+        elements: [
+          { name: "Cột trụ thép tròn D800", type: "cylinder", position: [0, -3.5, -0.2], scale: [0.8, 7.0, 0.8], color: "#64748b" },
+          { name: "Chân đế dầm vát chữ Y", type: "box", position: [0, 0, -0.2], scale: [10.2, 0.6, 1.0], color: "#334155" },
+          { name: "Mặt bảng pano", type: "box", position: [0, 2.7, 0], scale: [10.0, 5.0, 0.05], color: "#ffffff" },
+          { name: "Mảng xanh lá cây thương hiệu", type: "box", position: [0, 2.3, 0.03], scale: [9.6, 2.4, 0.01], color: "#84cc16" },
+          { name: "Đèn rọi 1", type: "box", position: [-3.6, 5.4, 0.4], scale: [0.15, 0.2, 0.4], color: "#18181b" },
+          { name: "Đèn rọi 2", type: "box", position: [-1.2, 5.4, 0.4], scale: [0.15, 0.2, 0.4], color: "#18181b" },
+          { name: "Đèn rọi 3", type: "box", position: [1.2, 5.4, 0.4], scale: [0.15, 0.2, 0.4], color: "#18181b" },
+          { name: "Đèn rọi 4", type: "box", position: [3.6, 5.4, 0.4], scale: [0.15, 0.2, 0.4], color: "#18181b" }
+        ]
       }
     ];
   }
