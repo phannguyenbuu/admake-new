@@ -51,7 +51,7 @@ import {
   Check,
 } from "lucide-react";
 
-export const WORKFLOW_STEPS = [
+const WORKFLOW_STEPS = [
   {
     step: 1,
     label: "1. Khảo Sát",
