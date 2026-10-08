@@ -539,47 +539,72 @@ export const Signboard3DStudio: React.FC<Signboard3DStudioProps> = ({ onClose })
 
               {/* Categorized Sample Signboards List */}
               <div className="space-y-2">
-                <label className="text-xs text-slate-600 font-semibold block">
-                  Hoặc chọn nhanh từ Thư viện Mẫu Bảng Hiệu Tham Khảo:
-                </label>
-                <div className="max-h-[420px] overflow-y-auto space-y-2 pr-1 custom-scrollbar">
-                  {hints.map((hint) => (
-                    <div
-                      key={hint.id}
-                      onClick={() => applySampleTo3D(hint)}
-                      className={`p-2.5 rounded-xl border text-xs cursor-pointer transition-all ${
-                        selectedHintId === hint.id
-                          ? "bg-blue-50 border-blue-500 text-blue-900 shadow-xs ring-1 ring-blue-300"
-                          : "bg-white border-slate-200 text-slate-700 hover:border-blue-300 hover:bg-slate-50"
-                      }`}
-                    >
-                      <div className="flex items-start gap-2.5">
-                        {hint.image_url ? (
-                          <img
-                            src={hint.image_url}
-                            alt={hint.title}
-                            className="w-16 h-16 rounded-lg object-cover border border-slate-200 shrink-0 bg-slate-100 shadow-2xs"
-                          />
-                        ) : (
-                          <div className="w-16 h-16 rounded-lg bg-slate-100 border border-slate-200 flex items-center justify-center shrink-0 text-slate-400 font-bold text-xs">
-                            3D
-                          </div>
-                        )}
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center justify-between mb-1">
-                            <span className="font-bold text-slate-800 text-[12px] truncate">{hint.title}</span>
-                            <span className="text-[10px] px-1.5 py-0.5 rounded font-bold bg-slate-100 text-slate-700 shrink-0 ml-1">
+                <div className="flex items-center justify-between">
+                  <label className="text-xs text-slate-600 font-semibold block">
+                    Hoặc chọn nhanh từ Thư viện Mẫu Bảng Hiệu Tham Khảo:
+                  </label>
+                  <span className="text-[11px] text-slate-400 font-medium">({hints.length} mẫu)</span>
+                </div>
+                <div className="max-h-[440px] overflow-y-auto grid grid-cols-2 gap-2.5 pr-1 custom-scrollbar">
+                  {hints.map((hint) => {
+                    const isSelected = selectedHintId === hint.id;
+                    return (
+                      <div
+                        key={hint.id}
+                        onClick={() => applySampleTo3D(hint)}
+                        title={hint.title}
+                        className={`group relative p-2 rounded-xl border text-xs cursor-pointer transition-all duration-200 flex flex-col justify-between ${
+                          isSelected
+                            ? "bg-blue-50/90 border-blue-500 shadow-xs ring-2 ring-blue-400/60"
+                            : "bg-white border-slate-200 hover:border-blue-300 hover:bg-slate-50/80 hover:shadow-2xs"
+                        }`}
+                      >
+                        {/* Hình ảnh bảng hiệu to rõ */}
+                        <div className="relative w-full aspect-[4/3] rounded-lg overflow-hidden bg-slate-100 mb-2 border border-slate-200/70 shrink-0">
+                          {hint.image_url ? (
+                            <img
+                              src={hint.image_url}
+                              alt={hint.title}
+                              className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                              loading="lazy"
+                            />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center text-slate-400 font-bold text-xs bg-slate-100">
+                              3D
+                            </div>
+                          )}
+
+                          {/* Dấu tích chọn */}
+                          {isSelected && (
+                            <div className="absolute top-1.5 left-1.5 w-5 h-5 rounded-full bg-blue-600 text-white flex items-center justify-center shadow-xs z-10">
+                              <Check className="w-3 h-3 stroke-[3]" />
+                            </div>
+                          )}
+
+                          {/* Badge phân loại */}
+                          <div className="absolute top-1.5 right-1.5 z-10">
+                            <span className="text-[10px] px-1.5 py-0.5 rounded font-bold bg-black/60 backdrop-blur-xs text-white shadow-2xs">
                               {hint.badge}
                             </span>
                           </div>
-                          <p className="text-[11px] text-slate-500 m-0 line-clamp-2 leading-relaxed">{hint.description}</p>
-                          <div className="text-[10px] text-blue-600 font-semibold mt-1">
-                            📐 {hint.dimensions.width}m × {hint.dimensions.height}m
+                        </div>
+
+                        {/* Thông tin: Tiêu đề & Kích thước (Ẩn phần hint mô tả theo yêu cầu) */}
+                        <div className="flex-1 flex flex-col justify-between min-w-0">
+                          <div
+                            className={`font-bold text-[12px] line-clamp-2 leading-snug transition-colors ${
+                              isSelected ? "text-blue-900" : "text-slate-800 group-hover:text-blue-600"
+                            }`}
+                          >
+                            {hint.title}
+                          </div>
+                          <div className="text-[10px] text-blue-600 font-semibold mt-1.5 flex items-center gap-1">
+                            <span>📐 {hint.dimensions.width}m × {hint.dimensions.height}m</span>
                           </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
 
@@ -1015,72 +1040,94 @@ export const Signboard3DStudio: React.FC<Signboard3DStudioProps> = ({ onClose })
         </div>
 
         {/* Right Column (Visual Display: 3D Canvas / GenAI Render / Result Card) */}
-        <div className="lg:col-span-7 flex flex-col space-y-4">
-          {/* Main Visualizer Box */}
-          <div className="relative flex-1 bg-slate-100 rounded-2xl border border-slate-200 overflow-hidden flex flex-col min-h-[480px]">
-            {/* View Switcher Tabs: 3D View vs. GenAI Render */}
-            <div className="flex items-center justify-between px-4 py-3 bg-white border-b border-slate-200 text-xs shrink-0">
-              <div className="flex items-center gap-2">
+        <div className="lg:col-span-7 flex flex-col min-h-[580px] lg:min-h-[660px]">
+          {/* Main Visualizer Box - Mở Canvas tràn viền 100% không border, các thông tin dùng floater nền xanh rêu Admake 75% */}
+          <div className="relative flex-1 w-full h-full min-h-[580px] lg:min-h-[660px] rounded-2xl overflow-hidden border-0 bg-slate-900 shadow-md flex flex-col group">
+            
+            {/* 1. Floater Góc Trên Trái: Chuyển Đổi Tab & Badge Thông Số Kích Thước Thực */}
+            <div
+              className="absolute top-3.5 left-3.5 z-20 flex flex-wrap items-center gap-2 p-1.5 rounded-2xl shadow-lg backdrop-blur-md border border-white/30 text-white"
+              style={{ backgroundColor: "rgba(0, 180, 182, 0.75)" }}
+            >
+              {/* Tab Switcher */}
+              <div className="flex items-center gap-1 bg-black/20 p-0.5 rounded-xl">
                 <button
                   type="button"
                   onClick={() => setCurrentStep(2)}
-                  className={`px-3 py-1 rounded-lg font-bold transition-all cursor-pointer ${
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
                     currentStep <= 3
-                      ? "bg-blue-600 text-white shadow-xs"
-                      : "text-slate-600 hover:text-slate-900"
+                      ? "bg-white text-[#006e70] shadow-sm font-extrabold"
+                      : "text-white/90 hover:text-white hover:bg-white/10"
                   }`}
                 >
-                  🧊 Mô Hình 3D WebGL
+                  <span>🧊</span>
+                  <span>Mô Hình 3D</span>
                 </button>
                 <button
                   type="button"
                   onClick={() => setCurrentStep(activeRenderUrl ? 5 : 4)}
-                  className={`px-3 py-1 rounded-lg font-bold transition-all cursor-pointer ${
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
                     currentStep >= 4
-                      ? "bg-blue-600 text-white shadow-xs"
-                      : "text-slate-600 hover:text-slate-900"
+                      ? "bg-white text-[#006e70] shadow-sm font-extrabold"
+                      : "text-white/90 hover:text-white hover:bg-white/10"
                   }`}
                 >
-                  🎨 Phối Cảnh Thực Tế GenAI
+                  <span>🎨</span>
+                  <span>Phối Cảnh GenAI</span>
                 </button>
               </div>
 
-              {genAiJob && (
-                <div className="flex items-center gap-2">
-                  <span className="text-[11px] text-slate-500">
-                    Trạng thái: <strong className="text-blue-600">{genAiJob.current_step}</strong>
+              {/* Dimension Specs Badge */}
+              {model3D && (
+                <div className="hidden sm:flex items-center gap-2 px-2.5 py-1 text-xs text-white">
+                  <span className="w-2 h-2 rounded-full bg-emerald-300 animate-pulse" />
+                  <span className="font-extrabold uppercase text-[11px] tracking-wide text-white">
+                    {model3D.category_label || "Bảng hiệu 3D"}
                   </span>
-                  <span className="text-slate-400">({genAiJob.progress}%)</span>
+                  <span className="text-white/95 font-mono text-[11px]">
+                    {model3D.dimensions.width}m × {model3D.dimensions.height}m × {Math.round(model3D.dimensions.depth * 1000)}mm
+                  </span>
+                  <span className="bg-white/25 text-white font-bold px-1.5 py-0.5 rounded text-[10px]">
+                    {(model3D.dimensions.width * model3D.dimensions.height).toFixed(1)} m²
+                  </span>
+                </div>
+              )}
+
+              {/* GenAI status if job is processing */}
+              {genAiJob && (
+                <div className="flex items-center gap-1.5 px-2 py-0.5 bg-black/25 rounded-lg text-[11px] text-white">
+                  <span>{genAiJob.current_step}</span>
+                  <span className="text-emerald-300 font-bold">({genAiJob.progress}%)</span>
                 </div>
               )}
             </div>
 
-            {/* Content: 3D Canvas hoặc GenAI Image Display */}
-            <div className="relative flex-1 flex items-center justify-center p-3">
+            {/* 2. Content: 3D Canvas hoặc GenAI Image Display (Tràn viền 100%) */}
+            <div className="relative w-full h-full flex-1 flex items-center justify-center">
               {currentStep <= 3 || !activeRenderUrl ? (
-                // Three.js 3D Viewer
-                <div className="w-full h-full flex flex-col">
+                // Three.js 3D Viewer tràn viền 100%
+                <div className="w-full h-full flex-1">
                   <Signboard3DCanvas
                     model={model3D}
                     onSnapshot={(dataUrl) => {
                       setCaptured3DSnapshot(dataUrl);
                       message.success("Đã chụp lại góc nhìn 3D làm hình ảnh tham chiếu!");
                     }}
-                    className="w-full h-[460px]"
+                    className="w-full h-full min-h-[580px] lg:min-h-[660px]"
                   />
                 </div>
               ) : (
                 // GenAI Rendered Image Display with Inpainting Pin support
                 <div
                   onClick={handleImageClick}
-                  className={`relative max-w-full max-h-[500px] rounded-xl overflow-hidden shadow-md border border-slate-200 ${
+                  className={`relative w-full h-full min-h-[580px] lg:min-h-[660px] flex items-center justify-center bg-slate-950 ${
                     isPinMode ? "cursor-crosshair" : "cursor-default"
                   }`}
                 >
                   <img
                     src={activeRenderUrl}
                     alt="GenAI Phối Cảnh Thực Tế"
-                    className="max-h-[480px] w-auto object-contain block rounded-lg select-none"
+                    className="max-h-[640px] w-auto max-w-full object-contain block select-none rounded-xl"
                   />
 
                   {/* Render Pins on Image */}
@@ -1098,15 +1145,15 @@ export const Signboard3DStudio: React.FC<Signboard3DStudioProps> = ({ onClose })
 
                   {/* Progress overlay when rendering */}
                   {(isRendering || isEditing) && (
-                    <div className="absolute inset-0 bg-white/85 backdrop-blur-xs flex flex-col items-center justify-center space-y-3 p-4">
+                    <div className="absolute inset-0 bg-slate-900/80 backdrop-blur-xs flex flex-col items-center justify-center space-y-3 p-4 z-30">
                       <Spin size="large" />
-                      <div className="text-sm font-bold text-blue-600">
+                      <div className="text-sm font-bold text-white">
                         {genAiJob?.current_step || "Đang xử lý qua GenAI..."}
                       </div>
                       <Progress
                         percent={genAiJob?.progress || 20}
                         status="active"
-                        strokeColor={{ "0%": "#2563eb", "100%": "#10b981" }}
+                        strokeColor={{ "0%": "#00B4B6", "100%": "#10b981" }}
                         className="w-64"
                       />
                     </div>
@@ -1115,16 +1162,19 @@ export const Signboard3DStudio: React.FC<Signboard3DStudioProps> = ({ onClose })
               )}
             </div>
 
-            {/* History Thumbnails Carousel */}
-            {renderHistory.length > 0 && (
-              <div className="p-3 bg-white border-t border-slate-200 flex items-center gap-2 overflow-x-auto">
-                <span className="text-[11px] text-slate-500 font-bold shrink-0">Lịch sử render:</span>
+            {/* 3. Floater Lịch Sử Render Carousel (khi xem GenAI và có lịch sử) */}
+            {renderHistory.length > 0 && currentStep >= 4 && (
+              <div
+                className="absolute bottom-20 left-3.5 z-20 p-2 rounded-xl border border-white/30 shadow-lg backdrop-blur-md flex items-center gap-2 overflow-x-auto max-w-[85%]"
+                style={{ backgroundColor: "rgba(0, 180, 182, 0.75)" }}
+              >
+                <span className="text-[11px] text-white font-bold shrink-0">Lịch sử:</span>
                 {renderHistory.map((url, idx) => (
                   <div
                     key={idx}
                     onClick={() => setActiveRenderUrl(url)}
-                    className={`h-14 w-20 rounded-lg overflow-hidden border-2 cursor-pointer shrink-0 transition-all ${
-                      activeRenderUrl === url ? "border-blue-600 scale-105" : "border-slate-200 opacity-70 hover:opacity-100"
+                    className={`h-12 w-16 rounded-lg overflow-hidden border-2 cursor-pointer shrink-0 transition-all ${
+                      activeRenderUrl === url ? "border-white scale-105 shadow-md" : "border-white/40 opacity-75 hover:opacity-100"
                     }`}
                   >
                     <img src={url} alt={`Version ${idx + 1}`} className="w-full h-full object-cover" />
@@ -1132,30 +1182,39 @@ export const Signboard3DStudio: React.FC<Signboard3DStudioProps> = ({ onClose })
                 ))}
               </div>
             )}
-          </div>
 
-          {/* Quick Summary Pill at Bottom */}
-          {quoteResult && (
-            <div className="flex flex-wrap items-center justify-between gap-3 p-3 bg-white rounded-xl border border-slate-200 text-xs text-slate-700 shadow-xs">
-              <div className="flex items-center gap-2">
-                <span className="text-slate-500">Quy cách:</span>
-                <span className="font-bold text-slate-800">{quoteResult.materials.surface.name}</span>
-                <span className="text-slate-400">•</span>
-                <span className="font-bold text-slate-800">{quoteResult.materials.iron_frame.name}</span>
+            {/* 4. Floater Dưới Đáy: Quy Cách & Báo Giá Nhanh */}
+            {quoteResult && (
+              <div
+                className="absolute bottom-3.5 left-3.5 right-3.5 z-20 flex flex-wrap items-center justify-between gap-3 p-2.5 sm:p-3 rounded-2xl shadow-xl backdrop-blur-md border border-white/30 text-white"
+                style={{ backgroundColor: "rgba(0, 180, 182, 0.75)" }}
+              >
+                <div className="flex items-center gap-2 text-xs">
+                  <span className="text-white/80 font-medium">Quy cách:</span>
+                  <span className="font-extrabold text-white">{quoteResult.materials.surface.name}</span>
+                  <span className="text-white/60">•</span>
+                  <span className="font-extrabold text-white">{quoteResult.materials.iron_frame.name}</span>
+                </div>
+
+                <div className="flex items-center gap-3 text-xs">
+                  <span className="hidden md:inline text-white/90">
+                    Đơn giá/m²: <strong className="text-amber-200 font-mono font-bold">{formatVND(quoteResult.summary.price_per_sqm)}</strong>
+                  </span>
+                  <span>
+                    Tổng thành tiền: <strong className="text-white text-sm sm:text-base font-black font-mono drop-shadow-xs">{formatVND(quoteResult.summary.quote_price)}</strong>
+                  </span>
+                  <Button
+                    size="small"
+                    type="primary"
+                    onClick={() => setCurrentStep(6)}
+                    className="bg-white hover:bg-slate-100 text-[#006e70] font-black rounded-xl border-none shadow-sm cursor-pointer hover:scale-105 active:scale-95 transition-all text-xs h-8 px-3"
+                  >
+                    Xem Báo Giá
+                  </Button>
+                </div>
               </div>
-              <div className="flex items-center gap-3">
-                <span>
-                  Đơn giá/m²: <strong className="text-amber-600">{formatVND(quoteResult.summary.price_per_sqm)}</strong>
-                </span>
-                <span>
-                  Tổng thành tiền: <strong className="text-blue-700 text-sm font-bold">{formatVND(quoteResult.summary.quote_price)}</strong>
-                </span>
-                <Button size="small" type="primary" onClick={() => setCurrentStep(6)} className="bg-blue-600">
-                  Xem Báo Giá
-                </Button>
-              </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </div>
     </div>

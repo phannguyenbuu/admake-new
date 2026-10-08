@@ -20,7 +20,7 @@ interface Signboard3DCanvasProps {
 export const Signboard3DCanvas: React.FC<Signboard3DCanvasProps> = ({
   model,
   onSnapshot,
-  className = "w-full h-[450px]",
+  className = "w-full h-full",
 }) => {
   const mountRef = useRef<HTMLDivElement>(null);
   const sceneRef = useRef<THREE.Scene | null>(null);
@@ -87,19 +87,26 @@ export const Signboard3DCanvas: React.FC<Signboard3DCanvasProps> = ({
     };
     animate();
 
-    // 8. Resize Handler
+    // 8. Resize Handler with ResizeObserver for true container responsiveness
     const handleResize = () => {
       if (!mountRef.current || !rendererRef.current || !cameraRef.current) return;
       const w = mountRef.current.clientWidth;
       const h = mountRef.current.clientHeight;
+      if (w === 0 || h === 0) return;
       cameraRef.current.aspect = w / h;
       cameraRef.current.updateProjectionMatrix();
       rendererRef.current.setSize(w, h);
     };
     window.addEventListener("resize", handleResize);
 
+    const resizeObserver = new ResizeObserver(() => {
+      handleResize();
+    });
+    resizeObserver.observe(container);
+
     return () => {
       window.removeEventListener("resize", handleResize);
+      resizeObserver.disconnect();
       cancelAnimationFrame(animationFrameId);
       renderer.dispose();
       container.innerHTML = "";
@@ -269,38 +276,23 @@ export const Signboard3DCanvas: React.FC<Signboard3DCanvasProps> = ({
   };
 
   return (
-    <div className="relative rounded-2xl overflow-hidden border border-slate-700 bg-slate-950 shadow-inner group">
-      {/* Three.js Canvas Container */}
+    <div className="relative w-full h-full overflow-hidden border-0 group select-none">
+      {/* Three.js Canvas Container - Full Bleed */}
       <div ref={mountRef} className={className} />
 
-      {/* Floating 3D Dimension Overlay */}
-      {model && (
-        <div className="absolute top-3 left-3 bg-slate-900/85 backdrop-blur-md px-3.5 py-2 rounded-xl border border-slate-700/80 text-xs text-slate-200 flex items-center gap-3 shadow-lg pointer-events-none">
-          <div className="flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
-            <span className="font-extrabold text-cyan-300 uppercase tracking-wider text-[11px]">
-              {model.category_label || "Bảng hiệu 3D"}
-            </span>
-          </div>
-          <span className="text-slate-400 font-mono">
-            {model.dimensions.width}m (Ngang) × {model.dimensions.height}m (Cao) × {Math.round(model.dimensions.depth * 1000)}mm (Sâu)
-          </span>
-          <span className="bg-cyan-950/80 text-cyan-400 font-bold px-2 py-0.5 rounded border border-cyan-800/40 text-[10px]">
-            {Math.round(model.dimensions.width * model.dimensions.height * 10) / 10} m²
-          </span>
-        </div>
-      )}
-
-      {/* Floating Control Toolbar */}
-      <div className="absolute top-3 right-3 flex items-center gap-1.5 bg-white/95 backdrop-blur-md p-1.5 rounded-xl border border-slate-200 shadow-sm text-slate-700">
+      {/* Floating Control Toolbar (Nền xanh rêu Admake, opacity 75%) */}
+      <div
+        className="absolute top-3.5 right-3.5 z-20 flex items-center gap-1.5 p-1.5 rounded-2xl border border-white/30 shadow-lg text-white backdrop-blur-md"
+        style={{ backgroundColor: "rgba(0, 180, 182, 0.75)" }}
+      >
         <Tooltip title={nightMode ? "Chuyển sang Ban Ngày" : "Bật Chế Độ Đêm (LED Phát Sáng)"}>
           <button
             type="button"
             onClick={() => setNightMode(!nightMode)}
-            className={`p-1.5 rounded-lg text-xs font-semibold flex items-center gap-1 transition-all ${
+            className={`p-1.5 rounded-lg text-xs font-bold flex items-center gap-1 transition-all cursor-pointer ${
               nightMode
-                ? "bg-amber-100 text-amber-800 border border-amber-300"
-                : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
+                ? "bg-amber-400 text-slate-900 shadow-xs"
+                : "text-white/90 hover:text-white hover:bg-white/20"
             }`}
           >
             <BulbOutlined />
@@ -312,10 +304,10 @@ export const Signboard3DCanvas: React.FC<Signboard3DCanvasProps> = ({
           <button
             type="button"
             onClick={() => setWireframeMode(!wireframeMode)}
-            className={`p-1.5 rounded-lg text-xs font-semibold flex items-center gap-1 transition-all ${
+            className={`p-1.5 rounded-lg text-xs font-bold flex items-center gap-1 transition-all cursor-pointer ${
               wireframeMode
-                ? "bg-blue-100 text-blue-800 border border-blue-300"
-                : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
+                ? "bg-white text-[#006e70] shadow-xs"
+                : "text-white/90 hover:text-white hover:bg-white/20"
             }`}
           >
             <EyeOutlined />
@@ -323,14 +315,16 @@ export const Signboard3DCanvas: React.FC<Signboard3DCanvasProps> = ({
           </button>
         </Tooltip>
 
-        <div className="w-[1px] h-4 bg-slate-200 mx-1" />
+        <div className="w-[1px] h-4 bg-white/30 mx-0.5" />
 
         <Tooltip title="Góc nhìn chính diện">
           <button
             type="button"
             onClick={() => setCameraAngle("front")}
-            className={`px-2 py-1 rounded text-[11px] font-bold transition-all ${
-              viewAngle === "front" ? "bg-blue-600 text-white" : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
+            className={`px-2 py-1 rounded-md text-[11px] font-extrabold transition-all cursor-pointer ${
+              viewAngle === "front"
+                ? "bg-white text-[#006e70] shadow-xs"
+                : "text-white/90 hover:text-white hover:bg-white/20"
             }`}
           >
             Mặt
@@ -341,8 +335,10 @@ export const Signboard3DCanvas: React.FC<Signboard3DCanvasProps> = ({
           <button
             type="button"
             onClick={() => setCameraAngle("perspective")}
-            className={`px-2 py-1 rounded text-[11px] font-bold transition-all ${
-              viewAngle === "perspective" ? "bg-blue-600 text-white" : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
+            className={`px-2 py-1 rounded-md text-[11px] font-extrabold transition-all cursor-pointer ${
+              viewAngle === "perspective"
+                ? "bg-white text-[#006e70] shadow-xs"
+                : "text-white/90 hover:text-white hover:bg-white/20"
             }`}
           >
             3D
@@ -353,7 +349,7 @@ export const Signboard3DCanvas: React.FC<Signboard3DCanvasProps> = ({
           <button
             type="button"
             onClick={handleCaptureSnapshot}
-            className="p-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold flex items-center gap-1 transition-all shadow-xs"
+            className="p-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-extrabold flex items-center gap-1 transition-all shadow-xs cursor-pointer border-none"
           >
             <CameraOutlined />
             <span className="hidden sm:inline">Lấy Mẫu 3D</span>
@@ -361,8 +357,11 @@ export const Signboard3DCanvas: React.FC<Signboard3DCanvasProps> = ({
         </Tooltip>
       </div>
 
-      {/* Guide hint at bottom */}
-      <div className="absolute bottom-2 left-3 text-[10px] text-slate-500 bg-white/90 backdrop-blur-xs px-2.5 py-1 rounded-md border border-slate-200 shadow-2xs pointer-events-none">
+      {/* Guide hint at bottom-left (Nền xanh rêu Admake, opacity 75%) */}
+      <div
+        className="absolute bottom-18 sm:bottom-16 left-3.5 z-20 text-[10px] sm:text-[11px] text-white font-medium px-2.5 py-1 rounded-lg border border-white/25 shadow-md backdrop-blur-md pointer-events-none"
+        style={{ backgroundColor: "rgba(0, 180, 182, 0.75)" }}
+      >
         Chuột trái: Xoay 360° • Cuộn chuột: Phóng to/Thu nhỏ • Chuột phải: Di chuyển
       </div>
     </div>
