@@ -431,33 +431,9 @@ export const Signboard3DStudio: React.FC = () => {
 
   return (
     <div className="flex flex-col h-full bg-white text-slate-800 rounded-2xl border border-slate-200 p-4 md:p-6 shadow-xs space-y-6">
-      {/* Header Studio & Workflow Stepper */}
-      <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-slate-200">
-        <div className="flex items-center gap-3">
-          <img
-            src="/logo.jpg"
-            alt="Admake Logo"
-            className="w-10 h-10 rounded-xl object-contain shadow-xs border border-slate-200"
-          />
-          <div>
-            <div className="flex items-center gap-2">
-              <img src="/ADMAKE.svg" alt="ADMAKE" className="h-7" />
-              <h1 className="text-base md:text-lg font-black text-slate-800 tracking-tight m-0">
-                3D SIGNBOARD AI STUDIO
-              </h1>
-              <span className="text-[10px] px-2 py-0.5 rounded-full font-bold bg-blue-50 text-blue-700 border border-blue-200">
-                GENAI 4K
-              </span>
-            </div>
-            <p className="text-xs text-slate-500 m-0">
-              Quy trình tự động hóa: Khảo Sát → Mô Hình 3D → Vật Liệu Admake → Chỉnh Sửa → Render GenAI → Báo Giá AI
-            </p>
-          </div>
-        </div>
-
-        {/* Chevron Arrow Timeline Stepper (Timeline phong cách mũi tên đa sắc) */}
-        <div className="flex items-center overflow-x-auto py-1 px-1 max-w-full">
-          <div className="flex items-center">
+      {/* Chevron Arrow Timeline Stepper (Timeline phong cách mũi tên đa sắc) */}
+      <div className="flex items-center justify-center w-full pb-3 border-b border-slate-200 overflow-x-auto">
+        <div className="flex items-center py-1 px-1">
             {WORKFLOW_STEPS.map((item, index) => {
               const Icon = item.icon;
               const isActive = currentStep === item.step;
@@ -515,7 +491,6 @@ export const Signboard3DStudio: React.FC = () => {
             })}
           </div>
         </div>
-      </div>
 
       {/* Main Content Area based on currentStep */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 min-h-[550px]">
