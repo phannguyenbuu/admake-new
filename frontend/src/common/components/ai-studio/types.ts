@@ -1,4 +1,4 @@
-export type AiEngine = "gpt" | "gemini";
+export type AiEngine = "gpt" | "gemini" | "toolx";
 export type AspectRatio = "1:1" | "16:9" | "9:16" | "4:3" | "3:4";
 export type Resolution = "4k" | "2k" | "1080p";
 
@@ -6,6 +6,12 @@ export interface ProPresets {
   style: string;
   lighting: string;
   lens: string;
+}
+
+export interface CodeBlock {
+  index?: number;
+  language: string;
+  code: string;
 }
 
 export interface AiStudioImageItem {
@@ -33,11 +39,14 @@ export interface ChatMessage {
   id: string;
   role: "user" | "assistant" | "system";
   content: string;
+  images?: string[];
+  code_blocks?: CodeBlock[];
   engine?: AiEngine;
   model?: string;
   tokens?: number;
   costUsd?: number;
   costVnd?: number;
+  durationSeconds?: number;
   timestamp: string;
 }
 

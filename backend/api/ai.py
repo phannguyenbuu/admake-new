@@ -2182,6 +2182,105 @@ def api_genai_gallery():
     except Exception as e:
         return jsonify({"error": f"Lỗi lấy gallery: {str(e)}"}), 502
 
+# ==============================================================================
+# GENAI TOOLXPRINT CHAT & CODE EXTRACTION (CHROME EXTENSION BRIDGE)
+# ==============================================================================
+@ai_bp.route('/api/ai/toolx/chat', methods=['POST', 'OPTIONS'])
+def api_ai_toolx_chat():
+    """
+    API riêng kết nối ChatGPT qua GenAI Toolxprint Bridge:
+    Nhận prompt + hình ảnh đính kèm (base64 hoặc URL),
+    trả về text phản hồi đầy đủ và bóc tách riêng các khối code để copy.
+    """
+    if request.method == 'OPTIONS':
+        return jsonify({"ok": True}), 200
+
+    data = request.get_json(force=True, silent=True) or {}
+    prompt = (data.get("prompt") or "").strip()
+    images = data.get("images") or data.get("reference_images") or []
+    new_chat = data.get("new_chat", False)
+    worker_id = data.get("worker_id")
+    wait = data.get("wait", True)
+
+    if not prompt and not images:
+        return jsonify({"success": False, "error": "Vui lòng nhập nội dung câu hỏi hoặc gửi ảnh đính kèm"}), 400
+
+    try:
+        payload = {
+            "prompt": prompt,
+            "reference_images": images,
+            "job_type": "chat_code",
+            "new_chat": new_chat,
+            "worker_id": worker_id
+        }
+        r = requests.post(f"{GENAI_BASE_URL}/api/chat/create", json=payload, timeout=30)
+        if r.status_code not in (200, 201):
+            return jsonify({"success": False, "error": f"Lỗi tạo tác vụ trên GenAI Toolxprint: {r.text}"}), 502
+
+        job_data = r.json()
+        job_id = job_data.get("id")
+
+        if not wait:
+            return jsonify({
+                "success": True,
+                "job_id": job_id,
+                "status": "queued",
+                "message": "Tác vụ chat đã được gửi vào hàng đợi"
+            }), 201
+
+        # Chờ kết quả polling tối đa 120s
+        start_time = time.time()
+        while time.time() - start_time < 120:
+            time.sleep(1.5)
+            chk = requests.get(f"{GENAI_BASE_URL}/api/jobs/{job_id}", timeout=10)
+            if chk.status_code == 200:
+                cur_job = chk.json()
+                if cur_job.get("status") == "completed":
+                    reply_text = cur_job.get("result_text") or cur_job.get("text") or ""
+                    code_blocks = cur_job.get("result_code_blocks") or cur_job.get("code_blocks") or []
+                    return jsonify({
+                        "success": True,
+                        "job_id": job_id,
+                        "status": "completed",
+                        "response_type": "text_code",
+                        "reply": reply_text,
+                        "text": reply_text,
+                        "code_blocks": code_blocks,
+                        "duration_seconds": cur_job.get("duration_seconds", 0)
+                    }), 200
+                elif cur_job.get("status") == "failed":
+                    return jsonify({
+                        "success": False,
+                        "job_id": job_id,
+                        "status": "failed",
+                        "error": cur_job.get("current_step") or "ChatGPT gặp sự cố khi xử lý tác vụ"
+                    }), 500
+
+        return jsonify({
+            "success": False,
+            "job_id": job_id,
+            "status": "timeout",
+            "error": "Quá thời gian chờ phản hồi từ ChatGPT (120s). Vui lòng kiểm tra lại tab ChatGPT đang chạy Extension."
+        }), 504
+
+    except Exception as e:
+        return jsonify({"success": False, "error": f"Lỗi kết nối GenAI Toolxprint: {str(e)}"}), 502
+
+@ai_bp.route('/api/ai/toolx/jobs/<job_id>', methods=['GET', 'OPTIONS'])
+def api_ai_toolx_job_get(job_id):
+    """Polling lấy trạng thái và kết quả text & code của job từ GenAI Toolxprint"""
+    if request.method == 'OPTIONS':
+        return jsonify({"ok": True}), 200
+    try:
+        r = requests.get(f"{GENAI_BASE_URL}/api/jobs/{job_id}", timeout=10)
+        return jsonify(r.json()), r.status_code
+    except Exception as e:
+        return jsonify({"error": f"Lỗi lấy trạng thái job: {str(e)}"}), 502
+
+# ==============================================================================
+# HINTS & MÔ HÌNH 3D QUẢNG CÁO
+# ==============================================================================
+
 @ai_bp.route('/api/ai/3d/hints', methods=['GET', 'OPTIONS'])
 def api_ai_3d_hints():
     """Lấy danh sách Hint chuyên dụng về quảng cáo từ bảng nhỏ đến bảng khổng lồ"""
