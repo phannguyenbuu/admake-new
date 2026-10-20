@@ -9,7 +9,7 @@ import { UpdateButtonProvider } from "../hooks/useUpdateButtonTask";
 const { Sider, Content } = Layout;
 
 const SIDEBAR_WIDTH = 280;
-const SIDEBAR_COLLAPSED_WIDTH = 80;
+const SIDEBAR_COLLAPSED_WIDTH = 40;
 
 export default function DashLayout() {
   const [collapsed, setCollapsed] = React.useState(false);
@@ -66,8 +66,8 @@ export default function DashLayout() {
                 boxShadow: "2px 0 8px rgba(0, 180, 182, 0.15)",
                 border: "none",
                 padding: "0",
-                borderTopRightRadius: "32px",
-                borderBottomRightRadius: "32px",
+                borderTopRightRadius: collapsed ? "16px" : "32px",
+                borderBottomRightRadius: collapsed ? "16px" : "32px",
                 height: "calc(100vh - 66px)",
                 display: "flex",
                 flexDirection: "column",
@@ -78,26 +78,42 @@ export default function DashLayout() {
                 top: 66,
                 bottom: 0,
                 overflow: "hidden",
+                transition: "all 0.2s ease",
               }}
               className="!fixed !left-0 !top-[66px] !bottom-0 !z-10 !opacity-90"
               trigger={null}
             >
-              {!collapsed && (
-                <div className="flex-1 overflow-y-auto pb-4">
-                  <RenderMenuBar />
+              {collapsed ? (
+                <div className="h-full w-full flex items-center justify-center">
+                  <button
+                    type="button"
+                    aria-label="Mở menu"
+                    onClick={toggleSidebar}
+                    className="flex h-8 w-8 items-center justify-center rounded-full border-0 bg-white/20 hover:bg-white/35 text-white transition hover:scale-110 focus:outline-none cursor-pointer text-sm shadow-xs"
+                    title="Mở menu (Mở rộng thanh bên)"
+                  >
+                    <RightOutlined />
+                  </button>
                 </div>
-              )}
+              ) : (
+                <>
+                  <div className="flex-1 overflow-y-auto pb-4">
+                    <RenderMenuBar />
+                  </div>
 
-              <div className={`mt-auto flex ${collapsed ? "justify-center" : "justify-end"}`}>
-                <button
-                  type="button"
-                  aria-label={collapsed ? "Mở menu" : "Thu gọn menu"}
-                  onClick={toggleSidebar}
-                  className="flex h-20 w-20 items-center justify-center rounded-full border-0 bg-transparent p-0 text-[28px] text-white/95 transition hover:scale-105 hover:text-white focus:outline-none"
-                >
-                  {collapsed ? <RightOutlined /> : <LeftOutlined />}
-                </button>
-              </div>
+                  <div className="mt-auto flex justify-end p-2.5">
+                    <button
+                      type="button"
+                      aria-label="Thu gọn menu"
+                      onClick={toggleSidebar}
+                      className="flex h-9 w-9 items-center justify-center rounded-full border-0 bg-white/15 hover:bg-white/30 text-white transition hover:scale-105 focus:outline-none cursor-pointer text-base shadow-xs"
+                      title="Thu gọn menu"
+                    >
+                      <LeftOutlined />
+                    </button>
+                  </div>
+                </>
+              )}
             </Sider>
           )}
 

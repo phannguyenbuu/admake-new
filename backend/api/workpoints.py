@@ -1506,34 +1506,59 @@ def post_workpoint_by_user_and_date(user_id):
     evening_in = bool(checklist.get("evening", {}).get("in"))
     evening_out = bool(checklist.get("evening", {}).get("out"))
 
+    is_overtime = data.get("is_overtime") is True or data.get("period") == "evening"
     requested_period = data.get("period")
-    if requested_period in ["morning", "noon", "evening"]:
+
+    if is_overtime:
+        # Người dùng chủ động chọn Điểm danh Tăng ca (Tối)
+        if evening_in and evening_out:
+            return jsonify({
+                "error": "EVENING_COMPLETED",
+                "message": "Bạn đã hoàn tất cả vào và ra ca tăng ca tối hôm nay."
+            }), 400
+        period = "evening"
+    elif requested_period in ["morning", "noon"]:
         period = requested_period
+    elif evening_in and not evening_out:
+        # Đang trong ca tối (đã vào tối mà chưa ra tối) -> Ra ca tối
+        period = "evening"
     elif current_time < time(12, 0) and not (noon_in or evening_in):
         # Buổi sáng (trước 12:00)
-        # Nếu ca sáng đã hoàn tất cả vào và ra, và giờ đã >= 11:30 -> cho phép vào ca chiều
-        if morning_in and morning_out and current_time >= time(11, 30):
-            period = "noon"
+        if morning_in and morning_out:
+            if current_time >= time(11, 30):
+                # Cho phép điểm danh sớm vào ca chiều từ 11:30
+                period = "noon"
+            else:
+                return jsonify({
+                    "error": "MORNING_COMPLETED",
+                    "message": "Bạn đã hoàn thành ca sáng (đã ra về). Ca chiều bắt đầu nhận từ 11:30."
+                }), 400
         else:
             period = "morning"
     else:
-        # Từ 12:00 trưa trở đi hoặc đã có ca chiều/tối:
-        # 1. Đang trong ca tối (đã vào tối mà chưa ra tối) -> Check-out ca tối
-        if evening_in and not evening_out:
-            period = "evening"
-        # 2. Đang trong ca chiều (đã vào chiều mà chưa ra chiều) -> Check-out ca chiều
-        elif noon_in and not noon_out:
+        # Từ 12:00 trưa trở đi và không chọn Tăng ca:
+        # Tuyệt đối KHÔNG fallback sang evening!
+        if noon_in and not noon_out:
+            # Đang trong ca chiều -> Bấm để Ra ca chiều
             period = "noon"
-        # 3. Đã hoàn tất ca chiều (cả vào và ra) -> Bất kỳ lần bấm tiếp theo nào đều là ca TỐI (TĂNG CA)
         elif noon_in and noon_out:
-            period = "evening"
-        # 4. Ca chiều chưa vào:
-        #    Nếu từ 17:00 trở đi -> Tự động nhận diện là ca TỐI (TĂNG CA)
-        #    Nếu trước 17:00 -> Nhận diện là ca CHIỀU
-        elif current_time >= time(17, 0):
-            period = "evening"
+            # Đã hoàn thành cả vào và ra ca chiều! Tuyệt đối không fallback sang tối
+            return jsonify({
+                "error": "NOON_COMPLETED",
+                "message": "Bạn đã hoàn thành ca chiều (đã ra về). Nếu bạn làm thêm giờ (tăng ca), vui lòng chọn nút [Điểm danh Tăng ca]."
+            }), 400
         else:
-            period = "noon"
+            # Ca chiều chưa có check-in:
+            if current_time <= time(18, 30):
+                # Vẫn trong khung giờ hành chính chiều / tan làm -> Thuộc ca Chiều
+                period = "noon"
+            else:
+                # Quá 18:30 tối mà chưa có ca chiều và không bấm Tăng ca:
+                # Báo lỗi rõ ràng, tuyệt đối không tự ý nhét vào tăng ca!
+                return jsonify({
+                    "error": "OFF_HOURS",
+                    "message": f"Đã quá giờ hành chính ({now.strftime('%H:%M')}). Nếu bạn làm thêm giờ (tăng ca), vui lòng chọn [Điểm danh Tăng ca]."
+                }), 400
 
     # print('period',period, workpoint.checklist)
 
@@ -1579,10 +1604,12 @@ def post_workpoint_by_user_and_date(user_id):
         flag_modified(workpoint, "checklist")
         # print(f"Checked in for {period} at {now.isoformat()}")
     else:
-        return jsonify(
-            message=f"Already checked out for {period}, skipping update",
-            data=workpoint.tdict()
-        ), 202
+        period_names = {"morning": "sáng", "noon": "chiều", "evening": "tối (tăng ca)"}
+        p_name = period_names.get(period, period)
+        return jsonify({
+            "error": "ALREADY_CHECKED_OUT",
+            "message": f"Bạn đã hoàn tất cả vào và ra cho ca {p_name} hôm nay."
+        }), 400
 
     db.session.add(workpoint)
     db.session.commit()

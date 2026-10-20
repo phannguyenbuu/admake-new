@@ -80,6 +80,8 @@ const CameraDialog: React.FC<CameraDialogProps> = ({userEl}) => {
   const [workpoint, setWorkpoint] = useState<Workpoint | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isOvertimeMode, setIsOvertimeMode] = useState<boolean>(false);
+  const [submitting, setSubmitting] = useState<boolean>(false);
   const isSupplier = userEl?.role?.name === "Thầu phụ";
   const [openWork, setOpenWork] = useState(false);
   const [openHoliday, setOpenHoliday] = useState(false);
@@ -386,55 +388,47 @@ const CameraDialog: React.FC<CameraDialogProps> = ({userEl}) => {
 
 
 
-async function postWorkpointCheck(imgUrl: string, lat:string, long:string) {
-  const url = `${useApiHost()}/workpoint/check/${userEl?.id}/`;
+const startCapture = (overtime: boolean) => {
+    setIsOvertimeMode(overtime);
+    capturePhoto();
+  };
 
-  try {
+  async function postWorkpointCheck(imgUrl: string, lat: string, long: string, isOvertime: boolean) {
+    const url = `${useApiHost()}/workpoint/check/${userEl?.id}/`;
+
     const response = await fetch(url, {
       method: "POST",
       headers: {
-        // Nếu không gửi body thì Content-Type có thể không cần
         "Content-Type": "application/json",
-
       },
-
-     body: JSON.stringify({
-      img: imgUrl,
-      lat: lat,
-      long: long
-    })
-
+      body: JSON.stringify({
+        img: imgUrl,
+        lat: lat,
+        long: long,
+        is_overtime: isOvertime,
+        period: isOvertime ? "evening" : undefined,
+      }),
     });
 
+    const data = await response.json();
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      throw new Error(data.message || data.error || `Lỗi điểm danh (HTTP ${response.status})`);
     }
 
-    const data = await response.json();
-    console.log("Response data:", data);
     return data;
-  } catch (error) {
-    console.error("Fetch error:", error);
-    throw error;
   }
-}
 
   const handleBack = () => {
     setStep(1);
     setCaptured(false);
-    // setImageURL(null);
-    // setImageData(null);
-    // setSendSuccessMsg("");
   };
 
   const handleSend = async () => {
-    console.log('handleSend', imageData);
-    
-    if(!imageData) return;
+    if (!imageData) return;
 
     let lat = '0';
     let long = '0';
-      
+
     const formatDate = (date: Date): string => {
       const pad = (n: number) => (n < 10 ? "0" + n : n);
       return (
@@ -447,7 +441,7 @@ async function postWorkpointCheck(imgUrl: string, lat:string, long:string) {
         pad(date.getSeconds())
       );
     };
-    
+
     const now = new Date();
     const dateTimeStr = formatDate(now);
     lat = position.latitude ? position.latitude.toFixed(6) : "-";
@@ -458,58 +452,61 @@ async function postWorkpointCheck(imgUrl: string, lat:string, long:string) {
     formData.append("latitude", position.latitude?.toString() ?? "");
     formData.append("longitude", position.longitude?.toString() ?? "");
     formData.append("time", dateTimeStr);
-    
     formData.append("file", imageData, filename);
 
-    fetch(`${useApiHost()}/message/upload`, {
-      method: "POST",
-      body: formData
-    })
-    .then(response => {
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+    setSubmitting(true);
+    try {
+      const uploadRes = await fetch(`${useApiHost()}/message/upload`, {
+        method: "POST",
+        body: formData,
+      });
+      if (!uploadRes.ok) {
+        throw new Error(`Upload ảnh thất bại (HTTP ${uploadRes.status})`);
       }
-      return response.json();
-    })
-    .then(result => {
-      console.log(result.data.file_url, result.data.link);
+      const uploadResult = await uploadRes.json();
+      const new_filename = uploadResult?.data?.file_url;
+      if (!new_filename) {
+        throw new Error("Không lấy được đường dẫn ảnh sau khi upload");
+      }
 
-      const new_filename = result.data.file_url;
-      postWorkpointCheck(new_filename, lat, long);
+      await postWorkpointCheck(new_filename, lat, long, isOvertimeMode);
 
-      
-      setTimeout(() => {
-        notification.success({message:`Đã gửi thành công!`});
-        setStep(1);
-        setOpenWork(true);
-        fetchWorkpoint();
-      }, 1000);
-    })
-    .catch((err) => {
-      notification.error({message:"Lỗi upload ảnh: " + err.message});
-    });
-
-    setImageData(null);
-    
-  }
+      notification.success({
+        message: isOvertimeMode ? "Điểm danh tăng ca tối thành công!" : "Điểm danh thành công!",
+      });
+      setStep(1);
+      setOpenWork(true);
+      fetchWorkpoint();
+    } catch (err: any) {
+      notification.error({
+        message: "Lỗi điểm danh",
+        description: err.message || "Không thể hoàn tất điểm danh",
+        duration: 6,
+      });
+      fetchWorkpoint();
+    } finally {
+      setSubmitting(false);
+      setImageData(null);
+    }
+  };
 
   const handleWorkBoardCancel = () => {
     setOpenWork(false);
     setStep(1);
-  }
+  };
 
   const handleHolidayBoardCancel = () => {
     setOpenHoliday(false);
     setStep(1);
-  }
+  };
 
   const handleTaskClick = () => {
     setOpenWork(true);
-  }
+  };
 
   const handleHolidayClick = () => {
     setOpenHoliday(true);
-  }
+  };
 
   const getFirstNameInitial = (fullName?: string) => {
     if (!fullName) return "U";
@@ -518,43 +515,80 @@ async function postWorkpointCheck(imgUrl: string, lat:string, long:string) {
     return firstName.charAt(0).toUpperCase();
   };
 
-  const getNextAction = (): { label: string; isOvertime: boolean } => {
+  const getRegularAction = (): { label: string; disabled: boolean } => {
     const chk = workpoint?.checklist || {};
     const mIn = !!chk.morning?.in;
     const mOut = !!chk.morning?.out;
     const nIn = !!chk.noon?.in;
     const nOut = !!chk.noon?.out;
-    const eIn = !!chk.evening?.in;
-    const eOut = !!chk.evening?.out;
 
     const now = new Date();
     const hour = now.getHours();
+    const minute = now.getMinutes();
+    const timeMinutes = hour * 60 + minute;
 
-    if (eIn && !eOut) return { label: "Điểm danh: Ra ca Tối (Tăng ca)", isOvertime: true };
-    if (nIn && !nOut) return { label: "Điểm danh: Ra ca Chiều", isOvertime: false };
-    if (mIn && !mOut && hour < 12) return { label: "Điểm danh: Ra ca Sáng", isOvertime: false };
+    // 1. Sáng trước 11:30
+    if (timeMinutes < 11 * 60 + 30) {
+      if (!mIn) return { label: "Điểm danh: Vào ca Sáng", disabled: false };
+      if (!mOut) return { label: "Điểm danh: Ra ca Sáng", disabled: false };
+      return { label: "Đã xong ca Sáng ✓ (Ca chiều từ 11:30)", disabled: true };
+    }
 
+    // 2. Chuyển tiếp 11:30 - 12:00
+    if (timeMinutes < 12 * 60) {
+      if (mIn && !mOut) return { label: "Điểm danh: Ra ca Sáng", disabled: false };
+      if (!nIn) return { label: "Điểm danh: Vào ca Chiều", disabled: false };
+      return { label: "Đã vào ca Chiều", disabled: true };
+    }
+
+    // 3. Khung giờ hành chính chiều (12:00 - 18:30)
+    if (timeMinutes <= 18 * 60 + 30) {
+      if (nIn && !nOut) {
+        return { label: "Điểm danh: Ra ca Chiều (Tan làm)", disabled: false };
+      }
+      if (!nIn) {
+        if (timeMinutes < 16 * 60) {
+          return { label: "Điểm danh: Vào ca Chiều", disabled: false };
+        } else {
+          return { label: "Điểm danh: Ra ca Chiều (Tan làm)", disabled: false };
+        }
+      }
+      return { label: "Đã hoàn thành ca Chiều ✓", disabled: true };
+    }
+
+    // 4. Sau 18:30
+    if (nIn && !nOut) {
+      return { label: "Điểm danh: Ra ca Chiều (Quá giờ)", disabled: false };
+    }
     if (nIn && nOut) {
-      if (!eIn) return { label: "Điểm danh: Vào ca Tối (Tăng ca)", isOvertime: true };
-      if (!eOut) return { label: "Điểm danh: Ra ca Tối (Tăng ca)", isOvertime: true };
-      return { label: "Đã hoàn thành các ca hôm nay ✓", isOvertime: false };
+      return { label: "Đã hoàn thành ca Chiều ✓", disabled: true };
+    }
+    return { label: "Đã hết giờ ca Chiều (>18:30)", disabled: true };
+  };
+
+  const getOvertimeAction = (): { label: string; active: boolean } | null => {
+    const chk = workpoint?.checklist || {};
+    const eIn = !!chk.evening?.in;
+    const eOut = !!chk.evening?.out;
+
+    if (eIn && !eOut) {
+      return { label: "🔥 Điểm danh: Ra ca Tối (Tăng ca)", active: true };
+    }
+    if (eIn && eOut) {
+      return { label: "Đã hoàn thành Tăng ca tối ✓", active: false };
     }
 
-    if (hour >= 17) {
-      if (!eIn) return { label: "Điểm danh: Vào ca Tối (Tăng ca)", isOvertime: true };
-      if (!eOut) return { label: "Điểm danh: Ra ca Tối (Tăng ca)", isOvertime: true };
-      return { label: "Đã hoàn thành các ca hôm nay ✓", isOvertime: false };
+    const nIn = !!chk.noon?.in;
+    const nOut = !!chk.noon?.out;
+    const isAfternoonDone = nIn && nOut;
+    const now = new Date();
+    const hour = now.getHours();
+
+    if (hour >= 17 || isAfternoonDone) {
+      return { label: "🔥 Điểm danh: Vào ca Tối (Tăng ca)", active: true };
     }
 
-    if (hour >= 12) {
-      if (!nIn) return { label: "Điểm danh: Vào ca Chiều", isOvertime: false };
-      if (!nOut) return { label: "Điểm danh: Ra ca Chiều", isOvertime: false };
-      return { label: "Điểm danh: Vào ca Tối (Tăng ca)", isOvertime: true };
-    }
-
-    if (!mIn) return { label: "Điểm danh: Vào ca Sáng", isOvertime: false };
-    if (!mOut) return { label: "Điểm danh: Ra ca Sáng", isOvertime: false };
-    return { label: "Điểm danh: Vào ca Chiều", isOvertime: false };
+    return null;
   };
 
   return (
@@ -684,28 +718,55 @@ async function postWorkpointCheck(imgUrl: string, lat:string, long:string) {
               <CurrentDateTime />
 
               {(() => {
-                const nextAction = getNextAction();
+                const reg = getRegularAction();
+                const ot = getOvertimeAction();
                 return (
-                  <Button
-                    variant="contained"
-                    sx={{
-                      backgroundColor: nextAction.isOvertime ? "#f59e0b" : "orange",
-                      borderRadius: 20,
-                      mt: 1,
-                      minHeight: 50,
-                      px: 3,
-                      maxWidth: 360,
-                      mb: 1,
-                      fontSize: 14,
-                      fontWeight: 600,
-                      textTransform: "none",
-                      boxShadow: nextAction.isOvertime ? "0 2px 8px rgba(245,158,11,0.4)" : "0 2px 8px rgba(255,165,0,0.3)",
-                    }}
-                    onClick={capturePhoto}
-                  >
-                    <img src="/alarm-svgrepo-com.svg" alt="ADMAKE" style={{ width: 36, marginRight: 8 }} />
-                    {nextAction.label}
-                  </Button>
+                  <Stack spacing={1} sx={{ mt: 1, mb: 1, width: "100%", maxWidth: 360, alignItems: "center" }}>
+                    {/* Nút điểm danh ca Hành chính (Sáng / Chiều) */}
+                    <Button
+                      variant="contained"
+                      disabled={reg.disabled}
+                      sx={{
+                        backgroundColor: reg.disabled ? "#94a3b8" : "#ea580c",
+                        "&:hover": { backgroundColor: reg.disabled ? "#94a3b8" : "#c2410c" },
+                        borderRadius: 20,
+                        minHeight: 48,
+                        px: 3,
+                        width: "100%",
+                        fontSize: 14,
+                        fontWeight: 600,
+                        textTransform: "none",
+                        boxShadow: reg.disabled ? "none" : "0 2px 8px rgba(234,88,12,0.35)",
+                      }}
+                      onClick={() => startCapture(false)}
+                    >
+                      <img src="/alarm-svgrepo-com.svg" alt="ADMAKE" style={{ width: 32, marginRight: 8 }} />
+                      {reg.label}
+                    </Button>
+
+                    {/* Nút điểm danh Tăng ca (Tối) - Riêng biệt, rõ ràng */}
+                    {ot && (
+                      <Button
+                        variant="contained"
+                        disabled={!ot.active}
+                        sx={{
+                          backgroundColor: !ot.active ? "#cbd5e1" : "#7c3aed",
+                          "&:hover": { backgroundColor: !ot.active ? "#cbd5e1" : "#6d28d9" },
+                          borderRadius: 20,
+                          minHeight: 46,
+                          px: 3,
+                          width: "100%",
+                          fontSize: 13,
+                          fontWeight: 600,
+                          textTransform: "none",
+                          boxShadow: !ot.active ? "none" : "0 2px 8px rgba(124,58,237,0.35)",
+                        }}
+                        onClick={() => startCapture(true)}
+                      >
+                        {ot.label}
+                      </Button>
+                    )}
+                  </Stack>
                 );
               })()}
 
@@ -805,11 +866,26 @@ async function postWorkpointCheck(imgUrl: string, lat:string, long:string) {
             <>
               <CenterBox>
                 <Box sx={{ textAlign: "center", mt: 1 }}>
+                  <div
+                    style={{
+                      display: "inline-block",
+                      padding: "4px 14px",
+                      borderRadius: 16,
+                      fontSize: 13,
+                      fontWeight: 700,
+                      marginBottom: 8,
+                      backgroundColor: isOvertimeMode ? "#fef3c7" : "#e0f2fe",
+                      color: isOvertimeMode ? "#b45309" : "#0369a1",
+                      border: isOvertimeMode ? "1px solid #fde68a" : "1px solid #bae6fd",
+                    }}
+                  >
+                    {isOvertimeMode ? "🔥 Đang điểm danh: TĂNG CA (TỐI)" : "Điểm danh: CA HÀNH CHÍNH"}
+                  </div>
                   {imageURL && (
                     <img
                       src={imageURL}
                       alt="Ảnh đã chụp"
-                      style={{ maxWidth: "100%", borderRadius: 8, height: "60vh" }}
+                      style={{ maxWidth: "100%", borderRadius: 8, height: "55vh" }}
                     />
                   )}
                   {position.latitude && position.longitude && (
@@ -833,10 +909,22 @@ async function postWorkpointCheck(imgUrl: string, lat:string, long:string) {
                   transform: "translateX(-50%)",
                 }}
               >
-                <Button onClick={handleSend} variant="contained" sx={{ backgroundColor: "#00B4B6" }}>
-                  Gửi
+                <Button
+                  onClick={handleSend}
+                  variant="contained"
+                  disabled={submitting}
+                  sx={{
+                    backgroundColor: isOvertimeMode ? "#7c3aed" : "#00B4B6",
+                    "&:hover": { backgroundColor: isOvertimeMode ? "#6d28d9" : "#009698" },
+                    minWidth: 120,
+                    fontWeight: 600,
+                  }}
+                >
+                  {submitting ? "Đang gửi..." : "Gửi điểm danh"}
                 </Button>
-                <Button onClick={handleBack}>Chụp lại</Button>
+                <Button onClick={handleBack} disabled={submitting}>
+                  Chụp lại
+                </Button>
               </Stack>
             </>
           )}

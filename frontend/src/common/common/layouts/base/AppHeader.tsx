@@ -32,7 +32,6 @@ export default function AppHeader() {
   const [notificationOpen, setNotificationOpen] = useState(false);
   const [feedbackOpen, setFeedbackOpen] = useState(false);
   const [affiliateOpen, setAffiliateOpen] = useState(false);
-  const [aiStudioOpen, setAiStudioOpen] = useState(false);
   const { username, userId, userRole, userRoleId, userLeadId, workspaces, setWorkspaces, fullName } = useUser();
   const [questionOpen, setQuestionOpen] = useState(false);
   const { getNotifyList, notifyList } = useUser();
@@ -142,18 +141,18 @@ export default function AppHeader() {
             {/* Menu Chat Group List */}
             <ChatGroupList />
 
-            {/* Nút ADMAKE AI Studio 4K */}
-            <Tooltip title="ADMAKE AI Studio 4K (Hội thoại AI, Tạo thiết kế & Sửa thiết kế)">
+            {/* Nút ADMAKE AI Studio BETA */}
+            <Tooltip title="ADMAKE AI Studio (BETA) (Hội thoại AI, Tạo thiết kế & Báo giá 3D)">
               <button
                 type="button"
-                onClick={() => setAiStudioOpen(true)}
+                onClick={() => navigate("/ai-studio")}
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gradient-to-r from-violet-600 via-indigo-600 to-emerald-500 hover:from-violet-500 hover:to-emerald-400 text-white font-bold text-xs shadow-sm hover:shadow-md transition-all cursor-pointer border-none hover:scale-105 active:scale-95"
-                title="ADMAKE AI Studio 4K"
+                title="ADMAKE AI Studio BETA"
               >
                 <Sparkles className="w-3.5 h-3.5 text-amber-300 animate-pulse" />
                 <span className="hidden sm:inline">AI Studio</span>
                 <span className="text-[10px] px-1.5 py-0.2 bg-white/25 rounded-full uppercase font-extrabold tracking-wider">
-                  4K
+                  BETA
                 </span>
               </button>
             </Tooltip>
@@ -214,9 +213,6 @@ export default function AppHeader() {
 
       {/* Modal Affiliate Giới thiệu Admake */}
       <AffiliateModal open={affiliateOpen} onCancel={() => setAffiliateOpen(false)} />
-
-      {/* Modal ADMAKE AI Studio 4K */}
-      <AiStudioModal open={aiStudioOpen} onCancel={() => setAiStudioOpen(false)} />
     </>
   );
 }

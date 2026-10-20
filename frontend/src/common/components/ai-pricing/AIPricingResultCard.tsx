@@ -289,7 +289,7 @@ ${warnings.filter(w => w.level === "danger").map(w => `\n⚠️ Lưu ý: ${w.mes
             onClick={handleCopyPrompt}
             className="px-3 py-2 rounded-xl text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 border border-slate-200 transition-all flex items-center gap-1.5 cursor-pointer"
           >
-            <CopyOutlined /> Sao chép Prompt đầy đủ (ChatGPT)
+            <CopyOutlined /> Sao chép Prompt đầy đủ
           </button>
         </div>
 

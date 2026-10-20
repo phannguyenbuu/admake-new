@@ -26,6 +26,58 @@ export default defineConfig({
       },
     },
     {
+      name: 'texture-maps-middleware',
+      configureServer(server) {
+        server.middlewares.use((req, res, next) => {
+          const reqUrl = req.url || '';
+          if (reqUrl.startsWith('/api/ai/maps/file')) {
+            try {
+              const urlObj = new URL(reqUrl, 'http://localhost:5173');
+              let relPath = urlObj.searchParams.get('path') || '';
+              if (!relPath) {
+                res.statusCode = 400;
+                res.end('Missing path');
+                return;
+              }
+              relPath = decodeURIComponent(relPath);
+
+              const localMapsDir = 'D:/Dropbox/3DLib/maps';
+              const publicMapsDir = path.resolve(__dirname, 'public/maps');
+              let targetFile = path.resolve(localMapsDir, relPath);
+              if (!fs.existsSync(targetFile)) {
+                targetFile = path.resolve(publicMapsDir, relPath);
+              }
+
+              if (fs.existsSync(targetFile) && fs.statSync(targetFile).isFile()) {
+                const ext = path.extname(targetFile).toLowerCase();
+                const mimeTypes: Record<string, string> = {
+                  '.jpg': 'image/jpeg',
+                  '.jpeg': 'image/jpeg',
+                  '.png': 'image/png',
+                  '.webp': 'image/webp',
+                  '.gif': 'image/gif',
+                };
+                res.setHeader('Content-Type', mimeTypes[ext] || 'image/jpeg');
+                res.setHeader('Cache-Control', 'public, max-age=86400');
+                fs.createReadStream(targetFile).pipe(res);
+                return;
+              } else {
+                res.statusCode = 404;
+                res.end(`Texture not found: ${relPath}`);
+                return;
+              }
+            } catch (err) {
+              console.error('Error serving texture map:', err);
+              res.statusCode = 500;
+              res.end('Internal error');
+              return;
+            }
+          }
+          next();
+        });
+      }
+    },
+    {
       name: 'rewrite-fallback',
       configureServer(server) {
         server.middlewares.use(async (req, res, next) => {

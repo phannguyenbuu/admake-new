@@ -77,6 +77,7 @@ const InvoiceDashboard = lazy(() => import("../common/app/dashboard/invoices/pag
 const MaterialsDashboard = lazy(() => import("../common/app/dashboard/materials/page"));
 const AccountingDashboard = lazy(() => import("../common/app/dashboard/accounting/page"));
 const AIPricingDashboard = lazy(() => import("../common/app/dashboard/ai-pricing/page"));
+const AiStudioPage = lazy(() => import("../common/app/dashboard/ai-studio/page"));
 
 const DashboardIndexRedirect = () => {
   const { canViewPermission } = useUser();
@@ -251,6 +252,17 @@ const routes: TRoute = {
           title: "Báo giá",
           icon: <FileTextOutlined />,
           ignoreInMenu: true,
+        },
+        {
+          path: "/ai-studio",
+          element: (
+            <Suspense fallback={<div className="flex items-center justify-center h-full min-h-[400px]"><span className="text-[#00b4b6] font-bold">Đang tải AI Studio...</span></div>}>
+              <AiStudioPage />
+            </Suspense>
+          ),
+          title: "AI Studio (BETA)",
+          icon: <RobotOutlined />,
+          ignoreInMenu: false,
         },
         {
           path: "/ai-pricing",

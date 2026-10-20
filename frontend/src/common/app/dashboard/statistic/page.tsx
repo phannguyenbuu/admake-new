@@ -8,8 +8,8 @@ import { useUser } from "../../../common/hooks/useUser";
 import { useApiHost } from "../../../common/hooks/useApiHost";
 import { TOKEN_LABEL } from "../../../common/config";
 import UnPermissionBoard from "../unPermissionBoard";
-import { AiStudioModal } from "../../../components/ai-studio/AiStudioModal";
 import { Sparkles } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const tabs = [
   { key: "cong-viec", label: "Thống kê công việc" },
@@ -117,11 +117,11 @@ const StatisticDashboard: IPage["Component"] = () => {
   });
   const [toMonth, setToMonth] = React.useState<string>(getCurrentMonth());
   const [search, setSearch] = React.useState("");
+  const navigate = useNavigate();
   const [taskNameSearch, setTaskNameSearch] = React.useState("");
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<string>("");
   const [data, setData] = React.useState<StatsResponse | null>(null);
-  const [aiModalOpen, setAiModalOpen] = React.useState(false);
 
   const fetchStats = React.useCallback(async () => {
     if (!userLeadId || userLeadId <= 0) return;
@@ -204,17 +204,17 @@ const StatisticDashboard: IPage["Component"] = () => {
             ))}
           </div>
 
-          {/* Nút ADMAKE AI Studio 4K Pro */}
+          {/* Nút ADMAKE AI Studio BETA */}
           <button
             type="button"
-            onClick={() => setAiModalOpen(true)}
+            onClick={() => navigate("/ai-studio")}
             className="flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-gradient-to-r from-violet-600 via-indigo-600 to-emerald-500 hover:from-violet-500 hover:to-emerald-400 text-white font-bold text-xs shadow-md shadow-violet-900/30 hover:shadow-lg transition-all cursor-pointer border-none hover:scale-105 active:scale-95"
-            title="Mở ADMAKE AI Studio (Hội thoại AI, Tạo thiết kế 4K & Sửa thiết kế)"
+            title="Mở ADMAKE AI Studio (Hội thoại AI, Tạo thiết kế & Báo giá 3D)"
           >
             <Sparkles className="w-3.5 h-3.5 text-amber-300 animate-pulse" />
             <span>AI Studio</span>
             <span className="text-[10px] px-1.5 py-0.2 bg-white/25 rounded-full uppercase font-extrabold tracking-wider">
-              4K Pro
+              BETA
             </span>
           </button>
         </div>
@@ -809,9 +809,6 @@ const StatisticDashboard: IPage["Component"] = () => {
           </>
         )}
       </section>
-
-      {/* Modal ADMAKE AI Studio 4K Pro */}
-      <AiStudioModal open={aiModalOpen} onCancel={() => setAiModalOpen(false)} />
     </div>
   ) : <UnPermissionBoard />;
 };

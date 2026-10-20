@@ -77,7 +77,7 @@ export const AIPricingForm: React.FC<AIPricingFormProps> = ({
   const handleCopyPrompt = () => {
     const prompt = generateFullPrompt(getCurrentInput());
     navigator.clipboard.writeText(prompt);
-    message.success("Đã sao chép prompt đầy đủ vào clipboard để gửi ChatGPT/Gemini!");
+    message.success("Đã sao chép prompt đầy đủ vào clipboard để gửi AI Studio/Gemini!");
   };
 
   const isCanvas = surfaceType.startsWith("bat_");

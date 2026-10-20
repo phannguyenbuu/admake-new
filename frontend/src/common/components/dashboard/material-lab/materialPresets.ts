@@ -1,5 +1,5 @@
 /**
- * Lumion Material Library — Preset Definitions
+ * Thư Viện Vật Liệu Kiến Trúc PBR — Preset Definitions
  * Static data: no Three.js dependency.
  */
 
@@ -18,7 +18,7 @@ export const MATERIAL_PRESETS: MaterialPreset[] = [
     id: 'lumion_standard',
     name: 'Standard (Tiêu chuẩn)',
     category: 'custom',
-    description: 'Vật liệu PBR vạn năng tiêu chuẩn của Lumion với độ nhám và phản chiếu cân bằng.',
+    description: 'Vật liệu PBR vạn năng tiêu chuẩn với độ nhám và phản chiếu cân bằng.',
     color: '#A0AEC0',
     tags: ['PBR', 'Vạn Năng', 'Phản Chiếu']
   },

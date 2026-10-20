@@ -42,6 +42,7 @@ from api.document_center import document_center_bp
 from api.attachments import attachments_bp
 from api.feedback import feedback_bp
 from api.ai import ai_bp
+from api.ai_maps import ai_maps_bp
 
 app.register_blueprint(customer_bp)
 app.register_blueprint(material_bp)
@@ -68,6 +69,7 @@ app.register_blueprint(document_center_bp)
 app.register_blueprint(attachments_bp)
 app.register_blueprint(feedback_bp)
 app.register_blueprint(ai_bp)
+app.register_blueprint(ai_maps_bp)
 
 from api.chat import socketio
 

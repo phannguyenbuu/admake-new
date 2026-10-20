@@ -982,6 +982,8 @@
         <button class="sidebar-link" type="button" data-tab-target="affiliateAdminTab">🎁 Affiliate & Giới thiệu</button>
         <button class="sidebar-link" type="button" data-tab-target="landingPageTab">Landing page</button>
         <button class="sidebar-link" type="button" data-tab-target="priceSettingTab">Price setting</button>
+        <button class="sidebar-link" type="button" data-tab-target="threeDStudioTab">📐 3D</button>
+        <button class="sidebar-link" type="button" data-tab-target="extensionBridgeTab">🔌 Chrome Extension <span class="badge bg-success ms-1" id="onlineWorkersBadge" style="font-size:10px;">0</span></button>
       </div>
     </aside>
 
@@ -1631,6 +1633,382 @@
             </nav>
           </div>
         </section>
+
+        <!-- ═══ TAB: 3D STUDIO & DEFAULT RB LOADED ═══ -->
+        <section class="tab-panel" id="threeDStudioTab">
+          <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+            <div>
+              <h2 style="font-size:22px;font-weight:700;margin:0;color:#0f172a;" class="d-flex align-items-center gap-2">
+                <span>📐 Cấu Hình 3D Studio</span>
+                <span class="badge text-white" style="background: linear-gradient(135deg, #00b4b6 0%, #0284c7 100%); font-size:12px; font-weight:600;">Default RB Loaded</span>
+              </h2>
+              <p class="text-muted mb-0" style="font-size:13px;">
+                Nhập và tùy chỉnh mã Ruby SketchUp (.rb) được mở mặc định mỗi khi khởi động giao diện 3D Signboard Studio.
+              </p>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+              <a href="/dashboard.html#statistic" target="_blank" class="btn btn-outline-info btn-sm fw-bold shadow-2xs d-flex align-items-center gap-1">
+                <span>👁️ Mở Khung 3D Studio Live</span>
+                <span style="font-size:11px;">↗</span>
+              </a>
+              <button type="button" class="btn btn-sm btn-outline-secondary fw-bold" onclick="loadDefaultRubyScript()">
+                🔄 Tải Lại
+              </button>
+            </div>
+          </div>
+
+          <!-- Main Card: Default RB Loaded -->
+          <div class="bg-white rounded-3 shadow-sm border p-3 mb-3" style="border-color: rgba(15, 23, 42, 0.12) !important;">
+            <!-- Header bar with badges & tools -->
+            <div class="d-flex justify-content-between align-items-center mb-2.5 flex-wrap gap-2 pb-2.5 border-bottom">
+              <div class="d-flex align-items-center gap-2 flex-wrap">
+                <span class="fw-bold" style="font-size:14px; color:#0f172a;">Kịch bản Ruby mặc định:</span>
+                <span id="rbFileBadge" class="badge bg-secondary font-monospace" style="font-size:11px;">Đang kiểm tra...</span>
+                <span id="rbCustomBadge" class="badge bg-info text-dark" style="font-size:11px; display:none;">✨ Đã Tùy Chỉnh</span>
+                <span id="rbElementCountBadge" class="badge bg-success" style="font-size:11px;">0 đối tượng 3D</span>
+                <span id="rbDimensionsBadge" class="badge bg-dark" style="font-size:11px; display:none;"></span>
+              </div>
+              <div class="d-flex align-items-center gap-2 text-muted" style="font-size:12px;">
+                <span id="rbUpdatedTimeLabel">Cập nhật: Chưa rõ</span>
+              </div>
+            </div>
+
+            <!-- Action buttons toolbar -->
+            <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2.5">
+              <div class="d-flex align-items-center gap-2 flex-wrap">
+                <button type="button" class="btn btn-sm text-white fw-bold shadow-sm d-flex align-items-center gap-1.5"
+                  style="background: linear-gradient(135deg, #00b4b6 0%, #0284c7 100%); border: none; padding: 6px 14px;"
+                  id="btnSaveDefaultRb" onclick="saveDefaultRubyScript()">
+                  <span>💾 Lưu Mã Ruby Mặc Định</span>
+                </button>
+                <button type="button" class="btn btn-sm btn-outline-success fw-bold d-flex align-items-center gap-1"
+                  id="btnValidateRb" onclick="validateRubyScript()">
+                  <span>⚡ Kiểm Tra Cú Pháp (Validate)</span>
+                </button>
+                <button type="button" class="btn btn-sm btn-outline-danger fw-bold d-flex align-items-center gap-1"
+                  id="btnResetDefaultRb" onclick="resetDefaultRubyScript()" title="Xóa code tùy chỉnh và hoàn nguyên về kịch bản signboard gốc">
+                  <span>🔄 Khôi Phục Mã Gốc</span>
+                </button>
+              </div>
+
+              <div class="d-flex align-items-center gap-1.5">
+                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="copyRubyScript()" title="Sao chép toàn bộ code">
+                  📋 Sao Chép
+                </button>
+                <button type="button" class="btn btn-sm btn-outline-primary" onclick="downloadRubyScript()" title="Tải file .rb">
+                  📥 Tải File (.rb)
+                </button>
+              </div>
+            </div>
+
+            <!-- Status Alert Box -->
+            <div id="rbStatusAlert" class="alert py-2 px-3 mb-2.5" style="display:none; font-size:12px;"></div>
+
+            <!-- Code Editor Box -->
+            <div class="position-relative rounded-3 overflow-hidden border" style="background:#0b1329; border-color:#1e293b !important;">
+              <div class="d-flex justify-content-between align-items-center px-3 py-1.5 bg-dark border-bottom" style="border-color:#1e293b !important; font-size:11px; color:#94a3b8;">
+                <span class="font-monospace fw-bold text-light">Ruby SketchUp Editor (.rb)</span>
+                <div class="d-flex align-items-center gap-3">
+                  <span id="rbLineCount">0 dòng</span>
+                  <span id="rbCharCount">0 KB</span>
+                  <span class="text-secondary d-none d-md-inline">Phím Tab: 2 khoảng trắng • Ctrl+S: Lưu</span>
+                </div>
+              </div>
+              <textarea id="defaultRubyEditor"
+                class="form-control border-0 font-monospace"
+                style="background: #0b1329; color: #38bdf8; font-size: 13px; line-height: 1.6; min-height: 480px; resize: vertical; tab-size: 2;"
+                spellcheck="false"
+                placeholder="# Nhập hoặc dán mã Ruby SketchUp (.rb) vào đây...&#10;entities = Sketchup.active_model.entities&#10;pts = [[0, 0, 0], [6.0, 0, 0], [6.0, 0, 2.5], [0, 0, 2.5]]&#10;face = entities.add_face(pts)&#10;face.pushpull(-0.25)"
+                oninput="onRubyEditorInput(this)"
+              ></textarea>
+            </div>
+          </div>
+
+          <!-- Documentation / Cheatsheet Card -->
+          <div class="bg-white rounded-3 shadow-sm border p-3" style="border-color: rgba(15, 23, 42, 0.12) !important;">
+            <h5 class="fw-bold mb-2" style="font-size:14px; color:#0f172a;">📖 Cẩm nang & Cú pháp SketchUp Ruby API được hệ thống hỗ trợ:</h5>
+            <div class="row g-2 text-muted" style="font-size:12px;">
+              <div class="col-md-4">
+                <div class="p-2.5 rounded-2 bg-light border">
+                  <div class="fw-bold text-dark mb-1">1. Tạo Mặt & Khối Hộp (Face & Extrude)</div>
+                  <code>face = entities.add_face(pts)</code><br>
+                  <code>face.pushpull(-0.25) # Đùn khối hộp</code>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="p-2.5 rounded-2 bg-light border">
+                  <div class="fw-bold text-dark mb-1">2. Gán Vật Liệu Admake (Materials)</div>
+                  <code>face.material = "Alu Alcorest Vàng Xước"</code><br>
+                  <code>group.material = "Inox Vàng Gương 304"</code>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="p-2.5 rounded-2 bg-light border">
+                  <div class="fw-bold text-dark mb-1">3. Tạo Chữ Nổi & Nhóm (3D Text & Group)</div>
+                  <code>entities.add_3d_text('ADMAKE', ...)</code><br>
+                  <code>grp = entities.add_group</code>
+                </div>
+              </div>
+          </div>
+
+          <!-- Kho Map & Texture 3D (3D Maps Library) Setting Card -->
+          <div class="bg-white rounded-3 shadow-sm border p-3 mt-3" style="border-color: rgba(15, 23, 42, 0.12) !important;">
+            <div class="d-flex justify-content-between align-items-center mb-2.5 flex-wrap gap-2 pb-2.5 border-bottom">
+              <div class="d-flex align-items-center gap-2 flex-wrap">
+                <span class="fw-bold" style="font-size:14px; color:#0f172a;">📁 Kho Map & Texture 3D (Texture Maps Library):</span>
+                <span id="mapsStatusBadge" class="badge bg-secondary font-monospace" style="font-size:11px;">Đang kiểm tra...</span>
+                <span id="mapsFilesCountBadge" class="badge bg-info text-dark" style="font-size:11px;">0 files</span>
+              </div>
+              <div>
+                <button type="button" class="btn btn-sm btn-outline-secondary fw-bold" onclick="load3DMapsStatus()">
+                  🔄 Quét Lại Kho Map
+                </button>
+              </div>
+            </div>
+
+            <div class="row g-2 align-items-center mb-3">
+              <div class="col-md-8">
+                <label class="form-label text-muted mb-1" style="font-size:12px;">Đường dẫn thư mục Texture Maps trên máy/máy chủ:</label>
+                <div class="input-group input-group-sm">
+                  <span class="input-group-text bg-light">📂 Path</span>
+                  <input type="text" class="form-control font-monospace" id="mapsPathInput" placeholder="Ví dụ: D:\Dropbox\3DLib\maps">
+                </div>
+              </div>
+              <div class="col-md-4 d-flex align-items-end gap-1.5 pt-3 pt-md-0">
+                <button type="button" class="btn btn-sm text-white fw-bold shadow-sm d-flex align-items-center gap-1.5"
+                  style="background: linear-gradient(135deg, #00b4b6 0%, #0284c7 100%); border: none; padding: 6px 14px;"
+                  onclick="save3DMapsPath()">
+                  <span>💾 Lưu Cấu Hình Kho Map</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Danh mục Top Texture Maps -->
+            <div class="p-2.5 bg-light rounded-2 border">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="fw-bold text-dark" style="font-size:12px;">Các danh mục Texture phổ biến trong kho:</span>
+                <span class="text-muted" style="font-size:11px;" id="mapsTopCategoriesSummary"></span>
+              </div>
+              <div class="d-flex flex-wrap gap-1.5" id="mapsCategoryChips">
+                <span class="text-muted" style="font-size:12px;">Đang tải danh mục...</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- TAB QUẢN LÝ CHROME EXTENSION WORKERS (AI BRIDGE v4.0) -->
+        <section class="tab-panel" id="extensionBridgeTab">
+          <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4 pb-3 border-bottom">
+            <div>
+              <h2 class="h4 fw-bold mb-1 text-dark d-flex align-items-center gap-2">
+                <span>🔌 Chrome Extension Workers & AI Studio Bridge</span>
+                <span class="badge bg-primary fs-6">v4.0 Unified</span>
+              </h2>
+              <p class="text-muted small mb-0">Hệ thống cầu nối ChatGPT tự động: Phân tích Vision, Trích xuất Ruby SketchUp 3D, Tạo ảnh DALL-E & Định tuyến theo Target PC.</p>
+            </div>
+            <div class="d-flex flex-wrap gap-2">
+              <a href="/lead-manage/extension/download" class="btn btn-primary btn-sm d-flex align-items-center gap-1 shadow-sm">
+                <span>📥</span> Tải Extension (.zip)
+              </a>
+              <button type="button" class="btn btn-outline-secondary btn-sm" onclick="loadExtensionWorkers()">
+                <span>🔄</span> Làm Mới
+              </button>
+              <button type="button" class="btn btn-outline-danger btn-sm" onclick="sendGlobalNewChat()">
+                <span>🧹</span> Reset Tất Cả New Chat
+              </button>
+            </div>
+          </div>
+
+          <!-- Cards Thống Kê -->
+          <div class="row g-3 mb-4">
+            <div class="col-sm-6 col-lg-3">
+              <div class="card border-0 shadow-sm rounded-3 bg-white p-3">
+                <div class="text-muted small fw-semibold text-uppercase">Máy Trực Tuyến (Online)</div>
+                <div class="h3 fw-bold text-success mb-0 mt-1" id="statOnlineWorkers">0</div>
+                <div class="text-muted" style="font-size:11px;">Đang kết nối qua Chrome</div>
+              </div>
+            </div>
+            <div class="col-sm-6 col-lg-3">
+              <div class="card border-0 shadow-sm rounded-3 bg-white p-3">
+                <div class="text-muted small fw-semibold text-uppercase">Máy Đang Rảnh (Idle)</div>
+                <div class="h3 fw-bold text-primary mb-0 mt-1" id="statIdleWorkers">0</div>
+                <div class="text-muted" style="font-size:11px;">Sẵn sàng nhận việc</div>
+              </div>
+            </div>
+            <div class="col-sm-6 col-lg-3">
+              <div class="card border-0 shadow-sm rounded-3 bg-white p-3">
+                <div class="text-muted small fw-semibold text-uppercase">Đang Xử Lý (Busy)</div>
+                <div class="h3 fw-bold text-warning mb-0 mt-1" id="statBusyWorkers">0</div>
+                <div class="text-muted" style="font-size:11px;">Đang render / trả lời</div>
+              </div>
+            </div>
+            <div class="col-sm-6 col-lg-3">
+              <div class="card border-0 shadow-sm rounded-3 bg-white p-3">
+                <div class="text-muted small fw-semibold text-uppercase">Hàng Đợi Chờ (Queue)</div>
+                <div class="h3 fw-bold text-dark mb-0 mt-1" id="statQueuedJobs">0</div>
+                <div class="text-muted" style="font-size:11px;">Tác vụ đang chờ giao</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bảng Danh Sách Workers & Target PC -->
+          <div class="card border-0 shadow-sm rounded-3 bg-white mb-4">
+            <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
+              <h5 class="card-title fw-bold mb-0 text-dark" style="font-size:15px;">
+                📋 Danh Sách Máy Trạm Kết Nối (Workers & Target PC)
+              </h5>
+              <span class="text-muted small" id="workersLastUpdateText">Cập nhật tự động mỗi 3 giây</span>
+            </div>
+            <div class="table-responsive">
+              <table class="table table-hover align-middle mb-0" style="font-size:13px;">
+                <thead class="table-light text-muted small">
+                  <tr>
+                    <th>ĐỊNH DANH MÁY (TARGET PC)</th>
+                    <th>LOẠI EXTENSION</th>
+                    <th>TÊN WORKER & EMAIL</th>
+                    <th>NHÃN TÀI KHOẢN</th>
+                    <th>TRẠNG THÁI</th>
+                    <th>MÃ REQUEST ĐANG XỬ LÝ</th>
+                    <th>PING CUỐI</th>
+                    <th>ĐÃ XỬ LÝ</th>
+                    <th class="text-end">THAO TÁC</th>
+                  </tr>
+                </thead>
+                <tbody id="workersTableBody">
+                  <tr>
+                    <td colspan="9" class="text-center py-4 text-muted">
+                      <div class="spinner-border spinner-border-sm text-primary me-2" role="status"></div>
+                      Đang quét danh sách Chrome Extension kết nối...
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Khu Vực Thử Nghiệm Giao Việc Theo Target PC & Hướng Dẫn -->
+          <div class="row g-4">
+            <!-- Cột Trái: Dispatcher Test -->
+            <div class="col-lg-7">
+              <div class="card border-0 shadow-sm rounded-3 bg-white h-100">
+                <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
+                  <h5 class="card-title fw-bold mb-0 text-dark" style="font-size:15px;">
+                    ⚡ Giao Việc Thử Nghiệm Theo Tên Máy (Target PC Dispatcher)
+                  </h5>
+                  <span class="badge" style="background:#7c3aed; color:#fff; font-size:10px;">Giao thức UB4 Độc Quyền</span>
+                </div>
+                <div class="card-body p-4">
+                  <form id="extensionTestForm" onsubmit="dispatchExtensionTest(event)">
+                    <div class="row g-3 mb-3">
+                      <div class="col-md-6">
+                        <label class="form-label small fw-semibold text-muted">CHỌN MÁY ĐÍCH (TARGET PC)</label>
+                        <select class="form-select form-select-sm" id="testTargetPcSelect">
+                          <option value="">-- Phân bổ tự động (Bất kỳ máy nào rảnh) --</option>
+                        </select>
+                        <div class="form-text" style="font-size:11px;">Server sẽ gọi đúng tên máy này để nhận việc.</div>
+                      </div>
+                      <div class="col-md-6">
+                        <label class="form-label small fw-semibold text-muted">LOẠI TÁC VỤ</label>
+                        <select class="form-select form-select-sm" id="testJobTypeSelect">
+                          <option value="chat_code">👁️ Phân tích Vision / Chat Text & Ruby 3D</option>
+                          <option value="image_gen">🎨 Tạo ảnh DALL-E mới</option>
+                          <option value="ruby_3d">📐 Dựng hình SketchUp Ruby 3D (.rb)</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <!-- MÃ REQUEST RIÊNG BIỆT (CHỐNG LẪN LỘN 2 EXTENSION CŨ) -->
+                    <div class="mb-3 p-2 rounded-3 border" style="background: rgba(124, 58, 237, 0.04); border-color: rgba(124, 58, 237, 0.25) !important;">
+                      <div class="d-flex justify-content-between align-items-center mb-1">
+                        <label class="form-label small fw-bold mb-0 text-dark" style="font-size:11px;">
+                          🔑 MÃ REQUEST RIÊNG ĐỘC QUYỀN (UB4-REQ)
+                        </label>
+                        <button type="button" class="btn btn-link btn-sm p-0 text-decoration-none" style="font-size:11px; color:#7c3aed;" onclick="generateNewTestRequestCode()">
+                          🔄 Tạo mã mới
+                        </button>
+                      </div>
+                      <input type="text" class="form-control form-control-sm font-monospace fw-bold" id="testRequestCodeInput" readonly style="background:#fff; color:#7c3aed; letter-spacing:0.5px;">
+                      <div class="form-text mt-1 mb-0" style="font-size:11px; color:#6b7280;">
+                        🛡️ <strong>Chống lẫn lộn tuyệt đối:</strong> Chỉ Extension Unified v4.0 mới nhận được mã này. Hai extension cũ (Vision / v3.0) sẽ tự động bị server chặn 100%.
+                      </div>
+                    </div>
+
+                    <div class="mb-3">
+                      <label class="form-label small fw-semibold text-muted">NỘI DUNG PROMPT</label>
+                      <textarea class="form-control form-control-sm" id="testPromptInput" rows="3" placeholder="Nhập prompt thử nghiệm...">Phân tích kết cấu bảng hiệu quảng cáo mặt tiền tiệm cà phê và tạo mã Ruby SketchUp 3D</textarea>
+                    </div>
+
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                      <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="testNewChatToggle" checked>
+                        <label class="form-check-label small" for="testNewChatToggle">Yêu cầu mở phiên chat mới sạch (Clean New Chat)</label>
+                      </div>
+                      <button type="submit" class="btn btn-primary btn-sm px-3 shadow-sm" id="btnSendTestTask">
+                        🚀 Gửi Tác Vụ
+                      </button>
+                    </div>
+                  </form>
+
+                  <!-- Live Task Result Box -->
+                  <div id="testTaskResultBox" style="display:none;" class="mt-3 p-3 rounded-3 bg-light border">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                      <span class="fw-bold small" id="testResultJobId">Job: ...</span>
+                      <span class="badge bg-info" id="testResultStatusBadge">Đang xử lý</span>
+                    </div>
+                    <div class="progress mb-2" style="height: 6px;">
+                      <div class="progress-bar progress-bar-striped progress-bar-animated bg-success" id="testResultProgressBar" style="width: 25%"></div>
+                    </div>
+                    <div class="small text-muted mb-2" id="testResultStepText">Đang gửi tới Extension...</div>
+                    <div id="testResultOutput" class="small p-2 bg-white rounded border overflow-auto" style="max-height: 200px; display:none; font-family: monospace;"></div>
+                    <div id="testResultImagePreview" class="mt-2 text-center" style="display:none;"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Cột Phải: Hướng Dẫn Nạp Extension -->
+            <div class="col-lg-5">
+              <div class="card border-0 shadow-sm rounded-3 bg-white h-100">
+                <div class="card-header bg-white py-3 border-bottom">
+                  <h5 class="card-title fw-bold mb-0 text-dark" style="font-size:15px;">
+                    📖 Hướng Dẫn Cài Đặt 3 Bước Cho Máy Nhân Viên
+                  </h5>
+                </div>
+                <div class="card-body p-4">
+                  <div class="d-flex flex-column gap-3" style="font-size: 13px;">
+                    <div class="d-flex gap-3 align-items-start">
+                      <span class="badge bg-primary rounded-circle d-flex align-items-center justify-content-center" style="width:24px; height:24px; flex-shrink:0;">1</span>
+                      <div>
+                        <strong>Tải & Giải Nén</strong><br>
+                        <span class="text-muted">Bấm nút "Tải Extension (.zip)" ở trên, giải nén file vào máy tính.</span>
+                      </div>
+                    </div>
+
+                    <div class="d-flex gap-3 align-items-start">
+                      <span class="badge bg-primary rounded-circle d-flex align-items-center justify-content-center" style="width:24px; height:24px; flex-shrink:0;">2</span>
+                      <div>
+                        <strong>Nạp vào Google Chrome</strong><br>
+                        <span class="text-muted">Mở <code class="bg-light px-1">chrome://extensions/</code>, bật <em>Chế độ nhà phát triển (Developer mode)</em>, chọn <strong>Tải tiện ích đã giải nén</strong> và trỏ tới thư mục vừa giải nén.</span>
+                      </div>
+                    </div>
+
+                    <div class="d-flex gap-3 align-items-start">
+                      <span class="badge bg-primary rounded-circle d-flex align-items-center justify-content-center" style="width:24px; height:24px; flex-shrink:0;">3</span>
+                      <div>
+                        <strong>Đặt Tên Máy (Target PC) & Đăng Nhập</strong><br>
+                        <span class="text-muted">Mở Popup extension, nhập tên máy (VD: <code class="bg-light px-1">PC_BUU_01</code>, <code class="bg-light px-1">PC_DESIGN</code>), đăng nhập <a href="https://chatgpt.com/" target="_blank">chatgpt.com</a> và bắt đầu nhận việc tự động!</span>
+                      </div>
+                    </div>
+
+                    <div class="alert alert-info border-0 rounded-3 p-3 mt-2 mb-0" style="font-size: 12px;">
+                      💡 <strong>Lưu ý:</strong> Phiên bản v4.0 đã tích hợp cơ chế <em>Clean Session Isolation</em>, tự động dọn sạch 100% draft và turns cũ, loại bỏ hoàn toàn lỗi kẹt phiên chat.
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
       </main>
     </div>
   </div>
@@ -1817,13 +2195,42 @@
         tabButtons.forEach(btn => {
           btn.classList.toggle('is-active', btn.dataset.tabTarget === targetId);
         });
+        if (targetId === 'threeDStudioTab') {
+          if (typeof loadDefaultRubyScript === 'function') {
+            loadDefaultRubyScript();
+          }
+          if (typeof load3DMapsStatus === 'function') {
+            load3DMapsStatus();
+          }
+        } else if (targetId === 'extensionBridgeTab') {
+          if (typeof loadExtensionWorkers === 'function') {
+            loadExtensionWorkers();
+          }
+        }
       };
 
       tabButtons.forEach(btn => {
         btn.addEventListener('click', () => {
           setActiveTab(btn.dataset.tabTarget);
+          if (btn.dataset.tabTarget === 'threeDStudioTab') {
+            try { history.replaceState(null, '', '#3d'); } catch (e) { window.location.hash = '3d'; }
+          } else if (btn.dataset.tabTarget === 'extensionBridgeTab') {
+            try { history.replaceState(null, '', '#extension'); } catch (e) { window.location.hash = 'extension'; }
+          }
         });
       });
+
+      // Tự động kích hoạt tab nếu URL có hash #3d hoặc #extension
+      const checkHashOnLoad = () => {
+        const h = (window.location.hash || '').replace('#', '').toLowerCase();
+        if (h === '3d' || h === 'threedstudiotab') {
+          setActiveTab('threeDStudioTab');
+        } else if (h === 'extension' || h === 'extensionbridgetab') {
+          setActiveTab('extensionBridgeTab');
+        }
+      };
+      checkHashOnLoad();
+      window.addEventListener('hashchange', checkHashOnLoad);
 
       const landingEditor = document.getElementById('landingContentEditor');
       const landingSaveBtn = document.getElementById('landingSaveBtn');
@@ -4079,6 +4486,673 @@
         }
       });
     });
+
+    // ══════════════════════════════════════════════════════════
+    // 📐 3D STUDIO & DEFAULT RB LOADED SCRIPT MANAGEMENT
+    // ══════════════════════════════════════════════════════════
+    let currentLoadedRbCode = "";
+
+    function onRubyEditorInput(textarea) {
+      if (!textarea) return;
+      const text = textarea.value || "";
+      const lines = text.split("\n").length;
+      const bytes = new Blob([text]).size;
+      const kb = (bytes / 1024).toFixed(1);
+      
+      const lineEl = document.getElementById("rbLineCount");
+      if (lineEl) lineEl.innerText = `${lines.toLocaleString()} dòng`;
+      const charEl = document.getElementById("rbCharCount");
+      if (charEl) charEl.innerText = `${kb} KB`;
+    }
+
+    // Thiết lập phím tắt trong Editor: Tab = 2 spaces, Ctrl+S = Lưu
+    document.addEventListener("DOMContentLoaded", () => {
+      const editor = document.getElementById("defaultRubyEditor");
+      if (!editor) return;
+
+      editor.addEventListener("keydown", (e) => {
+        // Tab key: Chèn 2 khoảng trắng
+        if (e.key === "Tab") {
+          e.preventDefault();
+          const start = editor.selectionStart;
+          const end = editor.selectionEnd;
+          editor.value = editor.value.substring(0, start) + "  " + editor.value.substring(end);
+          editor.selectionStart = editor.selectionEnd = start + 2;
+          onRubyEditorInput(editor);
+        }
+        // Ctrl+S / Cmd+S: Lưu nhanh
+        if ((e.ctrlKey || e.metaKey) && (e.key === "s" || e.key === "S")) {
+          e.preventDefault();
+          saveDefaultRubyScript();
+        }
+      });
+    });
+
+    async function loadDefaultRubyScript() {
+      const editor = document.getElementById("defaultRubyEditor");
+      const fileBadge = document.getElementById("rbFileBadge");
+      const customBadge = document.getElementById("rbCustomBadge");
+      const countBadge = document.getElementById("rbElementCountBadge");
+      const dimBadge = document.getElementById("rbDimensionsBadge");
+      const timeLabel = document.getElementById("rbUpdatedTimeLabel");
+      const statusAlert = document.getElementById("rbStatusAlert");
+
+      if (fileBadge) fileBadge.innerText = "Đang tải dữ liệu...";
+
+      try {
+        const res = await fetch("/api/ai/signs/default-rb");
+        const data = await res.json();
+
+        if (data.success && data.ruby_code) {
+          currentLoadedRbCode = data.ruby_code;
+          if (editor) {
+            editor.value = data.ruby_code;
+            onRubyEditorInput(editor);
+          }
+
+          if (fileBadge) {
+            fileBadge.innerText = data.filename || "signboard_sketchup.rb";
+            fileBadge.className = data.is_custom ? "badge bg-primary font-monospace" : "badge bg-secondary font-monospace";
+          }
+          if (customBadge) {
+            customBadge.style.display = data.is_custom ? "inline-block" : "none";
+          }
+          if (countBadge) {
+            countBadge.innerText = `${data.element_count || 0} đối tượng 3D`;
+          }
+          if (dimBadge && data.model3d?.dimensions) {
+            const d = data.model3d.dimensions;
+            dimBadge.innerText = `Kích thước: ${d.width || 6}m × ${d.height || 2.5}m × ${d.depth || 0.25}m`;
+            dimBadge.style.display = "inline-block";
+          }
+          if (timeLabel) {
+            timeLabel.innerText = data.updated_at ? `Cập nhật: ${data.updated_at}` : `Trạng thái: Đang hoạt động`;
+          }
+
+          if (statusAlert) {
+            statusAlert.style.display = "block";
+            statusAlert.className = "alert alert-success py-2 px-3 mb-2.5";
+            statusAlert.innerHTML = `✅ <strong>Đã tải kịch bản:</strong> File <code>${escapeHtml(data.filename)}</code> với <strong>${data.element_count || 0} đối tượng 3D</strong> sẵn sàng nạp mặc định khi mở không gian 3D.`;
+            setTimeout(() => { if (statusAlert) statusAlert.style.display = "none"; }, 5000);
+          }
+        } else {
+          if (fileBadge) fileBadge.innerText = "Lỗi nạp file";
+          if (statusAlert) {
+            statusAlert.style.display = "block";
+            statusAlert.className = "alert alert-danger py-2 px-3 mb-2.5";
+            statusAlert.innerText = `❌ Lỗi: ${data.error || "Không thể tải kịch bản Ruby"}`;
+          }
+        }
+      } catch (err) {
+        if (fileBadge) fileBadge.innerText = "Lỗi kết nối";
+        if (statusAlert) {
+          statusAlert.style.display = "block";
+          statusAlert.className = "alert alert-danger py-2 px-3 mb-2.5";
+          statusAlert.innerText = `❌ Không thể kết nối tới máy chủ backend: ${err.message}`;
+        }
+      }
+    }
+
+    async function saveDefaultRubyScript() {
+      const editor = document.getElementById("defaultRubyEditor");
+      const btn = document.getElementById("btnSaveDefaultRb");
+      const statusAlert = document.getElementById("rbStatusAlert");
+      const code = (editor?.value || "").trim();
+
+      if (!code) {
+        alert("Vui lòng nhập mã Ruby SketchUp trước khi lưu!");
+        return;
+      }
+
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = `<span>⏳ Đang kiểm tra & lưu...</span>`;
+      }
+
+      try {
+        const res = await fetch("/api/ai/signs/default-rb", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ ruby_code: code }),
+        });
+        const data = await res.json();
+
+        if (data.success) {
+          currentLoadedRbCode = code;
+          const fileBadge = document.getElementById("rbFileBadge");
+          if (fileBadge) {
+            fileBadge.innerText = data.filename || "active_default_signboard.rb";
+            fileBadge.className = "badge bg-primary font-monospace";
+          }
+          const customBadge = document.getElementById("rbCustomBadge");
+          if (customBadge) customBadge.style.display = "inline-block";
+          const countBadge = document.getElementById("rbElementCountBadge");
+          if (countBadge) countBadge.innerText = `${data.element_count || 0} đối tượng 3D`;
+          const timeLabel = document.getElementById("rbUpdatedTimeLabel");
+          if (timeLabel) timeLabel.innerText = `Vừa lưu lúc ${data.updated_at || "hôm nay"}`;
+
+          if (statusAlert) {
+            statusAlert.style.display = "block";
+            statusAlert.className = "alert alert-success py-2 px-3 mb-2.5";
+            statusAlert.innerHTML = `🎉 <strong>Lưu thành công!</strong> Kịch bản Ruby mặc định mới đã được áp dụng. Khi mở bất kỳ giao diện 3D Studio nào, hệ thống sẽ tự động nạp đoạn code này với <strong>${data.element_count || 0} vật thể 3D</strong>!`;
+          }
+          alert("✅ Đã lưu kịch bản Ruby mặc định thành công! Mã này sẽ được mở tự động mỗi khi vào 3D.");
+        } else {
+          if (statusAlert) {
+            statusAlert.style.display = "block";
+            statusAlert.className = "alert alert-danger py-2 px-3 mb-2.5";
+            statusAlert.innerText = `❌ Lưu thất bại: ${data.error || "Không rõ nguyên nhân"}`;
+          }
+          alert(`Lưu thất bại: ${data.error || "Lỗi máy chủ"}`);
+        }
+      } catch (err) {
+        if (statusAlert) {
+          statusAlert.style.display = "block";
+          statusAlert.className = "alert alert-danger py-2 px-3 mb-2.5";
+          statusAlert.innerText = `❌ Lỗi kết nối khi lưu: ${err.message}`;
+        }
+        alert(`Lỗi kết nối khi lưu kịch bản: ${err.message}`);
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = `<span>💾 Lưu Mã Ruby Mặc Định</span>`;
+        }
+      }
+    }
+
+    async function validateRubyScript() {
+      const editor = document.getElementById("defaultRubyEditor");
+      const btn = document.getElementById("btnValidateRb");
+      const statusAlert = document.getElementById("rbStatusAlert");
+      const code = (editor?.value || "").trim();
+
+      if (!code) {
+        alert("Vui lòng nhập mã Ruby để kiểm tra cú pháp!");
+        return;
+      }
+
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = `<span>⏳ Đang phân tích...</span>`;
+      }
+
+      try {
+        const res = await fetch("/api/ai/signs/validate-ruby", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ ruby_code: code }),
+        });
+        const data = await res.json();
+
+        if (statusAlert) {
+          statusAlert.style.display = "block";
+          if (data.valid) {
+            statusAlert.className = "alert alert-success py-2 px-3 mb-2.5";
+            let breakdownStr = "";
+            if (data.types_breakdown) {
+              breakdownStr = Object.entries(data.types_breakdown).map(([k, v]) => `${k}: ${v}`).join(", ");
+            }
+            statusAlert.innerHTML = `
+              <div class="fw-bold mb-1">✅ Cú pháp hoàn toàn hợp lệ!</div>
+              <div>• Tổng đối tượng 3D tạo ra: <strong>${data.element_count}</strong> (${breakdownStr || "Mesh"})</div>
+              ${data.dimensions ? `<div>• Kích thước tổng thể: <strong>${data.dimensions.width || 6}m × ${data.dimensions.height || 2.5}m × ${data.dimensions.depth || 0.25}m</strong></div>` : ""}
+            `;
+          } else {
+            statusAlert.className = "alert alert-danger py-2 px-3 mb-2.5";
+            statusAlert.innerHTML = `
+              <div class="fw-bold mb-1">❌ Phát hiện lỗi trong cú pháp Ruby:</div>
+              <div><code>${escapeHtml(data.error || data.message || "Cú pháp không hợp lệ")}</code></div>
+            `;
+          }
+        }
+      } catch (err) {
+        if (statusAlert) {
+          statusAlert.style.display = "block";
+          statusAlert.className = "alert alert-danger py-2 px-3 mb-2.5";
+          statusAlert.innerText = `❌ Lỗi kết nối kiểm tra: ${err.message}`;
+        }
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = `<span>⚡ Kiểm Tra Cú Pháp (Validate)</span>`;
+        }
+      }
+    }
+
+    async function resetDefaultRubyScript() {
+      if (!confirm("Bạn có chắc chắn muốn khôi phục về kịch bản Ruby mẫu gốc signboard_sketchup_1791878469884.rb không? Toàn bộ tùy chỉnh riêng sẽ bị xóa.")) {
+        return;
+      }
+
+      const editor = document.getElementById("defaultRubyEditor");
+      const btn = document.getElementById("btnResetDefaultRb");
+      const statusAlert = document.getElementById("rbStatusAlert");
+
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = `<span>⏳ Đang khôi phục...</span>`;
+      }
+
+      try {
+        const res = await fetch("/api/ai/signs/default-rb/reset", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" }
+        });
+        const data = await res.json();
+
+        if (data.success && data.ruby_code) {
+          currentLoadedRbCode = data.ruby_code;
+          if (editor) {
+            editor.value = data.ruby_code;
+            onRubyEditorInput(editor);
+          }
+          const fileBadge = document.getElementById("rbFileBadge");
+          if (fileBadge) {
+            fileBadge.innerText = data.filename || "signboard_sketchup_1791878469884.rb";
+            fileBadge.className = "badge bg-secondary font-monospace";
+          }
+          const customBadge = document.getElementById("rbCustomBadge");
+          if (customBadge) customBadge.style.display = "none";
+          const countBadge = document.getElementById("rbElementCountBadge");
+          if (countBadge) countBadge.innerText = `${data.element_count || 0} đối tượng 3D`;
+          const timeLabel = document.getElementById("rbUpdatedTimeLabel");
+          if (timeLabel) timeLabel.innerText = "Đã khôi phục về bản gốc";
+
+          if (statusAlert) {
+            statusAlert.style.display = "block";
+            statusAlert.className = "alert alert-info py-2 px-3 mb-2.5";
+            statusAlert.innerText = "🔄 Đã khôi phục thành công về kịch bản Ruby mẫu gốc!";
+          }
+          alert("✅ Đã khôi phục về kịch bản Ruby mẫu gốc!");
+        } else {
+          alert(`Khôi phục thất bại: ${data.error || "Lỗi máy chủ"}`);
+        }
+      } catch (err) {
+        alert(`Lỗi kết nối khi khôi phục: ${err.message}`);
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = `<span>🔄 Khôi Phục Mã Gốc</span>`;
+        }
+      }
+    }
+
+    function copyRubyScript() {
+      const editor = document.getElementById("defaultRubyEditor");
+      const code = editor?.value || "";
+      if (!code) {
+        alert("Không có mã Ruby nào để sao chép!");
+        return;
+      }
+      navigator.clipboard.writeText(code).then(() => {
+        alert("📋 Đã sao chép toàn bộ mã Ruby vào bộ nhớ đệm!");
+      }).catch(() => {
+        alert("Không thể sao chép tự động, vui lòng chọn và Ctrl+C thủ công.");
+      });
+    }
+
+    function downloadRubyScript() {
+      const editor = document.getElementById("defaultRubyEditor");
+      const code = editor?.value || "";
+      if (!code) {
+        alert("Không có mã Ruby nào để tải!");
+        return;
+      }
+      const blob = new Blob([code], { type: "text/plain;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "signboard_sketchup_default.rb";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    async function load3DMapsStatus() {
+      const badge = document.getElementById("mapsStatusBadge");
+      const filesBadge = document.getElementById("mapsFilesCountBadge");
+      const pathInput = document.getElementById("mapsPathInput");
+      const chips = document.getElementById("mapsCategoryChips");
+      const summary = document.getElementById("mapsTopCategoriesSummary");
+
+      if (badge) badge.innerText = "Đang kiểm tra...";
+
+      try {
+        const res = await fetch("/api/ai/maps/status");
+        const data = await res.json();
+        if (data.success) {
+          if (pathInput) pathInput.value = data.path || "";
+          if (badge) {
+            badge.innerText = data.exists ? "✅ Đang kết nối" : "⚠️ Thư mục không tồn tại";
+            badge.className = data.exists ? "badge bg-success font-monospace" : "badge bg-warning text-dark font-monospace";
+          }
+          if (filesBadge) {
+            filesBadge.innerText = `${(data.total_files || 0).toLocaleString()} files (${data.categories_count || 0} danh mục)`;
+          }
+          if (summary) {
+            summary.innerText = `Tổng cộng ${data.categories_count || 0} danh mục texture`;
+          }
+          if (chips && data.top_categories) {
+            chips.innerHTML = data.top_categories.map(c => 
+              `<span class="badge bg-white text-dark border shadow-2xs py-1 px-2" style="font-size:11px;">
+                <strong>${escapeHtml(c.name)}</strong>: <span class="text-primary font-bold">${c.file_count.toLocaleString()}</span>
+              </span>`
+            ).join("");
+          }
+        }
+      } catch (err) {
+        if (badge) badge.innerText = "Lỗi kết nối";
+      }
+    }
+
+    async function save3DMapsPath() {
+      const pathInput = document.getElementById("mapsPathInput");
+      const p = pathInput?.value?.trim();
+      if (!p) {
+        alert("Vui lòng nhập đường dẫn thư mục maps!");
+        return;
+      }
+      try {
+        const res = await fetch("/api/ai/maps/config", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ path: p })
+        });
+        const data = await res.json();
+        if (data.success) {
+          alert(`✅ Đã lưu cấu hình kho map thành công!\nĐường dẫn: ${data.path}\nTìm thấy: ${(data.total_files || 0).toLocaleString()} files.`);
+          load3DMapsStatus();
+        } else {
+          alert(`Lỗi khi lưu: ${data.error || "Không rõ"}`);
+        }
+      } catch (err) {
+        alert(`Lỗi kết nối: ${err.message}`);
+      }
+    }
+
+    // -------------------------------------------------------------------------
+    // EXTENSION BRIDGE MANAGEMENT JS (AI Studio v4.0)
+    // -------------------------------------------------------------------------
+    async function loadExtensionWorkers() {
+      try {
+        const res = await fetch("/lead-manage/extension/workers");
+        const data = await res.json();
+        const workers = (data && data.workers) || [];
+        const queueCount = (data && data.queue_count) || 0;
+
+        const onlineCount = workers.filter(w => w.is_online).length;
+        const idleCount = workers.filter(w => w.is_online && w.status === 'idle').length;
+        const busyCount = workers.filter(w => w.is_online && w.status === 'busy').length;
+
+        const statOnline = document.getElementById("statOnlineWorkers");
+        const statIdle = document.getElementById("statIdleWorkers");
+        const statBusy = document.getElementById("statBusyWorkers");
+        const statQueue = document.getElementById("statQueuedJobs");
+        const badgeOnline = document.getElementById("onlineWorkersBadge");
+
+        if (statOnline) statOnline.textContent = onlineCount;
+        if (statIdle) statIdle.textContent = idleCount;
+        if (statBusy) statBusy.textContent = busyCount;
+        if (statQueue) statQueue.textContent = queueCount;
+        if (badgeOnline) badgeOnline.textContent = onlineCount;
+
+        const targetSelect = document.getElementById("testTargetPcSelect");
+        if (targetSelect) {
+          const currentVal = targetSelect.value;
+          const pcList = Array.from(new Set(workers.map(w => w.pc_name || w.name || w.worker_id).filter(Boolean)));
+          let optionsHtml = '<option value="">-- Phân bổ tự động (Bất kỳ máy nào rảnh) --</option>';
+          pcList.forEach(pc => {
+            const w = workers.find(x => (x.pc_name || x.name || x.worker_id) === pc);
+            const statusIcon = (w && w.is_online) ? (w.status === 'busy' ? '🟡' : '🟢') : '⚪';
+            optionsHtml += `<option value="${pc}">${statusIcon} Máy: ${pc} (${w ? w.name : ''})</option>`;
+          });
+          targetSelect.innerHTML = optionsHtml;
+          if (currentVal && pcList.includes(currentVal)) {
+            targetSelect.value = currentVal;
+          }
+        }
+
+        const tbody = document.getElementById("workersTableBody");
+        if (!tbody) return;
+
+        if (workers.length === 0) {
+          tbody.innerHTML = `
+            <tr>
+              <td colspan="8" class="text-center py-4 text-muted">
+                Chưa có Chrome Extension nào kết nối. Vui lòng cài đặt Extension và mở trang chatgpt.com.
+              </td>
+            </tr>
+          `;
+          return;
+        }
+
+        tbody.innerHTML = workers.map(w => {
+          const isOnline = w.is_online;
+          const statusBadge = !isOnline 
+            ? '<span class="badge bg-secondary">⚪ Ngoại tuyến</span>'
+            : (w.status === 'busy' 
+                ? '<span class="badge bg-warning text-dark">🟡 Đang xử lý</span>' 
+                : '<span class="badge bg-success">🟢 Sẵn sàng</span>');
+
+          const isUnified = (w.bridge_type === 'chatgpt_unified_bridge') || (w.is_unified === true);
+          const bridgeBadge = isUnified
+            ? '<span class="badge shadow-sm" style="background:#7c3aed; color:#fff; font-size:11px;">⚡ Unified v4.0 (UB4)</span>'
+            : '<span class="badge bg-secondary text-white" style="font-size:11px;" title="Extension cũ - Không nhận được job UB4">⚠️ Legacy Bridge</span>';
+
+          const pcBadge = `<span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25 px-2 py-1 fw-bold font-monospace">${w.pc_name || w.name || w.worker_id}</span>`;
+          const lastPing = w.seconds_since_ping !== undefined ? `${w.seconds_since_ping}s trước` : (w.last_heartbeat_str || 'N/A');
+
+          const reqCodeDisplay = w.current_request_code 
+            ? `<span class="badge bg-dark text-warning font-monospace border border-warning" style="font-size:11px;">⚡ ${w.current_request_code}</span>`
+            : (w.current_job_id ? `<code class="text-muted" style="font-size:11px;">${w.current_job_id.slice(0, 12)}...</code>` : '<span class="text-muted" style="font-size:11px;">Trống</span>');
+
+          return `
+            <tr>
+              <td>${pcBadge}</td>
+              <td>${bridgeBadge}</td>
+              <td>
+                <div class="fw-semibold text-dark">${w.name || w.worker_id}</div>
+                <div class="text-muted" style="font-size:11px;">${w.account_email || 'Chưa nhận diện email'}</div>
+              </td>
+              <td><span class="text-muted">${w.account_label || 'ChatGPT Plus'}</span></td>
+              <td>${statusBadge}</td>
+              <td>${reqCodeDisplay}</td>
+              <td><span class="text-muted small">${lastPing}</span></td>
+              <td><span class="fw-bold">${w.total_completed || 0}</span></td>
+              <td class="text-end">
+                <button type="button" class="btn btn-outline-danger btn-sm py-0 px-2" title="Mở cuộc trò chuyện mới sạch trên máy này" onclick="sendExtensionNewChat('${w.worker_id}', '${w.pc_name || w.worker_id}')">
+                  🧹 Reset
+                </button>
+                <button type="button" class="btn btn-outline-primary btn-sm py-0 px-2 ms-1" onclick="selectWorkerForTest('${w.pc_name || w.worker_id}')">
+                  ⚡ Test
+                </button>
+              </td>
+            </tr>
+          `;
+        }).join("");
+
+      } catch (err) {
+        console.warn("Lỗi tải danh sách extension workers:", err);
+      }
+    }
+
+    function generateNewTestRequestCode() {
+      const rand = Math.random().toString(36).substring(2, 6).toUpperCase();
+      const code = `UB4-REQ-${Math.floor(Date.now()/1000)}-${rand}`;
+      const inp = document.getElementById("testRequestCodeInput");
+      if (inp) inp.value = code;
+      return code;
+    }
+
+    function selectWorkerForTest(pcName) {
+      const sel = document.getElementById("testTargetPcSelect");
+      if (sel) {
+        sel.value = pcName;
+        sel.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
+
+    async function sendExtensionNewChat(workerId, targetPc) {
+      if (!confirm(`Bạn có chắc muốn gửi lệnh mở cuộc trò chuyện mới sạch tới máy [${targetPc}]?`)) return;
+      try {
+        const res = await fetch("/lead-manage/extension/new_chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ worker_id: workerId, target_pc: targetPc })
+        });
+        const data = await res.json();
+        if (data.status === 'ok') {
+          alert(`✅ Đã gửi lệnh Reset New Chat thành công tới máy [${targetPc}]! (Mã: ${data.request_code || 'UB4-NEWCHAT'})`);
+          loadExtensionWorkers();
+        } else {
+          alert(`Lỗi: ${data.error || 'Không thể gửi lệnh'}`);
+        }
+      } catch (e) {
+        alert(`Lỗi kết nối: ${e.message}`);
+      }
+    }
+
+    async function sendGlobalNewChat() {
+      if (!confirm("Bạn có chắc muốn yêu cầu TẤT CẢ Extension Workers mở phiên trò chuyện mới sạch?")) return;
+      try {
+        const res = await fetch("/lead-manage/extension/new_chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ target_pc: null })
+        });
+        const data = await res.json();
+        if (data.status === 'ok') {
+          alert("✅ Đã gửi yêu cầu Reset New Chat vào hàng đợi chung cho tất cả các máy!");
+          loadExtensionWorkers();
+        }
+      } catch (e) {
+        alert(`Lỗi: ${e.message}`);
+      }
+    }
+
+    async function dispatchExtensionTest(e) {
+      e.preventDefault();
+      const targetPc = document.getElementById("testTargetPcSelect")?.value || null;
+      const jobType = document.getElementById("testJobTypeSelect")?.value || "chat_code";
+      const prompt = document.getElementById("testPromptInput")?.value || "";
+      const newChat = document.getElementById("testNewChatToggle")?.checked || false;
+      const btn = document.getElementById("btnSendTestTask");
+
+      let reqCode = document.getElementById("testRequestCodeInput")?.value;
+      if (!reqCode) reqCode = generateNewTestRequestCode();
+
+      const box = document.getElementById("testTaskResultBox");
+      const stepText = document.getElementById("testResultStepText");
+      const pbar = document.getElementById("testResultProgressBar");
+      const badge = document.getElementById("testResultStatusBadge");
+      const out = document.getElementById("testResultOutput");
+      const imgPreview = document.getElementById("testResultImagePreview");
+
+      if (btn) btn.disabled = true;
+      if (box) box.style.display = "block";
+      if (out) out.style.display = "none";
+      if (imgPreview) imgPreview.style.display = "none";
+      if (badge) { badge.className = "badge bg-info"; badge.textContent = "Đang gửi..."; }
+      if (stepText) stepText.textContent = `Đang đưa tác vụ [${reqCode}] vào hàng đợi độc quyền...`;
+      if (pbar) { pbar.style.width = "20%"; }
+
+      try {
+        const res = await fetch("/lead-manage/extension/dispatch_test", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            prompt,
+            job_type: jobType,
+            target_pc: targetPc,
+            new_chat: newChat,
+            request_code: reqCode
+          })
+        });
+        const data = await res.json();
+        if (data.status !== "ok" || !data.job) {
+          throw new Error(data.error || "Không thể tạo job");
+        }
+
+        const jobId = data.job.id;
+        const actualReqCode = data.request_code || reqCode;
+        document.getElementById("testResultJobId").innerHTML = `⚡ <span class="text-primary font-monospace">${actualReqCode}</span> | ID: ${jobId} ${targetPc ? `(Đích: <strong>${targetPc}</strong>)` : '(Hàng đợi)'}`;
+        if (pbar) pbar.style.width = "40%";
+        if (badge) { badge.className = "badge bg-warning text-dark"; badge.textContent = "Đang chờ Extension nhận..."; }
+
+        let pollCount = 0;
+        const pollInterval = setInterval(async () => {
+          pollCount++;
+          try {
+            const jRes = await fetch(`/api/jobs/${actualReqCode}`);
+            if (jRes.ok) {
+              const jData = await jRes.json();
+              if (stepText) stepText.textContent = jData.current_step || "Đang xử lý...";
+              if (pbar && jData.progress) pbar.style.width = `${Math.max(40, jData.progress)}%`;
+
+              if (jData.preview_url || jData.preview_base64) {
+                if (imgPreview) {
+                  imgPreview.style.display = "block";
+                  imgPreview.innerHTML = `<img src="${jData.preview_base64 || jData.preview_url}" style="max-height: 180px; border-radius: 8px;" alt="Preview" class="shadow-sm">`;
+                }
+              }
+
+              if (jData.status === "completed") {
+                clearInterval(pollInterval);
+                if (btn) btn.disabled = false;
+                if (pbar) pbar.style.width = "100%";
+                if (badge) { badge.className = "badge bg-success"; badge.textContent = "Hoàn tất!"; }
+                if (stepText) stepText.textContent = `Hoàn tất mã [${actualReqCode}] trong ${jData.duration_seconds || 0}s!`;
+
+                if (out) {
+                  out.style.display = "block";
+                  out.textContent = jData.ruby_code || jData.result_text || jData.text || "Hoàn thành tác vụ!";
+                }
+
+                if (jData.image_url || jData.image_base64) {
+                  if (imgPreview) {
+                    imgPreview.style.display = "block";
+                    imgPreview.innerHTML = `<img src="${jData.image_base64 || jData.image_url}" style="max-height: 250px; border-radius: 8px;" alt="Result" class="shadow-sm">`;
+                  }
+                }
+                generateNewTestRequestCode();
+                loadExtensionWorkers();
+              } else if (jData.status === "failed") {
+                clearInterval(pollInterval);
+                if (btn) btn.disabled = false;
+                if (badge) { badge.className = "badge bg-danger"; badge.textContent = "Thất bại"; }
+                if (stepText) stepText.textContent = `Lỗi: ${jData.current_step || 'Không rõ'}`;
+                generateNewTestRequestCode();
+              }
+            }
+          } catch (pe) {}
+
+          if (pollCount > 120) {
+            clearInterval(pollInterval);
+            if (btn) btn.disabled = false;
+            if (badge) { badge.className = "badge bg-danger"; badge.textContent = "Timeout"; }
+            generateNewTestRequestCode();
+          }
+        }, 1500);
+
+      } catch (err) {
+        if (btn) btn.disabled = false;
+        if (badge) { badge.className = "badge bg-danger"; badge.textContent = "Lỗi"; }
+        if (stepText) stepText.textContent = err.message;
+        generateNewTestRequestCode();
+      }
+    }
+
+    // Khởi tạo mã request ban đầu
+    generateNewTestRequestCode();
+
+    // Auto poll workers when tab is active
+    setInterval(() => {
+      const activePanel = document.querySelector(".tab-panel.is-active");
+      if (activePanel && activePanel.id === "extensionBridgeTab") {
+        loadExtensionWorkers();
+      }
+    }, 3000);
   </script>
 </body>
 

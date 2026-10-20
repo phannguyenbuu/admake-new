@@ -1,1 +1,61 @@
 @import "tailwindcss";
+
+/* ── Clear, High-Contrast Visible Scrollbars for Light Panels & Lists ── */
+.visible-scrollbar,
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #94a3b8 #f1f5f9;
+}
+
+.visible-scrollbar::-webkit-scrollbar,
+.custom-scrollbar::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+
+.visible-scrollbar::-webkit-scrollbar-track,
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 9999px;
+}
+
+.visible-scrollbar::-webkit-scrollbar-thumb,
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #94a3b8;
+  border-radius: 9999px;
+  border: 1px solid #f1f5f9;
+}
+
+.visible-scrollbar::-webkit-scrollbar-thumb:hover,
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #64748b;
+}
+
+/* ── Always Visible Vertical Scrollbar (Đậm nét, hiện rõ 100%) ── */
+.always-visible-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #94a3b8 #f1f5f9;
+  overflow-y: scroll !important;
+}
+
+.always-visible-scrollbar::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+  display: block !important;
+}
+
+.always-visible-scrollbar::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 6px;
+  border-left: 1px solid #e2e8f0;
+}
+
+.always-visible-scrollbar::-webkit-scrollbar-thumb {
+  background: #94a3b8;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+}
+
+.always-visible-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #00b4b6;
+}

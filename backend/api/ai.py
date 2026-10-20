@@ -2,13 +2,27 @@ import os
 import io
 import json
 import time
+import datetime
 import math
 import base64
+import re
+import threading
+import secrets
+from collections import deque
 import requests
 import urllib.request
 from urllib.error import HTTPError, URLError
 from PIL import Image, ImageFilter, ImageEnhance
 from flask import Blueprint, request, jsonify
+
+try:
+    from .sketchup_ruby_generator import generate_ruby_script, parse_ruby_to_mesh
+except ImportError:
+    try:
+        from sketchup_ruby_generator import generate_ruby_script, parse_ruby_to_mesh
+    except Exception:
+        generate_ruby_script = None
+        parse_ruby_to_mesh = None
 
 ai_bp = Blueprint('ai', __name__)
 
@@ -42,7 +56,7 @@ def get_ai_studio_keys():
                             gemini_key = lines[i + 1].strip()
                         elif l == "[GPTKey]" and i + 1 < len(lines):
                             gpt_key = lines[i + 1].strip()
-                if gemini_key or gpt_key:
+                if gemini_key and gpt_key:
                     break
             except Exception:
                 pass
@@ -2183,14 +2197,578 @@ def api_genai_gallery():
         return jsonify({"error": f"Lỗi lấy gallery: {str(e)}"}), 502
 
 # ==============================================================================
+# ADMAKE CHATGPT VISION & TEXT WORKER ORCHESTRATOR
+# ==============================================================================
+class AdmakeVisionOrchestrator:
+    def __init__(self):
+        self._lock = threading.RLock()
+        self.workers = {}      # worker_id -> WorkerInfo dict
+        self.jobs = {}         # job_id -> JobInfo dict
+        self.queue = deque()   # deque of job_ids
+
+    def register_or_update_worker(self, worker_id, name=None, account_label=None, status=None,
+                                   current_job_id=None, ip_address=None, account_email=None, pc_name=None,
+                                   bridge_type=None, bridge_version=None, protocol=None, capabilities=None):
+        with self._lock:
+            now = time.time()
+            clean_pc = (pc_name or name or worker_id or "").strip().upper()
+
+            # Phân định loại Extension: Unified v4.0 vs Legacy Bridge (Cũ)
+            is_unified = False
+            if bridge_type:
+                is_unified = (str(bridge_type).strip().lower() == "chatgpt_unified_bridge")
+            elif bridge_version and "4" in str(bridge_version):
+                is_unified = True
+
+            resolved_bridge = "chatgpt_unified_bridge" if is_unified else "legacy_bridge"
+            resolved_version = str(bridge_version) if bridge_version else ("4.0" if is_unified else "3.0")
+            resolved_proto = str(protocol) if protocol else ("unified_v4" if is_unified else "legacy")
+
+            if worker_id not in self.workers:
+                self.workers[worker_id] = {
+                    "worker_id": worker_id,
+                    "name": name or worker_id,
+                    "pc_name": clean_pc,
+                    "bridge_type": resolved_bridge,
+                    "bridge_version": resolved_version,
+                    "is_unified": is_unified,
+                    "protocol": resolved_proto,
+                    "capabilities": capabilities or {},
+                    "account_label": account_label or ("ChatGPT Unified Bridge" if is_unified else "ChatGPT AI Bridge"),
+                    "account_email": account_email or "",
+                    "status": status or "idle",
+                    "current_job_id": current_job_id,
+                    "current_request_code": None,
+                    "ip_address": ip_address or "",
+                    "is_enabled": True,
+                    "created_at": now,
+                    "last_heartbeat": now,
+                    "total_completed": 0
+                }
+            else:
+                w = self.workers[worker_id]
+                w["last_heartbeat"] = now
+                if name: w["name"] = name
+                if pc_name: w["pc_name"] = clean_pc
+                if bridge_type or bridge_version:
+                    w["bridge_type"] = resolved_bridge
+                    w["bridge_version"] = resolved_version
+                    w["is_unified"] = is_unified
+                if protocol: w["protocol"] = resolved_proto
+                if capabilities: w["capabilities"] = capabilities
+                if account_label: w["account_label"] = account_label
+                if account_email: w["account_email"] = account_email
+                if status: w["status"] = status
+                if current_job_id is not None: w["current_job_id"] = current_job_id
+                if ip_address: w["ip_address"] = ip_address
+
+    def get_online_workers(self):
+        with self._lock:
+            now = time.time()
+            res = []
+            for wid, w in self.workers.items():
+                is_online = (now - w.get("last_heartbeat", 0)) < 30
+                res.append({
+                    **w,
+                    "is_online": is_online,
+                    "seconds_since_ping": round(now - w.get("last_heartbeat", 0), 1),
+                    "last_heartbeat_str": time.strftime("%H:%M:%S", time.localtime(w.get("last_heartbeat", 0)))
+                })
+            return res
+
+    def find_job(self, task_id_or_request_code):
+        if not task_id_or_request_code:
+            return None
+        with self._lock:
+            if task_id_or_request_code in self.jobs:
+                return self.jobs[task_id_or_request_code]
+            for j in self.jobs.values():
+                if j.get("request_code") == task_id_or_request_code:
+                    return j
+            return None
+
+    def create_job(self, prompt, reference_images=None, job_type="chat_code", target_worker_id=None,
+                   target_pc=None, new_chat=False, style=None, bridge_type="chatgpt_unified_bridge",
+                   request_code=None, only_unified=True):
+        with self._lock:
+            now_ts = int(time.time() * 1000)
+            job_id = f"job_{now_ts}"
+            clean_target_pc = (target_pc or target_worker_id or "").strip().upper() if (target_pc or target_worker_id) else None
+
+            # Sinh mã Request độc quyền riêng cho Extension Unified v4.0 nếu chưa có
+            if not request_code:
+                rand_part = secrets.token_hex(2).upper()
+                req_code = f"UB4-REQ-{int(time.time())}-{rand_part}"
+            else:
+                req_code = request_code.strip()
+
+            job = {
+                "id": job_id,
+                "request_code": req_code,
+                "bridge_type": bridge_type or "chatgpt_unified_bridge",
+                "only_unified": bool(only_unified),
+                "protocol_version": "v4.0",
+                "job_type": job_type,
+                "prompt": prompt,
+                "reference_images": reference_images or [],
+                "images": reference_images or [],
+                "target_worker_id": target_worker_id,
+                "target_pc": clean_target_pc,
+                "style": style or "None",
+                "assigned_worker_id": None,
+                "assigned_pc_name": None,
+                "new_chat": new_chat,
+                "status": "queued",
+                "progress": 0,
+                "current_step": f"Tác vụ [{req_code}] đang chờ trong hàng đợi hệ thống...",
+                "result_text": "",
+                "result_code_blocks": [],
+                "ruby_code": "",
+                "image_url": None,
+                "image_base64": None,
+                "created_at": time.time(),
+                "duration_seconds": 0
+            }
+            self.jobs[job_id] = job
+            self.queue.append(job_id)
+            return job
+
+    def dispatch_next_job(self, worker_id):
+        with self._lock:
+            w = self.workers.get(worker_id)
+            if not w or not w.get("is_enabled", True):
+                return None
+
+            wid = (worker_id or "").strip().upper()
+            w_pc = (w.get("pc_name") or "").strip().upper()
+            w_name = (w.get("name") or "").strip().upper()
+            w_bridge = (w.get("bridge_type") or "").strip().lower()
+            is_w_unified = (w_bridge == "chatgpt_unified_bridge" or w.get("is_unified") is True)
+
+            for i, jid in enumerate(list(self.queue)):
+                job = self.jobs.get(jid)
+                if not job or job.get("status") != "queued":
+                    continue
+
+                # 2. Định tuyến theo đúng tên máy tính (Target PC):
+                target = (job.get("target_pc") or job.get("target_worker_id") or "").strip().upper()
+                is_explicit_target = bool(target and target in (wid, w_pc, w_name))
+
+                # 1. BẢO VỆ CHỐNG LẪN LỘN VỚI 2 EXTENSION CŨ:
+                # Nếu job có mã request riêng UB4- hoặc yêu cầu only_unified hoặc bridge_type == chatgpt_unified_bridge:
+                # Chỉ cho phép extension mới (Unified v4.0) nhận TRỪ KHI được chỉ định đích danh (explicit target)!
+                job_req = str(job.get("request_code") or "")
+                job_bridge = str(job.get("bridge_type") or "").lower()
+                is_unified_job = (
+                    job.get("only_unified", True) or 
+                    job_bridge == "chatgpt_unified_bridge" or 
+                    job_req.startswith("UB4-")
+                )
+
+                if is_unified_job and not is_w_unified and not is_explicit_target:
+                    # Extension cũ poll -> Bỏ qua nếu không được chỉ định đích danh!
+                    continue
+
+                if target and not is_explicit_target:
+                    continue
+
+                self.queue.remove(jid)
+                job["status"] = "processing"
+                job["assigned_worker_id"] = worker_id
+                job["assigned_pc_name"] = w_pc
+                job["current_step"] = f"Đã phân bổ cho {w.get('pc_name') or w.get('name', worker_id)} [Mã: {job.get('request_code', job['id'])}]..."
+                job["started_at"] = time.time()
+                w["status"] = "busy"
+                w["current_job_id"] = jid
+                w["current_request_code"] = job.get("request_code")
+                return {
+                    "id": job["id"],
+                    "request_code": job.get("request_code"),
+                    "bridge_type": "chatgpt_unified_bridge",
+                    "protocol_version": "v4.0",
+                    "job_type": job.get("job_type", "chat_code"),
+                    "prompt": job["prompt"],
+                    "images": job.get("images", []),
+                    "reference_images": job.get("reference_images", []),
+                    "new_chat": job.get("new_chat", False),
+                    "style": job.get("style", "None"),
+                    "is_worker_task": True
+                }
+            return None
+
+    def update_job_progress(self, worker_id, task_id, step=None, progress=None, request_code=None):
+        with self._lock:
+            job = self.find_job(task_id or request_code)
+            if job:
+                if step: job["current_step"] = step
+                if progress is not None: job["progress"] = progress
+
+    def complete_job(self, worker_id, task_id, text="", code_blocks=None, ruby_code=None, error=None,
+                     image_url=None, image_base64=None, request_code=None):
+        with self._lock:
+            job = self.find_job(task_id or request_code)
+            w = self.workers.get(worker_id)
+            if w:
+                w["status"] = "idle"
+                w["current_job_id"] = None
+                w["current_request_code"] = None
+                w["total_completed"] = w.get("total_completed", 0) + 1
+            if job:
+                now = time.time()
+                job["completed_at"] = now
+                job["duration_seconds"] = round(now - job.get("started_at", job["created_at"]), 1)
+                if error:
+                    job["status"] = "failed"
+                    job["current_step"] = error
+                else:
+                    job["status"] = "completed"
+                    job["result_text"] = text
+                    job["text"] = text
+                    job["result_code_blocks"] = code_blocks or []
+                    job["ruby_code"] = ruby_code or ""
+                    if image_url:
+                        job["image_url"] = image_url
+                        job["result_image_url"] = image_url
+                    if image_base64:
+                        job["image_base64"] = image_base64
+                    if ruby_code and parse_ruby_to_mesh:
+                        try:
+                            m3d = parse_ruby_to_mesh(ruby_code)
+                            job["model3d"] = m3d
+                            if m3d and m3d.get("components") and "bảng thống kê cấu kiện" not in ruby_code.lower():
+                                try:
+                                    from .ruby_components import generate_bom_comment_header, generate_bom_markdown_table
+                                    w_val = float(m3d.get("dimensions", {}).get("width") or 6.0)
+                                    h_val = float(m3d.get("dimensions", {}).get("height") or 2.5)
+                                    d_val = float(m3d.get("dimensions", {}).get("depth") or 0.25)
+                                    name = m3d.get("name") or "Biển Hiệu Quảng Cáo"
+                                    cat = m3d.get("category") or "storefront"
+                                    hdr = generate_bom_comment_header(m3d["components"], w_val, h_val, d_val, name, cat)
+                                    ruby_code = f"{hdr}\n{ruby_code}"
+                                    job["ruby_code"] = ruby_code
+                                    if "|" not in text:
+                                        tbl = generate_bom_markdown_table(m3d["components"], w_val, h_val, d_val, name)
+                                        job["text"] = f"{tbl}\n\n{text}"
+                                        job["result_text"] = job["text"]
+                                except Exception:
+                                    pass
+                        except Exception as parse_e:
+                            job["model3d_error"] = str(parse_e)
+                    job["current_step"] = "Hoàn tất!"
+                    job["progress"] = 100
+                return True
+            return False
+
+admake_vision_orchestrator = AdmakeVisionOrchestrator()
+
+# ==============================================================================
+# WORKER ROUTES (CHO CHATGPT AI STUDIO & WORKER BRIDGE EXTENSION HEARTBEAT VÀ NHẬN VIỆC)
+# ==============================================================================
+@ai_bp.route("/api/worker/heartbeat", methods=["POST", "OPTIONS"])
+def api_admake_worker_heartbeat():
+    if request.method == "OPTIONS":
+        return jsonify({"ok": True}), 200
+    data = request.get_json(force=True, silent=True) or {}
+    admake_vision_orchestrator.register_or_update_worker(
+        worker_id=data.get("worker_id", "default_worker"),
+        name=data.get("name"),
+        pc_name=data.get("pc_name"),
+        bridge_type=data.get("bridge_type"),
+        bridge_version=data.get("bridge_version"),
+        protocol=data.get("protocol"),
+        capabilities=data.get("capabilities"),
+        account_label=data.get("account_label"),
+        status=data.get("status"),
+        current_job_id=data.get("current_job_id"),
+        ip_address=request.remote_addr,
+        account_email=data.get("account_email")
+    )
+    return jsonify({"status": "ok"})
+
+@ai_bp.route("/api/worker/poll", methods=["GET", "POST", "OPTIONS"])
+def api_admake_worker_poll():
+    if request.method == "OPTIONS":
+        return jsonify({"ok": True}), 200
+    data = request.get_json(force=True, silent=True) or {} if request.method == "POST" else {}
+    worker_id = request.args.get("worker_id") or data.get("worker_id") or "default_worker"
+    admake_vision_orchestrator.register_or_update_worker(
+        worker_id=worker_id,
+        name=request.args.get("name") or data.get("name"),
+        pc_name=request.args.get("pc_name") or data.get("pc_name"),
+        bridge_type=request.args.get("bridge_type") or data.get("bridge_type"),
+        bridge_version=request.args.get("bridge_version") or data.get("bridge_version"),
+        protocol=request.args.get("protocol") or data.get("protocol"),
+        account_label=request.args.get("account_label") or data.get("account_label"),
+        account_email=request.args.get("account_email") or data.get("account_email"),
+        ip_address=request.remote_addr
+    )
+    task = admake_vision_orchestrator.dispatch_next_job(worker_id)
+    if task:
+        return jsonify({"has_task": True, "task": task, "is_enabled": True})
+    return jsonify({"has_task": False, "is_enabled": True})
+
+@ai_bp.route("/api/worker/progress", methods=["POST", "OPTIONS"])
+def api_admake_worker_progress():
+    if request.method == "OPTIONS":
+        return jsonify({"ok": True}), 200
+    data = request.get_json(force=True, silent=True) or {}
+    admake_vision_orchestrator.update_job_progress(
+        worker_id=data.get("worker_id"),
+        task_id=data.get("task_id"),
+        request_code=data.get("request_code"),
+        step=data.get("step"),
+        progress=data.get("progress")
+    )
+    return jsonify({"status": "ok"})
+
+@ai_bp.route("/api/worker/preview", methods=["POST", "OPTIONS"])
+def api_admake_worker_preview():
+    if request.method == "OPTIONS":
+        return jsonify({"ok": True}), 200
+    data = request.get_json(force=True, silent=True) or {}
+    task_id = data.get("task_id")
+    request_code = data.get("request_code")
+    preview_url = data.get("preview_url")
+    preview_base64 = data.get("preview_base64")
+    job = admake_vision_orchestrator.find_job(task_id or request_code)
+    if job:
+        if preview_url: job["preview_url"] = preview_url
+        if preview_base64: job["preview_base64"] = preview_base64
+        job["current_step"] = "Đã có ảnh xem trước (preview)..."
+    return jsonify({"status": "ok"})
+
+@ai_bp.route("/api/worker/complete", methods=["POST", "OPTIONS"])
+def api_admake_worker_complete():
+    if request.method == "OPTIONS":
+        return jsonify({"ok": True}), 200
+    data = request.get_json(force=True, silent=True) or {}
+    worker_id = data.get("worker_id")
+    task_id = data.get("task_id")
+    request_code = data.get("request_code")
+    text = data.get("text") or data.get("result_text") or ""
+    code_blocks = data.get("code_blocks") or data.get("result_code_blocks") or []
+    ruby_code = data.get("ruby_code") or ""
+    image_url = data.get("image_url")
+    image_base64 = data.get("image_base64")
+    error = data.get("error")
+
+    def _score_ruby(code_str: str) -> int:
+        if not code_str:
+            return -99999
+        s = len(code_str)
+        if any(k in code_str for k in ("entities", "add_group", "add_face", "pushpull")):
+            s += 20000
+        if "Sketchup" in code_str or "require 'sketchup.rb'" in code_str:
+            s += 10000
+        if "def " in code_str and "end" in code_str:
+            s += 5000
+        if code_str.strip().lower().startswith("load ") and len(code_str) < 150:
+            s -= 30000
+        return s
+
+    # Lựa chọn khối Ruby chất lượng nhất từ ruby_code, code_blocks hoặc text
+    candidates = []
+    if ruby_code:
+        candidates.append(ruby_code)
+    for cb in code_blocks:
+        c = (cb.get("code") or "").strip()
+        if c:
+            candidates.append(c)
+    if not candidates and text:
+        for m in re.finditer(r'```(?:ruby|rb)?\s*(.*?)\s*```', text, re.DOTALL | re.IGNORECASE):
+            c = m.group(1).strip()
+            if c:
+                candidates.append(c)
+
+    if candidates:
+        candidates.sort(key=_score_ruby, reverse=True)
+        ruby_code = candidates[0]
+
+    admake_vision_orchestrator.complete_job(
+        worker_id=worker_id,
+        task_id=task_id,
+        request_code=request_code,
+        text=text,
+        code_blocks=code_blocks,
+        ruby_code=ruby_code,
+        error=error,
+        image_url=image_url,
+        image_base64=image_base64
+    )
+    return jsonify({"success": True})
+
+@ai_bp.route("/api/workers", methods=["GET", "OPTIONS"])
+def api_admake_workers():
+    if request.method == "OPTIONS":
+        return jsonify({"ok": True}), 200
+    local_workers = [w for w in admake_vision_orchestrator.get_online_workers() if w.get("is_online")]
+    if local_workers:
+        return jsonify(local_workers), 200
+    try:
+        r = requests.get(f"{GENAI_BASE_URL}/api/workers", timeout=5)
+        if r.status_code == 200:
+            return jsonify(r.json()), 200
+    except Exception:
+        pass
+    return jsonify([]), 200
+
+@ai_bp.route("/api/chat/create", methods=["POST", "OPTIONS"])
+def api_admake_chat_create():
+    if request.method == "OPTIONS":
+        return jsonify({"ok": True}), 200
+    data = request.get_json(force=True, silent=True) or {}
+    prompt = (data.get("prompt") or "").strip()
+    images = data.get("reference_images") or data.get("images") or []
+    target_worker_id = data.get("worker_id")
+    target_pc = data.get("target_pc") or data.get("pc_name") or target_worker_id
+    new_chat = data.get("new_chat", False)
+    job_type = data.get("job_type", "chat_code")
+    style = data.get("style", "None")
+
+    online_local = [w for w in admake_vision_orchestrator.get_online_workers() if w.get("is_online")]
+    if online_local:
+        job = admake_vision_orchestrator.create_job(
+            prompt=prompt,
+            reference_images=images,
+            job_type=job_type,
+            target_worker_id=target_worker_id,
+            target_pc=target_pc,
+            new_chat=new_chat,
+            style=style
+        )
+        return jsonify(job), 201
+
+    try:
+        r = requests.post(f"{GENAI_BASE_URL}/api/chat/create", json=data, timeout=15)
+        return jsonify(r.json()), r.status_code
+    except Exception as e:
+        return jsonify({"error": f"Lỗi tạo tác vụ: {str(e)}"}), 502
+
+@ai_bp.route("/api/jobs/<job_id>", methods=["GET", "OPTIONS"])
+def api_admake_job_get(job_id):
+    if request.method == "OPTIONS":
+        return jsonify({"ok": True}), 200
+    job = admake_vision_orchestrator.find_job(job_id)
+    if job:
+        return jsonify(job), 200
+    try:
+        r = requests.get(f"{GENAI_BASE_URL}/api/jobs/{job_id}", timeout=10)
+        return jsonify(r.json()), r.status_code
+    except Exception as e:
+        return jsonify({"error": f"Lỗi lấy trạng thái job: {str(e)}"}), 502
+
+@ai_bp.route("/api/jobs/create", methods=["POST", "OPTIONS"])
+@ai_bp.route("/api/jobs/edit-full", methods=["POST", "OPTIONS"])
+@ai_bp.route("/api/jobs/edit-inpaint", methods=["POST", "OPTIONS"])
+def api_admake_jobs_unified_create():
+    if request.method == "OPTIONS":
+        return jsonify({"ok": True}), 200
+    data = request.get_json(force=True, silent=True) or {}
+    prompt = (data.get("prompt") or "").strip()
+    images = data.get("reference_images") or data.get("images") or []
+    if data.get("image") and data.get("image") not in images:
+        images = [data.get("image")] + images
+    target_worker_id = data.get("worker_id") or data.get("target_worker_id")
+    target_pc = data.get("target_pc") or data.get("pc_name") or target_worker_id
+    new_chat = data.get("new_chat", False)
+    job_type = data.get("job_type", "image_gen")
+    style = data.get("style", "None")
+    req_code = data.get("request_code")
+
+    online_local = [w for w in admake_vision_orchestrator.get_online_workers() if w.get("is_online")]
+    if online_local:
+        job = admake_vision_orchestrator.create_job(
+            prompt=prompt,
+            reference_images=images,
+            job_type=job_type,
+            target_worker_id=target_worker_id,
+            target_pc=target_pc,
+            new_chat=new_chat,
+            style=style,
+            request_code=req_code
+        )
+        return jsonify(job), 201
+
+    try:
+        r = requests.post(f"{GENAI_BASE_URL}{request.path}", json=data, timeout=15)
+        return jsonify(r.json()), r.status_code
+    except Exception as e:
+        return jsonify({"error": f"Lỗi tạo tác vụ: {str(e)}"}), 502
+
+@ai_bp.route("/api/chatgpt/new_chat", methods=["POST", "OPTIONS"])
+def api_admake_chatgpt_new_chat():
+    if request.method == "OPTIONS":
+        return jsonify({"ok": True}), 200
+    data = request.get_json(force=True, silent=True) or {}
+    target_worker_id = data.get("worker_id")
+    target_pc = data.get("target_pc") or target_worker_id
+
+    online_local = [w for w in admake_vision_orchestrator.get_online_workers() if w.get("is_online")]
+    if online_local:
+        job = admake_vision_orchestrator.create_job(
+            prompt="",
+            job_type="new_chat",
+            target_worker_id=target_worker_id,
+            target_pc=target_pc,
+            new_chat=True
+        )
+        return jsonify({"status": "ok", "message": "New chat action queued on Admake Cloud", "job": job}), 200
+
+    try:
+        r = requests.post(f"{GENAI_BASE_URL}/api/chatgpt/new_chat", json=data, timeout=10)
+        return jsonify(r.json()), r.status_code
+    except Exception as e:
+        return jsonify({"error": f"Lỗi gửi lệnh New Chat: {str(e)}"}), 502
+
+
+@ai_bp.route('/api/ruby/generate', methods=['POST', 'OPTIONS'])
+def api_proxy_ruby_generate():
+    """Proxy tới GenAI Toolxprint Ruby Generator API (với CORS đầy đủ)"""
+    if request.method == 'OPTIONS':
+        return jsonify({"ok": True}), 200
+
+    data = request.get_json(force=True, silent=True) or {}
+    headers = {"Content-Type": "application/json"}
+    for h in ["Authorization", "X-OpenAI-Key"]:
+        if h in request.headers:
+            headers[h] = request.headers[h]
+
+    try:
+        r = requests.post(f"{GENAI_BASE_URL}/api/ruby/generate", json=data, headers=headers, timeout=120)
+        return jsonify(r.json()), r.status_code
+    except Exception as e:
+        return jsonify({"success": False, "error": f"Lỗi chuyển tiếp tới GenAI Ruby API: {str(e)}"}), 502
+
+
+@ai_bp.route('/api/3d/parse_ruby', methods=['POST', 'OPTIONS'])
+def api_proxy_3d_parse_ruby():
+    """Proxy tới GenAI Toolxprint Headless SketchUp 3D Parser API (với CORS đầy đủ)"""
+    if request.method == 'OPTIONS':
+        return jsonify({"ok": True}), 200
+
+    data = request.get_json(force=True, silent=True) or {}
+    headers = {"Content-Type": "application/json"}
+    for h in ["Authorization", "X-OpenAI-Key"]:
+        if h in request.headers:
+            headers[h] = request.headers[h]
+
+    try:
+        r = requests.post(f"{GENAI_BASE_URL}/api/3d/parse_ruby", json=data, headers=headers, timeout=60)
+        return jsonify(r.json()), r.status_code
+    except Exception as e:
+        return jsonify({"success": False, "error": f"Lỗi chuyển tiếp tới GenAI 3D Parser API: {str(e)}"}), 502
+
+
+
+# ==============================================================================
 # GENAI TOOLXPRINT CHAT & CODE EXTRACTION (CHROME EXTENSION BRIDGE)
 # ==============================================================================
 @ai_bp.route('/api/ai/toolx/chat', methods=['POST', 'OPTIONS'])
 def api_ai_toolx_chat():
     """
-    API riêng kết nối ChatGPT qua GenAI Toolxprint Bridge:
-    Nhận prompt + hình ảnh đính kèm (base64 hoặc URL),
-    trả về text phản hồi đầy đủ và bóc tách riêng các khối code để copy.
+    API kết nối ChatGPT qua Chrome Extension AI Studio Bridge:
+    Đẩy tác vụ vào hàng đợi của AdmakeVisionOrchestrator để Chrome Extension (đang chạy trên máy người dùng)
+    mở/dùng tab chatgpt.com và tương tác. Hỗ trợ định tuyến đích danh máy (target_pc).
     """
     if request.method == 'OPTIONS':
         return jsonify({"ok": True}), 200
@@ -2200,77 +2778,102 @@ def api_ai_toolx_chat():
     images = data.get("images") or data.get("reference_images") or []
     new_chat = data.get("new_chat", False)
     worker_id = data.get("worker_id")
+    target_pc = data.get("target_pc") or data.get("pc_name") or worker_id
     wait = data.get("wait", True)
+    job_type = data.get("job_type", "chat_code")
+    style = data.get("style", "None")
 
     if not prompt and not images:
-        return jsonify({"success": False, "error": "Vui lòng nhập nội dung câu hỏi hoặc gửi ảnh đính kèm"}), 400
+        prompt = "Phân tích kết cấu bảng hiệu quảng cáo và tạo mã Ruby SketchUp 3D"
 
-    try:
-        payload = {
-            "prompt": prompt,
-            "reference_images": images,
-            "job_type": "chat_code",
-            "new_chat": new_chat,
-            "worker_id": worker_id
-        }
-        r = requests.post(f"{GENAI_BASE_URL}/api/chat/create", json=payload, timeout=30)
-        if r.status_code not in (200, 201):
-            return jsonify({"success": False, "error": f"Lỗi tạo tác vụ trên GenAI Toolxprint: {r.text}"}), 502
+    # Kiểm tra Extension Worker trực tuyến (ưu tiên worker local trên máy user)
+    online_local = [w for w in admake_vision_orchestrator.get_online_workers() if w.get("is_online")]
+    if not online_local:
+        has_remote = False
+        try:
+            r = requests.get(f"{GENAI_BASE_URL}/api/workers", timeout=3)
+            if r.status_code == 200 and r.json():
+                has_remote = True
+        except Exception:
+            pass
 
-        job_data = r.json()
-        job_id = job_data.get("id")
+        if not has_remote:
+            return jsonify({
+                "success": False,
+                "error": "Không có Chrome Extension ChatGPT AI Bridge nào đang trực tuyến. Vui lòng mở Chrome có cài Extension và đăng nhập chatgpt.com để nhận việc."
+            }), 503
 
-        if not wait:
+        try:
+            r = requests.post(f"{GENAI_BASE_URL}/api/chat/create", json=data, timeout=15)
+            return jsonify(r.json()), r.status_code
+        except Exception as e:
+            return jsonify({"success": False, "error": f"Lỗi chuyển tiếp tới Toolxprint: {str(e)}"}), 502
+
+    # Đưa vào hàng đợi AdmakeVisionOrchestrator để Extension trên Chrome nhận việc
+    job = admake_vision_orchestrator.create_job(
+        prompt=prompt,
+        reference_images=images,
+        job_type=job_type,
+        target_worker_id=worker_id,
+        target_pc=target_pc,
+        new_chat=new_chat,
+        style=style
+    )
+    job_id = job["id"]
+
+    if not wait:
+        return jsonify({
+            "success": True,
+            "job_id": job_id,
+            "id": job_id,
+            "status": "queued",
+            "message": "Đã gửi tác vụ tới Chrome Extension ChatGPT Vision Bridge..."
+        }), 201
+
+    # Chờ Chrome Extension xử lý trên chatgpt.com tối đa 180s
+    start_time = time.time()
+    while time.time() - start_time < 180:
+        time.sleep(1.5)
+        cur = admake_vision_orchestrator.jobs.get(job_id)
+        if not cur:
+            break
+        if cur.get("status") == "completed":
+            reply_text = cur.get("result_text") or cur.get("text") or ""
+            code_blocks = cur.get("result_code_blocks") or cur.get("code_blocks") or []
             return jsonify({
                 "success": True,
                 "job_id": job_id,
-                "status": "queued",
-                "message": "Tác vụ chat đã được gửi vào hàng đợi"
-            }), 201
+                "status": "completed",
+                "response_type": "text_code",
+                "reply": reply_text,
+                "text": reply_text,
+                "ruby_code": cur.get("ruby_code") or "",
+                "model3d": cur.get("model3d"),
+                "code_blocks": code_blocks,
+                "duration_seconds": cur.get("duration_seconds", 0)
+            }), 200
+        elif cur.get("status") == "failed":
+            return jsonify({
+                "success": False,
+                "job_id": job_id,
+                "status": "failed",
+                "error": cur.get("current_step") or cur.get("error") or "Chrome Extension báo lỗi khi xử lý tác vụ trên ChatGPT"
+            }), 502
 
-        # Chờ kết quả polling tối đa 120s
-        start_time = time.time()
-        while time.time() - start_time < 120:
-            time.sleep(1.5)
-            chk = requests.get(f"{GENAI_BASE_URL}/api/jobs/{job_id}", timeout=10)
-            if chk.status_code == 200:
-                cur_job = chk.json()
-                if cur_job.get("status") == "completed":
-                    reply_text = cur_job.get("result_text") or cur_job.get("text") or ""
-                    code_blocks = cur_job.get("result_code_blocks") or cur_job.get("code_blocks") or []
-                    return jsonify({
-                        "success": True,
-                        "job_id": job_id,
-                        "status": "completed",
-                        "response_type": "text_code",
-                        "reply": reply_text,
-                        "text": reply_text,
-                        "code_blocks": code_blocks,
-                        "duration_seconds": cur_job.get("duration_seconds", 0)
-                    }), 200
-                elif cur_job.get("status") == "failed":
-                    return jsonify({
-                        "success": False,
-                        "job_id": job_id,
-                        "status": "failed",
-                        "error": cur_job.get("current_step") or "ChatGPT gặp sự cố khi xử lý tác vụ"
-                    }), 500
-
-        return jsonify({
-            "success": False,
-            "job_id": job_id,
-            "status": "timeout",
-            "error": "Quá thời gian chờ phản hồi từ ChatGPT (120s). Vui lòng kiểm tra lại tab ChatGPT đang chạy Extension."
-        }), 504
-
-    except Exception as e:
-        return jsonify({"success": False, "error": f"Lỗi kết nối GenAI Toolxprint: {str(e)}"}), 502
+    return jsonify({
+        "success": False,
+        "job_id": job_id,
+        "status": "timeout",
+        "error": "Quá thời gian chờ phản hồi từ Chrome Extension ChatGPT (180s). Vui lòng kiểm tra lại tab chatgpt.com trên máy tính."
+    }), 504
 
 @ai_bp.route('/api/ai/toolx/jobs/<job_id>', methods=['GET', 'OPTIONS'])
 def api_ai_toolx_job_get(job_id):
-    """Polling lấy trạng thái và kết quả text & code của job từ GenAI Toolxprint"""
+    """Polling lấy trạng thái và kết quả text & code của job"""
     if request.method == 'OPTIONS':
         return jsonify({"ok": True}), 200
+    if job_id in admake_vision_orchestrator.jobs:
+        return jsonify(admake_vision_orchestrator.jobs[job_id]), 200
     try:
         r = requests.get(f"{GENAI_BASE_URL}/api/jobs/{job_id}", timeout=10)
         return jsonify(r.json()), r.status_code
@@ -2293,149 +2896,465 @@ def api_ai_3d_hints():
 
 @ai_bp.route('/api/ai/3d/generate', methods=['POST', 'OPTIONS'])
 def api_ai_3d_generate():
-    """Phân tích yêu cầu khách hàng và sinh mô hình 3D + bóc tách vật tư bằng Google Gemini"""
+    """Tạo mô hình 3D biển hiệu qua Chrome Extension ChatGPT Vision Bridge"""
     if request.method == 'OPTIONS':
         return jsonify({"ok": True}), 200
 
     data = request.get_json(force=True, silent=True) or {}
     user_prompt = (data.get("prompt") or "").strip()
     hint_id = data.get("hint_id")
-    custom_dim = data.get("dimensions") or {}
-    custom_mat = data.get("materials") or {}
+    images_input = data.get("images") or data.get("reference_images") or []
 
     selected_hint = next((h for h in SIGNBOARD_HINTS if h["id"] == hint_id), None)
     if not user_prompt and selected_hint:
         user_prompt = selected_hint["prompt"]
 
-    if not user_prompt:
-        return jsonify({"success": False, "error": "Vui lòng nhập mô tả yêu cầu hoặc chọn một mẫu Hint quảng cáo."}), 400
+    online_local = [w for w in admake_vision_orchestrator.get_online_workers() if w.get("is_online")]
+    if not online_local:
+        return jsonify({
+            "success": False,
+            "error": "Không có Chrome Extension ChatGPT Vision Bridge nào đang trực tuyến. Vui lòng mở Chrome có cài Extension và đăng nhập chatgpt.com."
+        }), 503
 
-    gemini_key, _ = get_ai_studio_keys()
-    if not gemini_key:
-        return jsonify({"success": False, "error": "Không tìm thấy [GeminiKey] trong D:/vps.md hoặc D:/vps_go.md"}), 500
+    from .chatgpt_vision_ruby import SYSTEM_RUBY_VISION_PROMPT
+    full_prompt = f"{SYSTEM_RUBY_VISION_PROMPT}\n\nYêu cầu bổ sung của khách hàng: {user_prompt}" if user_prompt else SYSTEM_RUBY_VISION_PROMPT
 
-    system_instruction = (
-        "Bạn là Kỹ Sư Trưởng Thiết Kế Kết Cấu 3D & Bóc Tách Dự Toán Biển Bảng Quảng Cáo tại ADMAKE.\n"
-        "Nhiệm vụ của bạn là nhận yêu cầu của khách hàng (từ bảng nhỏ, hộp đèn, biển vẫy, mặt tiền, đến pano tấm lớn và billboard khổng lồ), "
-        "sau đó tính toán quy chuẩn kết cấu và trả về DUY NHẤT một chuỗi JSON hợp lệ (không chứa markdown, không có ```json).\n\n"
-        "Định dạng JSON bắt buộc:\n"
-        "{\n"
-        "  \"name\": \"Tên công trình bảng hiệu\",\n"
-        "  \"category\": \"mini\" | \"storefront\" | \"billboard\",\n"
-        "  \"category_label\": \"Bảng hiệu mặt tiền\" (hoặc Biển vẫy/Hộp đèn, Pano tấm lớn Billboard, Màn hình LED),\n"
-        "  \"description\": \"Mô tả kỹ thuật kết cấu và quy cách hoàn thiện\",\n"
-        "  \"dimensions\": {\"width\": 6.0, \"height\": 2.5, \"depth\": 0.25},\n"
-        "  \"elements\": [\n"
-        "    {\"name\": \"Khung sắt hộp 25x25\", \"type\": \"box\", \"position\": [0, 0, 0], \"scale\": [6.0, 2.5, 0.05], \"color\": \"#475569\"},\n"
-        "    {\"name\": \"Mặt bảng Alu 3mm\", \"type\": \"box\", \"position\": [0, 0, 0.03], \"scale\": [6.0, 2.5, 0.01], \"color\": \"#1e293b\"},\n"
-        "    {\"name\": \"Chữ nổi Mica LED sáng mặt\", \"type\": \"box\", \"position\": [0, 0.2, 0.08], \"scale\": [4.2, 0.7, 0.08], \"color\": \"#f59e0b\"},\n"
-        "    {\"name\": \"Slogan phụ\", \"type\": \"box\", \"position\": [0, -0.4, 0.06], \"scale\": [3.0, 0.3, 0.04], \"color\": \"#ffffff\"}\n"
-        "  ],\n"
-        "  \"materials_spec\": {\n"
-        "    \"iron_type\": \"vuong_25\",\n"
-        "    \"surface_type\": \"alu_3mm\",\n"
-        "    \"has_led\": true,\n"
-        "    \"has_sheet_backing\": true\n"
-        "  },\n"
-        "  \"render_prompt\": \"Photorealistic commercial photography of a modern storefront signboard...\"\n"
-        "}\n\n"
-        "Lưu ý quan trọng cho 3D Elements:\n"
-        "- Nếu là Billboard khổng lồ một cột trụ: Thêm 1 element type 'cylinder' cho cột trụ lớn ở vị trí [0, -height/2, 0], scale [1.0, 10.0, 1.0], color '#334155'.\n"
-        "- Nếu là bảng mặt tiền: Khung xương sắt đan ô, mặt bảng phẳng và chữ 3D nổi ra phía trước trục Z dương (+Z).\n"
-        "- Kích thước (dimensions.width, height, depth) tính bằng mét.\n"
-        "- Tọa độ position và scale tính bằng mét."
+    job = admake_vision_orchestrator.create_job(
+        prompt=full_prompt,
+        reference_images=images_input,
+        job_type="chat_code",
+        target_worker_id=None,
+        new_chat=False
     )
+    job_id = job["id"]
 
-    models_to_try = ["gemini-3.5-flash", "gemini-3.1-flash-lite", "gemini-3.6-flash", "gemini-2.5-flash"]
-    parsed_result = None
-    last_err = None
+    start_time = time.time()
+    while time.time() - start_time < 180:
+        time.sleep(1.5)
+        cur = admake_vision_orchestrator.jobs.get(job_id)
+        if not cur:
+            break
+        if cur.get("status") == "completed":
+            ruby_code = cur.get("ruby_code") or ""
+            model_3d = cur.get("model3d")
+            if not model_3d and ruby_code:
+                try:
+                    from .ruby3d import ruby_to_model3d
+                    model_3d = ruby_to_model3d(ruby_code)
+                except Exception:
+                    pass
+            if not model_3d or not model_3d.get("elements"):
+                return jsonify({
+                    "success": False,
+                    "error": "Chrome Extension ChatGPT đã phản hồi nhưng không dựng được mô hình 3D từ mã Ruby."
+                }), 502
 
-    for m_name in models_to_try:
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/{m_name}:generateContent?key={gemini_key}"
-        payload = {
-            "contents": [{"parts": [{"text": f"Yêu cầu khách hàng: {user_prompt}\nThông tin bổ sung nếu có: Kích thước: {json.dumps(custom_dim)}, Vật tư: {json.dumps(custom_mat)}"}]}],
-            "generationConfig": {
-                "temperature": 0.3,
-                "responseMimeType": "application/json"
-            },
-            "systemInstruction": {"parts": [{"text": system_instruction}]}
+            dim_w = float(model_3d.get("dimensions", {}).get("width") or 6.0)
+            dim_h = float(model_3d.get("dimensions", {}).get("height") or 2.5)
+            mat_spec = model_3d.get("materials_spec") or {}
+            calc_input = {
+                "width": dim_w,
+                "height": dim_h,
+                "iron_type": mat_spec.get("iron_type") or "vuong_25",
+                "surface_type": mat_spec.get("surface_type") or "alu_3mm",
+                "has_sheet_backing": mat_spec.get("has_sheet_backing", True),
+                "profit_margin": 30
+            }
+            quote = calculate_signboard(calc_input)
+            model_3d["quotation"] = quote
+            model_3d["ruby_code"] = ruby_code
+            return jsonify({"success": True, "data": model_3d}), 200
+
+        elif cur.get("status") == "failed":
+            return jsonify({
+                "success": False,
+                "error": cur.get("current_step") or cur.get("error") or "Chrome Extension ChatGPT gặp sự cố khi xử lý tác vụ"
+            }), 502
+
+    return jsonify({
+        "success": False,
+        "error": "Quá thời gian chờ phản hồi từ Chrome Extension ChatGPT (180s). Vui lòng kiểm tra lại tab chatgpt.com trên máy tính."
+    }), 504
+
+
+# ==============================================================================
+# SKETCHUP RUBY SCRIPT GENERATOR & 3D MESH PARSER ENDPOINTS
+# ==============================================================================
+
+@ai_bp.route('/api/ai/signboard/generate-rb', methods=['POST', 'OPTIONS'])
+def api_signboard_generate_ruby():
+    """Tạo mã nguồn Ruby (.rb) SketchUp từ thông số mô hình 3D"""
+    if request.method == 'OPTIONS':
+        return jsonify({"ok": True}), 200
+
+    data = request.get_json(force=True, silent=True) or {}
+    model_data = data.get("model") or data
+
+    if not generate_ruby_script:
+        return jsonify({"success": False, "error": "Chưa tải được module sketchup_ruby_generator"}), 500
+
+    try:
+        ruby_code = generate_ruby_script(model_data)
+        return jsonify({
+            "success": True,
+            "ruby_code": ruby_code,
+            "filename": f"signboard_{(model_data.get('category') or '3d')}.rb"
+        }), 200
+    except Exception as e:
+        return jsonify({"success": False, "error": f"Lỗi sinh mã Ruby: {str(e)}"}), 500
+
+
+@ai_bp.route('/api/ai/signboard/parse-rb-mesh', methods=['POST', 'OPTIONS'])
+def api_signboard_parse_ruby_to_mesh():
+    """Phân tích mã nguồn Ruby (.rb) thành 3D Mesh Elements và Báo giá"""
+    if request.method == 'OPTIONS':
+        return jsonify({"ok": True}), 200
+
+    data = request.get_json(force=True, silent=True) or {}
+    ruby_code = data.get("ruby_code") or data.get("text") or ""
+
+    if not ruby_code:
+        return jsonify({"success": False, "error": "Vui lòng cung cấp mã nguồn Ruby (.rb)"}), 400
+
+    if not parse_ruby_to_mesh:
+        return jsonify({"success": False, "error": "Chưa tải được module sketchup_ruby_generator"}), 500
+
+    try:
+        model_3d = parse_ruby_to_mesh(ruby_code)
+
+        # Tính báo giá dự toán theo kích thước và vật liệu vừa bóc tách
+        dims = model_3d.get("dimensions") or {}
+        w = float(dims.get("width") or 6.0)
+        h = float(dims.get("height") or 2.5)
+        mat_spec = model_3d.get("materials_spec") or {}
+
+        calc_input = {
+            "width": w,
+            "height": h,
+            "iron_type": mat_spec.get("iron_type") or "vuong_25",
+            "surface_type": mat_spec.get("surface_type") or "alu_3mm",
+            "has_sheet_backing": mat_spec.get("has_sheet_backing", True),
+            "profit_margin": 30
         }
-        try:
-            resp = requests.post(url, json=payload, timeout=40)
-            if resp.status_code == 200:
-                raw_text = resp.json()["candidates"][0]["content"]["parts"][0]["text"].strip()
-                if raw_text.startswith("```"):
-                    raw_text = raw_text.strip("`")
-                    if raw_text.startswith("json"):
-                        raw_text = raw_text[4:].strip()
-                parsed_result = json.loads(raw_text)
-                break
-            else:
-                last_err = f"Gemini {m_name} status {resp.status_code}: {resp.text[:200]}"
-        except Exception as e:
-            last_err = str(e)
+        quote = calculate_signboard(calc_input)
+        model_3d["quotation"] = quote
 
-    # Nếu AI chưa trả về được thì dùng cấu hình mặc định từ Hint hoặc tạo cấu trúc fallback chuẩn xác
-    if not parsed_result:
-        w = float(custom_dim.get("width") or (selected_hint["dimensions"]["width"] if selected_hint else 6.0))
-        h = float(custom_dim.get("height") or (selected_hint["dimensions"]["height"] if selected_hint else 2.5))
-        d = float(custom_dim.get("depth") or (selected_hint["dimensions"]["depth"] if selected_hint else 0.25))
-        cat = selected_hint["category"] if selected_hint else ("billboard" if w >= 10 else "storefront")
-        
-        if selected_hint and selected_hint.get("elements"):
-            elements = selected_hint["elements"]
-        else:
-            elements = [
-                {"name": "Khung xương sắt hộp", "type": "box", "position": [0, 0, 0], "scale": [w, h, 0.05], "color": "#475569"},
-                {"name": "Mặt bảng ốp dựng", "type": "box", "position": [0, 0, 0.03], "scale": [w, h, 0.01], "color": "#1e293b"},
-                {"name": "Bộ chữ nổi thương hiệu", "type": "box", "position": [0, 0.2, 0.08], "scale": [round(w * 0.7, 2), round(h * 0.35, 2), 0.08], "color": "#f59e0b"},
-                {"name": "Slogan phụ phát sáng", "type": "box", "position": [0, -round(h * 0.25, 2), 0.06], "scale": [round(w * 0.5, 2), round(h * 0.15, 2), 0.04], "color": "#ffffff"}
-            ]
-            if cat == "billboard":
-                elements.insert(0, {
-                    "name": "Cột trụ thép tròn chịu lực",
-                    "type": "cylinder",
-                    "position": [0, -round(h * 1.2, 2), -0.2],
-                    "scale": [1.0, round(h * 2.4, 2), 1.0],
-                    "color": "#334155"
-                })
+        return jsonify({
+            "success": True,
+            "model3d": model_3d,
+            "quotation": quote
+        }), 200
+    except Exception as e:
+        return jsonify({"success": False, "error": f"Lỗi phân tích mã Ruby sang 3D: {str(e)}"}), 500
 
-        hint_mat = selected_hint.get("materials") if selected_hint else {}
-        parsed_result = {
-            "name": selected_hint["title"] if selected_hint else "Bảng hiệu thiết kế 3D ADMAKE",
-            "category": cat,
-            "category_label": selected_hint["badge"] if selected_hint else "Bảng hiệu mặt tiền",
-            "description": selected_hint["description"] if selected_hint else f"Bảng hiệu kết cấu chuẩn kỹ thuật kích thước {w}m x {h}m.",
-            "dimensions": {"width": w, "height": h, "depth": d},
-            "elements": elements,
-            "materials_spec": {
-                "iron_type": hint_mat.get("iron_type") or ("vuong_25" if w < 10 else "vuong_30"),
-                "surface_type": hint_mat.get("surface_type") or ("alu_3mm" if w < 10 else "bat_3m_uv"),
-                "has_led": hint_mat.get("has_led", True),
-                "has_sheet_backing": hint_mat.get("has_sheet_backing", True)
-            },
-            "render_prompt": selected_hint.get("prompt") if (selected_hint and selected_hint.get("prompt")) else f"Professional realistic architectural photograph of {user_prompt}, photorealistic signboard render, 4k ultra high resolution, perfectly detailed."
-        }
 
-    # Tính toán bảng bóc tách vật tư & nhân công thực tế bằng calculate_signboard
-    dim_w = float(parsed_result.get("dimensions", {}).get("width") or 6.0)
-    dim_h = float(parsed_result.get("dimensions", {}).get("height") or 2.5)
-    mat_spec = parsed_result.get("materials_spec") or {}
+# ==============================================================================
+# SIGNS CATALOG (THƯ VIỆN MẪU BIỂN HIỆU THỰC TẾ & MÃ RUBY SKETCHUP)
+# ==============================================================================
 
-    calc_input = {
-        "width": dim_w,
-        "height": dim_h,
-        "iron_type": mat_spec.get("iron_type") or "vuong_25",
-        "surface_type": mat_spec.get("surface_type") or "alu_3mm",
-        "has_sheet_backing": mat_spec.get("has_sheet_backing", True),
-        "profit_margin": 30
-    }
-    calc_quote = calculate_signboard(calc_input)
-    parsed_result["quotation"] = calc_quote
+@ai_bp.route('/api/ai/signs/catalog', methods=['GET', 'OPTIONS'])
+def api_signs_catalog():
+    """Lấy danh sách các mẫu bảng hiệu thực tế kèm mã Ruby và 3D Mesh"""
+    if request.method == 'OPTIONS':
+        return jsonify({"ok": True}), 200
+
+    catalog_paths = [
+        os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "static", "signs", "signs_catalog.json"),
+        r"D:\Dropbox\_Documents\Admake\frontend\public\signs\signs_catalog.json",
+        "/var/www/admake/signs/signs_catalog.json",
+        "/root/admake/backend/static/signs/signs_catalog.json"
+    ]
+    catalog_data = []
+    for p in catalog_paths:
+        if p and os.path.exists(p):
+            try:
+                with open(p, "r", encoding="utf-8") as fp:
+                    catalog_data = json.load(fp)
+                if catalog_data:
+                    break
+            except Exception:
+                pass
 
     return jsonify({
         "success": True,
-        "data": parsed_result
+        "count": len(catalog_data),
+        "catalog": catalog_data
     }), 200
+
+
+# ==============================================================================
+# FONT CHỮ BẢNG HIỆU & MÃ RUBY MẪU MẶC ĐỊNH
+# ==============================================================================
+
+@ai_bp.route('/api/ai/fonts/list', methods=['GET', 'OPTIONS'])
+def api_fonts_list():
+    """Trả về danh mục 100 font chữ bảng hiệu quảng cáo chuẩn Việt, có thể bổ sung từ backend"""
+    if request.method == 'OPTIONS':
+        return jsonify({"ok": True}), 200
+    try:
+        from .fonts_catalog import get_fonts_catalog
+        fonts = get_fonts_catalog()
+    except Exception:
+        try:
+            from fonts_catalog import get_fonts_catalog
+            fonts = get_fonts_catalog()
+        except Exception as e:
+            fonts = [{"id": "roboto", "name": "Roboto", "category": "sans-serif", "category_vn": "Mặc định", "weights": [400, 700], "styles": ["normal"]}]
+    return jsonify({
+        "success": True,
+        "count": len(fonts),
+        "fonts": fonts
+    }), 200
+
+
+def _get_signs_directories():
+    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    candidates = [
+        os.path.join(base_dir, "static", "signs"),
+        r"D:\Dropbox\_Documents\Admake\frontend\public\signs",
+        "/var/www/admake/signs",
+        "/root/admake/backend/static/signs",
+    ]
+    valid = []
+    for c in candidates:
+        if c and os.path.isdir(c) and c not in valid:
+            valid.append(c)
+    return valid
+
+
+@ai_bp.route('/api/ai/signs/default-rb', methods=['GET', 'POST', 'OPTIONS'])
+def api_signs_default_ruby():
+    """Tải hoặc Lưu kịch bản Ruby mặc định (Default RB Loaded) cho 3D Signboard Studio"""
+    if request.method == 'OPTIONS':
+        return jsonify({"ok": True}), 200
+
+    signs_dirs = _get_signs_directories()
+    active_filename = "active_default_signboard.rb"
+    sample_filename = "signboard_sketchup_1791878469884.rb"
+
+    if request.method == 'POST':
+        try:
+            data = request.get_json(force=True, silent=True) or {}
+            new_code = (data.get("ruby_code") or "").strip()
+            if not new_code:
+                return jsonify({"success": False, "error": "Mã Ruby không được để trống"}), 400
+
+            # Đảm bảo có ít nhất 1 thư mục signs hợp lệ
+            if not signs_dirs:
+                base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+                default_dir = os.path.join(base_dir, "static", "signs")
+                os.makedirs(default_dir, exist_ok=True)
+                signs_dirs = [default_dir]
+
+            # Lưu file vào tất cả thư mục signs khả dụng
+            saved_paths = []
+            for sdir in signs_dirs:
+                try:
+                    os.makedirs(sdir, exist_ok=True)
+                    target_file = os.path.join(sdir, active_filename)
+                    with open(target_file, "w", encoding="utf-8") as f:
+                        f.write(new_code)
+                    saved_paths.append(target_file)
+                except Exception as e:
+                    print(f"[api_signs_default_ruby] Lỗi lưu vào {sdir}: {e}")
+
+            # Thử parse ra mô hình 3D (không chặn lưu nếu cú pháp có cảnh báo)
+            model_3d = None
+            parse_err = None
+            if parse_ruby_to_mesh:
+                try:
+                    model_3d = parse_ruby_to_mesh(new_code)
+                except Exception as e:
+                    parse_err = str(e)
+
+            elements_count = len(model_3d.get("elements", [])) if (model_3d and "elements" in model_3d) else 0
+            now_str = time.strftime("%Y-%m-%d %H:%M:%S")
+
+            return jsonify({
+                "success": True,
+                "message": "Đã lưu kịch bản Ruby mặc định thành công!",
+                "filename": active_filename,
+                "is_custom": True,
+                "element_count": elements_count,
+                "model3d": model_3d,
+                "parse_error": parse_err,
+                "updated_at": now_str,
+                "saved_paths": saved_paths
+            }), 200
+        except Exception as err:
+            print(f"[api_signs_default_ruby] Exception: {err}")
+            return jsonify({
+                "success": False,
+                "error": f"Lỗi máy chủ khi lưu: {err}"
+            }), 500
+
+    # GET: Tải file active_default_signboard.rb trước, nếu không có thì fallback sang file mẫu gốc
+    code = ""
+    resolved_file = ""
+    is_custom = False
+
+    # 1. Thử file tùy chỉnh active_default_signboard.rb
+    for sdir in signs_dirs:
+        p = os.path.join(sdir, active_filename)
+        if os.path.exists(p):
+            try:
+                with open(p, "r", encoding="utf-8", errors="replace") as f:
+                    content = f.read()
+                if content.strip():
+                    code = content
+                    resolved_file = active_filename
+                    is_custom = True
+                    break
+            except Exception:
+                pass
+
+    # 2. Nếu chưa có tùy chỉnh, đọc file mẫu gốc
+    if not code:
+        fallback_candidates = []
+        for sdir in signs_dirs:
+            fallback_candidates.append(os.path.join(sdir, sample_filename))
+        fallback_candidates.extend([
+            r"C:\Users\nguyenbuu.DESKTOP-TOEFTR1\Downloads\\" + sample_filename,
+            r"D:\Dropbox\_Documents\Admake\frontend\public\signs\\" + sample_filename,
+            "/var/www/admake/signs/" + sample_filename,
+            "/root/admake/backend/static/signs/" + sample_filename,
+        ])
+        for p in fallback_candidates:
+            if p and os.path.exists(p):
+                try:
+                    with open(p, "r", encoding="utf-8", errors="replace") as f:
+                        content = f.read()
+                    if content.strip():
+                        code = content
+                        resolved_file = sample_filename
+                        is_custom = False
+                        break
+                except Exception:
+                    pass
+
+    if not code:
+        return jsonify({"success": False, "error": f"Không tìm thấy file kịch bản Ruby mẫu"}), 404
+
+    model_3d = None
+    if parse_ruby_to_mesh:
+        try:
+            model_3d = parse_ruby_to_mesh(code)
+        except Exception:
+            pass
+
+    elements_count = len(model_3d.get("elements", [])) if (model_3d and "elements" in model_3d) else 0
+
+    return jsonify({
+        "success": True,
+        "filename": resolved_file,
+        "is_custom": is_custom,
+        "ruby_code": code,
+        "element_count": elements_count,
+        "model3d": model_3d
+    }), 200
+
+
+@ai_bp.route('/api/ai/signs/default-rb/reset', methods=['POST', 'OPTIONS'])
+def api_signs_default_ruby_reset():
+    """Khôi phục kịch bản Ruby mặc định về file mẫu gốc signboard_sketchup_1791878469884.rb"""
+    if request.method == 'OPTIONS':
+        return jsonify({"ok": True}), 200
+
+    signs_dirs = _get_signs_directories()
+    active_filename = "active_default_signboard.rb"
+    sample_filename = "signboard_sketchup_1791878469884.rb"
+
+    # Xóa file active tùy chỉnh nếu có
+    for sdir in signs_dirs:
+        p = os.path.join(sdir, active_filename)
+        if os.path.exists(p):
+            try:
+                os.remove(p)
+            except Exception as e:
+                print(f"[api_signs_default_ruby_reset] Lỗi xóa {p}: {e}")
+
+    # Đọc lại file gốc
+    code = ""
+    for sdir in signs_dirs:
+        p = os.path.join(sdir, sample_filename)
+        if os.path.exists(p):
+            try:
+                with open(p, "r", encoding="utf-8", errors="replace") as f:
+                    code = f.read()
+                if code.strip():
+                    break
+            except Exception:
+                pass
+
+    model_3d = None
+    if parse_ruby_to_mesh and code:
+        try:
+            model_3d = parse_ruby_to_mesh(code)
+        except Exception:
+            pass
+
+    elements_count = len(model_3d.get("elements", [])) if (model_3d and "elements" in model_3d) else 0
+
+    return jsonify({
+        "success": True,
+        "message": "Đã khôi phục về kịch bản mẫu gốc thành công!",
+        "filename": sample_filename,
+        "is_custom": False,
+        "ruby_code": code,
+        "element_count": elements_count,
+        "model3d": model_3d
+    }), 200
+
+
+@ai_bp.route('/api/ai/signs/validate-ruby', methods=['POST', 'OPTIONS'])
+def api_signs_validate_ruby():
+    """Kiểm tra cú pháp và diễn giải mã Ruby thành cấu trúc 3D mà không lưu"""
+    if request.method == 'OPTIONS':
+        return jsonify({"ok": True}), 200
+
+    data = request.get_json(force=True, silent=True) or {}
+    code = (data.get("ruby_code") or "").strip()
+    if not code:
+        return jsonify({"success": False, "valid": False, "error": "Mã Ruby trống"}), 400
+
+    if not parse_ruby_to_mesh:
+        return jsonify({"success": True, "valid": True, "warning": "Parser 3D chưa được nạp, không thể đếm chi tiết", "element_count": 0}), 200
+
+    try:
+        model_3d = parse_ruby_to_mesh(code)
+        elements = model_3d.get("elements", []) if model_3d else []
+        dimensions = model_3d.get("dimensions", {}) if model_3d else {}
+        name = model_3d.get("name", "Mô hình 3D") if model_3d else ""
+
+        # Phân loại thống kê các chi tiết
+        types_breakdown = {}
+        materials_breakdown = {}
+        for el in elements:
+            etype = el.get("type", "mesh")
+            types_breakdown[etype] = types_breakdown.get(etype, 0) + 1
+            mat = el.get("material", "default")
+            materials_breakdown[mat] = materials_breakdown.get(mat, 0) + 1
+
+        return jsonify({
+            "success": True,
+            "valid": True,
+            "name": name,
+            "element_count": len(elements),
+            "dimensions": dimensions,
+            "types_breakdown": types_breakdown,
+            "materials_breakdown": materials_breakdown,
+            "message": f"Cú pháp hợp lệ! Diễn giải thành công {len(elements)} đối tượng 3D."
+        }), 200
+    except Exception as e:
+        return jsonify({
+            "success": True,
+            "valid": False,
+            "error": str(e),
+            "message": f"Lỗi cú pháp hoặc diễn giải Ruby: {e}"
+        }), 200
+
+
+
+
 
 

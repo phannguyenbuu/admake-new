@@ -545,3 +545,100 @@ def admin_leads():
         f_login_to=f_login_to,
         trial_counts=trial_counts,
     )
+
+@lead_manage_bp.route("/extension", methods=["GET"])
+def extension_manage_redirect():
+    from flask import redirect
+    return redirect("/lead-manage/#extension")
+
+@lead_manage_bp.route("/extension/download", methods=["GET"])
+def extension_download():
+    from flask import send_file, current_app
+    zip_path = os.path.join(current_app.root_path, "static", "downloads", "chatgpt_unified_bridge.zip")
+    if not os.path.exists(zip_path):
+        import zipfile
+        src_dir = os.path.join(current_app.root_path, "..", "chatgpt_unified_bridge")
+        os.makedirs(os.path.dirname(zip_path), exist_ok=True)
+        with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as zf:
+            for root, dirs, files in os.walk(src_dir):
+                for f in files:
+                    p = os.path.join(root, f)
+                    arcname = os.path.relpath(p, src_dir)
+                    zf.write(p, arcname)
+    return send_file(zip_path, as_attachment=True, download_name="chatgpt_unified_bridge_v4.0.zip")
+
+@lead_manage_bp.route("/extension/workers", methods=["GET"])
+def extension_workers():
+    from flask import jsonify
+    try:
+        from api.ai import admake_vision_orchestrator
+        workers = admake_vision_orchestrator.get_online_workers()
+        queue = list(admake_vision_orchestrator.queue)
+        jobs = [admake_vision_orchestrator.jobs[jid] for jid in queue if jid in admake_vision_orchestrator.jobs]
+        return jsonify({
+            "status": "ok",
+            "workers": workers,
+            "queue_count": len(queue),
+            "jobs": jobs
+        })
+    except Exception as e:
+        return jsonify({"status": "error", "error": str(e), "workers": []})
+
+@lead_manage_bp.route("/extension/new_chat", methods=["POST"])
+def extension_new_chat():
+    from flask import jsonify, request
+    try:
+        from api.ai import admake_vision_orchestrator
+        data = request.get_json(silent=True) or {}
+        worker_id = data.get("worker_id")
+        target_pc = data.get("target_pc") or worker_id
+        job = admake_vision_orchestrator.create_job(
+            prompt="Clean Session Reset",
+            job_type="new_chat",
+            target_pc=target_pc,
+            new_chat=True,
+            bridge_type="chatgpt_unified_bridge",
+            only_unified=True
+        )
+        return jsonify({"status": "ok", "job": job, "request_code": job.get("request_code")})
+    except Exception as e:
+        return jsonify({"status": "error", "error": str(e)})
+
+@lead_manage_bp.route("/extension/dispatch_test", methods=["POST"])
+def extension_dispatch_test():
+    from flask import jsonify, request
+    try:
+        from api.ai import admake_vision_orchestrator
+        data = request.get_json(silent=True) or {}
+        prompt = (data.get("prompt") or "Vẽ logo bảng hiệu quảng cáo mica sáng chân đèn LED").strip()
+        job_type = data.get("job_type", "image_gen")
+        target_pc = data.get("target_pc")
+        new_chat = bool(data.get("new_chat", False))
+        custom_req_code = data.get("request_code")
+        job = admake_vision_orchestrator.create_job(
+            prompt=prompt,
+            job_type=job_type,
+            target_pc=target_pc,
+            new_chat=new_chat,
+            bridge_type="chatgpt_unified_bridge",
+            request_code=custom_req_code,
+            only_unified=True
+        )
+        return jsonify({"status": "ok", "job": job, "request_code": job.get("request_code")})
+    except Exception as e:
+        return jsonify({"status": "error", "error": str(e)})
+
+@lead_manage_bp.route("/extension/job_status", methods=["GET"])
+def extension_job_status():
+    from flask import jsonify, request
+    try:
+        from api.ai import admake_vision_orchestrator
+        req_code = request.args.get("request_code")
+        task_id = request.args.get("task_id") or request.args.get("id")
+        job = admake_vision_orchestrator.find_job(req_code or task_id)
+        if not job:
+            return jsonify({"status": "not_found", "message": "Không tìm thấy tác vụ với mã này"}), 404
+        return jsonify({"status": "ok", "job": job})
+    except Exception as e:
+        return jsonify({"status": "error", "error": str(e)})
+
