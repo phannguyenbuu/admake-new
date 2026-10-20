@@ -113,14 +113,34 @@ def admin_leads():
 
     # Text search
     if query_text:
-        like = f"%{query_text}%"
-        lead_query = lead_query.filter(
-            or_(
-                LeadPayload.name.ilike(like),
-                LeadPayload.company.ilike(like),
-                LeadPayload.phone.ilike(like),
-            )
-        )
+        clean_q = query_text.strip()
+        like = f"%{clean_q}%"
+
+        # Match lead IDs from users matching username (e.g. ad375, ad100, etc.)
+        matching_lead_ids = [
+            row[0] for row in db.session.query(User.lead_id)
+            .filter(User.username.ilike(like), User.lead_id.isnot(None))
+            .distinct().all()
+        ]
+
+        # Check if query matches a lead ID directly or as 'ad<id>'
+        matched_id = None
+        if clean_q.isdigit():
+            matched_id = int(clean_q)
+        elif clean_q.lower().startswith("ad") and clean_q[2:].isdigit():
+            matched_id = int(clean_q[2:])
+
+        or_conditions = [
+            LeadPayload.name.ilike(like),
+            LeadPayload.company.ilike(like),
+            LeadPayload.phone.ilike(like),
+        ]
+        if matching_lead_ids:
+            or_conditions.append(LeadPayload.id.in_(matching_lead_ids))
+        if matched_id is not None:
+            or_conditions.append(LeadPayload.id == matched_id)
+
+        lead_query = lead_query.filter(or_(*or_conditions))
 
     # Column filters
     if f_name:

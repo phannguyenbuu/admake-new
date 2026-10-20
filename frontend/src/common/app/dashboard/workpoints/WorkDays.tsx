@@ -1,4 +1,5 @@
-import { Modal, notification } from "antd";
+import { Modal, notification, Input, InputNumber, Button, Tooltip } from "antd";
+import { TOKEN_LABEL } from "../../../common/config";
 import React, { useEffect, useState } from "react";
 import { useApiHost, useApiStatic } from "../../../common/hooks/useApiHost";
 import { Stack, Box, Typography } from "@mui/material";
@@ -87,6 +88,14 @@ export default function WorkDays({ record, selectedMonth }: ParamWorkDaysProps) 
   const [modalImg, setModalImg] = useState<PeriodData | null>(null);
   const [statuses, setStatuses] = useState(createEmptyStatuses(daysInMonth));
   const [modalVisible, setModalVisible] = useState(false);
+  const [supplementOutTime, setSupplementOutTime] = useState<string>("21:30");
+  const [supplementWorkhour, setSupplementWorkhour] = useState<number>(2.5);
+  const [supplementNote, setSupplementNote] = useState<string>("");
+  const [isSavingSupplement, setIsSavingSupplement] = useState<boolean>(false);
+
+  const hasUnclosedOvertime = React.useMemo(() => {
+    return statuses.some((day) => day[2] === "overtime-in");
+  }, [statuses]);
 
   useEffect(() => {
     setMainData(record.items);
@@ -111,8 +120,8 @@ export default function WorkDays({ record, selectedMonth }: ParamWorkDaysProps) 
   const colors: Record<StatusKey, string> = {
     in: "green",
     out: "red",
-    "overtime-in": "#FFA000",   // vàng — tăng ca check-in
-    "overtime-out": "#FFA000",  // vàng — tăng ca check-out
+    "overtime-in": "#DC2626",   // ĐỎ — Cảnh báo: Tăng ca chưa check-out!
+    "overtime-out": "#FFA000",  // Vàng cam — Tăng ca check-out hoàn thành
     off: "#999",
     null: "white",
   };
@@ -120,6 +129,58 @@ export default function WorkDays({ record, selectedMonth }: ParamWorkDaysProps) 
   const handleOk = () => {
     setModalVisible(false);
     setModalImg(null);
+  };
+
+  const handleSaveSupplementOvertime = async () => {
+    if (!modalImg?.workpoint_id) {
+      notification.error({ message: "Không tìm thấy mã chấm công" });
+      return;
+    }
+    setIsSavingSupplement(true);
+    try {
+      const token = localStorage.getItem(TOKEN_LABEL) || sessionStorage.getItem(TOKEN_LABEL) || "";
+      const authHeaders: HeadersInit = token ? { Authorization: `Bearer ${token}` } : {};
+
+      const response = await fetch(`${useApiHost()}/workpoint/${modalImg.workpoint_id}/supplement-overtime`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          ...authHeaders,
+        },
+        body: JSON.stringify({
+          period: modalImg.periodKey || "evening",
+          workhour: supplementWorkhour,
+          out_time: supplementOutTime,
+          note: supplementNote,
+        }),
+      });
+
+      const data = await response.json();
+      if (response.ok && data.success) {
+        notification.success({ message: "Đã bổ sung giờ tăng ca thành công!" });
+        const updatedWp = data.workpoint;
+        setMainData((prev) =>
+          prev.map((item) => (String(item.id) === String(updatedWp.id) ? updatedWp : item))
+        );
+        const periodKey = (modalImg.periodKey || "evening") as keyof Checklist;
+        const updatedPeriod = updatedWp.checklist?.[periodKey];
+        if (updatedPeriod) {
+          setModalImg((prev) => (prev ? {
+            ...prev,
+            ...updatedPeriod,
+            workpoint_id: updatedWp.id,
+            periodKey: periodKey,
+          } : prev));
+        }
+      } else {
+        notification.error({ message: "Lỗi bổ sung giờ tăng ca", description: data.error });
+      }
+    } catch (err) {
+      console.error(err);
+      notification.error({ message: "Lỗi kết nối", description: "Vui lòng thử lại" });
+    } finally {
+      setIsSavingSupplement(false);
+    }
   };
 
   const handleLeaveDelete = async (leaveId: string | number | undefined) => {
@@ -151,8 +212,13 @@ export default function WorkDays({ record, selectedMonth }: ParamWorkDaysProps) 
           <Typography color="#fff" textAlign="center" fontSize={10} fontWeight={300}>
             {((totalHour?.morning || 0) + (totalHour?.noon || 0)).toFixed(2)}
           </Typography>
-          <Typography color="#fff" textAlign="center" fontSize={10} fontWeight={300}>
+          <Typography color={hasUnclosedOvertime ? "#FEE2E2" : "#fff"} textAlign="center" fontSize={10} fontWeight={hasUnclosedOvertime ? 700 : 300}>
             {(totalHour?.evening || 0).toFixed(2)}
+            {hasUnclosedOvertime && (
+              <Tooltip title="Có ca tăng ca chưa check-out, kế toán cần kiểm tra/bổ sung giờ">
+                <span style={{ color: "#EF4444", fontSize: 10, fontWeight: "bold", marginLeft: 1 }}>!</span>
+              </Tooltip>
+            )}
           </Typography>
         </Stack>
 
@@ -214,7 +280,13 @@ export default function WorkDays({ record, selectedMonth }: ParamWorkDaysProps) 
                           ) {
                             const periodData = item.checklist?.[periodKey];
                             if (periodData) {
-                              imgUrl = periodData;
+                              imgUrl = {
+                                ...periodData,
+                                workpoint_id: item.id,
+                                periodKey: periodKey,
+                                day: date,
+                                period: periodIndex,
+                              };
                               break;
                             }
                           }
@@ -222,30 +294,65 @@ export default function WorkDays({ record, selectedMonth }: ParamWorkDaysProps) 
                       }
                     }
 
+                    const isUnclosedOvertime = status === "overtime-in";
                     const bgColor = status && status.startsWith("off")
                       ? "#999"
                       : colors[(status ?? "null") as StatusKey];
 
-                    return (
+                    const dotNode = (
                       <div
                         key={periodIndex}
                         style={{
-                          display: "block",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
                           width: 16,
                           height: 16,
                           borderRadius: 8,
                           backgroundColor: bgColor,
-                          border: isSunday ? "1px solid red" : "1px solid #999",
+                          border: isUnclosedOvertime
+                            ? "2px solid #B91C1C"
+                            : isSunday
+                            ? "1px solid red"
+                            : "1px solid #999",
                           marginBottom: 1,
                           cursor: imgUrl ? "pointer" : "default",
+                          color: "#fff",
+                          fontSize: 10,
+                          fontWeight: "bold",
+                          boxShadow: isUnclosedOvertime ? "0 0 4px #EF4444" : "none",
                         }}
                         onClick={() => {
                           if (imgUrl) {
                             setModalImg(imgUrl);
+                            if (imgUrl.in?.time) {
+                              try {
+                                const inH = dayjs(imgUrl.in.time).hour();
+                                const inM = dayjs(imgUrl.in.time).minute();
+                                const outH = Math.min(22, inH + 3);
+                                setSupplementOutTime(`${String(outH).padStart(2, "0")}:${String(inM).padStart(2, "0")}`);
+                              } catch {
+                                setSupplementOutTime("21:30");
+                              }
+                            } else {
+                              setSupplementOutTime("21:30");
+                            }
+                            setSupplementWorkhour(imgUrl.workhour || 2.5);
+                            setSupplementNote("");
                             setModalVisible(true);
                           }
                         }}
-                      />
+                      >
+                        {isUnclosedOvertime ? "!" : ""}
+                      </div>
+                    );
+
+                    return isUnclosedOvertime ? (
+                      <Tooltip key={periodIndex} title="Tăng ca chưa check-out! Click để xem & kế toán bổ sung giờ">
+                        {dotNode}
+                      </Tooltip>
+                    ) : (
+                      dotNode
                     );
                   })}
                 </div>
@@ -339,6 +446,80 @@ export default function WorkDays({ record, selectedMonth }: ParamWorkDaysProps) 
                     }
                   }}
                 />
+              </Stack>
+            )}
+
+            {/* Form bổ sung giờ tăng ca cho kế toán */}
+            {modalImg?.status !== "off" && (modalImg?.periodKey === "evening" || modalImg?.period === 2) && (
+              <Stack direction="column" sx={{ maxWidth: 360, width: "100%", mt: 1 }}>
+                {!modalImg?.out?.time ? (
+                  <Box sx={{ p: 2, bgcolor: "#FEF2F2", border: "1px solid #F87171", borderRadius: 2 }}>
+                    <Typography sx={{ color: "#B91C1C", fontWeight: "bold", fontSize: 13, mb: 0.5 }}>
+                      ⚠️ CẢNH BÁO: CHƯA CÓ CHECK-OUT TĂNG CA!
+                    </Typography>
+                    <Typography sx={{ color: "#7F1D1D", fontSize: 11, mb: 1.5 }}>
+                      Nhân viên chưa chấm công ra ca tối. Kế toán xác nhận lại và bổ sung giờ tăng ca bên dưới:
+                    </Typography>
+                    <Stack spacing={1.5}>
+                      <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                        <Typography sx={{ fontSize: 12, fontWeight: 500, minWidth: 80 }}>Giờ ra ca:</Typography>
+                        <Input
+                          size="small"
+                          style={{ width: 100 }}
+                          placeholder="21:30"
+                          value={supplementOutTime}
+                          onChange={(e) => setSupplementOutTime(e.target.value)}
+                        />
+                      </Box>
+                      <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                        <Typography sx={{ fontSize: 12, fontWeight: 500, minWidth: 80 }}>Số giờ tăng:</Typography>
+                        <InputNumber
+                          size="small"
+                          style={{ width: 80 }}
+                          min={0.5}
+                          max={6}
+                          step={0.5}
+                          value={supplementWorkhour}
+                          onChange={(v) => setSupplementWorkhour(v || 0)}
+                        />
+                        <Typography sx={{ fontSize: 11, color: "#666" }}>giờ</Typography>
+                      </Box>
+                      <Button
+                        type="primary"
+                        danger
+                        size="small"
+                        loading={isSavingSupplement}
+                        onClick={handleSaveSupplementOvertime}
+                      >
+                        💾 Lưu bổ sung giờ tăng ca
+                      </Button>
+                    </Stack>
+                  </Box>
+                ) : (
+                  <Box sx={{ p: 1.5, bgcolor: "#F0FDF4", border: "1px solid #86EFAC", borderRadius: 2, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                    <Box>
+                      <Typography sx={{ fontSize: 12, color: "#166534", fontWeight: 600 }}>
+                        ✅ Tăng ca: {modalImg.workhour || 0} giờ
+                      </Typography>
+                      <Typography sx={{ fontSize: 10, color: "#15803D" }}>
+                        Check out: {modalImg.out?.time ? dayjs(modalImg.out.time).format("HH:mm DD/MM/YYYY") : "—"}
+                        {modalImg.out?.img === "" && " (Kế toán bổ sung)"}
+                      </Typography>
+                    </Box>
+                    <Button
+                      size="small"
+                      onClick={() => {
+                        setSupplementWorkhour(modalImg.workhour || 2.5);
+                        if (modalImg.out?.time) {
+                          setSupplementOutTime(dayjs(modalImg.out.time).format("HH:mm"));
+                        }
+                        setModalImg({ ...modalImg, out: undefined });
+                      }}
+                    >
+                      Sửa lại
+                    </Button>
+                  </Box>
+                )}
               </Stack>
             )}
 

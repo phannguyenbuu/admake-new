@@ -1120,6 +1120,85 @@ def put_remove_workpoint(id):
     
     return jsonify([c.tdict() for c in workpoint]), 200
 
+@workpoint_bp.route("/<string:id>/supplement-overtime", methods=["PUT"])
+def supplement_overtime_workpoint(id):
+    try:
+        workpoint = db.session.get(Workpoint, id)
+        if not workpoint:
+            return jsonify({"error": f"Workpoint {id} not found"}), 404
+
+        data = request.get_json(force=True, silent=True) or {}
+        period = data.get("period", "evening")
+        workhour = float(data.get("workhour", 0))
+        out_time_raw = data.get("out_time")
+        note = data.get("note", "")
+
+        checklist = workpoint.checklist or {}
+        if period not in checklist:
+            checklist[period] = {}
+
+        period_data = checklist[period]
+        in_data = period_data.get("in", {})
+        
+        # Determine out_time ISO string
+        out_time_iso = None
+        if out_time_raw:
+            if "T" in str(out_time_raw):
+                out_time_iso = str(out_time_raw)
+            else:
+                base_date = None
+                if in_data.get("time"):
+                    base_date = in_data["time"][:10]
+                elif workpoint.createdAt:
+                    base_date = str(workpoint.createdAt)[:10]
+                else:
+                    base_date = datetime.date.today().isoformat()
+                
+                parts = str(out_time_raw).strip().split(":")
+                hh = int(parts[0]) if len(parts) > 0 and parts[0].isdigit() else 21
+                mm = int(parts[1]) if len(parts) > 1 and parts[1].isdigit() else 0
+                out_time_iso = f"{base_date}T{hh:02d}:{mm:02d}:00+07:00"
+        elif in_data.get("time"):
+            base_date = in_data["time"][:10]
+            out_time_iso = f"{base_date}T21:30:00+07:00"
+
+        # If workhour not explicitly provided, calculate from diff
+        if workhour <= 0 and in_data.get("time") and out_time_iso:
+            try:
+                t_in = datetime.datetime.fromisoformat(in_data["time"])
+                t_out = datetime.datetime.fromisoformat(out_time_iso)
+                diff = (t_out - t_in).total_seconds() / 3600.0
+                workhour = round(max(0.5, min(diff, 6.0)), 2)
+            except Exception:
+                workhour = 2.0
+
+        period_data["out"] = {
+            "time": out_time_iso,
+            "img": "",
+            "lat": in_data.get("lat", ""),
+            "long": in_data.get("long", ""),
+            "is_supplemented": True,
+            "supplemented_at": datetime.datetime.now().isoformat()
+        }
+        period_data["workhour"] = workhour
+        if note:
+            period_data["note"] = note
+
+        checklist[period] = period_data
+        workpoint.checklist = checklist
+        flag_modified(workpoint, "checklist")
+        db.session.commit()
+
+        return jsonify({
+            "success": True,
+            "message": "Đã bổ sung giờ tăng ca thành công",
+            "workpoint": workpoint.tdict()
+        }), 200
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": str(e)}), 500
+
 @workpoint_bp.route("/message", methods=["POST"])
 def post_workpoint_message():
     user_id = request.form.get("user_id")

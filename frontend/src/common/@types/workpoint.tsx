@@ -8,7 +8,7 @@ export interface Check {
 }
 
 export interface PeriodData {
-  id?: number;
+  id?: number | string;
   in?: Check;
   out?: Check;
   workhour?: number;
@@ -16,6 +16,8 @@ export interface PeriodData {
   period: number;
   day: Date;
   text: string;
+  workpoint_id?: string;
+  periodKey?: string;
 }
 
 export interface Checklist {

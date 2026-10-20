@@ -1002,7 +1002,7 @@
             </div>
             <form class="search-box" method="get" style="flex-wrap: nowrap;">
               <input class="form-control" type="text" name="q" id="leadSearchInput" value="{{ query_text }}"
-                placeholder="{{ labels.search_placeholder or " Search by lead name, company, or mobile" }}" />
+                placeholder="{{ labels.search_placeholder or "Tìm theo tên, công ty, SĐT, mã ID, tài khoản (vd: ad103)..." }}" />
               <button class="search-clear {% if not query_text %}is-hidden{% endif %}" type="button"
                 id="leadSearchClear">x</button>
               <button class="btn btn-primary btn-sm" type="submit">{{ labels.search_button or "Search" }}</button>

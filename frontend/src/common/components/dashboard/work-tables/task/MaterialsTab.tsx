@@ -183,10 +183,11 @@ function SuggestSelect({ value, onChange, options, placeholder }: SuggestSelectP
 interface MaterialsGridProps {
     form?: FormInstance;
     userId?: string;
+    laborSalaryCost?: number;
 }
 
 // ─── Materials Grid Tab ───────────────────────────────────────────────────────
-function MaterialsGrid({ form, userId }: MaterialsGridProps) {
+function MaterialsGrid({ form, userId, laborSalaryCost }: MaterialsGridProps) {
     const { taskDetail } = useTaskContext();
     const { userLeadId } = useUser();
 
@@ -460,8 +461,9 @@ function MaterialsGrid({ form, userId }: MaterialsGridProps) {
 
     const assignedStaffCount = taskDetail?.assign_ids?.length || 0;
     const laborRewardCost = Number(taskDetail?.reward || 0);
+    const laborCost = (laborSalaryCost && laborSalaryCost > 0) ? laborSalaryCost : laborRewardCost;
 
-    const grandTotalOrderCost = netFinalCost + laborRewardCost + totalExtraCost;
+    const grandTotalOrderCost = netFinalCost + laborCost + totalExtraCost;
 
     // ── Grid Column Layout ────────────────────────────────────────────────────
     const COL_W = ["minmax(0, 3fr)", "minmax(0, 1.5fr)", "minmax(0, 1.2fr)", "minmax(0, 1.5fr)", "minmax(0, 1.8fr)", "minmax(0, 1.5fr)", "32px"];
@@ -985,7 +987,7 @@ function MaterialsGrid({ form, userId }: MaterialsGridProps) {
                             <UserCheck size={12} className="text-emerald-400" />
                             2. Nhân công ({assignedStaffCount} người)
                         </span>
-                        <span className="text-sm font-bold text-emerald-400 mt-1">{formatMoney(laborRewardCost)}</span>
+                        <span className="text-sm font-bold text-emerald-400 mt-1">{formatMoney(laborCost)}</span>
                     </div>
 
                     {/* 3. Phát sinh khác */}
@@ -1009,8 +1011,9 @@ function MaterialsGrid({ form, userId }: MaterialsGridProps) {
 interface MaterialsTabProps {
     form?: FormInstance;
     userId?: string;
+    laborSalaryCost?: number;
 }
 
-export default function MaterialsTab({ form, userId }: MaterialsTabProps) {
-    return <MaterialsGrid form={form} userId={userId} />;
+export default function MaterialsTab({ form, userId, laborSalaryCost }: MaterialsTabProps) {
+    return <MaterialsGrid form={form} userId={userId} laborSalaryCost={laborSalaryCost} />;
 }

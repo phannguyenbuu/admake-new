@@ -181,7 +181,7 @@ export default function FormTaskBody({
                 <div className="mb-4 flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-500">
                   <InboxOutlined /> Danh sách vật liệu
                 </div>
-                <MaterialsTab form={form} />
+                <MaterialsTab form={form} laborSalaryCost={computedTotalSalary} />
               </div>
 
               <div className="max-h-[420px] overflow-y-auto rounded-xl border border-slate-200 bg-white p-5 shadow-sm">

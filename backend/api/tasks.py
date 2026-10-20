@@ -360,28 +360,11 @@ def update_task_icon(id):
                 except (ValueError, TypeError):
                     existing_icons = [task.icon]  # format cũ: 1 string plain
 
-            # Nếu có ảnh cũ, chuyển tất cả ảnh cũ sang phần tài liệu (Message)
-            if existing_icons:
-                user_id = request.form.get("user_id") or getattr(current_user, 'id', None)
-                ls = task.assets if task.assets else []
-                for old_icon in existing_icons:
-                    json_data = {
-                        "type": "task",
-                        "user_id": str(user_id) if user_id else None,
-                        "file_url": old_icon,
-                        "thumb_url": old_icon,
-                        "message_id": generate_datetime_id(),
-                        "task_id": task_id
-                    }
-                    message = Message.create_item(json_data)
-                    ls.append(message.message_id)
-                    pushed_messages.append(message.tdict())
-                
-                task.assets = ls
-                flag_modified(task, "assets")
+            # Giữ lại tất cả ảnh đã upload trong task.icon (hỗ trợ nhiều ảnh công việc)
+            if new_icon not in existing_icons:
+                existing_icons.append(new_icon)
 
-            # Gán ảnh mới làm icon duy nhất
-            task.icon = _json.dumps([new_icon])
+            task.icon = _json.dumps(existing_icons)
             flag_modified(task, 'icon')
             db.session.commit()
 
@@ -389,8 +372,7 @@ def update_task_icon(id):
                 'success': True,
                 'filename': filename,
                 'thumb_url': thumb_url,
-                'icons': [new_icon],
-                'pushed_messages': pushed_messages,
+                'icons': existing_icons,
                 'task': task.tdict()
             }), 200
         else:
