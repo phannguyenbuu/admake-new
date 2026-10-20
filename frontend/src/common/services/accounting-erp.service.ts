@@ -147,7 +147,7 @@ export const AccountingErpService = {
   getApBill: (id: string) => axiosClient.get(`/accounting/ap-bills/${id}`),
   updateApBill: (id: string, payload: Record<string, any>) => axiosClient.put(`/accounting/ap-bills/${id}`, payload),
   confirmApBill: (id: string) => axiosClient.post(`/accounting/ap-bills/${id}/confirm`, {}),
-  cancelApBill: (id: string) => axiosClient.post(`/accounting/ap-bills/${id}/cancel`, {}),
+  cancelApBill: (id: string, force_delete_payments?: boolean) => axiosClient.post(`/accounting/ap-bills/${id}/cancel${force_delete_payments ? '?force_delete_payments=1' : ''}`, {}),
   recordApPayment: (id: string, payload: Record<string, any>) => axiosClient.post(`/accounting/ap-bills/${id}/payments`, payload),
   updateApPayment: (billId: string, paymentId: string, payload: Record<string, any>) => axiosClient.patch(`/accounting/ap-bills/${billId}/payments/${paymentId}`, payload),
   deleteApPayment: (billId: string, paymentId: string) => axiosClient.delete(`/accounting/ap-bills/${billId}/payments/${paymentId}`),

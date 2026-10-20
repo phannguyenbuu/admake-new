@@ -384,8 +384,18 @@ def _sync_ap_payment_links(payment: APBillPayment, bill: APBill):
                     line.credit = payment.amount
 
 
-def _require_lead(lead_id: int):
-    lead = db.session.get(LeadPayload, lead_id)
+def _require_lead(lead_id: int | None):
+    if not lead_id or int(lead_id) <= 0:
+        actor = getattr(g, "permission_actor", None)
+        if actor and getattr(actor, "lead_id", None):
+            lead_id = actor.lead_id
+        elif actor and getattr(actor, "role_id", 0) == -2:
+            first_lead = LeadPayload.query.filter(LeadPayload.deletedAt.is_(None)).order_by(LeadPayload.id.asc()).first()
+            if first_lead:
+                lead_id = first_lead.id
+    if not lead_id or int(lead_id) <= 0:
+        abort(400, description="lead_id is required")
+    lead = db.session.get(LeadPayload, int(lead_id))
     if not lead or lead.deletedAt:
         abort(404, description="Lead not found")
     return lead
@@ -434,7 +444,7 @@ def compute_aging_bucket(balance_amount: float, due_date_value: date | None, as_
 def _recompute_receivable_status(current_status: str, balance_amount: float, effective_total_amount: float, due_date_value: date | None, as_of: date):
     if current_status == "cancelled":
         return "cancelled"
-    if current_status == "draft":
+    if current_status == "draft" and balance_amount >= effective_total_amount:
         return "draft"
     if balance_amount <= 0:
         return "paid"
@@ -463,7 +473,11 @@ def _build_running_code(model, lead_id: int, prefix: str, date_value: date):
             seq = int(existing.code.split("-")[-1]) + 1
         except Exception:
             seq = 1
-    return f"{code_prefix}-{seq:04d}"
+    candidate = f"{code_prefix}-{seq:04d}"
+    while model.query.filter_by(lead_id=lead_id, code=candidate).first() is not None:
+        seq += 1
+        candidate = f"{code_prefix}-{seq:04d}"
+    return candidate
 
 
 def _build_entry_no(lead_id: int, entry_date: date):
@@ -857,7 +871,7 @@ def _generate_ap_confirm_entry(bill: APBill):
     return entry
 
 
-def _record_ar_payment(invoice: ARInvoice, payment_date: date, amount: float, payment_method: str, note: str | None, payment_type: str = "phat_sinh"):
+def _record_ar_payment(invoice: ARInvoice, payment_date: date, amount: float, payment_method: str, note: str | None, payment_type: str = "phat_sinh", daily_cash_id: str | None = None):
     if invoice.status == "cancelled":
         abort(400, description="Khong the ghi nhan thanh toan cho cong no da huy")
     if amount <= 0:
@@ -866,46 +880,57 @@ def _record_ar_payment(invoice: ARInvoice, payment_date: date, amount: float, pa
     cash_row = None
     entry = None
     if payment_type == "tam_ung":
-        cash_row = _create_daily_cash_row(
-            lead_id=invoice.lead_id,
-            direction="income",
-            payment_date=payment_date,
-            amount=amount,
-            counterparty_name=invoice.customer_name,
-            description=f"Thu tien khach hang {invoice.code}",
-            payment_method=payment_method,
-            doc_ref=invoice.code,
-            source_type="ar_invoice",
-            source_id=invoice.id,
-        )
-        entry = _create_journal_entry(
-            lead_id=invoice.lead_id,
-            entry_date=payment_date,
-            description=f"Thu tien cong no {invoice.code}",
-            source_type="ar_payment",
-            source_id=invoice.id,
-            reference_no=invoice.code,
-            lines=[
-                {
-                    "account_code": _cash_account_by_method(payment_method),
-                    "partner_type": "customer",
-                    "partner_id": invoice.customer_id,
-                    "partner_name": invoice.customer_name,
-                    "debit": amount,
-                    "credit": 0,
-                },
-                {
-                    "account_code": "131",
-                    "partner_type": "customer",
-                    "partner_id": invoice.customer_id,
-                    "partner_name": invoice.customer_name,
-                    "debit": 0,
-                    "credit": amount,
-                },
-            ],
-            status="draft",
-        )
-        cash_row.journal_entry_id = entry.id
+        if daily_cash_id:
+            cash_row = db.session.get(AccountingDailyCash, daily_cash_id)
+            if cash_row and cash_row.lead_id == invoice.lead_id and not cash_row.deletedAt:
+                cash_row.doc_ref = invoice.code
+                if cash_row.journal_entry_id:
+                    entry = db.session.get(JournalEntry, cash_row.journal_entry_id)
+            else:
+                cash_row = None
+
+        if not cash_row:
+            cash_row = _create_daily_cash_row(
+                lead_id=invoice.lead_id,
+                direction="income",
+                payment_date=payment_date,
+                amount=amount,
+                counterparty_name=invoice.customer_name,
+                description=f"Thu tien khach hang {invoice.code}",
+                payment_method=payment_method,
+                doc_ref=invoice.code,
+                source_type="ar_invoice",
+                source_id=invoice.id,
+            )
+        if not entry:
+            entry = _create_journal_entry(
+                lead_id=invoice.lead_id,
+                entry_date=payment_date,
+                description=f"Thu tien cong no {invoice.code}",
+                source_type="ar_payment",
+                source_id=invoice.id,
+                reference_no=invoice.code,
+                lines=[
+                    {
+                        "account_code": _cash_account_by_method(payment_method),
+                        "partner_type": "customer",
+                        "partner_id": invoice.customer_id,
+                        "partner_name": invoice.customer_name,
+                        "debit": amount,
+                        "credit": 0,
+                    },
+                    {
+                        "account_code": "131",
+                        "partner_type": "customer",
+                        "partner_id": invoice.customer_id,
+                        "partner_name": invoice.customer_name,
+                        "debit": 0,
+                        "credit": amount,
+                    },
+                ],
+                status="draft",
+            )
+            cash_row.journal_entry_id = entry.id
 
     payment = ARInvoicePayment(
         id=generate_datetime_id(),
@@ -930,7 +955,7 @@ def _record_ar_payment(invoice: ARInvoice, payment_date: date, amount: float, pa
     _update_invoice_balances(invoice)
     return payment
 
-def _record_ap_payment(bill: APBill, payment_date: date, amount: float, payment_method: str, note: str | None, payment_type: str = "phat_sinh"):
+def _record_ap_payment(bill: APBill, payment_date: date, amount: float, payment_method: str, note: str | None, payment_type: str = "phat_sinh", daily_cash_id: str | None = None):
     if bill.status == "cancelled":
         abort(400, description="Khong the ghi nhan thanh toan cho cong no da huy")
     if amount <= 0:
@@ -939,46 +964,57 @@ def _record_ap_payment(bill: APBill, payment_date: date, amount: float, payment_
     cash_row = None
     entry = None
     if payment_type == "tam_ung":
-        cash_row = _create_daily_cash_row(
-            lead_id=bill.lead_id,
-            direction="expense",
-            payment_date=payment_date,
-            amount=amount,
-            counterparty_name=bill.supplier_name,
-            description=f"Thanh toán NCC {bill.code}",
-            payment_method=payment_method,
-            doc_ref=bill.code,
-            source_type="ap_bill",
-            source_id=bill.id,
-        )
-        entry = _create_journal_entry(
-            lead_id=bill.lead_id,
-            entry_date=payment_date,
-            description=f"Thanh toán công nợ {bill.code}",
-            source_type="ap_payment",
-            source_id=bill.id,
-            reference_no=bill.code,
-            lines=[
-                {
-                    "account_code": "331",
-                    "partner_type": "supplier",
-                    "partner_id": bill.supplier_id,
-                    "partner_name": bill.supplier_name,
-                    "debit": amount,
-                    "credit": 0,
-                },
-                {
-                    "account_code": _cash_account_by_method(payment_method),
-                    "partner_type": "supplier",
-                    "partner_id": bill.supplier_id,
-                    "partner_name": bill.supplier_name,
-                    "debit": 0,
-                    "credit": amount,
-                },
-            ],
-            status="draft",
-        )
-        cash_row.journal_entry_id = entry.id
+        if daily_cash_id:
+            cash_row = db.session.get(AccountingDailyCash, daily_cash_id)
+            if cash_row and cash_row.lead_id == bill.lead_id and not cash_row.deletedAt:
+                cash_row.doc_ref = bill.code
+                if cash_row.journal_entry_id:
+                    entry = db.session.get(JournalEntry, cash_row.journal_entry_id)
+            else:
+                cash_row = None
+
+        if not cash_row:
+            cash_row = _create_daily_cash_row(
+                lead_id=bill.lead_id,
+                direction="expense",
+                payment_date=payment_date,
+                amount=amount,
+                counterparty_name=bill.supplier_name,
+                description=f"Thanh toán NCC {bill.code}",
+                payment_method=payment_method,
+                doc_ref=bill.code,
+                source_type="ap_bill",
+                source_id=bill.id,
+            )
+        if not entry:
+            entry = _create_journal_entry(
+                lead_id=bill.lead_id,
+                entry_date=payment_date,
+                description=f"Thanh toán công nợ {bill.code}",
+                source_type="ap_payment",
+                source_id=bill.id,
+                reference_no=bill.code,
+                lines=[
+                    {
+                        "account_code": "331",
+                        "partner_type": "supplier",
+                        "partner_id": bill.supplier_id,
+                        "partner_name": bill.supplier_name,
+                        "debit": amount,
+                        "credit": 0,
+                    },
+                    {
+                        "account_code": _cash_account_by_method(payment_method),
+                        "partner_type": "supplier",
+                        "partner_id": bill.supplier_id,
+                        "partner_name": bill.supplier_name,
+                        "debit": 0,
+                        "credit": amount,
+                    },
+                ],
+                status="draft",
+            )
+            cash_row.journal_entry_id = entry.id
 
     payment = APBillPayment(
         id=generate_datetime_id(),
@@ -1168,7 +1204,8 @@ def create_period():
 @accounting_erp_bp.route("/ar-invoices", methods=["GET"])
 def list_ar_invoices():
     lead_id = request.args.get("lead", 0, type=int)
-    _require_lead(lead_id)
+    lead = _require_lead(lead_id)
+    lead_id = lead.id
     _refresh_ar_invoice_metrics(lead_id)
     page = request.args.get("page", 1, type=int)
     limit = min(request.args.get("limit", 20, type=int), 200)
@@ -1216,7 +1253,8 @@ def list_ar_invoices():
 def create_ar_invoice():
     data = request.get_json() or {}
     lead_id = int(data.get("lead_id") or 0)
-    _require_lead(lead_id)
+    lead = _require_lead(lead_id)
+    lead_id = lead.id
     _ensure_accounting_setup(lead_id)
     invoice_date = _parse_date(data.get("invoice_date")) or date.today()
     tax_code = _find_tax_code(lead_id, _clean_text(data.get("tax_code_id")), "output")
@@ -1371,7 +1409,10 @@ def cancel_ar_invoice(invoice_id):
         je = db.session.get(JournalEntry, item.journal_entry_id)
         if je:
             if je.status == "posted":
-                abort(400, description="Không thể huỷ hoá đơn đã ghi sổ (posted).")
+                try:
+                    _reverse_entry(je, f"Hủy hóa đơn {item.code}")
+                except Exception:
+                    abort(400, description="Không thể huỷ hoá đơn đã ghi sổ (posted).")
             je.deletedAt = datetime.utcnow()
             for line in je.lines:
                 line.deletedAt = datetime.utcnow()
@@ -1407,8 +1448,9 @@ def record_ar_invoice_payment(invoice_id):
     payment_method = _validate_enum("payment_method", data.get("payment_method"), PAYMENT_METHODS, "cash")
     payment_type = _clean_text(data.get("payment_type")) or "phat_sinh"
     amount = _round_money(data.get("amount"))
+    daily_cash_id = _clean_text(data.get("daily_cash_id"))
     try:
-        payment = _record_ar_payment(item, payment_date, amount, payment_method, _clean_text(data.get("note")), payment_type)
+        payment = _record_ar_payment(item, payment_date, amount, payment_method, _clean_text(data.get("note")), payment_type, daily_cash_id)
         db.session.commit()
     except Exception:
         db.session.rollback()
@@ -1511,7 +1553,8 @@ def ar_statement():
 @accounting_erp_bp.route("/ap-bills", methods=["GET"])
 def list_ap_bills():
     lead_id = request.args.get("lead", 0, type=int)
-    _require_lead(lead_id)
+    lead = _require_lead(lead_id)
+    lead_id = lead.id
     page = request.args.get("page", 1, type=int)
     limit = min(request.args.get("limit", 20, type=int), 200)
     status = _clean_text(request.args.get("status"))
@@ -1557,7 +1600,8 @@ def list_ap_bills():
 def create_ap_bill():
     data = request.get_json() or {}
     lead_id = int(data.get("lead_id") or 0)
-    _require_lead(lead_id)
+    lead = _require_lead(lead_id)
+    lead_id = lead.id
     _ensure_accounting_setup(lead_id)
     bill_date = _parse_date(data.get("bill_date")) or date.today()
     tax_code = _find_tax_code(lead_id, _clean_text(data.get("tax_code_id")), "input")
@@ -1681,14 +1725,27 @@ def cancel_ap_bill(bill_id):
     item = APBill.query.filter(APBill.id == bill_id, APBill.deletedAt.is_(None)).first()
     if not item:
         abort(404, description="AP bill not found")
-    if item.paid_amount > 0:
-        abort(400, description="Không thể huỷ hoá đơn mua hàng đã có thanh toán. Vui lòng xoá các thanh toán trước.")
+    
+    force_delete_payments = request.args.get("force_delete_payments", "0") == "1"
+    
+    active_payments = [p for p in item.payments if not p.deletedAt]
+    if active_payments:
+        if force_delete_payments:
+            for p in active_payments:
+                p.deletedAt = datetime.utcnow()
+                _soft_delete_ap_payment_links(p)
+            _update_bill_balances(item)
+        else:
+            abort(400, description="Không thể huỷ hoá đơn mua hàng còn các bút toán phát sinh/thanh toán. Vui lòng xoá các bút toán trước.")
     
     if item.journal_entry_id:
         je = db.session.get(JournalEntry, item.journal_entry_id)
         if je:
             if je.status == "posted":
-                abort(400, description="Không thể huỷ hoá đơn mua hàng đã ghi sổ (posted).")
+                try:
+                    _reverse_entry(je, f"Hủy công nợ {item.code}")
+                except Exception:
+                    abort(400, description="Không thể huỷ hoá đơn mua hàng đã ghi sổ (posted).")
             je.deletedAt = datetime.utcnow()
             for line in je.lines:
                 line.deletedAt = datetime.utcnow()
@@ -1724,8 +1781,9 @@ def record_ap_bill_payment(bill_id):
     payment_method = _validate_enum("payment_method", data.get("payment_method"), PAYMENT_METHODS, "cash")
     amount = _round_money(data.get("amount"))
     payment_type = _clean_text(data.get("payment_type")) or "phat_sinh"
+    daily_cash_id = _clean_text(data.get("daily_cash_id"))
     try:
-        payment = _record_ap_payment(item, payment_date, amount, payment_method, _clean_text(data.get("note")), payment_type)
+        payment = _record_ap_payment(item, payment_date, amount, payment_method, _clean_text(data.get("note")), payment_type, daily_cash_id)
         db.session.commit()
     except Exception:
         db.session.rollback()

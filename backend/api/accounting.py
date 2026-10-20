@@ -137,8 +137,18 @@ def _clean_text(value):
 
 
 def _ensure_lead(lead_id):
-    lead = db.session.get(LeadPayload, lead_id)
-    if not lead:
+    if not lead_id or int(lead_id) <= 0:
+        actor = getattr(g, "permission_actor", None)
+        if actor and getattr(actor, "lead_id", None):
+            lead_id = actor.lead_id
+        elif actor and getattr(actor, "role_id", 0) == -2:
+            first_lead = LeadPayload.query.filter(LeadPayload.deletedAt.is_(None)).order_by(LeadPayload.id.asc()).first()
+            if first_lead:
+                lead_id = first_lead.id
+    if not lead_id or int(lead_id) <= 0:
+        abort(400, description="lead_id is required")
+    lead = db.session.get(LeadPayload, int(lead_id))
+    if not lead or lead.deletedAt:
         abort(404, description="Lead not found")
     return lead
 
@@ -271,7 +281,8 @@ def get_document_types():
 @accounting_bp.route("/daily-cash", methods=["GET"])
 def get_daily_cash():
     lead_id = request.args.get("lead", 0, type=int)
-    _ensure_lead(lead_id)
+    lead = _ensure_lead(lead_id)
+    lead_id = lead.id
 
     page = request.args.get("page", 1, type=int)
     limit = request.args.get("limit", 20, type=int)
@@ -368,7 +379,8 @@ def get_daily_cash():
 def create_daily_cash():
     data = request.get_json() or {}
     lead_id = int(data.get("lead_id") or 0)
-    _ensure_lead(lead_id)
+    lead = _ensure_lead(lead_id)
+    lead_id = lead.id
 
     txn_date = _parse_date(data.get("txn_date")) or date.today()
     direction = _validate_enum("direction", data.get("direction"), CASH_DIRECTIONS, "expense")

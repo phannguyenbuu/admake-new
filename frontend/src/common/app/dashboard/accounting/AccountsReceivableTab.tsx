@@ -1,4 +1,4 @@
-import React, { useState, useRef, useMemo } from "react";
+import React, { useState, useRef, useMemo, useEffect } from "react";
 import { Modal, notification, Popconfirm, AutoComplete } from "antd";
 import { useCustomerQuery } from "../../../common/hooks/customer.hook";
 
@@ -236,6 +236,12 @@ function MoneyInput({
   const [focused, setFocused] = useState(false);
   const [raw, setRaw] = useState("");
 
+  useEffect(() => {
+    if (!focused) {
+      setRaw(value > 0 ? String(value) : "");
+    }
+  }, [value, focused]);
+
   const handleFocus = () => {
     setFocused(true);
     setRaw(value > 0 ? String(value) : "");
@@ -245,8 +251,9 @@ function MoneyInput({
     onChange(parseMoney(raw));
   };
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    // chỉ giữ chữ số và dấu chấm thập phân
-    setRaw(e.target.value.replace(/[^0-9.]/g, ""));
+    const clean = e.target.value.replace(/[^0-9.]/g, "");
+    setRaw(clean);
+    onChange(parseMoney(clean));
   };
 
   return (
@@ -671,7 +678,7 @@ function PaymentSubRow({
   payments: Payment[];
   invoiceId: string;
   invoiceStatus: string;
-  onAddPayment: (p: AddPaymentForm) => void;
+  onAddPayment: (p: AddPaymentForm & { daily_cash_id?: string }) => void;
   addingLoading: boolean;
   onPaymentsChanged: (updated: Payment[]) => void;
   dailyCashList: DailyCashRef[];
@@ -722,12 +729,14 @@ function PaymentSubRow({
     const noteWithRef = chosen
       ? `[TC:${chosen.voucher_no}]${tuForm.note ? " " + tuForm.note : ""}`
       : tuForm.note;
+    const chosenCashId = chosen ? chosen.id : undefined;
     setTcRef("");
     onAddPayment({
       amount: tuForm.amount,
       payment_type: "tam_ung",
       payment_date: tuForm.payment_date,
       note: noteWithRef,
+      daily_cash_id: chosenCashId,
     });
     setTuForm({ amount: 0, payment_date: dayjs().format("YYYY-MM-DD"), note: "" });
   };
@@ -905,7 +914,8 @@ const emptyForm = {
 // ─── Main ─────────────────────────────────────────────────────────────────────
 
 export default function AccountsReceivableTab() {
-  const { userLeadId } = useUser();
+  const { userLeadId, currentWorkspace } = useUser();
+  const effectiveLeadId = userLeadId || (currentWorkspace as any)?.lead_id || 0;
   const queryClient = useQueryClient();
   const [month, setMonth] = useState(dayjs().format("YYYY-MM"));
   const [keyword, setKeyword] = useState("");
@@ -945,7 +955,7 @@ export default function AccountsReceivableTab() {
   const hasActiveFilter = !!(filterVat || filterStatus || filterPaid);
 
   const params = {
-    lead: userLeadId,
+    lead: effectiveLeadId,
     from_date: fromDate,
     to_date: toDate,
     search: keyword || undefined,
@@ -955,30 +965,30 @@ export default function AccountsReceivableTab() {
 
   const listQuery = useQuery({
     queryKey: ["ar-list", params],
-    enabled: !!userLeadId,
+    enabled: !!effectiveLeadId,
     queryFn: async () => (await AccountingErpService.listArInvoices(params)).data,
   });
 
   const taxQuery = useQuery({
-    queryKey: ["tax-codes", userLeadId],
-    enabled: !!userLeadId,
+    queryKey: ["tax-codes", effectiveLeadId],
+    enabled: !!effectiveLeadId,
     queryFn: async () =>
-      ((await AccountingErpService.listTaxCodes({ lead: userLeadId })).data?.data || []) as TaxCode[],
+      ((await AccountingErpService.listTaxCodes({ lead: effectiveLeadId })).data?.data || []) as TaxCode[],
     staleTime: 5 * 60 * 1000,
   });
 
   const taxCodes: TaxCode[] = taxQuery.data || [];
 
   const taskQuery = useQuery({
-    queryKey: ["tasks-inlead", userLeadId],
-    enabled: !!userLeadId,
+    queryKey: ["tasks-inlead", effectiveLeadId],
+    enabled: !!effectiveLeadId,
     queryFn: async () => {
       const res = await import("../../../services/task.service").then((m) =>
         m.TaskService ? m.TaskService : null
       );
       // Dùng trực tiếp axiosClient giống các màn hình khác
       const { default: axiosClient } = await import("../../../services/axiosClient");
-      const data = await axiosClient.get(`/task/inlead/${userLeadId}`);
+      const data = await axiosClient.get(`/task/inlead/${effectiveLeadId}`);
       return (data.data || []) as { id: string; title: string }[];
     },
     staleTime: 5 * 60 * 1000,
@@ -986,10 +996,10 @@ export default function AccountsReceivableTab() {
   const tasks = (taskQuery.data || []) as any[];
 
   const inventoryQuery = useQuery({
-    queryKey: ["inventory-items", userLeadId],
-    enabled: !!userLeadId,
+    queryKey: ["inventory-items", effectiveLeadId],
+    enabled: !!effectiveLeadId,
     queryFn: async () => {
-      const res = await InventoryService.listItems({ lead: userLeadId, limit: 1000 });
+      const res = await InventoryService.listItems({ lead: effectiveLeadId, limit: 1000 });
       return (res.data?.data || []) as InventoryItem[];
     },
     staleTime: 5 * 60 * 1000,
@@ -998,13 +1008,13 @@ export default function AccountsReceivableTab() {
 
   // ── Daily Cash list (cùng tháng, dùng để link phếu TC vào payment) ──────────
   const dailyCashQuery = useQuery({
-    queryKey: ["daily-cash-list", userLeadId, month],
-    enabled: !!userLeadId,
+    queryKey: ["daily-cash-list", effectiveLeadId, month],
+    enabled: !!effectiveLeadId,
     queryFn: async () => {
       const { default: axiosClient } = await import("../../../services/axiosClient");
       const res = await axiosClient.get(`/accounting/daily-cash`, {
         params: {
-          lead: userLeadId,
+          lead: effectiveLeadId,
           from_date: dayjs(`${month}-01`).startOf("month").format("YYYY-MM-DD"),
           to_date: dayjs(`${month}-01`).endOf("month").format("YYYY-MM-DD"),
           limit: 200,
@@ -1030,7 +1040,7 @@ export default function AccountsReceivableTab() {
   const createMutation = useMutation({
     mutationFn: (payload: Record<string, any>) =>
       AccountingErpService.createArInvoice({
-        lead_id: userLeadId,
+        lead_id: effectiveLeadId,
         ...payload,
       }),
     onSuccess: async () => {
@@ -1498,7 +1508,7 @@ export default function AccountsReceivableTab() {
                       <button
                         onClick={() => {
                           createMutation.mutate({
-                            lead_id: userLeadId,
+                            lead_id: effectiveLeadId,
                             customer_name: group.customerName === "(Chưa có tên khách)" ? "" : group.customerName,
                             base_amount: 0,
                             tax_rate: 0,
@@ -1743,6 +1753,7 @@ export default function AccountsReceivableTab() {
                                       payment_method: "bank_transfer",
                                       payment_type: p.payment_type,
                                       note: p.note,
+                                      daily_cash_id: p.daily_cash_id,
                                     },
                                   })
                                 }
@@ -1839,7 +1850,7 @@ export default function AccountsReceivableTab() {
         onOk={() =>
           createMutation.mutate({
             ...form,
-            lead_id: userLeadId,
+            lead_id: effectiveLeadId,
             tax_amount: Math.round(form.base_amount * form.tax_rate / 100),
             total_amount: form.base_amount + Math.round(form.base_amount * form.tax_rate / 100),
           })

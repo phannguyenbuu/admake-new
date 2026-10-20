@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Modal, notification, Popconfirm } from "antd";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import dayjs from "dayjs";
@@ -96,10 +96,60 @@ function InlineText({ value, onSave, className = "", type = "text", placeholder 
 }
 
 // ─── MoneyInput ───────────────────────────────────────────────────────────────
-function MoneyInput({ value, onChange, onEnter, placeholder = "Số tiền...", className = "" }: { value: number; onChange: (n: number) => void; onEnter?: () => void; placeholder?: string; className?: string }) {
+function MoneyInput({
+  value,
+  onChange,
+  onEnter,
+  placeholder = "Số tiền...",
+  className = "",
+}: {
+  value: number;
+  onChange: (n: number) => void;
+  onEnter?: () => void;
+  placeholder?: string;
+  className?: string;
+}) {
   const [focused, setFocused] = useState(false);
   const [raw, setRaw] = useState("");
-  return <input type="text" inputMode="numeric" value={focused ? raw : (value > 0 ? fmt(value) : "")} placeholder={placeholder} onFocus={() => { setFocused(true); setRaw(value > 0 ? String(value) : ""); }} onBlur={() => { setFocused(false); onChange(parseMoney(raw)); }} onChange={(e) => setRaw(e.target.value.replace(/[^0-9.]/g, ""))} onKeyDown={(e) => { if (e.key === "Enter") { onChange(parseMoney(raw)); setFocused(false); onEnter?.(); } }} className={`border border-slate-200 rounded-md px-2 py-1 text-xs text-right ${className}`} />;
+
+  useEffect(() => {
+    if (!focused) {
+      setRaw(value > 0 ? String(value) : "");
+    }
+  }, [value, focused]);
+
+  const handleFocus = () => {
+    setFocused(true);
+    setRaw(value > 0 ? String(value) : "");
+  };
+  const handleBlur = () => {
+    setFocused(false);
+    onChange(parseMoney(raw));
+  };
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const clean = e.target.value.replace(/[^0-9.]/g, "");
+    setRaw(clean);
+    onChange(parseMoney(clean));
+  };
+
+  return (
+    <input
+      type="text"
+      inputMode="numeric"
+      value={focused ? raw : (value > 0 ? fmt(value) : "")}
+      placeholder={placeholder}
+      onFocus={handleFocus}
+      onBlur={handleBlur}
+      onChange={handleChange}
+      onKeyDown={(e) => {
+        if (e.key === "Enter") {
+          handleBlur();
+          onEnter?.();
+        }
+      }}
+      className={`border border-slate-200 rounded-md px-2 py-1 text-xs text-right ${className}`}
+    />
+  );
 }
 
 // ─── InlineVAT ────────────────────────────────────────────────────────────────
@@ -292,7 +342,7 @@ function PaymentSubRow({
   payments: Payment[];
   invoiceId: string;
   invoiceStatus: string;
-  onAddPayment: (p: AddPaymentForm) => void;
+  onAddPayment: (p: AddPaymentForm & { daily_cash_id?: string }) => void;
   addingLoading: boolean;
   onPaymentsChanged: (u: Payment[]) => void;
   dailyCashList: DailyCashRef[];
@@ -341,12 +391,14 @@ function PaymentSubRow({
     }
     const chosen = dailyCashList.find((d) => d.id === tcRef);
     const noteWithRef = chosen ? `[TC:${chosen.voucher_no}]${tuForm.note ? " " + tuForm.note : ""}` : tuForm.note;
+    const chosenCashId = chosen ? chosen.id : undefined;
     setTcRef("");
     onAddPayment({
       amount: tuForm.amount,
       payment_type: "tam_ung",
       payment_date: tuForm.payment_date,
       note: noteWithRef,
+      daily_cash_id: chosenCashId,
     });
     setTuForm({ amount: 0, payment_date: dayjs().format("YYYY-MM-DD"), note: "" });
   };
@@ -514,7 +566,8 @@ const emptyForm = { supplier_name: "", description: "", bill_date: dayjs().forma
 
 // ─── Main ─────────────────────────────────────────────────────────────────────
 export default function AccountsPayableTab() {
-  const { userLeadId } = useUser();
+  const { userLeadId, currentWorkspace } = useUser();
+  const effectiveLeadId = userLeadId || (currentWorkspace as any)?.lead_id || 0;
   const queryClient = useQueryClient();
   const [keyword, setKeyword] = useState("");
   const [open, setOpen] = useState(false);
@@ -540,23 +593,23 @@ export default function AccountsPayableTab() {
   const clearSort = (field: string) => { if (sortField === field) { setSortField(null); setPage(1); } };
   const hasActiveFilter = !!(filterVat || filterStatus || filterPaid);
 
-  const params = { lead: userLeadId, from_date: fromDate, to_date: toDate, search: keyword || undefined, page: 1, limit: 500 };
+  const params = { lead: effectiveLeadId, from_date: fromDate, to_date: toDate, search: keyword || undefined, page: 1, limit: 500 };
 
-  const listQuery = useQuery({ queryKey: ["ap-list", params], enabled: !!userLeadId, queryFn: async () => (await AccountingErpService.listApBills(params)).data });
-  const taxQuery = useQuery({ queryKey: ["tax-codes", userLeadId], enabled: !!userLeadId, queryFn: async () => ((await AccountingErpService.listTaxCodes({ lead: userLeadId })).data?.data || []) as TaxCode[], staleTime: 5 * 60 * 1000 });
+  const listQuery = useQuery({ queryKey: ["ap-list", params], enabled: !!effectiveLeadId, queryFn: async () => (await AccountingErpService.listApBills(params)).data });
+  const taxQuery = useQuery({ queryKey: ["tax-codes", effectiveLeadId], enabled: !!effectiveLeadId, queryFn: async () => ((await AccountingErpService.listTaxCodes({ lead: effectiveLeadId })).data?.data || []) as TaxCode[], staleTime: 5 * 60 * 1000 });
   const taxCodes: TaxCode[] = taxQuery.data || [];
 
   const taskQuery = useQuery({
-    queryKey: ["tasks-inlead", userLeadId], enabled: !!userLeadId, staleTime: 5 * 60 * 1000,
-    queryFn: async () => { const { default: axiosClient } = await import("../../../services/axiosClient"); const data = await axiosClient.get(`/task/inlead/${userLeadId}`); return (data.data || []) as { id: string; title: string }[]; },
+    queryKey: ["tasks-inlead", effectiveLeadId], enabled: !!effectiveLeadId, staleTime: 5 * 60 * 1000,
+    queryFn: async () => { const { default: axiosClient } = await import("../../../services/axiosClient"); const data = await axiosClient.get(`/task/inlead/${effectiveLeadId}`); return (data.data || []) as { id: string; title: string }[]; },
   });
   const tasks = (taskQuery.data || []) as any[];
 
   const inventoryQuery = useQuery({
-    queryKey: ["inventory-items", userLeadId],
-    enabled: !!userLeadId,
+    queryKey: ["inventory-items", effectiveLeadId],
+    enabled: !!effectiveLeadId,
     queryFn: async () => {
-      const res = await InventoryService.listItems({ lead: userLeadId, limit: 1000 });
+      const res = await InventoryService.listItems({ lead: effectiveLeadId, limit: 1000 });
       return (res.data?.data || []) as InventoryItem[];
     },
     staleTime: 5 * 60 * 1000,
@@ -564,8 +617,8 @@ export default function AccountsPayableTab() {
   const inventoryItems = inventoryQuery.data || [];
 
   const dailyCashQuery = useQuery({
-    queryKey: ["daily-cash-list", userLeadId, month], enabled: !!userLeadId, staleTime: 2 * 60 * 1000,
-    queryFn: async () => { const { default: axiosClient } = await import("../../../services/axiosClient"); const res = await axiosClient.get(`/accounting/daily-cash`, { params: { lead: userLeadId, from_date: dayjs(`${month}-01`).startOf("month").format("YYYY-MM-DD"), to_date: dayjs(`${month}-01`).endOf("month").format("YYYY-MM-DD"), limit: 200 } }); return (res.data?.data || []) as DailyCashRef[]; },
+    queryKey: ["daily-cash-list", effectiveLeadId, month], enabled: !!effectiveLeadId, staleTime: 2 * 60 * 1000,
+    queryFn: async () => { const { default: axiosClient } = await import("../../../services/axiosClient"); const res = await axiosClient.get(`/accounting/daily-cash`, { params: { lead: effectiveLeadId, from_date: dayjs(`${month}-01`).startOf("month").format("YYYY-MM-DD"), to_date: dayjs(`${month}-01`).endOf("month").format("YYYY-MM-DD"), limit: 200 } }); return (res.data?.data || []) as DailyCashRef[]; },
   });
   const dailyCashList = dailyCashQuery.data || [];
 
@@ -591,9 +644,28 @@ export default function AccountsPayableTab() {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (row: ApBill) => AccountingErpService.cancelApBill(row.id),
-    onSuccess: async () => { notification.success({ message: "Đã xoá công nợ" }); await invalidate(); },
-    onError: (e: any) => notification.error({ message: e?.response?.data?.description || "Xoá thất bại" }),
+    mutationFn: ({ row, force }: { row: ApBill; force?: boolean }) =>
+      AccountingErpService.cancelApBill(row.id, force),
+    onSuccess: async () => {
+      notification.success({ message: "Đã xoá công nợ" });
+      await invalidate();
+    },
+    onError: (e: any, variables) => {
+      const msg = e?.response?.data?.description || "Xoá thất bại";
+      if (msg.includes("bút toán phát sinh") || msg.includes("thanh toán")) {
+        Modal.confirm({
+          title: "Công nợ này đang có các khoản thanh toán",
+          content: `Hóa đơn này đang có các khoản thanh toán hoặc phát sinh, bạn có chắc chắn muốn xóa hết không?`,
+          okText: "Đồng ý",
+          cancelText: "Hủy",
+          onOk: () => {
+            deleteMutation.mutate({ row: variables.row, force: true });
+          },
+        });
+      } else {
+        notification.error({ message: msg });
+      }
+    },
   });
 
   const paymentMutation = useMutation({
@@ -854,7 +926,7 @@ export default function AccountsPayableTab() {
                         okText="Xoá công nợ"
                         cancelText="Huỷ"
                         okButtonProps={{ danger: true }}
-                        onConfirm={() => deleteMutation.mutate(row)}
+                        onConfirm={() => deleteMutation.mutate({ row })}
                       >
                         <button title="Xoá công nợ này" className="p-1.5 rounded-md border border-rose-200 text-rose-500 hover:text-rose-700 hover:border-rose-400 hover:bg-rose-50 transition-colors">
                           <Trash2 size={13} />
@@ -873,7 +945,7 @@ export default function AccountsPayableTab() {
                           dailyCashList={dailyCashList}
                           onDeleted={invalidate}
                           onPaymentsChanged={(updated) => setPaymentsMap((prev) => ({ ...prev, [row.id]: updated }))}
-                          onAddPayment={(p) => paymentMutation.mutate({ invoiceId: row.id, payload: { payment_date: p.payment_date, amount: p.amount, payment_method: "bank_transfer", payment_type: p.payment_type, note: p.note } })}
+                          onAddPayment={(p) => paymentMutation.mutate({ invoiceId: row.id, payload: { payment_date: p.payment_date, amount: p.amount, payment_method: "bank_transfer", payment_type: p.payment_type, note: p.note, daily_cash_id: p.daily_cash_id } })}
                         />
                       </td>
                     </tr>
@@ -907,7 +979,7 @@ export default function AccountsPayableTab() {
       )}
 
       {/* Create modal */}
-      <Modal title="Tạo công nợ phải trả" open={open} onCancel={() => setOpen(false)} confirmLoading={createMutation.isPending} onOk={() => createMutation.mutate({ ...form, lead_id: userLeadId, tax_amount: Math.round(form.base_amount * form.tax_rate / 100), total_amount: form.base_amount + Math.round(form.base_amount * form.tax_rate / 100) })} okText="Tạo" cancelText="Huỷ">
+      <Modal title="Tạo công nợ phải trả" open={open} onCancel={() => setOpen(false)} confirmLoading={createMutation.isPending} onOk={() => createMutation.mutate({ ...form, lead_id: effectiveLeadId, tax_amount: Math.round(form.base_amount * form.tax_rate / 100), total_amount: form.base_amount + Math.round(form.base_amount * form.tax_rate / 100) })} okText="Tạo" cancelText="Huỷ">
         <div className="grid grid-cols-1 gap-3 pt-2">
           <div><label className="text-xs text-slate-500 mb-1 block">Nhà cung cấp *</label><input value={form.supplier_name} onChange={(e) => setForm((p) => ({ ...p, supplier_name: e.target.value }))} placeholder="Tên nhà cung cấp" className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm" /></div>
           <div><label className="text-xs text-slate-500 mb-1 block">Diễn giải</label><textarea value={form.description} onChange={(e) => setForm((p) => ({ ...p, description: e.target.value }))} placeholder="Nội dung chi tiết..." className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm min-h-[60px]" /></div>
