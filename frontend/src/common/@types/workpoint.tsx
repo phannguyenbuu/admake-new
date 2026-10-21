@@ -12,10 +12,10 @@ export interface PeriodData {
   in?: Check;
   out?: Check;
   workhour?: number;
-  status: string;
-  period: number;
-  day: Date;
-  text: string;
+  status?: string;
+  period?: number;
+  day?: Date;
+  text?: string;
   workpoint_id?: string;
   periodKey?: string;
 }

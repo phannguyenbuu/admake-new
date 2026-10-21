@@ -1657,18 +1657,57 @@ def post_workpoint_by_user_and_date(user_id):
             check_in_time = tz.localize(check_in_time)
         else:
             check_in_time = check_in_time.astimezone(tz)
-        diff = now - check_in_time
-        work_hours = max(0.0, min(diff.total_seconds() / 3600.0, 6.0))
 
-        workpoint.checklist[period]["out"] = {
-            "time": now.isoformat(),
-            "img": img_url,
-            "lat": lat,
-            "long": long,
-            
-        }
+        # Tự động tách tăng ca nếu ra ca chiều sau 18:30 (làm việc liên tục qua 17:30)
+        if period == "noon" and current_time >= time(18, 30):
+            noon_end_time = datetime.combine(now.date(), time(17, 30))
+            if now.tzinfo is not None:
+                noon_end_time = noon_end_time.replace(tzinfo=now.tzinfo)
+            else:
+                noon_end_time = tz.localize(noon_end_time)
 
-        workpoint.checklist[period]["workhour"] = work_hours
+            noon_diff = noon_end_time - check_in_time
+            noon_hours = max(0.0, min(noon_diff.total_seconds() / 3600.0, 4.0))
+
+            workpoint.checklist["noon"]["out"] = {
+                "time": noon_end_time.isoformat(),
+                "img": img_url,
+                "lat": lat,
+                "long": long,
+            }
+            workpoint.checklist["noon"]["workhour"] = round(noon_hours, 2)
+
+            eve_diff = now - noon_end_time
+            eve_hours = max(0.5, round(eve_diff.total_seconds() / 3600.0, 2))
+
+            workpoint.checklist["evening"] = {
+                "in": {
+                    "time": noon_end_time.isoformat(),
+                    "img": workpoint.checklist["noon"]["in"].get("img") or img_url,
+                    "lat": workpoint.checklist["noon"]["in"].get("lat") or lat,
+                    "long": workpoint.checklist["noon"]["in"].get("long") or long,
+                },
+                "out": {
+                    "time": now.isoformat(),
+                    "img": img_url,
+                    "lat": lat,
+                    "long": long,
+                },
+                "workhour": eve_hours,
+            }
+        else:
+            diff = now - check_in_time
+            work_hours = max(0.0, min(diff.total_seconds() / 3600.0, 6.0))
+
+            workpoint.checklist[period]["out"] = {
+                "time": now.isoformat(),
+                "img": img_url,
+                "lat": lat,
+                "long": long,
+            }
+
+            workpoint.checklist[period]["workhour"] = work_hours
+
         flag_modified(workpoint, "checklist")
         # print(f"Work hours in {period}: {work_hours:.2f} hours", workpoint.checklist)
     elif "in" not in workpoint.checklist[period]:

@@ -74,6 +74,30 @@ export const buildMonthlyStatuses = ({
         statuses[dayIndex][PERIOD_MAP[period]] = null;
       }
     });
+
+    // Tự động nhận diện tăng ca (màu cam) nếu ca chiều check-out sau 18:00 mà chưa có bản ghi ca tối
+    const noonData = item.checklist.noon;
+    const eveningData = item.checklist.evening;
+    if (noonData?.out?.time && !eveningData?.out) {
+      try {
+        const outDate = new Date(noonData.out.time);
+        const outHours = outDate.getHours();
+        const outMinutes = outDate.getMinutes();
+        const totalMinutes = outHours * 60 + outMinutes;
+        // Nếu check-out từ 18:00 trở đi (ví dụ 18:30, 20:13, 20:43)
+        if (totalMinutes >= 18 * 60) {
+          statuses[dayIndex][2] = "overtime-out"; // Màu cam (#FFA000) cho ca tăng ca!
+          const otHours = Math.max(0.5, Number(((totalMinutes - 17.5 * 60) / 60).toFixed(2)));
+          totalHour.evening += otHours;
+          const originalNoonHours = noonData.workhour || 0;
+          if (originalNoonHours > 4) {
+            totalHour.noon -= (originalNoonHours - 4);
+          }
+        }
+      } catch (e) {
+        // ignore parse error
+      }
+    }
   });
 
   leaves?.forEach((leave) => {

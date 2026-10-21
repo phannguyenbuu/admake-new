@@ -278,7 +278,41 @@ export default function WorkDays({ record, selectedMonth }: ParamWorkDaysProps) 
                             itemMonth === date.getMonth() &&
                             itemYear === date.getFullYear()
                           ) {
-                            const periodData = item.checklist?.[periodKey];
+                            let periodData = item.checklist?.[periodKey];
+                            if (periodIndex === 1 && periodData?.out?.time && !item.checklist?.evening?.out) {
+                              try {
+                                const outDate = new Date(periodData.out.time);
+                                const totalMinutes = outDate.getHours() * 60 + outDate.getMinutes();
+                                if (totalMinutes >= 18 * 60) {
+                                  periodData = {
+                                    ...periodData,
+                                    out: {
+                                      ...periodData.out,
+                                      time: `${itemYear}-${String(itemMonth + 1).padStart(2, "0")}-${String(itemDay).padStart(2, "0")}T17:30:00+07:00`,
+                                    },
+                                    workhour: Math.min(4.0, periodData.workhour || 4.0),
+                                  };
+                                }
+                              } catch (e) {}
+                            } else if (!periodData && periodIndex === 2 && item.checklist?.noon?.out?.time) {
+                              try {
+                                const outDate = new Date(item.checklist.noon.out.time);
+                                const totalMinutes = outDate.getHours() * 60 + outDate.getMinutes();
+                                if (totalMinutes >= 18 * 60) {
+                                  const otHours = Math.max(0.5, Number(((totalMinutes - 17.5 * 60) / 60).toFixed(2)));
+                                  periodData = {
+                                    in: {
+                                      time: `${itemYear}-${String(itemMonth + 1).padStart(2, "0")}-${String(itemDay).padStart(2, "0")}T17:30:00+07:00`,
+                                      img: item.checklist.noon.in?.img || "",
+                                      lat: item.checklist.noon.in?.lat || "-",
+                                      long: item.checklist.noon.in?.long || "-",
+                                    },
+                                    out: item.checklist.noon.out,
+                                    workhour: otHours,
+                                  };
+                                }
+                              } catch (e) {}
+                            }
                             if (periodData) {
                               imgUrl = {
                                 ...periodData,
@@ -370,194 +404,259 @@ export default function WorkDays({ record, selectedMonth }: ParamWorkDaysProps) 
         title=""
         okText="OK"
         cancelButtonProps={{ style: { display: "none" } }}
-        style={{ padding: 20, minWidth: modalImg?.status !== "off" ? "90vw" : 250 }}
+        centered
+        width={modalImg?.status !== "off" ? 720 : 360}
+        style={{ maxWidth: "95vw", top: 20 }}
+        styles={{
+          body: {
+            maxHeight: "85vh",
+            overflowY: "auto",
+            overflowX: "hidden",
+            padding: "16px 12px",
+          },
+        }}
       >
-        <CenterBox>
-          <Box sx={{ borderRadius: 10, backgroundColor: "#00B4B6", px: 5, py: 1 }}>
-            <Typography sx={{ textTransform: "uppercase", color: "#fff", fontWeight: 500, textAlign: "center" }}>
+        <CenterBox sx={{ width: "100%", display: "flex", flexDirection: "column", alignItems: "center" }}>
+          <Box sx={{ borderRadius: 10, backgroundColor: "#00B4B6", px: { xs: 2, sm: 4 }, py: 1, mb: 1, width: "100%", maxWidth: 380 }}>
+            <Typography sx={{ textTransform: "uppercase", color: "#fff", fontWeight: 600, textAlign: "center", fontSize: { xs: 13, sm: 15 } }}>
               {username}
             </Typography>
-            {modalImg?.out?.img && (
-              <Typography sx={{ color: "#fff", textAlign: "center", fontSize: 10 }}>
-                Số giờ làm trong buổi: {modalImg.workhour?.toFixed(2)}
+            {modalImg?.workhour !== undefined && modalImg.workhour !== null && (
+              <Typography sx={{ color: "#fff", textAlign: "center", fontSize: 11, mt: 0.5 }}>
+                Số giờ làm trong buổi: <b>{Number(modalImg.workhour).toFixed(2)} giờ</b>
               </Typography>
             )}
           </Box>
 
           {modalImg?.status !== "off" && (
-            <Typography fontSize={10} color="#00B4B6" fontStyle="italic">
+            <Typography fontSize={11} color="#00B4B6" fontStyle="italic" sx={{ mb: 1 }}>
               Nhấp vào hình để xem vị trí trên Google Maps
             </Typography>
           )}
 
-          <Stack
-            direction="row"
-            spacing={2}
-            style={{
-              padding: 20,
-              height: modalImg?.status === "off" ? 200 : "90vh",
-              width: "fit-content",
-            }}
-          >
-            {modalImg?.in?.img && (
-              <Stack>
-                <Typography textAlign="center">Check in {modalImg.in.time}</Typography>
-                <img
-                  src={resolveStaticImageUrl(staticBase, modalImg.in.img)}
-                  alt="Check-in"
-                  style={{ maxHeight: "80vh", minWidth: 300, borderRadius: 8, marginBottom: 8, cursor: "pointer" }}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    if (
-                      modalImg?.in?.lat &&
-                      modalImg?.in?.long &&
-                      modalImg.in.lat !== "-" &&
-                      modalImg.in.long !== "-"
-                    ) {
-                      const url = `https://www.google.com/maps?q=${modalImg.in.lat},${modalImg.in.long}`;
-                      window.open(url, "_blank");
-                    } else {
-                      notification.error({ message: "Không có tọa độ để mở bản đồ" });
-                    }
-                  }}
-                />
-              </Stack>
-            )}
-
-            {modalImg?.out?.img && (
-              <Stack>
-                <Typography textAlign="center">Check out {modalImg.out.time}</Typography>
-                <img
-                  src={resolveStaticImageUrl(staticBase, modalImg.out.img)}
-                  alt="Check-out"
-                  style={{ maxHeight: "80vh", minWidth: 300, borderRadius: 8, marginBottom: 8, cursor: "pointer" }}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    if (
-                      modalImg?.out?.lat &&
-                      modalImg?.out?.long &&
-                      modalImg.out.lat !== "-" &&
-                      modalImg.out.long !== "-"
-                    ) {
-                      const url = `https://www.google.com/maps?q=${modalImg.out.lat},${modalImg.out.long}`;
-                      window.open(url, "_blank");
-                    } else {
-                      notification.error({ message: "Không có tọa độ để mở bản đồ" });
-                    }
-                  }}
-                />
-              </Stack>
-            )}
-
-            {/* Form bổ sung giờ tăng ca cho kế toán */}
-            {modalImg?.status !== "off" && (modalImg?.periodKey === "evening" || modalImg?.period === 2) && (
-              <Stack direction="column" sx={{ maxWidth: 360, width: "100%", mt: 1 }}>
-                {!modalImg?.out?.time ? (
-                  <Box sx={{ p: 2, bgcolor: "#FEF2F2", border: "1px solid #F87171", borderRadius: 2 }}>
-                    <Typography sx={{ color: "#B91C1C", fontWeight: "bold", fontSize: 13, mb: 0.5 }}>
-                      ⚠️ CẢNH BÁO: CHƯA CÓ CHECK-OUT TĂNG CA!
-                    </Typography>
-                    <Typography sx={{ color: "#7F1D1D", fontSize: 11, mb: 1.5 }}>
-                      Nhân viên chưa chấm công ra ca tối. Kế toán xác nhận lại và bổ sung giờ tăng ca bên dưới:
-                    </Typography>
-                    <Stack spacing={1.5}>
-                      <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                        <Typography sx={{ fontSize: 12, fontWeight: 500, minWidth: 80 }}>Giờ ra ca:</Typography>
-                        <Input
-                          size="small"
-                          style={{ width: 100 }}
-                          placeholder="21:30"
-                          value={supplementOutTime}
-                          onChange={(e) => setSupplementOutTime(e.target.value)}
-                        />
-                      </Box>
-                      <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                        <Typography sx={{ fontSize: 12, fontWeight: 500, minWidth: 80 }}>Số giờ tăng:</Typography>
-                        <InputNumber
-                          size="small"
-                          style={{ width: 80 }}
-                          min={0.5}
-                          max={6}
-                          step={0.5}
-                          value={supplementWorkhour}
-                          onChange={(v) => setSupplementWorkhour(v || 0)}
-                        />
-                        <Typography sx={{ fontSize: 11, color: "#666" }}>giờ</Typography>
-                      </Box>
-                      <Button
-                        type="primary"
-                        danger
-                        size="small"
-                        loading={isSavingSupplement}
-                        onClick={handleSaveSupplementOvertime}
-                      >
-                        💾 Lưu bổ sung giờ tăng ca
-                      </Button>
-                    </Stack>
-                  </Box>
-                ) : (
-                  <Box sx={{ p: 1.5, bgcolor: "#F0FDF4", border: "1px solid #86EFAC", borderRadius: 2, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                    <Box>
-                      <Typography sx={{ fontSize: 12, color: "#166534", fontWeight: 600 }}>
-                        ✅ Tăng ca: {modalImg.workhour || 0} giờ
-                      </Typography>
-                      <Typography sx={{ fontSize: 10, color: "#15803D" }}>
-                        Check out: {modalImg.out?.time ? dayjs(modalImg.out.time).format("HH:mm DD/MM/YYYY") : "—"}
-                        {modalImg.out?.img === "" && " (Kế toán bổ sung)"}
-                      </Typography>
-                    </Box>
-                    <Button
-                      size="small"
-                      onClick={() => {
-                        setSupplementWorkhour(modalImg.workhour || 2.5);
-                        if (modalImg.out?.time) {
-                          setSupplementOutTime(dayjs(modalImg.out.time).format("HH:mm"));
-                        }
-                        setModalImg({ ...modalImg, out: undefined });
-                      }}
+          {modalImg?.status !== "off" ? (
+            <Stack sx={{ width: "100%", alignItems: "center" }} spacing={2}>
+              <Stack
+                direction={{ xs: "column", sm: "row" }}
+                spacing={2}
+                sx={{
+                  width: "100%",
+                  justifyContent: "center",
+                  alignItems: "stretch",
+                  my: 0.5,
+                }}
+              >
+                {modalImg?.in?.img && (
+                  <Stack
+                    sx={{
+                      flex: 1,
+                      maxWidth: { xs: "100%", sm: 340 },
+                      bgcolor: "#f8fafc",
+                      p: 1.5,
+                      borderRadius: 2,
+                      border: "1px solid #e2e8f0",
+                      alignItems: "center",
+                    }}
+                  >
+                    <Typography
+                      textAlign="center"
+                      sx={{ fontSize: 12, fontWeight: 600, mb: 1, color: "#0f766e" }}
                     >
-                      Sửa lại
-                    </Button>
-                  </Box>
+                      Check in: {modalImg.in.time ? dayjs(modalImg.in.time).format("HH:mm:ss (DD/MM)") : "—"}
+                    </Typography>
+                    <Box
+                      component="img"
+                      src={resolveStaticImageUrl(staticBase, modalImg.in.img)}
+                      alt="Check-in"
+                      sx={{
+                        width: "100%",
+                        maxHeight: { xs: 240, sm: 340 },
+                        objectFit: "contain",
+                        borderRadius: 1.5,
+                        cursor: "pointer",
+                        bgcolor: "#000",
+                      }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (
+                          modalImg?.in?.lat &&
+                          modalImg?.in?.long &&
+                          modalImg.in.lat !== "-" &&
+                          modalImg.in.long !== "-"
+                        ) {
+                          const url = `https://www.google.com/maps?q=${modalImg.in.lat},${modalImg.in.long}`;
+                          window.open(url, "_blank");
+                        } else {
+                          notification.error({ message: "Không có tọa độ để mở bản đồ" });
+                        }
+                      }}
+                    />
+                  </Stack>
+                )}
+
+                {modalImg?.out?.img && (
+                  <Stack
+                    sx={{
+                      flex: 1,
+                      maxWidth: { xs: "100%", sm: 340 },
+                      bgcolor: "#f8fafc",
+                      p: 1.5,
+                      borderRadius: 2,
+                      border: "1px solid #e2e8f0",
+                      alignItems: "center",
+                    }}
+                  >
+                    <Typography
+                      textAlign="center"
+                      sx={{ fontSize: 12, fontWeight: 600, mb: 1, color: "#be123c" }}
+                    >
+                      Check out: {modalImg.out.time ? dayjs(modalImg.out.time).format("HH:mm:ss (DD/MM)") : "—"}
+                    </Typography>
+                    <Box
+                      component="img"
+                      src={resolveStaticImageUrl(staticBase, modalImg.out.img)}
+                      alt="Check-out"
+                      sx={{
+                        width: "100%",
+                        maxHeight: { xs: 240, sm: 340 },
+                        objectFit: "contain",
+                        borderRadius: 1.5,
+                        cursor: "pointer",
+                        bgcolor: "#000",
+                      }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (
+                          modalImg?.out?.lat &&
+                          modalImg?.out?.long &&
+                          modalImg.out.lat !== "-" &&
+                          modalImg.out.long !== "-"
+                        ) {
+                          const url = `https://www.google.com/maps?q=${modalImg.out.lat},${modalImg.out.long}`;
+                          window.open(url, "_blank");
+                        } else {
+                          notification.error({ message: "Không có tọa độ để mở bản đồ" });
+                        }
+                      }}
+                    />
+                  </Stack>
                 )}
               </Stack>
-            )}
 
-            {modalImg?.status === "off" && (() => {
+              {/* Form bổ sung giờ tăng ca cho kế toán */}
+              {(modalImg?.periodKey === "evening" || modalImg?.period === 2) && (
+                <Stack direction="column" sx={{ maxWidth: 460, width: "100%", mt: 1 }}>
+                  {!modalImg?.out?.time ? (
+                    <Box sx={{ p: 2, bgcolor: "#FEF2F2", border: "1px solid #F87171", borderRadius: 2 }}>
+                      <Typography sx={{ color: "#B91C1C", fontWeight: "bold", fontSize: 13, mb: 0.5 }}>
+                        ⚠️ CẢNH BÁO: CHƯA CÓ CHECK-OUT TĂNG CA!
+                      </Typography>
+                      <Typography sx={{ color: "#7F1D1D", fontSize: 11, mb: 1.5 }}>
+                        Nhân viên chưa chấm công ra ca tối. Kế toán xác nhận lại và bổ sung giờ tăng ca bên dưới:
+                      </Typography>
+                      <Stack spacing={1.5}>
+                        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                          <Typography sx={{ fontSize: 12, fontWeight: 500, minWidth: 80 }}>Giờ ra ca:</Typography>
+                          <Input
+                            size="small"
+                            style={{ width: 100 }}
+                            placeholder="21:30"
+                            value={supplementOutTime}
+                            onChange={(e) => setSupplementOutTime(e.target.value)}
+                          />
+                        </Box>
+                        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                          <Typography sx={{ fontSize: 12, fontWeight: 500, minWidth: 80 }}>Số giờ tăng:</Typography>
+                          <InputNumber
+                            size="small"
+                            style={{ width: 80 }}
+                            min={0.5}
+                            max={6}
+                            step={0.5}
+                            value={supplementWorkhour}
+                            onChange={(v) => setSupplementWorkhour(v || 0)}
+                          />
+                          <Typography sx={{ fontSize: 11, color: "#666" }}>giờ</Typography>
+                        </Box>
+                        <Button
+                          type="primary"
+                          danger
+                          size="small"
+                          loading={isSavingSupplement}
+                          onClick={handleSaveSupplementOvertime}
+                        >
+                          💾 Lưu bổ sung giờ tăng ca
+                        </Button>
+                      </Stack>
+                    </Box>
+                  ) : (
+                    <Box sx={{ p: 1.5, bgcolor: "#F0FDF4", border: "1px solid #86EFAC", borderRadius: 2, display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%" }}>
+                      <Box>
+                        <Typography sx={{ fontSize: 12, color: "#166534", fontWeight: 600 }}>
+                          ✅ Tăng ca: {Number(modalImg.workhour || 0).toFixed(2)} giờ
+                        </Typography>
+                        <Typography sx={{ fontSize: 11, color: "#15803D" }}>
+                          Check out: {modalImg.out?.time ? dayjs(modalImg.out.time).format("HH:mm:ss (DD/MM)") : "—"}
+                          {modalImg.out?.img === "" && " (Kế toán bổ sung)"}
+                        </Typography>
+                      </Box>
+                      <Button
+                        size="small"
+                        onClick={() => {
+                          setSupplementWorkhour(modalImg.workhour || 2.5);
+                          if (modalImg.out?.time) {
+                            setSupplementOutTime(dayjs(modalImg.out.time).format("HH:mm"));
+                          }
+                          setModalImg({ ...modalImg, out: undefined });
+                        }}
+                      >
+                        Sửa lại
+                      </Button>
+                    </Box>
+                  )}
+                </Stack>
+              )}
+            </Stack>
+          ) : (
+            (() => {
               const leaveItem = record.leaves?.find((l) => String(l.id) === String(modalImg.id));
               const createdDateStr = leaveItem?.createdAt 
                 ? dayjs(leaveItem.createdAt).format("DD-MM-YYYY HH:mm")
                 : null;
               return (
-                <Stack direction="column">
-                  <Typography textAlign="center" style={{ fontWeight: 700 }}>
+                <Stack direction="column" sx={{ p: 2, alignItems: "center", width: "100%" }} spacing={1}>
+                  <Typography textAlign="center" sx={{ fontWeight: 700, fontSize: 15, color: "#334155" }}>
                     XIN NGHỈ PHÉP
                   </Typography>
-                  <Typography textAlign="center">
-                    {modalImg.day.getDate().toString().padStart(2, "0") + "-" +
-                      (modalImg.day.getMonth() + 1).toString().padStart(2, "0") + "-" +
-                      modalImg.day.getFullYear()}
+                  <Typography textAlign="center" sx={{ fontSize: 13, color: "#64748b" }}>
+                    {modalImg.day
+                      ? `${modalImg.day.getDate().toString().padStart(2, "0")}-${(modalImg.day.getMonth() + 1).toString().padStart(2, "0")}-${modalImg.day.getFullYear()}`
+                      : "—"}
                   </Typography>
-                  <Typography textAlign="center">
+                  <Typography textAlign="center" sx={{ fontSize: 13, fontWeight: 500 }}>
                     Buổi {modalImg.period === 0 ? "sáng" : modalImg.period === 1 ? "chiều" : "tối"}
                   </Typography>
-                  <Typography textAlign="center">Lý do: {modalImg.text}</Typography>
+                  <Typography textAlign="center" sx={{ fontSize: 13, fontStyle: "italic", color: "#475569" }}>
+                    Lý do: {modalImg.text}
+                  </Typography>
                   {createdDateStr && (
-                    <Typography textAlign="center" style={{ fontSize: "0.85rem", color: "#666", marginTop: 4 }}>
+                    <Typography textAlign="center" sx={{ fontSize: 11, color: "#94a3b8", mt: 0.5 }}>
                       Ngày gửi xin phép: {createdDateStr}
                     </Typography>
                   )}
 
-                  <DeleteConfirm
-                    caption="XÓA NGHỈ PHÉP"
-                    text="Bạn muốn xóa nghỉ phép này?"
-                    elId={modalImg.id}
-                    onDelete={() => handleLeaveDelete(modalImg.id)}
-                  />
+                  <Box sx={{ mt: 2 }}>
+                    <DeleteConfirm
+                      caption="XÓA NGHỈ PHÉP"
+                      text="Bạn muốn xóa nghỉ phép này?"
+                      elId={modalImg.id}
+                      onDelete={() => handleLeaveDelete(modalImg.id)}
+                    />
+                  </Box>
                 </Stack>
               );
-            })()}
-          </Stack>
+            })()
+          )}
         </CenterBox>
       </Modal>
     </>

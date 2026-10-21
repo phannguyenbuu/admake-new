@@ -510,7 +510,17 @@ const SalaryBoard: React.FC<SalaryBoardProps> = ({
         
         // Noon
         if (checklist.noon?.in) {
-          t += checkWorkhour(checklist.noon, 17);
+          let noonHours = checkWorkhour(checklist.noon, 17);
+          if (!checklist.evening?.in && checklist.noon?.out?.time) {
+            try {
+              const outDate = new Date(checklist.noon.out.time);
+              const totalMinutes = outDate.getHours() * 60 + outDate.getMinutes();
+              if (totalMinutes >= 18 * 60) {
+                noonHours = Math.min(noonHours, 4.0);
+              }
+            } catch (e) {}
+          }
+          t += noonHours;
           p += checkWorkPeriod(checklist.noon);
 
           const inTime = dayjs(checklist.noon.in.time).local();
@@ -524,6 +534,15 @@ const SalaryBoard: React.FC<SalaryBoardProps> = ({
         // Evening (overtime)
         if (checklist.evening?.in) {
           over_t += checkWorkhour(checklist.evening, 22);
+        } else if (checklist.noon?.out?.time) {
+          try {
+            const outDate = new Date(checklist.noon.out.time);
+            const totalMinutes = outDate.getHours() * 60 + outDate.getMinutes();
+            if (totalMinutes >= 18 * 60) {
+              const otHours = Math.max(0.5, Number(((totalMinutes - 17.5 * 60) / 60).toFixed(2)));
+              over_t += otHours;
+            }
+          } catch (e) {}
         }
       });
 
