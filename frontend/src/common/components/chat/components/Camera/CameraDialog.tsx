@@ -595,12 +595,17 @@ const startCapture = (overtime: boolean) => {
     <Stack
       p={1}
       spacing={1}
-      style={{
+      sx={{
         position: "relative",
         zIndex: 1,
         minHeight: "100vh",
         height: isSupplier ? "auto" : "100vh",
         overflowY: "auto",
+        overflowX: "hidden",
+        width: "100%",
+        maxWidth: "100vw",
+        boxSizing: "border-box",
+        alignItems: "center",
       }}
     >
       {/* Avatar Background Image (width 50vw, opacity 50%, centered behind attendance table) */}
@@ -639,72 +644,95 @@ const startCapture = (overtime: boolean) => {
         </div>
       )}
 
-      <Stack direction="row" alignItems="center" spacing={1} style={{width:'90vw', marginLeft:10, marginTop: 5}}>
-        <LogoAdmake/>
+      <Stack
+        direction="row"
+        alignItems="center"
+        justifyContent="space-between"
+        sx={{
+          width: "100%",
+          maxWidth: 420,
+          px: 1,
+          mt: 0.5,
+          boxSizing: "border-box",
+        }}
+      >
+        <LogoAdmake />
         
-        {/* Nút Chọn & Xóa Avatar */}
-        <div style={{ display: "flex", alignItems: "center", gap: 6, marginLeft: 15 }}>
-          <input
-            type="file"
-            ref={avatarInputRef}
-            onChange={handleAvatarChange}
-            accept="image/*"
-            style={{ display: "none" }}
-          />
-          <button
-            onClick={() => avatarInputRef.current?.click()}
-            disabled={uploadingAvatar}
-            style={{
-              width: 36,
-              height: 36,
-              borderRadius: "50%",
-              backgroundColor: "#0284c7",
-              color: "#ffffff",
-              fontWeight: 700,
-              fontSize: 16,
-              border: "2px solid #38bdf8",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              cursor: "pointer",
-              boxShadow: "0 2px 4px rgba(0,0,0,0.15)",
-              flexShrink: 0,
-            }}
-            title="Bấm để chọn / đổi ảnh đại diện"
-          >
-            {uploadingAvatar ? "..." : getFirstNameInitial(userEl?.fullName)}
-          </button>
-
-          {avatarUrl && (
+        <Stack direction="row" alignItems="center" spacing={1} sx={{ minWidth: 0, overflow: "hidden" }}>
+          {/* Nút Chọn & Xóa Avatar */}
+          <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+            <input
+              type="file"
+              ref={avatarInputRef}
+              onChange={handleAvatarChange}
+              accept="image/*"
+              style={{ display: "none" }}
+            />
             <button
-              onClick={handleClearAvatar}
+              onClick={() => avatarInputRef.current?.click()}
               disabled={uploadingAvatar}
               style={{
-                width: 22,
-                height: 22,
+                width: 36,
+                height: 36,
                 borderRadius: "50%",
-                backgroundColor: "#f43f5e",
+                backgroundColor: "#0284c7",
                 color: "#ffffff",
                 fontWeight: 700,
-                fontSize: 11,
-                border: "none",
+                fontSize: 16,
+                border: "2px solid #38bdf8",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
                 cursor: "pointer",
-                boxShadow: "0 1px 3px rgba(0,0,0,0.2)",
+                boxShadow: "0 2px 4px rgba(0,0,0,0.15)",
                 flexShrink: 0,
               }}
-              title="Xóa ảnh đại diện"
+              title="Bấm để chọn / đổi ảnh đại diện"
             >
-              ✕
+              {uploadingAvatar ? "..." : getFirstNameInitial(userEl?.fullName)}
             </button>
-          )}
-        </div>
 
-        <Box style={{ fontWeight: 600, fontSize: 15, color: "#1e293b", marginLeft: 10 }}>
-          {userEl?.fullName}
-        </Box>
+            {avatarUrl && (
+              <button
+                onClick={handleClearAvatar}
+                disabled={uploadingAvatar}
+                style={{
+                  width: 22,
+                  height: 22,
+                  borderRadius: "50%",
+                  backgroundColor: "#f43f5e",
+                  color: "#ffffff",
+                  fontWeight: 700,
+                  fontSize: 11,
+                  border: "none",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  cursor: "pointer",
+                  boxShadow: "0 1px 3px rgba(0,0,0,0.2)",
+                  flexShrink: 0,
+                }}
+                title="Xóa ảnh đại diện"
+              >
+                ✕
+              </button>
+            )}
+          </div>
+
+          <Box
+            sx={{
+              fontWeight: 600,
+              fontSize: 15,
+              color: "#1e293b",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+              maxWidth: { xs: 150, sm: 220 },
+            }}
+          >
+            {userEl?.fullName}
+          </Box>
+        </Stack>
       </Stack>
 
       
@@ -714,16 +742,17 @@ const startCapture = (overtime: boolean) => {
       ) : (
         <>
           {step === 1 && (
-            <CenterBox>
+            <Box sx={{ width: "100%", maxWidth: 420, display: "flex", flexDirection: "column", alignItems: "center", px: { xs: 0.5, sm: 1 }, boxSizing: "border-box" }}>
               <CurrentDateTime />
 
               {(() => {
                 const reg = getRegularAction();
                 const ot = getOvertimeAction();
                 return (
-                  <Stack spacing={1} sx={{ mt: 1, mb: 1, width: "100%", maxWidth: 360, alignItems: "center" }}>
+                  <Stack spacing={1} sx={{ mt: 1, mb: 1, width: "100%", alignItems: "center" }}>
                     {/* Nút điểm danh ca Hành chính (Sáng / Chiều) */}
                     <Button
+                      fullWidth
                       variant="contained"
                       disabled={reg.disabled}
                       sx={{
@@ -732,7 +761,6 @@ const startCapture = (overtime: boolean) => {
                         borderRadius: 20,
                         minHeight: 48,
                         px: 3,
-                        width: "100%",
                         fontSize: 14,
                         fontWeight: 600,
                         textTransform: "none",
@@ -740,13 +768,14 @@ const startCapture = (overtime: boolean) => {
                       }}
                       onClick={() => startCapture(false)}
                     >
-                      <img src="/alarm-svgrepo-com.svg" alt="ADMAKE" style={{ width: 32, marginRight: 8 }} />
+                      <img src="/alarm-svgrepo-com.svg" alt="ADMAKE" style={{ width: 28, marginRight: 8 }} />
                       {reg.label}
                     </Button>
 
                     {/* Nút điểm danh Tăng ca (Tối) - Riêng biệt, rõ ràng */}
                     {ot && (
                       <Button
+                        fullWidth
                         variant="contained"
                         disabled={!ot.active}
                         sx={{
@@ -755,7 +784,6 @@ const startCapture = (overtime: boolean) => {
                           borderRadius: 20,
                           minHeight: 46,
                           px: 3,
-                          width: "100%",
                           fontSize: 13,
                           fontWeight: 600,
                           textTransform: "none",
@@ -772,94 +800,117 @@ const startCapture = (overtime: boolean) => {
 
               <WorkpointGrid workpoint={workpoint} fetchWorkpoint={fetchWorkpoint} />
 
-              <Stack direction="row" spacing={1} p={1}>
+              {/* 4 Nút chức năng 2x2 Grid trên mobile - Không bao giờ tràn ngang */}
+              <Box sx={{ width: "100%", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 1, my: 1 }}>
                 <Button
+                  fullWidth
                   variant="contained"
                   sx={{
-                    borderRadius: 40,
+                    borderRadius: 30,
                     backgroundColor: "#00B4B6",
-                    fontSize: 10,
-                    whiteSpace: "nowrap",
-                    mt: 1,
-                    height: 50,
-                    maxWidth: 300,
-                    mb: 1,
+                    "&:hover": { backgroundColor: "#009698" },
+                    fontSize: 12,
+                    fontWeight: 600,
+                    textTransform: "none",
+                    height: 44,
+                    boxShadow: "0 2px 4px rgba(0,180,182,0.2)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: 0.8,
                   }}
                   onClick={handleHolidayClick}
                 >
-                  <img src="/holiday-island-tourism-svgrepo-com.svg" alt="ADMAKE" style={{ width: 32 }} />
+                  <img src="/holiday-island-tourism-svgrepo-com.svg" alt="Nghỉ phép" style={{ width: 22, height: 22 }} />
                   Nghỉ phép
                 </Button>
 
                 <Button
+                  fullWidth
                   variant="contained"
                   sx={{
-                    borderRadius: 40,
+                    borderRadius: 30,
                     backgroundColor: "#00B4B6",
-                    fontSize: 10,
-                    textAlign: "left",
-                    whiteSpace: "nowrap",
-                    mt: 1,
-                    height: 50,
-                    maxWidth: 300,
-                    mb: 1,
+                    "&:hover": { backgroundColor: "#009698" },
+                    fontSize: 12,
+                    fontWeight: 600,
+                    textTransform: "none",
+                    height: 44,
+                    boxShadow: "0 2px 4px rgba(0,180,182,0.2)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: 0.8,
                   }}
                   onClick={handleTaskClick}
                 >
-                  <img src="/task-done-svgrepo-com.svg" alt="ADMAKE" style={{ width: 32 }} />
+                  <img src="/task-done-svgrepo-com.svg" alt="Nhiệm vụ" style={{ width: 22, height: 22 }} />
                   Nhiệm vụ
                 </Button>
 
                 <Button
+                  fullWidth
                   variant="contained"
                   sx={{
-                    borderRadius: 40,
+                    borderRadius: 30,
                     backgroundColor: "#0891b2",
-                    fontSize: 10,
-                    textAlign: "left",
-                    whiteSpace: "nowrap",
-                    mt: 1,
-                    height: 50,
-                    maxWidth: 300,
-                    mb: 1,
+                    "&:hover": { backgroundColor: "#0e7490" },
+                    fontSize: 12,
+                    fontWeight: 600,
+                    textTransform: "none",
+                    height: 44,
+                    boxShadow: "0 2px 4px rgba(8,145,178,0.2)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: 0.8,
                   }}
-                  onClick={() => {
-                    setOpenAdvanceModal(true);
-                  }}
+                  onClick={() => setOpenAdvanceModal(true)}
                 >
-                  <img src="/pay-svgrepo-com.svg" alt="Đề xuất ứng tiền" style={{ width: 30 }} />
+                  <img src="/pay-svgrepo-com.svg" alt="Ứng tiền" style={{ width: 22, height: 22 }} />
                   Đề xuất ứng tiền
                 </Button>
 
                 <Button
+                  fullWidth
+                  variant="contained"
                   sx={{
-                    borderRadius: 40,
-                    color: "#fff",
-                    fontSize: 10,
+                    borderRadius: 30,
                     backgroundColor: "#00B4B6",
-                    textAlign: "left",
-                    whiteSpace: "nowrap",
-                    mt: 1,
-                    height: 50,
-                    maxWidth: 300,
-                    mb: 1,
+                    "&:hover": { backgroundColor: "#009698" },
+                    fontSize: 12,
+                    fontWeight: 600,
+                    textTransform: "none",
+                    height: 44,
+                    boxShadow: "0 2px 4px rgba(0,180,182,0.2)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: 0.8,
                   }}
                   onClick={() => setModalVisible(true)}
                 >
-                  <img src="/pay-svgrepo-com.svg" alt="ADMAKE" style={{ width: 32 }} />
+                  <img src="/pay-svgrepo-com.svg" alt="Bảng lương" style={{ width: 22, height: 22 }} />
                   Bảng lương
                 </Button>
-              </Stack>
+              </Box>
 
               <video
                 ref={videoRef}
-                width="100%"
-                height="auto"
                 autoPlay
                 playsInline
-                style={{ borderRadius: 8, backgroundColor: "#000", width: "100%", maxWidth: 400 }}
+                style={{
+                  borderRadius: 10,
+                  backgroundColor: "#000",
+                  width: "100%",
+                  maxWidth: 420,
+                  height: "auto",
+                  aspectRatio: "4/3",
+                  objectFit: "cover",
+                  boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
+                }}
               />
-            </CenterBox>
+            </Box>
           )}
 
           {step === 2 && (
