@@ -5,62 +5,52 @@ module MenuCamTayA4FomexCanDecal
     model.start_operation('MenuCamTayA4FomexCanDecal', true)
     entities = model.active_entities
 
-    # Tạo khung đỡ
-    base_width = 210.mm
-    base_height = 297.mm
-    base_depth = 10.mm
-
-    # Tạo nhóm cho khung
+    # Tạo khung sắt đỡ
     frame_group = entities.add_group
-    frame_group.name = "Khung"
-
-    # Tạo mặt phẳng cho khung
+    frame_group.name = "Khung Sắt Đỡ"
     frame_pts = [
-      [0, 0, 0],
-      [base_width, 0, 0],
-      [base_width, base_height, 0],
-      [0, base_height, 0]
+      [0.mm, 0.mm, 0.mm],
+      [210.mm, 0.mm, 0.mm],
+      [210.mm, 297.mm, 0.mm],
+      [0.mm, 297.mm, 0.mm]
     ]
     frame_face = frame_group.entities.add_face(frame_pts)
-    frame_face.pushpull(base_depth) # Kéo nổi khung
-
-    # Gán màu cho khung
+    frame_face.pushpull(10.mm) # Độ dày của khung
     frame_group.material = "Gray"
 
-    # Tạo bề mặt biển
+    # Tạo bề mặt biển chính
     surface_group = entities.add_group
-    surface_group.name = "Bề mặt biển"
-
-    # Tạo mặt phẳng cho bề mặt biển
-    surface_face = surface_group.entities.add_face(frame_pts)
-    surface_face.pushpull(-base_depth) # Kéo ngược để tạo độ dày
-
-    # Gán vật liệu cho bề mặt biển
+    surface_group.name = "Bề Mặt Biển"
+    surface_pts = [
+      [0.mm, 0.mm, 10.mm],
+      [210.mm, 0.mm, 10.mm],
+      [210.mm, 297.mm, 10.mm],
+      [0.mm, 297.mm, 10.mm]
+    ]
+    surface_face = surface_group.entities.add_face(surface_pts)
+    surface_face.pushpull(-0.5.mm) # Độ dày của bề mặt
     surface_group.material = "White"
 
     # Tạo chữ nổi 3D
     text_group = entities.add_group
-    text_group.name = "Chữ nổi"
-
-    # Tạo chữ nổi
+    text_group.name = "Chữ Nổi"
     text = "Menu"
-    text_position = [base_width / 4, base_height / 2, base_depth]
-    text_face = text_group.entities.add_3d_text(text, TextAlignCenter, text_position, 1.mm, false, false)
-    text_face.pushpull(5.mm) # Kéo nổi chữ
-
-    # Gán màu cho chữ nổi
+    text_position = [10.mm, 10.mm, 10.mm]
+    text_entity = text_group.entities.add_3d_text(text, TextAlignCenter, text_position, 10.mm)
     text_group.material = "Red"
 
-    # Tạo viền trang trí
-    border_group = entities.add_group
-    border_group.name = "Viền trang trí"
-
-    # Tạo viền
-    border_face = border_group.entities.add_face(frame_pts)
-    border_face.pushpull(2.mm) # Kéo nổi viền
-
-    # Gán màu cho viền
-    border_group.material = "Gold"
+    # Tạo đèn LED viền
+    led_group = entities.add_group
+    led_group.name = "Đèn LED"
+    led_pts = [
+      [0.mm, 0.mm, 10.mm],
+      [210.mm, 0.mm, 10.mm],
+      [210.mm, 0.mm, 15.mm],
+      [0.mm, 0.mm, 15.mm]
+    ]
+    led_face = led_group.entities.add_face(led_pts)
+    led_face.pushpull(0.5.mm) # Độ dày của đèn LED
+    led_group.material = "Yellow"
 
     model.commit_operation
   end

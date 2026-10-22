@@ -5,41 +5,57 @@ module StandeeChanChuX60X160
     model.start_operation('StandeeChanChuX60X160', true)
     entities = model.active_entities
 
-    # Tạo khung đỡ
-    base_width = 600.mm
-    base_height = 1600.mm
-    base_depth = 30.mm
-    leg_depth = 30.mm
-    leg_height = 1000.mm
-    leg_width = 20.mm
-
     # Tạo khung chân chữ X
-    leg1 = entities.add_group
-    leg1.name = "Leg1"
-    leg1_face = leg1.entities.add_face([0, 0, 0], [leg_width, 0, 0], [leg_width, leg_depth, 0], [0, leg_depth, 0])
-    leg1_face.pushpull(leg_height)
+    x_frame = entities.add_group
+    x_frame.name = "Khung Chân Chữ X"
+    frame_material = "Gray"
 
-    leg2 = entities.add_group
-    leg2.name = "Leg2"
-    leg2_face = leg2.entities.add_face([base_width - leg_width, 0, 0], [base_width, 0, 0], [base_width, leg_depth, 0], [base_width - leg_width, leg_depth, 0])
-    leg2_face.pushpull(leg_height)
+    # Tạo các điểm cho khung
+    pts = [
+      [0.mm, 0.mm, 0.mm],
+      [600.mm, 0.mm, 0.mm],
+      [600.mm, 30.mm, 0.mm],
+      [0.mm, 30.mm, 0.mm]
+    ]
+    face = x_frame.entities.add_face(pts)
+    face.pushpull(-1600.mm) # Kéo dài khung
 
-    # Tạo bề mặt biển quảng cáo
+    x_frame.material = frame_material
+
+    # Tạo bề mặt biển
     surface = entities.add_group
-    surface.name = "Surface"
-    surface_face = surface.entities.add_face([0, 0, leg_height], [base_width, 0, leg_height], [base_width, base_depth, leg_height], [0, base_depth, leg_height])
-    surface_face.pushpull(-base_depth)
+    surface.name = "Bề Mặt Biển"
+    surface_material = "White"
+
+    # Tạo các điểm cho bề mặt biển
+    surface_pts = [
+      [0.mm, 0.mm, -1600.mm],
+      [600.mm, 0.mm, -1600.mm],
+      [600.mm, 30.mm, -1600.mm],
+      [0.mm, 30.mm, -1600.mm]
+    ]
+    surface_face = surface.entities.add_face(surface_pts)
+    surface_face.pushpull(30.mm) # Độ dày của biển
+
+    surface.material = surface_material
+
+    # Tạo chữ nổi 3D
+    text_group = entities.add_group
+    text_group.name = "Chữ Nổi 3D"
+    text_material = "Red"
+
+    # Tạo chữ nổi
+    text = "Standee"
+    text_position = [50.mm, 10.mm, -1600.mm]
+    text_entity = text_group.entities.add_3d_text(text, TextAlignCenter, text_position, 100.mm, 0, 0)
+    text_group.entities.transform_entities(Geom::Transformation.translation([0, 0, -30.mm]), text_entity)
+
+    text_group.material = text_material
 
     # Gán màu cho các nhóm
-    leg1.material = "Gray"
-    leg2.material = "Gray"
-    surface.material = "White"
-
-    # Thêm chữ nổi 3D
-    text_group = entities.add_group
-    text_group.name = "Text"
-    text = text_group.entities.add_3d_text("Standee", TextAlignCenter, "Arial", true, false, 100.mm, 1.mm, false)
-    text_group.transform!(Geom::Transformation.new([base_width / 2 - 50.mm, base_depth / 2 - 20.mm, leg_height + 10.mm]))
+    x_frame.material = frame_material
+    surface.material = surface_material
+    text_group.material = text_material
 
     model.commit_operation
   end

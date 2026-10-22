@@ -5,63 +5,53 @@ module BangHieuBatLotTon1300X120
     model.start_operation('BangHieuBatLotTon1300X120', true)
     entities = model.active_entities
 
-    # Tạo khung đỡ
-    base_width = 13000.mm
-    base_height = 1200.mm
-    base_depth = 150.mm
-
-    # Tạo nhóm cho khung đỡ
-    grp_frame = entities.add_group
-    grp_frame.name = "Khung Do"
+    # Tạo khung sắt đỡ
+    frame_group = entities.add_group
+    frame_group.name = "KhungSatDo"
     frame_pts = [
-      [0, 0, 0],
-      [base_width, 0, 0],
-      [base_width, base_depth, 0],
-      [0, base_depth, 0]
+      [0.mm, 0.mm, 0.mm],
+      [13000.mm, 0.mm, 0.mm],
+      [13000.mm, 150.mm, 0.mm],
+      [0.mm, 150.mm, 0.mm]
     ]
-    frame_face = grp_frame.entities.add_face(frame_pts)
-    frame_face.pushpull(-base_height) # Kéo dài xuống dưới
+    frame_face = frame_group.entities.add_face(frame_pts)
+    frame_face.pushpull(1200.mm)  # Chiều cao của khung
+    frame_group.material = "Gray"
 
     # Tạo bề mặt biển
-    grp_surface = entities.add_group
-    grp_surface.name = "Be Mat Bien"
+    surface_group = entities.add_group
+    surface_group.name = "BeMatBien"
     surface_pts = [
-      [0, 0, -base_height],
-      [base_width, 0, -base_height],
-      [base_width, base_depth, -base_height],
-      [0, base_depth, -base_height]
+      [0.mm, 0.mm, 0.mm],
+      [13000.mm, 0.mm, 0.mm],
+      [13000.mm, 150.mm, 0.mm],
+      [0.mm, 150.mm, 0.mm]
     ]
-    surface_face = grp_surface.entities.add_face(surface_pts)
-    surface_face.pushpull(-10.mm) # Độ dày của bạt lót tôn
-
-    # Gán màu cho bề mặt biển
-    grp_surface.material = "LightGray"
+    surface_face = surface_group.entities.add_face(surface_pts)
+    surface_face.pushpull(-10.mm)  # Độ dày của bề mặt biển
+    surface_group.material = "White"  # Màu sắc bề mặt biển
 
     # Tạo chữ nổi 3D
-    grp_text = entities.add_group
-    grp_text.name = "Chu Noi 3D"
-    text_height = 100.mm
-    text_depth = 20.mm
-    text_content = "Bảng Hiệu Bạt Lot Tôn"
-    text_position = [base_width / 2, base_depth / 2, -base_height - 10.mm]
+    text_group = entities.add_group
+    text_group.name = "ChuNoi3D"
+    text = "Bảng Hiệu"
+    text_position = [6500.mm, 75.mm, 10.mm]  # Vị trí chữ nổi
+    text_face = text_group.entities.add_text(text, text_position)
+    text_group.entities.add_face(text_face.vertices.map(&:position)).pushpull(30.mm)  # Độ dày chữ nổi
+    text_group.material = "Red"  # Màu chữ nổi
 
-    # Tạo chữ nổi
-    text_entity = grp_text.entities.add_3d_text(text_content, TextAlignCenter, text_height, false, false, false, false)
-    text_entity.transform!(Geom::Transformation.translation(text_position))
-    text_entity.pushpull(text_depth)
-
-    # Gán màu cho chữ nổi
-    grp_text.material = "Red"
-
-    # Tạo viền trang trí
-    grp_border = entities.add_group
-    grp_border.name = "Vien Trang Tri"
-    border_thickness = 5.mm
-    border_face = grp_border.entities.add_face(frame_pts)
-    border_face.pushpull(border_thickness) # Kéo lên trên
-
-    # Gán màu cho viền trang trí
-    grp_border.material = "Gold"
+    # Tạo các chi tiết trang trí (đèn LED, viền nẹp)
+    decoration_group = entities.add_group
+    decoration_group.name = "ChiTietTrangTri"
+    led_pts = [
+      [0.mm, 0.mm, 120.mm],
+      [13000.mm, 0.mm, 120.mm],
+      [13000.mm, 150.mm, 120.mm],
+      [0.mm, 150.mm, 120.mm]
+    ]
+    led_face = decoration_group.entities.add_face(led_pts)
+    led_face.pushpull(10.mm)  # Độ dày của đèn LED
+    decoration_group.material = "Yellow"  # Màu đèn LED
 
     model.commit_operation
   end

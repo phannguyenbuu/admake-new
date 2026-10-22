@@ -5,62 +5,53 @@ module TamQrDeBanMica
     model.start_operation('TamQrDeBanMica', true)
     entities = model.active_entities
 
-    # Tạo chân đế
-    base_height = 10.mm
-    base_width = 120.mm
-    base_depth = 50.mm
-    base_pts = [
-      [0, 0, 0],
-      [base_width, 0, 0],
-      [base_width, base_depth, 0],
-      [0, base_depth, 0]
+    # Tạo khung sắt đỡ
+    frame_group = entities.add_group
+    frame_group.name = "Khung Sắt Đỡ"
+    frame_pts = [
+      [0.mm, 0.mm, 0.mm],
+      [120.mm, 0.mm, 0.mm],
+      [120.mm, 180.mm, 0.mm],
+      [0.mm, 180.mm, 0.mm]
     ]
-    base_face = entities.add_face(base_pts)
-    base_face.pushpull(base_height)
-    base_group = entities.add_group(base_face)
-    base_group.name = "ChanDe"
+    frame_face = frame_group.entities.add_face(frame_pts)
+    frame_face.pushpull(5.mm) # Độ dày của khung
+    frame_group.material = "Gray"
 
-    # Tạo bề mặt tấm nền
-    surface_height = 180.mm
-    surface_thickness = 5.mm
+    # Tạo bề mặt biển chính
+    surface_group = entities.add_group
+    surface_group.name = "Bề Mặt Biển Chính"
     surface_pts = [
-      [0, 0, base_height],
-      [base_width, 0, base_height],
-      [base_width, base_depth, base_height],
-      [0, base_depth, base_height]
+      [0.mm, 0.mm, 5.mm],
+      [120.mm, 0.mm, 5.mm],
+      [120.mm, 180.mm, 5.mm],
+      [0.mm, 180.mm, 5.mm]
     ]
-    surface_face = entities.add_face(surface_pts)
-    surface_face.pushpull(surface_thickness)
-    surface_group = entities.add_group(surface_face)
-    surface_group.name = "TamNen"
-    surface_group.material = "Mica"
+    surface_face = surface_group.entities.add_face(surface_pts)
+    surface_face.pushpull(50.mm) # Độ dày của bề mặt
+    surface_group.material = "White"
 
     # Tạo chữ nổi 3D
-    text_height = 10.mm
-    text_depth = 5.mm
-    text_content = "QR CODE"
-    text_position = [base_width / 2, base_depth / 2, base_height + surface_thickness]
     text_group = entities.add_group
-    text_face = text_group.entities.add_face([text_position, [text_position[0] + 30.mm, text_position[1], text_position[2]], 
-                                                   [text_position[0] + 30.mm, text_position[1] + 10.mm, text_position[2]], 
-                                                   [text_position[0], text_position[1] + 10.mm, text_position[2]]])
-    text_face.pushpull(text_depth)
-    text_group.name = "ChuNoi"
-    text_group.material = "White"
+    text_group.name = "Chữ Nổi"
+    text_position = [10.mm, 10.mm, 55.mm]
+    text = "QR Code"
+    text_face = text_group.entities.add_text(text, text_position)
+    text_face.pushpull(5.mm) # Độ dày của chữ nổi
+    text_group.material = "Black"
 
-    # Tạo viền trang trí
-    border_thickness = 2.mm
-    border_pts = [
-      [-border_thickness, -border_thickness, base_height + surface_thickness],
-      [base_width + border_thickness, -border_thickness, base_height + surface_thickness],
-      [base_width + border_thickness, base_depth + border_thickness, base_height + surface_thickness],
-      [-border_thickness, base_depth + border_thickness, base_height + surface_thickness]
+    # Tạo đèn LED viền
+    led_group = entities.add_group
+    led_group.name = "Đèn LED"
+    led_pts = [
+      [0.mm, 0.mm, 60.mm],
+      [120.mm, 0.mm, 60.mm],
+      [120.mm, 180.mm, 60.mm],
+      [0.mm, 180.mm, 60.mm]
     ]
-    border_face = entities.add_face(border_pts)
-    border_face.pushpull(border_thickness)
-    border_group = entities.add_group(border_face)
-    border_group.name = "VienTrangTri"
-    border_group.material = "Gold"
+    led_face = led_group.entities.add_face(led_pts)
+    led_face.pushpull(5.mm) # Độ dày của đèn LED
+    led_group.material = "Yellow"
 
     model.commit_operation
   end

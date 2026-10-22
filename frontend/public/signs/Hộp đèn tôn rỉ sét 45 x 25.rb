@@ -5,59 +5,58 @@ module HopDenTonRiSet45X25
     model.start_operation('HopDenTonRiSet45X25', true)
     entities = model.active_entities
 
-    # Tạo khung đỡ
-    base_pts = [
-      [0.mm, 0.mm, 0.mm],
-      [450.mm, 0.mm, 0.mm],
-      [450.mm, 20.mm, 0.mm],
-      [0.mm, 20.mm, 0.mm]
-    ]
-    base_face = entities.add_face(base_pts)
-    base_face.reverse! # Đảo mặt nếu cần
-    base_grp = entities.add_group(base_face)
-    base_grp.name = "Khung Đỡ"
-    base_grp.material = "Steel"
-
-    # Tạo bề mặt biển quảng cáo
-    surface_pts = [
+    # Tạo khung sắt đỡ
+    grp_frame = entities.add_group
+    grp_frame.name = "Khung Sắt Đỡ"
+    frame_pts = [
       [0.mm, 0.mm, 0.mm],
       [450.mm, 0.mm, 0.mm],
       [450.mm, 250.mm, 0.mm],
       [0.mm, 250.mm, 0.mm]
     ]
-    surface_face = entities.add_face(surface_pts)
-    surface_face.reverse! # Đảo mặt nếu cần
-    surface_grp = entities.add_group(surface_face)
-    surface_grp.name = "Bề Mặt Biển"
-    surface_grp.material = "Alu"
+    frame_face = grp_frame.entities.add_face(frame_pts)
+    frame_face.pushpull(20.mm)
+    grp_frame.material = "Gray"
+
+    # Tạo bề mặt biển
+    grp_surface = entities.add_group
+    grp_surface.name = "Bề Mặt Biển"
+    surface_pts = [
+      [0.mm, 0.mm, 20.mm],
+      [450.mm, 0.mm, 20.mm],
+      [450.mm, 250.mm, 20.mm],
+      [0.mm, 250.mm, 20.mm]
+    ]
+    surface_face = grp_surface.entities.add_face(surface_pts)
+    surface_face.pushpull(-5.mm)  # Tạo độ dày cho bề mặt
+    grp_surface.material = "White"
 
     # Tạo chữ nổi 3D
-    text = "HỘP ĐÈN"
-    text_grp = entities.add_group
-    text_face = text_grp.entities.add_text(text, [50.mm, 50.mm, 0.mm], 100.mm)
-    text_face.pushpull(10.mm) # Độ dày chữ nổi
-    text_grp.name = "Chữ Nổi"
-    text_grp.material = "White"
+    grp_text = entities.add_group
+    grp_text.name = "Chữ Nổi 3D"
+    text_height = 15.mm
+    text_depth = 5.mm
+    text = "Hộp đèn"
+    text_position = [50.mm, 100.mm, 20.mm]
+    text_entity = grp_text.entities.add_text(text, text_position)
+    text_entity.transform!(Geom::Transformation.new(text_position))
+    text_entity.explode.each do |entity|
+      entity.pushpull(text_depth)
+    end
+    grp_text.material = "Red"
 
-    # Tạo đèn LED
-    led_grp = entities.add_group
-    led_box = led_grp.entities.add_face([0.mm, 0.mm, 0.mm], [450.mm, 0.mm, 0.mm], [450.mm, 20.mm, 0.mm], [0.mm, 20.mm, 0.mm])
-    led_box.pushpull(-5.mm) # Độ sâu của đèn LED
-    led_grp.name = "Đèn LED"
-    led_grp.material = "Yellow"
-
-    # Tạo viền trang trí
-    border_pts = [
-      [0.mm, -5.mm, 0.mm],
-      [450.mm, -5.mm, 0.mm],
-      [450.mm, 0.mm, 0.mm],
-      [0.mm, 0.mm, 0.mm]
+    # Tạo đèn LED viền
+    grp_led = entities.add_group
+    grp_led.name = "Đèn LED"
+    led_pts = [
+      [0.mm, 0.mm, 25.mm],
+      [450.mm, 0.mm, 25.mm],
+      [450.mm, 250.mm, 25.mm],
+      [0.mm, 250.mm, 25.mm]
     ]
-    border_face = entities.add_face(border_pts)
-    border_face.reverse! # Đảo mặt nếu cần
-    border_grp = entities.add_group(border_face)
-    border_grp.name = "Viền Trang Trí"
-    border_grp.material = "Red"
+    led_face = grp_led.entities.add_face(led_pts)
+    led_face.pushpull(2.mm)
+    grp_led.material = "Yellow"
 
     model.commit_operation
   end

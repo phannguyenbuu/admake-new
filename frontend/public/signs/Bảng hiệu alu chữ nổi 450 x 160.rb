@@ -5,77 +5,48 @@ module BangHieuAluChuNoi450X160
     model.start_operation('BangHieuAluChuNoi450X160', true)
     entities = model.active_entities
 
-    # Tạo khung đỡ
-    frame_height = 30.mm
-    frame_width = 4500.mm
-    frame_depth = 30.mm
-
+    # Tạo khung sắt đỡ
     frame_pts = [
-      [0, 0, 0],
-      [frame_width, 0, 0],
-      [frame_width, frame_depth, 0],
-      [0, frame_depth, 0]
+      [0.mm, 0.mm, 0.mm],
+      [4500.mm, 0.mm, 0.mm],
+      [4500.mm, 30.mm, 0.mm],
+      [0.mm, 30.mm, 0.mm]
     ]
-
-    frame_face = entities.add_face(frame_pts)
-    frame_face.pushpull(frame_height)
-
-    frame_group = entities.add_group(frame_face)
-    frame_group.name = "Khung Đỡ"
-    frame_group.material = "Gray"
+    frame_grp = entities.add_group
+    frame_face = frame_grp.entities.add_face(frame_pts)
+    frame_face.pushpull(30.mm) # Độ dày khung
+    frame_grp.material = "Gray"
 
     # Tạo bề mặt biển
-    surface_height = 1600.mm
-    surface_depth = 30.mm
-
     surface_pts = [
-      [0, 0, frame_height],
-      [frame_width, 0, frame_height],
-      [frame_width, surface_depth, frame_height],
-      [0, surface_depth, frame_height]
+      [0.mm, 0.mm, 30.mm],
+      [4500.mm, 0.mm, 30.mm],
+      [4500.mm, 1600.mm, 30.mm],
+      [0.mm, 1600.mm, 30.mm]
     ]
-
-    surface_face = entities.add_face(surface_pts)
-    surface_face.pushpull(surface_height)
-
-    surface_group = entities.add_group(surface_face)
-    surface_group.name = "Bề Mặt Biển"
-    surface_group.material = "Alu"
+    surface_grp = entities.add_group
+    surface_face = surface_grp.entities.add_face(surface_pts)
+    surface_face.pushpull(5.mm) # Độ dày bề mặt
+    surface_grp.material = "Aluminum"
 
     # Tạo chữ nổi 3D
-    letter_height = 100.mm
-    letter_depth = 30.mm
-    letter_width = 20.mm
+    text_grp = entities.add_group
+    text = "Bảng hiệu alu chữ nổi"
+    text_pts = [0.mm, 1000.mm, 35.mm] # Vị trí chữ nổi
+    text_face = text_grp.entities.add_text(text, text_pts)
+    text_grp.material = "White"
 
-    letter_pts = [
-      [1000.mm, 15.mm, frame_height + surface_height],
-      [1000.mm + letter_width, 15.mm, frame_height + surface_height],
-      [1000.mm + letter_width, 15.mm + letter_depth, frame_height + surface_height],
-      [1000.mm, 15.mm + letter_depth, frame_height + surface_height]
+    # Tạo đèn LED viền
+    led_grp = entities.add_group
+    led_pts = [
+      [0.mm, 0.mm, 30.mm],
+      [4500.mm, 0.mm, 30.mm],
+      [4500.mm, 30.mm, 30.mm],
+      [0.mm, 30.mm, 30.mm]
     ]
-
-    letter_face = entities.add_face(letter_pts)
-    letter_face.pushpull(letter_height)
-
-    letter_group = entities.add_group(letter_face)
-    letter_group.name = "Chữ Nổi"
-    letter_group.material = "Red"
-
-    # Tạo viền trang trí
-    border_height = 5.mm
-    border_pts = [
-      [0, 0, frame_height + surface_height + letter_height],
-      [frame_width, 0, frame_height + surface_height + letter_height],
-      [frame_width, surface_depth, frame_height + surface_height + letter_height],
-      [0, surface_depth, frame_height + surface_height + letter_height]
-    ]
-
-    border_face = entities.add_face(border_pts)
-    border_face.pushpull(border_height)
-
-    border_group = entities.add_group(border_face)
-    border_group.name = "Viền Trang Trí"
-    border_group.material = "Gold"
+    led_face = led_grp.entities.add_face(led_pts)
+    led_face.pushpull(10.mm) # Độ dày đèn LED
+    led_grp.material = "Yellow"
 
     model.commit_operation
   end

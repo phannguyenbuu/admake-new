@@ -5,53 +5,57 @@ module KiotDenLed240X160X200
     model.start_operation('KiotDenLed240X160X200', true)
     entities = model.active_entities
 
-    # Tạo khung đỡ
-    base_pts = [
-      [0, 0, 0],
-      [2400.mm, 0, 0],
-      [2400.mm, 2000.mm, 0],
-      [0, 2000.mm, 0]
+    # Tạo khung sắt đỡ
+    frame_group = entities.add_group
+    frame_group.name = "Khung Sắt Đỡ"
+    frame_pts = [
+      [0.mm, 0.mm, 0.mm],
+      [2400.mm, 0.mm, 0.mm],
+      [2400.mm, 2000.mm, 0.mm],
+      [0.mm, 2000.mm, 0.mm]
     ]
-    base_face = entities.add_face(base_pts)
-    base_face.reverse! # Đảo mặt nếu cần
-    base = entities.add_group(base_face)
-    base.material = "Gray"
+    frame_face = frame_group.entities.add_face(frame_pts)
+    frame_face.pushpull(1600.mm) # Kéo cao 1600mm
+    frame_group.material = "Gray"
 
-    # Tạo bề mặt biển quảng cáo
-    sign_pts = [
-      [0, 0, 1600.mm],
-      [2400.mm, 0, 1600.mm],
+    # Tạo bề mặt biển
+    surface_group = entities.add_group
+    surface_group.name = "Bề Mặt Biển"
+    surface_pts = [
+      [0.mm, 0.mm, 1600.mm],
+      [2400.mm, 0.mm, 1600.mm],
       [2400.mm, 2000.mm, 1600.mm],
-      [0, 2000.mm, 1600.mm]
+      [0.mm, 2000.mm, 1600.mm]
     ]
-    sign_face = entities.add_face(sign_pts)
-    sign_face.reverse! # Đảo mặt nếu cần
-    sign = entities.add_group(sign_face)
-    sign.material = "White"
+    surface_face = surface_group.entities.add_face(surface_pts)
+    surface_face.pushpull(20.mm) # Độ dày 20mm
+    surface_group.material = "White"
 
     # Tạo chữ nổi 3D
-    text = "Đèn LED"
     text_group = entities.add_group
-    text_face = text_group.entities.add_3d_text(text, TextAlignCenter, "Arial", true, false, 100.mm, 0, 0)
-    text_group.transform!(Geom::Transformation.new([1200.mm, 1000.mm, 1600.mm])) # Đặt vị trí chữ
+    text_group.name = "Chữ Nổi"
+    text_pts = [
+      [1000.mm, 1000.mm, 1620.mm],
+      [1400.mm, 1000.mm, 1620.mm],
+      [1400.mm, 1200.mm, 1620.mm],
+      [1000.mm, 1200.mm, 1620.mm]
+    ]
+    text_face = text_group.entities.add_face(text_pts)
+    text_face.pushpull(50.mm) # Kéo cao 50mm
     text_group.material = "Red"
 
     # Tạo đèn LED
     led_group = entities.add_group
-    led_box = led_group.entities.add_box(0, 0, 1600.mm, 2400.mm, 2000.mm, 50.mm)
-    led_group.material = "Yellow"
-
-    # Tạo viền trang trí
-    border_pts = [
-      [0, 0, 1600.mm + 10.mm],
-      [2400.mm, 0, 1600.mm + 10.mm],
-      [2400.mm, 2000.mm, 1600.mm + 10.mm],
-      [0, 2000.mm, 1600.mm + 10.mm]
+    led_group.name = "Đèn LED"
+    led_pts = [
+      [0.mm, 0.mm, 1580.mm],
+      [2400.mm, 0.mm, 1580.mm],
+      [2400.mm, 2000.mm, 1580.mm],
+      [0.mm, 2000.mm, 1580.mm]
     ]
-    border_face = entities.add_face(border_pts)
-    border_face.reverse! # Đảo mặt nếu cần
-    border = entities.add_group(border_face)
-    border.material = "Black"
+    led_face = led_group.entities.add_face(led_pts)
+    led_face.pushpull(10.mm) # Độ dày 10mm
+    led_group.material = "Yellow"
 
     model.commit_operation
   end

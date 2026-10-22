@@ -5,53 +5,47 @@ module TranhDienSieuMong60X80
     model.start_operation('TranhDienSieuMong60X80', true)
     entities = model.active_entities
 
-    # Tạo khung đỡ
-    frame_group = entities.add_group
-    frame_group.name = "Khung Đỡ"
-    frame_points = [
-      [0.mm, 0.mm, 0.mm],
-      [600.mm, 0.mm, 0.mm],
-      [600.mm, 800.mm, 0.mm],
-      [0.mm, 800.mm, 0.mm]
-    ]
-    frame_face = frame_group.entities.add_face(frame_points)
-    frame_face.reverse! # Đảo mặt nếu cần
-    frame_face.pushpull(20.mm) # Độ dày khung
-    frame_group.material = "Gray"
+    # Tạo khung sắt đỡ
+    frame_width = 600.mm
+    frame_height = 800.mm
+    frame_depth = 20.mm
 
-    # Tạo bề mặt biển quảng cáo
-    surface_group = entities.add_group
-    surface_group.name = "Bề Mặt Biển"
-    surface_points = [
-      [0.mm, 0.mm, 20.mm],
-      [600.mm, 0.mm, 20.mm],
-      [600.mm, 800.mm, 20.mm],
-      [0.mm, 800.mm, 20.mm]
+    # Tạo khung
+    frame_pts = [
+      [0, 0, 0],
+      [frame_width, 0, 0],
+      [frame_width, frame_height, 0],
+      [0, frame_height, 0]
     ]
-    surface_face = surface_group.entities.add_face(surface_points)
-    surface_face.reverse! # Đảo mặt nếu cần
-    surface_face.pushpull(-20.mm) # Độ dày bề mặt
-    surface_group.material = "White"
+    frame_grp = entities.add_group
+    frame_face = frame_grp.entities.add_face(frame_pts)
+    frame_face.pushpull(frame_depth) # Kéo khung lên
+    frame_grp.material = "Gray" # Màu khung
+
+    # Tạo bề mặt biển
+    surface_grp = entities.add_group
+    surface_face = surface_grp.entities.add_face(frame_pts)
+    surface_face.pushpull(-frame_depth) # Đẩy bề mặt vào trong
+    surface_grp.material = "White" # Màu bề mặt
 
     # Tạo chữ nổi 3D
-    text_group = entities.add_group
-    text_group.name = "Chữ Nổi 3D"
-    text_position = [100.mm, 100.mm, 20.mm]
-    text_face = text_group.entities.add_face([text_position, [text_position[0] + 200.mm, text_position[1], text_position[2]], 
-                                                [text_position[0] + 200.mm, text_position[1] + 50.mm, text_position[2]], 
-                                                [text_position[0], text_position[1] + 50.mm, text_position[2]]])
-    text_face.pushpull(5.mm) # Độ dày chữ nổi
-    text_group.material = "Red"
+    text_height = 10.mm
+    text_depth = 5.mm
+    text_content = "Tranh điện siêu mỏng"
+    text_position = [frame_width / 2, frame_height / 2, frame_depth]
 
-    # Tạo đèn LED
-    led_group = entities.add_group
-    led_group.name = "Đèn LED"
-    led_position = [0.mm, 0.mm, 25.mm]
-    led_face = led_group.entities.add_face([led_position, [led_position[0] + 600.mm, led_position[1], led_position[2]], 
-                                                          [led_position[0] + 600.mm, led_position[1] + 10.mm, led_position[2]], 
-                                                          [led_position[0], led_position[1] + 10.mm, led_position[2]]])
-    led_face.pushpull(1.mm) # Độ dày đèn LED
-    led_group.material = "Yellow"
+    text_grp = entities.add_group
+    text_face = text_grp.entities.add_face([text_position, [text_position[0] + 200.mm, text_position[1], text_position[2]], 
+                                                  [text_position[0] + 200.mm, text_position[1] + text_height, text_position[2]], 
+                                                  [text_position[0], text_position[1] + text_height, text_position[2]]])
+    text_face.pushpull(text_depth) # Kéo chữ nổi lên
+    text_grp.material = "Blue" # Màu chữ
+
+    # Tạo đèn LED viền
+    led_grp = entities.add_group
+    led_face = led_grp.entities.add_face(frame_pts)
+    led_face.pushpull(5.mm) # Kéo đèn LED ra ngoài
+    led_grp.material = "Yellow" # Màu đèn LED
 
     model.commit_operation
   end

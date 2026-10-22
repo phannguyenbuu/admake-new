@@ -5,33 +5,53 @@ module BienSoNhaInoxSoNoiNenVanGo30X20
     model.start_operation('BienSoNhaInoxSoNoiNenVanGo30X20', true)
     entities = model.active_entities
 
-    # Tạo khung đỡ
-    base_group = entities.add_group
-    base_group.name = "Khung Do"
-    base_face = base_group.entities.add_face([0.mm, 0.mm, 0.mm], [300.mm, 0.mm, 0.mm], [300.mm, 200.mm, 0.mm], [0.mm, 200.mm, 0.mm])
-    base_face.pushpull(20.mm)
-    base_group.material = "Wood"
+    # Tạo khung sắt đỡ
+    frame_pts = [
+      [0.mm, 0.mm, 0.mm],
+      [300.mm, 0.mm, 0.mm],
+      [300.mm, 200.mm, 0.mm],
+      [0.mm, 200.mm, 0.mm]
+    ]
+    frame_grp = entities.add_group
+    frame_face = frame_grp.entities.add_face(frame_pts)
+    frame_face.pushpull(20.mm) # Độ dày khung
+    frame_grp.material = "Gray"
 
-    # Tạo bề mặt biển
-    surface_group = entities.add_group
-    surface_group.name = "Be Mat Bien"
-    surface_face = surface_group.entities.add_face([10.mm, 10.mm, 20.mm], [290.mm, 10.mm, 20.mm], [290.mm, 190.mm, 20.mm], [10.mm, 190.mm, 20.mm])
-    surface_face.pushpull(5.mm)
-    surface_group.material = "Wood Grain"
+    # Tạo tấm nền chính
+    base_pts = [
+      [5.mm, 5.mm, 20.mm],
+      [295.mm, 5.mm, 20.mm],
+      [295.mm, 195.mm, 20.mm],
+      [5.mm, 195.mm, 20.mm]
+    ]
+    base_grp = entities.add_group
+    base_face = base_grp.entities.add_face(base_pts)
+    base_face.pushpull(5.mm) # Độ dày tấm nền
+    base_grp.material = "Wood"
 
-    # Tạo chữ số nổi
-    number_group = entities.add_group
-    number_group.name = "Chu So Noi"
-    number_face = number_group.entities.add_face([50.mm, 50.mm, 25.mm], [100.mm, 50.mm, 25.mm], [100.mm, 150.mm, 25.mm], [50.mm, 150.mm, 25.mm])
-    number_face.pushpull(5.mm)
-    number_group.material = "Metallic"
+    # Tạo chữ số nổi 3D
+    number_grp = entities.add_group
+    number_pts = [
+      [100.mm, 100.mm, 20.mm],
+      [120.mm, 100.mm, 20.mm],
+      [120.mm, 140.mm, 20.mm],
+      [100.mm, 140.mm, 20.mm]
+    ]
+    number_face = number_grp.entities.add_face(number_pts)
+    number_face.pushpull(5.mm) # Độ dày chữ số
+    number_grp.material = "Silver"
 
-    # Tạo viền trang trí
-    border_group = entities.add_group
-    border_group.name = "Vien Trang Tri"
-    border_face = border_group.entities.add_face([0.mm, 0.mm, 25.mm], [300.mm, 0.mm, 25.mm], [300.mm, 200.mm, 25.mm], [0.mm, 200.mm, 25.mm])
-    border_face.pushpull(2.mm)
-    border_group.material = "Gold"
+    # Tạo đèn LED viền
+    led_grp = entities.add_group
+    led_pts = [
+      [0.mm, 0.mm, 25.mm],
+      [300.mm, 0.mm, 25.mm],
+      [300.mm, 200.mm, 25.mm],
+      [0.mm, 200.mm, 25.mm]
+    ]
+    led_face = led_grp.entities.add_face(led_pts)
+    led_face.pushpull(5.mm) # Độ dày đèn LED
+    led_grp.material = "Yellow"
 
     model.commit_operation
   end

@@ -5,48 +5,57 @@ module BangHieuBatLotTon2MatCoTru250X150
     model.start_operation('BangHieuBatLotTon2MatCoTru250X150', true)
     entities = model.active_entities
 
-    # Tạo khung đỡ
-    base_pts = [
+    # Tạo khung sắt đỡ
+    grp_frame = entities.add_group
+    grp_frame.name = "Khung Sắt Đỡ"
+    frame_pts = [
       [0.mm, 0.mm, 0.mm],
       [2500.mm, 0.mm, 0.mm],
       [2500.mm, 30.mm, 0.mm],
       [0.mm, 30.mm, 0.mm]
     ]
-    base_face = entities.add_face(base_pts)
-    base_face.reverse! # Đảo mặt nếu cần
-    base_face.pushpull(1500.mm) # Kéo lên cao 1500mm
-    base_group = entities.add_group(base_face)
-    base_group.name = "KhungDo"
+    frame_face = grp_frame.entities.add_face(frame_pts)
+    frame_face.pushpull(1500.mm) # Kéo khối lên cao 1500mm
+    grp_frame.material = "Gray"
 
     # Tạo bề mặt biển
-    sign_pts = [
-      [0.mm, 0.mm, 1500.mm],
-      [2500.mm, 0.mm, 1500.mm],
-      [2500.mm, 30.mm, 1500.mm],
-      [0.mm, 30.mm, 1500.mm]
+    grp_surface = entities.add_group
+    grp_surface.name = "Bề Mặt Biển"
+    surface_pts = [
+      [0.mm, 0.mm, 0.mm],
+      [2500.mm, 0.mm, 0.mm],
+      [2500.mm, 30.mm, 0.mm],
+      [0.mm, 30.mm, 0.mm]
     ]
-    sign_face = entities.add_face(sign_pts)
-    sign_face.reverse! # Đảo mặt nếu cần
-    sign_face.pushpull(-30.mm) # Kéo xuống 30mm để tạo độ dày
-    sign_group = entities.add_group(sign_face)
-    sign_group.material = "White" # Màu trắng cho bề mặt biển
-    sign_group.name = "BeMatBien"
+    surface_face = grp_surface.entities.add_face(surface_pts)
+    surface_face.pushpull(5.mm) # Kéo khối lên cao 5mm
+    grp_surface.material = "Blue"
 
     # Tạo chữ nổi 3D
-    text = "QUẢNG CÁO"
-    text_group = entities.add_group
-    text_face = text_group.entities.add_3d_text(text, TextAlignCenter, "Arial", true, false, 100.mm, 0.mm, 0.mm)
-    text_group.transform!(Geom::Transformation.new([1000.mm, 15.mm, 1500.mm])) # Đặt chữ nổi ở giữa
-    text_group.material = "Red" # Màu đỏ cho chữ nổi
-    text_group.name = "ChuNoi"
+    grp_text = entities.add_group
+    grp_text.name = "Chữ Nổi"
+    text_pts = [
+      [1000.mm, 15.mm, 5.mm],
+      [1500.mm, 15.mm, 5.mm],
+      [1500.mm, 45.mm, 5.mm],
+      [1000.mm, 45.mm, 5.mm]
+    ]
+    text_face = grp_text.entities.add_face(text_pts)
+    text_face.pushpull(10.mm) # Kéo khối lên cao 10mm
+    grp_text.material = "White"
 
     # Tạo đèn LED
-    led_group = entities.add_group
-    led_face = led_group.entities.add_face([0.mm, 0.mm, 1500.mm], [2500.mm, 0.mm, 1500.mm], [2500.mm, 30.mm, 1500.mm], [0.mm, 30.mm, 1500.mm])
-    led_face.reverse!
-    led_face.pushpull(-5.mm) # Kéo xuống để tạo độ dày cho đèn LED
-    led_group.material = "Yellow" # Màu vàng cho đèn LED
-    led_group.name = "DenLED"
+    grp_led = entities.add_group
+    grp_led.name = "Đèn LED"
+    led_pts = [
+      [0.mm, 0.mm, 1550.mm],
+      [2500.mm, 0.mm, 1550.mm],
+      [2500.mm, 30.mm, 1550.mm],
+      [0.mm, 30.mm, 1550.mm]
+    ]
+    led_face = grp_led.entities.add_face(led_pts)
+    led_face.pushpull(5.mm) # Kéo khối lên cao 5mm
+    grp_led.material = "Yellow"
 
     model.commit_operation
   end

@@ -5,65 +5,51 @@ module BienTenCongTyInoxAnMon40X30
     model.start_operation('BienTenCongTyInoxAnMon40X30', true)
     entities = model.active_entities
 
-    # Tạo khung đỡ
-    base_height = 20.mm
-    base_width = 400.mm
-    base_depth = 300.mm
-    base_pts = [
-      [0, 0, 0],
-      [base_width, 0, 0],
-      [base_width, base_depth, 0],
-      [0, base_depth, 0]
+    # Tạo khung sắt đỡ
+    frame_pts = [
+      [0.mm, 0.mm, 0.mm],
+      [400.mm, 0.mm, 0.mm],
+      [400.mm, 300.mm, 0.mm],
+      [0.mm, 300.mm, 0.mm]
     ]
-    base_face = entities.add_face(base_pts)
-    base_face.pushpull(base_height)
-    base_group = entities.add_group(base_face)
-    base_group.name = "KhungDo"
+    frame_face = entities.add_face(frame_pts)
+    frame_face.reverse! # Đảo mặt nếu cần
+    frame_face.pushpull(20.mm) # Kéo khối lên 20mm
+    frame_group = entities.add_group(frame_face)
+    frame_group.material = "Gray" # Màu khung sắt
 
     # Tạo bề mặt biển
-    surface_height = 5.mm
     surface_pts = [
-      [0, 0, base_height],
-      [base_width, 0, base_height],
-      [base_width, base_depth, base_height],
-      [0, base_depth, base_height]
+      [5.mm, 5.mm, 20.mm],
+      [395.mm, 5.mm, 20.mm],
+      [395.mm, 295.mm, 20.mm],
+      [5.mm, 295.mm, 20.mm]
     ]
     surface_face = entities.add_face(surface_pts)
-    surface_face.pushpull(surface_height)
+    surface_face.reverse! # Đảo mặt nếu cần
+    surface_face.pushpull(5.mm) # Kéo khối lên 5mm
     surface_group = entities.add_group(surface_face)
-    surface_group.name = "BeMatBien"
-    surface_group.material = "Aluminum"
+    surface_group.material = "Silver" # Màu inox
 
     # Tạo chữ nổi 3D
     text = "CÔNG TY ABC"
-    text_height = 10.mm
-    text_depth = 5.mm
-    text_position = [50.mm, 50.mm, base_height + surface_height]
     text_group = entities.add_group
-    text_group.name = "ChuNoi"
-    text_group.entities.add_text(text, text_position, text_height)
-    text_face = text_group.entities.add_face([
-      [text_position[0], text_position[1], text_position[2]],
-      [text_position[0] + 100.mm, text_position[1], text_position[2]],
-      [text_position[0] + 100.mm, text_position[1] + 20.mm, text_position[2]],
-      [text_position[0], text_position[1] + 20.mm, text_position[2]]
-    ])
-    text_face.pushpull(text_depth)
+    text_entity = text_group.entities.add_3d_text(text, TextAlignCenter, "Arial", true, false, 100.mm, 0.mm, 0.mm)
+    text_group.transform!(Geom::Transformation.new([100.mm, 100.mm, 25.mm])) # Đặt chữ nổi lên bề mặt
+    text_group.material = "Gold" # Màu chữ
 
-    # Tạo đèn LED
-    led_height = 2.mm
-    led_depth = 5.mm
-    led_position = [0, 0, base_height + surface_height + text_depth]
+    # Tạo đèn LED viền
     led_group = entities.add_group
-    led_group.name = "DenLED"
-    led_face = led_group.entities.add_face([
-      [led_position[0], led_position[1], led_position[2]],
-      [led_position[0] + base_width, led_position[1], led_position[2]],
-      [led_position[0] + base_width, led_position[1] + led_depth, led_position[2]],
-      [led_position[0], led_position[1] + led_depth, led_position[2]]
-    ])
-    led_face.pushpull(led_height)
-    led_group.material = "Yellow"
+    led_pts = [
+      [0.mm, 0.mm, 25.mm],
+      [400.mm, 0.mm, 25.mm],
+      [400.mm, 300.mm, 25.mm],
+      [0.mm, 300.mm, 25.mm]
+    ]
+    led_face = led_group.entities.add_face(led_pts)
+    led_face.reverse! # Đảo mặt nếu cần
+    led_face.pushpull(5.mm) # Kéo khối lên 5mm
+    led_group.material = "Yellow" # Màu đèn LED
 
     model.commit_operation
   end

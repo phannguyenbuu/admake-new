@@ -6,50 +6,45 @@ module BangChucDanhDeGoAnMon
     entities = model.active_entities
 
     # Tạo khung đỡ
-    base_pts = [
+    frame_pts = [
       [0.mm, 0.mm, 0.mm],
       [300.mm, 0.mm, 0.mm],
       [300.mm, 40.mm, 0.mm],
       [0.mm, 40.mm, 0.mm]
     ]
-    base_face = entities.add_face(base_pts)
-    base_face.reverse! # Đảo mặt nếu cần
-    base_face.pushpull(10.mm) # Độ dày của khung đỡ
-    base_group = entities.add_group(base_face)
-    base_group.material = "Brown"
+    frame_grp = entities.add_group
+    frame_face = frame_grp.entities.add_face(frame_pts)
+    frame_face.pushpull(150.mm) # Kéo khối lên cao 150mm
+    frame_grp.material = "Gray" # Màu khung
 
     # Tạo bề mặt biển
     surface_pts = [
-      [0.mm, 0.mm, 10.mm],
-      [300.mm, 0.mm, 10.mm],
-      [300.mm, 40.mm, 10.mm],
-      [0.mm, 40.mm, 10.mm]
+      [5.mm, 5.mm, 150.mm],
+      [295.mm, 5.mm, 150.mm],
+      [295.mm, 35.mm, 150.mm],
+      [5.mm, 35.mm, 150.mm]
     ]
-    surface_face = entities.add_face(surface_pts)
-    surface_face.reverse! # Đảo mặt nếu cần
-    surface_face.pushpull(5.mm) # Độ dày của bề mặt biển
-    surface_group = entities.add_group(surface_face)
-    surface_group.material = "LightWood"
+    surface_grp = entities.add_group
+    surface_face = surface_grp.entities.add_face(surface_pts)
+    surface_face.pushpull(5.mm) # Kéo bề mặt lên cao 5mm
+    surface_grp.material = "White" # Màu bề mặt biển
 
     # Tạo chữ nổi 3D
-    text = "Chức Danh"
-    text_group = entities.add_group
-    text_face = text_group.entities.add_3d_text(text, TextAlignCenter, "Arial", true, false, 10.mm, 0.mm, 0.mm)
-    text_group.transform!(Geom::Transformation.new([50.mm, 10.mm, 15.mm])) # Đặt vị trí chữ nổi
-    text_group.material = "Gold"
+    text_grp = entities.add_group
+    text = text_grp.entities.add_text("Chức Danh", [10.mm, 10.mm, 155.mm], 20.mm)
+    text_grp.material = "Blue" # Màu chữ nổi
 
-    # Tạo viền trang trí
-    border_pts = [
-      [-5.mm, -5.mm, 10.mm],
-      [305.mm, -5.mm, 10.mm],
-      [305.mm, 45.mm, 10.mm],
-      [-5.mm, 45.mm, 10.mm]
+    # Tạo đèn LED viền
+    led_grp = entities.add_group
+    led_pts = [
+      [0.mm, 0.mm, 155.mm],
+      [300.mm, 0.mm, 155.mm],
+      [300.mm, 5.mm, 155.mm],
+      [0.mm, 5.mm, 155.mm]
     ]
-    border_face = entities.add_face(border_pts)
-    border_face.reverse! # Đảo mặt nếu cần
-    border_face.pushpull(2.mm) # Độ dày của viền
-    border_group = entities.add_group(border_face)
-    border_group.material = "DarkBrown"
+    led_face = led_grp.entities.add_face(led_pts)
+    led_face.pushpull(2.mm) # Kéo đèn LED lên cao 2mm
+    led_grp.material = "Yellow" # Màu đèn LED
 
     model.commit_operation
   end

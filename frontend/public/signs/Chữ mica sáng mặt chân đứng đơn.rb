@@ -5,75 +5,53 @@ module ChuMicaSangMatChanDungDon
     model.start_operation('ChuMicaSangMatChanDungDon', true)
     entities = model.active_entities
 
-    # Tạo khung đỡ
-    base_height = 60.mm
-    base_width = 1200.mm
-    base_depth = 60.mm
-
-    base_pts = [
-      [0, 0, 0],
-      [base_width, 0, 0],
-      [base_width, base_depth, 0],
-      [0, base_depth, 0]
+    # Tạo khung sắt đỡ
+    grp_frame = entities.add_group
+    grp_frame.name = "KhungSatDo"
+    frame_pts = [
+      [0.mm, 0.mm, 0.mm],
+      [1200.mm, 0.mm, 0.mm],
+      [1200.mm, 60.mm, 0.mm],
+      [0.mm, 60.mm, 0.mm]
     ]
-    
-    base_face = entities.add_face(base_pts)
-    base_face.pushpull(base_height)
-    base_group = entities.add_group(base_face)
-    base_group.name = "Khung Đỡ"
-    base_group.material = "Gray"
+    frame_face = grp_frame.entities.add_face(frame_pts)
+    frame_face.pushpull(400.mm) # Kéo lên cao 400mm
+    grp_frame.material = "Gray"
 
     # Tạo bề mặt biển
-    surface_height = 400.mm
-    surface_depth = 60.mm
-
+    grp_surface = entities.add_group
+    grp_surface.name = "BeMatBien"
     surface_pts = [
-      [0, 0, base_height],
-      [base_width, 0, base_height],
-      [base_width, surface_depth, base_height],
-      [0, surface_depth, base_height]
+      [0.mm, 0.mm, 0.mm],
+      [1200.mm, 0.mm, 0.mm],
+      [1200.mm, 60.mm, 0.mm],
+      [0.mm, 60.mm, 0.mm]
     ]
-
-    surface_face = entities.add_face(surface_pts)
-    surface_face.pushpull(surface_height)
-    surface_group = entities.add_group(surface_face)
-    surface_group.name = "Bề Mặt Biển"
-    surface_group.material = "White"
+    surface_face = grp_surface.entities.add_face(surface_pts)
+    surface_face.pushpull(10.mm) # Độ dày 10mm
+    grp_surface.material = "White"
 
     # Tạo chữ nổi 3D
-    letter_height = 400.mm
-    letter_depth = 10.mm
-    letter_width = 100.mm
+    grp_text = entities.add_group
+    grp_text.name = "ChuNoi3D"
+    text = "SANG"
+    text_position = [100.mm, 10.mm, 10.mm]
+    text_entity = grp_text.entities.add_text(text, text_position)
+    text_entity.transform!(Geom::Transformation.new([0, 0, 10.mm])) # Nâng chữ lên 10mm
+    grp_text.material = "Blue"
 
-    letter_pts = [
-      [100.mm, 30.mm, base_height + surface_height],
-      [100.mm + letter_width, 30.mm, base_height + surface_height],
-      [100.mm + letter_width, 30.mm + letter_depth, base_height + surface_height],
-      [100.mm, 30.mm + letter_depth, base_height + surface_height]
-    ]
-
-    letter_face = entities.add_face(letter_pts)
-    letter_face.pushpull(letter_height)
-    letter_group = entities.add_group(letter_face)
-    letter_group.name = "Chữ Nổi"
-    letter_group.material = "Red"
-
-    # Tạo đèn LED (biểu tượng)
-    led_height = 5.mm
-    led_depth = 5.mm
-
+    # Tạo đèn LED viền
+    grp_led = entities.add_group
+    grp_led.name = "DenLED"
     led_pts = [
-      [50.mm, 30.mm + letter_depth + 5.mm, base_height + surface_height + letter_height],
-      [50.mm + led_depth, 30.mm + letter_depth + 5.mm, base_height + surface_height + letter_height],
-      [50.mm + led_depth, 30.mm + letter_depth + 5.mm + led_height, base_height + surface_height + letter_height],
-      [50.mm, 30.mm + letter_depth + 5.mm + led_height, base_height + surface_height + letter_height]
+      [0.mm, 0.mm, 10.mm],
+      [1200.mm, 0.mm, 10.mm],
+      [1200.mm, 60.mm, 10.mm],
+      [0.mm, 60.mm, 10.mm]
     ]
-
-    led_face = entities.add_face(led_pts)
-    led_face.pushpull(led_depth)
-    led_group = entities.add_group(led_face)
-    led_group.name = "Đèn LED"
-    led_group.material = "Yellow"
+    led_face = grp_led.entities.add_face(led_pts)
+    led_face.pushpull(5.mm) # Độ dày 5mm
+    grp_led.material = "Yellow"
 
     model.commit_operation
   end

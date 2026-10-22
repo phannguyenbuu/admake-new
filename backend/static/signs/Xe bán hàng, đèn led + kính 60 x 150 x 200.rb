@@ -5,53 +5,53 @@ module XeBanHangDenLedKinh60X150X200
     model.start_operation('XeBanHangDenLedKinh60X150X200', true)
     entities = model.active_entities
 
-    # Tạo khung đỡ
+    # Tạo khung sắt đỡ
     grp_frame = entities.add_group
-    grp_frame.name = "Khung Do"
+    grp_frame.name = "Khung Sắt Đỡ"
     frame_pts = [
-      [0, 0, 0],
-      [600.mm, 0, 0],
-      [600.mm, 2000.mm, 0],
-      [0, 2000.mm, 0]
+      [0.mm, 0.mm, 0.mm],
+      [600.mm, 0.mm, 0.mm],
+      [600.mm, 2000.mm, 0.mm],
+      [0.mm, 2000.mm, 0.mm]
     ]
     frame_face = grp_frame.entities.add_face(frame_pts)
-    frame_face.pushpull(1500.mm) # Kéo nổi khung lên 1500mm
+    frame_face.pushpull(50.mm) # Độ dày của khung
     grp_frame.material = "Gray"
 
     # Tạo bề mặt biển quảng cáo
-    grp_surface = entities.add_group
-    grp_surface.name = "Be Mat Bien Quang Cao"
-    surface_pts = [
-      [0, 0, 1500.mm],
-      [600.mm, 0, 1500.mm],
-      [600.mm, 2000.mm, 1500.mm],
-      [0, 2000.mm, 1500.mm]
+    grp_sign = entities.add_group
+    grp_sign.name = "Bề Mặt Biển Quảng Cáo"
+    sign_pts = [
+      [0.mm, 0.mm, 50.mm],
+      [600.mm, 0.mm, 50.mm],
+      [600.mm, 1500.mm, 50.mm],
+      [0.mm, 1500.mm, 50.mm]
     ]
-    surface_face = grp_surface.entities.add_face(surface_pts)
-    surface_face.pushpull(10.mm) # Độ dày bề mặt biển
-    grp_surface.material = "White"
+    sign_face = grp_sign.entities.add_face(sign_pts)
+    sign_face.pushpull(10.mm) # Độ dày của biển
+    grp_sign.material = "White"
 
     # Tạo chữ nổi 3D
     grp_text = entities.add_group
-    grp_text.name = "Chu Noi 3D"
+    grp_text.name = "Chữ Nổi"
     text_pts = [
-      [100.mm, 1000.mm, 1510.mm],
-      [500.mm, 1000.mm, 1510.mm],
-      [500.mm, 1100.mm, 1510.mm],
-      [100.mm, 1100.mm, 1510.mm]
+      [50.mm, 50.mm, 60.mm],
+      [550.mm, 50.mm, 60.mm],
+      [550.mm, 100.mm, 60.mm],
+      [50.mm, 100.mm, 60.mm]
     ]
     text_face = grp_text.entities.add_face(text_pts)
-    text_face.pushpull(20.mm) # Kéo nổi chữ lên 20mm
+    text_face.pushpull(20.mm) # Độ dày của chữ
     grp_text.material = "Red"
 
     # Tạo đèn LED
     grp_led = entities.add_group
-    grp_led.name = "Den LED"
+    grp_led.name = "Đèn LED"
     led_pts = [
-      [0, 0, 1530.mm],
-      [600.mm, 0, 1530.mm],
-      [600.mm, 2000.mm, 1530.mm],
-      [0, 2000.mm, 1530.mm]
+      [0.mm, 0.mm, 70.mm],
+      [600.mm, 0.mm, 70.mm],
+      [600.mm, 10.mm, 70.mm],
+      [0.mm, 10.mm, 70.mm]
     ]
     led_face = grp_led.entities.add_face(led_pts)
     led_face.pushpull(5.mm) # Độ dày của đèn LED

@@ -5,56 +5,37 @@ module BangHieuXinhanBat2MatCoTru150X150
     model.start_operation('BangHieuXinhanBat2MatCoTru150X150', true)
     entities = model.active_entities
 
-    # Tạo khung đỡ
-    base_height = 1500.mm
-    base_width = 1500.mm
-    base_depth = 30.mm
-    post_size = 150.mm
-
-    # Tạo trụ
-    post_pts = [
-      [0, 0, 0],
-      [0, post_size, 0],
-      [post_size, post_size, 0],
-      [post_size, 0, 0]
-    ]
-    post_face = entities.add_face(post_pts)
-    post_face.pushpull(base_height)
-
-    # Tạo khung biển
-    frame_pts = [
-      [0, 0, base_height],
-      [0, base_width, base_height],
-      [base_depth, base_width, base_height],
-      [base_depth, 0, base_height]
-    ]
-    frame_face = entities.add_face(frame_pts)
-    frame_face.pushpull(-base_depth)
+    # Tạo khung trụ
+    trụ = entities.add_group
+    trụ.name = "Trụ 150x150"
+    trụ_entities = trụ.entities
+    trụ_face = trụ_entities.add_face([0.mm, 0.mm, 0.mm], [150.mm, 0.mm, 0.mm], [150.mm, 150.mm, 0.mm], [0.mm, 150.mm, 0.mm])
+    trụ_face.pushpull(1500.mm) # Chiều cao trụ
+    trụ.material = "Gray"
 
     # Tạo bề mặt biển
-    surface_pts = [
-      [0, 0, base_height],
-      [0, base_width, base_height],
-      [base_depth, base_width, base_height],
-      [base_depth, 0, base_height]
-    ]
-    surface_face = entities.add_face(surface_pts)
-    surface_face.pushpull(-5.mm) # Độ dày của bề mặt biển
+    biển = entities.add_group
+    biển.name = "Bề mặt biển"
+    biển_entities = biển.entities
+    biển_face = biển_entities.add_face([0.mm, 0.mm, 1500.mm], [1500.mm, 0.mm, 1500.mm], [1500.mm, 30.mm, 1500.mm], [0.mm, 30.mm, 1500.mm])
+    biển_face.pushpull(30.mm) # Độ dày biển
+    biển.material = "White"
 
-    # Gán màu cho bề mặt biển
-    surface_group = entities.add_group(surface_face)
-    surface_group.material = "White"
+    # Tạo chữ nổi
+    chữ_nổi = entities.add_group
+    chữ_nổi.name = "Chữ nổi"
+    chữ_nổi_entities = chữ_nổi.entities
+    chữ_nổi_face = chữ_nổi_entities.add_face([100.mm, 10.mm, 1500.mm], [400.mm, 10.mm, 1500.mm], [400.mm, 60.mm, 1500.mm], [100.mm, 60.mm, 1500.mm])
+    chữ_nổi_face.pushpull(10.mm) # Chiều cao chữ nổi
+    chữ_nổi.material = "Red"
 
-    # Tạo chữ nổi 3D
-    text_height = 50.mm
-    text_depth = 10.mm
-    text = "Xinhan"
-    text_group = entities.add_group
-    text_group.entities.add_3d_text(text, TextAlignCenter, text_height, false, false, false, false)
-    text_group.transform!(Geom::Transformation.new([base_depth/2, base_width/2, base_height + 5.mm]))
-
-    # Gán màu cho chữ
-    text_group.material = "Red"
+    # Tạo đèn LED
+    đèn_LED = entities.add_group
+    đèn_LED.name = "Đèn LED"
+    đèn_LED_entities = đèn_LED.entities
+    đèn_LED_face = đèn_LED_entities.add_face([0.mm, 0.mm, 1500.mm], [1500.mm, 0.mm, 1500.mm], [1500.mm, 10.mm, 1500.mm], [0.mm, 10.mm, 1500.mm])
+    đèn_LED_face.pushpull(5.mm) # Chiều cao đèn LED
+    đèn_LED.material = "Yellow"
 
     model.commit_operation
   end

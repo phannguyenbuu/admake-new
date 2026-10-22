@@ -5,54 +5,49 @@ module PhieuBaoHanhInGiay
     model.start_operation('PhieuBaoHanhInGiay', true)
     entities = model.active_entities
 
-    # Tạo khung đỡ cho phiếu bảo hành
-    base_pts = [
+    # Tạo khung sắt đỡ
+    frame_grp = entities.add_group
+    frame_pts = [
       [0.mm, 0.mm, 0.mm],
       [200.mm, 0.mm, 0.mm],
       [200.mm, 100.mm, 0.mm],
       [0.mm, 100.mm, 0.mm]
     ]
-    base_face = entities.add_face(base_pts)
-    base_face.reverse! # Đảo mặt nếu cần
-    base_face.pushpull(2.mm) # Độ dày 2mm
-    base_group = entities.add_group(base_face)
-    base_group.name = "Khung Phiếu Bảo Hành"
-    base_group.material = "White" # Màu trắng cho khung
+    frame_face = frame_grp.entities.add_face(frame_pts)
+    frame_face.pushpull(2.mm)  # Độ dày khung
+    frame_grp.material = "Gray"
 
-    # Tạo bề mặt biển
+    # Tạo bề mặt biển chính
+    surface_grp = entities.add_group
     surface_pts = [
-      [0.mm, 0.mm, 0.mm],
-      [200.mm, 0.mm, 0.mm],
-      [200.mm, 100.mm, 0.mm],
-      [0.mm, 100.mm, 0.mm]
+      [0.mm, 0.mm, 2.mm],
+      [200.mm, 0.mm, 2.mm],
+      [200.mm, 100.mm, 2.mm],
+      [0.mm, 100.mm, 2.mm]
     ]
-    surface_face = entities.add_face(surface_pts)
-    surface_face.reverse! # Đảo mặt nếu cần
-    surface_group = entities.add_group(surface_face)
-    surface_group.name = "Bề Mặt Biển"
-    surface_group.material = "Mica" # Màu mica
+    surface_face = surface_grp.entities.add_face(surface_pts)
+    surface_face.pushpull(-2.mm)  # Độ dày bề mặt
+    surface_grp.material = "White"
 
     # Tạo chữ nổi 3D
-    text = "Phiếu Bảo Hành"
-    text_group = entities.add_group
-    text_face = text_group.entities.add_3d_text(text, TextAlignCenter, "Arial", true, false, 10.mm, 0.mm, 0.mm)
-    text_group.transform!(Geom::Transformation.translation([50.mm, 50.mm, 2.mm])) # Đặt chữ nổi lên bề mặt
-    text_group.name = "Chữ Nổi 3D"
-    text_group.material = "Gold" # Màu vàng cho chữ nổi
+    text_grp = entities.add_group
+    text = "Phiếu bảo hành"
+    text_position = [10.mm, 10.mm, 2.mm]
+    text_face = text_grp.entities.add_text(text, text_position)
+    text_face.pushpull(5.mm)  # Độ dày chữ nổi
+    text_grp.material = "Blue"
 
-    # Tạo viền trang trí
-    border_pts = [
-      [-2.mm, -2.mm, 0.mm],
-      [202.mm, -2.mm, 0.mm],
-      [202.mm, 102.mm, 0.mm],
-      [-2.mm, 102.mm, 0.mm]
+    # Tạo đèn LED viền
+    led_grp = entities.add_group
+    led_pts = [
+      [0.mm, -5.mm, 2.mm],
+      [200.mm, -5.mm, 2.mm],
+      [200.mm, -5.mm, 5.mm],
+      [0.mm, -5.mm, 5.mm]
     ]
-    border_face = entities.add_face(border_pts)
-    border_face.reverse! # Đảo mặt nếu cần
-    border_face.pushpull(1.mm) # Độ dày 1mm cho viền
-    border_group = entities.add_group(border_face)
-    border_group.name = "Viền Trang Trí"
-    border_group.material = "Black" # Màu đen cho viền
+    led_face = led_grp.entities.add_face(led_pts)
+    led_face.pushpull(2.mm)  # Độ dày đèn LED
+    led_grp.material = "Yellow"
 
     model.commit_operation
   end
