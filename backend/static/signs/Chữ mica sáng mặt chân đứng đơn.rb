@@ -1,262 +1,81 @@
-# encoding: UTF-8
-# ============================================================
-# NHA KHE SIGN - SKETCHUP RUBY 3D
-# SketchUp Ruby API | Units: mm
-# ============================================================
+# Mã nguồn Ruby hoàn chỉnh
+module ChuMicaSangMatChanDungDon
+  def self.build
+    model = Sketchup.active_model
+    model.start_operation('ChuMicaSangMatChanDungDon', true)
+    entities = model.active_entities
 
-module NhaKheSign
-  extend self
+    # Tạo khung đỡ
+    base_height = 60.mm
+    base_width = 1200.mm
+    base_depth = 60.mm
 
-  # ----------------------------------------------------------
-  # 1. CONFIGURATION
-  # ----------------------------------------------------------
-  WIDTH       = 4000.mm
-  PANEL_H     = 650.mm
-  PANEL_D     = 100.mm
-  PANEL_Z     = 650.mm
+    base_pts = [
+      [0, 0, 0],
+      [base_width, 0, 0],
+      [base_width, base_depth, 0],
+      [0, base_depth, 0]
+    ]
+    
+    base_face = entities.add_face(base_pts)
+    base_face.pushpull(base_height)
+    base_group = entities.add_group(base_face)
+    base_group.name = "Khung Đỡ"
+    base_group.material = "Gray"
 
-  FRAME       = 30.mm
-  SLAT_W      = 65.mm
-  SLAT_GAP    = 5.mm
+    # Tạo bề mặt biển
+    surface_height = 400.mm
+    surface_depth = 60.mm
 
-  TOP_TEXT    = "NHÀ KHÉ"
-  BOTTOM_TEXT = "BÒ NẤM NƯỚNG SỐT"
+    surface_pts = [
+      [0, 0, base_height],
+      [base_width, 0, base_height],
+      [base_width, surface_depth, base_height],
+      [0, surface_depth, base_height]
+    ]
 
-  TOP_H       = 390.mm
-  BOTTOM_H    = 190.mm
-  LETTER_D    = 32.mm
-  OUTLINE_D   = 42.mm
+    surface_face = entities.add_face(surface_pts)
+    surface_face.pushpull(surface_height)
+    surface_group = entities.add_group(surface_face)
+    surface_group.name = "Bề Mặt Biển"
+    surface_group.material = "White"
 
-  POST_W      = 70.mm
-  POST_D      = 60.mm
-  POST_H      = 1450.mm
-  BASE_W      = 220.mm
-  BASE_D      = 180.mm
-  BASE_T      = 12.mm
+    # Tạo chữ nổi 3D
+    letter_height = 400.mm
+    letter_depth = 10.mm
+    letter_width = 100.mm
 
-  # ----------------------------------------------------------
-  # 2. MATERIALS
-  # ----------------------------------------------------------
-  def mat(model, name, rgb)
-    m = model.materials[name] || model.materials.add(name)
-    m.color = Sketchup::Color.new(*rgb)
-    m
+    letter_pts = [
+      [100.mm, 30.mm, base_height + surface_height],
+      [100.mm + letter_width, 30.mm, base_height + surface_height],
+      [100.mm + letter_width, 30.mm + letter_depth, base_height + surface_height],
+      [100.mm, 30.mm + letter_depth, base_height + surface_height]
+    ]
+
+    letter_face = entities.add_face(letter_pts)
+    letter_face.pushpull(letter_height)
+    letter_group = entities.add_group(letter_face)
+    letter_group.name = "Chữ Nổi"
+    letter_group.material = "Red"
+
+    # Tạo đèn LED (biểu tượng)
+    led_height = 5.mm
+    led_depth = 5.mm
+
+    led_pts = [
+      [50.mm, 30.mm + letter_depth + 5.mm, base_height + surface_height + letter_height],
+      [50.mm + led_depth, 30.mm + letter_depth + 5.mm, base_height + surface_height + letter_height],
+      [50.mm + led_depth, 30.mm + letter_depth + 5.mm + led_height, base_height + surface_height + letter_height],
+      [50.mm, 30.mm + letter_depth + 5.mm + led_height, base_height + surface_height + letter_height]
+    ]
+
+    led_face = entities.add_face(led_pts)
+    led_face.pushpull(led_depth)
+    led_group = entities.add_group(led_face)
+    led_group.name = "Đèn LED"
+    led_group.material = "Yellow"
+
+    model.commit_operation
   end
-
-  def materials(model)
-    {
-      black:  mat(model, "NK | Black steel",       [22, 22, 25]),
-      steel:  mat(model, "NK | Galvanized steel",  [135, 142, 146]),
-      wood1:  mat(model, "NK | Dark walnut",       [48, 26, 17]),
-      wood2:  mat(model, "NK | Walnut",            [83, 43, 24]),
-      wood3:  mat(model, "NK | Light walnut",      [108, 61, 34]),
-      yellow: mat(model, "NK | Yellow LED face",   [255, 218, 0]),
-      white:  mat(model, "NK | White LED face",    [255, 250, 238]),
-      warm:   mat(model, "NK | Warm diffuser",     [255, 225, 150]),
-      base:   mat(model, "NK | Base plate",        [45, 47, 50])
-    }
-  end
-
-  # ----------------------------------------------------------
-  # 3. SOLID BOX
-  # ----------------------------------------------------------
-  def box(entities, name, x, y, z, dx, dy, dz, material)
-    g = entities.add_group
-    g.name = name
-    e = g.entities
-
-    p1 = [x,      y,      z]
-    p2 = [x + dx, y,      z]
-    p3 = [x + dx, y + dy, z]
-    p4 = [x,      y + dy, z]
-
-    face = e.add_face(p1, p2, p3, p4)
-    if face
-      face.reverse! if face.normal.z < 0
-      face.pushpull(dz)
-
-      e.grep(Sketchup::Face).each do |f|
-        f.material = material
-        f.back_material = material
-      end
-    end
-
-    g
-  end
-
-  # ----------------------------------------------------------
-  # 4. CYLINDER
-  # ----------------------------------------------------------
-  def cylinder(entities, name, x, y, z, radius, height, material)
-    g = entities.add_group
-    g.name = name
-    e = g.entities
-
-    circle = e.add_circle(
-      Geom::Point3d.new(x, y, z),
-      Geom::Vector3d.new(0, 0, 1),
-      radius,
-      16
-    )
-
-    face = e.add_face(circle)
-    if face
-      face.reverse! if face.normal.z < 0
-      face.pushpull(height)
-      e.grep(Sketchup::Face).each do |f|
-        f.material = material
-        f.back_material = material
-      end
-    end
-
-    g
-  end
-
-  # ----------------------------------------------------------
-  # 5. 3D TEXT
-  #
-  # Local text is generated on XY, then rotated 90 degrees
-  # about X so its front faces toward negative Y.
-  # ----------------------------------------------------------
-  def text3d(parent, label, height, depth, baseline, material, name)
-    g = parent.add_group
-    g.name = name
-
-    begin
-      g.entities.add_3d_text(
-        label,
-        TextAlignCenter,
-        "Arial",
-        true,       # bold
-        false,      # italic
-        height,
-        0.5.mm,     # tolerance
-        0,          # Z offset
-        true,       # filled
-        depth
-      )
-    rescue => error
-      puts "Cannot create text '#{label}': #{error.message}"
-      g.erase!
-      return nil
-    end
-
-    rotation = Geom::Transformation.rotation(
-      ORIGIN,
-      X_AXIS,
-      90.degrees
-    )
-    g.transform!(rotation)
-
-    # Center the actual generated text.
-    bounds = g.bounds
-    cx = (bounds.min.x + bounds.max.x) / 2.0
-    min_z = bounds.min.z
-
-    translation = Geom::Transformation.translation(
-      Geom::Vector3d.new(-cx, -35.mm, baseline - min_z)
-    )
-    g.transform!(translation)
-
-    g.entities.grep(Sketchup::Face).each do |f|
-      f.material = material
-      f.back_material = material
-    end
-
-    g
-  end
-
-  # ----------------------------------------------------------
-  # 6. CHANNEL LETTERS
-  # ----------------------------------------------------------
-  def channel_text(parent, label, height, baseline, face_material,
-                   dark_material, prefix)
-
-    # Dark backing/body, thicker than the illuminated face.
-    text3d(
-      parent, label, height, OUTLINE_D,
-      baseline, dark_material,
-      "#{prefix} | Black backing"
-    )
-
-    # Colored front face.
-    text3d(
-      parent, label, height, LETTER_D,
-      baseline, face_material,
-      "#{prefix} | Front face"
-    )
-  end
-
-  # ----------------------------------------------------------
-  # 7. MAIN SIGN PANEL
-  # ----------------------------------------------------------
-  def build_panel(parent, m)
-    g = parent.add_group
-    g.name = "01 | PANEL AND WOOD SLATS"
-    e = g.entities
-
-    x0 = -WIDTH / 2.0
-    z0 = PANEL_Z
-
-    # Main panel body.
-    box(
-      e, "Main black backing",
-      x0, 0, z0,
-      WIDTH, PANEL_D, PANEL_H,
-      m[:black]
-    )
-
-    # Vertical decorative wood slats on the front.
-    x = x0
-    i = 0
-    pitch = SLAT_W + SLAT_GAP
-
-    while x < WIDTH / 2.0
-      w = [SLAT_W, WIDTH / 2.0 - x].min
-      wood = [m[:wood1], m[:wood2], m[:wood3]][i % 3]
-
-      box(
-        e, "Wood slat %02d" % (i + 1),
-        x, -8.mm, z0 + 8.mm,
-        w, 8.mm, PANEL_H - 16.mm,
-        wood
-      )
-
-      x += pitch
-      i += 1
-    end
-
-    # Outer rectangular metal frame.
-    box(
-      e, "Top frame",
-      x0 - FRAME, -20.mm, z0 + PANEL_H,
-      WIDTH + 2 * FRAME, 30.mm, FRAME,
-      m[:steel]
-    )
-
-    box(
-      e, "Bottom frame",
-      x0 - FRAME, -20.mm, z0 - FRAME,
-      WIDTH + 2 * FRAME, 30.mm, FRAME,
-      m[:steel]
-    )
-
-    box(
-      e, "Left frame",
-      x0 - FRAME, -20.mm, z0,
-      FRAME, 30.mm, PANEL_H,
-      m[:steel]
-    )
-
-    box(
-      e, "Right frame",
-      WIDTH / 2.0, -20.mm, z0,
-      FRAME, 30.mm, PANEL_H,
-      m[:steel]
-    )
-
-    # Rear horizontal reinforcement.
-    box(
-      e, "Rear upper reinforcement",
-      x0, PANEL_D, z0 + PANEL_H - 65.mm,
-      WIDTH
+end
+ChuMicaSangMatChanDungDon.build

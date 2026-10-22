@@ -1,35 +1,3 @@
-# ==============================================================================
-# BẢNG THỐNG KÊ CẤU KIỆN & BÓC TÁCH VẬT TƯ THI CÔNG CHI TIẾT (BOM)
-# Dự án: Mô hình 3D từ mã SketchUp
-# Phân loại: STOREFRONT | Kích thước: 4.0m (Dài) x 1.8m (Cao) x 0.04m (Sâu) • Diện tích: 7.2 m²
-# Tổng số cấu kiện kết cấu: 7 hạng mục
-# Tự động đánh giá & lập trình bởi: ADMAKE AI Structural Engineering Studio
-# ------------------------------------------------------------------------------
-# STT | Tên Cấu Kiện                      | Kích Thước (Quy Cách)             | SL   | ĐVT    | Đơn Giá (VNĐ) | Thành Tiền (VNĐ)
-# ------------------------------------------------------------------------------
-#   1 | Khung xương giàn sắt hộp (Sắt hộ | Đan xương nan caro nhịp 1.2m, tổ |    4 | cây (6m |       185.000 |          740.000
-#   2 | Thanh giằng xéo tăng cứng chống  | Sắt hộp vuông 25x25x1.2mm đan ch |    3 | cây (6m |       145.000 |          435.000
-#   3 | Mặt bảng tấm ốp Alu Alcorest 3mm | 4.0m x 1.8m (Diện tích thiết kế: |  7.2 | m²      |       650.000 |        4.680.000
-#   4 | Nẹp viền nhôm định hình V25 bo g | V nhôm 25x25mm bọc kín 4 cạnh vi |    4 | cây (3m |        45.000 |          180.000
-#   5 | Tôn mạ màu chống thấm bảo vệ mặt | Tôn kẽm mạ màu 0.35mm che kín mặ |  7.2 | m²      |        95.000 |          684.000
-#   6 | Bộ chữ nổi 3D thương hiệu phát s | Khổ bộ chữ 2.8m x 0.63m, mặt Mic |    1 | bộ      |     3.024.000 |        3.024.000
-#   7 | Vật tư phụ & Phụ kiện liên kết c | Que hàn, ốc vít tự khoan, silico |    1 | gói kho |       396.000 |          396.000
-# ------------------------------------------------------------------------------
-# THÔNG SỐ DỰ TRÙ VẬN HÀNH & LOGISTICS (AI STRUCTURAL ESTIMATE)
-# 1. Nhân công sản xuất & lắp đặt: 8 công (Đơn giá: 400.000 đ/công)
-# 2. Cự ly vận chuyển công trình: 15 km (Đơn giá: 15.000 đ/km)
-# 3. % Hao hụt vật tư: 5%
-# 4. Trọng lượng vận chuyển: 207 kg
-# 5. Kích thước đóng gói: 4.0m × 1.8m × 0.35m (nguyên kiện)
-# 6. Đề xuất loại xe sử dụng: Xe tải thùng dài 2.5 tấn (thùng dài 4.3m)
-# ------------------------------------------------------------------------------
-# TỔNG DỰ TOÁN VẬT TƯ BÓC TÁCH: 10.139.000 VNĐ
-# Hướng dẫn: Mở SketchUp -> Extensions -> Ruby Console -> Dán mã này và Enter
-# ==============================================================================
-
-# ============================================================
-# BUN DAU CO HAU - SIGNBOARD 3D
-# SketchUp Ruby API | Units: mm
 # ============================================================
 
 module BunDauCoHau3D

@@ -1,9 +1,3 @@
-# encoding: UTF-8
-# ============================================================
-# XE ĐIỆN THU HIỀN - SKETCHUP RUBY 3D
-# Biển quảng cáo mặt tiền - mô hình tham số
-# Đơn vị: mm
-# SketchUp Ruby API
 # ============================================================
 
 require 'sketchup.rb'
@@ -88,7 +82,7 @@ module XeDienThuHien3D
              bold = true, italic = false,
              align = 0)
     g = entities.add_group
-    g.name = "CHU_NOI_#{label.gsub(/\s+/, '_')}"
+    g.name = "CHU_NOI_#{label.tr(" ", "_")}"
     e = g.entities
 
     begin

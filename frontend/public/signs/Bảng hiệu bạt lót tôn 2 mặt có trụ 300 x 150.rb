@@ -1,8 +1,3 @@
-# encoding: UTF-8
-# ============================================================
-# ADMAKE - BIEN BAO DU AN / SKETCHUP RUBY API
-# Dung hinh 3D theo anh bien bao ngoai troi
-# Don vi: mm
 # ============================================================
 
 module ADMAKE_BienBaoDuAn
@@ -45,7 +40,7 @@ module ADMAKE_BienBaoDuAn
 
   def text3d(entities, string, x, y, z, height, mat, bold = true)
     g = entities.add_group
-    g.name = "Chu_#{string.gsub(/[^A-Za-z0-9]/, '_')}"
+    g.name = "Chu_#{string.tr(" ", "_")}"
 
     ok = g.entities.add_3d_text(
       string,

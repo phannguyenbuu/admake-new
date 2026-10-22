@@ -1,136 +1,59 @@
-# ============================================================
-# SKETCHUP RUBY - BANG VINH DANH DONG VANG, DE GO DO
-# Don vi: mm | SketchUp 2021+
-# Cach dung: Window > Ruby Console > load file .rb
-# ============================================================
+# Mã nguồn Ruby hoàn chỉnh
+module BienChucDanhChanGo30X15
+  def self.build
+    model = Sketchup.active_model
+    model.start_operation('BienChucDanhChanGo30X15', true)
+    entities = model.active_entities
 
-module BangVinhDanh3D
-  extend self
-
-  def mat(name, color, alpha = 1.0)
-    m = Sketchup.active_model.materials[name] ||
-        Sketchup.active_model.materials.add(name)
-    m.color = Sketchup::Color.new(*color)
-    m.alpha = alpha
-    m
-  end
-
-  def box(entities, name, x, y, z, sx, sy, sz, material)
-    g = entities.add_group
-    g.name = name
-    e = g.entities
-
-    pts = [
-      [x-sx/2, y-sy/2, z-sz/2],
-      [x+sx/2, y-sy/2, z-sz/2],
-      [x+sx/2, y+sy/2, z-sz/2],
-      [x-sx/2, y+sy/2, z-sz/2]
-    ].map { |p| Geom::Point3d.new(*p) }
-
-    f = e.add_face(pts)
-    return g unless f
-
-    f.reverse! if f.normal.z < 0
-    f.pushpull(sz)
-
-    # Pushpull theo Z, sau do chinh tam khoi ve cao do z
-    g.transform!(
-      Geom::Transformation.translation([0, 0, z-sz/2])
-    )
-    g.material = material
-    g.entities.grep(Sketchup::Face).each do |face|
-      face.material = material
-      face.back_material = material
-    end
-    g
-  end
-
-  # Tao khoi hop bang 8 diem, dung truc X/Y/Z
-  def solid_box(entities, name, x, y, z, sx, sy, sz, material)
-    g = entities.add_group
-    g.name = name
-    e = g.entities
-
-    x1, x2 = x-sx/2, x+sx/2
-    y1, y2 = y-sy/2, y+sy/2
-    z1, z2 = z-sz/2, z+sz/2
-
-    faces = [
-      [[x1,y1,z1],[x2,y1,z1],[x2,y2,z1],[x1,y2,z1]],
-      [[x1,y1,z2],[x1,y2,z2],[x2,y2,z2],[x2,y1,z2]],
-      [[x1,y1,z1],[x1,y1,z2],[x2,y1,z2],[x2,y1,z1]],
-      [[x1,y2,z1],[x2,y2,z1],[x2,y2,z2],[x1,y2,z2]],
-      [[x1,y1,z1],[x1,y2,z1],[x1,y2,z2],[x1,y1,z2]],
-      [[x2,y1,z1],[x2,y1,z2],[x2,y2,z2],[x2,y2,z1]]
+    # Tạo khung đỡ
+    base_pts = [
+      [0.mm, 0.mm, 0.mm],
+      [300.mm, 0.mm, 0.mm],
+      [300.mm, 20.mm, 0.mm],
+      [0.mm, 20.mm, 0.mm]
     ]
+    base_face = entities.add_face(base_pts)
+    base_face.reverse!
+    base_grp = entities.add_group(base_face)
+    base_grp.name = "Khung Đỡ"
+    base_grp.material = "Brown"
 
-    faces.each do |arr|
-      face = e.add_face(arr.map { |p| Geom::Point3d.new(*p) })
-      next unless face
-      face.reverse! if face.normal.dot(
-        Geom::Vector3d.new(
-          face.bounds.center.x-x,
-          face.bounds.center.y-y,
-          face.bounds.center.z-z
-        )
-      ) < 0
-      face.material = material
-      face.back_material = material
-    end
-    g
-  end
+    # Tạo bề mặt biển
+    sign_pts = [
+      [0.mm, 20.mm, 0.mm],
+      [300.mm, 20.mm, 0.mm],
+      [300.mm, 170.mm, 0.mm],
+      [0.mm, 170.mm, 0.mm]
+    ]
+    sign_face = entities.add_face(sign_pts)
+    sign_face.reverse!
+    sign_grp = entities.add_group(sign_face)
+    sign_grp.name = "Bề Mặt Biển"
+    sign_grp.material = "LightWood"
 
-  # Chu noi 3D: mat chu huong ra phia truoc bang (Y am)
-  def text3d(entities, string, x, front_y, z,
-             height, material, bold = true, extrusion = 1.2)
-    g = entities.add_group
-    g.name = "Chu noi - #{string}"
+    # Tạo chữ nổi 3D
+    text = "Chức Danh"
+    text_grp = entities.add_group
+    text_face = text_grp.entities.add_3d_text(text, TextAlignCenter, "Arial", true, false, 100.mm, 1.mm)
+    text_grp.transform!(Geom::Transformation.new([50.mm, 50.mm, 1.mm]))
+    text_grp.name = "Chữ Nổi"
+    text_grp.material = "Gold"
 
-    begin
-      g.entities.add_3d_text(
-        string,
-        TextAlignCenter = 1,
-        "Arial",
-        bold,
-        false,
-        height,
-        0.5,
-        0,
-        true,
-        extrusion
-      )
-    rescue
-      g.entities.add_3d_text(
-        string, 1, "Arial", bold, false, height, 0.5, 0
-      )
-    end
+    # Tạo viền trang trí
+    border_pts = [
+      [-5.mm, 15.mm, 0.mm],
+      [305.mm, 15.mm, 0.mm],
+      [305.mm, 175.mm, 0.mm],
+      [-5.mm, 175.mm, 0.mm]
+    ]
+    border_face = entities.add_face(border_pts)
+    border_face.reverse!
+    border_grp = entities.add_group(border_face)
+    border_grp.name = "Viền Trang Trí"
+    border_grp.material = "DarkGray"
 
-    # Mat phang XY cua text xoay thanh mat phang XZ
-    rotation = Geom::Transformation.rotation(
-      ORIGIN, X_AXIS, 90.degrees
-    )
-    translation = Geom::Transformation.translation(
-      [x, front_y, z]
-    )
-    g.transform!(translation * rotation)
-
-    g.material = material
-    g.entities.grep(Sketchup::Face).each do |f|
-      f.material = material
-      f.back_material = material
-    end
-    g
-  end
-
-  def border_frame(entities, x, y, z, w, h, t, material, name)
-    
-  def border_frame(entities, x, y, z, w, h, t, material, name)
-    
-  def border_frame(entities, x, y, z, w, h, t, material, name)
-    solid_box(entities, "#{name} - Tren", x, y, z+h/2-t/2, w, t, t, material)
-    solid_box(entities, "#{name} - Duoi", x, y, z-h/2+t/2, w, t, t, material)
-    solid_box(entities, "#{name} - Trai", x-w/2+t/2, y, z, t, t, h-2*t, material)
-    solid_box(entities, "#{name} - Phai", x+w/2-t/2, y, z, t, t, h-2*t, material)
+    # Kết thúc thao tác
+    model.commit_operation
   end
 end
-BangVinhDanh3D.border_frame(Sketchup.active_model.entities, 0, 0, 0, 300, 150, 10, BangVinhDanh3D.mat("go", [120, 60, 20]), "Khung") rescue nil
+BienChucDanhChanGo30X15.build
