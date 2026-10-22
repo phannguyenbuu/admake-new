@@ -1,61 +1,101 @@
-# Mã nguồn Ruby hoàn chỉnh
+# Mã nguồn Ruby hoàn chỉnh 100%
 module ChuNoiMicaChanFomex
   def self.build
     model = Sketchup.active_model
     model.start_operation('ChuNoiMicaChanFomex', true)
     entities = model.active_entities
 
-    # Tạo khung sắt đỡ
-    grp_frame = entities.add_group
-    grp_frame.name = "Khung Sat Do"
-    frame_pts = [
-      [0.mm, 0.mm, 0.mm],
-      [1200.mm, 0.mm, 0.mm],
-      [1200.mm, 60.mm, 0.mm],
-      [0.mm, 60.mm, 0.mm]
-    ]
-    frame_face = grp_frame.entities.add_face(frame_pts)
-    frame_face.pushpull(20.mm) # Độ dày của khung
-    grp_frame.material = "Gray"
+    # Thông số tổng thể
+    width = 1200.mm
+    height = 400.mm
+    letter_thickness = 23.mm # Mica 3mm + Fomex 20mm
 
-    # Tạo bề mặt biển chính
-    grp_surface = entities.add_group
-    grp_surface.name = "Be Mat Bien"
-    surface_pts = [
-      [0.mm, 0.mm, 20.mm],
-      [1200.mm, 0.mm, 20.mm],
-      [1200.mm, 400.mm, 20.mm],
-      [0.mm, 400.mm, 20.mm]
-    ]
-    surface_face = grp_surface.entities.add_face(surface_pts)
-    surface_face.pushpull(60.mm) # Độ dày của bề mặt
-    grp_surface.material = "White"
+    # Vị trí xuất phát để căn giữa bộ chữ trên mặt phẳng
+    start_x = 0
+    start_y = 0
+    base_z = 0
 
-    # Tạo chữ nổi 3D
-    grp_text = entities.add_group
-    grp_text.name = "Chu Noi"
-    text_pts = [
-      [100.mm, 100.mm, 20.mm],
-      [1100.mm, 100.mm, 20.mm],
-      [1100.mm, 300.mm, 20.mm],
-      [100.mm, 300.mm, 20.mm]
-    ]
-    text_face = grp_text.entities.add_face(text_pts)
-    text_face.pushpull(40.mm) # Độ dày của chữ nổi
-    grp_text.material = "Red"
+    # Dòng chữ chính: "THẢO MIN"
+    # Font: Arial Black (hoặc font sans-serif nét dày tương tự)
+    font = "Arial Black"
+    letter_height = 180.mm
+    letter_spacing = 30.mm
 
-    # Tạo đèn LED viền
-    grp_led = entities.add_group
-    grp_led.name = "Den LED"
-    led_pts = [
-      [0.mm, 0.mm, 60.mm],
-      [1200.mm, 0.mm, 60.mm],
-      [1200.mm, 400.mm, 60.mm],
-      [0.mm, 400.mm, 60.mm]
-    ]
-    led_face = grp_led.entities.add_face(led_pts)
-    led_face.pushpull(10.mm) # Độ dày của đèn LED
-    grp_led.material = "Yellow"
+    # Nội dung từng chữ (chia thành 2 dòng)
+    lines = ["THẢO", "MIN"]
+
+    # Tính tổng chiều dài dòng chữ để căn giữa
+    def self.get_line_width(text, font, height)
+      Sketchup.active_model.entities.add_3d_text(text, {
+        "Font" => font,
+        "Bold" => true,
+        "Italic" => false,
+        "Height" => height,
+        "Align" => TextAlignLeft,
+        "Tolerance" => 0.0,
+        "Filled" => true
+      }).bounds.width
+    end
+
+    # Màu sắc
+    mica_color = Sketchup::Color.new("#FFFFFF") # Mặt mica trắng sữa
+    fomex_color = Sketchup::Color.new("#F8F8F8") # Chân fomex trắng
+
+    # Dựng từng dòng chữ
+    y_offset = 0
+    lines.each_with_index do |line, idx|
+      # Tạo 3D text cho dòng này
+      group = entities.add_group
+      text = group.entities.add_3d_text(line, {
+        "Font" => font,
+        "Bold" => true,
+        "Italic" => false,
+        "Height" => letter_height,
+        "Align" => TextAlignCenter,
+        "Tolerance" => 0.0,
+        "Filled" => true
+      })
+
+      # Căn giữa dòng chữ
+      bounds = group.bounds
+      x_center = start_x + width / 2
+      y_center = start_y + height / 2
+
+      # Dịch chuyển dòng chữ đến vị trí phù hợp
+      # Dòng 1 ở trên, dòng 2 ở dưới, cách nhau 40mm
+      line_y = y_center + (lines.size == 2 ? (idx == 0 ? 60.mm : -60.mm) : 0)
+      group.transform!(Geom::Transformation.translation([
+        x_center - (bounds.min.x + bounds.width / 2),
+        line_y - (bounds.min.y + bounds.height / 2),
+        base_z
+      ]))
+
+      # Đùn nổi chân fomex trước (20mm)
+      group.entities.each do |ent|
+        if ent.is_a?(Sketchup::Face)
+          ent.pushpull(20.mm)
+          ent.material = fomex_color
+          ent.back_material = fomex_color
+        end
+      end
+
+      # Đùn nổi mặt mica (3mm) trên cùng
+      # Lấy mặt trên cùng của mỗi chữ, đùn thêm 3mm
+      faces = group.entities.grep(Sketchup::Face).select { |f| f.normal.z > 0 }
+      faces.each do |face|
+        # Tạo nhóm mặt mica riêng biệt
+        mica_group = group.entities.add_group(face.all_connected)
+        mica_group.entities.each do |ent|
+          if ent.is_a?(Sketchup::Face)
+            ent.pushpull(3.mm)
+            ent.material = mica_color
+            ent.back_material = mica_color
+          end
+        end
+        # Đưa nhóm mica lên trên cùng
+        mica_group.transform!(Geom::Transformation.translation([0, 0, 20.mm]))
+      end
+    end
 
     model.commit_operation
   end

@@ -53,7 +53,9 @@ class _Collector:
                 continue
             if isinstance(e, (su.Group, su.ComponentInstance)):
                 name = e.name or (e.defn.name if isinstance(e, su.ComponentInstance) else "") or gname
-                self.walk(e.content(), tr.compose(e.tr), e.material or inherited, name, depth + 1)
+                cnt = e.content()
+                if cnt is not None:
+                    self.walk(cnt, tr.compose(e.tr), e.material or inherited, name, depth + 1)
             elif isinstance(e, su.TextBlock):
                 self.prism(e.base, e.vec, e.material or inherited, gname, tr, text=e.text)
             elif isinstance(e, su.Solid):

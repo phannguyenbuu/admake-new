@@ -1,84 +1,181 @@
-# Mã nguồn Ruby hoàn chỉnh
+# Mã nguồn Ruby hoàn chỉnh 100%
 module KiotDenLed140X160X200
   def self.build
     model = Sketchup.active_model
     model.start_operation('KiotDenLed140X160X200', true)
     entities = model.active_entities
 
-    # Tạo khung sắt đỡ
-    frame_height = 1600.mm
-    frame_width = 1400.mm
-    frame_depth = 2000.mm
-    frame_thickness = 50.mm
+    # Thông số
+    width = 1400.mm
+    height = 1600.mm
+    depth = 2000.mm
+    frame_size = 30.mm
+    alu_thickness = 3.mm
+    roof_height = 250.mm
+    sign_height = 350.mm
+    led_box_height = 250.mm
+    led_box_depth = 120.mm
 
-    # Tạo nhóm khung
-    grp_frame = entities.add_group
-    grp_frame.name = "Khung Sắt Đỡ"
-    pts_frame = [
-      [0, 0, 0],
-      [frame_width, 0, 0],
-      [frame_width, frame_depth, 0],
-      [0, frame_depth, 0]
-    ]
-    face_frame = grp_frame.entities.add_face(pts_frame)
-    face_frame.pushpull(frame_height)
+    # Màu sắc
+    color_yellow = Sketchup::Color.new("#FFD600")
+    color_orange = Sketchup::Color.new("#FF6F00")
+    color_white = Sketchup::Color.new("#FFFFFF")
+    color_gray = Sketchup::Color.new("#B0BEC5")
+    color_black = Sketchup::Color.new("#212121")
+    color_green = Sketchup::Color.new("#43A047")
+    color_cream = Sketchup::Color.new("#FFF8E1")
 
-    # Gán màu cho khung
-    grp_frame.material = "Gray"
+    # 1. Khung xương sắt hộp
+    frame_group = entities.add_group
+    frame = frame_group.entities
 
-    # Tạo bề mặt biển quảng cáo
-    sign_height = 1600.mm
-    sign_width = 1400.mm
-    sign_depth = 20.mm
+    # 4 cột đứng
+    [[0,0,0],[width-frame_size,0,0],[0,depth-frame_size,0],[width-frame_size,depth-frame_size,0]].each do |pt|
+      frame.add_face([pt,[pt[0]+frame_size,pt[1],pt[2]],[pt[0]+frame_size,pt[1]+frame_size,pt[2]],[pt[0],pt[1]+frame_size,pt[2]]]).pushpull(height)
+    end
 
-    # Tạo nhóm biển quảng cáo
-    grp_sign = entities.add_group
-    grp_sign.name = "Bề Mặt Biển Quảng Cáo"
-    pts_sign = [
-      [0, 0, frame_height],
-      [sign_width, 0, frame_height],
-      [sign_width, sign_depth, frame_height],
-      [0, sign_depth, frame_height]
-    ]
-    face_sign = grp_sign.entities.add_face(pts_sign)
-    face_sign.pushpull(sign_depth)
+    # Xương ngang trên/dưới
+    [[0,0,0],[0,0,height-frame_size],[0,depth-frame_size,0],[0,depth-frame_size,height-frame_size]].each do |pt|
+      frame.add_face([pt,[pt[0]+width,pt[1],pt[2]],[pt[0]+width,pt[1]+frame_size,pt[2]],[pt[0],pt[1]+frame_size,pt[2]]]).pushpull(frame_size)
+    end
 
-    # Gán màu cho biển quảng cáo
-    grp_sign.material = "White"
+    # Xương ngang giữa tăng cứng (chia 3 tầng)
+    [height/3, height*2/3].each do |z|
+      frame.add_face([[0,0,z],[width,0,z],[width,frame_size,z],[0,frame_size,z]]).pushpull(frame_size)
+      frame.add_face([[0,depth-frame_size,z],[width,depth-frame_size,z],[width,depth,z],[0,depth,z]]).pushpull(frame_size)
+    end
 
-    # Tạo chữ nổi 3D
-    text_height = 100.mm
-    text_depth = 20.mm
-    text_content = "Kiot"
+    # Xương dọc hai bên
+    [0, width-frame_size].each do |x|
+      frame.add_face([[x,0,0],[x+frame_size,0,0],[x+frame_size,0,height],[x,0,height]]).pushpull(frame_size)
+      frame.add_face([[x,depth-frame_size,0],[x+frame_size,depth-frame_size,0],[x+frame_size,depth-frame_size,height],[x,depth-frame_size,height]]).pushpull(frame_size)
+    end
 
-    # Tạo nhóm chữ nổi
-    grp_text = entities.add_group
-    grp_text.name = "Chữ Nổi"
-    text_position = [200.mm, 10.mm, frame_height + 10.mm]
-    text = grp_text.entities.add_text(text_content, text_position)
-    text_face = grp_text.entities.add_face([text_position, [text_position[0] + 100.mm, text_position[1], text_position[2]], 
-                                                  [text_position[0] + 100.mm, text_position[1] + text_height, text_position[2]], 
-                                                  [text_position[0], text_position[1] + text_height, text_position[2]]])
-    text_face.pushpull(text_depth)
+    # Chân đế (4 chân)
+    [[0,0,0],[width-frame_size,0,0],[0,depth-frame_size,0],[width-frame_size,depth-frame_size,0]].each do |pt|
+      frame.add_face([pt,[pt[0]+frame_size,pt[1],pt[2]],[pt[0]+frame_size,pt[1]+frame_size,pt[2]],[pt[0],pt[1]+frame_size,pt[2]]]).pushpull(-50.mm)
+    end
 
-    # Gán màu cho chữ nổi
-    grp_text.material = "Red"
+    # 2. Tấm alu vàng mặt ngoài
+    alu_group = entities.add_group
+    alu = alu_group.entities
+    # Mặt trước
+    face = alu.add_face([ [0,0,0], [width,0,0], [width,0,height], [0,0,height] ])
+    face.pushpull(alu_thickness)
+    alu_group.material = color_yellow
 
-    # Tạo đèn LED
-    led_height = 10.mm
-    led_depth = 10.mm
+    # Mặt bên trái
+    face = alu.add_face([ [0,0,0], [0,depth,0], [0,depth,height], [0,0,height] ])
+    face.pushpull(alu_thickness)
+    alu_group.material = color_yellow
 
-    # Tạo nhóm đèn LED
-    grp_led = entities.add_group
-    grp_led.name = "Đèn LED"
-    led_position = [0, 0, frame_height + 20.mm]
-    led_face = grp_led.entities.add_face([led_position, [led_position[0] + frame_width, led_position[1], led_position[2]], 
-                                                     [led_position[0] + frame_width, led_position[1] + led_depth, led_position[2]], 
-                                                     [led_position[0], led_position[1] + led_depth, led_position[2]]])
-    led_face.pushpull(led_height)
+    # Mặt bên phải
+    face = alu.add_face([ [width,0,0], [width,depth,0], [width,depth,height], [width,0,height] ])
+    face.pushpull(alu_thickness)
+    alu_group.material = color_yellow
 
-    # Gán màu cho đèn LED
-    grp_led.material = "Yellow"
+    # Mặt sau
+    face = alu.add_face([ [0,depth,0], [width,depth,0], [width,depth,height], [0,depth,height] ])
+    face.pushpull(alu_thickness)
+    alu_group.material = color_yellow
+
+    # 3. Mái lượn sóng cam (CNC alu)
+    roof_group = entities.add_group
+    roof = roof_group.entities
+    # Tạo đường lượn sóng
+    wave_pts = []
+    wave_count = 4
+    step = width/wave_count
+    (0..wave_count).each do |i|
+      x = i*step
+      y = 0
+      z = height
+      wave_pts << [x, y, z]
+      wave_pts << [x+step/2, y, z+roof_height*(i%2==0 ? 1 : -0.5)]
+    end
+    # Đường lượn sóng phía trước
+    path = []
+    (0..wave_count*2).each do |i|
+      pt = wave_pts[i]
+      path << [pt[0], pt[1], pt[2]]
+    end
+    # Đường lượn sóng phía sau
+    path_back = path.map{|pt| [pt[0], pt[1]+alu_thickness+400.mm, pt[2]]}
+    # Tạo mặt mái
+    roof_face_pts = path + path_back.reverse
+    face = roof.add_face(roof_face_pts)
+    face.pushpull(alu_thickness)
+    roof_group.material = color_orange
+
+    # 4. Cửa cuốn nhôm vàng kem
+    door_group = entities.add_group
+    door = door_group.entities
+    door_width = 900.mm
+    door_height = 1200.mm
+    door_x = (width-door_width)/2
+    door_y = alu_thickness+1.mm
+    door_z = 200.mm
+    face = door.add_face([ [door_x,door_y,door_z], [door_x+door_width,door_y,door_z], [door_x+door_width,door_y,door_z+door_height], [door_x,door_y,door_z+door_height] ])
+    face.pushpull(10.mm)
+    door_group.material = color_cream
+
+    # 5. Hộp đèn mica trắng (phía dưới)
+    led_group = entities.add_group
+    led = led_group.entities
+    led_x = (width-900.mm)/2
+    led_y = alu_thickness+30.mm
+    led_z = 250.mm
+    face = led.add_face([ [led_x,led_y,led_z], [led_x+900.mm,led_y,led_z], [led_x+900.mm,led_y,led_z+led_box_height], [led_x,led_y,led_z+led_box_height] ])
+    face.pushpull(led_box_depth)
+    led_group.material = color_white
+
+    # 6. Chữ nổi "TIK TAK"
+    text_group = entities.add_group
+    text = text_group.entities
+    text_z = height-120.mm
+    text_y = alu_thickness+5.mm
+    text_x = 120.mm
+    tik = text.add_3d_text('TIK', TextAlignLeft, "Arial Black", false, false, 180.mm, 40.mm, 0, true, 0)
+    tik.transform!(Geom::Transformation.translation([text_x, text_y, text_z]))
+    tik.material = color_white
+    tik.back_material = color_orange
+
+    tak = text.add_3d_text('TAK', TextAlignLeft, "Arial Black", false, false, 180.mm, 40.mm, 0, true, 0)
+    tak.transform!(Geom::Transformation.translation([text_x+350.mm, text_y, text_z]))
+    tak.material = color_white
+    tak.back_material = color_orange
+
+    # 7. Logo lát cam (hình tròn, lát cam, lá xanh)
+    logo_group = entities.add_group
+    logo = logo_group.entities
+    logo_center = [text_x+650.mm, text_y+20.mm, text_z+60.mm]
+    logo_radius = 60.mm
+    logo_face = logo.add_circle(logo_center, [0,1,0], logo_radius)
+    logo_face = logo.add_face(logo_face)
+    logo_face.pushpull(20.mm)
+    logo_group.material = color_orange
+    # Lát cam vàng
+    cam_face = logo.add_circle(logo_center, [0,1,0], logo_radius*0.7)
+    cam_face = logo.add_face(cam_face)
+    cam_face.pushpull(21.mm)
+    cam_face.material = color_yellow
+    # Lá xanh
+    leaf = logo.add_face([
+      [logo_center[0]+logo_radius*0.7, logo_center[1], logo_center[2]+logo_radius*0.7],
+      [logo_center[0]+logo_radius*0.9, logo_center[1], logo_center[2]+logo_radius*1.1],
+      [logo_center[0]+logo_radius*0.5, logo_center[1], logo_center[2]+logo_radius*1.2]
+    ])
+    leaf.pushpull(10.mm)
+    leaf.material = color_green
+
+    # 8. Chữ phụ hộp đèn (dán decal mô phỏng)
+    led_text_group = led_group.entities.add_group
+    led_text = led_text_group.entities
+    led_text.add_3d_text('ĂN VẶT - MÁY TRÁI SỮA', TextAlignCenter, "Arial", false, false, 40.mm, 8.mm, 0, true, 0)
+    led_text.add_3d_text('TIKTAK', TextAlignCenter, "Arial Black", false, false, 60.mm, 15.mm, 0, true, 0)
+    led_text.add_3d_text('Face Book: TikTak Kỳ Mỹ, Cam Ranh 79 520', TextAlignCenter, "Arial", false, false, 20.mm, 5.mm, 0, true, 0)
+    led_text.add_3d_text('Hotline - Zalo: 0961 85 18 12', TextAlignCenter, "Arial", false, false, 20.mm, 5.mm, 0, true, 0)
+    led_text_group.material = color_black
 
     model.commit_operation
   end

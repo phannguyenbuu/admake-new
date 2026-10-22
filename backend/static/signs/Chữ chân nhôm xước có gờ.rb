@@ -1,55 +1,77 @@
-# Mã nguồn Ruby hoàn chỉnh
+# Mã nguồn Ruby hoàn chỉnh 100%
 module ChuChanNhomXuocCoGo
   def self.build
     model = Sketchup.active_model
     model.start_operation('ChuChanNhomXuocCoGo', true)
     entities = model.active_entities
 
-    # Tạo khung sắt đỡ
-    frame_group = entities.add_group
-    frame_group.name = "KhungSatDo"
-    frame_pts = [
-      [0.mm, 0.mm, 0.mm],
-      [1200.mm, 0.mm, 0.mm],
-      [1200.mm, 400.mm, 0.mm],
-      [0.mm, 400.mm, 0.mm]
-    ]
-    frame_face = frame_group.entities.add_face(frame_pts)
-    frame_face.pushpull(60.mm) # Độ dày của khung
-    frame_group.material = "Gray"
+    # Thông số bảng giả định
+    width = 1200.mm
+    height = 400.mm
+    depth = 60.mm
+    margin = 40.mm
 
-    # Tạo bề mặt biển
-    surface_group = entities.add_group
-    surface_group.name = "BeMatBien"
-    surface_pts = [
-      [0.mm, 0.mm, 60.mm],
-      [1200.mm, 0.mm, 60.mm],
-      [1200.mm, 400.mm, 60.mm],
-      [0.mm, 400.mm, 60.mm]
-    ]
-    surface_face = surface_group.entities.add_face(surface_pts)
-    surface_face.pushpull(-5.mm) # Độ dày của bề mặt
-    surface_group.material = "White"
+    # Tạo nền mica trắng (nếu cần)
+    base_face = entities.add_face(
+      [0, 0, 0],
+      [width, 0, 0],
+      [width, height, 0],
+      [0, height, 0]
+    )
+    base_face.pushpull(-5.mm)
+    base = base_face.all_connected
+    base.each { |e| e.material = "#FFFFFF" }
 
-    # Tạo chữ nổi 3D
-    text_group = entities.add_group
-    text_group.name = "ChuNoi"
-    text_face = text_group.entities.add_face([0.mm, 0.mm, 60.mm])
-    text_face.pushpull(10.mm) # Độ dày của chữ
-    text_group.material = "Blue"
+    # Tạo các chữ nổi (ví dụ: "F", "O", "C")
+    # Kích thước mỗi chữ: rộng ~200mm, cao ~250mm, sâu 60mm
+    char_height = 250.mm
+    char_depth = 60.mm
+    char_margin = 50.mm
+    font = "Arial Black"
+    bold = true
+    italic = false
 
-    # Tạo đèn LED viền
-    led_group = entities.add_group
-    led_group.name = "DenLED"
-    led_pts = [
-      [0.mm, -10.mm, 60.mm],
-      [1200.mm, -10.mm, 60.mm],
-      [1200.mm, -10.mm, 70.mm],
-      [0.mm, -10.mm, 70.mm]
-    ]
-    led_face = led_group.entities.add_face(led_pts)
-    led_face.pushpull(10.mm) # Độ dày của đèn LED
-    led_group.material = "Yellow"
+    # Vị trí các chữ (giả định 3 chữ: "F", "O", "C")
+    chars = ["F", "O", "C"]
+    x = margin
+    y = (height - char_height) / 2
+
+    chars.each do |ch|
+      group = entities.add_group
+      char_entities = group.entities
+      text = char_entities.add_3d_text(
+        ch,
+        TextAlignLeft,
+        char_height,
+        char_depth,
+        false,
+        font,
+        bold,
+        italic
+      )
+      # Đặt vị trí chữ
+      bounds = group.bounds
+      group.transform!(Geom::Transformation.translation([x, y, 5.mm]))
+      # Gán vật liệu vàng xước
+      group.material = "#D4AF37"
+      group.entities.each { |e| e.material = "#D4AF37" }
+      # Tạo gờ nổi (viền quanh mặt chữ)
+      # Gờ cao 2mm, rộng 5mm quanh mặt chữ
+      face = nil
+      group.entities.each { |e| face = e if e.is_a?(Sketchup::Face) }
+      if face
+        edges = face.outer_loop.edges
+        offset_faces = face.offset(5.mm)
+        if offset_faces
+          offset_faces.each do |f|
+            f.pushpull(2.mm)
+            f.material = "#D4AF37"
+          end
+        end
+      end
+      # Cập nhật vị trí x cho chữ tiếp theo
+      x += char_height + char_margin
+    end
 
     model.commit_operation
   end

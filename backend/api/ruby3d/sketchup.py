@@ -285,6 +285,9 @@ class Entity(RObj):
     def rb_typename(self, ip, a, b):
         return self.rb_class_name.split("::")[-1]
 
+    def rb_all_connected(self, ip, a, b):
+        return [self]
+
     def bounds_into(self, bb, tr):
         pass
 
@@ -342,7 +345,7 @@ class Edge(Entity):
     def rb_material(self, ip, a, b):
         return self.material
 
-    rb_soft_set = rb_smooth_set = rb_casts_shadows_set = lambda self, ip, a, b: a[0]  # noqa: E731
+    rb_soft_set = rb_smooth_set = rb_casts_shadows_set = rb_width_set = lambda self, ip, a, b: a[0]  # noqa: E731
 
     def rb_find_faces(self, ip, a, b):
         if self.curve is not None and self.curve.closed and not self.curve.face_made:
@@ -427,7 +430,20 @@ class Face(Entity):
         return self.back_material
 
     def rb_pushpull(self, ip, a, b):
-        d = float(a[0])
+        val = a[0]
+        if hasattr(val, "rb_length"):
+            d = float(val.rb_length(ip, [], None))
+        elif hasattr(val, "length"):
+            d = float(val.length())
+        elif hasattr(val, "x") and hasattr(val, "y") and hasattr(val, "z"):
+            d = (val.x**2 + val.y**2 + val.z**2)**0.5
+        elif isinstance(val, (list, tuple)) and len(val) == 3:
+            d = (val[0]**2 + val[1]**2 + val[2]**2)**0.5
+        else:
+            try:
+                d = float(val)
+            except Exception:
+                d = 1.0
         if abs(d) < GEOM_EPS:
             return None
         vec = tuple(c * d for c in self.normal)
@@ -476,6 +492,15 @@ class Face(Entity):
         return [n[0], n[1], n[2], -(n[0] * p[0] + n[1] * p[1] + n[2] * p[2])]
 
     def rb_position_material(self, ip, a, b):
+        return self
+
+    def rb_transform_b(self, ip, a, b):
+        tr = as_transform(a[0]) if a else Transformation()
+        self.pts = [tr.apply_point(p) for p in self.pts]
+        self.normal = newell_normal(self.pts)
+        return self
+
+    def rb_offset(self, ip, a, b):
         return self
 
     def bounds_into(self, bb, tr):

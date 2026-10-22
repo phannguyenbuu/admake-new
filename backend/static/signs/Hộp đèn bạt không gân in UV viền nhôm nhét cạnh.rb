@@ -1,53 +1,140 @@
-# Mã nguồn Ruby hoàn chỉnh
+# Mã nguồn Ruby hoàn chỉnh 100%
 module HopDenBatKhongGanInUvVienNhomNhetCanh
   def self.build
     model = Sketchup.active_model
     model.start_operation('HopDenBatKhongGanInUvVienNhomNhetCanh', true)
     entities = model.active_entities
 
-    # Tạo khung sắt đỡ
-    frame_grp = entities.add_group
-    frame_pts = [
-      [0.mm, 0.mm, 0.mm],
-      [3000.mm, 0.mm, 0.mm],
-      [3000.mm, 1000.mm, 0.mm],
-      [0.mm, 1000.mm, 0.mm]
-    ]
-    frame_face = frame_grp.entities.add_face(frame_pts)
-    frame_face.pushpull(150.mm) # Độ dày của khung
-    frame_grp.material = "Gray"
+    # Thông số chính
+    width = 3000.mm
+    height = 1000.mm
+    depth = 150.mm
+    khung_size = 30.mm
+    viền_nhôm = 10.mm
 
-    # Tạo bề mặt biển
-    surface_grp = entities.add_group
-    surface_pts = [
-      [0.mm, 0.mm, 150.mm],
-      [3000.mm, 0.mm, 150.mm],
-      [3000.mm, 1000.mm, 150.mm],
-      [0.mm, 1000.mm, 150.mm]
-    ]
-    surface_face = surface_grp.entities.add_face(surface_pts)
-    surface_face.pushpull(-5.mm) # Độ dày của bề mặt
-    surface_grp.material = "White"
+    # Tạo nhóm tổng thể
+    group = entities.add_group
+    ents = group.entities
 
-    # Tạo chữ nổi 3D
-    text_grp = entities.add_group
-    text = "Hộp đèn bạt không gân"
-    text_position = [1500.mm, 500.mm, 155.mm] # Vị trí chữ nổi
-    text_face = text_grp.entities.add_text(text, text_position)
-    text_face.pushpull(10.mm) # Độ dày chữ nổi
-    text_grp.material = "Red"
+    # 1. Khung sắt hộp 30x30mm
+    khung_group = ents.add_group
+    khung_ents = khung_group.entities
 
-    # Tạo đèn LED viền
-    led_grp = entities.add_group
-    led_pts = [
-      [0.mm, 0.mm, 160.mm],
-      [3000.mm, 0.mm, 160.mm],
-      [3000.mm, 1000.mm, 160.mm],
-      [0.mm, 1000.mm, 160.mm]
-    ]
-    led_face = led_grp.entities.add_face(led_pts)
-    led_face.pushpull(5.mm) # Độ dày của viền đèn LED
-    led_grp.material = "Yellow"
+    # Khung ngoài
+    [
+      [0,0,0], [width,0,0], [width,height,0], [0,height,0]
+    ].each_with_index do |pt, i|
+      next_pt = [
+        [width,0,0], [width,height,0], [0,height,0], [0,0,0]
+      ][i]
+      khung_ents.add_face(pt, [pt[0],pt[1],pt[2]+khung_size], [next_pt[0],next_pt[1],next_pt[2]+khung_size], next_pt).pushpull(khung_size)
+    end
+
+    # Khung sau
+    [
+      [0,0,depth-khung_size], [width,0,depth-khung_size], [width,height,depth-khung_size], [0,height,depth-khung_size]
+    ].each_with_index do |pt, i|
+      next_pt = [
+        [width,0,depth-khung_size], [width,height,depth-khung_size], [0,height,depth-khung_size], [0,0,depth-khung_size]
+      ][i]
+      khung_ents.add_face(pt, [pt[0],pt[1],pt[2]+khung_size], [next_pt[0],next_pt[1],next_pt[2]+khung_size], next_pt).pushpull(khung_size)
+    end
+
+    # Xương dọc (cách nhau ~500mm)
+    (1..5).each do |i|
+      x = i * width/6
+      khung_ents.add_face([x,0,0], [x,0,depth-khung_size], [x+khung_size,0,depth-khung_size], [x+khung_size,0,0]).pushpull(height)
+    end
+
+    # Xương ngang tăng cứng trên/dưới
+    [khung_size, height-khung_size*2].each do |y|
+      khung_ents.add_face([0,y,0], [width,y,0], [width,y,depth-khung_size], [0,y,depth-khung_size]).pushpull(khung_size)
+    end
+
+    # Tai treo trần (2 bên)
+    tai_group = ents.add_group
+    tai_ents = tai_group.entities
+    [[0, height/2, depth], [width, height/2, depth]].each do |pt|
+      face = tai_ents.add_face([pt[0]-30.mm, pt[1]-30.mm, pt[2]], [pt[0]+30.mm, pt[1]-30.mm, pt[2]], [pt[0]+30.mm, pt[1]+30.mm, pt[2]], [pt[0]-30.mm, pt[1]+30.mm, pt[2]])
+      face.pushpull(10.mm)
+    end
+
+    # 2. Tấm nền mặt biển (bạt in UV)
+    mat_group = ents.add_group
+    mat_ents = mat_group.entities
+    face = mat_ents.add_face([0,0,khung_size], [width,0,khung_size], [width,height,khung_size], [0,height,khung_size])
+    face.pushpull(depth-khung_size*2)
+    mat = model.materials.add('bat_do')
+    mat.color = Sketchup::Color.new('#ed1c24')
+    face.material = mat
+    face.back_material = mat
+
+    # 3. Viền nẹp nhôm nhét cạnh (trắng bạc)
+    vien_group = ents.add_group
+    vien_ents = vien_group.entities
+    # Viền trên
+    vien_ents.add_face([0,0,khung_size], [width,0,khung_size], [width,0,khung_size+viền_nhôm], [0,0,khung_size+viền_nhôm]).pushpull(viền_nhôm)
+    # Viền dưới
+    vien_ents.add_face([0,height,khung_size], [width,height,khung_size], [width,height,khung_size+viền_nhôm], [0,height,khung_size+viền_nhôm]).pushpull(viền_nhôm)
+    # Viền trái
+    vien_ents.add_face([0,0,khung_size], [0,height,khung_size], [0,height,khung_size+viền_nhôm], [0,0,khung_size+viền_nhôm]).pushpull(viền_nhôm)
+    # Viền phải
+    vien_ents.add_face([width,0,khung_size], [width,height,khung_size], [width,height,khung_size+viền_nhôm], [width,0,khung_size+viền_nhôm]).pushpull(viền_nhôm)
+    mat_vien = model.materials.add('vien_nhom')
+    mat_vien.color = Sketchup::Color.new('#e5e5e5')
+    vien_group.material = mat_vien
+
+    # 4. Logo MEAT Deli (khối oval + text)
+    logo_group = ents.add_group
+    logo_ents = logo_group.entities
+    # Oval đỏ
+    center = [250.mm, 200.mm, khung_size+1.mm]
+    oval = logo_ents.add_circle(center, [0,0,1], 80.mm, 32)
+    oval_face = logo_ents.add_face(oval)
+    oval_face.pushpull(5.mm)
+    mat_logo = model.materials.add('logo_do')
+    mat_logo.color = Sketchup::Color.new('#ed1c24')
+    oval_face.material = mat_logo
+    # Text "MEAT"
+    logo_ents.add_3d_text('MEAT', TextAlignCenter, 'Arial Black', false, false, 50.mm, 5.mm).each { |e| e.move!([250.mm, 200.mm, khung_size+6.mm]) }
+    # Text "Deli"
+    logo_ents.add_3d_text('Deli', TextAlignLeft, 'Arial', false, false, 25.mm, 3.mm).each { |e| e.move!([250.mm, 250.mm, khung_size+6.mm]) }
+    # Text "Thịt sạch"
+    logo_ents.add_3d_text('Thịt sạch', TextAlignLeft, 'Arial', false, false, 15.mm, 2.mm).each { |e| e.move!([250.mm, 270.mm, khung_size+6.mm]) }
+    # Màu chữ
+    mat_white = model.materials.add('chu_trang')
+    mat_white.color = Sketchup::Color.new('#ffffff')
+    mat_deli = model.materials.add('chu_xanh')
+    mat_deli.color = Sketchup::Color.new('#222c3a')
+    logo_group.entities.grep(Sketchup::ComponentInstance).each { |ci| ci.material = mat_white }
+
+    # 5. Dòng chữ lớn: "Ủ MÁT CHUẨN ÂU - TƯƠI NGON MỀM MỌNG"
+    text_group = ents.add_group
+    text_ents = text_group.entities
+    text_ents.add_3d_text('Ủ MÁT CHUẨN ÂU - TƯƠI NGON MỀM MỌNG', TextAlignCenter, 'Arial Black', false, false, 80.mm, 8.mm).each { |e| e.move!([width/2, height/2, khung_size+6.mm]) }
+    text_group.material = mat_white
+
+    # 6. Logo OXY-FRESH và tem kiểm định (khối mô phỏng)
+    oxy_group = ents.add_group
+    oxy_ents = oxy_group.entities
+    oxy_center = [width-250.mm, 200.mm, khung_size+1.mm]
+    oxy = oxy_ents.add_circle(oxy_center, [0,0,1], 40.mm, 32)
+    oxy_face = oxy_ents.add_face(oxy)
+    oxy_face.pushpull(5.mm)
+    oxy_mat = model.materials.add('oxy_do')
+    oxy_mat.color = Sketchup::Color.new('#ed1c24')
+    oxy_face.material = oxy_mat
+    # Text "OXY-FRESH"
+    oxy_ents.add_3d_text('OXY-FRESH', TextAlignCenter, 'Arial', false, false, 18.mm, 2.mm).each { |e| e.move!([width-250.mm, 200.mm, khung_size+7.mm]) }
+    # Text "THỊT SẠCH KHÔNG AI CHẠM"
+    oxy_ents.add_3d_text('THỊT SẠCH KHÔNG AI CHẠM', TextAlignLeft, 'Arial', false, false, 15.mm, 2.mm).each { |e| e.move!([width-250.mm, 250.mm, khung_size+7.mm]) }
+    oxy_group.material = mat_white
+
+    # 7. Gán màu cho khung sắt
+    mat_khung = model.materials.add('khung_sat')
+    mat_khung.color = Sketchup::Color.new('#444444')
+    khung_group.material = mat_khung
+    tai_group.material = mat_khung
 
     model.commit_operation
   end

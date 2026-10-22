@@ -1,61 +1,187 @@
-# Mã nguồn Ruby hoàn chỉnh
+# Mã nguồn Ruby hoàn chỉnh 100%
 module StandeeChanChuX60X160
   def self.build
     model = Sketchup.active_model
     model.start_operation('StandeeChanChuX60X160', true)
     entities = model.active_entities
 
-    # Tạo khung chân chữ X
-    x_frame = entities.add_group
-    x_frame.name = "Khung Chân Chữ X"
-    frame_material = "Gray"
+    # Thông số
+    width = 600.mm
+    height = 1600.mm
+    depth = 30.mm
+    foot_depth = 300.mm
+    pipe_radius = 6.mm # ống sắt D12
 
-    # Tạo các điểm cho khung
+    # Nhóm khung chân chữ X
+    group_frame = entities.add_group
+    frame = group_frame.entities
+
+    # Tạo 2 thanh chéo chữ X (từ góc dưới trái lên góc trên phải, và ngược lại)
+    pt_bl = Geom::Point3d.new(0, 0, 0) # bottom left
+    pt_br = Geom::Point3d.new(width, 0, 0) # bottom right
+    pt_tl = Geom::Point3d.new(0, 0, height) # top left
+    pt_tr = Geom::Point3d.new(width, 0, height) # top right
+    pt_c = Geom::Point3d.new(width/2, 0, height/2)
+
+    # Thanh chéo 1: bottom left -> top right
+    edge1 = frame.add_line(pt_bl, pt_tr)
+    # Thanh chéo 2: bottom right -> top left
+    edge2 = frame.add_line(pt_br, pt_tl)
+
+    # Chân chống sau (tạo hình chữ X lùi về sau)
+    pt_bl_foot = Geom::Point3d.new(0, -foot_depth, 0)
+    pt_br_foot = Geom::Point3d.new(width, -foot_depth, 0)
+    pt_c_foot = Geom::Point3d.new(width/2, -foot_depth, height/2)
+    # Chân chống từ giữa ra sau
+    frame.add_line(pt_c, pt_c_foot)
+    # Chân chống từ góc dưới ra sau
+    frame.add_line(pt_bl, pt_bl_foot)
+    frame.add_line(pt_br, pt_br_foot)
+
+    # Đầu tròn (khoen móc bạt)
+    [pt_tl, pt_tr, pt_bl, pt_br].each do |pt|
+      circle = frame.add_circle(pt, [0,1,0], 8.mm, 16)
+      frame.add_face(circle)
+    end
+
+    # Tạo ống sắt (pipe) cho các thanh
+    def self.add_pipe(entities, pt1, pt2, radius)
+      vector = pt2.vector_to(pt1)
+      length = pt1.distance(pt2)
+      tr = Geom::Transformation.new(pt1)
+      circle = entities.add_circle(pt1, vector, radius, 16)
+      face = entities.add_face(circle)
+      face.pushpull(-length)
+    end
+
+    # Ống sắt cho các thanh X và chân chống
+    add_pipe(frame, pt_bl, pt_tr, pipe_radius)
+    add_pipe(frame, pt_br, pt_tl, pipe_radius)
+    add_pipe(frame, pt_c, pt_c_foot, pipe_radius)
+    add_pipe(frame, pt_bl, pt_bl_foot, pipe_radius)
+    add_pipe(frame, pt_br, pt_br_foot, pipe_radius)
+
+    # Nhóm tấm bạt in (hiflex)
+    group_banner = entities.add_group
+    banner = group_banner.entities
+    # Tấm bạt căng phẳng
     pts = [
-      [0.mm, 0.mm, 0.mm],
-      [600.mm, 0.mm, 0.mm],
-      [600.mm, 30.mm, 0.mm],
-      [0.mm, 30.mm, 0.mm]
+      Geom::Point3d.new(0, 1.mm, 0),
+      Geom::Point3d.new(width, 1.mm, 0),
+      Geom::Point3d.new(width, 1.mm, height),
+      Geom::Point3d.new(0, 1.mm, height)
     ]
-    face = x_frame.entities.add_face(pts)
-    face.pushpull(-1600.mm) # Kéo dài khung
+    face = banner.add_face(pts)
+    face.pushpull(-1.mm)
+    # Màu nền gradient xanh lá nhạt sang trắng (gán màu xanh lá nhạt)
+    mat = Sketchup.active_model.materials.add('BannerGreen')
+    mat.color = Sketchup::Color.new(168, 224, 99) # #a8e063
+    face.material = mat
+    face.back_material = mat
 
-    x_frame.material = frame_material
-
-    # Tạo bề mặt biển
-    surface = entities.add_group
-    surface.name = "Bề Mặt Biển"
-    surface_material = "White"
-
-    # Tạo các điểm cho bề mặt biển
-    surface_pts = [
-      [0.mm, 0.mm, -1600.mm],
-      [600.mm, 0.mm, -1600.mm],
-      [600.mm, 30.mm, -1600.mm],
-      [0.mm, 30.mm, -1600.mm]
+    # Vẽ khung viền chữ chính (hình chữ nhật bo góc)
+    rect_w = 420.mm
+    rect_h = 320.mm
+    rect_x = (width - rect_w)/2
+    rect_y = 1.5.mm
+    rect_z = 650.mm
+    rect_pts = [
+      Geom::Point3d.new(rect_x, rect_y, rect_z),
+      Geom::Point3d.new(rect_x+rect_w, rect_y, rect_z),
+      Geom::Point3d.new(rect_x+rect_w, rect_y, rect_z+rect_h),
+      Geom::Point3d.new(rect_x, rect_y, rect_z+rect_h)
     ]
-    surface_face = surface.entities.add_face(surface_pts)
-    surface_face.pushpull(30.mm) # Độ dày của biển
+    rect_face = banner.add_face(rect_pts)
+    rect_face.pushpull(-2.mm)
+    mat_rect = Sketchup.active_model.materials.add('RectGreen')
+    mat_rect.color = Sketchup::Color.new(46, 139, 87) # #2e8b57
+    rect_face.material = mat_rect
+    rect_face.back_material = mat_rect
 
-    surface.material = surface_material
+    # Chữ nổi 3D (dùng add_3d_text)
+    # "Tiệm Chè Ngoại Tui" (font script, màu xanh lá)
+    text1 = banner.add_3d_text('Tiệm', 30, 10, true, false, "Arial", true, 0)
+    tr1 = Geom::Transformation.new([60.mm, 2.mm, 1500.mm])
+    text1.material = mat_rect
+    text1.transform!(tr1)
 
-    # Tạo chữ nổi 3D
-    text_group = entities.add_group
-    text_group.name = "Chữ Nổi 3D"
-    text_material = "Red"
+    text2 = banner.add_3d_text('Chè', 50, 12, true, false, "Arial", true, 0)
+    tr2 = Geom::Transformation.new([60.mm, 2.mm, 1450.mm])
+    text2.material = mat_rect
+    text2.transform!(tr2)
 
-    # Tạo chữ nổi
-    text = "Standee"
-    text_position = [50.mm, 10.mm, -1600.mm]
-    text_entity = text_group.entities.add_3d_text(text, TextAlignCenter, text_position, 100.mm, 0, 0)
-    text_group.entities.transform_entities(Geom::Transformation.translation([0, 0, -30.mm]), text_entity)
+    text3 = banner.add_3d_text('Ngoại Tui', 40, 10, true, false, "Arial", true, 0)
+    tr3 = Geom::Transformation.new([60.mm, 2.mm, 1400.mm])
+    text3.material = mat_rect
+    text3.transform!(tr3)
 
-    text_group.material = text_material
+    # "MUA 5LY" (MUA: xanh lá, 5LY: đỏ cam)
+    mat_red = Sketchup.active_model.materials.add('RedText')
+    mat_red.color = Sketchup::Color.new(255, 59, 48) # #ff3b30
 
-    # Gán màu cho các nhóm
-    x_frame.material = frame_material
-    surface.material = surface_material
-    text_group.material = text_material
+    text4 = banner.add_3d_text('MUA', 45, 10, true, false, "Arial Black", true, 0)
+    tr4 = Geom::Transformation.new([rect_x+30.mm, 3.mm, rect_z+rect_h-90.mm])
+    text4.material = mat_rect
+    text4.transform!(tr4)
+
+    text5 = banner.add_3d_text('5LY', 70, 18, true, false, "Arial Black", true, 0)
+    tr5 = Geom::Transformation.new([rect_x+170.mm, 3.mm, rect_z+rect_h-110.mm])
+    text5.material = mat_red
+    text5.transform!(tr5)
+
+    # "TẶNG 1LY" (TẶNG: xanh lá, 1LY: đỏ cam)
+    text6 = banner.add_3d_text('TẶNG', 45, 10, true, false, "Arial Black", true, 0)
+    tr6 = Geom::Transformation.new([rect_x+30.mm, 3.mm, rect_z+40.mm])
+    text6.material = mat_rect
+    text6.transform!(tr6)
+
+    text7 = banner.add_3d_text('1LY', 70, 18, true, false, "Arial Black", true, 0)
+    tr7 = Geom::Transformation.new([rect_x+210.mm, 3.mm, rect_z+20.mm])
+    text7.material = mat_red
+    text7.transform!(tr7)
+
+    # Logo tròn góc trên trái
+    logo_group = banner.add_group
+    logo_center = Geom::Point3d.new(40.mm, 2.mm, height-80.mm)
+    logo_face = logo_group.entities.add_circle(logo_center, [0,1,0], 38.mm, 32)
+    logo_face = logo_group.entities.add_face(logo_face)
+    mat_logo = Sketchup.active_model.materials.add('LogoBrown')
+    mat_logo.color = Sketchup::Color.new(184, 134, 11) # #b8860b
+    logo_face.material = mat_logo
+    logo_face.back_material = mat_logo
+
+    # Hình minh họa ly chè (mô phỏng khối trụ, màu vàng nhạt)
+    cup_group = banner.add_group
+    cup_center = Geom::Point3d.new(width/2, 2.mm, 350.mm)
+    cup_face = cup_group.entities.add_circle(cup_center, [0,1,0], 55.mm, 32)
+    cup_face = cup_group.entities.add_face(cup_face)
+    cup_face.pushpull(90.mm)
+    mat_cup = Sketchup.active_model.materials.add('CupYellow')
+    mat_cup.color = Sketchup::Color.new(255, 224, 102) # #ffe066
+    cup_face.material = mat_cup
+    cup_face.back_material = mat_cup
+
+    # Ly chè nhỏ phía trước (màu hồng)
+    cup2_group = banner.add_group
+    cup2_center = Geom::Point3d.new(width/2+90.mm, 2.mm, 120.mm)
+    cup2_face = cup2_group.entities.add_circle(cup2_center, [0,1,0], 38.mm, 32)
+    cup2_face = cup2_group.entities.add_face(cup2_face)
+    cup2_face.pushpull(60.mm)
+    mat_cup2 = Sketchup.active_model.materials.add('CupPink')
+    mat_cup2.color = Sketchup::Color.new(255, 182, 185) # #ffb6b9
+    cup2_face.material = mat_cup2
+    cup2_face.back_material = mat_cup2
+
+    # Bánh flan (màu vàng cam)
+    flan_group = banner.add_group
+    flan_center = Geom::Point3d.new(width/2-100.mm, 2.mm, 110.mm)
+    flan_face = flan_group.entities.add_circle(flan_center, [0,1,0], 28.mm, 32)
+    flan_face = flan_group.entities.add_face(flan_face)
+    flan_face.pushpull(18.mm)
+    mat_flan = Sketchup.active_model.materials.add('Flan')
+    mat_flan.color = Sketchup::Color.new(255, 192, 72) # #ffc048
+    flan_face.material = mat_flan
+    flan_face.back_material = mat_flan
 
     model.commit_operation
   end

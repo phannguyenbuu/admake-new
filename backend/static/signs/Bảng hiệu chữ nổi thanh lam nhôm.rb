@@ -1,56 +1,153 @@
-# Mã nguồn Ruby hoàn chỉnh
+# Mã nguồn Ruby hoàn chỉnh 100%
 module BangHieuChuNoiThanhLamNhom
   def self.build
     model = Sketchup.active_model
     model.start_operation('BangHieuChuNoiThanhLamNhom', true)
     entities = model.active_entities
 
-    # Tạo khung sắt đỡ
-    grp_frame = entities.add_group
-    grp_frame.name = "Khung Sat Do"
-    frame_pts = [
-      [0.mm, 0.mm, 0.mm],
-      [1200.mm, 0.mm, 0.mm],
-      [1200.mm, 400.mm, 0.mm],
-      [0.mm, 400.mm, 0.mm]
-    ]
-    frame_face = grp_frame.entities.add_face(frame_pts)
-    frame_face.pushpull(60.mm) # Độ dày của khung
-    grp_frame.material = "Gray"
+    # Thông số chính
+    width = 1200.mm
+    height = 400.mm
+    depth = 60.mm
+    khung_size = 25.mm
+    lam_height = 40.mm
+    lam_spacing = 10.mm
+    num_lam = ((height + lam_spacing) / (lam_height + lam_spacing)).floor
 
-    # Tạo bề mặt biển
-    grp_surface = entities.add_group
-    grp_surface.name = "Be Mat Bien"
-    surface_pts = [
-      [5.mm, 5.mm, 60.mm],
-      [1195.mm, 5.mm, 60.mm],
-      [1195.mm, 395.mm, 60.mm],
-      [5.mm, 395.mm, 60.mm]
-    ]
-    surface_face = grp_surface.entities.add_face(surface_pts)
-    surface_face.pushpull(5.mm) # Độ dày của bề mặt
-    grp_surface.material = "White"
+    # Màu sắc
+    mau_do = "#E10613"
+    mau_trang = "#FFFFFF"
+    mau_den = "#222222"
 
-    # Tạo chữ nổi 3D
-    grp_text = entities.add_group
-    grp_text.name = "Chu Noi 3D"
-    text = "SẢN PHẨM"
-    text_position = [100.mm, 100.mm, 65.mm]
-    text_entity = grp_text.entities.add_3d_text(text, TextAlignCenter, text_position, 1.mm, false, false)
-    grp_text.material = "Blue"
+    # === Khung xương sắt hộp ===
+    khung_group = entities.add_group
+    khung = khung_group.entities
 
-    # Tạo đèn LED viền
-    grp_led = entities.add_group
-    grp_led.name = "Den LED"
-    led_pts = [
-      [0.mm, 0.mm, 65.mm],
-      [1200.mm, 0.mm, 65.mm],
-      [1200.mm, 400.mm, 65.mm],
-      [0.mm, 400.mm, 65.mm]
-    ]
-    led_face = grp_led.entities.add_face(led_pts)
-    led_face.pushpull(10.mm) # Độ dày của đèn LED
-    grp_led.material = "Yellow"
+    # Viền ngoài
+    khung.add_face([0,0,0],[width,0,0],[width,height,0],[0,height,0]).pushpull(-khung_size)
+    # Xương đứng giữa
+    khung.add_face([width/2-khung_size/2,0,0],[width/2+khung_size/2,0,0],[width/2+khung_size/2,height,0],[width/2-khung_size/2,height,0]).pushpull(-khung_size)
+    # Xương ngang tăng cứng
+    khung.add_face([0,height/2-khung_size/2,0],[width,height/2-khung_size/2,0],[width,height/2+khung_size/2,0],[0,height/2+khung_size/2,0]).pushpull(-khung_size)
+    # Đặt màu khung
+    khung_group.material = mau_den
+
+    # === Thanh lam nhôm ngang ===
+    lam_group = entities.add_group
+    lam_entities = lam_group.entities
+    y = 0
+    num_lam.times do |i|
+      lam = lam_entities.add_face([0, y, khung_size], [width, y, khung_size], [width, y+lam_height, khung_size], [0, y+lam_height, khung_size])
+      lam.pushpull(depth-khung_size)
+      y += lam_height + lam_spacing
+    end
+    lam_group.material = mau_do
+
+    # === Viền nẹp nhôm bao quanh ===
+    vien_group = entities.add_group
+    vien = vien_group.entities
+    vien_width = 10.mm
+    # Viền trên
+    vien.add_face([-vien_width, -vien_width, khung_size], [width+vien_width, -vien_width, khung_size], [width+vien_width, 0, khung_size], [-vien_width, 0, khung_size]).pushpull(depth)
+    # Viền dưới
+    vien.add_face([-vien_width, height, khung_size], [width+vien_width, height, khung_size], [width+vien_width, height+vien_width, khung_size], [-vien_width, height+vien_width, khung_size]).pushpull(depth)
+    # Viền trái
+    vien.add_face([-vien_width, 0, khung_size], [0, 0, khung_size], [0, height, khung_size], [-vien_width, height, khung_size]).pushpull(depth)
+    # Viền phải
+    vien.add_face([width, 0, khung_size], [width+vien_width, 0, khung_size], [width+vien_width, height, khung_size], [width, height, khung_size]).pushpull(depth)
+    vien_group.material = mau_do
+
+    # === Logo cá nổi bên trái ===
+    logo_group = entities.add_group
+    logo_center = [140.mm, height/2+20.mm, depth-10.mm]
+    logo_radius = 120.mm
+    # Nền logo tròn
+    logo_face = logo_group.entities.add_circle(logo_center, [0,0,1], logo_radius)
+    logo_face = logo_group.entities.add_face(logo_face)
+    logo_face.pushpull(18.mm)
+    logo_group.material = mau_do
+    # Viền trắng ngoài logo
+    logo_vien = logo_group.entities.add_circle(logo_center, [0,0,1], logo_radius+8.mm)
+    logo_vien_face = logo_group.entities.add_face(logo_vien)
+    logo_vien_face.erase!
+    # Hình cá cách điệu (mô phỏng khối cong nổi)
+    ca_body = logo_group.entities.add_face([logo_center[0]-80.mm, logo_center[1]+30.mm, depth+8.mm],
+                                           [logo_center[0]+80.mm, logo_center[1]+30.mm, depth+8.mm],
+                                           [logo_center[0]+60.mm, logo_center[1]-60.mm, depth+8.mm],
+                                           [logo_center[0]-60.mm, logo_center[1]-60.mm, depth+8.mm])
+    ca_body.pushpull(8.mm)
+    ca_body.material = mau_trang
+
+    # === Chữ nổi chính: "CÁ NHỎ YÊU BỘT" ===
+    chu_chinh_group = entities.add_group
+    chu_chinh_text = "CÁ NHỎ YÊU BỘT"
+    chu_chinh_group.entities.add_3d_text(
+      chu_chinh_text,
+      TextAlignCenter,
+      "Arial Rounded MT Bold",
+      110.mm,
+      false,
+      30.mm,
+      0,
+      true,
+      0
+    ).transform!(Geom::Transformation.translation([width/2, height-110.mm, depth-5.mm]))
+    chu_chinh_group.material = mau_trang
+
+    # === Chữ nổi phụ tiếng Trung: "小鱼爱上粉" ===
+    chu_phu_group = entities.add_group
+    chu_phu_text = "小鱼爱上粉"
+    chu_phu_group.entities.add_3d_text(
+      chu_phu_text,
+      TextAlignCenter,
+      "Arial Unicode MS",
+      70.mm,
+      false,
+      20.mm,
+      0,
+      true,
+      0
+    ).transform!(Geom::Transformation.translation([width/2+70.mm, height/2-30.mm, depth-5.mm]))
+    chu_phu_group.material = mau_trang
+
+    # === Số điện thoại và icon ===
+    so_dt_group = entities.add_group
+    # Icon điện thoại (mô phỏng hình chữ nhật bo tròn)
+    dt_icon = so_dt_group.entities.add_face([width/2-220.mm, 20.mm, depth-5.mm],
+                                            [width/2-200.mm, 20.mm, depth-5.mm],
+                                            [width/2-200.mm, 60.mm, depth-5.mm],
+                                            [width/2-220.mm, 60.mm, depth-5.mm])
+    dt_icon.pushpull(15.mm)
+    dt_icon.material = mau_trang
+    # Số điện thoại
+    so_dt_text = "0362 455 098 - 0794 637 672"
+    so_dt_group.entities.add_3d_text(
+      so_dt_text,
+      TextAlignLeft,
+      "Arial Black",
+      40.mm,
+      false,
+      15.mm,
+      0,
+      true,
+      0
+    ).transform!(Geom::Transformation.translation([width/2-180.mm, 20.mm, depth-5.mm]))
+    so_dt_group.material = mau_trang
+
+    # === Logo chữ trong logo (mô phỏng) ===
+    logo_text_group = logo_group.entities.add_group
+    logo_text_group.entities.add_3d_text(
+      "小鱼爱上粉\nCÁ NHỎ YÊU BỘT",
+      TextAlignCenter,
+      "Arial Unicode MS",
+      22.mm,
+      false,
+      4.mm,
+      0,
+      true,
+      0
+    ).transform!(Geom::Transformation.translation([logo_center[0], logo_center[1]-20.mm, depth+12.mm]))
+    logo_text_group.material = mau_trang
 
     model.commit_operation
   end

@@ -1,53 +1,145 @@
-# Mã nguồn Ruby hoàn chỉnh
+# Mã nguồn Ruby hoàn chỉnh 100%
 module HagtagsFomexCanDecal5mm
   def self.build
     model = Sketchup.active_model
     model.start_operation('HagtagsFomexCanDecal5mm', true)
     entities = model.active_entities
 
-    # Tạo khung sắt đỡ
-    frame_grp = entities.add_group
-    frame_pts = [
-      [0.mm, 0.mm, 0.mm],
-      [3000.mm, 0.mm, 0.mm],
-      [3000.mm, 150.mm, 0.mm],
-      [0.mm, 150.mm, 0.mm]
-    ]
-    frame_face = frame_grp.entities.add_face(frame_pts)
-    frame_face.pushpull(100.mm) # Chiều cao khung
-    frame_grp.material = "Gray"
+    # Kích thước tổng thể (mm)
+    width = 300.mm
+    height = 200.mm
+    thickness = 5.mm
+    handle_width = 40.mm
+    handle_height = 120.mm
+    handle_thickness = 5.mm
 
-    # Tạo bề mặt biển chính
-    surface_grp = entities.add_group
-    surface_pts = [
-      [0.mm, 0.mm, 100.mm],
-      [3000.mm, 0.mm, 100.mm],
-      [3000.mm, 150.mm, 100.mm],
-      [0.mm, 150.mm, 100.mm]
-    ]
-    surface_face = surface_grp.entities.add_face(surface_pts)
-    surface_face.pushpull(5.mm) # Độ dày Fomex
-    surface_grp.material = "White"
+    # Tạo biên dạng đám mây đơn giản (dạng bo tròn nhiều điểm)
+    points = []
+    center_x = width / 2
+    center_y = height / 2
+    r1 = 40.mm
+    r2 = 30.mm
+    r3 = 25.mm
+    r4 = 35.mm
+    r5 = 28.mm
+    # Đám mây gồm 5 cung tròn lớn nhỏ xen kẽ
+    points += (0..90).step(10).map { |a| Geom::Point3d.new(center_x + r1 * Math.cos(a * Math::PI / 180), center_y + r1 * Math.sin(a * Math::PI / 180), 0) }
+    points += (90..160).step(10).map { |a| Geom::Point3d.new(center_x + r2 * Math.cos(a * Math::PI / 180) + 50.mm, center_y + r2 * Math.sin(a * Math::PI / 180) + 20.mm, 0) }
+    points += (160..220).step(10).map { |a| Geom::Point3d.new(center_x + r3 * Math.cos(a * Math::PI / 180) + 80.mm, center_y + r3 * Math.sin(a * Math::PI / 180) + 10.mm, 0) }
+    points += (220..300).step(10).map { |a| Geom::Point3d.new(center_x + r4 * Math.cos(a * Math::PI / 180) - 30.mm, center_y + r4 * Math.sin(a * Math::PI / 180) - 20.mm, 0) }
+    points += (300..360).step(10).map { |a| Geom::Point3d.new(center_x + r5 * Math.cos(a * Math::PI / 180) - 60.mm, center_y + r5 * Math.sin(a * Math::PI / 180) + 10.mm, 0) }
 
-    # Tạo chữ nổi 3D
-    text_grp = entities.add_group
-    text = "Hagtags"
-    text_position = [1500.mm, 75.mm, 105.mm] # Vị trí chữ nổi
-    text_face = text_grp.entities.add_text(text, text_position, 100.mm)
-    text_face.pushpull(10.mm) # Độ dày chữ nổi
-    text_grp.material = "Red"
+    # Tạo mặt chính
+    face = entities.add_face(points)
+    face.pushpull(thickness)
 
-    # Tạo đèn LED hoặc viền nẹp trang trí
-    led_grp = entities.add_group
-    led_pts = [
-      [0.mm, 0.mm, 110.mm],
-      [3000.mm, 0.mm, 110.mm],
-      [3000.mm, 10.mm, 110.mm],
-      [0.mm, 10.mm, 110.mm]
-    ]
-    led_face = led_grp.entities.add_face(led_pts)
-    led_face.pushpull(5.mm) # Độ dày viền nẹp
-    led_grp.material = "Yellow"
+    # Tô màu nền trắng
+    mat_white = model.materials.add('FomexWhite')
+    mat_white.color = '#FFFFFF'
+    face.material = mat_white
+    face.back_material = mat_white
+
+    # Viền ngoài màu xanh lá mạ (tạo offset)
+    require 'sketchup.rb'
+    edges = face.outer_loop.edges
+    offset_faces = face.offset(-5.mm)
+    if offset_faces
+      offset_face = offset_faces.first
+      mat_green = model.materials.add('OutlineGreen')
+      mat_green.color = '#C6E377'
+      offset_face.material = mat_green
+      offset_face.back_material = mat_green
+    end
+
+    # Tay cầm (hình chữ nhật bo tròn)
+    handle_origin = Geom::Point3d.new(center_x - handle_width / 2, -handle_height + 10.mm, 0)
+    handle_face = entities.add_face(
+      handle_origin,
+      handle_origin + Geom::Vector3d.new(handle_width, 0, 0),
+      handle_origin + Geom::Vector3d.new(handle_width, handle_height, 0),
+      handle_origin + Geom::Vector3d.new(0, handle_height, 0)
+    )
+    handle_face.pushpull(handle_thickness)
+    handle_face.material = mat_white
+    handle_face.back_material = mat_white
+
+    # Chữ nổi 3D (dùng add_3d_text)
+    text1 = entities.add_3d_text(
+      "Hàn Quốc ơi",
+      TextAlignCenter,
+      "Arial",
+      false,
+      false,
+      20.mm,
+      1,
+      thickness = 3.mm
+    )
+    text1.material = model.materials.add('TextBlue').tap { |m| m.color = '#1A237E' }
+    tr1 = Geom::Transformation.new([center_x - 60.mm, center_y + 40.mm, thickness])
+    text1.transform!(tr1)
+
+    text2 = entities.add_3d_text(
+      "Chờ Tôi",
+      TextAlignCenter,
+      "Arial",
+      false,
+      false,
+      24.mm,
+      1,
+      thickness = 3.mm
+    )
+    text2.material = model.materials.add('TextRed').tap { |m| m.color = '#FF3B30' }
+    tr2 = Geom::Transformation.new([center_x - 35.mm, center_y + 10.mm, thickness])
+    text2.transform!(tr2)
+
+    text3 = entities.add_3d_text(
+      "Nhé!!",
+      TextAlignCenter,
+      "Arial",
+      false,
+      false,
+      18.mm,
+      1,
+      thickness = 3.mm
+    )
+    text3.material = model.materials.add('TextBlue2').tap { |m| m.color = '#1A237E' }
+    tr3 = Geom::Transformation.new([center_x + 30.mm, center_y - 20.mm, thickness])
+    text3.transform!(tr3)
+
+    # Icon trái tim (vẽ hình ellipse đỏ)
+    heart_center = Geom::Point3d.new(center_x + 60.mm, center_y + 10.mm, thickness)
+    heart = entities.add_circle(heart_center, [0,0,1], 8.mm, 24)
+    heart_face = entities.add_face(heart)
+    mat_heart = model.materials.add('HeartRed')
+    mat_heart.color = '#FF3B30'
+    heart_face.material = mat_heart
+    heart_face.back_material = mat_heart
+    heart_face.pushpull(3.mm)
+
+    # Icon quốc kỳ Hàn Quốc (mô phỏng hình tròn nhỏ)
+    flag_center = Geom::Point3d.new(center_x - 10.mm, center_y - 10.mm, thickness)
+    flag = entities.add_circle(flag_center, [0,0,1], 5.mm, 24)
+    flag_face = entities.add_face(flag)
+    mat_flag = model.materials.add('FlagKorea')
+    mat_flag.color = '#FFFFFF'
+    flag_face.material = mat_flag
+    flag_face.back_material = mat_flag
+    flag_face.pushpull(1.5.mm)
+
+    # Icon tòa nhà Hàn Quốc (mô phỏng khối hộp nhỏ)
+    house_origin = Geom::Point3d.new(center_x + 40.mm, center_y - 30.mm, thickness)
+    house_group = entities.add_group
+    house_face = house_group.entities.add_face(
+      house_origin,
+      house_origin + Geom::Vector3d.new(18.mm, 0, 0),
+      house_origin + Geom::Vector3d.new(18.mm, 10.mm, 0),
+      house_origin + Geom::Vector3d.new(0, 10.mm, 0)
+    )
+    house_face.pushpull(4.mm)
+    mat_house = model.materials.add('HouseGray')
+    mat_house.color = '#B0BEC5'
+    house_face.material = mat_house
+    house_face.back_material = mat_house
 
     model.commit_operation
   end

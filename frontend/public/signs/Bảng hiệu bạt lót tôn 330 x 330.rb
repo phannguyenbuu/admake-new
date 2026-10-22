@@ -1,58 +1,223 @@
-# Mã nguồn Ruby hoàn chỉnh
+# Mã nguồn Ruby hoàn chỉnh 100%
 module BangHieuBatLotTon330X330
   def self.build
     model = Sketchup.active_model
     model.start_operation('BangHieuBatLotTon330X330', true)
     entities = model.active_entities
 
-    # Tạo khung sắt đỡ
-    frame_group = entities.add_group
-    frame_group.name = "Khung Sat Do"
-    frame_pts = [
-      [0.mm, 0.mm, 0.mm],
-      [3300.mm, 0.mm, 0.mm],
-      [3300.mm, 3300.mm, 0.mm],
-      [0.mm, 3300.mm, 0.mm]
-    ]
-    frame_face = frame_group.entities.add_face(frame_pts)
-    frame_face.pushpull(30.mm)  # Độ dày của khung
-    frame_group.material = "Gray"
+    # Thông số chính
+    width = 3300.mm
+    height = 3300.mm
+    depth = 30.mm
+    khung_size = 30.mm
+    viền_nẹp = 30.mm
 
-    # Tạo bề mặt biển
-    surface_group = entities.add_group
-    surface_group.name = "Be Mat Bien"
-    surface_pts = [
-      [0.mm, 0.mm, 30.mm],
-      [3300.mm, 0.mm, 30.mm],
-      [3300.mm, 3300.mm, 30.mm],
-      [0.mm, 3300.mm, 30.mm]
-    ]
-    surface_face = surface_group.entities.add_face(surface_pts)
-    surface_face.pushpull(5.mm)  # Độ dày của bề mặt biển
-    surface_group.material = "Blue"
+    # 1. Khung xương sắt hộp
+    khung_group = entities.add_group
+    khung = khung_group.entities
 
-    # Tạo chữ nổi 3D
-    text_group = entities.add_group
-    text_group.name = "Chu Noi 3D"
-    text_position = [1000.mm, 1000.mm, 35.mm]
-    text_face = text_group.entities.add_face([text_position, [text_position[0] + 2000.mm, text_position[1], text_position[2]], 
-                                                [text_position[0] + 2000.mm, text_position[1] + 500.mm, text_position[2]], 
-                                                [text_position[0], text_position[1] + 500.mm, text_position[2]]])
-    text_face.pushpull(10.mm)  # Độ dày của chữ nổi
-    text_group.material = "Yellow"
-
-    # Tạo đèn LED viền
-    led_group = entities.add_group
-    led_group.name = "Den LED"
-    led_pts = [
-      [0.mm, 0.mm, 40.mm],
-      [3300.mm, 0.mm, 40.mm],
-      [3300.mm, 3300.mm, 40.mm],
-      [0.mm, 3300.mm, 40.mm]
+    # Khung viền ngoài
+    pts = [
+      [0, 0, 0],
+      [width, 0, 0],
+      [width, height, 0],
+      [0, height, 0]
     ]
-    led_face = led_group.entities.add_face(led_pts)
-    led_face.pushpull(5.mm)  # Độ dày của đèn LED
-    led_group.material = "White"
+    khung.add_face(pts).pushpull(-khung_size)
+
+    # Xương đứng (cách nhau ~500mm)
+    (1..5).each do |i|
+      x = i * (width / 6)
+      khung.add_face(
+        [x, 0, 0],
+        [x + khung_size, 0, 0],
+        [x + khung_size, height, 0],
+        [x, height, 0]
+      ).pushpull(-khung_size)
+    end
+
+    # Xương ngang (tăng cứng)
+    (1..5).each do |j|
+      y = j * (height / 6)
+      khung.add_face(
+        [0, y, 0],
+        [width, y, 0],
+        [width, y + khung_size, 0],
+        [0, y + khung_size, 0]
+      ).pushpull(-khung_size)
+    end
+
+    # 2. Tấm nền bảng hiệu (bạt in căng trên tôn/alu)
+    nen_group = entities.add_group
+    nen = nen_group.entities
+    nen_face = nen.add_face(
+      [khung_size, khung_size, khung_size],
+      [width - khung_size, khung_size, khung_size],
+      [width - khung_size, height - khung_size, khung_size],
+      [khung_size, height - khung_size, khung_size]
+    )
+    nen_face.pushpull(depth - khung_size)
+    # Màu nền xanh dương đậm
+    mat_nen = model.materials.add('NenXanhDuong')
+    mat_nen.color = '#0052A5'
+    nen_face.material = mat_nen
+    nen_face.back_material = mat_nen
+
+    # 3. Viền nẹp nhôm/alu trắng
+    vien_group = entities.add_group
+    vien = vien_group.entities
+    # Trên
+    vien.add_face(
+      [0, 0, depth],
+      [width, 0, depth],
+      [width, viền_nẹp, depth],
+      [0, viền_nẹp, depth]
+    ).pushpull(khung_size)
+    # Dưới
+    vien.add_face(
+      [0, height - viền_nẹp, depth],
+      [width, height - viền_nẹp, depth],
+      [width, height, depth],
+      [0, height, depth]
+    ).pushpull(khung_size)
+    # Trái
+    vien.add_face(
+      [0, viền_nẹp, depth],
+      [viền_nẹp, viền_nẹp, depth],
+      [viền_nẹp, height - viền_nẹp, depth],
+      [0, height - viền_nẹp, depth]
+    ).pushpull(khung_size)
+    # Phải
+    vien.add_face(
+      [width - viền_nẹp, viền_nẹp, depth],
+      [width, viền_nẹp, depth],
+      [width, height - viền_nẹp, depth],
+      [width - viền_nẹp, height - viền_nẹp, depth]
+    ).pushpull(khung_size)
+    mat_vien = model.materials.add('VienTrang')
+    mat_vien.color = '#E5E5E5'
+    vien_group.material = mat_vien
+
+    # 4. Logo DAIKIN (chữ nổi 3D mô phỏng, thực tế là in phẳng)
+    logo_group = entities.add_group
+    logo = logo_group.entities
+    logo.add_3d_text(
+      "DAIKIN",
+      TextAlignLeft,
+      "Arial Black",
+      false,
+      false,
+      200.mm,
+      30.mm,
+      0,
+      true,
+      false
+    ).move!([khung_size + 80.mm, height - 350.mm, depth + 1.mm])
+    mat_logo = model.materials.add('LogoDaikin')
+    mat_logo.color = '#FFFFFF'
+    logo_group.material = mat_logo
+
+    # 5. Chữ SkyAir (chữ lớn, nghiêng)
+    skyair_group = entities.add_group
+    skyair = skyair_group.entities
+    skyair.add_3d_text(
+      "SkyAir",
+      TextAlignLeft,
+      "Arial Italic",
+      false,
+      false,
+      250.mm,
+      40.mm,
+      0,
+      true,
+      false
+    ).move!([khung_size + 400.mm, height - 1400.mm, depth + 1.mm])
+    mat_skyair = model.materials.add('SkyAir')
+    mat_skyair.color = '#FFFFFF'
+    skyair_group.material = mat_skyair
+
+    # 6. Dòng chữ phụ "Công trình sử dụng ĐIỀU HÒA KHÔNG KHÍ THƯƠNG MẠI"
+    phu1_group = entities.add_group
+    phu1 = phu1_group.entities
+    phu1.add_3d_text(
+      "Công trình sử dụng\nĐIỀU HÒA KHÔNG KHÍ THƯƠNG MẠI",
+      TextAlignLeft,
+      "Arial",
+      false,
+      false,
+      60.mm,
+      10.mm,
+      0,
+      true,
+      false
+    ).move!([khung_size + 80.mm, height - 600.mm, depth + 1.mm])
+    mat_phu1 = model.materials.add('ChuPhu1')
+    mat_phu1.color = '#FFFFFF'
+    phu1_group.material = mat_phu1
+
+    # 7. Hình máy lạnh (mô phỏng khối hộp chữ nhật)
+    maylanh_group = entities.add_group
+    maylanh = maylanh_group.entities
+    maylanh.add_face(
+      [khung_size + 600.mm, height - 1100.mm, depth + 1.mm],
+      [khung_size + 1200.mm, height - 1100.mm, depth + 1.mm],
+      [khung_size + 1200.mm, height - 600.mm, depth + 1.mm],
+      [khung_size + 600.mm, height - 600.mm, depth + 1.mm]
+    ).pushpull(80.mm)
+    mat_maylanh = model.materials.add('MayLanh')
+    mat_maylanh.color = '#B0C4DE'
+    maylanh_group.material = mat_maylanh
+
+    # 8. Logo Đại Phong (mô phỏng khối vuông cam)
+    daiphong_group = entities.add_group
+    daiphong = daiphong_group.entities
+    daiphong.add_face(
+      [khung_size + 50.mm, khung_size + 50.mm, depth + 1.mm],
+      [khung_size + 150.mm, khung_size + 50.mm, depth + 1.mm],
+      [khung_size + 150.mm, khung_size + 150.mm, depth + 1.mm],
+      [khung_size + 50.mm, khung_size + 150.mm, depth + 1.mm]
+    ).pushpull(10.mm)
+    mat_dp = model.materials.add('DaiPhong')
+    mat_dp.color = '#F37021'
+    daiphong_group.material = mat_dp
+
+    # 9. Dòng chữ nhỏ phía dưới (địa chỉ, hotline, v.v.)
+    phu2_group = entities.add_group
+    phu2 = phu2_group.entities
+    phu2.add_3d_text(
+      "CÔNG TY TNHH DỊCH VỤ KỸ THUẬT ĐẠI PHONG\nĐC: Số 286 đường Phạm Văn Đồng, P. Tân Lập, Tp. Buôn Ma Thuột, Đắk Lắk, Việt Nam\nĐT: (02623) 50 56 58    Hotline: 0983.068.068",
+      TextAlignLeft,
+      "Arial",
+      false,
+      false,
+      30.mm,
+      6.mm,
+      0,
+      true,
+      false
+    ).move!([khung_size + 180.mm, khung_size + 60.mm, depth + 1.mm])
+    mat_phu2 = model.materials.add('ChuPhu2')
+    mat_phu2.color = '#222222'
+    phu2_group.material = mat_phu2
+
+    # 10. Dòng cuối cùng (chữ xanh dương)
+    phu3_group = entities.add_group
+    phu3 = phu3_group.entities
+    phu3.add_3d_text(
+      "HÂN HẠNH CUNG CẤP VÀ THI CÔNG TẠI CÔNG TRÌNH NÀY",
+      TextAlignLeft,
+      "Arial",
+      false,
+      false,
+      40.mm,
+      8.mm,
+      0,
+      true,
+      false
+    ).move!([khung_size + 180.mm, khung_size + 20.mm, depth + 1.mm])
+    mat_phu3 = model.materials.add('ChuPhu3')
+    mat_phu3.color = '#0052A5'
+    phu3_group.material = mat_phu3
 
     model.commit_operation
   end

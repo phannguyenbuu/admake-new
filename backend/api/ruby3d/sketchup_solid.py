@@ -30,7 +30,9 @@ class Solid(Entity):
     def get_material(self):
         if self.material is not None:
             return self.material
-        return self.face.material or self.face.back_material
+        if self.face is not None:
+            return self.face.material or self.face.back_material
+        return None
 
     def rb_normal(self, ip, a, b):
         return Vector3d(*vnorm(self.vec))
@@ -39,6 +41,28 @@ class Solid(Entity):
         return None
 
     def rb_reverse_b(self, ip, a, b):
+        return self
+
+    def rb_outer_loop(self, ip, a, b):
+        return self
+
+    def rb_vertices(self, ip, a, b):
+        from .sketchup import Vertex
+        return [Vertex(p) for p in self.base]
+
+    def rb_edges(self, ip, a, b):
+        from .sketchup import Edge
+        n = len(self.base)
+        return [Edge(self.ents, self.base[i], self.base[(i + 1) % n]) for i in range(n)]
+
+    def rb_transform_b(self, ip, a, b):
+        from .geom import as_transform, Transformation
+        tr = as_transform(a[0]) if a else Transformation()
+        self.base = [tr.apply_point(p) for p in self.base]
+        self.vec = tr.apply_vec(self.vec)
+        return self
+
+    def rb_offset(self, ip, a, b):
         return self
 
     def bounds_into(self, bb, tr):
@@ -96,6 +120,28 @@ class TextBlock(Entity):
         return None
 
     def rb_reverse_b(self, ip, a, b):
+        return self
+
+    def rb_outer_loop(self, ip, a, b):
+        return self
+
+    def rb_vertices(self, ip, a, b):
+        from .sketchup import Vertex
+        return [Vertex(p) for p in self.base]
+
+    def rb_edges(self, ip, a, b):
+        from .sketchup import Edge
+        n = len(self.base)
+        return [Edge(self.ents, self.base[i], self.base[(i + 1) % n]) for i in range(n)]
+
+    def rb_transform_b(self, ip, a, b):
+        from .geom import as_transform, Transformation
+        tr = as_transform(a[0]) if a else Transformation()
+        self.base = [tr.apply_point(p) for p in self.base]
+        self.vec = tr.apply_vec(self.vec)
+        return self
+
+    def rb_offset(self, ip, a, b):
         return self
 
     def bounds_into(self, bb, tr):

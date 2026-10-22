@@ -1,56 +1,178 @@
-# Mã nguồn Ruby hoàn chỉnh
+# Mã nguồn Ruby hoàn chỉnh 100%
 module MenuCamTayA4FomexCanDecal
   def self.build
     model = Sketchup.active_model
     model.start_operation('MenuCamTayA4FomexCanDecal', true)
     entities = model.active_entities
 
-    # Tạo khung sắt đỡ
-    frame_group = entities.add_group
-    frame_group.name = "Khung Sắt Đỡ"
-    frame_pts = [
-      [0.mm, 0.mm, 0.mm],
-      [210.mm, 0.mm, 0.mm],
-      [210.mm, 297.mm, 0.mm],
-      [0.mm, 297.mm, 0.mm]
-    ]
-    frame_face = frame_group.entities.add_face(frame_pts)
-    frame_face.pushpull(10.mm) # Độ dày của khung
-    frame_group.material = "Gray"
+    # Kích thước menu A4
+    width = 210.mm
+    height = 297.mm
+    thickness = 5.mm
+    corner_radius = 8.mm
 
-    # Tạo bề mặt biển chính
-    surface_group = entities.add_group
-    surface_group.name = "Bề Mặt Biển"
-    surface_pts = [
-      [0.mm, 0.mm, 10.mm],
-      [210.mm, 0.mm, 10.mm],
-      [210.mm, 297.mm, 10.mm],
-      [0.mm, 297.mm, 10.mm]
+    # Tạo tấm nền Fomex bo góc
+    pts = [
+      Geom::Point3d.new(corner_radius, 0, 0),
+      Geom::Point3d.new(width - corner_radius, 0, 0),
+      Geom::Point3d.new(width, corner_radius, 0),
+      Geom::Point3d.new(width, height - corner_radius, 0),
+      Geom::Point3d.new(width - corner_radius, height, 0),
+      Geom::Point3d.new(corner_radius, height, 0),
+      Geom::Point3d.new(0, height - corner_radius, 0),
+      Geom::Point3d.new(0, corner_radius, 0)
     ]
-    surface_face = surface_group.entities.add_face(surface_pts)
-    surface_face.pushpull(-0.5.mm) # Độ dày của bề mặt
-    surface_group.material = "White"
 
-    # Tạo chữ nổi 3D
+    # Tạo mặt phẳng với bo góc
+    edges = []
+    edges << entities.add_arc(Geom::Point3d.new(corner_radius, 0, 0), [1,0,0], [0,1,0], corner_radius, 270.degrees, 360.degrees, 12)
+    edges << entities.add_line(Geom::Point3d.new(corner_radius, 0, 0), Geom::Point3d.new(width - corner_radius, 0, 0))
+    edges << entities.add_arc(Geom::Point3d.new(width - corner_radius, corner_radius, 0), [0,1,0], [-1,0,0], corner_radius, 0.degrees, 90.degrees, 12)
+    edges << entities.add_line(Geom::Point3d.new(width, corner_radius, 0), Geom::Point3d.new(width, height - corner_radius, 0))
+    edges << entities.add_arc(Geom::Point3d.new(width - corner_radius, height - corner_radius, 0), [-1,0,0], [0,-1,0], corner_radius, 90.degrees, 180.degrees, 12)
+    edges << entities.add_line(Geom::Point3d.new(width - corner_radius, height, 0), Geom::Point3d.new(corner_radius, height, 0))
+    edges << entities.add_arc(Geom::Point3d.new(corner_radius, height - corner_radius, 0), [0,-1,0], [1,0,0], corner_radius, 180.degrees, 270.degrees, 12)
+    edges << entities.add_line(Geom::Point3d.new(0, height - corner_radius, 0), Geom::Point3d.new(0, corner_radius, 0))
+
+    face = entities.add_face(edges.map(&:start).uniq)
+    face.pushpull(-thickness)
+
+    # Tô màu nền trắng
+    mat_white = model.materials.add('FomexWhite')
+    mat_white.color = '#ffffff'
+    face.material = mat_white
+    face.back_material = mat_white
+
+    # Tạo viền xanh lá cây đậm (2mm)
+    border_thickness = 2.mm
+    border_group = entities.add_group
+    border_face = border_group.entities.add_face(
+      [Geom::Point3d.new(0,0,0.1.mm),
+       Geom::Point3d.new(width,0,0.1.mm),
+       Geom::Point3d.new(width,height,0.1.mm),
+       Geom::Point3d.new(0,height,0.1.mm)]
+    )
+    inner_face = border_group.entities.add_face(
+      [Geom::Point3d.new(border_thickness,border_thickness,0.1.mm),
+       Geom::Point3d.new(width-border_thickness,border_thickness,0.1.mm),
+       Geom::Point3d.new(width-border_thickness,height-border_thickness,0.1.mm),
+       Geom::Point3d.new(border_thickness,height-border_thickness,0.1.mm)]
+    )
+    inner_face.erase!
+    mat_border = model.materials.add('BorderGreen')
+    mat_border.color = '#2e5d3b'
+    border_face.material = mat_border
+
+    # Chữ nổi 3D mô phỏng (dù thực tế là decal, vẫn tạo khối nổi nhẹ để nhận diện)
     text_group = entities.add_group
-    text_group.name = "Chữ Nổi"
-    text = "Menu"
-    text_position = [10.mm, 10.mm, 10.mm]
-    text_entity = text_group.entities.add_3d_text(text, TextAlignCenter, text_position, 10.mm)
-    text_group.material = "Red"
 
-    # Tạo đèn LED viền
-    led_group = entities.add_group
-    led_group.name = "Đèn LED"
-    led_pts = [
-      [0.mm, 0.mm, 10.mm],
-      [210.mm, 0.mm, 10.mm],
-      [210.mm, 0.mm, 15.mm],
-      [0.mm, 0.mm, 15.mm]
-    ]
-    led_face = led_group.entities.add_face(led_pts)
-    led_face.pushpull(0.5.mm) # Độ dày của đèn LED
-    led_group.material = "Yellow"
+    # "TIỆM CHÈ NGOẠI TUI"
+    text1 = text_group.entities.add_3d_text(
+      "TIỆM CHÈ NGOẠI TUI",
+      TextAlignCenter,
+      "Arial",
+      false,
+      false,
+      18.mm,
+      1.5.mm,
+      0,
+      true,
+      0
+    )
+    text1.material = mat_border
+    text1.move! Geom::Transformation.translation([width/2, 25.mm, 1.5.mm])
+
+    # Slogan
+    mat_slogan = model.materials.add('SloganGray')
+    mat_slogan.color = '#6b7c6a'
+    text2 = text_group.entities.add_3d_text(
+      '"Chè Truyền Thống Ít Ngọt"',
+      TextAlignCenter,
+      "Arial Italic",
+      false,
+      false,
+      7.mm,
+      1.mm,
+      0,
+      true,
+      0
+    )
+    text2.material = mat_slogan
+    text2.move! Geom::Transformation.translation([width/2, 40.mm, 1.5.mm])
+
+    # Box "40K"
+    box_group = entities.add_group
+    box_w = 30.mm
+    box_h = 22.mm
+    box_x = 15.mm
+    box_y = 55.mm
+    box_face = box_group.entities.add_face(
+      [Geom::Point3d.new(box_x, box_y, 1.2.mm),
+       Geom::Point3d.new(box_x+box_w, box_y, 1.2.mm),
+       Geom::Point3d.new(box_x+box_w, box_y+box_h, 1.2.mm),
+       Geom::Point3d.new(box_x, box_y+box_h, 1.2.mm)]
+    )
+    mat_box = model.materials.add('BoxGreen')
+    mat_box.color = '#4b7f4b'
+    box_face.material = mat_box
+
+    # Text "40K"
+    text3 = box_group.entities.add_3d_text(
+      "40K",
+      TextAlignCenter,
+      "Arial Black",
+      false,
+      false,
+      10.mm,
+      1.mm,
+      0,
+      true,
+      0
+    )
+    mat_white2 = model.materials.add('TextWhite')
+    mat_white2.color = '#ffffff'
+    text3.material = mat_white2
+    text3.move! Geom::Transformation.translation([box_x+box_w/2, box_y+box_h/2-4.mm, 2.2.mm])
+
+    # Địa chỉ và số điện thoại (dưới cùng)
+    text4 = text_group.entities.add_3d_text(
+      "300 Hoàng Diệu, Buôn Ma Thuột",
+      TextAlignCenter,
+      "Arial",
+      false,
+      false,
+      7.mm,
+      1.mm,
+      0,
+      true,
+      0
+    )
+    text4.material = mat_white2
+    text4.move! Geom::Transformation.translation([width/2, height-18.mm, 1.5.mm])
+
+    text5 = text_group.entities.add_3d_text(
+      "0849458548 - 0339443156",
+      TextAlignCenter,
+      "Arial",
+      false,
+      false,
+      7.mm,
+      1.mm,
+      0,
+      true,
+      0
+    )
+    text5.material = mat_white2
+    text5.move! Geom::Transformation.translation([width/2, height-10.mm, 1.5.mm])
+
+    # Logo tròn mô phỏng (khối tròn, màu xanh nhạt)
+    logo_group = entities.add_group
+    logo_center = Geom::Point3d.new(width-35.mm, 28.mm, 1.2.mm)
+    logo_face = logo_group.entities.add_circle(logo_center, [0,0,1], 18.mm, 32)
+    logo_face = logo_group.entities.add_face(logo_face)
+    mat_logo = model.materials.add('LogoGreen')
+    mat_logo.color = '#f5e9c5'
+    logo_face.material = mat_logo
 
     model.commit_operation
   end

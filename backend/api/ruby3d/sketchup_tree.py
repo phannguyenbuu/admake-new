@@ -158,19 +158,66 @@ class Entities(RObj):
         return inst
 
     def rb_add_3d_text(self, ip, a, b):
+        def _to_f(v, default=0.0):
+            try:
+                return float(v)
+            except Exception:
+                return default
+
         text = str(a[0]) if a else ""
         align = int(a[1]) if len(a) > 1 and is_num(a[1]) else 0
         bold = bool(a[3]) if len(a) > 3 else False
-        height = float(a[5]) if len(a) > 5 else 12.0
-        z = float(a[7]) if len(a) > 7 else 0.0
-        extrusion = float(a[9]) if len(a) > 9 else 0.0
+        height = _to_f(a[5], 12.0) if len(a) > 5 else 12.0
+        z = _to_f(a[7], 0.0) if len(a) > 7 else 0.0
+
+        # Hỗ trợ độ dày chữ (extrusion) từ a[9] hoặc a[6]
+        extrusion = 0.0
+        if len(a) > 9 and is_num(a[9]):
+            extrusion = _to_f(a[9], 0.0)
+        elif len(a) > 6 and is_num(a[6]) and float(a[6]) > 0:
+            extrusion = _to_f(a[6], 0.0)
+        if extrusion <= 0.0:
+            extrusion = max(10.0, height * 0.1)
+
+        # Hỗ trợ vị trí tọa độ đặt chữ nếu truyền ở tham số cuối
+        pos_offset = (0.0, 0.0, 0.0)
+        for arg in reversed(a[6:]):
+            if isinstance(arg, (list, tuple)) and len(arg) == 3 and all(is_num(x) for x in arg):
+                pos_offset = (float(arg[0]), float(arg[1]), float(arg[2]))
+                break
+            elif hasattr(arg, 'x') and hasattr(arg, 'y') and hasattr(arg, 'z'):
+                pos_offset = (float(arg.x), float(arg.y), float(arg.z))
+                break
+
         if text.strip():
             for i, line in enumerate(text.split("\n")):
-                blk = su.TextBlock(self, line, align, height, z, extrusion, bold)
-                if i:
-                    blk.base = [(p[0], p[1] - i * height * 1.25, p[2]) for p in blk.base]
-                self.items.append(blk)
-        return True
+                total_w = max(su.text_width(line, height, bold), height * 0.3)
+                x0 = 0.0 if align == 0 else (-total_w / 2 if align == 1 else -total_w)
+                cur_x = x0
+                has_char_blocks = False
+                for ch in line:
+                    cw = su.text_width(ch, height, bold)
+                    if ch == " ":
+                        cur_x += cw
+                        continue
+                    ch_w = max(cw * 0.85, height * 0.15)
+                    ch_base = [
+                        (cur_x + pos_offset[0], pos_offset[1] - i * height * 1.25, z + pos_offset[2]),
+                        (cur_x + ch_w + pos_offset[0], pos_offset[1] - i * height * 1.25, z + pos_offset[2]),
+                        (cur_x + ch_w + pos_offset[0], height + pos_offset[1] - i * height * 1.25, z + pos_offset[2]),
+                        (cur_x + pos_offset[0], height + pos_offset[1] - i * height * 1.25, z + pos_offset[2]),
+                    ]
+                    ch_blk = su.Solid(self, ch_base, (0.0, 0.0, extrusion), None)
+                    ch_blk.name = f"Letter_{ch}"
+                    self.items.append(ch_blk)
+                    cur_x += cw
+                    has_char_blocks = True
+
+                if not has_char_blocks:
+                    blk = su.TextBlock(self, line, align, height, z + pos_offset[2], extrusion, bold)
+                    blk.base = [(p[0] + pos_offset[0], p[1] + pos_offset[1] - i * height * 1.25, p[2]) for p in blk.base]
+                    self.items.append(blk)
+        return self.items[-1] if self.items else su.Inert(self)
 
     def _inert(self, ip, a, b):
         e = su.Inert(self)
@@ -321,6 +368,9 @@ class _Placed(su.Entity):
     def rb_material(self, ip, a, b):
         return self.material
 
+    rb_back_material_set = rb_material_set
+    rb_back_material = rb_material
+
     def rb_transformation(self, ip, a, b):
         return Transformation(self.tr.m)
 
@@ -449,13 +499,18 @@ class ComponentInstance(_Placed):
         super().__init__(ents)
         self.defn = defn
         self.tr = tr
-        defn.instances.append(self)
+        if hasattr(defn, "instances") and isinstance(getattr(defn, "instances", None), list):
+            defn.instances.append(self)
 
     def content(self):
-        return self.defn.entities
+        if hasattr(self.defn, "entities"):
+            return self.defn.entities
+        return None
 
     def rb_definition(self, ip, a, b):
         return self.defn
 
     def rb_entities(self, ip, a, b):
-        return self.defn.entities
+        if hasattr(self.defn, "entities"):
+            return self.defn.entities
+        return self.ents

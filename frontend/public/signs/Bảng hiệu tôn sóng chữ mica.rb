@@ -1,58 +1,220 @@
-# Mã nguồn Ruby hoàn chỉnh
+# Mã nguồn Ruby hoàn chỉnh 100%
 module BangHieuTonSongChuMica
   def self.build
     model = Sketchup.active_model
     model.start_operation('BangHieuTonSongChuMica', true)
     entities = model.active_entities
 
-    # Tạo khung sắt đỡ
-    frame_group = entities.add_group
-    frame_group.name = "KhungSatDo"
-    frame_pts = [
-      [0.mm, 0.mm, 0.mm],
-      [1200.mm, 0.mm, 0.mm],
-      [1200.mm, 400.mm, 0.mm],
-      [0.mm, 400.mm, 0.mm]
-    ]
-    frame_face = frame_group.entities.add_face(frame_pts)
-    frame_face.pushpull(60.mm)  # Độ dày khung
-    frame_group.material = "Gray"
+    # Thông số chính
+    width = 1200.mm
+    height = 400.mm
+    depth = 60.mm
+    khung_size = 30.mm
+    viendaunep = 10.mm
 
-    # Tạo bề mặt biển
-    surface_group = entities.add_group
-    surface_group.name = "BeMatBien"
-    surface_pts = [
-      [0.mm, 0.mm, 60.mm],
-      [1200.mm, 0.mm, 60.mm],
-      [1200.mm, 400.mm, 60.mm],
-      [0.mm, 400.mm, 60.mm]
-    ]
-    surface_face = surface_group.entities.add_face(surface_pts)
-    surface_face.pushpull(5.mm)  # Độ dày bề mặt
-    surface_group.material = "White"
+    # Màu sắc
+    mau_ton = "#19d3c5"
+    mau_khung = "#222222"
+    mau_chu_trang = "#ffffff"
+    mau_chu_vang = "#ffd600"
+    mau_chu_cam = "#ffb74d"
+    mau_vien_den = "#222222"
 
-    # Tạo chữ nổi 3D
-    text_group = entities.add_group
-    text_group.name = "ChuNoi"
-    text = "Bảng Hiệu"
-    text_position = [100.mm, 100.mm, 65.mm]  # Vị trí chữ nổi
-    text_face = text_group.entities.add_text(text, text_position)
-    text_group.entities.add_face(text_face.vertices.map { |v| v.position })
-    text_group.entities.each { |e| e.transform!(Geom::Transformation.new([0, 0, 0])) }
-    text_group.material = "Red"
-
-    # Tạo đèn LED viền
-    led_group = entities.add_group
-    led_group.name = "DenLED"
-    led_pts = [
-      [0.mm, 0.mm, 65.mm],
-      [1200.mm, 0.mm, 65.mm],
-      [1200.mm, 400.mm, 65.mm],
-      [0.mm, 400.mm, 65.mm]
+    # 1. Khung sắt hộp
+    khung_group = entities.add_group
+    kg = khung_group.entities
+    # Khung ngoài
+    pts = [
+      [0,0,0], [width,0,0], [width,height,0], [0,height,0]
     ]
-    led_face = led_group.entities.add_face(led_pts)
-    led_face.pushpull(5.mm)  # Độ dày đèn LED
-    led_group.material = "Yellow"
+    kg.add_face(pts).pushpull(-khung_size)
+    # Xương đứng (2 xương giữa)
+    x1 = width/3
+    x2 = 2*width/3
+    [x1, x2].each do |x|
+      kg.add_face([[x,0,-khung_size],[x+khung_size,0,-khung_size],[x+khung_size,height,-khung_size],[x,height,-khung_size]]).pushpull(-khung_size)
+    end
+    # Xương ngang tăng cứng (1 thanh giữa)
+    y1 = height/2
+    kg.add_face([[0,y1,-khung_size],[width,y1,-khung_size],[width,y1+khung_size,-khung_size],[0,y1+khung_size,-khung_size]]).pushpull(-khung_size)
+    # Tai treo tường (2 bên)
+    kg.add_face([[-khung_size/2, height*0.2, -khung_size], [0, height*0.2, -khung_size], [0, height*0.2+60.mm, -khung_size], [-khung_size/2, height*0.2+60.mm, -khung_size]]).pushpull(-10.mm)
+    kg.add_face([[width, height*0.8, -khung_size], [width+khung_size/2, height*0.8, -khung_size], [width+khung_size/2, height*0.8+60.mm, -khung_size], [width, height*0.8+60.mm, -khung_size]]).pushpull(-10.mm)
+    khung_group.material = mau_khung
+
+    # 2. Nền tôn sóng
+    ton_group = entities.add_group
+    tg = ton_group.entities
+    face = tg.add_face([ [khung_size,khung_size,0], [width-khung_size,khung_size,0], [width-khung_size,height-khung_size,0], [khung_size,height-khung_size,0] ])
+    face.pushpull(depth-khung_size)
+    ton_group.material = mau_ton
+
+    # Mô phỏng sóng tôn (dạng gợn sóng đơn giản)
+    song_width = 40.mm
+    song_depth = 6.mm
+    n_song = ((width-2*khung_size)/song_width).to_i
+    (0...n_song).each do |i|
+      x = khung_size + i*song_width
+      tg.add_face([
+        [x,khung_size,depth-khung_size],
+        [x+song_width/2,khung_size,depth-khung_size+song_depth],
+        [x+song_width/2,height-khung_size,depth-khung_size+song_depth],
+        [x,height-khung_size,depth-khung_size]
+      ]).pushpull(-2.mm)
+    end
+
+    # 3. Viền nẹp alu/nhôm đen
+    vien_group = entities.add_group
+    vg = vien_group.entities
+    # 4 cạnh viền
+    # Trên
+    vg.add_face([
+      [0,0,depth-viendaunep],
+      [width,0,depth-viendaunep],
+      [width,0,depth],
+      [0,0,depth]
+    ]).pushpull(viendaunep)
+    # Dưới
+    vg.add_face([
+      [0,height,depth-viendaunep],
+      [width,height,depth-viendaunep],
+      [width,height,depth],
+      [0,height,depth]
+    ]).pushpull(viendaunep)
+    # Trái
+    vg.add_face([
+      [0,0,depth-viendaunep],
+      [0,height,depth-viendaunep],
+      [0,height,depth],
+      [0,0,depth]
+    ]).pushpull(viendaunep)
+    # Phải
+    vg.add_face([
+      [width,0,depth-viendaunep],
+      [width,height,depth-viendaunep],
+      [width,height,depth],
+      [width,0,depth]
+    ]).pushpull(viendaunep)
+    vien_group.material = mau_vien_den
+
+    # 4. Chữ nổi 3D
+    # "BÚN ĐẬU"
+    text_group1 = entities.add_group
+    text1 = text_group1.entities.add_3d_text(
+      "BÚN ĐẬU",
+      TextAlignLeft,
+      "Arial Black",
+      false, false,
+      70.mm, 30.mm, 0, true, 0
+    )
+    text_group1.material = mau_chu_trang
+    text_group1.entities.each { |e| e.material = mau_chu_trang if e.is_a?(Sketchup::Face) }
+    text_group1.move! Geom::Transformation.new([khung_size+40.mm, height-120.mm, depth])
+
+    # Viền đen cho "BÚN ĐẬU"
+    vien1 = entities.add_group
+    vien1.entities.add_3d_text(
+      "BÚN ĐẬU",
+      TextAlignLeft,
+      "Arial Black",
+      false, false,
+      74.mm, 34.mm, 0, true, 0
+    )
+    vien1.material = mau_vien_den
+    vien1.entities.each { |e| e.material = mau_vien_den if e.is_a?(Sketchup::Face) }
+    vien1.move! Geom::Transformation.new([khung_size+38.mm, height-122.mm, depth-2.mm])
+
+    # "CÔ HẬU"
+    text_group2 = entities.add_group
+    text2 = text_group2.entities.add_3d_text(
+      "CÔ HẬU",
+      TextAlignLeft,
+      "Arial Black",
+      false, false,
+      120.mm, 60.mm, 0, true, 0
+    )
+    text_group2.material = mau_chu_vang
+    text_group2.entities.each { |e| e.material = mau_chu_vang if e.is_a?(Sketchup::Face) }
+    text_group2.move! Geom::Transformation.new([khung_size+340.mm, height-130.mm, depth])
+
+    # Viền đen cho "CÔ HẬU"
+    vien2 = entities.add_group
+    vien2.entities.add_3d_text(
+      "CÔ HẬU",
+      TextAlignLeft,
+      "Arial Black",
+      false, false,
+      126.mm, 66.mm, 0, true, 0
+    )
+    vien2.material = mau_vien_den
+    vien2.entities.each { |e| e.material = mau_vien_den if e.is_a?(Sketchup::Face) }
+    vien2.move! Geom::Transformation.new([khung_size+337.mm, height-133.mm, depth-2.mm])
+
+    # "HƯƠNG VỊ HÀ THÀNH"
+    text_group3 = entities.add_group
+    text3 = text_group3.entities.add_3d_text(
+      "HƯƠNG VỊ HÀ THÀNH",
+      TextAlignLeft,
+      "Arial Black",
+      false, false,
+      70.mm, 30.mm, 0, true, 0
+    )
+    text_group3.material = mau_chu_vang
+    text_group3.entities.each { |e| e.material = mau_chu_vang if e.is_a?(Sketchup::Face) }
+    text_group3.move! Geom::Transformation.new([khung_size+40.mm, height-210.mm, depth])
+
+    # Viền đen cho "HƯƠNG VỊ HÀ THÀNH"
+    vien3 = entities.add_group
+    vien3.entities.add_3d_text(
+      "HƯƠNG VỊ HÀ THÀNH",
+      TextAlignLeft,
+      "Arial Black",
+      false, false,
+      74.mm, 34.mm, 0, true, 0
+    )
+    vien3.material = mau_vien_den
+    vien3.entities.each { |e| e.material = mau_vien_den if e.is_a?(Sketchup::Face) }
+    vien3.move! Geom::Transformation.new([khung_size+38.mm, height-212.mm, depth-2.mm])
+
+    # Địa chỉ, số điện thoại, icon nhà
+    # Icon nhà
+    icon_group = entities.add_group
+    pts_icon = [
+      [khung_size+10.mm, khung_size+20.mm, depth+1.mm],
+      [khung_size+22.mm, khung_size+32.mm, depth+1.mm],
+      [khung_size+34.mm, khung_size+20.mm, depth+1.mm],
+      [khung_size+34.mm, khung_size+34.mm, depth+1.mm],
+      [khung_size+10.mm, khung_size+34.mm, depth+1.mm]
+    ]
+    icon_face = icon_group.entities.add_face(pts_icon)
+    icon_face.pushpull(4.mm)
+    icon_group.material = mau_chu_cam
+
+    # Địa chỉ
+    diachi_group = entities.add_group
+    diachi = diachi_group.entities.add_3d_text(
+      "2122 PHẠM THẾ HIỂN P6 Q8",
+      TextAlignLeft,
+      "Arial",
+      false, false,
+      25.mm, 10.mm, 0, true, 0
+    )
+    diachi_group.material = mau_chu_cam
+    diachi_group.entities.each { |e| e.material = mau_chu_cam if e.is_a?(Sketchup::Face) }
+    diachi_group.move! Geom::Transformation.new([khung_size+45.mm, khung_size+20.mm, depth+1.mm])
+
+    # Số điện thoại
+    sdt_group = entities.add_group
+    sdt = sdt_group.entities.add_3d_text(
+      "0375 038 008",
+      TextAlignLeft,
+      "Arial",
+      false, false,
+      25.mm, 10.mm, 0, true, 0
+    )
+    sdt_group.material = mau_chu_cam
+    sdt_group.entities.each { |e| e.material = mau_chu_cam if e.is_a?(Sketchup::Face) }
+    sdt_group.move! Geom::Transformation.new([width-250.mm, khung_size+20.mm, depth+1.mm])
 
     model.commit_operation
   end

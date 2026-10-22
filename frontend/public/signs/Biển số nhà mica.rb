@@ -1,50 +1,114 @@
-# Mã nguồn Ruby hoàn chỉnh
+# Mã nguồn Ruby hoàn chỉnh 100% dựng biển số nhà mica "223" (xanh dương)
 module BienSoNhaMica
   def self.build
     model = Sketchup.active_model
     model.start_operation('BienSoNhaMica', true)
     entities = model.active_entities
 
-    # Tạo khung sắt đỡ
-    frame_pts = [
-      [0.mm, 0.mm, 0.mm],
-      [300.mm, 0.mm, 0.mm],
-      [300.mm, 200.mm, 0.mm],
-      [0.mm, 200.mm, 0.mm]
-    ]
-    frame_grp = entities.add_group
-    frame_face = frame_grp.entities.add_face(frame_pts)
-    frame_face.pushpull(25.mm) # Độ dày khung
-    frame_grp.material = "Gray" # Màu khung sắt
+    # Kích thước biển
+    width = 300.mm
+    height = 200.mm
+    thickness = 5.mm
+    corner_radius = 10.mm
 
-    # Tạo bề mặt biển
-    surface_pts = [
-      [5.mm, 5.mm, 25.mm],
-      [295.mm, 5.mm, 25.mm],
-      [295.mm, 195.mm, 25.mm],
-      [5.mm, 195.mm, 25.mm]
+    # Tạo mặt nền mica bo góc
+    pts = [
+      [0, 0, 0],
+      [width, 0, 0],
+      [width, height, 0],
+      [0, height, 0]
     ]
-    surface_grp = entities.add_group
-    surface_face = surface_grp.entities.add_face(surface_pts)
-    surface_face.pushpull(5.mm) # Độ dày bề mặt
-    surface_grp.material = "White" # Màu bề mặt biển
+    face = entities.add_face(pts)
+    face.pushpull(thickness)
+    group_bg = entities.add_group(face.all_connected)
+    group_bg.material = "#0A2D8F" # Xanh dương đậm
 
-    # Tạo chữ nổi 3D
-    text_grp = entities.add_group
-    text = text_grp.entities.add_text("Số nhà", [50.mm, 100.mm, 30.mm], 30.mm)
-    text_grp.material = "Blue" # Màu chữ nổi
+    # Bo góc (cắt bo 4 góc)
+    require 'sketchup.rb'
+    def self.round_corners(group, width, height, radius, thickness)
+      ents = group.entities
+      # 4 góc: (0,0), (width,0), (width,height), (0,height)
+      [[0,0], [width,0], [width,height], [0,height]].each do |x, y|
+        center = Geom::Point3d.new(x == 0 ? radius : width - radius, y == 0 ? radius : height - radius, thickness/2)
+        arc = ents.add_arc(center, [0,0,1], [x==0 ? 1 : -1,0,0], radius, 0, 90.degrees)
+        face = ents.add_face(arc)
+        face.pushpull(-thickness)
+      end
+    end
+    round_corners(group_bg, width, height, corner_radius, thickness)
 
-    # Tạo viền nẹp trang trí
-    border_pts = [
-      [0.mm, 0.mm, 30.mm],
-      [300.mm, 0.mm, 30.mm],
-      [300.mm, 200.mm, 30.mm],
-      [0.mm, 200.mm, 30.mm]
+    # Viền chỉ trắng (vẽ đường line offset vào trong 10mm)
+    offset = 10.mm
+    viền_pts = [
+      [offset, offset, thickness+0.1],
+      [width-offset, offset, thickness+0.1],
+      [width-offset, height-offset, thickness+0.1],
+      [offset, height-offset, thickness+0.1],
+      [offset, offset, thickness+0.1]
     ]
-    border_grp = entities.add_group
-    border_face = border_grp.entities.add_face(border_pts)
-    border_face.pushpull(5.mm) # Độ dày viền
-    border_grp.material = "Gold" # Màu viền nẹp
+    viền = entities.add_group
+    viền.entities.add_edges(viền_pts)
+    viền.material = "#FFFFFF"
+
+    # Vẽ 4 họa tiết góc (dạng bo cong)
+    def self.add_corner_decor(entities, x, y, thickness, color)
+      r = 10.mm
+      arc = entities.add_arc([x, y, thickness+0.1], [0,0,1], [1,0,0], r, 0, 90.degrees)
+      arc.each { |e| e.material = color }
+    end
+    add_corner_decor(entities, offset, offset, thickness, "#FFFFFF")
+    add_corner_decor(entities, width-offset, offset, thickness, "#FFFFFF")
+    add_corner_decor(entities, width-offset, height-offset, thickness, "#FFFFFF")
+    add_corner_decor(entities, offset, height-offset, thickness, "#FFFFFF")
+
+    # Vẽ lỗ bắt vít 4 góc
+    hole_radius = 4.mm
+    hole_offset = 8.mm
+    [[hole_offset, hole_offset],
+     [width-hole_offset, hole_offset],
+     [width-hole_offset, height-hole_offset],
+     [hole_offset, height-hole_offset]].each do |x, y|
+      circle = entities.add_circle([x, y, thickness/2], [0,0,1], hole_radius)
+      hole_face = entities.add_face(circle)
+      hole_face.pushpull(-thickness*2)
+    end
+
+    # Thêm số nhà lớn "223"
+    text_group = entities.add_group
+    text_group.entities.add_3d_text(
+      "223",
+      TextAlignCenter,
+      "Arial Black",
+      false,
+      false,
+      60.mm, # Chiều cao chữ lớn
+      2.mm,  # Độ dày nổi nhẹ
+      0,     # Độ nghiêng
+      true,  # Filled
+      0
+    )
+    # Đặt vị trí số lớn
+    t = Geom::Transformation.new([width/2, height*0.60, thickness+0.5])
+    text_group.transform!(t)
+    text_group.material = "#FFFFFF"
+
+    # Thêm dòng chữ phụ "TRƯƠNG PHƯỚC PHAN,P.BTD,Q.BTÂN"
+    text_sub = entities.add_group
+    text_sub.entities.add_3d_text(
+      "TRƯƠNG PHƯỚC PHAN,P.BTD,Q.BTÂN",
+      TextAlignCenter,
+      "Arial",
+      false,
+      false,
+      15.mm, # Chiều cao chữ phụ
+      1.2.mm, # Độ dày nổi nhẹ
+      0,
+      true,
+      0
+    )
+    t2 = Geom::Transformation.new([width/2, height*0.18, thickness+0.5])
+    text_sub.transform!(t2)
+    text_sub.material = "#FFFFFF"
 
     model.commit_operation
   end

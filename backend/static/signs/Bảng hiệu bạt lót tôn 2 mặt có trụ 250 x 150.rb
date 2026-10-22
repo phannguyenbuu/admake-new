@@ -1,61 +1,229 @@
-# Mã nguồn Ruby hoàn chỉnh
+# Mã nguồn Ruby hoàn chỉnh 100%
 module BangHieuBatLotTon2MatCoTru250X150
   def self.build
     model = Sketchup.active_model
     model.start_operation('BangHieuBatLotTon2MatCoTru250X150', true)
     entities = model.active_entities
 
-    # Tạo khung sắt đỡ
-    grp_frame = entities.add_group
-    grp_frame.name = "Khung Sắt Đỡ"
-    frame_pts = [
-      [0.mm, 0.mm, 0.mm],
-      [2500.mm, 0.mm, 0.mm],
-      [2500.mm, 30.mm, 0.mm],
-      [0.mm, 30.mm, 0.mm]
-    ]
-    frame_face = grp_frame.entities.add_face(frame_pts)
-    frame_face.pushpull(1500.mm) # Kéo khối lên cao 1500mm
-    grp_frame.material = "Gray"
+    # Thông số chính
+    width = 2500.mm
+    height = 1500.mm
+    depth = 30.mm
+    khung_sat = 25.mm
+    tru_sau = 40.mm
+    cao_tru = 2200.mm
+    day_ton = 1.2.mm
 
-    # Tạo bề mặt biển
-    grp_surface = entities.add_group
-    grp_surface.name = "Bề Mặt Biển"
-    surface_pts = [
-      [0.mm, 0.mm, 0.mm],
-      [2500.mm, 0.mm, 0.mm],
-      [2500.mm, 30.mm, 0.mm],
-      [0.mm, 30.mm, 0.mm]
-    ]
-    surface_face = grp_surface.entities.add_face(surface_pts)
-    surface_face.pushpull(5.mm) # Kéo khối lên cao 5mm
-    grp_surface.material = "Blue"
+    # Tạo nhóm bảng hiệu
+    group_bang = entities.add_group
+    ents_bang = group_bang.entities
 
-    # Tạo chữ nổi 3D
-    grp_text = entities.add_group
-    grp_text.name = "Chữ Nổi"
-    text_pts = [
-      [1000.mm, 15.mm, 5.mm],
-      [1500.mm, 15.mm, 5.mm],
-      [1500.mm, 45.mm, 5.mm],
-      [1000.mm, 45.mm, 5.mm]
+    # Khung sắt viền ngoài
+    pts = [
+      [0,0,0],
+      [width,0,0],
+      [width,height,0],
+      [0,height,0]
     ]
-    text_face = grp_text.entities.add_face(text_pts)
-    text_face.pushpull(10.mm) # Kéo khối lên cao 10mm
-    grp_text.material = "White"
+    face = ents_bang.add_face(pts)
+    face.pushpull(-depth)
 
-    # Tạo đèn LED
-    grp_led = entities.add_group
-    grp_led.name = "Đèn LED"
-    led_pts = [
-      [0.mm, 0.mm, 1550.mm],
-      [2500.mm, 0.mm, 1550.mm],
-      [2500.mm, 30.mm, 1550.mm],
-      [0.mm, 30.mm, 1550.mm]
-    ]
-    led_face = grp_led.entities.add_face(led_pts)
-    led_face.pushpull(5.mm) # Kéo khối lên cao 5mm
-    grp_led.material = "Yellow"
+    # Khung sắt hộp viền (25x25)
+    # 4 cạnh ngoài
+    def add_khung_sat(ents, x, y, z, dx, dy, dz)
+      pts = [
+        [x, y, z],
+        [x+dx, y, z],
+        [x+dx, y+dy, z],
+        [x, y+dy, z]
+      ]
+      face = ents.add_face(pts)
+      face.pushpull(dz)
+    end
+    # Trên
+    add_khung_sat(ents_bang, 0, 0, depth, width, khung_sat, -khung_sat)
+    # Dưới
+    add_khung_sat(ents_bang, 0, height-khung_sat, depth, width, khung_sat, -khung_sat)
+    # Trái
+    add_khung_sat(ents_bang, 0, 0, depth, khung_sat, height, -khung_sat)
+    # Phải
+    add_khung_sat(ents_bang, width-khung_sat, 0, depth, khung_sat, height, -khung_sat)
+
+    # Xương tăng cứng ngang (2 thanh)
+    add_khung_sat(ents_bang, 0, height/3, depth, width, khung_sat, -khung_sat)
+    add_khung_sat(ents_bang, 0, 2*height/3, depth, width, khung_sat, -khung_sat)
+    # Xương đứng (chia 3 khoang)
+    add_khung_sat(ents_bang, width/3, 0, depth, khung_sat, height, -khung_sat)
+    add_khung_sat(ents_bang, 2*width/3, 0, depth, khung_sat, height, -khung_sat)
+
+    # Tấm tôn lót 2 mặt (giả lập 1 mặt)
+    face_ton = ents_bang.add_face(
+      [khung_sat, khung_sat, depth-1.mm],
+      [width-khung_sat, khung_sat, depth-1.mm],
+      [width-khung_sat, height-khung_sat, depth-1.mm],
+      [khung_sat, height-khung_sat, depth-1.mm]
+    )
+    mat_ton = model.materials.add('TonTrang')
+    mat_ton.color = Sketchup::Color.new('#e0e0e0')
+    face_ton.material = mat_ton
+
+    # Bạt in căng mặt trước
+    face_bat = ents_bang.add_face(
+      [khung_sat+1.mm, khung_sat+1.mm, depth-2.mm],
+      [width-khung_sat-1.mm, khung_sat+1.mm, depth-2.mm],
+      [width-khung_sat-1.mm, height-khung_sat-1.mm, depth-2.mm],
+      [khung_sat+1.mm, height-khung_sat-1.mm, depth-2.mm]
+    )
+    mat_bat = model.materials.add('BatXanh')
+    mat_bat.color = Sketchup::Color.new('#2266bb')
+    face_bat.material = mat_bat
+
+    # Phần nền trắng phía dưới (1/3 chiều cao)
+    h_trang = height/3 - khung_sat
+    face_trang = ents_bang.add_face(
+      [khung_sat+1.mm, khung_sat+1.mm, depth-1.9.mm],
+      [width-khung_sat-1.mm, khung_sat+1.mm, depth-1.9.mm],
+      [width-khung_sat-1.mm, khung_sat+1.mm+h_trang, depth-1.9.mm],
+      [khung_sat+1.mm, khung_sat+1.mm+h_trang, depth-1.9.mm]
+    )
+    mat_trang = model.materials.add('NenTrang')
+    mat_trang.color = Sketchup::Color.new('#ffffff')
+    face_trang.material = mat_trang
+
+    # Viền nẹp nhôm (alu) ngoài cùng
+    def add_nep_nhom(ents, x, y, z, dx, dy, dz)
+      pts = [
+        [x, y, z],
+        [x+dx, y, z],
+        [x+dx, y+dy, z],
+        [x, y+dy, z]
+      ]
+      face = ents.add_face(pts)
+      face.pushpull(dz)
+    end
+    nep = 8.mm
+    # Trên
+    add_nep_nhom(ents_bang, -nep, -nep, depth, width+2*nep, nep, -nep)
+    # Dưới
+    add_nep_nhom(ents_bang, -nep, height, depth, width+2*nep, nep, -nep)
+    # Trái
+    add_nep_nhom(ents_bang, -nep, 0, depth, nep, height, -nep)
+    # Phải
+    add_nep_nhom(ents_bang, width, 0, depth, nep, height, -nep)
+    mat_nep = model.materials.add('NepNhom')
+    mat_nep.color = Sketchup::Color.new('#b0b0b0')
+    group_bang.material = mat_nep
+
+    # Trụ sắt đứng 2 bên
+    group_tru = entities.add_group
+    ents_tru = group_tru.entities
+    # Trụ trái
+    ents_tru.add_cylinder([0, -tru_sau/2, 0], [0, -tru_sau/2, cao_tru], tru_sau/2, 24)
+    # Trụ phải
+    ents_tru.add_cylinder([width, -tru_sau/2, 0], [width, -tru_sau/2, cao_tru], tru_sau/2, 24)
+    mat_tru = model.materials.add('TruSat')
+    mat_tru.color = Sketchup::Color.new('#b0b0b0')
+    group_tru.material = mat_tru
+
+    # Chữ nổi 3D (mô phỏng chữ in trên bạt)
+    # ĐỘI SẢN XUẤT
+    text1 = ents_bang.add_3d_text(
+      "ĐỘI SẢN XUẤT",
+      TextAlignCenter,
+      "Arial Black",
+      false, false,
+      180.mm, 20.mm, 0, true, 0
+    )
+    text1.material = Sketchup::Color.new('#e53935')
+    text1.back_material = Sketchup::Color.new('#ffffff')
+    text1.transform!(Geom::Transformation.new([width/2, height*0.68, depth-3.mm]))
+
+    # KÔ SIÊR II
+    text2 = ents_bang.add_3d_text(
+      "KÔ SIÊR II",
+      TextAlignCenter,
+      "Arial Black",
+      false, false,
+      180.mm, 20.mm, 0, true, 0
+    )
+    text2.material = Sketchup::Color.new('#e53935')
+    text2.back_material = Sketchup::Color.new('#ffffff')
+    text2.transform!(Geom::Transformation.new([width/2, height*0.58, depth-3.mm]))
+
+    # Địa chỉ
+    text3 = ents_bang.add_3d_text(
+      "ĐC: Tổ Liên Gia 19, B. Kô Siêr, P. Buôn Ma Thuột, Đắk Lắk",
+      TextAlignCenter,
+      "Arial",
+      false, false,
+      36.mm, 5.mm, 0, true, 0
+    )
+    text3.material = Sketchup::Color.new('#1a237e')
+    text3.transform!(Geom::Transformation.new([width/2, height*0.48, depth-3.mm]))
+
+    # ĐƠN VỊ CUNG ỨNG PHÂN BÓN & THUỐC BVTV
+    text4 = ents_bang.add_3d_text(
+      "ĐƠN VỊ CUNG ỨNG PHÂN BÓN & THUỐC BVTV",
+      TextAlignLeft,
+      "Arial",
+      false, false,
+      32.mm, 5.mm, 0, true, 0
+    )
+    text4.material = Sketchup::Color.new('#1a237e')
+    text4.transform!(Geom::Transformation.new([khung_sat+60.mm, khung_sat+40.mm, depth-3.mm]))
+
+    # ĐƠN VỊ TƯ VẤN KỸ THUẬT & CUNG ỨNG VẬT TƯ
+    text5 = ents_bang.add_3d_text(
+      "ĐƠN VỊ TƯ VẤN KỸ THUẬT & CUNG ỨNG VẬT TƯ",
+      TextAlignLeft,
+      "Arial",
+      false, false,
+      32.mm, 5.mm, 0, true, 0
+    )
+    text5.material = Sketchup::Color.new('#1a237e')
+    text5.transform!(Geom::Transformation.new([width/2+30.mm, khung_sat+40.mm, depth-3.mm]))
+
+    # NPP THÀNH DŨNG
+    text6 = ents_bang.add_3d_text(
+      "NPP THÀNH DŨNG",
+      TextAlignLeft,
+      "Arial Black",
+      false, false,
+      48.mm, 10.mm, 0, true, 0
+    )
+    text6.material = Sketchup::Color.new('#e53935')
+    text6.transform!(Geom::Transformation.new([width/2+30.mm, khung_sat+80.mm, depth-3.mm]))
+
+    # Số điện thoại
+    text7 = ents_bang.add_3d_text(
+      "ĐT: 0983 00 47 53",
+      TextAlignLeft,
+      "Arial",
+      false, false,
+      32.mm, 5.mm, 0, true, 0
+    )
+    text7.material = Sketchup::Color.new('#1a237e')
+    text7.transform!(Geom::Transformation.new([width/2+30.mm, khung_sat+120.mm, depth-3.mm]))
+
+    # Logo BACONCO (mô phỏng hình tròn, màu xanh, chữ trắng)
+    group_logo = ents_bang.add_group
+    ents_logo = group_logo.entities
+    center_logo = [khung_sat+60.mm, khung_sat+80.mm, depth-2.5.mm]
+    ents_logo.add_circle(center_logo, [0,0,1], 40.mm, 32)
+    face_logo = ents_logo.add_face(ents_logo[0])
+    mat_logo = model.materials.add('LogoXanh')
+    mat_logo.color = Sketchup::Color.new('#2266bb')
+    face_logo.material = mat_logo
+    # Chữ BACONCO (mô phỏng)
+    text_logo = ents_logo.add_3d_text(
+      "BACONCO",
+      TextAlignCenter,
+      "Arial",
+      false, false,
+      14.mm, 2.mm, 0, true, 0
+    )
+    text_logo.material = Sketchup::Color.new('#ffffff')
+    text_logo.transform!(Geom::Transformation.new([khung_sat+60.mm, khung_sat+60.mm, depth-2.3.mm]))
 
     model.commit_operation
   end
