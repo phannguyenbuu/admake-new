@@ -1,0 +1,57 @@
+# Material file for bang_hieu_bat_lot_ton_2_mat_co_tru_300_x_150.obj
+
+newmtl Mat_91918c
+Ka 0.171 0.171 0.165
+Kd 0.569 0.569 0.549
+Ks 0.2 0.2 0.2
+Ns 32.0
+d 1.000
+illum 2
+
+newmtl Mat_879196
+Ka 0.159 0.171 0.176
+Kd 0.529 0.569 0.588
+Ks 0.2 0.2 0.2
+Ns 32.0
+d 1.000
+illum 2
+
+newmtl Mat_afb9c0
+Ka 0.206 0.218 0.226
+Kd 0.686 0.725 0.753
+Ks 0.2 0.2 0.2
+Ns 32.0
+d 1.000
+illum 2
+
+newmtl Mat_1441af
+Ka 0.024 0.076 0.206
+Kd 0.078 0.255 0.686
+Ks 0.2 0.2 0.2
+Ns 32.0
+d 1.000
+illum 2
+
+newmtl Mat_f5f6f8
+Ka 0.288 0.289 0.292
+Kd 0.961 0.965 0.973
+Ks 0.2 0.2 0.2
+Ns 32.0
+d 1.000
+illum 2
+
+newmtl Mat_b12a31
+Ka 0.208 0.049 0.058
+Kd 0.694 0.165 0.192
+Ks 0.2 0.2 0.2
+Ns 32.0
+d 1.000
+illum 2
+
+newmtl Mat_143269
+Ka 0.024 0.059 0.124
+Kd 0.078 0.196 0.412
+Ks 0.2 0.2 0.2
+Ns 32.0
+d 1.000
+illum 2

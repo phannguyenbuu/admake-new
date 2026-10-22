@@ -35,6 +35,10 @@ export interface SignSampleItem {
   image_url: string;
   rb_filename: string;
   rb_url: string;
+  obj_filename?: string;
+  obj_url?: string;
+  mtl_filename?: string;
+  mtl_url?: string;
   title: string;
   description: string;
   category: "billboard" | "storefront" | "mini";

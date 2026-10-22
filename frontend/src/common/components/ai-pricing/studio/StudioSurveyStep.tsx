@@ -262,7 +262,7 @@ export const StudioSurveyStep: React.FC<StudioSurveyStepProps> = ({
                 >
                   <div className="relative w-full h-28 sm:h-32 bg-slate-800 overflow-hidden shrink-0 flex items-center justify-center">
                     <img
-                      src={sample.image_url}
+                      src={encodeURI(sample.image_url)}
                       alt={sample.title}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 block"
                       loading="lazy"
@@ -297,7 +297,20 @@ export const StudioSurveyStep: React.FC<StudioSurveyStepProps> = ({
                       <span className="truncate font-sans font-medium text-slate-500">
                         {sample.dimensions?.width}×{sample.dimensions?.height}m
                       </span>
-                      <span className="text-[#00b4b6] font-bold shrink-0">3D</span>
+                      <div className="flex items-center gap-1.5 shrink-0">
+                        {sample.obj_url && (
+                          <a
+                            href={encodeURI(sample.obj_url)}
+                            download={sample.obj_filename || `${sample.title}.obj`}
+                            onClick={(e) => e.stopPropagation()}
+                            className="px-1.5 py-0.5 rounded-md bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold border border-emerald-200 text-[10px] transition-colors"
+                            title="Tải file 3D Wavefront (.obj)"
+                          >
+                            OBJ
+                          </a>
+                        )}
+                        <span className="text-[#00b4b6] font-bold shrink-0">3D</span>
+                      </div>
                     </div>
                   </div>
                 </div>

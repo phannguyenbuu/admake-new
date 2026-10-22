@@ -1,0 +1,49 @@
+# Material file for hop_en_tron_xinhan_40.obj
+
+newmtl Mat_191b1f
+Ka 0.029 0.032 0.036
+Kd 0.098 0.106 0.122
+Ks 0.2 0.2 0.2
+Ns 32.0
+d 1.000
+illum 2
+
+newmtl Mat_f8f7fa
+Ka 0.292 0.291 0.294
+Kd 0.973 0.969 0.980
+Ks 0.2 0.2 0.2
+Ns 32.0
+d 1.000
+illum 2
+
+newmtl Mat_e61c64
+Ka 0.271 0.033 0.118
+Kd 0.902 0.110 0.392
+Ks 0.2 0.2 0.2
+Ns 32.0
+d 1.000
+illum 2
+
+newmtl Mat_55be64
+Ka 0.100 0.224 0.118
+Kd 0.333 0.745 0.392
+Ks 0.2 0.2 0.2
+Ns 32.0
+d 1.000
+illum 2
+
+newmtl Mat_dc1630
+Ka 0.259 0.026 0.056
+Kd 0.863 0.086 0.188
+Ks 0.2 0.2 0.2
+Ns 32.0
+d 1.000
+illum 2
+
+newmtl Mat_faca1c
+Ka 0.294 0.238 0.033
+Kd 0.980 0.792 0.110
+Ks 0.2 0.2 0.2
+Ns 32.0
+d 1.000
+illum 2

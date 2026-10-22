@@ -436,10 +436,10 @@ export function useStudioImageAndRuby({
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `signboard_model_${Date.now()}.txt`;
+    a.download = `signboard_sketchup_${Date.now()}.rb`;
     a.click();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
-    message.success("Đã tải file mô hình về máy!");
+    message.success("Đã tải mã nguồn SketchUp Ruby (.rb) về máy!");
   };
 
   return {

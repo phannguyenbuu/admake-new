@@ -1,0 +1,25 @@
+# Material file for bien_chuc_danh_chan_go_30_x_15.obj
+
+newmtl Mat_334155
+Ka 0.060 0.076 0.100
+Kd 0.200 0.255 0.333
+Ks 0.2 0.2 0.2
+Ns 32.0
+d 1.000
+illum 2
+
+newmtl Mat_f8fafc
+Ka 0.292 0.294 0.296
+Kd 0.973 0.980 0.988
+Ks 0.2 0.2 0.2
+Ns 32.0
+d 1.000
+illum 2
+
+newmtl Mat_f59e0b
+Ka 0.288 0.186 0.013
+Kd 0.961 0.620 0.043
+Ks 0.2 0.2 0.2
+Ns 32.0
+d 1.000
+illum 2

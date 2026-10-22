@@ -1,0 +1,33 @@
+# Material file for standee_chan_chu_x_60_x_160.obj
+
+newmtl Mat_324155
+Ka 0.059 0.076 0.100
+Kd 0.196 0.255 0.333
+Ks 0.2 0.2 0.2
+Ns 32.0
+d 1.000
+illum 2
+
+newmtl Mat_f0f2f5
+Ka 0.282 0.285 0.288
+Kd 0.941 0.949 0.961
+Ks 0.2 0.2 0.2
+Ns 32.0
+d 1.000
+illum 2
+
+newmtl Mat_eb9114
+Ka 0.276 0.171 0.024
+Kd 0.922 0.569 0.078
+Ks 0.2 0.2 0.2
+Ns 32.0
+d 1.000
+illum 2
+
+newmtl Mat_dcb432
+Ka 0.259 0.212 0.059
+Kd 0.863 0.706 0.196
+Ks 0.2 0.2 0.2
+Ns 32.0
+d 1.000
+illum 2

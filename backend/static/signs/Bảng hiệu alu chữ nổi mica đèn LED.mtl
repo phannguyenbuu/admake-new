@@ -1,0 +1,33 @@
+# Material file for bang_hieu_alu_chu_noi_mica_en_led.obj
+
+newmtl Mat_555b5e
+Ka 0.100 0.107 0.111
+Kd 0.333 0.357 0.369
+Ks 0.2 0.2 0.2
+Ns 32.0
+d 1.000
+illum 2
+
+newmtl Mat_afb5b8
+Ka 0.206 0.213 0.216
+Kd 0.686 0.710 0.722
+Ks 0.2 0.2 0.2
+Ns 32.0
+d 1.000
+illum 2
+
+newmtl Mat_373b3d
+Ka 0.065 0.069 0.072
+Kd 0.216 0.231 0.239
+Ks 0.2 0.2 0.2
+Ns 32.0
+d 1.000
+illum 2
+
+newmtl Mat_475569
+Ka 0.084 0.100 0.124
+Kd 0.278 0.333 0.412
+Ks 0.2 0.2 0.2
+Ns 32.0
+d 1.000
+illum 2

@@ -2884,14 +2884,33 @@ def api_ai_toolx_job_get(job_id):
 # HINTS & MÔ HÌNH 3D QUẢNG CÁO
 # ==============================================================================
 
+def load_signs_catalog():
+    paths = [
+        os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "static", "signs", "signs_catalog.json"),
+        r"D:\Dropbox\_Documents\Admake\frontend\public\signs\signs_catalog.json",
+        "/var/www/admake/signs/signs_catalog.json",
+        "/root/admake/backend/static/signs/signs_catalog.json"
+    ]
+    for p in paths:
+        if p and os.path.exists(p):
+            try:
+                with open(p, "r", encoding="utf-8") as fp:
+                    data = json.load(fp)
+                if data:
+                    return data
+            except Exception:
+                pass
+    return []
+
 @ai_bp.route('/api/ai/3d/hints', methods=['GET', 'OPTIONS'])
 def api_ai_3d_hints():
     """Lấy danh sách Hint chuyên dụng về quảng cáo từ bảng nhỏ đến bảng khổng lồ"""
     if request.method == 'OPTIONS':
         return jsonify({"ok": True}), 200
+    catalog = load_signs_catalog()
     return jsonify({
         "success": True,
-        "hints": SIGNBOARD_HINTS
+        "hints": catalog if catalog else SIGNBOARD_HINTS
     }), 200
 
 @ai_bp.route('/api/ai/3d/generate', methods=['POST', 'OPTIONS'])

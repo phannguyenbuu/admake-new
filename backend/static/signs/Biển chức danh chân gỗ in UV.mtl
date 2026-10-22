@@ -1,0 +1,73 @@
+# Material file for bien_chuc_danh_chan_go_in_uv.obj
+
+newmtl Mat_5c0f19
+Ka 0.108 0.018 0.029
+Kd 0.361 0.059 0.098
+Ks 0.2 0.2 0.2
+Ns 32.0
+d 1.000
+illum 2
+
+newmtl Mat_821c26
+Ka 0.153 0.033 0.045
+Kd 0.510 0.110 0.149
+Ks 0.2 0.2 0.2
+Ns 32.0
+d 1.000
+illum 2
+
+newmtl Mat_e0b82a
+Ka 0.264 0.216 0.049
+Kd 0.878 0.722 0.165
+Ks 0.2 0.2 0.2
+Ns 32.0
+d 1.000
+illum 2
+
+newmtl Mat_ffde5c
+Ka 0.300 0.261 0.108
+Kd 1.000 0.871 0.361
+Ks 0.2 0.2 0.2
+Ns 32.0
+d 1.000
+illum 2
+
+newmtl Mat_7e5c13
+Ka 0.148 0.108 0.022
+Kd 0.494 0.361 0.075
+Ks 0.2 0.2 0.2
+Ns 32.0
+d 1.000
+illum 2
+
+newmtl Mat_475569
+Ka 0.084 0.100 0.124
+Kd 0.278 0.333 0.412
+Ks 0.2 0.2 0.2
+Ns 32.0
+d 1.000
+illum 2
+
+newmtl Mat_0f2587
+Ka 0.018 0.044 0.159
+Kd 0.059 0.145 0.529
+Ks 0.2 0.2 0.2
+Ns 32.0
+d 1.000
+illum 2
+
+newmtl Mat_c60f12
+Ka 0.233 0.018 0.021
+Kd 0.776 0.059 0.071
+Ks 0.2 0.2 0.2
+Ns 32.0
+d 1.000
+illum 2
+
+newmtl Mat_19783f
+Ka 0.029 0.141 0.074
+Kd 0.098 0.471 0.247
+Ks 0.2 0.2 0.2
+Ns 32.0
+d 1.000
+illum 2

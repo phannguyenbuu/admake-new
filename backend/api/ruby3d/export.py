@@ -157,6 +157,9 @@ def repair_ruby_syntax(src: str) -> str:
     if "```" in src:
         src = src.split("```")[0].strip()
 
+    # Thay the .gsub(/.../, ...) bang .tr(" ", "_") de tranh loi regex trong chuoi interpolation
+    src = re.sub(r'\.gsub\s*\(\s*/[^/]+/\s*,\s*["\'][^"\']*["\']\s*\)', '.tr(" ", "_")', src)
+
     lines = src.splitlines()
     repaired = []
     continuation_chars = ('(', '[', '{', ',', '+', '-', '*', '/', '\\', '.')
