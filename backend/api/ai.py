@@ -3064,7 +3064,7 @@ def api_signboard_parse_ruby_to_mesh():
             "quotation": quote
         }), 200
     except Exception as e:
-        return jsonify({"success": False, "error": f"Lỗi phân tích mã Ruby sang 3D: {str(e)}"}), 500
+        return jsonify({"success": False, "error": f"Lỗi phân tích mã Ruby sang 3D: {str(e)}"}), 200
 
 
 # ==============================================================================
@@ -3251,8 +3251,46 @@ def api_signs_default_ruby():
                 except Exception:
                     pass
 
+    # 3. Nếu chưa có, quét lấy file .rb đầu tiên có trong thư mục signs
     if not code:
-        return jsonify({"success": False, "error": f"Không tìm thấy file kịch bản Ruby mẫu"}), 404
+        for sdir in signs_dirs:
+            if os.path.isdir(sdir):
+                rbs = [f for f in sorted(os.listdir(sdir)) if f.endswith('.rb')]
+                for rbf in rbs:
+                    p = os.path.join(sdir, rbf)
+                    try:
+                        with open(p, "r", encoding="utf-8", errors="replace") as f:
+                            content = f.read()
+                        if content.strip():
+                            code = content
+                            resolved_file = rbf
+                            is_custom = False
+                            break
+                    except Exception:
+                        pass
+                if code:
+                    break
+
+    # 4. Nếu vẫn chưa có, lấy từ signs_catalog.json
+    if not code:
+        for sdir in signs_dirs:
+            cp = os.path.join(sdir, "signs_catalog.json")
+            if os.path.exists(cp):
+                try:
+                    with open(cp, "r", encoding="utf-8") as f:
+                        cat_items = json.load(f)
+                    for item in cat_items:
+                        if item.get("ruby_code") and item.get("has_3d"):
+                            code = item["ruby_code"]
+                            resolved_file = item.get("rb_filename") or f"{item.get('title')}.rb"
+                            break
+                except Exception:
+                    pass
+            if code:
+                break
+
+    if not code:
+        return jsonify({"success": False, "error": f"Chưa có kịch bản Ruby khả dụng"}), 200
 
     model_3d = None
     if parse_ruby_to_mesh:

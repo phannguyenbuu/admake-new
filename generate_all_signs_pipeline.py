@@ -374,7 +374,7 @@ def run():
                     'has_sheet_backing': False
                 },
                 'elements': [],
-                'ruby_code': clean_rb_code if has_real_rb else "",
+                'ruby_code': "",
                 'prompt': f"Bảng hiệu {base}, phối cảnh thực tế sắc nét 4K."
             }
             no_3d_count += 1
@@ -418,6 +418,12 @@ def run():
                 mtl_src = os.path.join(SRC_DIR, item['mtl_filename'])
                 if os.path.exists(mtl_src):
                     shutil.copy2(mtl_src, os.path.join(target_dir, item['mtl_filename']))
+
+        # Ghi active_default_signboard.rb từ sản phẩm 3D đầu tiên
+        first_3d = next((item for item in catalog if item.get('has_3d') and item.get('ruby_code')), None)
+        if first_3d:
+            with open(os.path.join(target_dir, "active_default_signboard.rb"), "w", encoding="utf-8") as f:
+                f.write(first_3d['ruby_code'])
 
         # Ghi signs_catalog.json
         cat_file = os.path.join(target_dir, "signs_catalog.json")

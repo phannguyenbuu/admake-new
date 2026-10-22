@@ -43,6 +43,7 @@ export interface SignSampleItem {
   description: string;
   category: "billboard" | "storefront" | "mini";
   badge: string;
+  has_3d?: boolean;
   dimensions: { width: number; height: number; depth: number };
   materials: {
     iron_type: string;

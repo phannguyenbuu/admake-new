@@ -265,13 +265,16 @@ export function useSignboardStudio(isActive: boolean = true) {
     };
     const cached = sampleMeshCacheRef.current.get(sample.id);
     applyParsedModelToMesh(cached || baseModel);
-    setActiveVisualTab("3d");
-    if (cached || !sample.ruby_code) return;
+    if (sample.has_3d) {
+      setActiveVisualTab("3d");
+    }
+    if (cached || !sample.ruby_code || sample.has_3d === false) return;
 
     sampleReqRef.current = sample.id;
     axiosClient
       .post("/ai/signboard/parse-rb-mesh", { ruby_code: sample.ruby_code }, { timeout: 30000 })
       .then((res) => {
+        if (!res.data?.success) return;
         const m: Signboard3DModel | undefined = res.data?.model3d || res.data?.model_3d || res.data?.model;
         if (!m?.elements?.length || m.source !== "ruby_interpreter") return;
         const real: Signboard3DModel = { ...baseModel, elements: m.elements, dimensions: m.dimensions || baseModel.dimensions, source: m.source, warnings: m.warnings };
@@ -279,7 +282,7 @@ export function useSignboardStudio(isActive: boolean = true) {
         if (!mountedRef.current || sampleReqRef.current !== sample.id) return;
         applyParsedModelToMesh(real);
       })
-      .catch((e) => console.warn("[Signboard3D] Không dựng được từ mã Ruby, dùng mô hình catalog:", e));
+      .catch(() => {});
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [applyParsedModelToMesh]);
 
