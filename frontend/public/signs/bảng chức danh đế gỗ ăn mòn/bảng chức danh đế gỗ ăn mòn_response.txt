@@ -1,0 +1,181 @@
+=== FILE: bảng chức danh đế gỗ ăn mòn.jfif ===  
+--- PHÂN TÍCH HÌNH ẢNH & THIẾT KẾ THỰC TẾ ---
+
+**1. Tên thương hiệu, dòng chữ chính hoặc số hiển thị:**  
+- Dòng chữ lớn nhất, nổi bật: **HUỲNH TẤN ĐÔ** (màu đỏ tươi, in hoa, font sans-serif, dày, nổi bật giữa bảng).
+- Dòng chữ phụ phía trên: **Luật sư** (màu đỏ, nhỏ hơn, in thường).
+
+**2. Nội dung chữ phụ, logo:**  
+- Logo bên trái: Biểu tượng Tòa án Nhân dân (cân công lý, nền đỏ, viền vàng, chữ vàng, chi tiết xanh dương).
+- Viền trang trí: Họa tiết vàng chạy quanh mép bảng và đế.
+- Không có số điện thoại, địa chỉ, icon mạng xã hội.
+
+**3. Màu sắc thực tế (chuẩn xác, mã hex):**  
+- Nền bảng: Vàng ánh kim nhạt (#D8C75A).
+- Viền bảng: Đỏ nâu gỗ (#7B2E1D).
+- Viền họa tiết: Vàng kim loại (#F5D76E).
+- Chữ chính/phụ: Đỏ tươi (#E53935).
+- Logo: Đỏ (#D32F2F), vàng (#F5D76E), xanh dương (#1976D2).
+- Đế gỗ: Đỏ nâu gỗ (#7B2E1D).
+
+**4. Vật liệu & quy cách gia công:**  
+- Mặt bảng: Kim loại ăn mòn (inox vàng hoặc nhôm vàng ăn mòn sơn màu).
+- Đế: Gỗ sơn PU màu đỏ nâu, ghép nhiều tầng, vát cạnh.
+- Viền: Nẹp nhôm vàng hoặc viền gỗ sơn vàng.
+- Logo: Ăn mòn màu hoặc in UV trực tiếp lên mặt bảng.
+- Không có đèn LED, không có khung sắt hộp.
+
+**5. Kích thước ước tính:**  
+- Rộng: 300mm  
+- Cao: 150mm  
+- Sâu tổng thể (đế): 40mm  
+- Đế gồm 2 tầng, tầng trên cao ~20mm, tầng dưới ~20mm, vát cạnh.
+
+---
+
+```ruby
+# Mã nguồn Ruby hoàn chỉnh 100%
+module BangChucDanhDeGoAnMon
+  def self.build
+    model = Sketchup.active_model
+    model.start_operation('BangChucDanhDeGoAnMon', true)
+    entities = model.active_entities
+
+    # Kích thước tổng thể
+    width = 300.mm
+    height = 150.mm
+    depth = 10.mm # độ dày mặt bảng kim loại
+    base_depth = 40.mm
+
+    # Đế gỗ tầng dưới
+    base1_height = 20.mm
+    base1_depth = base_depth
+    base1_width = width + 20.mm
+    base1 = entities.add_group
+    base1_face = base1.entities.add_face(
+      [-(base1_width/2), -base1_depth/2, 0],
+      [ (base1_width/2), -base1_depth/2, 0],
+      [ (base1_width/2),  (base1_depth/2), 0],
+      [-(base1_width/2),  (base1_depth/2), 0]
+    )
+    base1_face.pushpull(base1_height)
+    base1.material = "#7B2E1D"
+
+    # Đế gỗ tầng trên
+    base2_height = 20.mm
+    base2_depth = 25.mm
+    base2_width = width + 10.mm
+    base2 = entities.add_group
+    base2_face = base2.entities.add_face(
+      [-(base2_width/2), -base2_depth/2, base1_height],
+      [ (base2_width/2), -base2_depth/2, base1_height],
+      [ (base2_width/2),  (base2_depth/2), base1_height],
+      [-(base2_width/2),  (base2_depth/2), base1_height]
+    )
+    base2_face.pushpull(base2_height)
+    base2.material = "#7B2E1D"
+
+    # Mặt bảng kim loại ăn mòn
+    board = entities.add_group
+    board_z = base1_height + base2_height
+    board_face = board.entities.add_face(
+      [-(width/2), -depth/2, board_z],
+      [ (width/2), -depth/2, board_z],
+      [ (width/2),  (depth/2), board_z],
+      [-(width/2),  (depth/2), board_z]
+    )
+    board_face.pushpull(height)
+    board.material = "#D8C75A"
+
+    # Viền bảng (viền đỏ nâu)
+    border = entities.add_group
+    border_thick = 3.mm
+    border_face = border.entities.add_face(
+      [-(width/2 + border_thick), -(depth/2 + border_thick), board_z - border_thick],
+      [ (width/2 + border_thick), -(depth/2 + border_thick), board_z - border_thick],
+      [ (width/2 + border_thick),  (depth/2 + border_thick), board_z - border_thick],
+      [-(width/2 + border_thick),  (depth/2 + border_thick), board_z - border_thick]
+    )
+    border_face.pushpull(height + 2*border_thick)
+    border.material = "#7B2E1D"
+
+    # Viền họa tiết vàng (chỉ mô phỏng khối)
+    pattern = entities.add_group
+    pattern_thick = 2.mm
+    pattern_offset = 7.mm
+    pattern_face = pattern.entities.add_face(
+      [-(width/2 - pattern_offset), -(depth/2 - pattern_thick), board_z + pattern_thick],
+      [ (width/2 - pattern_offset), -(depth/2 - pattern_thick), board_z + pattern_thick],
+      [ (width/2 - pattern_offset),  (depth/2 - pattern_thick), board_z + pattern_thick],
+      [-(width/2 - pattern_offset),  (depth/2 - pattern_thick), board_z + pattern_thick]
+    )
+    pattern_face.pushpull(height - 2*pattern_offset)
+    pattern.material = "#F5D76E"
+
+    # Viền họa tiết vàng ở đế
+    base_pattern = entities.add_group
+    base_pattern_face = base_pattern.entities.add_face(
+      [-(base2_width/2 - 7.mm), -base2_depth/2 + 2.mm, base1_height + 1.mm],
+      [ (base2_width/2 - 7.mm), -base2_depth/2 + 2.mm, base1_height + 1.mm],
+      [ (base2_width/2 - 7.mm),  (base2_depth/2) - 2.mm, base1_height + 1.mm],
+      [-(base2_width/2 - 7.mm),  (base2_depth/2) - 2.mm, base1_height + 1.mm]
+    )
+    base_pattern_face.pushpull(2.mm)
+    base_pattern.material = "#F5D76E"
+
+    # Logo (mô phỏng khối tròn, không chi tiết)
+    logo = entities.add_group
+    logo_radius = 28.mm
+    logo_center = [-(width/2) + 45.mm, 0, board_z + height/2]
+    logo_face = logo.entities.add_circle(logo_center, [0,0,1], logo_radius)
+    logo.entities.add_face(logo_face).pushpull(2.mm)
+    logo.material = "#D32F2F"
+
+    # Chữ nổi "LUẬT SƯ"
+    text1 = entities.add_group
+    text1.entities.add_3d_text(
+      "Luật sư",
+      TextAlignLeft,
+      "Arial",
+      false,
+      false,
+      18.mm,
+      2.mm,
+      0,
+      true,
+      "#E53935"
+    ).move!([-(width/2) + 100.mm, 0, board_z + height - 40.mm])
+
+    # Chữ nổi "HUỲNH TẤN ĐÔ"
+    text2 = entities.add_group
+    text2.entities.add_3d_text(
+      "HUỲNH TẤN ĐÔ",
+      TextAlignLeft,
+      "Arial Black",
+      false,
+      false,
+      28.mm,
+      6.mm,
+      0,
+      true,
+      "#E53935"
+    ).move!([-(width/2) + 100.mm, 0, board_z + height - 80.mm])
+
+    model.commit_operation
+  end
+end
+BangChucDanhDeGoAnMon.build
+```
+
+--- THÔNG SỐ VÀ VẬT LIỆU GIA CÔNG ---
+
+| Bộ phận             | Kích thước (mm)         | Vật liệu           | Màu sắc (hex)  | Ghi chú                    |
+|---------------------|-------------------------|--------------------|---------------|---------------------------|
+| Mặt bảng            | 300 x 150 x 10          | Inox vàng ăn mòn   | #D8C75A       | Ăn mòn, phủ màu vàng      |
+| Đế gỗ tầng dưới     | 320 x 40 x 20           | Gỗ sơn PU          | #7B2E1D       | Vát cạnh, sơn đỏ nâu      |
+| Đế gỗ tầng trên     | 310 x 25 x 20           | Gỗ sơn PU          | #7B2E1D       | Vát cạnh, sơn đỏ nâu      |
+| Viền bảng           | 306 x 156 x 3           | Gỗ/nhôm            | #7B2E1D       | Viền nổi, sơn đỏ nâu      |
+| Viền họa tiết vàng  | 286 x 136 x 2           | Nhôm/gỗ            | #F5D76E       | Họa tiết vàng kim         |
+| Logo                | Ø56 x 2                 | Inox/UV màu        | #D32F2F       | Mô phỏng hình tròn        |
+| Chữ nổi "HUỲNH TẤN ĐÔ" | Cao 28 x dày 6      | Inox sơn đỏ        | #E53935       | Nổi, in hoa, dày 6mm      |
+| Chữ nổi "Luật sư"   | Cao 18 x dày 2          | Inox sơn đỏ        | #E53935       | Nổi, in thường, dày 2mm   |

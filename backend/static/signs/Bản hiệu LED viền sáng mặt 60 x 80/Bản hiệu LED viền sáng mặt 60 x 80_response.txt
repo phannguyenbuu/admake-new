@@ -1,0 +1,252 @@
+=== FILE: Bản hiệu LED viền sáng mặt 60 x 80.jpg ===
+--- PHÂN TÍCH HÌNH ẢNH & THIẾT KẾ THỰC TẾ ---
+
+**1. Tên thương hiệu, dòng chữ chính:**
+- "Hương Giang" (chữ nổi lớn, font script, màu trắng, đặt phía trên)
+- "Cà Phê Bên Suối" (chữ nổi lớn, font sans-serif bo tròn, màu vàng cam, chia 2 dòng, đặt giữa bảng)
+
+**2. Nội dung chữ phụ:**
+- "21 Nguyễn Tuân" (chữ nổi nhỏ, màu đen trên nền trắng, nằm trong khối bo tròn góc ở đáy bảng)
+
+**3. Màu sắc thực tế (chuẩn xác, ước lượng mã hex):**
+- Nền bảng: Đen đậm (gần #181A20)
+- Chữ "Hương Giang": Trắng (gần #FFFFFF)
+- Chữ "Cà Phê Bên Suối": Vàng cam (gần #FFC300)
+- Khối nền chữ địa chỉ: Trắng (gần #F5F5F5)
+- Chữ địa chỉ: Đen (gần #222222)
+- Viền nẹp alu: Xám bạc (gần #C0C0C0)
+- LED viền: Ánh sáng trắng xanh (gần #B5E3FF)
+
+**4. Vật liệu & quy cách gia công:**
+- Khung xương: Sắt hộp 25x25mm, sơn đen, có chân đế đứng.
+- Tấm nền: Alu composite đen, dày 3mm.
+- Viền nẹp alu: Nhôm hoặc alu uốn bo cạnh, rộng 20mm.
+- Chữ nổi: Mica trắng (chữ lớn), mica vàng cam (chữ vàng), dán nổi 3D, dày 20-30mm.
+- Đèn LED: Dải LED gắn viền mặt trước, ánh sáng trắng xanh.
+- Đế chữ phụ: Mica trắng, bo góc, dày 10mm.
+
+**5. Kích thước tổng thể:**
+- Rộng: 600mm
+- Cao: 800mm
+- Sâu: 20mm (tấm mặt) + 25mm (khung xương) = tổng sâu ~45mm
+
+---
+
+```ruby
+# Mã nguồn Ruby hoàn chỉnh 100%
+module BanHieuLedVienSangMat60X80
+  def self.build
+    model = Sketchup.active_model
+    model.start_operation('BanHieuLedVienSangMat60X80', true)
+    entities = model.active_entities
+
+    # Thông số kích thước
+    width = 600.mm
+    height = 800.mm
+    depth = 20.mm
+    khung_size = 25.mm
+    viền_nẹp = 20.mm
+    radius = 40.mm
+
+    # ======= Khung xương sắt hộp =======
+    khung_group = entities.add_group
+    khung = khung_group.entities
+
+    # Khung ngoài
+    pts = [
+      [0,0,0], [width,0,0], [width,height,0], [0,height,0]
+    ]
+    khung_face = khung.add_face(pts)
+    khung_face.pushpull(-khung_size)
+    # Xương đứng giữa
+    khung.add_face(
+      [width/2-khung_size/2,0,0],
+      [width/2+khung_size/2,0,0],
+      [width/2+khung_size/2,height,0],
+      [width/2-khung_size/2,height,0]
+    ).pushpull(-khung_size)
+    # Xương ngang tăng cứng (trên/dưới)
+    khung.add_face(
+      [0,khung_size,0],
+      [width,khung_size,0],
+      [width,khung_size+khung_size,0],
+      [0,khung_size+khung_size,0]
+    ).pushpull(-khung_size)
+    khung.add_face(
+      [0,height-khung_size*2,0],
+      [width,height-khung_size*2,0],
+      [width,height-khung_size,0],
+      [0,height-khung_size,0]
+    ).pushpull(-khung_size)
+    # Chân đế đứng
+    chan_de = khung.add_group
+    chan_de.entities.add_face(
+      [width/2-20.mm, -50.mm, -khung_size],
+      [width/2+20.mm, -50.mm, -khung_size],
+      [width/2+20.mm, 0, -khung_size],
+      [width/2-20.mm, 0, -khung_size]
+    ).pushpull(-25.mm)
+    khung_group.material = "#222222"
+
+    # ======= Tấm nền alu composite =======
+    nen_group = entities.add_group
+    nen = nen_group.entities
+    # Bo góc
+    nen_face = nen.add_face(
+      Geom::Point3d.new(viền_nẹp,viền_nẹp,khung_size),
+      Geom::Point3d.new(width-viền_nẹp,viền_nẹp,khung_size),
+      Geom::Point3d.new(width-viền_nẹp,height-viền_nẹp,khung_size),
+      Geom::Point3d.new(viền_nẹp,height-viền_nẹp,khung_size)
+    )
+    nen_face.pushpull(depth)
+    nen_group.material = "#181A20"
+
+    # ======= Viền nẹp alu bo cạnh =======
+    vien_group = entities.add_group
+    vien = vien_group.entities
+    # 4 cạnh viền
+    vien.add_face(
+      [0,0,khung_size+depth],
+      [width,0,khung_size+depth],
+      [width,viền_nẹp,khung_size+depth],
+      [0,viền_nẹp,khung_size+depth]
+    ).pushpull(viền_nẹp)
+    vien.add_face(
+      [0,height-viền_nẹp,khung_size+depth],
+      [width,height-viền_nẹp,khung_size+depth],
+      [width,height,khung_size+depth],
+      [0,height,khung_size+depth]
+    ).pushpull(viền_nẹp)
+    vien.add_face(
+      [0,viền_nẹp,khung_size+depth],
+      [viền_nẹp,viền_nẹp,khung_size+depth],
+      [viền_nẹp,height-viền_nẹp,khung_size+depth],
+      [0,height-viền_nẹp,khung_size+depth]
+    ).pushpull(viền_nẹp)
+    vien.add_face(
+      [width-viền_nẹp,viền_nẹp,khung_size+depth],
+      [width,viền_nẹp,khung_size+depth],
+      [width,height-viền_nẹp,khung_size+depth],
+      [width-viền_nẹp,height-viền_nẹp,khung_size+depth]
+    ).pushpull(viền_nẹp)
+    vien_group.material = "#C0C0C0"
+
+    # ======= LED viền sáng =======
+    led_group = entities.add_group
+    led = led_group.entities
+    led_radius = 3.mm
+    led_spacing = 35.mm
+    # LED trên viền (4 cạnh)
+    (viền_nẹp+led_spacing).step(width-viền_nẹp-led_spacing, led_spacing) do |x|
+      led.add_circle([x,viền_nẹp/2,khung_size+depth+viền_nẹp/2], [0,0,1], led_radius)
+      led.entities[-1].material = "#B5E3FF"
+      led.add_circle([x,height-viền_nẹp/2,khung_size+depth+viền_nẹp/2], [0,0,1], led_radius)
+      led.entities[-1].material = "#B5E3FF"
+    end
+    (viền_nẹp+led_spacing).step(height-viền_nẹp-led_spacing, led_spacing) do |y|
+      led.add_circle([viền_nẹp/2,y,khung_size+depth+viền_nẹp/2], [0,0,1], led_radius)
+      led.entities[-1].material = "#B5E3FF"
+      led.add_circle([width-viền_nẹp/2,y,khung_size+depth+viền_nẹp/2], [0,0,1], led_radius)
+      led.entities[-1].material = "#B5E3FF"
+    end
+
+    # ======= Chữ nổi 3D =======
+    # "Hương Giang"
+    text1_group = entities.add_group
+    text1 = text1_group.entities
+    text1.add_3d_text(
+      "Hương Giang",
+      TextAlignCenter,
+      "Arial",
+      false,
+      false,
+      80.mm,
+      30.mm,
+      0,
+      true,
+      0
+    ).each { |e| e.material = "#FFFFFF" }
+    text1_group.transform!(Geom::Transformation.translation([width/2, height-220.mm, khung_size+depth+2.mm]))
+
+    # "Cà Phê"
+    text2_group = entities.add_group
+    text2 = text2_group.entities
+    text2.add_3d_text(
+      "Cà Phê",
+      TextAlignCenter,
+      "Arial",
+      true,
+      false,
+      65.mm,
+      25.mm,
+      0,
+      true,
+      0
+    ).each { |e| e.material = "#FFC300" }
+    text2_group.transform!(Geom::Transformation.translation([width/2, height-350.mm, khung_size+depth+2.mm]))
+
+    # "Bên Suối"
+    text3_group = entities.add_group
+    text3 = text3_group.entities
+    text3.add_3d_text(
+      "Bên Suối",
+      TextAlignCenter,
+      "Arial",
+      true,
+      false,
+      65.mm,
+      25.mm,
+      0,
+      true,
+      0
+    ).each { |e| e.material = "#FFC300" }
+    text3_group.transform!(Geom::Transformation.translation([width/2, height-420.mm, khung_size+depth+2.mm]))
+
+    # ======= Địa chỉ (nền trắng, chữ đen) =======
+    diachi_group = entities.add_group
+    diachi = diachi_group.entities
+    diachi_width = 350.mm
+    diachi_height = 55.mm
+    diachi_radius = 25.mm
+    # Nền bo góc
+    diachi_face = diachi.add_face(
+      [width/2-diachi_width/2, 40.mm, khung_size+depth+1.mm],
+      [width/2+diachi_width/2, 40.mm, khung_size+depth+1.mm],
+      [width/2+diachi_width/2, 40.mm+diachi_height, khung_size+depth+1.mm],
+      [width/2-diachi_width/2, 40.mm+diachi_height, khung_size+depth+1.mm]
+    )
+    diachi_face.pushpull(10.mm)
+    diachi_group.material = "#F5F5F5"
+    # Chữ địa chỉ
+    text4_group = diachi_group.entities.add_group
+    text4 = text4_group.entities
+    text4.add_3d_text(
+      "21 Nguyễn Tuân",
+      TextAlignCenter,
+      "Arial",
+      false,
+      false,
+      30.mm,
+      8.mm,
+      0,
+      true,
+      0
+    ).each { |e| e.material = "#222222" }
+    text4_group.transform!(Geom::Transformation.translation([diachi_width/2, diachi_height/2, 10.mm]))
+
+    model.commit_operation
+  end
+end
+BanHieuLedVienSangMat60X80.build
+```
+
+--- THÔNG SỐ VÀ VẬT LIỆU GIA CÔNG ---
+
+| Bộ phận         | Kích thước                | Vật liệu                | Màu sắc (hex)   | Ghi chú                    |
+|-----------------|--------------------------|-------------------------|-----------------|----------------------------|
+| Khung xương     | 600x800x25mm             | Sắt hộp 25x25mm         | #222222         | Có chân đế đứng            |
+| Tấm nền         | 560x760x20mm             | Alu composite 3mm       | #181A20         | Bo góc                     |
+| Viền nẹp        | 20mm rộng                | Nhôm/alu                | #C0C0C0         | Uốn bo cạnh                |
+| Chữ nổi lớn     | Cao 65-80mm, dày 25-30mm | Mica trắng/vàng cam     | #FFFFFF/#FFC300 | "Hương Giang", "Cà Phê Bên Suối" |
+| Đèn LED viền    | ĐK 6mm, cách 35mm        | LED ánh sáng trắng xanh | #B5E3FF         | Gắn viền mặt trước         |
+| Địa chỉ         | 350x55x10mm              | Mica trắng, chữ mica đen| #F5F5F5/#222222 | "21 Nguyễn Tuân"           |

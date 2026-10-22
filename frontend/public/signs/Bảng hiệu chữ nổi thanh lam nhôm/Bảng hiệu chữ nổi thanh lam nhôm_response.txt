@@ -1,0 +1,212 @@
+=== FILE: Bảng hiệu chữ nổi thanh lam nhôm.jpg ===
+--- PHÂN TÍCH HÌNH ẢNH & THIẾT KẾ THỰC TẾ ---
+
+**1. Tên thương hiệu, dòng chữ chính:**
+- Dòng chữ lớn nhất, nổi bật: **"CÁ NHỎ YÊU BỘT"** (chữ in hoa, màu trắng, font bo tròn, chữ nổi mica dày).
+- Logo hình cá bên trái, trong logo có chữ:  
+  - Trên: "小鱼爱上粉" (tiếng Trung, màu trắng)
+  - Dưới: "CÁ NHỎ YÊU BỘT" (màu trắng, in hoa)
+
+**2. Nội dung chữ phụ, slogan, số điện thoại, địa chỉ, icon:**
+- Dòng chữ nổi tiếng Trung lớn: "小鱼爱上粉" (màu trắng, chữ nổi mica, font thư pháp).
+- Dòng số điện thoại:  
+  - Biểu tượng điện thoại màu trắng  
+  - Số: **0362 455 098 - 0794 637 672** (màu trắng, chữ nổi mica, font in đậm, nền đỏ)
+
+**3. Màu sắc thực tế (chuẩn xác, mã hex):**
+- Nền thanh lam nhôm: **Đỏ tươi** (#E10613)
+- Chữ nổi mica: **Trắng** (#FFFFFF)
+- Logo cá:  
+  - Nền đỏ: #E10613  
+  - Họa tiết và chữ trong logo: **Trắng** (#FFFFFF)
+- Viền nẹp nhôm: **Đỏ bóng** (#E10613)
+- Khung sắt hộp: **Đen** (#222222) (ẩn bên trong, không lộ ra ngoài)
+- Không có đèn LED lộ rõ trong ảnh.
+
+**4. Vật liệu và quy cách gia công:**
+- Khung xương sắt hộp 25x25mm, sơn đen, gia cố viền và xương ngang/đứng.
+- Thanh lam nhôm hộp 30x60mm, sơn tĩnh điện đỏ, xếp ngang, cách đều nhau.
+- Chữ nổi mica trắng dày 20-30mm (chữ lớn), 15-20mm (chữ phụ, số điện thoại).
+- Logo mica nổi, nền mica đỏ, viền mica trắng, dán decal/cắt CNC.
+- Số điện thoại và icon điện thoại mica trắng, nền đỏ.
+- Kích thước tổng thể: **Rộng 1200mm x Cao 400mm x Sâu 60mm**.
+
+**5. Kích thước ước tính:**
+- Tổng biển: 1200mm x 400mm x 60mm
+- Logo cá: Đường kính ~280mm
+- Chữ nổi chính: Cao ~110mm, dày 30mm
+- Chữ phụ: Cao ~70mm, dày 20mm
+- Số điện thoại: Cao ~40mm, dày 15mm
+
+---
+
+```ruby
+# Mã nguồn Ruby hoàn chỉnh 100%
+module BangHieuChuNoiThanhLamNhom
+  def self.build
+    model = Sketchup.active_model
+    model.start_operation('BangHieuChuNoiThanhLamNhom', true)
+    entities = model.active_entities
+
+    # Thông số chính
+    width = 1200.mm
+    height = 400.mm
+    depth = 60.mm
+    khung_size = 25.mm
+    lam_height = 40.mm
+    lam_spacing = 10.mm
+    num_lam = ((height + lam_spacing) / (lam_height + lam_spacing)).floor
+
+    # Màu sắc
+    mau_do = "#E10613"
+    mau_trang = "#FFFFFF"
+    mau_den = "#222222"
+
+    # === Khung xương sắt hộp ===
+    khung_group = entities.add_group
+    khung = khung_group.entities
+
+    # Viền ngoài
+    khung.add_face([0,0,0],[width,0,0],[width,height,0],[0,height,0]).pushpull(-khung_size)
+    # Xương đứng giữa
+    khung.add_face([width/2-khung_size/2,0,0],[width/2+khung_size/2,0,0],[width/2+khung_size/2,height,0],[width/2-khung_size/2,height,0]).pushpull(-khung_size)
+    # Xương ngang tăng cứng
+    khung.add_face([0,height/2-khung_size/2,0],[width,height/2-khung_size/2,0],[width,height/2+khung_size/2,0],[0,height/2+khung_size/2,0]).pushpull(-khung_size)
+    # Đặt màu khung
+    khung_group.material = mau_den
+
+    # === Thanh lam nhôm ngang ===
+    lam_group = entities.add_group
+    lam_entities = lam_group.entities
+    y = 0
+    num_lam.times do |i|
+      lam = lam_entities.add_face([0, y, khung_size], [width, y, khung_size], [width, y+lam_height, khung_size], [0, y+lam_height, khung_size])
+      lam.pushpull(depth-khung_size)
+      y += lam_height + lam_spacing
+    end
+    lam_group.material = mau_do
+
+    # === Viền nẹp nhôm bao quanh ===
+    vien_group = entities.add_group
+    vien = vien_group.entities
+    vien_width = 10.mm
+    # Viền trên
+    vien.add_face([-vien_width, -vien_width, khung_size], [width+vien_width, -vien_width, khung_size], [width+vien_width, 0, khung_size], [-vien_width, 0, khung_size]).pushpull(depth)
+    # Viền dưới
+    vien.add_face([-vien_width, height, khung_size], [width+vien_width, height, khung_size], [width+vien_width, height+vien_width, khung_size], [-vien_width, height+vien_width, khung_size]).pushpull(depth)
+    # Viền trái
+    vien.add_face([-vien_width, 0, khung_size], [0, 0, khung_size], [0, height, khung_size], [-vien_width, height, khung_size]).pushpull(depth)
+    # Viền phải
+    vien.add_face([width, 0, khung_size], [width+vien_width, 0, khung_size], [width+vien_width, height, khung_size], [width, height, khung_size]).pushpull(depth)
+    vien_group.material = mau_do
+
+    # === Logo cá nổi bên trái ===
+    logo_group = entities.add_group
+    logo_center = [140.mm, height/2+20.mm, depth-10.mm]
+    logo_radius = 120.mm
+    # Nền logo tròn
+    logo_face = logo_group.entities.add_circle(logo_center, [0,0,1], logo_radius)
+    logo_face = logo_group.entities.add_face(logo_face)
+    logo_face.pushpull(18.mm)
+    logo_group.material = mau_do
+    # Viền trắng ngoài logo
+    logo_vien = logo_group.entities.add_circle(logo_center, [0,0,1], logo_radius+8.mm)
+    logo_vien_face = logo_group.entities.add_face(logo_vien)
+    logo_vien_face.erase!
+    # Hình cá cách điệu (mô phỏng khối cong nổi)
+    ca_body = logo_group.entities.add_face([logo_center[0]-80.mm, logo_center[1]+30.mm, depth+8.mm],
+                                           [logo_center[0]+80.mm, logo_center[1]+30.mm, depth+8.mm],
+                                           [logo_center[0]+60.mm, logo_center[1]-60.mm, depth+8.mm],
+                                           [logo_center[0]-60.mm, logo_center[1]-60.mm, depth+8.mm])
+    ca_body.pushpull(8.mm)
+    ca_body.material = mau_trang
+
+    # === Chữ nổi chính: "CÁ NHỎ YÊU BỘT" ===
+    chu_chinh_group = entities.add_group
+    chu_chinh_text = "CÁ NHỎ YÊU BỘT"
+    chu_chinh_group.entities.add_3d_text(
+      chu_chinh_text,
+      TextAlignCenter,
+      "Arial Rounded MT Bold",
+      110.mm,
+      false,
+      30.mm,
+      0,
+      true,
+      0
+    ).transform!(Geom::Transformation.translation([width/2, height-110.mm, depth-5.mm]))
+    chu_chinh_group.material = mau_trang
+
+    # === Chữ nổi phụ tiếng Trung: "小鱼爱上粉" ===
+    chu_phu_group = entities.add_group
+    chu_phu_text = "小鱼爱上粉"
+    chu_phu_group.entities.add_3d_text(
+      chu_phu_text,
+      TextAlignCenter,
+      "Arial Unicode MS",
+      70.mm,
+      false,
+      20.mm,
+      0,
+      true,
+      0
+    ).transform!(Geom::Transformation.translation([width/2+70.mm, height/2-30.mm, depth-5.mm]))
+    chu_phu_group.material = mau_trang
+
+    # === Số điện thoại và icon ===
+    so_dt_group = entities.add_group
+    # Icon điện thoại (mô phỏng hình chữ nhật bo tròn)
+    dt_icon = so_dt_group.entities.add_face([width/2-220.mm, 20.mm, depth-5.mm],
+                                            [width/2-200.mm, 20.mm, depth-5.mm],
+                                            [width/2-200.mm, 60.mm, depth-5.mm],
+                                            [width/2-220.mm, 60.mm, depth-5.mm])
+    dt_icon.pushpull(15.mm)
+    dt_icon.material = mau_trang
+    # Số điện thoại
+    so_dt_text = "0362 455 098 - 0794 637 672"
+    so_dt_group.entities.add_3d_text(
+      so_dt_text,
+      TextAlignLeft,
+      "Arial Black",
+      40.mm,
+      false,
+      15.mm,
+      0,
+      true,
+      0
+    ).transform!(Geom::Transformation.translation([width/2-180.mm, 20.mm, depth-5.mm]))
+    so_dt_group.material = mau_trang
+
+    # === Logo chữ trong logo (mô phỏng) ===
+    logo_text_group = logo_group.entities.add_group
+    logo_text_group.entities.add_3d_text(
+      "小鱼爱上粉\nCÁ NHỎ YÊU BỘT",
+      TextAlignCenter,
+      "Arial Unicode MS",
+      22.mm,
+      false,
+      4.mm,
+      0,
+      true,
+      0
+    ).transform!(Geom::Transformation.translation([logo_center[0], logo_center[1]-20.mm, depth+12.mm]))
+    logo_text_group.material = mau_trang
+
+    model.commit_operation
+  end
+end
+BangHieuChuNoiThanhLamNhom.build
+```
+
+--- THÔNG SỐ VÀ VẬT LIỆU GIA CÔNG ---
+
+| Bộ phận                | Kích thước/Quy cách           | Vật liệu         | Màu sắc (Hex) |
+|------------------------|-------------------------------|------------------|--------------|
+| Khung xương sắt hộp    | 25x25mm, sơn tĩnh điện        | Sắt hộp vuông    | #222222      |
+| Thanh lam nhôm         | 30x60mm, sơn tĩnh điện        | Nhôm hộp         | #E10613      |
+| Viền nẹp nhôm          | 10mm, chạy quanh viền         | Nhôm/alu         | #E10613      |
+| Logo cá                | Ø280mm, mica nổi              | Mica đỏ/trắng    | #E10613/#FFF |
+| Chữ nổi chính          | Cao 110mm, dày 30mm           | Mica nổi         | #FFFFFF      |
+| Chữ nổi phụ (TQ)       | Cao 70mm, dày 20mm            | Mica nổi         | #FFFFFF      |
+| Số điện thoại, icon    | Cao 40mm, dày 15mm            | Mica nổi         | #FFFFFF      |
+| Tổng kích thước biển   | 1200 x 400 x 60 mm            |                  |              |

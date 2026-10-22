@@ -1,0 +1,148 @@
+=== FILE: Chữ mica uốn nổi fom đèn LED.jpg ===
+--- PHÂN TÍCH HÌNH ẢNH & THIẾT KẾ THỰC TẾ ---
+**Tên thương hiệu, dòng chữ chính:**  
+- Dòng chữ nổi bật là "B" và "L" (có thể là một phần của tên thương hiệu hoặc ký hiệu, do ảnh chỉ chụp cận cảnh hai ký tự này).
+
+**Nội dung chữ phụ, slogan, số điện thoại, địa chỉ, icon mạng xã hội hoặc logo:**  
+- Không thấy chữ phụ, slogan, số điện thoại, địa chỉ hay icon mạng xã hội trong ảnh này.
+
+**Màu sắc thực tế chuẩn xác:**  
+- Mặt chữ mica: Xanh lá sáng nổi bật (mã hex gần đúng: #39FF14).
+- Thành chữ (viền hông): Xám đậm (mã hex gần đúng: #3A3A3A).
+- Không thấy nền bảng, chỉ thấy chữ nổi.
+
+**Vật liệu và quy cách gia công:**  
+- Mặt chữ: Mica uốn nổi, dán fomex hoặc nhựa định hình, gắn đèn LED bên trong.
+- Thành chữ: Fomex hoặc mica xám uốn nổi, dày khoảng 30mm-60mm.
+- Không thấy rõ khung xương sắt, nền alu hay chân đế trong ảnh này.
+- Đèn LED: Lắp bên trong chữ, phát sáng xuyên mặt mica.
+
+**Kích thước ước tính:**  
+- Tổng thể (ước lượng theo yêu cầu): Rộng 1200mm x Cao 400mm x Sâu 60mm.
+- Kích thước từng chữ: "B" và "L" cao khoảng 350mm, dày 60mm.
+
+```ruby
+# Mã nguồn Ruby hoàn chỉnh 100%
+module ChuMicaUonNoiFomDenLed
+  def self.build
+    model = Sketchup.active_model
+    model.start_operation('ChuMicaUonNoiFomDenLed', true)
+    entities = model.active_entities
+
+    # Thông số tổng thể
+    width = 1200.mm
+    height = 400.mm
+    depth = 60.mm
+
+    # Tạo nhóm chữ nổi
+    group = entities.add_group
+    gents = group.entities
+
+    # Tạo mặt chữ "B"
+    b_face = gents.add_3d_text(
+      "B",
+      TextAlignLeft,
+      "Arial Black",
+      false, # Bold
+      false, # Italic
+      350.mm, # Chiều cao chữ
+      0, # Độ nghiêng
+      true, # Filled
+      0
+    )
+    b_group = gents.add_group(b_face)
+    b_group.move! Geom::Transformation.new([100.mm, 25.mm, 0])
+    # Đẩy nổi chữ "B"
+    b_group.entities.each do |e|
+      if e.is_a?(Sketchup::Face)
+        e.pushpull(depth)
+      end
+    end
+
+    # Tạo mặt chữ "L"
+    l_face = gents.add_3d_text(
+      "L",
+      TextAlignLeft,
+      "Arial Black",
+      false,
+      false,
+      350.mm,
+      0,
+      true,
+      0
+    )
+    l_group = gents.add_group(l_face)
+    l_group.move! Geom::Transformation.new([600.mm, 25.mm, 0])
+    # Đẩy nổi chữ "L"
+    l_group.entities.each do |e|
+      if e.is_a?(Sketchup::Face)
+        e.pushpull(depth)
+      end
+    end
+
+    # Tô màu mặt chữ (mica xanh lá)
+    green = model.materials.add('MicaGreen')
+    green.color = '#39FF14'
+    [b_group, l_group].each do |letter_group|
+      letter_group.entities.each do |e|
+        if e.is_a?(Sketchup::Face)
+          # Mặt trên cùng
+          if e.normal.z > 0.9
+            e.material = green
+          end
+        end
+      end
+    end
+
+    # Tô màu thành chữ (xám đậm)
+    gray = model.materials.add('MicaGray')
+    gray.color = '#3A3A3A'
+    [b_group, l_group].each do |letter_group|
+      letter_group.entities.each do |e|
+        if e.is_a?(Sketchup::Face)
+          # Thành bên
+          if e.normal.z.abs < 0.1
+            e.material = gray
+          end
+        end
+      end
+    end
+
+    # Mô phỏng đèn LED (tạo khối mỏng bên trong chữ)
+    led_mat = model.materials.add('LEDGlow')
+    led_mat.color = '#BFFF00'
+    led_mat.alpha = 0.4
+    [b_group, l_group].each do |letter_group|
+      letter_group.entities.each do |e|
+        if e.is_a?(Sketchup::Face)
+          # Mặt trên cùng
+          if e.normal.z > 0.9
+            led_face = e
+            led = gents.add_face(led_face.vertices.map(&:position))
+            led.pushpull(-5.mm)
+            led.material = led_mat
+          end
+        end
+      end
+    end
+
+    # Đặt nhóm chữ vào vị trí giữa bảng (nếu cần)
+    group.move! Geom::Transformation.new([0, 0, 0])
+
+    model.commit_operation
+  end
+end
+ChuMicaUonNoiFomDenLed.build
+```
+--- THÔNG SỐ VÀ VẬT LIỆU GIA CÔNG ---
+| Thành phần     | Vật liệu                | Màu sắc (Hex) | Kích thước (mm)         | Ghi chú                |
+|----------------|------------------------|---------------|-------------------------|------------------------|
+| Mặt chữ        | Mica uốn nổi           | #39FF14       | Cao 350 x Dày 60        | Phát sáng, LED bên trong|
+| Thành chữ      | Fomex/Mica xám         | #3A3A3A       | Dày 60                  | Uốn nổi, bo cạnh       |
+| Đèn LED        | LED dán trong chữ      | #BFFF00 (Glow)| -                       | Ánh sáng xuyên mica    |
+| Khung xương    | Không thấy trong ảnh   | -             | -                       |                        |
+| Nền bảng       | Không thấy trong ảnh   | -             | -                       |                        |
+
+**Lưu ý:**  
+- Nếu cần dựng thêm khung xương, nền alu, hoặc các chi tiết khác, vui lòng cung cấp ảnh tổng thể hoặc thông tin bổ sung.  
+- Mã Ruby trên dựng đúng 2 chữ nổi "B" và "L" với màu sắc, vật liệu và hiệu ứng LED sát thực tế ảnh.

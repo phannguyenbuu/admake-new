@@ -1,0 +1,157 @@
+=== FILE: Led neon nhiều màu 90 x 60.jpg ===
+--- PHÂN TÍCH HÌNH ẢNH & THIẾT KẾ THỰC TẾ ---
+
+**1. Tên thương hiệu, dòng chữ chính:**  
+- Chữ nổi chính: **"Thien Thanh"** (kiểu chữ viết tay nghệ thuật, 2 dòng, chữ "Thien" phía trên, "Thanh" phía dưới).
+- Không có số nhà, chức danh, slogan, số điện thoại, địa chỉ, icon mạng xã hội hay logo phụ.
+
+**2. Nội dung phụ:**  
+- Có biểu tượng vương miện (crown) phía trên chữ "Thien", bên phải.
+
+**3. Màu sắc thực tế (chuẩn xác, ước lượng mã hex):**  
+- Chữ "Thien": LED neon màu **hồng tím** (#FF3EF6).
+- Chữ "Thanh": LED neon màu **xanh dương sáng** (#00B2FF).
+- Viền chữ: LED neon trắng xanh (#FFFFFF hoặc #B6F0FF).
+- Vương miện: LED neon **vàng cam** (#FFD600).
+- Nền: Không rõ vật liệu nền, nhưng thường là mica trắng sữa hoặc mica trong cắt CNC theo biên dạng chữ, không có nền alu hay gỗ lộ rõ trong ảnh (nền tối do chụp ban đêm).
+
+**4. Vật liệu & quy cách gia công:**  
+- Chữ nổi mica uốn nổi, gắn LED neon dán viền mặt chữ.
+- Đế mica trắng sữa cắt CNC theo biên dạng chữ và vương miện, dày 8-10mm.
+- Không có khung sắt hộp lộ ra, có thể gắn trực tiếp lên tường hoặc có chân treo phía sau.
+- Không có viền nẹp nhôm/alu, chỉ có viền sáng LED.
+- Kích thước tổng thể: **Rộng 900mm x Cao 600mm x Sâu 20mm** (ước lượng, đúng yêu cầu).
+
+**5. Kết luận:**  
+- Sản phẩm là biển chữ nổi mica gắn LED neon nhiều màu, dạng chữ viết tay nghệ thuật, có vương miện, không nền alu/gỗ, không khung viền lộ rõ.
+
+```ruby
+# Mã nguồn Ruby hoàn chỉnh 100%
+module LedNeonNhieuMau90X60
+  def self.build
+    model = Sketchup.active_model
+    model.start_operation('LedNeonNhieuMau90X60', true)
+    entities = model.active_entities
+
+    # Kích thước tổng thể
+    width = 900.mm
+    height = 600.mm
+    base_thickness = 10.mm
+    letter_thickness = 30.mm
+    crown_thickness = 20.mm
+
+    # Tạo đế mica trắng sữa (cắt CNC theo biên dạng chữ, ở đây mô phỏng hình chữ nhật bo góc)
+    base = entities.add_group
+    pts = [
+      [0, 0, 0],
+      [width, 0, 0],
+      [width, height, 0],
+      [0, height, 0]
+    ]
+    face = base.entities.add_face(pts)
+    face.pushpull(base_thickness)
+    # Bo góc nhẹ (mô phỏng)
+    base.material = "#F8F8FF" # trắng sữa
+
+    # Vị trí chữ "Thien"
+    thien_group = entities.add_group
+    thien_text = "Thien"
+    thien_pos = [width * 0.18, height * 0.60, base_thickness]
+    thien = thien_group.entities.add_3d_text(
+      thien_text,
+      TextAlignLeft,
+      "Brush Script MT",
+      false,
+      false,
+      letter_thickness,
+      120.mm,
+      0,
+      true,
+      thien_pos
+    )
+    thien_group.material = "#FF3EF6" # Hồng tím LED neon
+
+    # Viền sáng chữ "Thien" (mô phỏng bằng offset)
+    thien_outline = thien_group.entities.add_group
+    thien_group.entities.each do |e|
+      if e.is_a?(Sketchup::Face)
+        outline = e.offset(5.mm)
+        outline.material = "#FFFFFF"
+      end
+    end
+
+    # Vị trí chữ "Thanh"
+    thanh_group = entities.add_group
+    thanh_text = "Thanh"
+    thanh_pos = [width * 0.13, height * 0.28, base_thickness]
+    thanh = thanh_group.entities.add_3d_text(
+      thanh_text,
+      TextAlignLeft,
+      "Brush Script MT",
+      false,
+      false,
+      letter_thickness,
+      120.mm,
+      0,
+      true,
+      thanh_pos
+    )
+    thanh_group.material = "#00B2FF" # Xanh dương LED neon
+
+    # Viền sáng chữ "Thanh"
+    thanh_outline = thanh_group.entities.add_group
+    thanh_group.entities.each do |e|
+      if e.is_a?(Sketchup::Face)
+        outline = e.offset(5.mm)
+        outline.material = "#B6F0FF"
+      end
+    end
+
+    # Vương miện (crown) phía trên chữ "Thien"
+    crown_group = entities.add_group
+    # Mô phỏng vương miện bằng các cung tròn và hình chữ nhật nhỏ
+    crown_base = crown_group.entities.add_circle(
+      [width * 0.70, height * 0.80, base_thickness + letter_thickness + 2.mm],
+      [0,0,1],
+      40.mm,
+      32
+    )
+    crown_face = crown_group.entities.add_face(crown_base)
+    crown_face.pushpull(crown_thickness)
+    crown_group.material = "#FFD600" # Vàng cam LED neon
+
+    # Thêm các chóp vương miện (mô phỏng 3 chóp)
+    3.times do |i|
+      angle = 120 * i - 60
+      rad = angle * Math::PI / 180
+      x = width * 0.70 + 40.mm * Math.cos(rad)
+      y = height * 0.80 + 40.mm * Math.sin(rad)
+      z = base_thickness + letter_thickness + crown_thickness + 2.mm
+      sphere = crown_group.entities.add_circle([x, y, z], [0,0,1], 8.mm, 16)
+      sphere_face = crown_group.entities.add_face(sphere)
+      sphere_face.pushpull(8.mm)
+    end
+
+    # Kết thúc thao tác
+    model.commit_operation
+  end
+end
+LedNeonNhieuMau90X60.build
+```
+
+--- THÔNG SỐ VÀ VẬT LIỆU GIA CÔNG ---
+
+| Bộ phận      | Vật liệu           | Màu sắc (hex) | Kích thước (mm)         | Ghi chú                      |
+|--------------|--------------------|--------------|-------------------------|------------------------------|
+| Đế biển      | Mica trắng sữa     | #F8F8FF      | 900 x 600 x 10          | CNC theo biên dạng chữ       |
+| Chữ "Thien"  | Mica + LED neon    | #FF3EF6      | Cao 120, dày 30         | Viền LED trắng #FFFFFF       |
+| Chữ "Thanh"  | Mica + LED neon    | #00B2FF      | Cao 120, dày 30         | Viền LED xanh #B6F0FF        |
+| Vương miện   | Mica + LED neon    | #FFD600      | R40, dày 20             | 3 chóp cầu nhỏ, LED vàng     |
+| Viền chữ     | LED neon           | #FFFFFF/#B6F0FF | 5mm quanh chữ         | Sáng viền nổi bật            |
+| Tổng thể     | -                  | -            | 900 x 600 x 60 (max)    | Không khung sắt, gắn tường   |
+
+**Lưu ý:**  
+- Mã Ruby trên mô phỏng hình dạng tổng thể, chữ nổi và vương miện, phù hợp dựng nhanh mô hình 3D nhận diện sản phẩm thực tế.  
+- Font chữ thực tế là Brush Script MT hoặc tương đương, có thể thay đổi nếu máy không hỗ trợ.  
+- Để mô phỏng LED neon viền, dùng offset hoặc tạo khối viền quanh chữ.  
+- Có thể chỉnh lại vị trí, kích thước các nhóm cho sát thực tế hơn khi dựng chi tiết.

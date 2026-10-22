@@ -1,0 +1,226 @@
+=== FILE: Menu cầm tay A4 Fomex cán decal.jfif ===  
+--- PHÂN TÍCH HÌNH ẢNH & THIẾT KẾ THỰC TẾ ---  
+**1. Tên thương hiệu, dòng chữ chính:**  
+- "TIỆM CHÈ NGOẠI TUI" (chữ lớn nhất, phía trên cùng, màu xanh lá cây đậm #2e5d3b)
+- Logo tròn bên phải: hình bà ngoại, chữ "Chè ngoại tui" (màu xanh lá cây #2e5d3b, vàng nhạt #f5e9c5, trắng #ffffff)
+- Slogan: "Chè Truyền Thống Ít Ngọt" (chữ nhỏ, màu xám xanh #6b7c6a)
+
+**2. Nội dung chữ phụ, slogan, số điện thoại, địa chỉ, icon mạng xã hội hoặc logo:**  
+- "CHE GÁNH BEST SELLER 40K" (nền xanh lá cây #4b7f4b, chữ trắng #ffffff)
+- Danh sách menu: các món chè, bánh flan, mix bánh miền tây, xôi, đặc biệt, giá tiền (chữ xanh đậm #2e5d3b, chữ đỏ #d43f3a cho món đặc biệt)
+- Hình ảnh minh họa món ăn (in decal màu)
+- Địa chỉ: "300 Hoàng Diệu, Buôn Ma Thuột, Đắk Lắk" (chữ trắng #ffffff trên nền xanh lá cây #4b7f4b)
+- Số điện thoại: "0849458548", "0339443156" (chữ trắng #ffffff trên nền xanh lá cây #4b7f4b)
+- Không có icon mạng xã hội.
+
+**3. Màu sắc thực tế chuẩn xác:**  
+- Nền chính: trắng #ffffff  
+- Khung viền: xanh lá cây đậm #2e5d3b  
+- Chữ chính: xanh lá cây đậm #2e5d3b  
+- Chữ phụ: xám xanh #6b7c6a, đỏ #d43f3a  
+- Nền các box: xanh lá cây #4b7f4b  
+- Logo: xanh lá cây #2e5d3b, vàng nhạt #f5e9c5, trắng #ffffff
+
+**4. Vật liệu và quy cách gia công:**  
+- Tấm nền: Fomex trắng dày 5mm, cán decal in màu  
+- Không có chữ nổi, chỉ in decal phẳng  
+- Không có đèn LED  
+- Không có viền nẹp nhôm, chỉ bo góc nhẹ  
+- Không có khung sắt, là menu cầm tay (không treo tường, không chân đế)
+
+**5. Kích thước ước tính:**  
+- Rộng: 210mm  
+- Cao: 297mm  
+- Dày: 5mm (tấm Fomex)  
+
+```ruby
+# Mã nguồn Ruby hoàn chỉnh 100%
+module MenuCamTayA4FomexCanDecal
+  def self.build
+    model = Sketchup.active_model
+    model.start_operation('MenuCamTayA4FomexCanDecal', true)
+    entities = model.active_entities
+
+    # Kích thước menu A4
+    width = 210.mm
+    height = 297.mm
+    thickness = 5.mm
+    corner_radius = 8.mm
+
+    # Tạo tấm nền Fomex bo góc
+    pts = [
+      Geom::Point3d.new(corner_radius, 0, 0),
+      Geom::Point3d.new(width - corner_radius, 0, 0),
+      Geom::Point3d.new(width, corner_radius, 0),
+      Geom::Point3d.new(width, height - corner_radius, 0),
+      Geom::Point3d.new(width - corner_radius, height, 0),
+      Geom::Point3d.new(corner_radius, height, 0),
+      Geom::Point3d.new(0, height - corner_radius, 0),
+      Geom::Point3d.new(0, corner_radius, 0)
+    ]
+
+    # Tạo mặt phẳng với bo góc
+    edges = []
+    edges << entities.add_arc(Geom::Point3d.new(corner_radius, 0, 0), [1,0,0], [0,1,0], corner_radius, 270.degrees, 360.degrees, 12)
+    edges << entities.add_line(Geom::Point3d.new(corner_radius, 0, 0), Geom::Point3d.new(width - corner_radius, 0, 0))
+    edges << entities.add_arc(Geom::Point3d.new(width - corner_radius, corner_radius, 0), [0,1,0], [-1,0,0], corner_radius, 0.degrees, 90.degrees, 12)
+    edges << entities.add_line(Geom::Point3d.new(width, corner_radius, 0), Geom::Point3d.new(width, height - corner_radius, 0))
+    edges << entities.add_arc(Geom::Point3d.new(width - corner_radius, height - corner_radius, 0), [-1,0,0], [0,-1,0], corner_radius, 90.degrees, 180.degrees, 12)
+    edges << entities.add_line(Geom::Point3d.new(width - corner_radius, height, 0), Geom::Point3d.new(corner_radius, height, 0))
+    edges << entities.add_arc(Geom::Point3d.new(corner_radius, height - corner_radius, 0), [0,-1,0], [1,0,0], corner_radius, 180.degrees, 270.degrees, 12)
+    edges << entities.add_line(Geom::Point3d.new(0, height - corner_radius, 0), Geom::Point3d.new(0, corner_radius, 0))
+
+    face = entities.add_face(edges.map(&:start).uniq)
+    face.pushpull(-thickness)
+
+    # Tô màu nền trắng
+    mat_white = model.materials.add('FomexWhite')
+    mat_white.color = '#ffffff'
+    face.material = mat_white
+    face.back_material = mat_white
+
+    # Tạo viền xanh lá cây đậm (2mm)
+    border_thickness = 2.mm
+    border_group = entities.add_group
+    border_face = border_group.entities.add_face(
+      [Geom::Point3d.new(0,0,0.1.mm),
+       Geom::Point3d.new(width,0,0.1.mm),
+       Geom::Point3d.new(width,height,0.1.mm),
+       Geom::Point3d.new(0,height,0.1.mm)]
+    )
+    inner_face = border_group.entities.add_face(
+      [Geom::Point3d.new(border_thickness,border_thickness,0.1.mm),
+       Geom::Point3d.new(width-border_thickness,border_thickness,0.1.mm),
+       Geom::Point3d.new(width-border_thickness,height-border_thickness,0.1.mm),
+       Geom::Point3d.new(border_thickness,height-border_thickness,0.1.mm)]
+    )
+    inner_face.erase!
+    mat_border = model.materials.add('BorderGreen')
+    mat_border.color = '#2e5d3b'
+    border_face.material = mat_border
+
+    # Chữ nổi 3D mô phỏng (dù thực tế là decal, vẫn tạo khối nổi nhẹ để nhận diện)
+    text_group = entities.add_group
+
+    # "TIỆM CHÈ NGOẠI TUI"
+    text1 = text_group.entities.add_3d_text(
+      "TIỆM CHÈ NGOẠI TUI",
+      TextAlignCenter,
+      "Arial",
+      false,
+      false,
+      18.mm,
+      1.5.mm,
+      0,
+      true,
+      0
+    )
+    text1.material = mat_border
+    text1.move! Geom::Transformation.translation([width/2, 25.mm, 1.5.mm])
+
+    # Slogan
+    mat_slogan = model.materials.add('SloganGray')
+    mat_slogan.color = '#6b7c6a'
+    text2 = text_group.entities.add_3d_text(
+      '"Chè Truyền Thống Ít Ngọt"',
+      TextAlignCenter,
+      "Arial Italic",
+      false,
+      false,
+      7.mm,
+      1.mm,
+      0,
+      true,
+      0
+    )
+    text2.material = mat_slogan
+    text2.move! Geom::Transformation.translation([width/2, 40.mm, 1.5.mm])
+
+    # Box "40K"
+    box_group = entities.add_group
+    box_w = 30.mm
+    box_h = 22.mm
+    box_x = 15.mm
+    box_y = 55.mm
+    box_face = box_group.entities.add_face(
+      [Geom::Point3d.new(box_x, box_y, 1.2.mm),
+       Geom::Point3d.new(box_x+box_w, box_y, 1.2.mm),
+       Geom::Point3d.new(box_x+box_w, box_y+box_h, 1.2.mm),
+       Geom::Point3d.new(box_x, box_y+box_h, 1.2.mm)]
+    )
+    mat_box = model.materials.add('BoxGreen')
+    mat_box.color = '#4b7f4b'
+    box_face.material = mat_box
+
+    # Text "40K"
+    text3 = box_group.entities.add_3d_text(
+      "40K",
+      TextAlignCenter,
+      "Arial Black",
+      false,
+      false,
+      10.mm,
+      1.mm,
+      0,
+      true,
+      0
+    )
+    mat_white2 = model.materials.add('TextWhite')
+    mat_white2.color = '#ffffff'
+    text3.material = mat_white2
+    text3.move! Geom::Transformation.translation([box_x+box_w/2, box_y+box_h/2-4.mm, 2.2.mm])
+
+    # Địa chỉ và số điện thoại (dưới cùng)
+    text4 = text_group.entities.add_3d_text(
+      "300 Hoàng Diệu, Buôn Ma Thuột",
+      TextAlignCenter,
+      "Arial",
+      false,
+      false,
+      7.mm,
+      1.mm,
+      0,
+      true,
+      0
+    )
+    text4.material = mat_white2
+    text4.move! Geom::Transformation.translation([width/2, height-18.mm, 1.5.mm])
+
+    text5 = text_group.entities.add_3d_text(
+      "0849458548 - 0339443156",
+      TextAlignCenter,
+      "Arial",
+      false,
+      false,
+      7.mm,
+      1.mm,
+      0,
+      true,
+      0
+    )
+    text5.material = mat_white2
+    text5.move! Geom::Transformation.translation([width/2, height-10.mm, 1.5.mm])
+
+    # Logo tròn mô phỏng (khối tròn, màu xanh nhạt)
+    logo_group = entities.add_group
+    logo_center = Geom::Point3d.new(width-35.mm, 28.mm, 1.2.mm)
+    logo_face = logo_group.entities.add_circle(logo_center, [0,0,1], 18.mm, 32)
+    logo_face = logo_group.entities.add_face(logo_face)
+    mat_logo = model.materials.add('LogoGreen')
+    mat_logo.color = '#f5e9c5'
+    logo_face.material = mat_logo
+
+    model.commit_operation
+  end
+end
+MenuCamTayA4FomexCanDecal.build
+```
+
+--- THÔNG SỐ VÀ VẬT LIỆU GIA CÔNG ---  
+| Thành phần         | Vật liệu         | Màu sắc (Hex) | Quy cách/Kích thước           |
+|--------------------|------------------|--------------|-------------------------------|
+| Tấm nền            | Fomex 5mm        | #ffffff      | 210x297x5mm, bo góc 8mm       |
+| Viền (border)      | Decal in màu     | #2e5d3b      | 2mm quanh mép                 |
+| Chữ/logo           | Decal in màu     | #2e5d3b, #4b7f4b, #6b7c6a, #d43f3a, #ffffff, #f5e9c5 | Nổi nhẹ 1-1.5mm (mô phỏng 3D) |
+| Logo tròn          | Decal in màu     | #f5e9c5      | Đường kính 36mm               |
+| Không khung sắt, không LED, không nẹp nhôm |              |              |                               |

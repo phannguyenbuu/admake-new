@@ -1,0 +1,219 @@
+=== FILE: Biển số nhà nền alu chữ nổi đồng.jfif ===  
+--- PHÂN TÍCH HÌNH ẢNH & THIẾT KẾ THỰC TẾ ---
+
+**1. Tên thương hiệu, dòng chữ chính hoặc số hiển thị trên sản phẩm:**  
+- **Dòng 1:** CÔNG TY TNHH (chữ in hoa, màu đen, phẳng)
+- **Dòng 2 (chính, chữ nổi):** CÀ BIỂN MŨI (chữ in hoa, màu vàng đồng gương, nổi 3D)
+- **Dòng 3:** MST: 3401291249 (chữ in hoa, màu đen, phẳng, có 2 gạch ngang hai bên)
+- **Dòng 4-5:** ĐỊA CHỈ: D12 LƯƠNG THẾ VINH, PHƯỜNG PHÚ THỦY, TỈNH LÂM ĐỒNG, VIỆT NAM (chữ in hoa, màu đen, phẳng)
+
+**2. Nội dung chữ phụ, slogan, số điện thoại, địa chỉ, icon mạng xã hội hoặc logo:**  
+- Không có logo, icon, slogan, số điện thoại hay mạng xã hội.
+
+**3. Màu sắc thực tế chuẩn xác của các phần:**  
+- **Nền alu xước bạc:** #E5E5E5 (bạc xước mờ, ánh kim nhẹ)
+- **Viền nẹp alu/nhôm:** #222222 (đen bóng)
+- **Chữ nổi vàng đồng:** #FFD700 (vàng đồng gương)
+- **Chữ phẳng đen:** #222222 (đen)
+- **Gạch ngang:** #222222 (đen)
+
+**4. Vật liệu và quy cách gia công nhận diện từ ảnh:**  
+- **Tấm nền:** Alu xước bạc 3mm, cắt CNC vuông vắn, bo góc nhẹ.
+- **Viền nẹp:** Nẹp nhôm đen hoặc alu đen, bản 10mm.
+- **Chữ nổi:** Inox vàng gương cắt CNC, dán nổi 3D (cao 5-8mm), riêng dòng "CÀ BIỂN MŨI".
+- **Chữ phẳng:** Decal đen hoặc in UV trực tiếp lên mặt alu.
+- **Khung xương:** Sắt hộp 25x25mm phía sau (giả định, không lộ ra ngoài).
+- **Tai treo:** Không thấy rõ, giả định có 2 tai treo phía sau.
+
+**5. Kích thước ước tính:**  
+- Rộng: 300mm  
+- Cao: 200mm  
+- Sâu: 25mm (gồm cả chữ nổi và nền alu + khung xương)
+
+---
+
+```ruby
+# Mã nguồn Ruby hoàn chỉnh 100%
+module BienSoNhaNenAluChuNoiDong
+  def self.build
+    model = Sketchup.active_model
+    model.start_operation('BienSoNhaNenAluChuNoiDong', true)
+    entities = model.active_entities
+
+    # Kích thước tổng thể
+    width = 300.mm
+    height = 200.mm
+    depth = 25.mm
+
+    # Thông số vật liệu
+    color_alu = "#E5E5E5"
+    color_vien = "#222222"
+    color_chu_noi = "#FFD700"
+    color_chu_phang = "#222222"
+
+    # 1. Khung xương sắt hộp phía sau (25x25mm)
+    khung_group = entities.add_group
+    khung = khung_group.entities
+    # Khung viền ngoài
+    khung.add_face([0,0,-25.mm],[width,0,-25.mm],[width,height,-25.mm],[0,height,-25.mm]).pushpull(25.mm)
+    # Xương ngang tăng cứng (ở giữa)
+    x1 = width/2 - 12.5.mm
+    khung.add_face([x1,0,-25.mm],[x1+25.mm,0,-25.mm],[x1+25.mm,height,-25.mm],[x1,height,-25.mm]).pushpull(25.mm)
+    # Xương dọc tăng cứng (ở giữa)
+    y1 = height/2 - 12.5.mm
+    khung.add_face([0,y1,-25.mm],[width,y1,-25.mm],[width,y1+25.mm,-25.mm],[0,y1+25.mm,-25.mm]).pushpull(25.mm)
+    # Tai treo (giả định 2 tai tròn Ø10mm, dày 5mm)
+    tai1 = khung_group.entities.add_circle([15.mm, height-10.mm, -12.5.mm], [0,0,1], 5.mm, 24)
+    khung_group.entities.add_face(tai1).pushpull(5.mm)
+    tai2 = khung_group.entities.add_circle([width-15.mm, height-10.mm, -12.5.mm], [0,0,1], 5.mm, 24)
+    khung_group.entities.add_face(tai2).pushpull(5.mm)
+
+    # 2. Tấm nền alu xước bạc
+    matbien_group = entities.add_group
+    matbien = matbien_group.entities
+    face = matbien.add_face([0,0,0],[width,0,0],[width,height,0],[0,height,0])
+    face.pushpull(-3.mm)
+    matbien_group.material = color_alu
+
+    # 3. Viền nẹp alu/nhôm đen (bản 10mm)
+    vien_group = entities.add_group
+    vien = vien_group.entities
+    vien_width = 10.mm
+    # Viền ngoài
+    outer = [
+      [0,0,0],[width,0,0],[width,height,0],[0,height,0]
+    ]
+    inner = [
+      [vien_width,vien_width,0],[width-vien_width,vien_width,0],[width-vien_width,height-vien_width,0],[vien_width,height-vien_width,0]
+    ]
+    vien_face = vien.add_face(outer)
+    vien_face.followme(vien.add_face(inner).all_connected.select{|e|e.is_a?(Sketchup::Edge)})
+    vien_group.material = color_vien
+
+    # 4. Chữ phẳng (CÔNG TY TNHH, MST, ĐỊA CHỈ)
+    text_group = entities.add_group
+    text_height = 18.mm
+    text_font = "Arial"
+    # Dòng 1: CÔNG TY TNHH
+    text1 = text_group.entities.add_3d_text(
+      "CÔNG TY TNHH", 
+      TextAlignCenter, 
+      text_height, 
+      2.mm, 
+      false, 
+      false, 
+      text_font
+    )
+    text1.material = color_chu_phang
+    text1.transform!(Geom::Transformation.translation([width/2, height-35.mm, 1.mm]))
+
+    # Dòng 3: MST: 3401291249 (có 2 gạch ngang)
+    text3 = text_group.entities.add_3d_text(
+      "MST: 3401291249", 
+      TextAlignCenter, 
+      14.mm, 
+      1.5.mm, 
+      false, 
+      false, 
+      text_font
+    )
+    text3.material = color_chu_phang
+    text3.transform!(Geom::Transformation.translation([width/2, height-85.mm, 1.mm]))
+    # Gạch ngang 2 bên
+    g_length = 35.mm
+    g_width = 1.5.mm
+    g_height = 1.5.mm
+    # Bên trái
+    text_group.entities.add_face(
+      [width/2-55.mm, height-80.mm, 1.2.mm],
+      [width/2-55.mm+g_length, height-80.mm, 1.2.mm],
+      [width/2-55.mm+g_length, height-80.mm+g_height, 1.2.mm],
+      [width/2-55.mm, height-80.mm+g_height, 1.2.mm]
+    ).pushpull(1.5.mm)
+    # Bên phải
+    text_group.entities.add_face(
+      [width/2+55.mm, height-80.mm, 1.2.mm],
+      [width/2+55.mm+g_length, height-80.mm, 1.2.mm],
+      [width/2+55.mm+g_length, height-80.mm+g_height, 1.2.mm],
+      [width/2+55.mm, height-80.mm+g_height, 1.2.mm]
+    ).pushpull(1.5.mm)
+
+    # Dòng 4: ĐỊA CHỈ (dòng 1)
+    text4 = text_group.entities.add_3d_text(
+      "ĐỊA CHỈ: D12 LƯƠNG THẾ VINH,", 
+      TextAlignCenter, 
+      10.mm, 
+      1.mm, 
+      false, 
+      false, 
+      text_font
+    )
+    text4.material = color_chu_phang
+    text4.transform!(Geom::Transformation.translation([width/2, height-110.mm, 1.mm]))
+    # Dòng 5: PHƯỜNG PHÚ THỦY, TỈNH LÂM ĐỒNG, VIỆT NAM
+    text5 = text_group.entities.add_3d_text(
+      "PHƯỜNG PHÚ THỦY, TỈNH LÂM ĐỒNG, VIỆT NAM", 
+      TextAlignCenter, 
+      10.mm, 
+      1.mm, 
+      false, 
+      false, 
+      text_font
+    )
+    text5.material = color_chu_phang
+    text5.transform!(Geom::Transformation.translation([width/2, height-122.mm, 1.mm]))
+
+    # 5. Chữ nổi 3D vàng đồng: "CÀ BIỂN MŨI"
+    chu_noi_group = entities.add_group
+    chu_noi_height = 28.mm
+    chu_noi_depth = 6.mm
+    chu_noi_font = "Arial Black"
+    chu_noi = chu_noi_group.entities.add_3d_text(
+      "CÀ BIỂN MŨI", 
+      TextAlignCenter, 
+      chu_noi_height, 
+      chu_noi_depth, 
+      false, 
+      false, 
+      chu_noi_font
+    )
+    chu_noi.material = color_chu_noi
+    chu_noi_group.material = color_chu_noi
+    chu_noi.transform!(Geom::Transformation.translation([width/2, height-60.mm, 3.mm]))
+
+    # 6. Đường viền chỉ trang trí trong mặt biển (line đen)
+    vien_trang_tri = entities.add_group
+    offset = 7.mm
+    pts = [
+      [offset, offset, 0],
+      [width-offset, offset, 0],
+      [width-offset, height-offset, 0],
+      [offset, height-offset, 0],
+      [offset, offset, 0]
+    ]
+    for i in 0..3
+      vien_trang_tri.entities.add_line(pts[i], pts[i+1])
+    end
+
+    model.commit_operation
+  end
+end
+BienSoNhaNenAluChuNoiDong.build
+```
+
+--- THÔNG SỐ VÀ VẬT LIỆU GIA CÔNG ---
+
+| Thành phần         | Kích thước / Quy cách           | Vật liệu / Màu sắc      | Ghi chú                         |
+|--------------------|---------------------------------|-------------------------|---------------------------------|
+| Nền alu            | 300x200x3 mm                    | Alu xước bạc #E5E5E5    | Cắt CNC, bo góc nhẹ             |
+| Viền nẹp           | 10mm (bản rộng)                 | Nhôm/alu đen #222222    | Chạy quanh viền                 |
+| Khung xương        | 25x25mm                         | Sắt hộp sơn đen         | Ẩn phía sau, có tai treo        |
+| Chữ nổi            | Cao 28mm, dày 6mm               | Inox vàng gương #FFD700 | "CÀ BIỂN MŨI"                   |
+| Chữ phẳng          | Cao 18mm/14mm/10mm, dày 1-2mm   | Decal/in UV đen #222222 | Các dòng còn lại                |
+| Đường viền trang trí| Offset 7mm, line 1mm           | Sơn/Decal đen           | Viền chỉ bên trong mặt biển     |
+| Gạch ngang         | Dài 35mm, dày 1.5mm             | Sơn/Decal đen           | Hai bên dòng MST                |
+| Tai treo           | Ø10mm, dày 5mm                  | Sắt/nhôm                | 2 tai treo phía sau             |
+
+**Lưu ý:**  
+- Mã Ruby trên dựng mô hình sát thực tế, có thể tùy chỉnh font chữ nếu máy không có Arial/Arial Black.
+- Nếu cần hiệu ứng xước mặt alu, có thể dùng plugin vật liệu hoặc texture trong SketchUp.

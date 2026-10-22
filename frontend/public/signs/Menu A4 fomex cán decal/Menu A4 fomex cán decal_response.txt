@@ -1,0 +1,189 @@
+=== FILE: Menu A4 fomex cán decal.jfif ===
+--- PHÂN TÍCH HÌNH ẢNH & THIẾT KẾ THỰC TẾ ---
+**1. Tên thương hiệu, dòng chữ chính:**  
+- "Tiệm Nhà Ken" (chữ lớn, nổi bật, font bo tròn, chữ "Ken" màu vàng đậm, chữ "Tiệm Nhà" màu trắng, viền đen).
+- Có hình mascot đầu người đội mũ, cầm ly nước bên cạnh chữ "Ken".
+
+**2. Nội dung chữ phụ, slogan, số điện thoại, địa chỉ, icon mạng xã hội hoặc logo:**  
+- Slogan: "ĂN VẶT NGON - GIÁ HẾT Ý" (chữ đỏ, in hoa, nền vàng).
+- Các mục thực đơn: "MỲ CAY", "ĂN VẶT NHÀ KEN", "TOPPING", "GIẢI KHÁT" (chữ trắng, nền đỏ).
+- Dòng chữ phụ cuối: "Cay Ngon KHÔ CƯỠNG!" (chữ vàng và trắng, font phá cách).
+- Icon ớt đỏ, lon nước ngọt (Coca, 7up) ở góc phải dưới.
+- Không thấy số điện thoại, địa chỉ, icon mạng xã hội trên mặt trước.
+
+**3. Màu sắc thực tế chuẩn xác (mã hex):**  
+- Nền chính: Đen #18191A  
+- Chữ "Ken": Vàng #FFD600, viền trắng #FFFFFF, bóng đổ đen #18191A  
+- Chữ "Tiệm Nhà": Trắng #FFFFFF, viền đen #18191A  
+- Slogan: Đỏ #FF2D2D, nền vàng #FFD600  
+- Mục menu: Nền đỏ #C62828, chữ trắng #FFFFFF  
+- Chữ phụ: Vàng #FFD600, trắng #FFFFFF  
+- Viền trang trí: Đỏ #C62828  
+- Icon ớt: Đỏ #FF2D2D, xanh #388E3C  
+- Hình ảnh món ăn: In decal màu.
+
+**4. Vật liệu và quy cách gia công:**  
+- Tấm nền: Fomex (PVC foam) dày 10mm, cán decal in màu UV.
+- Không có chữ nổi vật lý, chỉ in decal nổi 3D giả hiệu ứng.
+- Không có viền nẹp nhôm, chỉ bo góc nhẹ.
+- Không có đèn LED.
+- Kích thước tiêu chuẩn: 210mm x 297mm x 10mm (A4).
+
+**5. Kích thước ước tính:**  
+- Rộng: 210mm  
+- Cao: 297mm  
+- Dày: 10mm  
+
+```ruby
+# Mã nguồn Ruby hoàn chỉnh 100%
+module MenuA4FomexCanDecal
+  def self.build
+    model = Sketchup.active_model
+    model.start_operation('MenuA4FomexCanDecal', true)
+    entities = model.active_entities
+
+    # Kích thước bảng
+    width = 210.mm
+    height = 297.mm
+    thickness = 10.mm
+
+    # Tạo tấm fomex nền
+    pts = [
+      [0, 0, 0],
+      [width, 0, 0],
+      [width, height, 0],
+      [0, height, 0]
+    ]
+    face = entities.add_face(pts)
+    face.pushpull(-thickness)
+
+    # Tô màu nền đen
+    mat_black = model.materials.add('Black')
+    mat_black.color = '#18191A'
+    face.material = mat_black
+    face.back_material = mat_black
+
+    # Tạo viền đỏ trang trí (dải dưới cùng)
+    border_height = 15.mm
+    border_pts = [
+      [0, 0, 0.1],
+      [width, 0, 0.1],
+      [width, border_height, 0.1],
+      [0, border_height, 0.1]
+    ]
+    border_face = entities.add_face(border_pts)
+    mat_red = model.materials.add('Red')
+    mat_red.color = '#C62828'
+    border_face.material = mat_red
+    border_face.back_material = mat_red
+
+    # Chữ nổi 3D (giả lập hiệu ứng nổi, thực tế là decal in UV)
+    # "Tiệm Nhà Ken"
+    text1 = entities.add_3d_text(
+      "Tiệm Nhà", 
+      TextAlignCenter, 
+      22.mm, 
+      true, 
+      false, 
+      0, 
+      "Arial Rounded MT Bold"
+    )
+    text1_group = entities.add_group(text1)
+    text1_group.material = mat_black
+    mat_white = model.materials.add('White')
+    mat_white.color = '#FFFFFF'
+    text1_group.material = mat_white
+    text1_group.move! Geom::Transformation.new([width/2, height-45.mm, 1.mm])
+
+    text2 = entities.add_3d_text(
+      "Ken", 
+      TextAlignCenter, 
+      38.mm, 
+      true, 
+      false, 
+      0, 
+      "Arial Rounded MT Bold"
+    )
+    text2_group = entities.add_group(text2)
+    mat_yellow = model.materials.add('Yellow')
+    mat_yellow.color = '#FFD600'
+    text2_group.material = mat_yellow
+    text2_group.move! Geom::Transformation.new([width/2, height-80.mm, 1.2.mm])
+
+    # Slogan đỏ
+    text3 = entities.add_3d_text(
+      "ĂN VẶT NGON - GIÁ HẾT Ý", 
+      TextAlignCenter, 
+      10.mm, 
+      true, 
+      false, 
+      0, 
+      "Arial Black"
+    )
+    text3_group = entities.add_group(text3)
+    text3_group.material = mat_red
+    text3_group.move! Geom::Transformation.new([width/2, height-100.mm, 1.1.mm])
+
+    # Các mục menu (ví dụ "MỲ CAY", "ĂN VẶT NHÀ KEN", "TOPPING", "GIẢI KHÁT")
+    menu_titles = [
+      ["MỲ CAY", height-120.mm],
+      ["ĂN VẶT NHÀ KEN", height-170.mm],
+      ["TOPPING", height-220.mm],
+      ["GIẢI KHÁT", height-250.mm]
+    ]
+    menu_titles.each do |title, y_pos|
+      t = entities.add_3d_text(title, TextAlignLeft, 9.mm, true, false, 0, "Arial Black")
+      g = entities.add_group(t)
+      g.material = mat_white
+      g.move! Geom::Transformation.new([15.mm, y_pos, 1.1.mm])
+    end
+
+    # Chữ phụ cuối: "Cay Ngon KHÔ CƯỠNG!"
+    text4 = entities.add_3d_text(
+      "Cay Ngon KHÔ CƯỠNG!", 
+      TextAlignRight, 
+      10.mm, 
+      true, 
+      false, 
+      0, 
+      "Arial Black"
+    )
+    text4_group = entities.add_group(text4)
+    text4_group.material = mat_yellow
+    text4_group.move! Geom::Transformation.new([width-10.mm, 25.mm, 1.1.mm])
+
+    # Icon ớt đỏ (mô phỏng bằng khối elip nhỏ)
+    mat_chili = model.materials.add('ChiliRed')
+    mat_chili.color = '#FF2D2D'
+    chili1 = entities.add_circle([width-40.mm, 20.mm, 1.2.mm], [0,0,1], 3.mm, 16)
+    chili1_face = entities.add_face(chili1)
+    chili1_face.material = mat_chili
+    chili1_face.pushpull(1.5.mm)
+
+    # Icon lon nước ngọt (mô phỏng bằng khối hộp nhỏ)
+    mat_coke = model.materials.add('CokeRed')
+    mat_coke.color = '#D32F2F'
+    coke = entities.add_group
+    coke.entities.add_face([width-25.mm, 15.mm, 1.2.mm], [width-20.mm, 15.mm, 1.2.mm], [width-20.mm, 30.mm, 1.2.mm], [width-25.mm, 30.mm, 1.2.mm])
+    coke.entities.grep(Sketchup::Face).each { |f| f.pushpull(4.mm) }
+    coke.material = mat_coke
+
+    # Kết thúc thao tác
+    model.commit_operation
+  end
+end
+MenuA4FomexCanDecal.build
+```
+--- THÔNG SỐ VÀ VẬT LIỆU GIA CÔNG ---
+| Thành phần         | Vật liệu         | Màu sắc (hex) | Kích thước (mm)      | Ghi chú           |
+|--------------------|------------------|---------------|----------------------|-------------------|
+| Tấm nền            | Fomex 10mm       | #18191A (đen) | 210 x 297 x 10       | Cán decal in UV   |
+| Viền trang trí     | Decal in         | #C62828 (đỏ)  | 210 x 15 x 0.1       | Dải dưới cùng     |
+| Chữ "Ken"          | Decal in         | #FFD600 (vàng)| Cao 38, dày 1.2      | 3D text nổi giả   |
+| Chữ "Tiệm Nhà"     | Decal in         | #FFFFFF (trắng)| Cao 22, dày 1.0     | 3D text nổi giả   |
+| Slogan, mục menu   | Decal in         | #FF2D2D/#C62828| Cao 10-12, dày 1.0  | 3D text nổi giả   |
+| Icon ớt, nước ngọt | Decal in         | #FF2D2D/#D32F2F| Elip/hộp nhỏ        | Mô phỏng 3D       |
+
+**Lưu ý:**  
+- Sản phẩm thực tế là fomex cán decal in UV, không có chữ nổi vật lý, mô hình 3D dùng `add_3d_text` để mô phỏng hiệu ứng nổi cho trình diễn.  
+- Kích thước, vị trí chữ và icon đã căn chỉnh tương đối theo bố cục thực tế trong ảnh.

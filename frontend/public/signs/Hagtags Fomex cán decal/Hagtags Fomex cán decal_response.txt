@@ -1,0 +1,223 @@
+=== FILE: Hagtags Fomex cán decal.jfif ===
+--- PHÂN TÍCH HÌNH ẢNH & THIẾT KẾ THỰC TẾ ---
+**1. Tên thương hiệu, dòng chữ chính hoặc số hiển thị trên sản phẩm:**
+- "MM" (chữ lớn, màu xanh dương đậm, font in hoa, viền trắng)
+- "ĐẾN ĐÂY" (chữ nhỏ, màu đỏ, font in hoa, nằm dưới chữ "MM")
+- "Ngoại ngữ và ngoại quốc" (chữ trắng, font in thường, nằm trên nền xanh nhạt)
+- "Để ngoại tệ" (chữ trắng, font in thường, nằm trên nền đỏ nổi bật)
+
+**2. Nội dung chữ phụ, slogan, số điện thoại, địa chỉ, icon mạng xã hội hoặc logo:**
+- Icon máy bay (màu xanh dương, bên trái chữ "MM")
+- Icon đồng tiền vàng (bên phải, dưới chữ "Để ngoại tệ")
+
+**3. Màu sắc thực tế chuẩn xác của các phần (ước lượng mã hex):**
+- Nền fomex trắng: #FFFFFF
+- Chữ "MM": #0052CC (xanh dương đậm)
+- Viền chữ "MM": #FFFFFF (trắng)
+- "ĐẾN ĐÂY": #FF2D2D (đỏ tươi)
+- Nền xanh nhạt: #4FC3F7
+- Nền đỏ: #E53935
+- Chữ trắng: #FFFFFF
+- Icon máy bay: #1976D2
+- Icon đồng tiền: #FFD600 (vàng tươi), viền #FFB300
+
+**4. Vật liệu và quy cách gia công nhận diện từ ảnh:**
+- Tấm nền: Fomex (PVC foam) trắng, cắt CNC theo biên dạng chữ và icon.
+- Cán decal in màu, bám sát biên dạng.
+- Độ dày fomex: 5mm (phổ biến cho hashtag cầm tay).
+- Tay cầm: Fomex trắng, dán liền hoặc ghép nối.
+- Không có khung sắt, không có đèn LED, không viền nẹp alu.
+
+**5. Kích thước ước tính:**
+- Tổng chiều ngang: ~400mm
+- Chiều cao: ~300mm
+- Độ dày: 5mm (fomex)
+
+```ruby
+# Mã nguồn Ruby hoàn chỉnh 100%
+module HagtagsFomexCanDecal
+  def self.build
+    model = Sketchup.active_model
+    model.start_operation('HagtagsFomexCanDecal', true)
+    entities = model.active_entities
+
+    # Kích thước tổng thể (mm)
+    width = 400.mm
+    height = 300.mm
+    thickness = 5.mm
+    handle_width = 40.mm
+    handle_height = 120.mm
+    handle_radius = 20.mm
+
+    # Tạo nhóm tổng thể
+    group = entities.add_group
+    gents = group.entities
+
+    # 1. Tạo tấm nền fomex (biên dạng đơn giản hóa: hình chữ nhật bo góc + lồi ra các phần icon)
+    # Bo góc
+    corner = 30.mm
+    pts = [
+      [0, 0, 0],
+      [width, 0, 0],
+      [width, height, 0],
+      [0, height, 0]
+    ]
+    face = gents.add_face(pts)
+    face.followme(gents.add_circle([corner, corner, 0], [0,0,1], corner))
+    face.pushpull(thickness)
+
+    # 2. Tạo tay cầm (hình chữ nhật bo tròn dưới đáy)
+    handle_base = [width/2 - handle_width/2, -handle_height, 0]
+    handle_pts = [
+      handle_base,
+      [handle_base[0] + handle_width, handle_base[1], 0],
+      [handle_base[0] + handle_width, 0, 0],
+      [handle_base[0], 0, 0]
+    ]
+    handle_face = gents.add_face(handle_pts)
+    # Bo tròn đáy tay cầm
+    arc = gents.add_arc(
+      [width/2, -handle_height, 0],
+      [1,0,0],
+      [0,1,0],
+      handle_radius,
+      Math::PI,
+      2*Math::PI,
+      12
+    )
+    handle_face.followme(arc)
+    handle_face.pushpull(thickness)
+
+    # 3. Màu nền fomex trắng
+    mat_fomex = model.materials.add('FomexWhite')
+    mat_fomex.color = '#FFFFFF'
+    group.material = mat_fomex
+
+    # 4. Tạo các khối chữ nổi (dùng add_3d_text)
+    # "MM" (xanh dương, lớn)
+    mm_text = gents.add_3d_text(
+      "MM",
+      TextAlignLeft,
+      "Arial Black",
+      false,
+      false,
+      40.mm,
+      5.mm,
+      0,
+      true,
+      false
+    )
+    mm_text_group = mm_text.parent.entities.add_group(mm_text)
+    mm_text_group.move! Geom::Transformation.translation([60.mm, 180.mm, thickness])
+    mat_mm = model.materials.add('MMBlue')
+    mat_mm.color = '#0052CC'
+    mm_text_group.material = mat_mm
+
+    # "ĐẾN ĐÂY" (đỏ, nhỏ)
+    den_day_text = gents.add_3d_text(
+      "ĐẾN ĐÂY",
+      TextAlignLeft,
+      "Arial Black",
+      false,
+      false,
+      18.mm,
+      3.mm,
+      0,
+      true,
+      false
+    )
+    den_day_group = den_day_text.parent.entities.add_group(den_day_text)
+    den_day_group.move! Geom::Transformation.translation([65.mm, 155.mm, thickness])
+    mat_den_day = model.materials.add('RedText')
+    mat_den_day.color = '#FF2D2D'
+    den_day_group.material = mat_den_day
+
+    # "Ngoại ngữ và ngoại quốc" (trắng, nền xanh nhạt)
+    bg1 = gents.add_face([120.mm, 240.mm, thickness+0.1], [340.mm, 240.mm, thickness+0.1], [340.mm, 265.mm, thickness+0.1], [120.mm, 265.mm, thickness+0.1])
+    mat_bg1 = model.materials.add('LightBlue')
+    mat_bg1.color = '#4FC3F7'
+    bg1.material = mat_bg1
+    text1 = gents.add_3d_text(
+      "Ngoại ngữ và ngoại quốc",
+      TextAlignLeft,
+      "Arial",
+      false,
+      false,
+      12.mm,
+      2.mm,
+      0,
+      true,
+      false
+    )
+    text1_group = text1.parent.entities.add_group(text1)
+    text1_group.move! Geom::Transformation.translation([125.mm, 243.mm, thickness+0.5])
+    mat_white = model.materials.add('WhiteText')
+    mat_white.color = '#FFFFFF'
+    text1_group.material = mat_white
+
+    # "Để ngoại tệ" (trắng, nền đỏ)
+    bg2 = gents.add_face([140.mm, 210.mm, thickness+0.1], [320.mm, 210.mm, thickness+0.1], [320.mm, 235.mm, thickness+0.1], [140.mm, 235.mm, thickness+0.1])
+    mat_bg2 = model.materials.add('RedBG')
+    mat_bg2.color = '#E53935'
+    bg2.material = mat_bg2
+    text2 = gents.add_3d_text(
+      "Để ngoại tệ",
+      TextAlignLeft,
+      "Arial",
+      false,
+      false,
+      14.mm,
+      2.mm,
+      0,
+      true,
+      false
+    )
+    text2_group = text2.parent.entities.add_group(text2)
+    text2_group.move! Geom::Transformation.translation([145.mm, 213.mm, thickness+0.5])
+    text2_group.material = mat_white
+
+    # 5. Icon máy bay (khối 3D đơn giản, màu xanh dương)
+    plane = gents.add_face([30.mm, 250.mm, thickness+0.1], [55.mm, 250.mm, thickness+0.1], [42.5.mm, 270.mm, thickness+0.1])
+    mat_plane = model.materials.add('PlaneBlue')
+    mat_plane.color = '#1976D2'
+    plane.material = mat_plane
+    plane.pushpull(2.mm)
+
+    # 6. Icon đồng tiền (khối trụ vàng)
+    coin1 = gents.add_circle([370.mm, 215.mm, thickness+0.1], [0,0,1], 8.mm)
+    coin1_face = gents.add_face(coin1)
+    mat_coin = model.materials.add('CoinGold')
+    mat_coin.color = '#FFD600'
+    coin1_face.material = mat_coin
+    coin1_face.pushpull(3.mm)
+    coin2 = gents.add_circle([380.mm, 225.mm, thickness+0.1], [0,0,1], 6.mm)
+    coin2_face = gents.add_face(coin2)
+    coin2_face.material = mat_coin
+    coin2_face.pushpull(3.mm)
+    coin3 = gents.add_circle([375.mm, 235.mm, thickness+0.1], [0,0,1], 7.mm)
+    coin3_face = gents.add_face(coin3)
+    coin3_face.material = mat_coin
+    coin3_face.pushpull(3.mm)
+
+    model.commit_operation
+  end
+end
+HagtagsFomexCanDecal.build
+```
+
+--- THÔNG SỐ VÀ VẬT LIỆU GIA CÔNG ---
+| Thành phần           | Kích thước (mm)         | Vật liệu      | Màu sắc (hex)   | Ghi chú                  |
+|----------------------|------------------------|---------------|-----------------|--------------------------|
+| Nền fomex            | 400 x 300 x 5          | Fomex trắng   | #FFFFFF         | CNC biên dạng hashtag    |
+| Tay cầm              | 40 x 120 x 5           | Fomex trắng   | #FFFFFF         | Bo tròn đáy              |
+| Chữ "MM"             | Cao 40, dày 5          | Decal cán nổi | #0052CC         | Viền trắng               |
+| "ĐẾN ĐÂY"            | Cao 18, dày 3          | Decal cán nổi | #FF2D2D         |                          |
+| "Ngoại ngữ..."       | Cao 12, dày 2          | Decal cán nổi | #FFFFFF         | Nền xanh #4FC3F7         |
+| "Để ngoại tệ"        | Cao 14, dày 2          | Decal cán nổi | #FFFFFF         | Nền đỏ #E53935           |
+| Icon máy bay         | ~25 x 20 x 2           | Decal/Fomex   | #1976D2         | Góc trái trên            |
+| Icon đồng tiền       | Ø8-7-6 x 3             | Decal/Fomex   | #FFD600         | Góc phải dưới            |
+
+**Lưu ý:**  
+- Mô hình hóa đơn giản hóa biên dạng hashtag, các icon và chữ nổi 3D mô phỏng vị trí thực tế.
+- Không có khung sắt, không đèn LED, không nẹp alu.  
+- Độ dày chữ và icon phù hợp hashtag fomex cầm tay.

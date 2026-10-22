@@ -1,0 +1,174 @@
+=== FILE: Tấm QR để bàn mica.jfif ===  
+--- PHÂN TÍCH HÌNH ẢNH & THIẾT KẾ THỰC TẾ ---
+
+**1. Tên thương hiệu, dòng chữ chính hoặc số hiển thị trên sản phẩm:**  
+- Chữ lớn nhất: **"66642888"** (số điện thoại, màu xanh đậm #003366).
+- Chữ phụ:  
+  - "CÔNG TY TNHH ĐA SÂN VƯỜN ĐỨC HIẾU" (màu xanh đậm #003366).
+  - "napas 247" (napas: xanh #003366, 247: xanh lá #8BC34A).
+  - "Xin Chào" (trên bụng mèo, màu đen #222222).
+
+**2. Nội dung chữ phụ, slogan, số điện thoại, địa chỉ, icon mạng xã hội hoặc logo:**  
+- Logo VietQR (chữ đỏ #E53935, xanh #003366).
+- Logo ACB (xanh #003366).
+- QR code (dạng hình vuông, mô phỏng bằng khối vuông màu xanh #003366).
+- Hình mèo thần tài Maneki Neko (nền trắng #FFFFFF, tai cam #FFB74D, má hồng #FFB6C1, đốm nâu #A0522D, vàng chuông #FFD600, đỏ túi #E53935, viền đen #222222).
+
+**3. Màu sắc thực tế chuẩn xác:**  
+- Nền mica trắng đục #FFFFFF.
+- Viền mèo và chữ: đen #222222.
+- Chữ số điện thoại, tên công ty: xanh đậm #003366.
+- Các chi tiết mèo: cam #FFB74D, đỏ #E53935, vàng #FFD600, hồng #FFB6C1, nâu #A0522D.
+- Đế mica trong suốt #F5F5F5.
+
+**4. Vật liệu và quy cách gia công:**  
+- Tấm mica trắng cắt CNC theo hình mèo và bảng QR, dày 3mm.
+- Đế mica trong suốt, dày 8mm, dán keo đứng.
+- In UV trực tiếp lên mica (không có khung sắt, không viền alu).
+- Không có LED, không có nẹp nhôm.
+- Kích thước tổng thể: Rộng 120mm x Cao 180mm x Sâu 50mm.
+
+**5. Kích thước ước tính:**  
+- Tổng thể: 120mm (rộng) x 180mm (cao) x 50mm (sâu, gồm đế).
+- Đế: 120mm x 30mm x 8mm.
+- Tấm đứng: 120mm x 160mm x 3mm.
+
+---
+
+```ruby
+# Mã nguồn Ruby hoàn chỉnh 100%
+module TamQrDeBanMica
+  def self.build
+    model = Sketchup.active_model
+    model.start_operation('TamQrDeBanMica', true)
+    entities = model.active_entities
+
+    # Kích thước tổng thể
+    width = 120.mm
+    height = 180.mm
+    depth = 50.mm
+
+    # Đế mica trong suốt
+    base_width = width
+    base_depth = 30.mm
+    base_height = 8.mm
+    base = entities.add_group
+    base_face = base.entities.add_face([0,0,0], [base_width,0,0], [base_width,base_depth,0], [0,base_depth,0])
+    base_face.pushpull(base_height)
+    base.material = Sketchup::Color.new(245,245,245) # #F5F5F5
+
+    # Tấm mica trắng cắt CNC (hình chữ nhật bo góc, mô phỏng hình mèo)
+    plate_width = width
+    plate_height = 160.mm
+    plate_thickness = 3.mm
+    plate = entities.add_group
+    # Tạo mặt bo góc lớn (mô phỏng hình mèo)
+    pts = []
+    r = 20.mm
+    pts += [[r,0,0]]
+    pts += [[plate_width-r,0,0]]
+    pts += [[plate_width, r,0]]
+    pts += [[plate_width, plate_height-r,0]]
+    pts += [[plate_width-r, plate_height,0]]
+    pts += [[r, plate_height,0]]
+    pts += [[0, plate_height-r,0]]
+    pts += [[0, r,0]]
+    face = plate.entities.add_face(pts)
+    face.pushpull(plate_thickness)
+    plate.material = Sketchup::Color.new(255,255,255) # #FFFFFF
+
+    # Đặt tấm mica đứng lên đế
+    plate.transform!(Geom::Transformation.translation([0, (base_depth-plate_thickness)/2, base_height]))
+
+    # Mèo thần tài (mô phỏng bằng các khối ellipse và hình tròn)
+    cat = plate.entities.add_group
+    # Thân mèo (ellipse lớn)
+    cat_body = cat.entities.add_face([20.mm, 30.mm, plate_thickness], [100.mm, 30.mm, plate_thickness], [100.mm, 120.mm, plate_thickness], [20.mm, 120.mm, plate_thickness])
+    cat_body.pushpull(-2.mm)
+    cat_body.material = Sketchup::Color.new(255,255,255) # #FFFFFF
+
+    # Mặt mèo (ellipse nhỏ)
+    cat_head = cat.entities.add_face([35.mm, 110.mm, plate_thickness], [85.mm, 110.mm, plate_thickness], [85.mm, 150.mm, plate_thickness], [35.mm, 150.mm, plate_thickness])
+    cat_head.pushpull(-2.mm)
+    cat_head.material = Sketchup::Color.new(255,255,255)
+
+    # Tai mèo (tam giác)
+    cat_ear1 = cat.entities.add_face([40.mm, 145.mm, plate_thickness], [50.mm, 160.mm, plate_thickness], [60.mm, 145.mm, plate_thickness])
+    cat_ear1.pushpull(-2.mm)
+    cat_ear1.material = Sketchup::Color.new(255,183,77) # #FFB74D
+    cat_ear2 = cat.entities.add_face([60.mm, 145.mm, plate_thickness], [70.mm, 160.mm, plate_thickness], [80.mm, 145.mm, plate_thickness])
+    cat_ear2.pushpull(-2.mm)
+    cat_ear2.material = Sketchup::Color.new(255,183,77)
+
+    # Má hồng
+    cheek1 = cat.entities.add_face([45.mm, 120.mm, plate_thickness], [55.mm, 120.mm, plate_thickness], [55.mm, 130.mm, plate_thickness], [45.mm, 130.mm, plate_thickness])
+    cheek1.pushpull(-1.mm)
+    cheek1.material = Sketchup::Color.new(255,182,193) # #FFB6C1
+    cheek2 = cat.entities.add_face([65.mm, 120.mm, plate_thickness], [75.mm, 120.mm, plate_thickness], [75.mm, 130.mm, plate_thickness], [65.mm, 130.mm, plate_thickness])
+    cheek2.pushpull(-1.mm)
+    cheek2.material = Sketchup::Color.new(255,182,193)
+
+    # Đốm nâu trên đầu
+    spot = cat.entities.add_face([55.mm, 155.mm, plate_thickness], [65.mm, 155.mm, plate_thickness], [65.mm, 160.mm, plate_thickness], [55.mm, 160.mm, plate_thickness])
+    spot.pushpull(-1.mm)
+    spot.material = Sketchup::Color.new(160,82,45) # #A0522D
+
+    # Túi đỏ
+    bag = cat.entities.add_face([30.mm, 40.mm, plate_thickness], [90.mm, 40.mm, plate_thickness], [90.mm, 70.mm, plate_thickness], [30.mm, 70.mm, plate_thickness])
+    bag.pushpull(-1.5.mm)
+    bag.material = Sketchup::Color.new(229,57,53) # #E53935
+
+    # Viền mèo (dùng đường line màu đen)
+    # (Bỏ qua chi tiết nhỏ, chỉ mô phỏng viền ngoài)
+
+    # Chữ "Xin Chào" trên túi
+    cat.entities.add_3d_text("Xin Chào", TextAlignCenter, "Arial", false, false, 7.mm, 1.mm, 0, true, [60.mm, 55.mm, plate_thickness+0.5.mm]).material = Sketchup::Color.new(34,34,34)
+
+    # QR code (hình vuông xanh)
+    qr_group = plate.entities.add_group
+    qr_face = qr_group.entities.add_face([80.mm, 80.mm, plate_thickness+0.1.mm], [110.mm, 80.mm, plate_thickness+0.1.mm], [110.mm, 110.mm, plate_thickness+0.1.mm], [80.mm, 110.mm, plate_thickness+0.1.mm])
+    qr_face.pushpull(0.5.mm)
+    qr_group.material = Sketchup::Color.new(0,51,102) # #003366
+
+    # Logo VietQR (chữ đỏ, xanh)
+    plate.entities.add_3d_text("Viet", TextAlignLeft, "Arial", true, false, 5.mm, 1.mm, 0, true, [85.mm, 115.mm, plate_thickness+0.2.mm]).material = Sketchup::Color.new(229,57,53)
+    plate.entities.add_3d_text("QR", TextAlignLeft, "Arial", true, false, 5.mm, 1.mm, 0, true, [100.mm, 115.mm, plate_thickness+0.2.mm]).material = Sketchup::Color.new(0,51,102)
+
+    # Logo ACB (xanh)
+    plate.entities.add_3d_text("ACB", TextAlignLeft, "Arial", true, false, 5.mm, 1.mm, 0, true, [110.mm, 115.mm, plate_thickness+0.2.mm]).material = Sketchup::Color.new(0,51,102)
+
+    # Chữ "napas 247"
+    plate.entities.add_3d_text("napas", TextAlignLeft, "Arial", false, false, 4.mm, 1.mm, 0, true, [85.mm, 75.mm, plate_thickness+0.2.mm]).material = Sketchup::Color.new(0,51,102)
+    plate.entities.add_3d_text("247", TextAlignLeft, "Arial", false, false, 4.mm, 1.mm, 0, true, [105.mm, 75.mm, plate_thickness+0.2.mm]).material = Sketchup::Color.new(139,195,74)
+
+    # Số điện thoại lớn
+    plate.entities.add_3d_text("66642888", TextAlignCenter, "Arial Black", true, false, 12.mm, 2.mm, 0, true, [95.mm, 60.mm, plate_thickness+0.2.mm]).material = Sketchup::Color.new(0,51,102)
+
+    # Tên công ty
+    plate.entities.add_3d_text("CÔNG TY TNHH ĐA", TextAlignLeft, "Arial", false, false, 4.mm, 1.mm, 0, true, [80.mm, 50.mm, plate_thickness+0.2.mm]).material = Sketchup::Color.new(0,51,102)
+    plate.entities.add_3d_text("SÂN VƯỜN ĐỨC HIẾU", TextAlignLeft, "Arial", false, false, 4.mm, 1.mm, 0, true, [80.mm, 45.mm, plate_thickness+0.2.mm]).material = Sketchup::Color.new(0,51,102)
+
+    # Gắn tấm đứng lên đế
+    plate.transform!(Geom::Transformation.translation([0, (base_depth-plate_thickness)/2, base_height]))
+
+    model.commit_operation
+  end
+end
+TamQrDeBanMica.build
+```
+
+--- THÔNG SỐ VÀ VẬT LIỆU GIA CÔNG ---
+
+| Bộ phận         | Kích thước (mm)        | Vật liệu         | Màu sắc (hex)   | Ghi chú                |
+|-----------------|-----------------------|------------------|-----------------|------------------------|
+| Đế              | 120 x 30 x 8          | Mica trong       | #F5F5F5         | Dán keo đứng           |
+| Tấm đứng        | 120 x 160 x 3         | Mica trắng       | #FFFFFF         | Cắt CNC theo hình mèo  |
+| Mèo thần tài    | ~80 x 120 x 2         | In UV trên mica  | Nhiều màu       | Mô phỏng hình khối     |
+| QR code         | 30 x 30 x 0.5         | In UV trên mica  | #003366         | Khối vuông mô phỏng    |
+| Logo, chữ nổi   | Theo vị trí           | In UV / 3D Text  | Đúng màu thực tế|                        |
+| Số điện thoại   | 12mm cao, 2mm dày     | In UV / 3D Text  | #003366         |                        |
+| Tên công ty     | 4mm cao, 1mm dày      | In UV / 3D Text  | #003366         |                        |
+
+**Lưu ý:**  
+- Mô hình đã đơn giản hóa hình mèo và các chi tiết nhỏ để phù hợp khả năng dựng hình tự động bằng Ruby API.
+- Nếu cần chi tiết hơn (tai, chân, chuông, v.v.), có thể bổ sung thêm các khối hình học tương ứng.

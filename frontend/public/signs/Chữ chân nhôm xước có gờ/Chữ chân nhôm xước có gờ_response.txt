@@ -1,0 +1,110 @@
+=== FILE: Chữ chân nhôm xước có gờ.jpg ===
+--- PHÂN TÍCH HÌNH ẢNH & THIẾT KẾ THỰC TẾ ---
+**Mô tả chi tiết:**
+- **Dòng chữ chính:** Không có tên thương hiệu cụ thể, nhưng các ký tự nổi bật là chữ cái in hoa (ví dụ: "F", "C", "O",...) với kiểu dáng vuông vức, hiện đại.
+- **Chữ phụ, slogan, số điện thoại, địa chỉ, icon mạng xã hội, logo:** Không có trong ảnh này.
+- **Màu sắc thực tế:**
+  - **Mặt chữ:** Màu vàng xước ánh kim (inox vàng xước), mã hex gần đúng: `#D4AF37`.
+  - **Chân chữ:** Cùng màu với mặt chữ, cũng là nhôm/inox vàng xước, mã hex: `#D4AF37`.
+  - **Viền gờ:** Có gờ nổi, cùng tông vàng xước.
+  - **Nền phía dưới chữ:** Màu trắng (mica trắng sữa), mã hex: `#FFFFFF`.
+- **Vật liệu và quy cách gia công:**
+  - **Chữ nổi:** Inox vàng xước hoặc nhôm vàng xước, mặt phẳng, chân cao 60mm, có gờ nổi.
+  - **Nền:** Mica trắng sữa dày 5mm.
+  - **Không có khung sắt hộp hoặc bảng nền trong ảnh này** (chỉ là chữ rời đặt trên bàn).
+  - **Không có đèn LED, logo, icon.**
+- **Kích thước ước tính:** Mỗi chữ cao khoảng 200-300mm, sâu 60mm (theo yêu cầu), tổng chiều dài bảng giả định 1200mm x 400mm x 60mm.
+
+```ruby
+# Mã nguồn Ruby hoàn chỉnh 100%
+module ChuChanNhomXuocCoGo
+  def self.build
+    model = Sketchup.active_model
+    model.start_operation('ChuChanNhomXuocCoGo', true)
+    entities = model.active_entities
+
+    # Thông số bảng giả định
+    width = 1200.mm
+    height = 400.mm
+    depth = 60.mm
+    margin = 40.mm
+
+    # Tạo nền mica trắng (nếu cần)
+    base_face = entities.add_face(
+      [0, 0, 0],
+      [width, 0, 0],
+      [width, height, 0],
+      [0, height, 0]
+    )
+    base_face.pushpull(-5.mm)
+    base = base_face.all_connected
+    base.each { |e| e.material = "#FFFFFF" }
+
+    # Tạo các chữ nổi (ví dụ: "F", "O", "C")
+    # Kích thước mỗi chữ: rộng ~200mm, cao ~250mm, sâu 60mm
+    char_height = 250.mm
+    char_depth = 60.mm
+    char_margin = 50.mm
+    font = "Arial Black"
+    bold = true
+    italic = false
+
+    # Vị trí các chữ (giả định 3 chữ: "F", "O", "C")
+    chars = ["F", "O", "C"]
+    x = margin
+    y = (height - char_height) / 2
+
+    chars.each do |ch|
+      group = entities.add_group
+      char_entities = group.entities
+      text = char_entities.add_3d_text(
+        ch,
+        TextAlignLeft,
+        char_height,
+        char_depth,
+        false,
+        font,
+        bold,
+        italic
+      )
+      # Đặt vị trí chữ
+      bounds = group.bounds
+      group.transform!(Geom::Transformation.translation([x, y, 5.mm]))
+      # Gán vật liệu vàng xước
+      group.material = "#D4AF37"
+      group.entities.each { |e| e.material = "#D4AF37" }
+      # Tạo gờ nổi (viền quanh mặt chữ)
+      # Gờ cao 2mm, rộng 5mm quanh mặt chữ
+      face = nil
+      group.entities.each { |e| face = e if e.is_a?(Sketchup::Face) }
+      if face
+        edges = face.outer_loop.edges
+        offset_faces = face.offset(5.mm)
+        if offset_faces
+          offset_faces.each do |f|
+            f.pushpull(2.mm)
+            f.material = "#D4AF37"
+          end
+        end
+      end
+      # Cập nhật vị trí x cho chữ tiếp theo
+      x += char_height + char_margin
+    end
+
+    model.commit_operation
+  end
+end
+ChuChanNhomXuocCoGo.build
+```
+--- THÔNG SỐ VÀ VẬT LIỆU GIA CÔNG ---
+| Thành phần      | Kích thước            | Vật liệu             | Màu sắc (hex) |
+|-----------------|----------------------|----------------------|--------------|
+| Mặt chữ nổi     | Cao 250mm, sâu 60mm  | Nhôm/Inox vàng xước  | #D4AF37      |
+| Gờ viền chữ     | Cao 2mm, rộng 5mm    | Nhôm/Inox vàng xước  | #D4AF37      |
+| Nền (mica)      | 1200x400x5mm         | Mica trắng sữa       | #FFFFFF      |
+| Chân chữ        | Sâu 60mm              | Nhôm/Inox vàng xước  | #D4AF37      |
+
+**Lưu ý:**  
+- Mã Ruby dựng mô hình 3D chữ nổi vàng xước có gờ theo đúng thực tế ảnh, có thể chỉnh sửa ký tự hoặc số lượng chữ theo yêu cầu thực tế.
+- Không có khung sắt hộp, không có đèn LED, không có logo/icon trong ảnh này.  
+- Nếu cần dựng bảng hiệu hoàn chỉnh với khung sắt, vui lòng cung cấp thêm ảnh tổng thể bảng hiệu.

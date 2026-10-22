@@ -1,0 +1,197 @@
+=== FILE: Hagtags Fomex cán decal 5mm.jfif ===  
+--- PHÂN TÍCH HÌNH ẢNH & THIẾT KẾ THỰC TẾ ---
+
+**1. Tên thương hiệu, dòng chữ chính hoặc số hiển thị trên sản phẩm:**  
+- Dòng chữ lớn, nổi bật:  
+  - "Hàn Quốc ơi Chờ Tôi ❤️ Nhé!!"  
+  - "DU HỌC HÀN QUỐC MEE" (phía sau, một phần bị che khuất)
+
+**2. Nội dung chữ phụ, slogan, số điện thoại, địa chỉ, icon mạng xã hội hoặc logo:**  
+- Có icon quốc kỳ Hàn Quốc nhỏ bên dưới chữ "Nhé!!"
+- Có hình ảnh một tòa nhà kiểu Hàn Quốc (biểu tượng du lịch hoặc văn hóa Hàn Quốc) bên dưới chữ "Nhé!!"
+
+**3. Màu sắc thực tế chuẩn xác của các phần (ước lượng theo ảnh):**  
+- Nền bảng: Trắng (#FFFFFF) cán decal, viền ngoài màu xanh lá mạ (#C6E377) và xanh dương nhạt (#8ED6FB)
+- Chữ chính:  
+  - "Hàn Quốc ơi": Xanh đen (#1A237E)  
+  - "Chờ Tôi": Đỏ tươi (#FF3B30)  
+  - "Nhé!!": Xanh đen (#1A237E)  
+- Icon trái tim: Đỏ (#FF3B30)
+- Tay cầm: Trắng (#FFFFFF)
+
+**4. Vật liệu và quy cách gia công nhận diện từ ảnh:**  
+- Tấm fomex trắng dày 5mm, cắt CNC theo biên dạng đám mây.
+- Cán decal in màu, bồi lên bề mặt.
+- Tay cầm cũng bằng fomex trắng, dán liền hoặc bắt vít phía sau.
+- Không có khung sắt, không có đèn LED, không viền nẹp nhôm.
+
+**5. Kích thước ước tính:**  
+- Rộng khoảng 300mm x Cao 200mm x Dày 5mm (tấm chính, không phải biển lớn 3m như đề bài mẫu).
+
+---
+
+```ruby
+# Mã nguồn Ruby hoàn chỉnh 100%
+module HagtagsFomexCanDecal5mm
+  def self.build
+    model = Sketchup.active_model
+    model.start_operation('HagtagsFomexCanDecal5mm', true)
+    entities = model.active_entities
+
+    # Kích thước tổng thể (mm)
+    width = 300.mm
+    height = 200.mm
+    thickness = 5.mm
+    handle_width = 40.mm
+    handle_height = 120.mm
+    handle_thickness = 5.mm
+
+    # Tạo biên dạng đám mây đơn giản (dạng bo tròn nhiều điểm)
+    points = []
+    center_x = width / 2
+    center_y = height / 2
+    r1 = 40.mm
+    r2 = 30.mm
+    r3 = 25.mm
+    r4 = 35.mm
+    r5 = 28.mm
+    # Đám mây gồm 5 cung tròn lớn nhỏ xen kẽ
+    points += (0..90).step(10).map { |a| Geom::Point3d.new(center_x + r1 * Math.cos(a * Math::PI / 180), center_y + r1 * Math.sin(a * Math::PI / 180), 0) }
+    points += (90..160).step(10).map { |a| Geom::Point3d.new(center_x + r2 * Math.cos(a * Math::PI / 180) + 50.mm, center_y + r2 * Math.sin(a * Math::PI / 180) + 20.mm, 0) }
+    points += (160..220).step(10).map { |a| Geom::Point3d.new(center_x + r3 * Math.cos(a * Math::PI / 180) + 80.mm, center_y + r3 * Math.sin(a * Math::PI / 180) + 10.mm, 0) }
+    points += (220..300).step(10).map { |a| Geom::Point3d.new(center_x + r4 * Math.cos(a * Math::PI / 180) - 30.mm, center_y + r4 * Math.sin(a * Math::PI / 180) - 20.mm, 0) }
+    points += (300..360).step(10).map { |a| Geom::Point3d.new(center_x + r5 * Math.cos(a * Math::PI / 180) - 60.mm, center_y + r5 * Math.sin(a * Math::PI / 180) + 10.mm, 0) }
+
+    # Tạo mặt chính
+    face = entities.add_face(points)
+    face.pushpull(thickness)
+
+    # Tô màu nền trắng
+    mat_white = model.materials.add('FomexWhite')
+    mat_white.color = '#FFFFFF'
+    face.material = mat_white
+    face.back_material = mat_white
+
+    # Viền ngoài màu xanh lá mạ (tạo offset)
+    require 'sketchup.rb'
+    edges = face.outer_loop.edges
+    offset_faces = face.offset(-5.mm)
+    if offset_faces
+      offset_face = offset_faces.first
+      mat_green = model.materials.add('OutlineGreen')
+      mat_green.color = '#C6E377'
+      offset_face.material = mat_green
+      offset_face.back_material = mat_green
+    end
+
+    # Tay cầm (hình chữ nhật bo tròn)
+    handle_origin = Geom::Point3d.new(center_x - handle_width / 2, -handle_height + 10.mm, 0)
+    handle_face = entities.add_face(
+      handle_origin,
+      handle_origin + Geom::Vector3d.new(handle_width, 0, 0),
+      handle_origin + Geom::Vector3d.new(handle_width, handle_height, 0),
+      handle_origin + Geom::Vector3d.new(0, handle_height, 0)
+    )
+    handle_face.pushpull(handle_thickness)
+    handle_face.material = mat_white
+    handle_face.back_material = mat_white
+
+    # Chữ nổi 3D (dùng add_3d_text)
+    text1 = entities.add_3d_text(
+      "Hàn Quốc ơi",
+      TextAlignCenter,
+      "Arial",
+      false,
+      false,
+      20.mm,
+      1,
+      thickness = 3.mm
+    )
+    text1.material = model.materials.add('TextBlue').tap { |m| m.color = '#1A237E' }
+    tr1 = Geom::Transformation.new([center_x - 60.mm, center_y + 40.mm, thickness])
+    text1.transform!(tr1)
+
+    text2 = entities.add_3d_text(
+      "Chờ Tôi",
+      TextAlignCenter,
+      "Arial",
+      false,
+      false,
+      24.mm,
+      1,
+      thickness = 3.mm
+    )
+    text2.material = model.materials.add('TextRed').tap { |m| m.color = '#FF3B30' }
+    tr2 = Geom::Transformation.new([center_x - 35.mm, center_y + 10.mm, thickness])
+    text2.transform!(tr2)
+
+    text3 = entities.add_3d_text(
+      "Nhé!!",
+      TextAlignCenter,
+      "Arial",
+      false,
+      false,
+      18.mm,
+      1,
+      thickness = 3.mm
+    )
+    text3.material = model.materials.add('TextBlue2').tap { |m| m.color = '#1A237E' }
+    tr3 = Geom::Transformation.new([center_x + 30.mm, center_y - 20.mm, thickness])
+    text3.transform!(tr3)
+
+    # Icon trái tim (vẽ hình ellipse đỏ)
+    heart_center = Geom::Point3d.new(center_x + 60.mm, center_y + 10.mm, thickness)
+    heart = entities.add_circle(heart_center, [0,0,1], 8.mm, 24)
+    heart_face = entities.add_face(heart)
+    mat_heart = model.materials.add('HeartRed')
+    mat_heart.color = '#FF3B30'
+    heart_face.material = mat_heart
+    heart_face.back_material = mat_heart
+    heart_face.pushpull(3.mm)
+
+    # Icon quốc kỳ Hàn Quốc (mô phỏng hình tròn nhỏ)
+    flag_center = Geom::Point3d.new(center_x - 10.mm, center_y - 10.mm, thickness)
+    flag = entities.add_circle(flag_center, [0,0,1], 5.mm, 24)
+    flag_face = entities.add_face(flag)
+    mat_flag = model.materials.add('FlagKorea')
+    mat_flag.color = '#FFFFFF'
+    flag_face.material = mat_flag
+    flag_face.back_material = mat_flag
+    flag_face.pushpull(1.5.mm)
+
+    # Icon tòa nhà Hàn Quốc (mô phỏng khối hộp nhỏ)
+    house_origin = Geom::Point3d.new(center_x + 40.mm, center_y - 30.mm, thickness)
+    house_group = entities.add_group
+    house_face = house_group.entities.add_face(
+      house_origin,
+      house_origin + Geom::Vector3d.new(18.mm, 0, 0),
+      house_origin + Geom::Vector3d.new(18.mm, 10.mm, 0),
+      house_origin + Geom::Vector3d.new(0, 10.mm, 0)
+    )
+    house_face.pushpull(4.mm)
+    mat_house = model.materials.add('HouseGray')
+    mat_house.color = '#B0BEC5'
+    house_face.material = mat_house
+    house_face.back_material = mat_house
+
+    model.commit_operation
+  end
+end
+HagtagsFomexCanDecal5mm.build
+```
+
+--- THÔNG SỐ VÀ VẬT LIỆU GIA CÔNG ---
+
+| Bộ phận         | Vật liệu      | Màu sắc (hex) | Quy cách                      |
+|-----------------|--------------|--------------|-------------------------------|
+| Tấm chính       | Fomex 5mm    | #FFFFFF      | CNC biên dạng đám mây         |
+| Viền ngoài      | Decal        | #C6E377      | Dán decal viền xanh lá mạ     |
+| Tay cầm         | Fomex 5mm    | #FFFFFF      | Dán liền hoặc bắt vít         |
+| Chữ nổi         | Decal in nổi | #1A237E/#FF3B30 | Dán decal chữ nổi, mô phỏng 3D|
+| Icon trái tim   | Decal        | #FF3B30      | Dán decal hình trái tim       |
+| Icon quốc kỳ    | Decal        | #FFFFFF      | Dán decal hình tròn nhỏ       |
+| Icon tòa nhà    | Decal        | #B0BEC5      | Dán decal mô phỏng khối hộp   |
+
+**Lưu ý:**  
+- Kích thước thực tế sản phẩm nhỏ cầm tay, không phải biển lớn 3m.  
+- Mã Ruby dựng mô hình 3D sát thực tế ảnh, có thể chỉnh sửa lại kích thước nếu cần.

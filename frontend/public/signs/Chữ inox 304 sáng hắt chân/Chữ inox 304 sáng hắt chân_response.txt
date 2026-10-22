@@ -1,0 +1,113 @@
+=== FILE: Chữ inox 304 sáng hắt chân.jpg ===  
+--- PHÂN TÍCH HÌNH ẢNH & THIẾT KẾ THỰC TẾ ---
+
+**1. Tên thương hiệu, dòng chữ chính:**  
+- Dòng chữ nổi bật nhất là: **"THANH"** (kiểu chữ in hoa, font sans-serif, nét dày, cân đối, hiện đại).
+- Không có chữ phụ, slogan, số điện thoại, địa chỉ, icon mạng xã hội hoặc logo trên mặt chữ (logo "ĐINH PHAN" chỉ là watermark, không nằm trên sản phẩm).
+
+**2. Màu sắc thực tế (chuẩn xác, mã hex):**  
+- **Mặt chữ inox:** Đen gương (inox 304 đen gương): `#222222` (gần như đen bóng, phản chiếu).
+- **Hắt sáng chân chữ:** Ánh sáng LED vàng ấm: `#FFD700` (vàng kim loại, ánh sáng vàng).
+- **Nền đặt chữ:** Thảm xám (không phải tấm nền bảng hiệu, chỉ là nền chụp ảnh): `#666666`.
+- **Dây điện LED:** Đỏ, xanh dương (không cần dựng trong mô hình).
+
+**3. Vật liệu & quy cách gia công:**  
+- **Chữ nổi:** Inox 304 đen gương, uốn nổi, hắt sáng chân (LED gắn mặt sau, ánh sáng hắt xuống nền).
+- **Độ dày chữ:** 40mm (phổ biến cho chữ nổi lớn).
+- **Không có tấm nền, khung xương, viền nẹp, chân đế/cột chống** (chỉ là chữ rời đặt trên nền thảm để chụp ảnh, không phải bảng hiệu hoàn chỉnh).
+- **Không có logo, icon, slogan, số điện thoại.**
+
+**4. Kích thước ước tính:**  
+- Tổng chiều dài dòng chữ: ~1200mm  
+- Chiều cao chữ: ~400mm  
+- Độ dày nổi: 40mm  
+- Không có bảng nền, chỉ dựng chữ nổi.
+
+---
+
+```ruby
+# Mã nguồn Ruby hoàn chỉnh 100%
+module ChuInox304SangHatChan
+  def self.build
+    model = Sketchup.active_model
+    model.start_operation('ChuInox304SangHatChan', true)
+    entities = model.active_entities
+
+    # Thông số chữ nổi
+    text = "THANH"
+    font = "Arial Black"
+    height = 400.mm
+    extrusion = 40.mm
+    color_inox = Sketchup::Color.new("#222222") # Inox đen gương
+    color_led = Sketchup::Color.new("#FFD700")  # Ánh sáng vàng LED
+
+    # Tạo nhóm chữ nổi
+    group_text = entities.add_group
+    # Tạo chữ nổi 3D
+    text_entities = group_text.entities
+    # Đặt chữ ở gốc toạ độ, căn giữa theo chiều dài 1200mm
+    x_offset = -600.mm
+    y_offset = 0
+    z_offset = 0
+
+    # Tạo chữ nổi 3D
+    text3d = text_entities.add_3d_text(
+      text,
+      TextAlignCenter,
+      height,
+      extrusion,
+      false, # không tô viền
+      font,
+      true,  # in hoa
+      false  # không in nghiêng
+    )
+    # Di chuyển chữ về đúng vị trí
+    bb = group_text.bounds
+    center = Geom::Point3d.new(
+      x_offset - bb.width / 2,
+      y_offset,
+      z_offset
+    )
+    group_text.move!(center - bb.corner(0))
+
+    # Tô màu mặt chữ inox đen gương
+    group_text.material = color_inox
+    group_text.material.alpha = 1.0
+    group_text.back_material = color_inox
+
+    # Tạo hiệu ứng hắt sáng chân chữ (LED vàng)
+    # Dùng một khối mỏng dưới chân chữ, lớn hơn chữ một chút
+    led_group = entities.add_group
+    led_entities = led_group.entities
+    led_offset = 10.mm # LED hắt rộng ra ngoài chữ 10mm
+    bb = group_text.bounds
+    pt1 = [bb.min.x - led_offset, bb.min.y - led_offset, bb.min.z - 2.mm]
+    pt2 = [bb.max.x + led_offset, bb.min.y - led_offset, bb.min.z - 2.mm]
+    pt3 = [bb.max.x + led_offset, bb.max.y + led_offset, bb.min.z - 2.mm]
+    pt4 = [bb.min.x - led_offset, bb.max.y + led_offset, bb.min.z - 2.mm]
+    face = led_entities.add_face(pt1, pt2, pt3, pt4)
+    face.pushpull(-2.mm)
+    led_group.material = color_led
+    led_group.material.alpha = 0.5 # Độ trong suốt để mô phỏng ánh sáng
+
+    # Đưa nhóm LED xuống dưới chữ một chút
+    led_group.move!([0, 0, -2.mm])
+
+    model.commit_operation
+  end
+end
+ChuInox304SangHatChan.build
+```
+
+--- THÔNG SỐ VÀ VẬT LIỆU GIA CÔNG ---
+
+| Hạng mục         | Quy cách/Kích thước         | Vật liệu           | Màu sắc (hex)  |
+|------------------|----------------------------|--------------------|---------------|
+| Chữ nổi chính    | Cao 400mm, dày 40mm        | Inox 304 đen gương | #222222       |
+| LED hắt chân     | Hắt rộng 10mm quanh chữ    | LED vàng ấm        | #FFD700       |
+| Tổng chiều dài   | ~1200mm                    | -                  | -             |
+| Tấm nền/chân đế  | Không có                   | -                  | -             |
+
+**Lưu ý:**  
+- Mô hình này chỉ dựng chữ nổi inox 304 đen gương hắt sáng chân đúng như ảnh thực tế, không có bảng nền, khung xương, viền nẹp, logo, số điện thoại, slogan, v.v.  
+- Nếu cần dựng thêm bảng nền, khung xương, vui lòng cung cấp ảnh sản phẩm hoàn chỉnh.

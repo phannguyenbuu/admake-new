@@ -1,0 +1,200 @@
+=== FILE: Bảng hiệu vách PVC vân đá.jpg ===
+--- PHÂN TÍCH HÌNH ẢNH & THIẾT KẾ THỰC TẾ ---
+
+**1. Tên thương hiệu, dòng chữ chính:**
+- Logo tròn phía trên: "VIỆN THẨM MỸ" (chữ nhỏ, viền tròn, có hình cánh chim và số 175 cách điệu bên trong).
+- Dòng chữ nổi lớn: "VIỆN THẨM MỸ 175"
+  - "VIỆN THẨM MỸ": chữ nổi màu vàng ánh kim (inox vàng gương).
+  - "175": chữ nổi màu xanh lá cây đậm, viền trắng (inox/mica xanh lá + viền trắng).
+
+**2. Nội dung chữ phụ, slogan, số điện thoại, địa chỉ, icon mạng xã hội hoặc logo:**
+- Không có slogan, số điện thoại, địa chỉ, icon mạng xã hội nào trên bảng hiệu này.
+- Logo tròn phía trên là đặc trưng nhận diện.
+
+**3. Màu sắc thực tế chuẩn xác (ước lượng mã hex):**
+- Nền vách PVC vân đá: #e5e6ea (trắng xám vân đá marble).
+- Viền nẹp nhôm/inox vàng: #ffe066 (vàng ánh kim).
+- Chữ nổi "VIỆN THẨM MỸ": #ffe066 (vàng ánh kim).
+- Chữ nổi "175": #218c5a (xanh lá cây đậm), viền trắng #ffffff.
+- Logo: viền tròn vàng #ffe066, nền trắng #ffffff, hình cánh chim vàng #ffe066, số 175 xanh lá #218c5a.
+
+**4. Vật liệu và quy cách gia công:**
+- Nền: Tấm PVC vân đá marble dán lên vách (hoặc alu vân đá).
+- Viền: Nẹp nhôm/inox vàng gương ốp nổi 20mm.
+- Chữ nổi: Inox vàng gương cắt CNC, dán nổi 30mm (chữ lớn), mica xanh lá + viền trắng (số 175).
+- Logo: Mica/inox cắt CNC, dán nổi 20mm.
+- Khung xương: Sắt hộp 25x25mm hoặc 30x30mm, xương đứng cách 500mm, xương ngang tăng cứng.
+- Tai treo hoặc chân đế: Không thấy rõ, giả định gắn trực tiếp lên tường.
+
+**5. Kích thước ước tính:**
+- Tổng thể: Rộng 3000mm x Cao 1000mm x Sâu 150mm (vách nổi).
+- Logo: Đường kính ~500mm.
+- Chữ "VIỆN THẨM MỸ": Cao ~150mm, dày 30mm.
+- Số "175": Cao ~200mm, dày 40mm.
+
+```ruby
+# Mã nguồn Ruby hoàn chỉnh 100%
+module BangHieuVachPvcVanDa
+  def self.build
+    model = Sketchup.active_model
+    model.start_operation('BangHieuVachPvcVanDa', true)
+    entities = model.active_entities
+
+    # Thông số kích thước
+    width = 3000.mm
+    height = 1000.mm
+    depth = 150.mm
+    khung_size = 30.mm
+    nẹp_vien = 20.mm
+
+    # === 1. Khung xương sắt hộp ===
+    khung_group = entities.add_group
+    kg = khung_group.entities
+
+    # Khung viền ngoài
+    [[0,0,0],[width,0,0],[width,height,0],[0,height,0]].each_with_index do |pt,i|
+      next_pt = [[width,0,0],[width,height,0],[0,height,0],[0,0,0]][i]
+      kg.add_face(pt, [pt[0],pt[1],pt[2]+khung_size], [next_pt[0],next_pt[1],next_pt[2]+khung_size], next_pt)
+    end
+
+    # Xương đứng (cách 500mm)
+    (1..5).each do |i|
+      x = i*500.mm
+      next if x >= width
+      kg.add_face([x,0,0],[x+khung_size,0,0],[x+khung_size,height,0],[x,height,0])
+    end
+
+    # Xương ngang tăng cứng (cách 300mm)
+    (1..2).each do |i|
+      y = i*300.mm
+      kg.add_face([0,y,0],[width,y,0],[width,y+khung_size,0],[0,y+khung_size,0])
+    end
+
+    khung_group.material = 'gray'
+
+    # === 2. Tấm nền vách PVC vân đá ===
+    nen_group = entities.add_group
+    face = nen_group.entities.add_face([0,0,khung_size],[width,0,khung_size],[width,height,khung_size],[0,height,khung_size])
+    face.pushpull(depth - khung_size)
+    nen_group.material = model.materials.add('PVC_VanDa')
+    nen_group.material.color = Sketchup::Color.new('#e5e6ea')
+
+    # === 3. Viền nẹp nhôm vàng ===
+    vien_group = entities.add_group
+    # Viền ngoài
+    vien_faces = [
+      [[0-nẹp_vien,0-nẹp_vien,khung_size],[width+nẹp_vien,0-nẹp_vien,khung_size],[width+nẹp_vien,0,khung_size],[0-nẹp_vien,0,khung_size]],
+      [[width,0-nẹp_vien,khung_size],[width+nẹp_vien,0-nẹp_vien,khung_size],[width+nẹp_vien,height+nẹp_vien,khung_size],[width,height+nẹp_vien,khung_size]],
+      [[0-nẹp_vien,height,khung_size],[width+nẹp_vien,height,khung_size],[width+nẹp_vien,height+nẹp_vien,khung_size],[0-nẹp_vien,height+nẹp_vien,khung_size]],
+      [[0-nẹp_vien,0,khung_size],[0,0,khung_size],[0,height,khung_size],[0-nẹp_vien,height,khung_size]]
+    ]
+    vien_faces.each do |pts|
+      f = vien_group.entities.add_face(pts)
+      f.pushpull(nẹp_vien)
+    end
+    vien_group.material = model.materials.add('NepVang')
+    vien_group.material.color = Sketchup::Color.new('#ffe066')
+
+    # === 4. Logo tròn nổi ===
+    logo_group = entities.add_group
+    logo_center = [width/2, height*0.7, depth-10.mm]
+    logo_radius = 250.mm
+    logo_face = logo_group.entities.add_circle(logo_center, [0,0,1], logo_radius)
+    logo_face = logo_group.entities.add_face(logo_face)
+    logo_face.pushpull(20.mm)
+    logo_group.material = model.materials.add('LogoVienVang')
+    logo_group.material.color = Sketchup::Color.new('#ffe066')
+
+    # Vẽ nền logo trắng
+    logo_inner = logo_group.entities.add_circle(logo_center, [0,0,1], logo_radius-10.mm)
+    logo_inner_face = logo_group.entities.add_face(logo_inner)
+    logo_inner_face.pushpull(19.mm)
+    logo_inner_face.material = Sketchup::Color.new('#ffffff')
+
+    # Vẽ số 175 cách điệu (khối chữ xanh lá)
+    text_175 = logo_group.entities.add_3d_text(
+      "175",  # text
+      TextAlignCenter,
+      "Arial Black",
+      false,  # Bold
+      false,  # Italic
+      120.mm, # height
+      10.mm,  # tolerance
+      20.mm,  # extrusion
+      true,   # filled
+      logo_center[0]-60.mm, logo_center[1]-40.mm, logo_center[2]+5.mm
+    )
+    text_175.material = Sketchup::Color.new('#218c5a')
+
+    # === 5. Chữ nổi "VIỆN THẨM MỸ" ===
+    text_group = entities.add_group
+    text = "VIỆN THẨM MỸ"
+    text_pos = [width/2-320.mm, height*0.35, depth+5.mm]
+    text_3d = text_group.entities.add_3d_text(
+      text,
+      TextAlignLeft,
+      "Arial Black",
+      false,
+      false,
+      150.mm,
+      10.mm,
+      30.mm,
+      true,
+      text_pos[0], text_pos[1], text_pos[2]
+    )
+    text_group.material = Sketchup::Color.new('#ffe066')
+
+    # === 6. Chữ nổi "175" ===
+    text_175_group = entities.add_group
+    text_175_pos = [width/2+180.mm, height*0.35, depth+5.mm]
+    text_3d_175 = text_175_group.entities.add_3d_text(
+      "175",
+      TextAlignLeft,
+      "Arial Black",
+      false,
+      false,
+      200.mm,
+      10.mm,
+      40.mm,
+      true,
+      text_175_pos[0], text_175_pos[1], text_175_pos[2]
+    )
+    text_175_group.material = Sketchup::Color.new('#218c5a')
+
+    # Viền trắng cho số 175
+    # Tạo một khối trắng lớn hơn một chút phía sau số 175
+    text_175_outline = text_175_group.entities.add_3d_text(
+      "175",
+      TextAlignLeft,
+      "Arial Black",
+      false,
+      false,
+      210.mm,
+      10.mm,
+      42.mm,
+      true,
+      text_175_pos[0]-5.mm, text_175_pos[1]-5.mm, text_175_pos[2]-2.mm
+    )
+    text_175_outline.material = Sketchup::Color.new('#ffffff')
+
+    model.commit_operation
+  end
+end
+BangHieuVachPvcVanDa.build
+```
+
+--- THÔNG SỐ VÀ VẬT LIỆU GIA CÔNG ---
+
+| Hạng mục                | Kích thước                | Vật liệu                  | Màu sắc (hex)   | Ghi chú                      |
+|-------------------------|---------------------------|---------------------------|-----------------|------------------------------|
+| Khung xương sắt hộp     | 30x30mm, chia 500mm       | Sắt hộp                   | #888888         | Xương đứng/ngang tăng cứng   |
+| Nền vách PVC vân đá     | 3000x1000x150mm           | PVC vân đá marble         | #e5e6ea         | Dán lên khung                |
+| Viền nẹp nhôm vàng      | 20mm                      | Nhôm/inox vàng gương      | #ffe066         | Ốp nổi quanh biển            |
+| Logo tròn nổi           | Ø500mm, dày 20mm          | Mica/inox/màu             | #ffe066/#ffffff/#218c5a | Logo nhận diện         |
+| Chữ nổi "VIỆN THẨM MỸ"  | Cao 150mm, dày 30mm       | Inox vàng gương           | #ffe066         | CNC, dán nổi                 |
+| Chữ nổi "175"           | Cao 200mm, dày 40mm       | Mica xanh lá + viền trắng | #218c5a/#ffffff | CNC, dán nổi, viền trắng     |
+| Tổng thể                | 3000x1000x150mm           |                           |                 |                              |
+
+**Lưu ý:**  
+- Mã Ruby trên có thể cần điều chỉnh vị trí chữ/logo cho sát thực tế hơn khi dựng mô hình 3D trong SketchUp.
+- Các thông số vật liệu, màu sắc đã được xác định sát thực tế ảnh chụp.

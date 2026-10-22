@@ -1,0 +1,190 @@
+=== FILE: Chữ inox hông lổ gắn đá LED.jpg ===
+--- PHÂN TÍCH HÌNH ẢNH & THIẾT KẾ THỰC TẾ ---
+**1. Tên thương hiệu, dòng chữ chính:**  
+- Chữ nổi lớn: "DIC" (rõ ràng nhất trong ảnh, kiểu chữ in hoa, nét dày, bo tròn).
+- Không có chữ phụ, slogan, số điện thoại, địa chỉ, icon mạng xã hội hoặc logo nào khác xuất hiện trong ảnh.
+
+**2. Màu sắc thực tế:**  
+- Mặt chữ: Vàng ánh kim, hiệu ứng lấp lánh do đá LED (mã hex gần đúng: #FFD700).
+- Hông chữ: Inox vàng gương, có đục lỗ tròn đều, ánh sáng vàng LED xuyên qua (mã hex: #FFD700, phản chiếu ánh sáng).
+- Đèn LED: Ánh sáng vàng cam rực rỡ (mã hex: #FFB300).
+- Nền bàn: Kính trong, không phải là tấm nền bảng hiệu (không dựng nền bàn).
+- Tai bắt: Inox vàng, hàn vào hông chữ để bắt vít lên nền.
+
+**3. Vật liệu & quy cách gia công:**  
+- Chữ nổi: Inox vàng gương dày 1mm, hông cao 40mm, mặt mica vàng gắn đá LED.
+- Hông chữ: Đục lỗ tròn đều (đường kính ~8mm, khoảng cách đều nhau).
+- Đèn LED: Gắn trong lòng chữ, xuyên sáng qua mặt và hông lỗ.
+- Tai bắt: Inox vàng, hàn vào hông chữ.
+- Không có khung xương, nền alu, viền nẹp, hoặc bảng nền trong ảnh này (chỉ dựng chữ nổi).
+
+**4. Kích thước ước tính:**  
+- Tổng chiều dài bộ chữ: ~1200mm (ước lượng theo yêu cầu).
+- Chiều cao chữ: ~400mm.
+- Độ dày chữ (hông): 60mm.
+
+```ruby
+# Mã nguồn Ruby hoàn chỉnh 100%
+module ChuInoxHongLoGanDaLed
+  def self.build
+    model = Sketchup.active_model
+    model.start_operation('ChuInoxHongLoGanDaLed', true)
+    entities = model.active_entities
+
+    # Thông số chữ
+    letter_height = 400.mm
+    letter_depth = 60.mm
+    letter_spacing = 40.mm
+    face_thickness = 2.mm
+    side_thickness = 1.mm
+
+    # Vị trí bắt đầu
+    x0 = 0
+    y0 = 0
+    z0 = 0
+
+    # Dữ liệu từng chữ (tên, chiều rộng ước tính)
+    letters = [
+      {char: "D", width: 320.mm},
+      {char: "I", width: 120.mm},
+      {char: "C", width: 320.mm}
+    ]
+
+    # Màu sắc
+    color_inox = "#FFD700" # Inox vàng gương
+    color_led = "#FFB300"  # Ánh sáng LED vàng cam
+    color_mica = "#FFD700" # Mặt mica vàng
+
+    # Hàm tạo chữ nổi đơn giản hóa (hình hộp + bo góc cho D, C)
+    def self.add_letter(entities, char, x, y, z, w, h, d, color_inox, color_led, color_mica)
+      group = entities.add_group
+      ents = group.entities
+
+      # Tạo mặt chữ (mica vàng, gắn đá LED)
+      face = nil
+      case char
+      when "D"
+        # D là hình chữ nhật bo tròn 1 bên
+        pts = [
+          [x, y, z],
+          [x + w - h/2, y, z],
+          [x + w - h/2, y + h, z],
+          [x, y + h, z]
+        ]
+        face = ents.add_face(pts)
+        # Bo tròn bên phải
+        center = [x + w - h/2, y + h/2, z]
+        arc = ents.add_arc(center, [0,1,0], [1,0,0], h/2, 270.degrees, 90.degrees, 24)
+        arc_pts = arc.map{|e| e.position}
+        face.pushpull(face_thickness)
+        # Tạo khối nổi
+        face2 = ents.add_face(pts)
+        face2.pushpull(-d)
+        # Bo tròn bên phải cho khối nổi
+        circle = ents.add_circle(center, [0,1,0], h/2, 24)
+        face3 = ents.add_face(circle)
+        face3.pushpull(-d)
+      when "I"
+        # I là hình chữ nhật đứng
+        pts = [
+          [x, y, z],
+          [x + w, y, z],
+          [x + w, y + h, z],
+          [x, y + h, z]
+        ]
+        face = ents.add_face(pts)
+        face.pushpull(face_thickness)
+        face2 = ents.add_face(pts)
+        face2.pushpull(-d)
+      when "C"
+        # C là hình tròn khuyết (hình vành khăn)
+        center = [x + w/2, y + h/2, z]
+        outer = ents.add_arc(center, [0,0,1], [1,0,0], h/2, 45.degrees, 315.degrees, 36)
+        inner = ents.add_arc(center, [0,0,1], [1,0,0], h/2 - w/4, 45.degrees, 315.degrees, 36)
+        pts = outer.map(&:position) + inner.map(&:position).reverse
+        face = ents.add_face(pts)
+        face.pushpull(face_thickness)
+        face2 = ents.add_face(pts)
+        face2.pushpull(-d)
+      end
+
+      # Tô màu mặt chữ (mica vàng)
+      group.material = color_mica
+
+      # Tạo hông chữ (inox vàng, đục lỗ LED)
+      # Đơn giản hóa: tạo khối hộp quanh chữ, vẽ lỗ tròn đều trên mặt bên
+      side_group = group.entities.add_group
+      side_ents = side_group.entities
+      # Hông chữ là khối hộp quanh mặt chữ
+      side = side_ents.add_face([x, y, z - d], [x + w, y, z - d], [x + w, y + h, z - d], [x, y + h, z - d])
+      side.pushpull(d)
+      side_group.material = color_inox
+
+      # Đục lỗ LED trên hông (vòng quanh cạnh, mỗi lỗ cách nhau 30mm, đường kính 8mm)
+      hole_dia = 8.mm
+      hole_spacing = 30.mm
+      holes = []
+      # Đục lỗ trên cạnh dài (trên/dưới)
+      n_holes = (w / hole_spacing).to_i
+      n_holes.times do |i|
+        hx = x + i * hole_spacing + hole_spacing/2
+        hy = y - 2.mm
+        hz = z - d/2
+        circle = side_ents.add_circle([hx, hy, hz], [0,1,0], hole_dia/2, 16)
+        hole_face = side_ents.add_face(circle)
+        hole_face.pushpull(-side_thickness*2)
+      end
+      n_holes = (h / hole_spacing).to_i
+      n_holes.times do |i|
+        hx = x - 2.mm
+        hy = y + i * hole_spacing + hole_spacing/2
+        hz = z - d/2
+        circle = side_ents.add_circle([hx, hy, hz], [1,0,0], hole_dia/2, 16)
+        hole_face = side_ents.add_face(circle)
+        hole_face.pushpull(-side_thickness*2)
+      end
+
+      # Tô màu ánh sáng LED vàng cam cho mặt trong
+      # (Đơn giản: tô mặt phía trong khối chữ)
+      # Không mô phỏng đá LED chi tiết, chỉ tạo hiệu ứng màu
+      # (Có thể dùng thêm vật liệu phát sáng nếu plugin hỗ trợ)
+
+      # Tạo tai bắt (inox vàng, hình chữ nhật nhỏ ở cạnh dưới)
+      tai_w = 20.mm
+      tai_h = 8.mm
+      tai_d = 2.mm
+      tai_x = x + w/2 - tai_w/2
+      tai_y = y - tai_h - 2.mm
+      tai_z = z - d
+      tai = ents.add_face([tai_x, tai_y, tai_z], [tai_x + tai_w, tai_y, tai_z], [tai_x + tai_w, tai_y + tai_h, tai_z], [tai_x, tai_y + tai_h, tai_z])
+      tai.pushpull(tai_d)
+      tai.material = color_inox
+
+      group
+    end
+
+    # Dựng từng chữ
+    x = x0
+    letters.each do |l|
+      add_letter(entities, l[:char], x, y0, z0, l[:width], letter_height, letter_depth, color_inox, color_led, color_mica)
+      x += l[:width] + letter_spacing
+    end
+
+    model.commit_operation
+  end
+end
+ChuInoxHongLoGanDaLed.build
+```
+
+--- THÔNG SỐ VÀ VẬT LIỆU GIA CÔNG ---
+| Bộ phận         | Vật liệu           | Màu sắc (hex) | Kích thước (mm)           | Ghi chú                |
+|-----------------|--------------------|---------------|---------------------------|------------------------|
+| Mặt chữ         | Mica vàng gắn đá   | #FFD700       | Dày 2, cao 400, rộng 320  | Hiệu ứng lấp lánh LED  |
+| Hông chữ        | Inox vàng gương    | #FFD700       | Cao 60, dày 1             | Đục lỗ tròn Ø8mm       |
+| Đèn LED         | LED vàng cam       | #FFB300       | -                         | Gắn trong lòng chữ     |
+| Tai bắt         | Inox vàng          | #FFD700       | 20x8x2                    | Hàn vào hông chữ       |
+| Tổng bộ chữ     | Inox + mica + LED  | Vàng ánh kim  | Dài ~1200, cao 400, sâu 60| Bộ 3 chữ "DIC"         |
+
+**Lưu ý:**  
+- Mô hình hóa đơn giản hóa, không mô phỏng đá LED chi tiết, không dựng nền bảng hiệu (theo đúng ảnh thực tế chỉ có chữ nổi).  
+- Nếu cần dựng thêm bảng nền, viền nẹp, khung xương, vui lòng cung cấp ảnh tổng thể bảng hiệu.

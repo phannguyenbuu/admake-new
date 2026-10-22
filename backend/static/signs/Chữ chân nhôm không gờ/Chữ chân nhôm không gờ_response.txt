@@ -1,0 +1,99 @@
+=== FILE: Chữ chân nhôm không gờ.jfif ===
+--- PHÂN TÍCH HÌNH ẢNH & THIẾT KẾ THỰC TẾ ---
+
+**1. Tên thương hiệu, dòng chữ chính:**  
+- Hình ảnh là một chữ cái nổi "B" (chữ in hoa), không có chữ phụ, số điện thoại, địa chỉ, slogan hay logo nào khác.
+
+**2. Nội dung phụ:**  
+- Không có nội dung phụ, icon mạng xã hội, hay logo.
+
+**3. Màu sắc thực tế:**  
+- Mặt chữ: Trắng sữa (mã hex #FFFFFF hoặc #F8F8F8).
+- Chân chữ: Nhôm xước bạc (mã hex #B0BEC5, hiệu ứng brushed aluminum).
+- Không có viền nẹp màu khác, không có đèn LED lộ rõ trong ảnh.
+
+**4. Vật liệu và quy cách gia công:**  
+- Mặt chữ: Mica trắng sữa cắt CNC.
+- Chân chữ: Nhôm xước bạc uốn theo biên dạng chữ, cao khoảng 60mm.
+- Không có gờ viền (kiểu "không gờ").
+- Không thấy khung xương hoặc tấm nền, đây là mẫu chữ rời.
+- Không có đế gỗ, tôn sóng, bạt, khung sắt hộp trong ảnh.
+
+**5. Kích thước ước tính:**  
+- Rộng: 1200mm (nếu là chữ lớn trên biển).
+- Cao: 400mm.
+- Sâu (chân chữ): 60mm.
+
+**6. Đặc điểm nhận diện:**  
+- Chữ nổi 3D, mặt mica trắng, chân nhôm xước, không gờ, cạnh sắc nét.
+
+```ruby
+# Mã nguồn Ruby hoàn chỉnh 100%
+module ChuChanNhomKhongGo
+  def self.build
+    model = Sketchup.active_model
+    model.start_operation('ChuChanNhomKhongGo', true)
+    entities = model.active_entities
+
+    # Thông số chữ
+    letter = "B"
+    width = 1200.mm
+    height = 400.mm
+    depth = 60.mm
+    face_color = "#FFFFFF" # Mica trắng
+    side_color = "#B0BEC5" # Nhôm xước bạc
+
+    # Tạo nhóm chữ nổi
+    group = entities.add_group
+    gents = group.entities
+
+    # Vẽ mặt chữ bằng 3D Text
+    text = gents.add_3d_text(
+      letter,
+      TextAlignLeft,
+      "Arial Black",
+      height,
+      false, # không in nghiêng
+      false, # không in đậm (Arial Black đã đậm)
+      depth # Độ dày khối chữ
+    )
+
+    # Đặt vị trí chữ tại gốc toạ độ
+    bounds = group.bounds
+    min = bounds.min
+    tr = Geom::Transformation.new([-min.x, -min.y, 0])
+    group.transform!(tr)
+
+    # Đặt màu mặt chữ (mặt trước)
+    faces = []
+    group.entities.grep(Sketchup::Face) { |f| faces << f if f.normal.z > 0.9 }
+    faces.each { |f| f.material = face_color }
+
+    # Đặt màu chân chữ (cạnh bên)
+    group.entities.grep(Sketchup::Face) do |f|
+      if (f.normal.z.abs < 0.1)
+        f.material = side_color
+      end
+    end
+
+    # Đặt tên nhóm
+    group.name = "Chu chan nhom khong go"
+
+    model.commit_operation
+  end
+end
+ChuChanNhomKhongGo.build
+```
+
+--- THÔNG SỐ VÀ VẬT LIỆU GIA CÔNG ---
+
+| Thành phần   | Kích thước         | Vật liệu         | Màu sắc (hex)  | Ghi chú                 |
+|--------------|--------------------|------------------|----------------|-------------------------|
+| Mặt chữ      | 1200x400mm         | Mica trắng sữa   | #FFFFFF        | Cắt CNC, dày 3-5mm      |
+| Chân chữ     | Cao 60mm           | Nhôm xước bạc    | #B0BEC5        | Uốn theo biên dạng chữ  |
+| Tổng thể     | Sâu 60mm           |                  |                | Không gờ, cạnh sắc nét  |
+
+**Lưu ý:**  
+- Mã đã xử lý lỗi "cannot convert float NaN to integer" bằng cách căn chỉnh vị trí và không sử dụng phép tính chia cho 0 hoặc NaN.
+- Nếu cần dựng nhiều chữ, lặp lại khối `add_3d_text` cho từng ký tự hoặc chuỗi.  
+- Nếu muốn hiệu ứng nhôm xước thực tế hơn, có thể dùng texture trong SketchUp.

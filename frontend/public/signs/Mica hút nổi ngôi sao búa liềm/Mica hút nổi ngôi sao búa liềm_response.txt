@@ -1,0 +1,182 @@
+=== FILE: Mica hút nổi ngôi sao búa liềm.jfif ===
+--- PHÂN TÍCH HÌNH ẢNH & THIẾT KẾ THỰC TẾ ---
+
+**1. Tên thương hiệu, dòng chữ chính hoặc số hiển thị:**  
+- KHÔNG có chữ, số, tên quán, thương hiệu, số nhà hay chức danh nào trên sản phẩm.  
+- Sản phẩm là các khối biểu tượng: 1 logo búa liềm và 4 ngôi sao năm cánh.
+
+**2. Nội dung chữ phụ, slogan, số điện thoại, địa chỉ, icon mạng xã hội hoặc logo:**  
+- KHÔNG có chữ phụ, slogan, số điện thoại, địa chỉ, icon mạng xã hội.  
+- Toàn bộ là các khối hình học: logo búa liềm và các ngôi sao.
+
+**3. Màu sắc thực tế chuẩn xác:**  
+- TẤT CẢ các phần (búa liềm, ngôi sao) đều là màu vàng tươi, bóng, mã hex gần đúng: **#FFD600**.  
+- Không có màu sắc khác, không có viền nẹp màu khác, không có đèn LED.
+
+**4. Vật liệu và quy cách gia công:**  
+- **Vật liệu:** Mica hút nổi (mica vàng, hút nổi chân không tạo khối 3D).  
+- **Gia công:**  
+  + Logo búa liềm: hút nổi nguyên khối, dày nổi ~40mm-60mm.  
+  + Ngôi sao: hút nổi 3D, mỗi ngôi sao dày nổi ~30mm-40mm, cạnh sắc nét, hình khối 5 cánh.  
+- **Không có khung sắt, không có nền alu, không có chân đế, không có bảng nền.**  
+- **Kích thước ước tính:**  
+  + Logo búa liềm: Rộng ~600mm x Cao ~600mm x Sâu ~50mm  
+  + Mỗi ngôi sao: Rộng ~350mm x Cao ~350mm x Sâu ~35mm
+
+**5. Đặc điểm khác:**  
+- Bề mặt bóng, phản chiếu ánh sáng.  
+- Các chi tiết đều là hình khối 3D, không phải decal dán hay in phẳng.
+
+```ruby
+# Mã nguồn Ruby hoàn chỉnh 100%
+module MicaHutNoiNgoiSaoBuaLiem
+  def self.build
+    model = Sketchup.active_model
+    model.start_operation('MicaHutNoiNgoiSaoBuaLiem', true)
+    entities = model.active_entities
+
+    # Màu vàng mica hút nổi
+    yellow = Sketchup::Color.new("#FFD600")
+
+    # === TẠO LOGO BÚA LIỀM ===
+    # Thông số logo búa liềm
+    logo_center = Geom::Point3d.new(0, 0, 0)
+    logo_scale = 600.0 # mm (chiều rộng chính)
+    logo_thickness = 50.0 # mm (độ nổi)
+    # Vẽ búa liềm bằng các khối cơ bản (hình chữ nhật, cung tròn, hình trụ)
+    logo_group = entities.add_group
+    logo_ents = logo_group.entities
+
+    # Thân liềm (hình tròn khuyết)
+    center_liem = Geom::Point3d.new(0, 0, 0)
+    radius_outer = 220.0
+    radius_inner = 140.0
+    angle1 = 30.degrees
+    angle2 = 320.degrees
+    # Vẽ cung ngoài
+    edges_outer = logo_ents.add_arc(center_liem, [1,0,0], [0,1,0], radius_outer, angle1, angle2, 24)
+    # Vẽ cung trong
+    edges_inner = logo_ents.add_arc(center_liem, [1,0,0], [0,1,0], radius_inner, angle1, angle2, 24)
+    # Nối hai đầu cung
+    pt1 = edges_outer.first.start.position
+    pt2 = edges_outer.last.end.position
+    pt3 = edges_inner.last.end.position
+    pt4 = edges_inner.first.start.position
+    logo_ents.add_line(pt1, pt4)
+    logo_ents.add_line(pt2, pt3)
+    # Tạo mặt liềm
+    face_liem = logo_ents.add_face(edges_outer + [logo_ents.add_line(pt2, pt3)] + edges_inner.reverse + [logo_ents.add_line(pt4, pt1)])
+    face_liem.pushpull(logo_thickness)
+    face_liem.material = yellow
+    face_liem.back_material = yellow
+
+    # Thân búa (hình chữ nhật)
+    hammer_w = 60.0
+    hammer_h = 220.0
+    hammer_thick = logo_thickness
+    hammer_origin = Geom::Point3d.new(-hammer_w/2, radius_outer-40, 0)
+    hammer_face = logo_ents.add_face([
+      hammer_origin,
+      hammer_origin.offset([1,0,0], hammer_w),
+      hammer_origin.offset([1,0,0], hammer_w).offset([0,1,0], hammer_h),
+      hammer_origin.offset([0,1,0], hammer_h)
+    ])
+    hammer_face.pushpull(hammer_thick)
+    hammer_face.material = yellow
+    hammer_face.back_material = yellow
+
+    # Đầu búa (hình hộp nhỏ)
+    head_w = 120.0
+    head_h = 40.0
+    head_thick = logo_thickness
+    head_origin = Geom::Point3d.new(-head_w/2, radius_outer+hammer_h-40, 0)
+    head_face = logo_ents.add_face([
+      head_origin,
+      head_origin.offset([1,0,0], head_w),
+      head_origin.offset([1,0,0], head_w).offset([0,1,0], head_h),
+      head_origin.offset([0,1,0], head_h)
+    ])
+    head_face.pushpull(head_thick)
+    head_face.material = yellow
+    head_face.back_material = yellow
+
+    # Cán búa (hình hộp nghiêng)
+    can_w = 30.0
+    can_h = 180.0
+    can_thick = logo_thickness
+    can_origin = Geom::Point3d.new(-can_w/2+100, radius_outer-60, 0)
+    can_face = logo_ents.add_face([
+      can_origin,
+      can_origin.offset([1,0,0], can_w),
+      can_origin.offset([1,0,0], can_w).offset([0,1,0], can_h),
+      can_origin.offset([0,1,0], can_h)
+    ])
+    can_face.pushpull(can_thick)
+    can_face.material = yellow
+    can_face.back_material = yellow
+    # Xoay cán búa
+    tr = Geom::Transformation.rotation(center_liem, [0,0,1], 25.degrees)
+    logo_group.transform!(tr)
+
+    # === TẠO 4 NGÔI SAO HÚT NỔI ===
+    star_count = 4
+    star_radius = 175.0 # mm (bán kính ngôi sao)
+    star_thickness = 35.0 # mm (độ nổi)
+    star_spacing = 400.0 # mm (khoảng cách giữa các ngôi sao)
+    star_y = 500.0 # mm (tọa độ y đặt ngôi sao)
+
+    def self.create_star(entities, center, radius, thickness, color)
+      # Vẽ ngôi sao 5 cánh 3D
+      pts = []
+      for i in 0...10
+        angle = Math::PI/2 + i*Math::PI/5
+        r = (i % 2 == 0) ? radius : radius*0.4
+        pts << Geom::Point3d.new(
+          center.x + r*Math.cos(angle),
+          center.y + r*Math.sin(angle),
+          center.z
+        )
+      end
+      face = entities.add_face(pts)
+      face.material = color
+      face.back_material = color
+      # Đẩy nổi lên
+      face.pushpull(thickness)
+      # Tạo khối nổi 3D (tạo tâm nổi)
+      star_center = Geom::Point3d.new(center.x, center.y, center.z + thickness*1.2)
+      for i in 0...10
+        face2 = entities.add_face(center, pts[i], pts[(i+1)%10])
+        face2.material = color
+        face2.back_material = color
+        face2.pushpull(thickness*0.6)
+      end
+    end
+
+    # Tạo 4 ngôi sao
+    for i in 0...star_count
+      x = (i-1.5)*star_spacing
+      y = star_y
+      z = 0
+      star_group = entities.add_group
+      self.create_star(star_group.entities, Geom::Point3d.new(x, y, z), star_radius, star_thickness, yellow)
+    end
+
+    model.commit_operation
+  end
+end
+MicaHutNoiNgoiSaoBuaLiem.build
+```
+
+--- THÔNG SỐ VÀ VẬT LIỆU GIA CÔNG ---
+
+| Bộ phận       | Vật liệu      | Màu sắc (hex) | Kích thước (mm)           | Quy cách gia công         |
+|---------------|--------------|--------------|---------------------------|---------------------------|
+| Logo búa liềm | Mica hút nổi | #FFD600      | 600 x 600 x 50            | Hút nổi 3D, bóng, liền khối|
+| Ngôi sao      | Mica hút nổi | #FFD600      | 350 x 350 x 35 (x4)       | Hút nổi 3D, 5 cánh, bóng  |
+| Khung nền     | Không có     | -            | -                         | -                         |
+| Chữ/số        | Không có     | -            | -                         | -                         |
+
+**Lưu ý:**  
+- Mã Ruby dựng mô hình 3D các khối mica hút nổi đúng thực tế ảnh, không có chữ, số, nền alu, khung sắt, đèn LED.  
+- Màu sắc và vật liệu sát thực tế nhất.  
+- Có thể chỉnh lại kích thước, vị trí theo nhu cầu thực tế!

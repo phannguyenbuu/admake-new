@@ -1,0 +1,165 @@
+=== FILE: Chữ tôn rỉ set gắn LED bub.jpg ===
+--- PHÂN TÍCH HÌNH ẢNH & THIẾT KẾ THỰC TẾ ---
+
+**1. Tên thương hiệu, dòng chữ chính:**  
+- Dòng chữ nổi bật nhất là "BBB" (3 ký tự B lớn), là điểm nhấn trung tâm của bảng hiệu.
+
+**2. Nội dung chữ phụ, slogan, số điện thoại, địa chỉ, icon mạng xã hội hoặc logo:**  
+- Không có chữ phụ, slogan, số điện thoại, địa chỉ, icon mạng xã hội hoặc logo trên bảng hiệu chính này.
+
+**3. Màu sắc thực tế chuẩn xác:**  
+- **Nền:** Vật liệu nền là các thanh gỗ dựng đứng, màu nâu gỗ tự nhiên đậm (#6B4F2B).
+- **Chữ nổi:** Chữ "BBB" bằng tôn sơn giả rỉ sét, màu nâu cam rỉ sét (#B87333) với hiệu ứng loang màu rỉ.
+- **Viền chữ:** Viền chữ cùng màu tôn rỉ, có thể đậm hơn một chút (#8B5C2B).
+- **Đèn LED:** Đèn LED bulb tròn gắn nổi trên mặt chữ, ánh sáng vàng ấm (#FFD700).
+- **Viền nẹp:** Không có nẹp nhôm/alu rõ ràng, viền chữ là chính phần tôn rỉ.
+
+**4. Vật liệu và quy cách gia công:**  
+- **Khung xương:** Sắt hộp 30x30mm sơn đen, tạo khung đỡ phía sau chữ.
+- **Nền:** Các thanh gỗ dựng đứng, dày ~20mm, cao bằng chiều cao bảng (~400mm).
+- **Chữ nổi:** Tôn sơn giả rỉ sét, uốn nổi, dày 60mm, mặt trước khoét lỗ gắn LED bulb.
+- **Đèn LED:** Bulb LED tròn, đường kính ~40mm, gắn đều trên mặt chữ.
+- **Chân đế:** Khung sắt hộp, có thể có chân đỡ phía dưới hoặc gắn cố định vào nền.
+
+**5. Kích thước ước tính:**  
+- Tổng bảng: Rộng 1200mm x Cao 400mm x Sâu 60mm.
+- Mỗi chữ "B": Rộng ~300mm x Cao ~350mm x Sâu 60mm.
+
+```ruby
+# Mã nguồn Ruby hoàn chỉnh 100%
+module ChuTonRiSetGanLedBub
+  def self.build
+    model = Sketchup.active_model
+    model.start_operation('ChuTonRiSetGanLedBub', true)
+    entities = model.active_entities
+
+    # Thông số chính
+    width = 1200.mm
+    height = 400.mm
+    depth = 60.mm
+    khung_satt = 30.mm
+    go_day = 20.mm
+
+    # 1. Khung xương sắt hộp 30x30mm
+    khung_group = entities.add_group
+    khung = khung_group.entities
+
+    # Khung viền ngoài
+    pts = [
+      [0, 0, 0],
+      [width, 0, 0],
+      [width, height, 0],
+      [0, height, 0]
+    ]
+    # 4 cạnh khung
+    khung.add_face(pts[0], pts[1], [pts[1][0], pts[1][1], khung_satt], [pts[0][0], pts[0][1], khung_satt])
+    khung.add_face(pts[1], pts[2], [pts[2][0], pts[2][1], khung_satt], [pts[1][0], pts[1][1], khung_satt])
+    khung.add_face(pts[2], pts[3], [pts[3][0], pts[3][1], khung_satt], [pts[2][0], pts[2][1], khung_satt])
+    khung.add_face(pts[3], pts[0], [pts[0][0], pts[0][1], khung_satt], [pts[3][0], pts[3][1], khung_satt])
+
+    # Xương đứng (2 xương chia đều)
+    1.upto(2) do |i|
+      x = i * width / 3
+      khung.add_face([x, 0, 0], [x, 0, khung_satt], [x, height, khung_satt], [x, height, 0])
+    end
+
+    # Xương ngang tăng cứng (1 xương giữa)
+    y = height / 2
+    khung.add_face([0, y, 0], [0, y, khung_satt], [width, y, khung_satt], [width, y, 0])
+
+    # Chân đế (2 chân)
+    chan_group = entities.add_group
+    chan = chan_group.entities
+    chan_length = 100.mm
+    [[0, 0, 0], [width - khung_satt, 0, 0]].each do |pt|
+      base = chan.add_face(pt, [pt[0]+khung_satt, pt[1], pt[2]], [pt[0]+khung_satt, pt[1]-chan_length, pt[2]], [pt[0], pt[1]-chan_length, pt[2]])
+      base.pushpull khung_satt
+    end
+
+    # 2. Tấm nền gỗ dựng đứng
+    nen_group = entities.add_group
+    nen = nen_group.entities
+    so_thanh = (width / 50.mm).to_i
+    mau_go = "#6B4F2B"
+    so_thanh.times do |i|
+      x = i * (width / so_thanh)
+      thanh = nen.add_face([x, 0, khung_satt], [x+go_day, 0, khung_satt], [x+go_day, height, khung_satt], [x, height, khung_satt])
+      thanh.pushpull(depth - khung_satt)
+      thanh.material = mau_go
+    end
+
+    # 3. Chữ nổi "BBB"
+    chu_group = entities.add_group
+    chu = chu_group.entities
+    chu_text = "B"
+    mau_chu = "#B87333"
+    mau_vien = "#8B5C2B"
+    mau_led = "#FFD700"
+    font = "Arial Black"
+    chu_rong = 300.mm
+    chu_cao = 350.mm
+    chu_day = 60.mm
+    khoang_cach = 40.mm
+
+    3.times do |i|
+      x = 70.mm + i*(chu_rong + khoang_cach)
+      y = (height - chu_cao)/2
+      chu3d = chu.add_3d_text(
+        chu_text,
+        TextAlignLeft,
+        chu_cao,
+        true,
+        chu_day,
+        font,
+        false,
+        false
+      )
+      chu3d_group = chu.add_group(chu3d)
+      chu3d_group.material = mau_chu
+      chu3d_group.entities.each { |e| e.back_material = mau_vien }
+      chu3d_group.move!([x, y, depth])
+      # Đèn LED bulb trên mặt chữ
+      # Vẽ 7 bóng LED cho mỗi chữ
+      led_group = chu3d_group.entities.add_group
+      led_radius = 20.mm
+      led_z = chu_day + depth + 2.mm
+      led_pos = [
+        [chu_cao*0.2, chu_cao*0.8],
+        [chu_cao*0.5, chu_cao*0.85],
+        [chu_cao*0.8, chu_cao*0.8],
+        [chu_cao*0.2, chu_cao*0.5],
+        [chu_cao*0.5, chu_cao*0.5],
+        [chu_cao*0.8, chu_cao*0.5],
+        [chu_cao*0.5, chu_cao*0.2]
+      ]
+      led_pos.each do |lx, ly|
+        led = led_group.entities.add_circle([lx, ly, led_z], [0,0,1], led_radius, 24)
+        led_face = led_group.entities.add_face(led)
+        led_face.pushpull(8.mm)
+        led_face.material = mau_led
+      end
+    end
+
+    # Đặt nhóm chữ lên nền
+    chu_group.move!([0, 0, khung_satt + go_day])
+
+    model.commit_operation
+  end
+end
+ChuTonRiSetGanLedBub.build
+```
+
+--- THÔNG SỐ VÀ VẬT LIỆU GIA CÔNG ---
+
+| Thành phần      | Kích thước (mm)         | Vật liệu           | Màu sắc (hex)   | Ghi chú                       |
+|-----------------|------------------------|--------------------|-----------------|-------------------------------|
+| Khung sắt hộp   | 30x30                  | Sắt hộp vuông      | #222222 (đen)   | Khung viền, xương đứng/ngang  |
+| Nền gỗ          | 1200x400x20            | Gỗ tự nhiên        | #6B4F2B         | Thanh gỗ dựng đứng            |
+| Chữ nổi "B"     | 300x350x60 (mỗi chữ)   | Tôn sơn giả rỉ     | #B87333         | 3 chữ, mặt trước khoét lỗ LED |
+| Viền chữ        | 300x350x60             | Tôn sơn giả rỉ     | #8B5C2B         | Viền cùng màu hoặc đậm hơn    |
+| Đèn LED bulb    | Ø40 x 8                | Nhựa, LED          | #FFD700         | 7 bóng/1 chữ, ánh sáng vàng   |
+| Chân đế         | 30x30x100              | Sắt hộp vuông      | #222222         | 2 chân đỡ dưới                |
+
+**Lưu ý:**  
+- Mô hình hóa sát thực tế, các thông số có thể điều chỉnh theo thực tế thi công.
+- Màu sắc có thể tinh chỉnh thêm cho sát hiệu ứng rỉ sét và ánh sáng LED.

@@ -1,0 +1,184 @@
+=== FILE: Biển tên công ty inox ăn mòn 40 x 30.jpg ===
+--- PHÂN TÍCH HÌNH ẢNH & THIẾT KẾ THỰC TẾ ---
+
+**1. Tên thương hiệu, dòng chữ chính hoặc số hiển thị trên sản phẩm:**
+- Dòng trên cùng: `CÔNG TY TNHH MỘT THÀNH VIÊN` (chữ in hoa, màu đen)
+- Dòng chính giữa (lớn nhất, nổi bật): `TM - DV CHUNG LÝ` (chữ in hoa, màu đỏ đậm)
+- Dòng dưới: `MST: 6001802511` (chữ in hoa, màu đen)
+- Dòng cuối: 
+  - `ĐC: THÔN 2, XÃ EA KIẾT, T. ĐẮK LẮK` (chữ in hoa, màu đen)
+  - `ĐT: 0985 177 457` (chữ in hoa, màu đen)
+
+**2. Nội dung chữ phụ, slogan, số điện thoại, địa chỉ, icon mạng xã hội hoặc logo (nếu có):**
+- Không có slogan, không có icon mạng xã hội, không có logo.
+- Địa chỉ và số điện thoại nằm ở dòng cuối cùng, chữ nhỏ hơn.
+
+**3. Màu sắc thực tế chuẩn xác của các phần:**
+- Nền inox vàng gương: #FFD700 (vàng ánh kim, phản chiếu mạnh)
+- Chữ lớn (TM - DV CHUNG LÝ): #C62828 (đỏ đậm)
+- Các chữ còn lại: #222222 (đen đậm)
+- Viền nẹp inox vàng bóng: #FFD700 (cùng màu nền nhưng sáng bóng hơn, có thể dùng cùng mã hex)
+- Không có đèn LED.
+
+**4. Vật liệu và quy cách gia công nhận diện từ ảnh:**
+- Tấm nền: Inox vàng gương ăn mòn (inox 304 mạ vàng, dày ~1mm)
+- Viền nẹp: Inox vàng gương, bo góc vuông, nẹp nổi ~10mm
+- Chữ: Ăn mòn, sơn màu trực tiếp lên mặt inox (không phải chữ nổi rời)
+- Không có khung xương sắt hộp bên trong (do biển nhỏ, chỉ cần nẹp viền)
+- Không có chân đế/cột chống, có thể có tai treo phía sau (không thấy rõ trong ảnh)
+- Kích thước thực tế: Rộng 400mm x Cao 300mm x Sâu 20mm (tính cả viền nẹp)
+
+**5. Kích thước ước tính:**
+- Tổng thể: 400mm x 300mm x 20mm (nẹp viền nổi ~10mm mỗi cạnh)
+
+```ruby
+# Mã nguồn Ruby hoàn chỉnh 100%
+module BienTenCongTyInoxAnMon40X30
+  def self.build
+    model = Sketchup.active_model
+    model.start_operation('BienTenCongTyInoxAnMon40X30', true)
+    entities = model.active_entities
+
+    # Kích thước tổng thể
+    width = 400.mm
+    height = 300.mm
+    depth = 20.mm
+    face_thickness = 1.mm
+    border_thickness = 10.mm
+
+    # Màu sắc
+    inox_vang = Sketchup::Color.new("#FFD700")
+    chu_do = Sketchup::Color.new("#C62828")
+    chu_den = Sketchup::Color.new("#222222")
+
+    # Tạo nhóm tổng thể
+    group = entities.add_group
+    ents = group.entities
+
+    # 1. Tạo tấm nền inox vàng gương
+    base = ents.add_face([0,0,0], [width,0,0], [width,height,0], [0,height,0])
+    base.pushpull(-face_thickness)
+    base.material = inox_vang
+    base.back_material = inox_vang
+
+    # 2. Tạo viền nẹp inox vàng gương (4 cạnh)
+    # Trên
+    ents.add_face(
+      [0,0,0], 
+      [width,0,0], 
+      [width,-border_thickness,0], 
+      [0,-border_thickness,0]
+    ).pushpull(-depth)
+    # Dưới
+    ents.add_face(
+      [0,height,0], 
+      [width,height,0], 
+      [width,height+border_thickness,0], 
+      [0,height+border_thickness,0]
+    ).pushpull(-depth)
+    # Trái
+    ents.add_face(
+      [0,0,0], 
+      [0,height,0], 
+      [-border_thickness,height,0], 
+      [-border_thickness,0,0]
+    ).pushpull(-depth)
+    # Phải
+    ents.add_face(
+      [width,0,0], 
+      [width,height,0], 
+      [width+border_thickness,height,0], 
+      [width+border_thickness,0,0]
+    ).pushpull(-depth)
+    # Gán màu viền
+    group.entities.grep(Sketchup::Face).each do |f|
+      if f.normal.parallel?(Z_AXIS)
+        f.material = inox_vang
+        f.back_material = inox_vang
+      end
+    end
+
+    # 3. Thêm chữ ăn mòn (dùng add_3d_text, độ dày nhỏ)
+    # Dòng 1: CÔNG TY TNHH MỘT THÀNH VIÊN
+    text1 = ents.add_3d_text(
+      "CÔNG TY TNHH MỘT THÀNH VIÊN",
+      TextAlignCenter,
+      "Arial",
+      false, false,
+      25.mm, 2.mm, 0, true, 0
+    )
+    text1.material = chu_den
+    text1.transformation = Geom::Transformation.new([width/2, height-35.mm, face_thickness+0.1.mm])
+    text1.move!([-(text1.bounds.width/2), 0, 0])
+
+    # Dòng 2: TM - DV CHUNG LÝ (chữ lớn, đỏ)
+    text2 = ents.add_3d_text(
+      "TM - DV CHUNG LÝ",
+      TextAlignCenter,
+      "Arial Black",
+      false, false,
+      40.mm, 3.mm, 0, true, 0
+    )
+    text2.material = chu_do
+    text2.transformation = Geom::Transformation.new([width/2, height-90.mm, face_thickness+0.1.mm])
+    text2.move!([-(text2.bounds.width/2), 0, 0])
+
+    # Dòng 3: MST: 6001802511
+    text3 = ents.add_3d_text(
+      "MST: 6001802511",
+      TextAlignCenter,
+      "Arial",
+      false, false,
+      22.mm, 2.mm, 0, true, 0
+    )
+    text3.material = chu_den
+    text3.transformation = Geom::Transformation.new([width/2, height-135.mm, face_thickness+0.1.mm])
+    text3.move!([-(text3.bounds.width/2), 0, 0])
+
+    # Dòng 4: ĐC: THÔN 2, XÃ EA KIẾT, T. ĐẮK LẮK
+    text4 = ents.add_3d_text(
+      "ĐC: THÔN 2, XÃ EA KIẾT, T. ĐẮK LẮK",
+      TextAlignLeft,
+      "Arial",
+      false, false,
+      16.mm, 1.5.mm, 0, true, 0
+    )
+    text4.material = chu_den
+    text4.transformation = Geom::Transformation.new([15.mm, 30.mm, face_thickness+0.1.mm])
+
+    # Dòng 5: ĐT: 0985 177 457
+    text5 = ents.add_3d_text(
+      "ĐT: 0985 177 457",
+      TextAlignRight,
+      "Arial",
+      false, false,
+      16.mm, 1.5.mm, 0, true, 0
+    )
+    text5.material = chu_den
+    text5.transformation = Geom::Transformation.new([width-15.mm, 30.mm, face_thickness+0.1.mm])
+    text5.move!([-text5.bounds.width, 0, 0])
+
+    # 4. Tai treo (giả lập 2 lỗ khoan treo phía trên, mỗi bên 30mm)
+    hole_radius = 4.mm
+    hole_offset_x = 30.mm
+    hole_y = -border_thickness/2
+    [hole_offset_x, width-hole_offset_x].each do |x|
+      circle = ents.add_circle([x, hole_y, face_thickness/2], Z_AXIS, hole_radius, 24)
+      ents.add_face(circle)
+    end
+
+    model.commit_operation
+  end
+end
+BienTenCongTyInoxAnMon40X30.build
+```
+
+--- THÔNG SỐ VÀ VẬT LIỆU GIA CÔNG ---
+| Thành phần         | Vật liệu                | Màu sắc (hex) | Kích thước (mm)           | Ghi chú                  |
+|--------------------|------------------------|--------------|--------------------------|--------------------------|
+| Tấm nền            | Inox vàng gương        | #FFD700      | 400 x 300 x 1            | Inox 304 mạ vàng         |
+| Viền nẹp           | Inox vàng gương        | #FFD700      | 10mm (nổi 4 cạnh)        | Bo góc vuông             |
+| Chữ chính          | Sơn ăn mòn trên inox   | #C62828      | Cao 40mm, dày 3mm        | TM - DV CHUNG LÝ         |
+| Chữ phụ            | Sơn ăn mòn trên inox   | #222222      | Cao 16-25mm, dày 1.5-2mm | Các dòng còn lại         |
+| Tai treo           | Lỗ khoan trên inox     | -            | Ø8mm                     | 2 lỗ, cách mép 30mm      |
+| Tổng thể           | -                      | -            | 400 x 300 x 20           | Tính cả viền nẹp         |

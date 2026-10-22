@@ -1,0 +1,218 @@
+=== FILE: Biển chức danh chân gỗ in UV.jfif ===  
+--- PHÂN TÍCH HÌNH ẢNH & THIẾT KẾ THỰC TẾ ---
+
+**1. Tên thương hiệu, dòng chữ chính hoặc số hiển thị trên sản phẩm:**  
+- Logo tròn cách điệu hoa 5 cánh (bên trái, xanh lá + vàng).
+- Dòng 1: "NHẬT KHOA HƯNG" (chữ in hoa, xanh dương, đậm, lớn).
+- Dòng 2: "CHI NHÁNH VĨNH LONG" (chữ in hoa, xanh dương, nhỏ hơn).
+- Dòng 3: "GIÁM ĐỐC" (chữ in hoa, xanh dương, nhỏ).
+- Dòng 4: "KIM NHỚ" (chữ in hoa, đỏ, cực lớn, nổi bật nhất).
+
+**2. Nội dung chữ phụ, slogan, số điện thoại, địa chỉ, icon mạng xã hội hoặc logo:**  
+- Logo tròn bên trái, dưới logo có chữ nhỏ: "NHAT KHOA HUNG" (chữ in hoa, xanh dương).
+- Không có số điện thoại, địa chỉ, icon mạng xã hội.
+
+**3. Màu sắc thực tế chuẩn xác:**  
+- Nền bảng: Vàng ánh kim (Hex: #FFD700).
+- Viền họa tiết: Vàng đậm (Hex: #E6B800).
+- Chữ lớn "KIM NHỚ": Đỏ tươi (Hex: #D32F2F).
+- Chữ phụ, thương hiệu: Xanh dương (Hex: #0D47A1).
+- Logo: Xanh lá (Hex: #388E3C), vàng (Hex: #FFD700), xanh dương (Hex: #0D47A1).
+- Đế gỗ: Đỏ nâu gụ (Hex: #7B3F00).
+
+**4. Vật liệu và quy cách gia công:**  
+- Mặt bảng: Mica vàng in UV, dán lên nền alu hoặc mica cứng.
+- Viền nẹp: Nhôm/vàng hoặc mica vàng, có họa tiết hoa văn.
+- Đế: Gỗ tự nhiên sơn PU bóng màu đỏ nâu, hai bậc, vát cạnh.
+- Logo và chữ: In UV trực tiếp lên mica (không phải chữ nổi rời).
+- Không có đèn LED, không có khung sắt hộp.
+
+**5. Kích thước ước tính:**  
+- Rộng: 300mm  
+- Cao: 150mm (mặt bảng), tổng cao cả đế ~180mm  
+- Sâu: 40mm (mặt bảng), tổng sâu cả đế ~90mm
+
+```ruby
+# Mã nguồn Ruby hoàn chỉnh 100%
+module BienChucDanhChanGoInUv
+  def self.build
+    model = Sketchup.active_model
+    model.start_operation('BienChucDanhChanGoInUv', true)
+    entities = model.active_entities
+
+    # Thông số kích thước
+    width = 300.mm
+    height = 150.mm
+    depth = 40.mm
+    base_height1 = 20.mm
+    base_height2 = 20.mm
+    base_depth1 = 90.mm
+    base_depth2 = 70.mm
+    base_offset = 10.mm
+
+    # Màu sắc
+    color_gold = Sketchup::Color.new("#FFD700")
+    color_gold_dark = Sketchup::Color.new("#E6B800")
+    color_red = Sketchup::Color.new("#D32F2F")
+    color_blue = Sketchup::Color.new("#0D47A1")
+    color_green = Sketchup::Color.new("#388E3C")
+    color_wood = Sketchup::Color.new("#7B3F00")
+    color_white = Sketchup::Color.new("#FFFFFF")
+
+    # 1. Đế gỗ bậc 1 (dưới cùng)
+    base1 = entities.add_group
+    pts1 = [
+      [0, 0, 0],
+      [width, 0, 0],
+      [width, base_depth1, 0],
+      [0, base_depth1, 0]
+    ]
+    face1 = base1.entities.add_face(pts1)
+    face1.pushpull(base_height1)
+    base1.material = color_wood
+
+    # 2. Đế gỗ bậc 2 (trên)
+    base2 = entities.add_group
+    pts2 = [
+      [base_offset, base_offset, base_height1],
+      [width - base_offset, base_offset, base_height1],
+      [width - base_offset, base_depth2 + base_offset, base_height1],
+      [base_offset, base_depth2 + base_offset, base_height1]
+    ]
+    face2 = base2.entities.add_face(pts2)
+    face2.pushpull(base_height2)
+    base2.material = color_wood
+
+    # 3. Mặt bảng mica vàng in UV
+    board = entities.add_group
+    board_z = base_height1 + base_height2
+    board_y = (base_depth2 + base_offset - depth) / 2 + base_offset
+    pts3 = [
+      [0, board_y, board_z],
+      [width, board_y, board_z],
+      [width, board_y + depth, board_z],
+      [0, board_y + depth, board_z]
+    ]
+    face3 = board.entities.add_face(pts3)
+    face3.pushpull(height)
+    board.material = color_gold
+
+    # 4. Viền nẹp vàng (hoa văn)
+    border = entities.add_group
+    border_width = 5.mm
+    # Viền ngoài
+    border_pts = [
+      [-border_width, board_y - border_width, board_z - border_width],
+      [width + border_width, board_y - border_width, board_z - border_width],
+      [width + border_width, board_y + depth + border_width, board_z - border_width],
+      [-border_width, board_y + depth + border_width, board_z - border_width]
+    ]
+    border_face = border.entities.add_face(border_pts)
+    border_face.pushpull(height + 2*border_width)
+    border.material = color_gold_dark
+
+    # 5. Logo (khối tròn + hoa văn cách điệu)
+    logo = entities.add_group
+    logo_radius = 18.mm
+    logo_center = [25.mm, board_y + depth/2, board_z + height/2]
+    logo_face = logo.entities.add_circle(logo_center, [0,0,1], logo_radius)
+    logo.entities.add_face(logo_face).pushpull(2.mm)
+    logo.material = color_green
+
+    # 6. Chữ "NHẬT KHOA HƯNG"
+    text1 = entities.add_group
+    text1.entities.add_3d_text(
+      "NHẬT KHOA HƯNG",
+      TextAlignCenter,
+      "Arial Black",
+      false,
+      false,
+      18.mm,
+      2.mm,
+      0,
+      true,
+      0
+    ).transform!(Geom::Transformation.translation([width/2, board_y + depth/2, board_z + height - 38.mm]))
+    text1.material = color_blue
+
+    # 7. Chữ "CHI NHÁNH VĨNH LONG"
+    text2 = entities.add_group
+    text2.entities.add_3d_text(
+      "CHI NHÁNH VĨNH LONG",
+      TextAlignCenter,
+      "Arial",
+      false,
+      false,
+      10.mm,
+      1.5.mm,
+      0,
+      true,
+      0
+    ).transform!(Geom::Transformation.translation([width/2, board_y + depth/2, board_z + height - 55.mm]))
+    text2.material = color_blue
+
+    # 8. Chữ "GIÁM ĐỐC"
+    text3 = entities.add_group
+    text3.entities.add_3d_text(
+      "GIÁM ĐỐC",
+      TextAlignCenter,
+      "Arial",
+      false,
+      false,
+      10.mm,
+      1.5.mm,
+      0,
+      true,
+      0
+    ).transform!(Geom::Transformation.translation([width/2, board_y + depth/2, board_z + height - 75.mm]))
+    text3.material = color_blue
+
+    # 9. Chữ lớn "KIM NHỚ"
+    text4 = entities.add_group
+    text4.entities.add_3d_text(
+      "KIM NHỚ",
+      TextAlignCenter,
+      "Arial Black",
+      false,
+      false,
+      24.mm,
+      4.mm,
+      0,
+      true,
+      0
+    ).transform!(Geom::Transformation.translation([width/2, board_y + depth/2, board_z + height - 105.mm]))
+    text4.material = color_red
+
+    # 10. Chữ nhỏ dưới logo: "NHAT KHOA HUNG"
+    text5 = entities.add_group
+    text5.entities.add_3d_text(
+      "NHAT KHOA HUNG",
+      TextAlignCenter,
+      "Arial",
+      false,
+      false,
+      6.mm,
+      1.mm,
+      0,
+      true,
+      0
+    ).transform!(Geom::Transformation.translation([25.mm, board_y + depth/2, board_z + height - 20.mm]))
+    text5.material = color_blue
+
+    model.commit_operation
+  end
+end
+BienChucDanhChanGoInUv.build
+```
+
+--- THÔNG SỐ VÀ VẬT LIỆU GIA CÔNG ---
+
+| Bộ phận                | Kích thước (mm)        | Vật liệu           | Màu sắc (Hex) |
+|------------------------|------------------------|--------------------|--------------|
+| Mặt bảng               | 300 x 150 x 40         | Mica vàng in UV    | #FFD700      |
+| Viền nẹp               | 5mm x quanh bảng       | Nhôm/mica vàng     | #E6B800      |
+| Đế gỗ bậc 1            | 300 x 90 x 20          | Gỗ sơn PU          | #7B3F00      |
+| Đế gỗ bậc 2            | 280 x 70 x 20          | Gỗ sơn PU          | #7B3F00      |
+| Logo                   | Ø36 x 2                | In UV trên mica    | #388E3C/#FFD700/#0D47A1 |
+| Chữ lớn "KIM NHỚ"      | 24mm cao, 4mm dày      | In UV              | #D32F2F      |
+| Chữ phụ/thương hiệu    | 6-18mm cao, 1-2mm dày  | In UV              | #0D47A1      |

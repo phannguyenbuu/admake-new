@@ -1,0 +1,259 @@
+=== FILE: Phiếu bảo hành in giấy.jfif ===  
+--- PHÂN TÍCH HÌNH ẢNH & THIẾT KẾ THỰC TẾ ---
+
+**1. Tên thương hiệu, dòng chữ chính hoặc số hiển thị:**  
+- Chữ lớn nhất: **PHIẾU BẢO HÀNH** (màu đen, font sans-serif, in hoa, căn giữa trên đầu phiếu)
+- Logo thương hiệu: **NANOPXN** (màu đỏ #d32f2f, in hoa, font sans-serif, phía trên bên trái)
+- Chữ nhỏ bên cạnh logo: "Made in Korea" (màu đen, font nhỏ)
+- Số phiếu: "Số:" (màu đen, font nhỏ, phía trên bên phải)
+- Có hình minh họa xe ô tô (màu xám nhạt, nét mảnh, phía trên bên phải)
+
+**2. Nội dung chữ phụ, slogan, số điện thoại, địa chỉ, icon mạng xã hội hoặc logo:**  
+- Các mục điền thông tin: "Khách hàng", "Nhãn hiệu xe", "Biển KS/Số khung", "Thời gian bảo hành", "Thời gian lắp đặt" (màu đen, font nhỏ, có dòng kẻ chấm để điền)
+- Sơ đồ xe (màu đen viền mảnh, nền trắng, các ô: "Phim kính lái", "Phim kính sườn trước", "Phim kính sườn sau", "Phim kính hậu")
+- Đoạn cảm ơn khách hàng (màu đen, font nhỏ, phía trên giữa)
+- Điều kiện bảo hành (màu đen, font nhỏ, phía dưới)
+- Số hotline nổi bật: **0347.699.094, 0971.422.334** (màu đỏ #d32f2f, in đậm, phía dưới cùng bên phải)
+
+**3. Màu sắc thực tế chuẩn xác:**  
+- Nền phiếu: Trắng (#ffffff)
+- Viền ngoài: Đen (#222222) dày ~2mm
+- Viền chỉ vàng kim loại (gold): #ffd700 (rất mảnh, sát viền đen)
+- Chữ chính: Đen (#222222)
+- Logo NANOPXN: Đỏ tươi (#d32f2f)
+- Số hotline: Đỏ tươi (#d32f2f)
+- Hình xe: Xám nhạt (#cccccc)
+
+**4. Vật liệu và quy cách gia công:**  
+- Phiếu in giấy cứng (giấy couche hoặc ivory, bề mặt láng mịn, dày ~2mm)
+- In offset 4 màu, cán mờ hoặc bóng
+- Không có khung xương sắt, không có hộp đèn, không có chữ nổi (chỉ là phiếu giấy in phẳng)
+- Viền chỉ vàng là viền in, không phải nẹp kim loại
+
+**5. Kích thước ước tính:**  
+- Rộng: 200mm  
+- Cao: 100mm  
+- Dày: 2mm  
+
+**Lưu ý:**  
+- Sản phẩm là phiếu giấy in phẳng, không có cấu kiện 3D nổi, không có khung xương, không có đèn LED, không có nẹp nhôm/alu.
+- Mô hình 3D chỉ cần dựng tấm phiếu giấy, các chi tiết chữ/số/logo là texture hoặc 3D text phẳng.
+
+---
+
+```ruby
+# Mã nguồn Ruby hoàn chỉnh 100%
+module PhieuBaoHanhInGiay
+  def self.build
+    model = Sketchup.active_model
+    model.start_operation('PhieuBaoHanhInGiay', true)
+    entities = model.active_entities
+
+    # Kích thước phiếu
+    width = 200.mm
+    height = 100.mm
+    thickness = 2.mm
+
+    # Tạo nhóm phiếu bảo hành
+    group = entities.add_group
+    gents = group.entities
+
+    # Tạo mặt phiếu (giấy)
+    pts = [
+      [0, 0, 0],
+      [width, 0, 0],
+      [width, height, 0],
+      [0, height, 0]
+    ]
+    face = gents.add_face(pts)
+    face.pushpull(thickness)
+
+    # Tô màu nền trắng
+    mat_white = model.materials.add('White')
+    mat_white.color = '#ffffff'
+    face.material = mat_white
+    face.back_material = mat_white
+
+    # Viền đen ngoài cùng (2mm)
+    border_w = 2.mm
+    border_face = gents.add_face([
+      [-border_w, -border_w, thickness/2],
+      [width+border_w, -border_w, thickness/2],
+      [width+border_w, height+border_w, thickness/2],
+      [-border_w, height+border_w, thickness/2]
+    ])
+    inner_border = gents.add_face([
+      [0, 0, thickness/2],
+      [width, 0, thickness/2],
+      [width, height, thickness/2],
+      [0, height, thickness/2]
+    ])
+    border_face.followme(gents.add_circle([0,0,thickness/2], [0,0,1], 0.1))
+    border_face.erase!
+    # Tô màu viền đen
+    mat_black = model.materials.add('Black')
+    mat_black.color = '#222222'
+    inner_border.material = mat_black
+
+    # Viền chỉ vàng (0.5mm)
+    gold_w = 0.5.mm
+    gold_face = gents.add_face([
+      [border_w, border_w, thickness/2+0.01],
+      [width-border_w, border_w, thickness/2+0.01],
+      [width-border_w, height-border_w, thickness/2+0.01],
+      [border_w, height-border_w, thickness/2+0.01]
+    ])
+    inner_gold = gents.add_face([
+      [border_w+gold_w, border_w+gold_w, thickness/2+0.01],
+      [width-border_w-gold_w, border_w+gold_w, thickness/2+0.01],
+      [width-border_w-gold_w, height-border_w-gold_w, thickness/2+0.01],
+      [border_w+gold_w, height-border_w-gold_w, thickness/2+0.01]
+    ])
+    gold_face.material = model.materials.add('Gold')
+    gold_face.material.color = '#ffd700'
+    inner_gold.erase!
+
+    # Thêm chữ/logo chính (dùng 3D Text phẳng)
+    # Logo NANOPXN
+    gents.add_3d_text(
+      "NANOPXN", 
+      TextAlignLeft = true, 
+      10.mm, 
+      true, 
+      false, 
+      0, 
+      [10.mm, height-18.mm, thickness+0.2.mm]
+    ).material = model.materials.add('Red').tap { |m| m.color = '#d32f2f' }
+
+    # Made in Korea (nhỏ)
+    gents.add_3d_text(
+      "Made in Korea", 
+      TextAlignLeft = true, 
+      4.mm, 
+      true, 
+      false, 
+      0, 
+      [60.mm, height-15.mm, thickness+0.2.mm]
+    ).material = mat_black
+
+    # PHIẾU BẢO HÀNH (chính giữa trên)
+    gents.add_3d_text(
+      "PHIẾU BẢO HÀNH", 
+      TextAlignCenter = true, 
+      8.mm, 
+      true, 
+      false, 
+      0, 
+      [width/2-35.mm, height-18.mm, thickness+0.2.mm]
+    ).material = mat_black
+
+    # Số: (trên phải)
+    gents.add_3d_text(
+      "Số:", 
+      TextAlignLeft = true, 
+      4.mm, 
+      true, 
+      false, 
+      0, 
+      [width-30.mm, height-15.mm, thickness+0.2.mm]
+    ).material = mat_black
+
+    # Hotline (dưới cùng phải)
+    hotline = "0347.699.094, 0971.422.334"
+    gents.add_3d_text(
+      hotline, 
+      TextAlignRight = true, 
+      5.mm, 
+      true, 
+      false, 
+      0, 
+      [width-90.mm, 5.mm, thickness+0.2.mm]
+    ).material = model.materials.add('Red2').tap { |m| m.color = '#d32f2f' }
+
+    # Các mục điền thông tin (chữ nhỏ)
+    info_fields = [
+      ["Khách hàng:", 10.mm, height-30.mm],
+      ["Nhãn hiệu xe:", 10.mm, height-40.mm],
+      ["Biển KS/Số khung:", 10.mm, height-50.mm],
+      ["Thời gian bảo hành:", 10.mm, height-60.mm],
+      ["Thời gian lắp đặt:", 10.mm, height-70.mm]
+    ]
+    info_fields.each do |text, x, y|
+      gents.add_3d_text(
+        text, 
+        TextAlignLeft = true, 
+        4.mm, 
+        true, 
+        false, 
+        0, 
+        [x, y, thickness+0.2.mm]
+      ).material = mat_black
+    end
+
+    # Sơ đồ xe (hình chữ nhật, mô phỏng)
+    car_w = 40.mm
+    car_h = 20.mm
+    car_x = width/2 - car_w/2
+    car_y = height/2 - car_h/2
+    car_face = gents.add_face([
+      [car_x, car_y, thickness+0.1.mm],
+      [car_x+car_w, car_y, thickness+0.1.mm],
+      [car_x+car_w, car_y+car_h, thickness+0.1.mm],
+      [car_x, car_y+car_h, thickness+0.1.mm]
+    ])
+    car_face.material = model.materials.add('GrayCar').tap { |m| m.color = '#cccccc' }
+
+    # Các ô kính xe
+    glass_fields = [
+      ["Phim kính lái", car_x+car_w/2-10.mm, car_y+car_h+2.mm],
+      ["Phim kính sườn trước", car_x-25.mm, car_y+car_h/2],
+      ["Phim kính sườn sau", car_x+car_w+2.mm, car_y+car_h/2],
+      ["Phim kính hậu", car_x+car_w/2-10.mm, car_y-8.mm]
+    ]
+    glass_fields.each do |text, x, y|
+      gents.add_3d_text(
+        text, 
+        TextAlignLeft = true, 
+        3.mm, 
+        true, 
+        false, 
+        0, 
+        [x, y, thickness+0.2.mm]
+      ).material = mat_black
+    end
+
+    # Hình xe ô tô góc trên phải (mô phỏng bằng hình chữ nhật nhỏ)
+    car_icon_w = 18.mm
+    car_icon_h = 7.mm
+    car_icon_x = width-28.mm
+    car_icon_y = height-15.mm
+    car_icon = gents.add_face([
+      [car_icon_x, car_icon_y, thickness+0.2.mm],
+      [car_icon_x+car_icon_w, car_icon_y, thickness+0.2.mm],
+      [car_icon_x+car_icon_w, car_icon_y+car_icon_h, thickness+0.2.mm],
+      [car_icon_x, car_icon_y+car_icon_h, thickness+0.2.mm]
+    ])
+    car_icon.material = model.materials.add('GrayCarIcon').tap { |m| m.color = '#cccccc' }
+
+    model.commit_operation
+  end
+end
+PhieuBaoHanhInGiay.build
+```
+
+--- THÔNG SỐ VÀ VẬT LIỆU GIA CÔNG ---
+
+| Thành phần         | Kích thước (mm)          | Vật liệu         | Màu sắc (hex)   | Ghi chú                       |
+|--------------------|-------------------------|------------------|-----------------|-------------------------------|
+| Tấm phiếu          | 200 x 100 x 2           | Giấy cứng        | #ffffff         | In offset, cán mờ/bóng        |
+| Viền ngoài         | 2mm                     | In trên giấy     | #222222         | Viền in phẳng, không nổi      |
+| Viền chỉ vàng      | 0.5mm                   | In trên giấy     | #ffd700         | Viền in phẳng, không nổi      |
+| Logo NANOPXN       | 10mm (cao chữ)          | In trên giấy     | #d32f2f         | In phẳng                      |
+| Chữ chính          | 8mm (cao chữ)           | In trên giấy     | #222222         | In phẳng                      |
+| Số hotline         | 5mm (cao chữ)           | In trên giấy     | #d32f2f         | In phẳng                      |
+| Hình xe, sơ đồ     | 40 x 20                 | In trên giấy     | #cccccc         | In phẳng                      |
+
+**Lưu ý:**  
+- Không có khung xương, không có nẹp, không có chữ nổi, không có đèn LED.  
+- Tất cả chi tiết là in phẳng trên giấy.  
+- Mô hình 3D chỉ mô phỏng hình dáng, bố cục, màu sắc cơ bản.
