@@ -1,0 +1,138 @@
+# MEP Wall Material Library
+
+newmtl Mat_Floor
+Ka 0.15 0.15 0.15
+Kd 0.28 0.30 0.32
+Ks 0.3 0.3 0.3
+Ns 30.0
+d 1.0
+illum 2
+
+newmtl Mat_Wall
+Ka 0.25 0.24 0.22
+Kd 0.90 0.88 0.84
+Ks 0.1 0.1 0.1
+Ns 10.0
+d 1.0
+illum 2
+
+newmtl Mat_DoorFrame
+Ka 0.1 0.1 0.1
+Kd 0.18 0.20 0.22
+Ks 0.5 0.5 0.5
+Ns 50.0
+d 1.0
+illum 2
+
+newmtl Mat_Steel
+Ka 0.1 0.15 0.2
+Kd 0.32 0.40 0.48
+Ks 0.6 0.6 0.6
+Ns 60.0
+d 1.0
+illum 2
+
+newmtl Mat_ColumnBox
+Ka 0.2 0.2 0.2
+Kd 0.84 0.82 0.79
+Ks 0.1 0.1 0.1
+Ns 15.0
+d 1.0
+illum 2
+
+newmtl Mat_Backbox
+Ka 0.2 0.1 0.0
+Kd 0.95 0.45 0.05
+Ks 0.2 0.2 0.2
+Ns 20.0
+d 1.0
+illum 2
+
+newmtl Mat_Conduit
+Ka 0.2 0.15 0.0
+Kd 0.98 0.58 0.10
+Ks 0.3 0.3 0.3
+Ns 30.0
+d 1.0
+illum 2
+
+newmtl Mat_Conduit_Data
+Ka 0.05 0.15 0.25
+Kd 0.10 0.55 0.88
+Ks 0.3 0.3 0.3
+Ns 30.0
+d 1.0
+illum 2
+
+newmtl Mat_Plate_White
+Ka 0.3 0.3 0.3
+Kd 0.95 0.95 0.96
+Ks 0.6 0.6 0.6
+Ns 80.0
+d 1.0
+illum 2
+
+newmtl Mat_Switch_Button
+Ka 0.3 0.3 0.3
+Kd 0.82 0.85 0.88
+Ks 0.7 0.7 0.7
+Ns 100.0
+d 1.0
+illum 2
+
+newmtl Mat_Socket_Hole
+Ka 0.05 0.05 0.05
+Kd 0.12 0.12 0.12
+Ks 0.1 0.1 0.1
+Ns 10.0
+d 1.0
+illum 2
+
+newmtl Mat_Socket_Red
+Ka 0.2 0.05 0.05
+Kd 0.85 0.15 0.15
+Ks 0.5 0.5 0.5
+Ns 50.0
+d 1.0
+illum 2
+
+newmtl Mat_LCD_Screen
+Ka 0.05 0.15 0.2
+Kd 0.08 0.35 0.45
+Ks 0.8 0.8 0.8
+Ns 120.0
+d 1.0
+illum 2
+
+newmtl Mat_LCD_Text
+Ka 0.1 0.5 0.6
+Kd 0.2 0.95 1.0
+Ks 0.9 0.9 0.9
+Ns 150.0
+d 1.0
+illum 2
+
+newmtl Mat_Dim_Yellow
+Ka 0.3 0.25 0.0
+Kd 1.0 0.85 0.05
+Ks 0.2 0.2 0.2
+Ns 10.0
+d 1.0
+illum 2
+
+newmtl Mat_Label_Bg
+Ka 0.1 0.1 0.1
+Kd 0.15 0.15 0.18
+Ks 0.1 0.1 0.1
+Ns 10.0
+d 1.0
+illum 2
+
+newmtl Mat_Label_Text
+Ka 0.4 0.4 0.4
+Kd 1.0 1.0 1.0
+Ks 0.1 0.1 0.1
+Ns 10.0
+d 1.0
+illum 2
+

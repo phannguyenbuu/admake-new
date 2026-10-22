@@ -1,0 +1,590 @@
+ChatGPT đã nói:
+Ruby
+# frozen_string_literal: true
+# ================================================================
+# THEGARA SIGNBOARD - SKETCHUP RUBY
+# Mo hinh bien hieu hop dung doc lap theo anh tham chieu.
+#
+# THANH PHAN:
+# 01. Than bien dang hop chu nhat
+# 02. Khung xuong thep ben trong
+# 03. Mat pano den nham
+# 04. Chu noi 3D THEGARA
+# 05. Dong chu phu CURATED GARMENTS & COLLECTIBLES
+# 06. Gio hoat dong
+# 07. Tay cam kim loai cong phia tren
+# 08. Chan de va nep vien
+#
+# Don vi: met
+# X = ngang, Y = chieu sau, Z = chieu cao
+#
+# Chay trong SketchUp Ruby Console:
+# load 'C:/duong_dan/thegara_signboard.rb'
+# ================================================================
+
+require 'sketchup.rb'
+
+module ThegaraSignboard
+  extend self
+
+  # --------------------------------------------------------------
+  # THONG SO
+  # --------------------------------------------------------------
+
+  SIGN_WIDTH  = 1.20
+  SIGN_HEIGHT = 0.78
+  SIGN_DEPTH  = 0.22
+
+  BASE_Z = 0.06
+  PANEL_Z = 0.10
+
+  FRAME_SIZE = 0.025
+  HANDLE_RADIUS = 0.008
+
+  CREATE_HANDLE = true
+  CREATE_TEXT = true
+  CREATE_INTERNAL_FRAME = true
+  CREATE_BASE = true
+
+  # --------------------------------------------------------------
+  # DON VI VA TOA DO
+  # --------------------------------------------------------------
+
+  def m(value)
+    value.to_f * 39.37007874015748
+  end
+
+  def pt(x, y, z)
+    Geom::Point3d.new(m(x), m(y), m(z))
+  end
+
+  def vec(x, y, z)
+    Geom::Vector3d.new(x, y, z)
+  end
+
+  def make_group(parent, name)
+    g = parent.add_group
+    g.name = name
+    g
+  end
+
+  # --------------------------------------------------------------
+  # VAT LIEU
+  # --------------------------------------------------------------
+
+  def make_material(name, rgb, alpha = 1.0)
+    materials = Sketchup.active_model.materials
+    mat = materials[name] || materials.add(name)
+    mat.color = Sketchup::Color.new(*rgb)
+    mat.alpha = alpha
+    mat
+  end
+
+  def setup_materials
+    @black = make_material(
+      'TG Matte Black',
+      [29, 29, 32]
+    )
+
+    @black_edge = make_material(
+      'TG Black Edge',
+      [12, 12, 14]
+    )
+
+    @charcoal = make_material(
+      'TG Charcoal Textured Face',
+      [43, 43, 47]
+    )
+
+    @steel = make_material(
+      'TG Brushed Stainless Steel',
+      [160, 164, 168]
+    )
+
+    @steel_dark = make_material(
+      'TG Dark Steel',
+      [65, 68, 72]
+    )
+
+    @white = make_material(
+      'TG White Lettering',
+      [250, 250, 248]
+    )
+
+    @glow = make_material(
+      'TG LED White',
+      [255, 255, 255]
+    )
+
+    @rubber = make_material(
+      'TG Rubber Feet',
+      [20, 20, 20]
+    )
+  end
+
+  # --------------------------------------------------------------
+  # KHOI HOP
+  # --------------------------------------------------------------
+
+  def add_box(entities, x, y, z, width, depth, height, mat)
+    return nil if width <= 0 || depth <= 0 || height <= 0
+
+    points = [
+      pt(x, y, z),
+      pt(x + width, y, z),
+      pt(x + width, y + depth, z),
+      pt(x, y + depth, z)
+    ]
+
+    face = entities.add_face(points)
+    return nil unless face && face.valid?
+
+    face.material = mat
+    face.back_material = mat
+    face.reverse! if face.normal.z < 0
+    face.pushpull(m(height))
+    face
+  end
+
+  # --------------------------------------------------------------
+  # THANH HOP NOI HAI DIEM
+  # --------------------------------------------------------------
+
+  def add_beam(entities, a, b, size, mat)
+    direction = b - a
+    length = direction.length
+    return nil if length < 0.001
+
+    direction.normalize!
+
+    ref = vec(0, 0, 1)
+    ref = vec(0, 1, 0) if direction.parallel?(ref)
+
+    u = direction.cross(ref)
+    u.normalize!
+    v = direction.cross(u)
+    v.normalize!
+
+    half = m(size) / 2.0
+
+    points = [
+      a.offset(u, half).offset(v, half),
+      a.offset(u, -half).offset(v, half),
+      a.offset(u, -half).offset(v, -half),
+      a.offset(u, half).offset(v, -half)
+    ]
+
+    face = entities.add_face(points)
+    return nil unless face && face.valid?
+
+    face.material = mat
+    face.back_material = mat
+    face.pushpull(length)
+    face
+  end
+
+  # --------------------------------------------------------------
+  # THANH TRON KIM LOAI
+  # --------------------------------------------------------------
+
+  def add_cylinder(entities, x, y, z, radius, height, mat, segments = 24)
+    edges = entities.add_circle(
+      pt(x, y, z),
+      vec(0, 0, 1),
+      m(radius),
+      segments
+    )
+
+    face = entities.add_face(edges)
+    return nil unless face && face.valid?
+
+    face.material = mat
+    face.back_material = mat
+    face.pushpull(m(height))
+    face
+  end
+
+  # --------------------------------------------------------------
+  # THAN BIEN
+  # --------------------------------------------------------------
+
+  def build_sign_body(parent)
+    g = make_group(parent, '01 - Main Sign Cabinet')
+    e = g.entities
+
+    # Vo hop chinh
+    add_box(
+      e,
+      -SIGN_WIDTH / 2.0,
+      -SIGN_DEPTH / 2.0,
+      BASE_Z,
+      SIGN_WIDTH,
+      SIGN_DEPTH,
+      SIGN_HEIGHT,
+      @black
+    )
+
+    # Mat truoc mau than
+    add_box(
+      e,
+      -SIGN_WIDTH / 2.0 + 0.018,
+      -SIGN_DEPTH / 2.0 - 0.003,
+      PANEL_Z,
+      SIGN_WIDTH - 0.036,
+      0.008,
+      SIGN_HEIGHT - 0.025,
+      @charcoal
+    )
+
+    # Nep vien tren
+    add_box(
+      e,
+      -SIGN_WIDTH / 2.0,
+      -SIGN_DEPTH / 2.0 - 0.008,
+      BASE_Z + SIGN_HEIGHT - 0.025,
+      SIGN_WIDTH,
+      0.018,
+      0.025,
+      @steel_dark
+    )
+
+    # Nep vien hai ben
+    add_box(
+      e,
+      -SIGN_WIDTH / 2.0,
+      -SIGN_DEPTH / 2.0 - 0.008,
+      BASE_Z,
+      0.018,
+      0.018,
+      SIGN_HEIGHT,
+      @black_edge
+    )
+
+    add_box(
+      e,
+      SIGN_WIDTH / 2.0 - 0.018,
+      -SIGN_DEPTH / 2.0 - 0.008,
+      BASE_Z,
+      0.018,
+      0.018,
+      SIGN_HEIGHT,
+      @black_edge
+    )
+
+    # Nep vien duoi
+    add_box(
+      e,
+      -SIGN_WIDTH / 2.0,
+      -SIGN_DEPTH / 2.0 - 0.008,
+      BASE_Z,
+      SIGN_WIDTH,
+      0.018,
+      0.018,
+      @black_edge
+    )
+
+    g
+  end
+
+  # --------------------------------------------------------------
+  # KHUNG XUONG BEN TRONG
+  # --------------------------------------------------------------
+
+  def build_internal_frame(parent)
+    g = make_group(parent, '02 - Internal Steel Frame')
+    e = g.entities
+
+    x1 = -SIGN_WIDTH / 2.0 + 0.04
+    x2 = SIGN_WIDTH / 2.0 - 0.04
+    y = SIGN_DEPTH / 2.0 - 0.035
+    z1 = BASE_Z + 0.035
+    z2 = BASE_Z + SIGN_HEIGHT - 0.035
+
+    add_beam(e, pt(x1, y, z1), pt(x2, y, z1), FRAME_SIZE, @steel_dark)
+    add_beam(e, pt(x1, y, z2), pt(x2, y, z2), FRAME_SIZE, @steel_dark)
+    add_beam(e, pt(x1, y, z1), pt(x1, y, z2), FRAME_SIZE, @steel_dark)
+    add_beam(e, pt(x2, y, z1), pt(x2, y, z2), FRAME_SIZE, @steel_dark)
+
+    # Thanh dung gia cuong
+    [-0.36, 0.0, 0.36].each do |x|
+      add_beam(
+        e,
+        pt(x, y, z1),
+        pt(x, y, z2),
+        0.012,
+        @steel
+      )
+    end
+
+    # Thanh ngang gia cuong
+    [0.20, 0.40, 0.60].each do |offset|
+      z = BASE_Z + offset
+      next if z >= z2
+
+      add_beam(
+        e,
+        pt(x1, y, z),
+        pt(x2, y, z),
+        0.012,
+        @steel_dark
+      )
+    end
+
+    g
+  end
+
+  # --------------------------------------------------------------
+  # CHU NOI 3D
+  # --------------------------------------------------------------
+
+  def create_text(parent, name, text, center_x, center_z,
+                  height, depth, mat, font = 'Arial', bold = true)
+    g = make_group(parent, name)
+
+    begin
+      g.entities.add_3d_text(
+        text,
+        TextAlignCenter,
+        font,
+        bold,
+        false,
+        m(height),
+        0.0,
+        0.0,
+        true,
+        m(depth)
+      )
+
+      g.entities.each do |entity|
+        next unless entity.respond_to?(:material=)
+
+        entity.material = mat
+        entity.back_material = mat if entity.respond_to?(:back_material=)
+      end
+
+      # Xoay chu dung tren mat truoc cua bien.
+      g.transform!(
+        Geom::Transformation.rotation(
+          ORIGIN,
+          X_AXIS,
+          90.degrees
+        )
+      )
+
+      bounds = g.bounds
+
+      target_x = m(center_x)
+      target_y = -m(SIGN_DEPTH / 2.0 + 0.012)
+      target_z = m(center_z)
+
+      translation = Geom::Vector3d.new(
+        target_x - (bounds.min.x + bounds.max.x) / 2.0,
+        target_y - bounds.min.y,
+        target_z - (bounds.min.z + bounds.max.z) / 2.0
+      )
+
+      g.transform!(Geom::Transformation.translation(translation))
+
+    rescue StandardError => error
+      puts "Text error [#{text}]: #{error.message}"
+    end
+
+    g
+  end
+
+  def build_lettering(parent)
+    g = make_group(parent, '03 - Raised White Typography')
+
+    # Lop nen den tao do day cho chu chinh
+    create_text(
+      g,
+      'THEGARA Shadow',
+      'THEGARA',
+      0.0,
+      BASE_Z + 0.49,
+      0.205,
+      0.012,
+      @black_edge,
+      'Arial',
+      true
+    )
+
+    create_text(
+      g,
+      'THEGARA Main',
+      'THEGARA',
+      0.0,
+      BASE_Z + 0.505,
+      0.205,
+      0.018,
+      @white,
+      'Arial',
+      true
+    )
+
+    create_text(
+      g,
+      'Curated Garments and Collectibles',
+      'CURATED GARMENTS & COLLECTIBLES',
+      0.0,
+      BASE_Z + 0.405,
+      0.043,
+      0.010,
+      @white,
+      'Arial',
+      true
+    )
+
+    create_text(
+      g,
+      'Opening Days',
+      'TUES - SUN',
+      0.0,
+      BASE_Z + 0.235,
+      0.050,
+      0.010,
+      @white,
+      'Arial',
+      false
+    )
+
+    create_text(
+      g,
+      'Opening Hours',
+      '11AM - 9PM',
+      0.0,
+      BASE_Z + 0.165,
+      0.050,
+      0.010,
+      @white,
+      'Arial',
+      false
+    )
+
+    g
+  end
+
+  # --------------------------------------------------------------
+  # TAY CAM KIM LOAI CONG
+  # --------------------------------------------------------------
+
+  def build_handle(parent)
+    g = make_group(parent, '04 - Curved Carry Handle')
+    e = g.entities
+
+    # Hai chan cam
+    x1 = -0.43
+    x2 = 0.43
+    y = 0.0
+    z = BASE_Z + SIGN_HEIGHT + 0.01
+
+    add_cylinder(e, x1, y, z - 0.015, 0.014, 0.045, @steel, 16)
+    add_cylinder(e, x2, y, z - 0.015, 0.014, 0.045, @steel, 16)
+
+    # Tay cam uon thanh nhieu doan nho
+    points = []
+    segments = 28
+
+    0.upto(segments) do |i|
+      t = Math::PI * i / segments.to_f
+      x = -0.43 + 0.86 * i / segments.to_f
+      zz = z + 0.12 * Math.sin(t)
+      points << pt(x, y, zz)
+    end
+
+    points.each_cons(2) do |a, b|
+      add_beam(e, a, b, 0.012, @steel)
+    end
+
+    g
+  end
+
+  # --------------------------------------------------------------
+  # CHAN DE CAO SU
+  # --------------------------------------------------------------
+
+  def build_feet(parent)
+    g = make_group(parent, '05 - Rubber Feet')
+    e = g.entities
+
+    [
+      [-SIGN_WIDTH / 2.0 + 0.08, -SIGN_DEPTH / 2.0 + 0.04],
+      [SIGN_WIDTH / 2.0 - 0.08, -SIGN_DEPTH / 2.0 + 0.04],
+      [-SIGN_WIDTH / 2.0 + 0.08, SIGN_DEPTH / 2.0 - 0.04],
+      [SIGN_WIDTH / 2.0 - 0.08, SIGN_DEPTH / 2.0 - 0.04]
+    ].each do |x, y|
+      add_cylinder(
+        e,
+        x,
+        y,
+        0.015,
+        0.035,
+        0.045,
+        @rubber,
+        20
+      )
+    end
+
+    g
+  end
+
+  # --------------------------------------------------------------
+  # CAMERA
+  # --------------------------------------------------------------
+
+  def set_camera
+    model = Sketchup.active_model
+    view = model.active_view
+
+    eye = pt(1.7, -3.0, 1.35)
+    target = pt(0, 0, BASE_Z + SIGN_HEIGHT / 2.0)
+
+    camera = Sketchup::Camera.new(eye, target, vec(0, 0, 1))
+    camera.perspective = true
+
+    view.camera = camera
+    view.zoom_extents
+    view.invalidate
+  end
+
+  # --------------------------------------------------------------
+  # TAO MO HINH
+  # --------------------------------------------------------------
+
+  def build
+    model = Sketchup.active_model
+    model.start_operation('Create THEGARA Signboard', true)
+
+    begin
+      setup_materials
+
+      root = make_group(
+        model.active_entities,
+        'THEGARA - Freestanding Display Sign'
+      )
+
+      build_sign_body(root)
+      build_internal_frame(root) if CREATE_INTERNAL_FRAME
+      build_lettering(root) if CREATE_TEXT
+      build_handle(root) if CREATE_HANDLE
+      build_feet(root) if CREATE_BASE
+
+      model.commit_operation
+      set_camera
+
+      puts '=============================================='
+      puts 'THEGARA SIGNBOARD CREATED'
+      puts "Size: #{SIGN_WIDTH} x #{SIGN_HEIGHT} x #{SIGN_DEPTH} m"
+      puts 'Main face, internal frame, raised typography,'
+      puts 'curved metal handle and rubber feet completed.'
+      puts '=============================================='
+
+    rescue StandardError => error
+      model.abort_operation
+      puts "THEGARA SIGNBOARD ERROR: #{error.message}"
+      puts error.backtrace
+    end
+  end
+end
+
+ThegaraSignboard.build

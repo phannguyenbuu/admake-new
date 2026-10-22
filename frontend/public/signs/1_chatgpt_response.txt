@@ -1,0 +1,800 @@
+ChatGPT đã nói:
+Ruby
+# ============================================================
+# BIEN QUANG CAO NGOAI TROI - SKETCHUP RUBY
+# Dung mo hinh 3D theo anh tham chieu
+# Don vi: met
+# Cau truc: Group rieng cho tung he thong
+# ============================================================
+
+require 'sketchup.rb'
+
+module BillboardOutdoor3D
+  extend self
+
+  # ----------------------------------------------------------
+  # 01. THONG SO MO HINH
+  # ----------------------------------------------------------
+
+  BOARD_W = 18.0
+  BOARD_H = 7.0
+  BOARD_Z = 11.0
+  BOARD_T = 0.12
+
+  COLUMN_X = 0.0
+  COLUMN_Y = 0.60
+  COLUMN_R = 0.65
+  COLUMN_H = 10.90
+
+  FOUNDATION_W = 4.0
+  FOUNDATION_D = 3.5
+  FOUNDATION_H = 1.0
+
+  TRUSS_W = 18.8
+  TRUSS_H = 1.40
+  TRUSS_D = 1.20
+  TRUSS_STEP = 1.20
+
+  CATWALK_W = 0.70
+  CATWALK_Z = BOARD_Z - TRUSS_H - 0.05
+
+  LADDER_X = 1.00
+  LADDER_Y = -0.45
+  LADDER_Z0 = 0.40
+  LADDER_Z1 = 10.80
+
+  LAMP_COUNT = 6
+
+  # ----------------------------------------------------------
+  # 02. DON VI VA VAT LIEU
+  # ----------------------------------------------------------
+
+  def mm(value)
+    value.to_f * 39.37007874015748
+  end
+
+  def pt(x, y, z)
+    Geom::Point3d.new(mm(x), mm(y), mm(z))
+  end
+
+  def vec(x, y, z)
+    Geom::Vector3d.new(x, y, z)
+  end
+
+  def make_group(parent, name)
+    group = parent.add_group
+    group.name = name
+    group
+  end
+
+  def make_material(name, rgb)
+    materials = Sketchup.active_model.materials
+    material = materials[name] || materials.add(name)
+    material.color = Sketchup::Color.new(*rgb)
+    material
+  end
+
+  def setup_materials
+    @concrete = make_material(
+      'BO3D Concrete', [165, 164, 155]
+    )
+    @concrete_dark = make_material(
+      'BO3D Foundation Concrete', [115, 116, 112]
+    )
+    @steel = make_material(
+      'BO3D Galvanized Steel', [155, 165, 173]
+    )
+    @steel_dark = make_material(
+      'BO3D Dark Steel', [65, 73, 80]
+    )
+    @steel_light = make_material(
+      'BO3D Bright Steel', [205, 210, 215]
+    )
+    @screen = make_material(
+      'BO3D Green Advertising Surface', [0, 255, 20]
+    )
+    @lamp = make_material(
+      'BO3D Lamp Housing', [40, 43, 46]
+    )
+    @lamp_glass = make_material(
+      'BO3D Lamp Glass', [255, 242, 200]
+    )
+    @ground = make_material(
+      'BO3D Ground', [185, 183, 176]
+    )
+  end
+
+  # ----------------------------------------------------------
+  # 03. KHOI HOP
+  # ----------------------------------------------------------
+
+  def add_box(entities, x, y, z, dx, dy, dz, material)
+    return nil if dx <= 0 || dy <= 0 || dz <= 0
+
+    corners = [
+      pt(x,      y,      z),
+      pt(x + dx, y,      z),
+      pt(x + dx, y + dy, z),
+      pt(x,      y + dy, z)
+    ]
+
+    face = entities.add_face(corners)
+    return nil unless face && face.valid?
+
+    face.reverse! if face.normal.z < 0
+    face.material = material
+    face.back_material = material
+    face.pushpull(mm(dz))
+
+    face
+  end
+
+  # ----------------------------------------------------------
+  # 04. THANH THEP HOP THEO HAI DIEM
+  # ----------------------------------------------------------
+
+  def add_beam(entities, p1, p2, size, material)
+    direction = p2 - p1
+    length = direction.length
+    return nil if length < 0.001
+
+    direction.normalize!
+
+    reference = vec(0, 0, 1)
+    reference = vec(0, 1, 0) if direction.parallel?(reference)
+
+    axis_x = direction.cross(reference)
+    axis_x.normalize!
+
+    axis_y = direction.cross(axis_x)
+    axis_y.normalize!
+
+    radius = mm(size) / 2.0
+
+    corners = [
+      p1.offset(axis_x, radius).offset(axis_y, radius),
+      p1.offset(axis_x, -radius).offset(axis_y, radius),
+      p1.offset(axis_x, -radius).offset(axis_y, -radius),
+      p1.offset(axis_x, radius).offset(axis_y, -radius)
+    ]
+
+    face = entities.add_face(corners)
+    return nil unless face && face.valid?
+
+    face.material = material
+    face.back_material = material
+    face.pushpull(length)
+
+    face
+  end
+
+  # ----------------------------------------------------------
+  # 05. ONG TRON DUNG
+  # ----------------------------------------------------------
+
+  def add_cylinder(entities, x, y, z, radius, height, material, segments = 48)
+    circle = entities.add_circle(
+      pt(x, y, z),
+      vec(0, 0, 1),
+      mm(radius),
+      segments
+    )
+
+    face = entities.add_face(circle)
+    return nil unless face && face.valid?
+
+    face.material = material
+    face.back_material = material
+    face.pushpull(mm(height))
+
+    face
+  end
+
+  # ----------------------------------------------------------
+  # 06. MONG BE TONG
+  # ----------------------------------------------------------
+
+  def build_foundation(parent)
+    group = make_group(parent, '01 - Mong be tong')
+    entities = group.entities
+
+    # Be tong lot
+    add_box(
+      entities,
+      COLUMN_X - FOUNDATION_W / 2.0 - 0.25,
+      COLUMN_Y - FOUNDATION_D / 2.0 - 0.25,
+      -FOUNDATION_H - 0.15,
+      FOUNDATION_W + 0.50,
+      FOUNDATION_D + 0.50,
+      0.15,
+      @concrete_dark
+    )
+
+    # Mong chinh
+    add_box(
+      entities,
+      COLUMN_X - FOUNDATION_W / 2.0,
+      COLUMN_Y - FOUNDATION_D / 2.0,
+      -FOUNDATION_H,
+      FOUNDATION_W,
+      FOUNDATION_D,
+      FOUNDATION_H,
+      @concrete
+    )
+
+    # Be co cot
+    add_box(
+      entities,
+      COLUMN_X - 1.15,
+      COLUMN_Y - 1.05,
+      0.0,
+      2.30,
+      2.10,
+      0.35,
+      @concrete
+    )
+
+    group
+  end
+
+  # ----------------------------------------------------------
+  # 07. BAN DE VA BULONG NEO
+  # ----------------------------------------------------------
+
+  def build_base_plate(parent)
+    group = make_group(parent, '02 - Ban de va bulong neo')
+    entities = group.entities
+
+    add_box(
+      entities,
+      COLUMN_X - 0.90,
+      COLUMN_Y - 0.85,
+      0.32,
+      1.80,
+      1.70,
+      0.12,
+      @steel_dark
+    )
+
+    [-0.70, 0.70].each do |dx|
+      [-0.60, 0.60].each do |dy|
+        x = COLUMN_X + dx
+        y = COLUMN_Y + dy
+
+        add_cylinder(
+          entities, x, y, 0.15,
+          0.025, 0.37, @steel_dark, 12
+        )
+
+        add_box(
+          entities,
+          x - 0.055, y - 0.055, 0.43,
+          0.11, 0.11, 0.045,
+          @steel_light
+        )
+      end
+    end
+
+    group
+  end
+
+  # ----------------------------------------------------------
+  # 08. COT THEP TRU TRON
+  # ----------------------------------------------------------
+
+  def build_column(parent)
+    group = make_group(parent, '03 - Cot thep tru tron')
+    entities = group.entities
+
+    add_cylinder(
+      entities,
+      COLUMN_X, COLUMN_Y, 0,
+      COLUMN_R, COLUMN_H, @steel, 64
+    )
+
+    # Vong tang cung
+    [0.35, 1.0, COLUMN_H - 0.50].each do |z|
+      add_cylinder(
+        entities,
+        COLUMN_X, COLUMN_Y, z,
+        COLUMN_R + 0.055, 0.08,
+        @steel_dark, 48
+      )
+    end
+
+    # Ban ma tren dau cot
+    add_box(
+      entities,
+      COLUMN_X - 0.95,
+      COLUMN_Y - 0.90,
+      COLUMN_H - 0.10,
+      1.90, 1.80, 0.18,
+      @steel_dark
+    )
+
+    # Suon tang cung
+    12.times do |i|
+      angle = 2.0 * Math::PI * i / 12.0
+
+      x1 = COLUMN_X + Math.cos(angle) * COLUMN_R
+      y1 = COLUMN_Y + Math.sin(angle) * COLUMN_R
+
+      x2 = COLUMN_X + Math.cos(angle) * 0.98
+      y2 = COLUMN_Y + Math.sin(angle) * 0.98
+
+      add_beam(
+        entities,
+        pt(x1, y1, COLUMN_H - 0.90),
+        pt(x2, y2, COLUMN_H + 0.15),
+        0.08, @steel_dark
+      )
+    end
+
+    group
+  end
+
+  # ----------------------------------------------------------
+  # 09. GIAN KHUNG XUONG THEP KHONG GIAN
+  # ----------------------------------------------------------
+
+  def build_truss(parent)
+    group = make_group(parent, '04 - Gian khung xuong thep khong gian')
+    entities = group.entities
+
+    xl = -TRUSS_W / 2.0
+    xr = TRUSS_W / 2.0
+
+    z_bottom = BOARD_Z - TRUSS_H
+    z_top = BOARD_Z
+
+    y_front = -0.20
+    y_back = y_front + TRUSS_D
+
+    count = (TRUSS_W / TRUSS_STEP).ceil
+
+    [y_front, y_back].each do |y|
+      # Thanh bien tren va duoi
+      add_beam(
+        entities,
+        pt(xl, y, z_top),
+        pt(xr, y, z_top),
+        0.09, @steel
+      )
+
+      add_beam(
+        entities,
+        pt(xl, y, z_bottom),
+        pt(xr, y, z_bottom),
+        0.09, @steel
+      )
+
+      # Thanh dung
+      (0..count).each do |i|
+        x = [xl + i * TRUSS_STEP, xr].min
+
+        add_beam(
+          entities,
+          pt(x, y, z_bottom),
+          pt(x, y, z_top),
+          0.055, @steel
+        )
+      end
+
+      # Thanh cheo
+      (0...count).each do |i|
+        xa = [xl + i * TRUSS_STEP, xr].min
+        xb = [xa + TRUSS_STEP, xr].min
+        next if xb - xa < 0.01
+
+        if i.even?
+          add_beam(
+            entities,
+            pt(xa, y, z_bottom),
+            pt(xb, y, z_top),
+            0.045, @steel_dark
+          )
+        else
+          add_beam(
+            entities,
+            pt(xa, y, z_top),
+            pt(xb, y, z_bottom),
+            0.045, @steel_dark
+          )
+        end
+      end
+    end
+
+    # Thanh ngang noi hai mat gian
+    (0..count).each do |i|
+      x = [xl + i * TRUSS_STEP, xr].min
+
+      [z_bottom, z_top].each do |z|
+        add_beam(
+          entities,
+          pt(x, y_front, z),
+          pt(x, y_back, z),
+          0.055, @steel
+        )
+      end
+    end
+
+    # Giang cheo khong gian
+    (0...count).each do |i|
+      next unless i.even?
+
+      xa = [xl + i * TRUSS_STEP, xr].min
+      xb = [xa + TRUSS_STEP, xr].min
+      next if xb - xa < 0.01
+
+      add_beam(
+        entities,
+        pt(xa, y_front, z_bottom),
+        pt(xb, y_back, z_top),
+        0.04, @steel_dark
+      )
+
+      add_beam(
+        entities,
+        pt(xa, y_back, z_bottom),
+        pt(xb, y_front, z_top),
+        0.04, @steel_dark
+      )
+    end
+
+    # Ban ma lien ket dau cot
+    add_box(
+      entities,
+      -1.0, y_front - 0.10, z_bottom - 0.12,
+      2.0, TRUSS_D + 0.20, 0.12,
+      @steel_dark
+    )
+
+    group
+  end
+
+  # ----------------------------------------------------------
+  # 10. MAT BIEN QUANG CAO
+  # ----------------------------------------------------------
+
+  def build_panel(parent)
+    group = make_group(parent, '05 - Mat bien quang cao')
+    entities = group.entities
+
+    # Tam hien thi
+    add_box(
+      entities,
+      -BOARD_W / 2.0,
+      -0.36,
+      BOARD_Z,
+      BOARD_W,
+      BOARD_T,
+      BOARD_H,
+      @screen
+    )
+
+    frame = 0.10
+    frame_y = -0.48
+
+    # Vien tren
+    add_box(
+      entities,
+      -BOARD_W / 2.0 - frame,
+      frame_y,
+      BOARD_Z + BOARD_H,
+      BOARD_W + 2 * frame,
+      0.10,
+      frame,
+      @steel_dark
+    )
+
+    # Vien duoi
+    add_box(
+      entities,
+      -BOARD_W / 2.0 - frame,
+      frame_y,
+      BOARD_Z - frame,
+      BOARD_W + 2 * frame,
+      0.10,
+      frame,
+      @steel_dark
+    )
+
+    # Vien trai va phai
+    add_box(
+      entities,
+      -BOARD_W / 2.0 - frame,
+      frame_y,
+      BOARD_Z,
+      frame, 0.10, BOARD_H,
+      @steel_dark
+    )
+
+    add_box(
+      entities,
+      BOARD_W / 2.0,
+      frame_y,
+      BOARD_Z,
+      frame, 0.10, BOARD_H,
+      @steel_dark
+    )
+
+    # Thanh gia cuong phia sau
+    [-5.5, -2.8, 0.0, 2.8, 5.5].each do |x|
+      add_beam(
+        entities,
+        pt(x, 0.0, BOARD_Z + 0.20),
+        pt(x, 0.0, BOARD_Z + BOARD_H - 0.20),
+        0.06, @steel
+      )
+    end
+
+    group
+  end
+
+  # ----------------------------------------------------------
+  # 11. SAN CATWALK VA LAN CAN
+  # ----------------------------------------------------------
+
+  def build_catwalk(parent)
+    group = make_group(parent, '06 - San catwalk va lan can')
+    entities = group.entities
+
+    xl = -TRUSS_W / 2.0
+    xr = TRUSS_W / 2.0
+
+    z = CATWALK_Z
+    y_front = -0.85
+    y_back = y_front + CATWALK_W
+
+    # Mat san thao tac
+    add_box(
+      entities,
+      xl, y_front, z,
+      TRUSS_W, CATWALK_W, 0.07,
+      @steel_dark
+    )
+
+    # Dam doc
+    [y_front, y_back].each do |y|
+      add_beam(
+        entities,
+        pt(xl, y, z - 0.05),
+        pt(xr, y, z - 0.05),
+        0.08, @steel
+      )
+    end
+
+    # Dam ngang
+    count = (TRUSS_W / 1.5).ceil
+
+    (0..count).each do |i|
+      x = xl + TRUSS_W * i / count.to_f
+
+      add_beam(
+        entities,
+        pt(x, y_front, z - 0.05),
+        pt(x, y_back, z - 0.05),
+        0.05, @steel
+      )
+    end
+
+    # Lan can
+    rail_top = z + 1.10
+    rail_mid = z + 0.55
+
+    [y_front, y_back].each do |y|
+      add_beam(
+        entities,
+        pt(xl, y, rail_top),
+        pt(xr, y, rail_top),
+        0.045, @steel
+      )
+
+      add_beam(
+        entities,
+        pt(xl, y, rail_mid),
+        pt(xr, y, rail_mid),
+        0.035, @steel
+      )
+
+      (0..count).each do |i|
+        x = xl + TRUSS_W * i / count.to_f
+
+        add_beam(
+          entities,
+          pt(x, y, z),
+          pt(x, y, rail_top),
+          0.035, @steel
+        )
+      end
+    end
+
+    group
+  end
+
+  # ----------------------------------------------------------
+  # 12. THANG LEO AN TOAN
+  # ----------------------------------------------------------
+
+  def build_ladder(parent)
+    group = make_group(parent, '07 - Thang leo an toan')
+    entities = group.entities
+
+    x = LADDER_X
+    y = LADDER_Y
+
+    # Thanh doc
+    [-0.25, 0.25].each do |dx|
+      add_beam(
+        entities,
+        pt(x + dx, y, LADDER_Z0),
+        pt(x + dx, y, LADDER_Z1),
+        0.045, @steel
+      )
+    end
+
+    # Bac thang
+    z = LADDER_Z0
+
+    while z < LADDER_Z1
+      add_beam(
+        entities,
+        pt(x - 0.25, y, z),
+        pt(x + 0.25, y, z),
+        0.035, @steel_light
+      )
+      z += 0.30
+    end
+
+    # Long bao ve
+    cage_y = y + 0.22
+    cage_z = 4.0
+
+    [-0.42, 0.42].each do |dx|
+      add_beam(
+        entities,
+        pt(x + dx, cage_y, cage_z),
+        pt(x + dx, cage_y, LADDER_Z1),
+        0.035, @steel
+      )
+    end
+
+    z = cage_z
+
+    while z < LADDER_Z1
+      add_beam(
+        entities,
+        pt(x - 0.42, cage_y, z),
+        pt(x + 0.42, cage_y, z),
+        0.03, @steel
+      )
+      z += 0.60
+    end
+
+    group
+  end
+
+  # ----------------------------------------------------------
+  # 13. DEN CHIEU SANG
+  # ----------------------------------------------------------
+
+  def build_lights(parent)
+    group = make_group(parent, '08 - Den chieu sang')
+    entities = group.entities
+
+    spacing = BOARD_W.to_f / (LAMP_COUNT - 1)
+
+    LAMP_COUNT.times do |i|
+      x = -BOARD_W / 2.0 + i * spacing
+      z = BOARD_Z + BOARD_H + 0.30
+
+      # Tay do
+      add_beam(
+        entities,
+        pt(x, -0.05, z),
+        pt(x, -0.70, z + 0.30),
+        0.045, @steel
+      )
+
+      # Than den
+      add_box(
+        entities,
+        x - 0.20, -0.95, z + 0.20,
+        0.40, 0.28, 0.12,
+        @lamp
+      )
+
+      # Mat phat sang
+      add_box(
+        entities,
+        x - 0.16, -0.94, z + 0.17,
+        0.32, 0.22, 0.025,
+        @lamp_glass
+      )
+    end
+
+    group
+  end
+
+  # ----------------------------------------------------------
+  # 14. MAT DAT THAM KHAO
+  # ----------------------------------------------------------
+
+  def build_ground(parent)
+    group = make_group(parent, '00 - Mat dat tham khao')
+
+    add_box(
+      group.entities,
+      -35, -20, -0.45,
+      70, 40, 0.20,
+      @ground
+    )
+
+    group
+  end
+
+  # ----------------------------------------------------------
+  # 15. CAMERA
+  # ----------------------------------------------------------
+
+  def setup_camera
+    view = Sketchup.active_model.active_view
+
+    camera = Sketchup::Camera.new(
+      pt(27, -42, 20),
+      pt(0, 0, 8),
+      vec(0, 0, 1)
+    )
+
+    view.camera = camera
+    view.zoom_extents
+    view.invalidate
+  end
+
+  # ----------------------------------------------------------
+  # 16. TAO MO HINH
+  # ----------------------------------------------------------
+
+  def build
+    model = Sketchup.active_model
+    model.start_operation('Create Outdoor Billboard 3D', true)
+
+    begin
+      setup_materials
+
+      root = make_group(
+        model.active_entities,
+        'BILLBOARD OUTDOOR - COMPLETE MODEL'
+      )
+
+      build_ground(root)
+      build_foundation(root)
+      build_base_plate(root)
+      build_column(root)
+      build_truss(root)
+      build_panel(root)
+      build_catwalk(root)
+      build_ladder(root)
+      build_lights(root)
+
+      model.commit_operation
+      setup_camera
+
+      puts 'Da tao xong mo hinh bien quang cao 3D.'
+      puts "Mat bang bang quang cao: #{BOARD_W} x #{BOARD_H} m."
+      puts "Cao do day bang: #{BOARD_Z} m."
+      puts 'Luu mo hinh thanh file SKP neu can.'
+
+    rescue StandardError => error
+      model.abort_operation
+      puts "Loi khi tao mo hinh: #{error.message}"
+      puts error.backtrace
+    end
+  end
+end
+
+# ============================================================
+# THUC THI
+# ============================================================
+
+BillboardOutdoor3D.build

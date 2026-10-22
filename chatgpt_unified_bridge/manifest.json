@@ -1,0 +1,50 @@
+{
+  "manifest_version": 3,
+  "name": "ChatGPT AI Studio & Worker Bridge v4.0",
+  "version": "4.0.0",
+  "description": "Cầu nối AI Hợp Nhất: Tự động hóa ChatGPT xử lý Truy vấn nội dung, Phân tích Vision, Trích xuất Ruby SketchUp 3D, Tạo ảnh DALL-E & Inpainting với định tuyến theo đúng tên máy (Target PC).",
+  "permissions": [
+    "storage",
+    "activeTab",
+    "scripting",
+    "tabs",
+    "clipboardWrite",
+    "clipboardRead"
+  ],
+  "host_permissions": [
+    "https://chatgpt.com/*",
+    "<all_urls>"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://chatgpt.com/*"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "ChatGPT AI Unified Bridge v4.0",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["icons/*"],
+      "matches": ["https://chatgpt.com/*"]
+    }
+  ]
+}

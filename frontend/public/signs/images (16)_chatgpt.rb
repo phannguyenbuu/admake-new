@@ -1,0 +1,897 @@
+# frozen_string_literal: true
+# ================================================================
+# OUTDOOR DOUBLE-POST BILLBOARD - SKETCHUP RUBY
+# Mo hinh bien quang cao ngoai troi theo anh tham chieu.
+#
+# THANH PHAN:
+# 01. Mong be tong cot tru
+# 02. Hai cot thep tron chiu luc
+# 03. Ban de va bu long neo
+# 04. Khung vien pano bang thep hop
+# 05. Gian khong gian tam giac
+# 06. Khung giang cheo hai ben va phia duoi
+# 07. San catwalk va lan can bao ve
+# 08. Thang leo co long bao ve
+# 09. Mat pano mau do
+# 10. Chu noi 3D trang/vang
+# 11. Den chieu sang tren dinh pano
+#
+# Don vi: met
+# Truc X = ngang, Y = chieu sau, Z = chieu cao
+#
+# Chay trong SketchUp Ruby Console:
+# load 'C:/duong_dan/outdoor_billboard.rb'
+# ================================================================
+
+require 'sketchup.rb'
+
+module OutdoorBillboardRed
+  extend self
+
+  # --------------------------------------------------------------
+  # THONG SO CHINH
+  # --------------------------------------------------------------
+
+  SIGN_WIDTH  = 8.0
+  SIGN_HEIGHT = 3.5
+  SIGN_BOTTOM = 11.0
+  SIGN_DEPTH  = 0.18
+
+  POST_SPACING = 4.5
+  POST_RADIUS  = 0.32
+  POST_HEIGHT  = SIGN_BOTTOM
+
+  FOUNDATION_W = 1.8
+  FOUNDATION_D = 1.8
+  FOUNDATION_H = 1.4
+
+  FRAME_DEPTH = 0.75
+  FRAME_BAR   = 0.07
+  TRUSS_BAR   = 0.045
+  TRUSS_STEP  = 0.48
+
+  CATWALK_DEPTH = 0.90
+  CATWALK_THICKNESS = 0.07
+
+  LADDER_WIDTH = 0.48
+  LADDER_STEP  = 0.30
+
+  CREATE_FOUNDATIONS = true
+  CREATE_CATWALK = true
+  CREATE_LADDER = true
+  CREATE_LIGHTS = true
+  CREATE_RAISED_TEXT = true
+
+  # --------------------------------------------------------------
+  # DON VI VA HINH HOC
+  # --------------------------------------------------------------
+
+  def mm(value)
+    value.to_f * 39.37007874015748
+  end
+
+  def p3(x, y, z)
+    Geom::Point3d.new(mm(x), mm(y), mm(z))
+  end
+
+  def v3(x, y, z)
+    Geom::Vector3d.new(x, y, z)
+  end
+
+  def make_group(parent, name)
+    g = parent.add_group
+    g.name = name
+    g
+  end
+
+  # --------------------------------------------------------------
+  # VAT LIEU
+  # --------------------------------------------------------------
+
+  def mat(name, rgb, alpha = 1.0)
+    materials = Sketchup.active_model.materials
+    m = materials[name] || materials.add(name)
+    m.color = Sketchup::Color.new(*rgb)
+    m.alpha = alpha
+    m
+  end
+
+  def setup_materials
+    @concrete = mat('BB - Concrete', [145, 143, 136])
+    @steel = mat('BB - Galvanized Steel', [118, 128, 137])
+    @steel_dark = mat('BB - Dark Steel', [42, 49, 57])
+    @steel_light = mat('BB - Silver Steel', [190, 198, 202])
+    @red = mat('BB - Advertising Red', [188, 14, 35])
+    @red_side = mat('BB - Panel Edge Red', [93, 8, 19])
+    @white = mat('BB - Letter White', [248, 246, 235])
+    @gold = mat('BB - Letter Gold', [237, 184, 67])
+    @black = mat('BB - Letter Shadow', [24, 24, 24])
+    @lamp = mat('BB - Lamp Housing', [65, 72, 78])
+    @lamp_glow = mat('BB - Lamp Lens', [255, 242, 195])
+  end
+
+  # --------------------------------------------------------------
+  # KHOI HOP
+  # --------------------------------------------------------------
+
+  def box(entities, x, y, z, width, depth, height, material)
+    return nil if width <= 0 || depth <= 0 || height <= 0
+
+    corners = [
+      p3(x, y, z),
+      p3(x + width, y, z),
+      p3(x + width, y + depth, z),
+      p3(x, y + depth, z)
+    ]
+
+    face = entities.add_face(corners)
+    return nil unless face && face.valid?
+
+    face.material = material
+    face.back_material = material
+    face.reverse! if face.normal.z < 0
+    face.pushpull(mm(height))
+    face
+  end
+
+  # --------------------------------------------------------------
+  # THANH THEP NOI HAI DIEM
+  # --------------------------------------------------------------
+
+  def beam(entities, a, b, size, material)
+    direction = b - a
+    length = direction.length
+    return nil if length < 0.001
+
+    direction.normalize!
+
+    reference = v3(0, 0, 1)
+    reference = v3(0, 1, 0) if direction.parallel?(reference)
+
+    u = direction.cross(reference)
+    u.normalize!
+    v = direction.cross(u)
+    v.normalize!
+
+    half = mm(size) / 2.0
+
+    corners = [
+      a.offset(u, half).offset(v, half),
+      a.offset(u, -half).offset(v, half),
+      a.offset(u, -half).offset(v, -half),
+      a.offset(u, half).offset(v, -half)
+    ]
+
+    face = entities.add_face(corners)
+    return nil unless face && face.valid?
+
+    face.material = material
+    face.back_material = material
+    face.pushpull(length)
+    face
+  end
+
+  # --------------------------------------------------------------
+  # TRU TRON
+  # --------------------------------------------------------------
+
+  def cylinder(entities, x, y, z, radius, height, material, segments = 24)
+    edges = entities.add_circle(
+      p3(x, y, z),
+      v3(0, 0, 1),
+      mm(radius),
+      segments
+    )
+
+    face = entities.add_face(edges)
+    return nil unless face && face.valid?
+
+    face.material = material
+    face.back_material = material
+    face.pushpull(mm(height))
+    face
+  end
+
+  # --------------------------------------------------------------
+  # MONG BE TONG VA COT
+  # --------------------------------------------------------------
+
+  def build_foundations(parent)
+    g = make_group(parent, '01 - Foundations and Posts')
+    e = g.entities
+
+    [-POST_SPACING / 2.0, POST_SPACING / 2.0].each do |x|
+      box(
+        e,
+        x - FOUNDATION_W / 2.0,
+        -FOUNDATION_D / 2.0,
+        -FOUNDATION_H,
+        FOUNDATION_W,
+        FOUNDATION_D,
+        FOUNDATION_H,
+        @concrete
+      )
+
+      box(
+        e,
+        x - 0.42,
+        -0.42,
+        0.0,
+        0.84,
+        0.84,
+        0.12,
+        @steel_dark
+      )
+
+      # Bu long neo tren ban de
+      [-0.29, 0.29].each do |dx|
+        [-0.29, 0.29].each do |dy|
+          cylinder(e, x + dx, dy, 0.12, 0.025, 0.08, @steel_light, 12)
+        end
+      end
+
+      # Than cot thep tron
+      cylinder(
+        e,
+        x,
+        0.0,
+        0.12,
+        POST_RADIUS,
+        POST_HEIGHT - 0.12,
+        @steel,
+        36
+      )
+
+      # Dai cot tren dinh
+      cylinder(
+        e,
+        x,
+        0.0,
+        SIGN_BOTTOM - 0.45,
+        POST_RADIUS + 0.035,
+        0.45,
+        @steel_dark,
+        36
+      )
+
+      # Ban ma lien ket tren cot
+      box(
+        e,
+        x - 0.38,
+        -0.45,
+        SIGN_BOTTOM - 0.18,
+        0.76,
+        0.90,
+        0.18,
+        @steel_dark
+      )
+    end
+
+    g
+  end
+
+  # --------------------------------------------------------------
+  # KHUNG VIEN PANO
+  # --------------------------------------------------------------
+
+  def build_panel_frame(parent)
+    g = make_group(parent, '02 - Billboard Perimeter Frame')
+    e = g.entities
+
+    x1 = -SIGN_WIDTH / 2.0
+    x2 = SIGN_WIDTH / 2.0
+    z1 = SIGN_BOTTOM
+    z2 = SIGN_BOTTOM + SIGN_HEIGHT
+    y_front = -0.22
+    y_back = y_front + FRAME_DEPTH
+
+    # Thanh vien truoc va sau
+    [y_front, y_back].each do |y|
+      beam(e, p3(x1, y, z1), p3(x2, y, z1), FRAME_BAR, @steel_dark)
+      beam(e, p3(x1, y, z2), p3(x2, y, z2), FRAME_BAR, @steel_dark)
+      beam(e, p3(x1, y, z1), p3(x1, y, z2), FRAME_BAR, @steel_dark)
+      beam(e, p3(x2, y, z1), p3(x2, y, z2), FRAME_BAR, @steel_dark)
+    end
+
+    # Thanh noi chieu sau
+    [x1, x2].each do |x|
+      [z1, z2].each do |z|
+        beam(
+          e,
+          p3(x, y_front, z),
+          p3(x, y_back, z),
+          FRAME_BAR,
+          @steel
+        )
+      end
+    end
+
+    # Thanh dung chia o khung sau
+    1.upto(7) do |i|
+      x = x1 + SIGN_WIDTH * i / 8.0
+      beam(
+        e,
+        p3(x, y_back, z1),
+        p3(x, y_back, z2),
+        0.045,
+        @steel
+      )
+    end
+
+    g
+  end
+
+  # --------------------------------------------------------------
+  # GIAN KHONG GIAN TAM GIAC PHIA DUOI PANO
+  # --------------------------------------------------------------
+
+  def build_lower_truss(parent)
+    g = make_group(parent, '03 - Lower Spatial Steel Truss')
+    e = g.entities
+
+    x1 = -SIGN_WIDTH / 2.0 - 0.10
+    x2 = SIGN_WIDTH / 2.0 + 0.10
+    z_top = SIGN_BOTTOM
+    z_bottom = SIGN_BOTTOM - 0.70
+    y_front = -0.35
+    y_back = 0.55
+
+    # Hai day ngang chinh
+    [y_front, y_back].each do |y|
+      beam(e, p3(x1, y, z_top), p3(x2, y, z_top), 0.07, @steel_dark)
+      beam(e, p3(x1, y, z_bottom), p3(x2, y, z_bottom), 0.07, @steel_dark)
+
+      count = (SIGN_WIDTH / TRUSS_STEP).ceil
+      1.upto(count - 1) do |i|
+        x = x1 + (x2 - x1) * i / count.to_f
+        beam(
+          e,
+          p3(x, y, z_top),
+          p3(x, y, z_bottom),
+          TRUSS_BAR,
+          @steel
+        )
+      end
+
+      # Thanh giang cheo tam giac
+      count = (SIGN_WIDTH / TRUSS_STEP).ceil
+
+      0.upto(count - 1) do |i|
+        xa = x1 + (x2 - x1) * i / count.to_f
+        xb = x1 + (x2 - x1) * (i + 1) / count.to_f
+
+        if i.even?
+          beam(
+            e,
+            p3(xa, y, z_bottom),
+            p3(xb, y, z_top),
+            TRUSS_BAR,
+            @steel
+          )
+        else
+          beam(
+            e,
+            p3(xa, y, z_top),
+            p3(xb, y, z_bottom),
+            TRUSS_BAR,
+            @steel
+          )
+        end
+      end
+    end
+
+    # Thanh giang ngang theo chieu sau
+    count = (SIGN_WIDTH / TRUSS_STEP).ceil
+    0.upto(count) do |i|
+      x = x1 + (x2 - x1) * i / count.to_f
+
+      beam(
+        e,
+        p3(x, y_front, z_top),
+        p3(x, y_back, z_top),
+        TRUSS_BAR,
+        @steel
+      )
+
+      beam(
+        e,
+        p3(x, y_front, z_bottom),
+        p3(x, y_back, z_bottom),
+        TRUSS_BAR,
+        @steel
+      )
+
+      beam(
+        e,
+        p3(x, y_front, z_bottom),
+        p3(x, y_back, z_top),
+        TRUSS_BAR,
+        @steel
+      )
+    end
+
+    g
+  end
+
+  # --------------------------------------------------------------
+  # GIANG CHEO HAI BEN
+  # --------------------------------------------------------------
+
+  def build_side_trusses(parent)
+    g = make_group(parent, '04 - Side Triangular Trusses')
+    e = g.entities
+
+    [-1, 1].each do |side|
+      x = side * (SIGN_WIDTH / 2.0 + 0.04)
+      y1 = -0.22
+      y2 = 0.55
+      z1 = SIGN_BOTTOM
+      z2 = SIGN_BOTTOM + SIGN_HEIGHT
+
+      beam(e, p3(x, y1, z1), p3(x, y2, z1), TRUSS_BAR, @steel)
+      beam(e, p3(x, y1, z2), p3(x, y2, z2), TRUSS_BAR, @steel)
+      beam(e, p3(x, y1, z1), p3(x, y1, z2), TRUSS_BAR, @steel_dark)
+      beam(e, p3(x, y2, z1), p3(x, y2, z2), TRUSS_BAR, @steel_dark)
+
+      count = 7
+      0.upto(count - 1) do |i|
+        za = z1 + (z2 - z1) * i / count.to_f
+        zb = z1 + (z2 - z1) * (i + 1) / count.to_f
+
+        if i.even?
+          beam(e, p3(x, y1, za), p3(x, y2, zb), TRUSS_BAR, @steel)
+        else
+          beam(e, p3(x, y2, za), p3(x, y1, zb), TRUSS_BAR, @steel)
+        end
+      end
+    end
+
+    g
+  end
+
+  # --------------------------------------------------------------
+  # SAN CATWALK VA LAN CAN
+  # --------------------------------------------------------------
+
+  def build_catwalk(parent)
+    g = make_group(parent, '05 - Maintenance Catwalk')
+    e = g.entities
+
+    x1 = -CATWALK_WIDTH / 2.0
+    y1 = 0.55
+    z = SIGN_BOTTOM - 0.82
+
+    box(
+      e,
+      x1,
+      y1,
+      z,
+      CATWALK_WIDTH,
+      CATWALK_DEPTH,
+      CATWALK_THICKNESS,
+      @steel_dark
+    )
+
+    # Thanh xương duoi san
+    [-0.30, 0.0, 0.30].each do |dy|
+      beam(
+        e,
+        p3(x1, y1 + dy, z - 0.05),
+        p3(-x1, y1 + dy, z - 0.05),
+        0.045,
+        @steel
+      )
+    end
+
+    # Thanh san catwalk ngang
+    0.upto(18) do |i|
+      x = x1 + CATWALK_WIDTH * i / 18.0
+      beam(
+        e,
+        p3(x, y1, z - 0.04),
+        p3(x, y1 + CATWALK_DEPTH, z - 0.04),
+        0.018,
+        @steel
+      )
+    end
+
+    # Lan can phia ngoai
+    rail_y = y1 + CATWALK_DEPTH
+    rail_z = z + 1.0
+
+    beam(
+      e,
+      p3(x1, rail_y, rail_z),
+      p3(-x1, rail_y, rail_z),
+      0.035,
+      @steel
+    )
+
+    beam(
+      e,
+      p3(x1, rail_y, z + 0.52),
+      p3(-x1, rail_y, z + 0.52),
+      0.025,
+      @steel
+    )
+
+    0.upto(12) do |i|
+      x = x1 + CATWALK_WIDTH * i / 12.0
+      beam(
+        e,
+        p3(x, rail_y, z + 0.04),
+        p3(x, rail_y, rail_z),
+        0.025,
+        @steel
+      )
+    end
+
+    g
+  end
+
+  # --------------------------------------------------------------
+  # THANG LEO CO LONG BAO VE
+  # --------------------------------------------------------------
+
+  def build_ladder(parent)
+    g = make_group(parent, '06 - Fixed Safety Ladder')
+    e = g.entities
+
+    x = SIGN_WIDTH / 2.0 + 0.65
+    y = 0.75
+    z0 = 0.15
+    z1 = SIGN_BOTTOM + SIGN_HEIGHT + 0.30
+
+    # Thanh doc
+    beam(e, p3(x, y, z0), p3(x, y, z1), 0.035, @steel_dark)
+    beam(
+      e,
+      p3(x + LADDER_WIDTH, y, z0),
+      p3(x + LADDER_WIDTH, y, z1),
+      0.035,
+      @steel_dark
+    )
+
+    # Bac thang
+    count = ((z1 - z0) / LADDER_STEP).to_i
+
+    0.upto(count) do |i|
+      z = z0 + i * LADDER_STEP
+
+      beam(
+        e,
+        p3(x, y, z),
+        p3(x + LADDER_WIDTH, y, z),
+        0.025,
+        @steel
+      )
+    end
+
+    # Long bao ve dang vong cung don gian
+    [z0 + 1.8, z0 + 2.5, z0 + 3.2, z0 + 3.9].each do |z|
+      beam(
+        e,
+        p3(x - 0.12, y + 0.20, z),
+        p3(x + LADDER_WIDTH + 0.12, y + 0.20, z),
+        0.025,
+        @steel
+      )
+
+      beam(
+        e,
+        p3(x - 0.12, y + 0.20, z),
+        p3(x - 0.12, y - 0.20, z),
+        0.025,
+        @steel
+      )
+
+      beam(
+        e,
+        p3(x + LADDER_WIDTH + 0.12, y + 0.20, z),
+        p3(x + LADDER_WIDTH + 0.12, y - 0.20, z),
+        0.025,
+        @steel
+      )
+    end
+
+    g
+  end
+
+  # --------------------------------------------------------------
+  # MAT PANO QUANG CAO
+  # --------------------------------------------------------------
+
+  def build_billboard_face(parent)
+    g = make_group(parent, '07 - Red Advertising Face')
+    e = g.entities
+
+    x = -SIGN_WIDTH / 2.0 + 0.045
+    y = -0.245
+    z = SIGN_BOTTOM + 0.045
+
+    box(
+      e,
+      x,
+      y,
+      z,
+      SIGN_WIDTH - 0.09,
+      0.035,
+      SIGN_HEIGHT - 0.09,
+      @red
+    )
+
+    # Vien canh pano
+    beam(
+      e,
+      p3(-SIGN_WIDTH / 2.0, y - 0.005, SIGN_BOTTOM),
+      p3(SIGN_WIDTH / 2.0, y - 0.005, SIGN_BOTTOM),
+      0.035,
+      @red_side
+    )
+
+    beam(
+      e,
+      p3(-SIGN_WIDTH / 2.0, y - 0.005, SIGN_BOTTOM + SIGN_HEIGHT),
+      p3(SIGN_WIDTH / 2.0, y - 0.005, SIGN_BOTTOM + SIGN_HEIGHT),
+      0.035,
+      @red_side
+    )
+
+    g
+  end
+
+  # --------------------------------------------------------------
+  # CHU NOI 3D TREN PANO
+  # --------------------------------------------------------------
+
+  def raised_text(parent, text, x, z, size, depth, material, name)
+    g = make_group(parent, name)
+
+    begin
+      g.entities.add_3d_text(
+        text,
+        TextAlignLeft,
+        'Arial',
+        true,
+        false,
+        mm(size),
+        0.0,
+        0.0,
+        true,
+        mm(depth)
+      )
+
+      g.entities.each do |entity|
+        next unless entity.respond_to?(:material=)
+
+        entity.material = material
+        entity.back_material = material if entity.respond_to?(:back_material=)
+      end
+
+      # Dung chu len mat dung
+      rotate = Geom::Transformation.rotation(
+        ORIGIN,
+        X_AXIS,
+        90.degrees
+      )
+
+      g.transform!(rotate)
+
+      bounds = g.bounds
+      target = Geom::Transformation.translation(
+        Geom::Vector3d.new(
+          mm(x) - bounds.min.x,
+          mm(-0.29) - bounds.min.y,
+          mm(z) - bounds.min.z
+        )
+      )
+
+      g.transform!(target)
+
+    rescue StandardError => error
+      puts "Loi tao chu '#{text}': #{error.message}"
+    end
+
+    g
+  end
+
+  def build_advertising_text(parent)
+    g = make_group(parent, '08 - Raised Advertising Text')
+    e = g.entities
+
+    # Dong chu chinh
+    raised_text(
+      g,
+      'I AM',
+      -1.05,
+      SIGN_BOTTOM + 1.62,
+      0.90,
+      0.035,
+      @white,
+      'I AM - White Raised Text'
+    )
+
+    raised_text(
+      g,
+      'JAYALAKSHMI',
+      -2.95,
+      SIGN_BOTTOM + 0.93,
+      0.49,
+      0.025,
+      @white,
+      'JAYALAKSHMI - White Raised Text'
+    )
+
+    raised_text(
+      g,
+      'THE BRIDAL DESTINATION',
+      -2.90,
+      SIGN_BOTTOM + 0.42,
+      0.19,
+      0.015,
+      @white,
+      'Tagline - White Text'
+    )
+
+    raised_text(
+      g,
+      'M.G. ROAD, THRISSUR',
+      1.05,
+      SIGN_BOTTOM + 0.44,
+      0.15,
+      0.012,
+      @gold,
+      'Location - Gold Text'
+    )
+
+    # Hinh trang tri dang duong cheo
+    beam(
+      e,
+      p3(2.45, -0.30, SIGN_BOTTOM + 0.55),
+      p3(2.75, -0.30, SIGN_BOTTOM + 1.65),
+      0.035,
+      @gold
+    )
+
+    beam(
+      e,
+      p3(2.62, -0.31, SIGN_BOTTOM + 0.62),
+      p3(2.95, -0.31, SIGN_BOTTOM + 1.45),
+      0.025,
+      @white
+    )
+
+    g
+  end
+
+  # --------------------------------------------------------------
+  # DEN CHIEU SANG
+  # --------------------------------------------------------------
+
+  def build_lights(parent)
+    g = make_group(parent, '09 - Billboard Floodlights')
+    e = g.entities
+
+    count = 9
+    x1 = -SIGN_WIDTH / 2.0 + 0.25
+    x2 = SIGN_WIDTH / 2.0 - 0.25
+    z = SIGN_BOTTOM + SIGN_HEIGHT + 0.05
+
+    0.upto(count - 1) do |i|
+      x = x1 + (x2 - x1) * i / (count - 1).to_f
+
+      # Chan den
+      box(
+        e,
+        x - 0.055,
+        0.05,
+        z,
+        0.11,
+        0.10,
+        0.055,
+        @lamp
+      )
+
+      # Can den huong ra truoc pano
+      beam(
+        e,
+        p3(x, 0.08, z + 0.04),
+        p3(x, -0.30, z + 0.20),
+        0.025,
+        @lamp
+      )
+
+      # Than den
+      box(
+        e,
+        x - 0.09,
+        -0.36,
+        z + 0.12,
+        0.18,
+        0.10,
+        0.055,
+        @lamp
+      )
+
+      # Mat den
+      box(
+        e,
+        x - 0.075,
+        -0.375,
+        z + 0.10,
+        0.15,
+        0.018,
+        0.025,
+        @lamp_glow
+      )
+    end
+
+    g
+  end
+
+  # --------------------------------------------------------------
+  # CAMERA
+  # --------------------------------------------------------------
+
+  def set_camera
+    model = Sketchup.active_model
+    view = model.active_view
+
+    eye = p3(11.0, -23.0, 15.0)
+    target = p3(0.0, 0.0, SIGN_BOTTOM + SIGN_HEIGHT / 2.0)
+
+    camera = Sketchup::Camera.new(eye, target, v3(0, 0, 1))
+    camera.perspective = true
+
+    view.camera = camera
+    view.zoom_extents
+    view.invalidate
+  end
+
+  # --------------------------------------------------------------
+  # TAO TOAN BO MO HINH
+  # --------------------------------------------------------------
+
+  def build
+    model = Sketchup.active_model
+
+    model.start_operation('Create Outdoor Billboard', true)
+
+    begin
+      setup_materials
+
+      root = make_group(
+        model.active_entities,
+        'OUTDOOR BILLBOARD - DOUBLE STEEL POSTS'
+      )
+
+      build_foundations(root) if CREATE_FOUNDATIONS
+      build_panel_frame(root)
+      build_lower_truss(root)
+      build_side_trusses(root)
+      build_billboard_face(root)
+      build_advertising_text(root) if CREATE_RAISED_TEXT
+      build_catwalk(root) if CREATE_CATWALK
+      build_ladder(root) if CREATE_LADDER
+      build_lights(root) if CREATE_LIGHTS
+
+      model.commit_operation
+      set_camera
+
+      puts '============================================'
+      puts 'OUTDOOR BILLBOARD CREATED SUCCESSFULLY'
+      puts "Pano: #{SIGN_WIDTH} x #{SIGN_HEIGHT} m"
+      puts "Bottom elevation: #{SIGN_BOTTOM} m"
+      puts 'Components: foundations, steel posts, trusses,'
+      puts 'catwalk, ladder, advertising panel and lights.'
+      puts '============================================'
+
+    rescue StandardError => error
+      model.abort_operation
+      puts "BILLBOARD ERROR: #{error.message}"
+      puts error.backtrace
+    end
+  end
+end
+
+OutdoorBillboardRed.build

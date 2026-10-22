@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ChatGPT AI Bridge v4.0</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { width: 380px; background: #0f172a; color: #f8fafc; padding: 16px; font-size: 13px; }
+    .header { display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #1e293b; padding-bottom: 12px; margin-bottom: 14px; }
+    .title-group { display: flex; align-items: center; gap: 8px; }
+    .icon { width: 28px; height: 28px; background: linear-gradient(135deg, #3b82f6, #8b5cf6); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 14px; }
+    .title { font-size: 14px; font-weight: 700; color: #ffffff; }
+    .badge-v { font-size: 10px; background: #2563eb; color: #fff; padding: 2px 6px; border-radius: 10px; margin-left: 4px; }
+    .status-badge { display: flex; align-items: center; gap: 5px; font-size: 11px; padding: 3px 8px; border-radius: 12px; background: #1e293b; color: #94a3b8; }
+    .status-dot { width: 8px; height: 8px; border-radius: 50%; background: #10b981; }
+
+    .form-group { margin-bottom: 12px; }
+    .label { display: flex; justify-content: space-between; font-size: 11px; font-weight: 600; color: #94a3b8; margin-bottom: 5px; }
+    .label span.hint { font-weight: 400; color: #64748b; font-size: 10px; }
+    .input-box { width: 100%; background: #1e293b; border: 1px solid #334155; border-radius: 8px; color: #f8fafc; padding: 8px 10px; font-size: 13px; outline: none; transition: border-color 0.2s; }
+    .input-box:focus { border-color: #3b82f6; }
+    .input-box.highlight { border-color: #3b82f6; background: rgba(59, 130, 246, 0.05); font-weight: 600; color: #60a5fa; }
+
+    .target-pc-card { background: rgba(59, 130, 246, 0.08); border: 1px dashed rgba(59, 130, 246, 0.4); border-radius: 10px; padding: 10px 12px; margin-bottom: 14px; }
+    .target-pc-desc { font-size: 11px; color: #93c5fd; margin-top: 4px; line-height: 1.4; }
+
+    .preset-group { display: flex; gap: 6px; margin-top: 6px; }
+    .preset-btn { flex: 1; padding: 4px 6px; font-size: 10px; font-weight: 600; background: #1e293b; color: #94a3b8; border: 1px solid #334155; border-radius: 6px; cursor: pointer; transition: all 0.2s; text-align: center; }
+    .preset-btn:hover { background: #3b82f6; color: #ffffff; border-color: #3b82f6; }
+
+    .toggle-row { display: flex; align-items: center; justify-content: space-between; background: #1e293b; border-radius: 8px; padding: 8px 12px; margin-bottom: 12px; border: 1px solid #334155; }
+    .toggle-label { font-weight: 600; font-size: 12px; }
+    .switch { position: relative; display: inline-block; width: 36px; height: 20px; }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #475569; transition: .3s; border-radius: 20px; }
+    .slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px; background-color: white; transition: .3s; border-radius: 50%; }
+    input:checked + .slider { background-color: #10b981; }
+    input:checked + .slider:before { transform: translateX(16px); }
+
+    .caps-box { background: #1e293b; border: 1px solid #334155; border-radius: 8px; padding: 8px 12px; margin-bottom: 14px; }
+    .caps-title { font-size: 11px; font-weight: 600; color: #94a3b8; margin-bottom: 6px; }
+    .caps-list { display: flex; flex-direction: column; gap: 6px; }
+    .caps-item { display: flex; align-items: center; gap: 8px; font-size: 12px; color: #cbd5e1; cursor: pointer; }
+    .caps-item input { accent-color: #3b82f6; cursor: pointer; }
+
+    .btn-group { display: flex; flex-direction: column; gap: 8px; margin-top: 14px; }
+    .btn { width: 100%; padding: 9px; border-radius: 8px; border: none; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 6px; }
+    .btn-primary { background: #2563eb; color: #ffffff; }
+    .btn-primary:hover { background: #1d4ed8; }
+    .btn-secondary { background: #334155; color: #cbd5e1; border: 1px solid #475569; }
+    .btn-secondary:hover { background: #475569; color: #ffffff; }
+    .btn-clean { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
+    .btn-clean:hover { background: rgba(239, 68, 68, 0.25); color: #fca5a5; }
+
+    .info-footer { margin-top: 14px; padding-top: 10px; border-top: 1px solid #1e293b; display: flex; justify-content: space-between; font-size: 10px; color: #64748b; }
+    .toast { display: none; margin-top: 8px; padding: 7px 10px; border-radius: 6px; font-size: 11px; text-align: center; }
+    .toast.success { display: block; background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); }
+    .toast.error { display: block; background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.4); }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="title-group">
+      <div class="icon">AI</div>
+      <div>
+        <div class="title">ChatGPT Studio Bridge <span class="badge-v">v4.0</span></div>
+      </div>
+    </div>
+    <div class="status-badge" id="header-status">
+      <span class="status-dot" id="status-dot"></span>
+      <span id="status-text">Online</span>
+    </div>
+  </div>
+
+  <div style="background: rgba(139, 92, 246, 0.15); border: 1px solid rgba(139, 92, 246, 0.4); border-radius: 8px; padding: 7px 10px; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; font-size: 11px;">
+    <span style="color: #c4b5fd; font-weight: 600;">⚡ Giao thức Độc Quyền:</span>
+    <span style="background: #7c3aed; color: #fff; padding: 2px 8px; border-radius: 6px; font-family: monospace; font-size: 11px; font-weight: bold;">UB4-REQ (v4.0)</span>
+  </div>
+
+  <!-- TARGET PC ROUTING -->
+  <div class="target-pc-card">
+    <div class="label">
+      <span>ĐỊNH DANH MÁY TÍNH (TARGET PC)</span>
+      <span class="hint">Server gọi đích danh</span>
+    </div>
+    <input type="text" id="pc-name" class="input-box highlight" placeholder="VD: PC_MAIN, PC_DESIGN_01...">
+    <div class="target-pc-desc">
+      💡 Khi Server giao việc chỉ định <strong>Target PC</strong> này, chỉ duy nhất máy này nhận việc. Nếu không chỉ định, việc sẽ đưa vào hàng đợi chung.
+    </div>
+  </div>
+
+  <div class="form-group">
+    <div class="label">
+      <span>TÊN WORKER HIỂN THỊ</span>
+    </div>
+    <input type="text" id="worker-name" class="input-box" placeholder="VD: Máy Bửu - Thiết Kế">
+  </div>
+
+  <div class="form-group">
+    <div class="label">
+      <span>SERVER URL (HỆ THỐNG MÁY CHỦ GENAI / VPS)</span>
+    </div>
+    <input type="text" id="server-url" class="input-box" placeholder="https://genai.toolxprint.com">
+    <div class="preset-group">
+      <button type="button" class="preset-btn" data-url="https://genai.toolxprint.com">⚡ ToolX GenAI</button>
+      <button type="button" class="preset-btn" data-url="http://localhost:5000">💻 Local (5000)</button>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <div class="label">
+      <span>NHÃN TÀI KHOẢN CHATGPT</span>
+    </div>
+    <input type="text" id="account-label" class="input-box" placeholder="ChatGPT Plus 1">
+  </div>
+
+  <div class="toggle-row">
+    <span class="toggle-label">Tự Động Nhận Việc (Auto-Poll)</span>
+    <label class="switch">
+      <input type="checkbox" id="auto-poll" checked>
+      <span class="slider"></span>
+    </label>
+  </div>
+
+  <div class="caps-box">
+    <div class="caps-title">KHẢ NĂNG XỬ LÝ (CAPABILITIES)</div>
+    <div class="caps-list">
+      <label class="caps-item">
+        <input type="checkbox" id="cap-image" checked>
+        <span>🎨 Tạo ảnh DALL-E & Sửa ảnh Inpainting</span>
+      </label>
+      <label class="caps-item">
+        <input type="checkbox" id="cap-vision" checked>
+        <span>👁️ Phân tích Vision & Truy vấn nội dung</span>
+      </label>
+      <label class="caps-item">
+        <input type="checkbox" id="cap-ruby" checked>
+        <span>📐 Trích xuất mã Ruby SketchUp 3D (.rb) & BOM</span>
+      </label>
+    </div>
+  </div>
+
+  <div id="toast-msg" class="toast"></div>
+
+  <div class="btn-group">
+    <button class="btn btn-primary" id="btn-save">💾 Lưu Cấu Hình</button>
+    <button class="btn btn-clean" id="btn-clean-newchat">🧹 Mở Chat Mới Sạch (Reset Session)</button>
+    <button class="btn btn-secondary" id="btn-test-ping">⚡ Kiểm Tra Kết Nối Server</button>
+  </div>
+
+  <div class="info-footer">
+    <span id="footer-wid">ID: ...</span>
+    <span>Auto-Clean Session · Target PC Routing</span>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
