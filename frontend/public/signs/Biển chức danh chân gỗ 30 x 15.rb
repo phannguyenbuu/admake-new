@@ -125,6 +125,8 @@ module BangVinhDanh3D
   def border_frame(entities, x, y, z, w, h, t, material, name)
     
   def border_frame(entities, x, y, z, w, h, t, material, name)
+    
+  def border_frame(entities, x, y, z, w, h, t, material, name)
     solid_box(entities, "#{name} - Tren", x, y, z+h/2-t/2, w, t, t, material)
     solid_box(entities, "#{name} - Duoi", x, y, z-h/2+t/2, w, t, t, material)
     solid_box(entities, "#{name} - Trai", x-w/2+t/2, y, z, t, t, h-2*t, material)

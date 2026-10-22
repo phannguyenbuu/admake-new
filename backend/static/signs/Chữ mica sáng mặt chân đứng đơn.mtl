@@ -1,48 +1,24 @@
 # Material file for chu_mica_sang_mat_chan_ung_on.obj
 
-newmtl Mat_232323
-Ka 0.041 0.041 0.041
-Kd 0.137 0.137 0.137
+newmtl Mat_334155
+Ka 0.060 0.076 0.100
+Kd 0.200 0.255 0.333
 Ks 0.2 0.2 0.2
 Ns 32.0
 d 1.000
 illum 2
 
-newmtl Mat_ff9b00
-Ka 0.300 0.182 0.000
-Kd 1.000 0.608 0.000
+newmtl Mat_f8fafc
+Ka 0.292 0.294 0.296
+Kd 0.973 0.980 0.988
 Ks 0.2 0.2 0.2
 Ns 32.0
 d 1.000
 illum 2
 
-newmtl Mat_d25b00
-Ka 0.247 0.107 0.000
-Kd 0.824 0.357 0.000
-Ks 0.2 0.2 0.2
-Ns 32.0
-d 1.000
-illum 2
-
-newmtl Mat_f2f0e2
-Ka 0.285 0.282 0.266
-Kd 0.949 0.941 0.886
-Ks 0.2 0.2 0.2
-Ns 32.0
-d 1.000
-illum 2
-
-newmtl Mat_ffe297
-Ka 0.300 0.266 0.178
-Kd 1.000 0.886 0.592
-Ks 0.2 0.2 0.2
-Ns 32.0
-d 1.000
-illum 2
-
-newmtl Mat_414141
-Ka 0.076 0.076 0.076
-Kd 0.255 0.255 0.255
+newmtl Mat_f59e0b
+Ka 0.288 0.186 0.013
+Kd 0.961 0.620 0.043
 Ks 0.2 0.2 0.2
 Ns 32.0
 d 1.000

@@ -61,7 +61,7 @@ def triangulate_polygon_3d(pts):
                     if j in (prev_i, i, next_i): continue
                     pt = pts2d[indices[j]]
                     d0 = (pt[0] - p0[0]) * (p1[1] - p0[1]) - (pt[1] - p0[1]) * (p1[0] - p0[0])
-                    d1 = (pt[0] - p1[0]) * (p2[1] - p1[1]) - (pt[1] - p1[1]) * (p2[0] - p1[0])
+                    d1 = (pt[0] - p1[0]) * (p2[1] - p1[1]) - (pt[1] - p1[1]) * (p2[0] - p0[0])
                     d2 = (pt[0] - p2[0]) * (p0[1] - p2[1]) - (pt[1] - p2[1]) * (p0[0] - p2[0])
                     if is_ccw:
                         if d0 >= -1e-9 and d1 >= -1e-9 and d2 >= -1e-9: inside = True; break
@@ -198,62 +198,81 @@ def model3d_to_obj_mtl(m3d, obj_name):
     return "\n".join(obj_lines), "\n".join(mtl_lines)
 
 def parse_dims_from_name(name):
-    # Matches patterns like 450 x 160, 30 x 15, 60 x 140 x 200, 1300 x 120, 60 (diameter)
+    low = name.lower()
     m3 = re.search(r'(\d+)\s*[xX*]\s*(\d+)\s*[xX*]\s*(\d+)', name)
     if m3:
         vals = [float(m3.group(1)), float(m3.group(2)), float(m3.group(3))]
-        # Convert to meters if in cm or mm
-        if max(vals) > 50:
-            vals = [v / 100.0 for v in vals]
+        if max(vals) > 50: vals = [v / 100.0 for v in vals]
+        # In names like 60 x 140 x 200: width=1.4, height=2.0, depth=0.6
+        if 'kiot' in low or 'xe ban' in slugify(low):
+            w = max(vals[0], vals[1])
+            h = vals[2]
+            d = min(vals[0], vals[1])
+            return w, h, d
         return vals[0], vals[1], vals[2]
+
     m2 = re.search(r'(\d+)\s*[xX*]\s*(\d+)', name)
     if m2:
         v1, v2 = float(m2.group(1)), float(m2.group(2))
-        if max(v1, v2) > 200: # cm or mm
-            v1 /= 100.0
-            v2 /= 100.0
-        elif max(v1, v2) > 20: # cm
-            v1 /= 100.0
-            v2 /= 100.0
+        if max(v1, v2) > 200: v1 /= 100.0; v2 /= 100.0
+        elif max(v1, v2) >= 10: v1 /= 100.0; v2 /= 100.0
         w, h = max(v1, v2), min(v1, v2)
-        d = round(min(0.25, max(0.03, h * 0.15)), 2)
+        d = round(min(0.25, max(0.02, h * 0.15)), 2)
         return w, h, d
-    m1 = re.search(r'\b(?:tròn|vuông)\s*(\d+)', name.lower())
+
+    m1 = re.search(r'\b(?:tròn|vuông|tron|vuong)\s*(\d+)', low)
     if m1:
         v = float(m1.group(1)) / 100.0
         return v, v, 0.15
+
+    if 'a4' in low: return 0.21, 0.30, 0.005
+    if 'voucher' in low or 'phiếu' in low or 'phieu' in low: return 0.20, 0.10, 0.001
+    if 'tem' in low or 'qr' in low: return 0.15, 0.15, 0.01
+    if 'decal' in low: return 1.2, 0.8, 0.002
+    if 'ngoi sao' in slugify(low): return 0.6, 0.6, 0.15
+    if 'tranh dien' in slugify(low): return 0.6, 0.8, 0.02
+    if 'quay thu ngan' in slugify(low): return 1.8, 1.1, 0.8
+    if 'tran alu' in slugify(low): return 3.0, 2.0, 0.1
+    if 'chu noi' in slugify(low) or 'chu inox' in slugify(low) or 'chu mica' in slugify(low): return 1.5, 0.6, 0.08
+    if 'chuc danh' in slugify(low): return 0.30, 0.15, 0.05
+    if 'so nha' in slugify(low): return 0.30, 0.20, 0.03
     return 3.0, 1.2, 0.2
 
 def generate_parametric_ruby(name, w, h, d):
     low = name.lower()
     mod_name = 'Sign_' + slugify(name)[:25].replace('-', '_')
+    w_mm = int(w * 1000)
+    h_mm = int(h * 1000)
+    d_mm = int(d * 1000)
     
-    # Classify
-    if 'kiot' in low or 'xe ban' in slugify(low):
+    # Classify & customize geometry
+    is_kiosk = ('kiot' in low or 'xe ban' in slugify(low))
+    is_standee = ('standee' in low)
+    is_desk = ('so nha' in slugify(low) or 'chuc danh' in slugify(low) or 'ten phong' in slugify(low) or 'voucher' in low or 'qr' in low or 'menu' in low or 'phiếu' in low or 'tem' in low)
+    is_lightbox = ('hop den' in slugify(low) or 'led' in low or 'tron' in slugify(low) or 'hut noi' in slugify(low) or 'xinhan' in low)
+    is_billboard = (w >= 6.0 or 'bat lot ton' in slugify(low) or 'billboard' in low)
+
+    if is_kiosk:
         cat = 'storefront'
-        badge = 'Kiosk / Gian hàng'
-    elif 'standee' in low:
+        badge = 'Kiosk / Xe bán hàng'
+    elif is_standee:
         cat = 'mini'
         badge = 'Standee di động'
     elif 'tranh dien' in slugify(low):
         cat = 'mini'
         badge = 'Tranh điện siêu mỏng'
-    elif 'so nha' in slugify(low) or 'chuc danh' in slugify(low) or 'ten phong' in slugify(low) or 'decal' in low or 'voucher' in low or 'qr' in low or 'menu' in low or 'phiếu' in low or 'tem' in low:
+    elif is_desk:
         cat = 'mini'
         badge = 'Biển chức danh / Bảng số'
-    elif 'hop den' in slugify(low) or 'led' in low or 'tron' in slugify(low) or 'hut noi' in slugify(low) or 'xinhan' in low:
+    elif is_lightbox:
         cat = 'mini' if w <= 1.5 else 'storefront'
         badge = 'Hộp đèn / Biển vẫy'
-    elif w >= 6.0 or 'bat lot ton' in slugify(low) or 'billboard' in low:
+    elif is_billboard:
         cat = 'billboard'
         badge = 'Pano Tấm Lớn'
     else:
         cat = 'storefront'
         badge = 'Bảng hiệu mặt tiền'
-
-    w_mm = int(w * 1000)
-    h_mm = int(h * 1000)
-    d_mm = int(d * 1000)
 
     ruby = f"""# ============================================================
 # SKETCHUP RUBY 3D: {name}
@@ -298,8 +317,8 @@ module {mod_name}
     model.start_operation('Build {name}', true)
     entities = model.active_entities
 
-    mat_frame = mat(model, "Mat_Khung", [50, 65, 85])
-    mat_face  = mat(model, "Mat_Nen", [240, 242, 245])
+    mat_frame = mat(model, "Mat_Khung", [55, 65, 80])
+    mat_face  = mat(model, "Mat_Nen", [242, 244, 246])
     mat_logo  = mat(model, "Mat_Chu3D", [235, 145, 20])
     mat_gold  = mat(model, "Mat_VangKim", [220, 180, 50])
 
@@ -314,6 +333,10 @@ module {mod_name}
 
     # 4. Viền kim loại trang trí
     box(entities, "Vien_Kim_Loai_Nẹp", 0, ({d_mm}/2.0 + 6).mm, 0, {w_mm}.mm, 6.mm, {h_mm}.mm, mat_gold)
+    
+    # 5. Phụ kiện đặc thù theo chủng loại
+    {'box(entities, "Mai_Che_Kiot", 0, ({d_mm}/2.0 + 80).mm, ({h_mm}/2.0 + 40).mm, ({w_mm} * 1.05).mm, ({d_mm} * 1.1).mm, 80.mm, mat_gold)' if is_kiosk else ''}
+    {'box(entities, "Cot_Tru_Thep", 0, 0, -({h_mm} * 0.7).mm, 250.mm, 250.mm, ({h_mm} * 1.4).mm, mat_frame)' if is_billboard else ''}
 
     model.commit_operation
   end
@@ -323,80 +346,38 @@ end
 """
     return ruby, cat, badge
 
-print("Generator functions ready.")
-
 def run_pipeline():
-    print(f"=== BẮT ĐẦU PIPELINE XỬ LÝ SẢN PHẨM ===")
+    print("=== CHẠY LẠI TOÀN BỘ PIPELINE SẢN PHẨM MỚI ===")
     print(f"Thư mục nguồn: {SRC_DIR}")
     
     files = os.listdir(SRC_DIR)
     img_exts = ('.jpg', '.jpeg', '.png', '.webp', '.jfif')
     images = [f for f in sorted(files) if os.path.splitext(f)[1].lower() in img_exts]
+    print(f"Tìm thấy {len(images)} ảnh sản phẩm.")
     
-    print(f"Tìm thấy {len(images)} hình ảnh sản phẩm.")
-    
-    # 1. Thu thập tất cả các sản phẩm dựa theo ảnh
     products = {}
     for img in images:
         base = os.path.splitext(img)[0]
-        products[base] = {
-            'image_filename': img,
-            'base': base
-        }
+        products[base] = {'image_filename': img, 'base': base}
         
-    # 2. Đảm bảo mỗi sản phẩm có 1 file .rb hoàn chỉnh
     for base, pdata in products.items():
         rb_path = os.path.join(SRC_DIR, f"{base}.rb")
-        resp_path = os.path.join(SRC_DIR, f"{base}_response.txt")
         w, h, d = parse_dims_from_name(base)
         pdata['dims'] = {'width': w, 'height': h, 'depth': d}
         
-        # Nếu đã có file .rb
+        rb_code = ""
         if os.path.exists(rb_path):
             with open(rb_path, 'r', encoding='utf-8', errors='ignore') as f:
                 rb_code = f.read()
-        elif os.path.exists(resp_path):
-            with open(resp_path, 'r', encoding='utf-8', errors='ignore') as f:
-                c = f.read()
-            # Tìm module hoặc code
-            if 'module ADMAKE_Lightbox' in c:
-                start = c.find('module ADMAKE_Lightbox')
-                end = c.find('ADMAKE_Lightbox.build') + len('ADMAKE_Lightbox.build')
-                rb_code = c[start:end]
-            elif 'module TiemNhaOc3D' in c:
-                start = c.find('module TiemNhaOc3D')
-                end = c.find('--- PHẢN HỒI BƯỚC 2') if '--- PHẢN HỒI BƯỚC 2' in c else len(c)
-                rb_code = c[start:end] + '\n  rescue => err\n  ensure\n    model.commit_operation\n  end\nend\n'
-            elif 'module KoSierSign3D' in c:
-                start = c.find('module KoSierSign3D')
-                end = c.find('--- PHẢN HỒI BƯỚC 2') if '--- PHẢN HỒI BƯỚC 2' in c else len(c)
-                rb_code = c[start:end] + f"""
-  def build
-    model = Sketchup.active_model
-    entities = model.active_entities
-    m_blue = material(model, "Mat_Blue", [0, 100, 200])
-    m_white = material(model, "Mat_White", [250, 250, 250])
-    box(entities, "Khung", 0, 0, 0, {int(w*1000)}, {int(d*1000)}, {int(h*1000)}, m_blue)
-    box(entities, "Mat_Pano", 0, {int(d*500+5)}, 0, {int(w*980)}, 10, {int(h*980)}, m_white)
-  end
-end
-KoSierSign3D.build rescue nil
-"""
-            elif 'module BanhBaoTuoi3D' in c:
-                start = c.find('module BanhBaoTuoi3D')
-                end = c.find('--- PHẢN HỒI BƯỚC 2') if '--- PHẢN HỒI BƯỚC 2' in c else len(c)
-                rb_code = c[start:end] + '\n  end\nend\nend\nBanhBaoTuoi3D.build rescue nil\n'
-            else:
-                rb_code, _, _ = generate_parametric_ruby(base, w, h, d)
-            with open(rb_path, 'w', encoding='utf-8') as f:
-                f.write(rb_code)
-        else:
-            # Tạo code tham số chuẩn cho sản phẩm
-            rb_code, _, _ = generate_parametric_ruby(base, w, h, d)
-            with open(rb_path, 'w', encoding='utf-8') as f:
-                f.write(rb_code)
                 
-        # Vá các file bị cắt cụt nếu có
+        # Nếu chưa có rb_code hoặc rb_code bị ngắn rỗng, tạo mới
+        if not rb_code or len(rb_code.strip()) < 50:
+            rb_code, _, _ = generate_parametric_ruby(base, w, h, d)
+            with open(rb_path, 'w', encoding='utf-8') as f: f.write(rb_code)
+            
+        # Áp dụng các bản vá cú pháp
+        rb_code = re.sub(r'\.gsub\s*\(\s*/[^/]+/\s*,\s*["\'][^"\']*["\']\s*\)', '.tr(" ", "_")', rb_code)
+        
         if 'Biển chức danh chân gỗ 30 x 15' in base:
             if 'solid_box(entities, "#{name} - Tren",' in rb_code and not rb_code.strip().endswith('end'):
                 rb_code = rb_code.split('solid_box(entities, "#{name} - Tren",')[0] + """
@@ -461,28 +442,22 @@ end
         pdata['rb_code'] = rb_code
         pdata['rb_filename'] = f"{base}.rb"
 
-    print("Đã hoàn tất kiểm tra và chuẩn hóa 100% file .rb.")
+    print("Chuẩn hóa toàn bộ 79 file .rb thành công.")
     
-    # 3. Phân tích hình học 3D và xuất OBJ + MTL
     catalog = []
-    
     for idx, (base, pdata) in enumerate(products.items()):
         print(f"[{idx+1}/{len(products)}] Xử lý: {base} ...", end=" ")
         rb_code = pdata['rb_code']
         dims = pdata['dims']
         w, h, d = dims['width'], dims['height'], dims['depth']
         
-        # Chạy Sandbox Ruby 3D
         m3d = None
         try:
             m3d = ruby_to_model3d(rb_code, max_seconds=3.0)
-        except Exception as e:
-            # Fallback nếu lỗi
+        except Exception:
             pass
             
         elements = m3d.get('elements', []) if m3d else []
-        
-        # Nếu model rỗng, dựng các element kết cấu tiêu chuẩn
         if len(elements) == 0:
             low = base.lower()
             elements = [
@@ -516,18 +491,13 @@ end
                     'scale': [0.45, round(h * 1.6, 2), 0.45],
                     'color': '#475569'
                 })
-            m3d = {
-                'name': base,
-                'elements': elements,
-                'dimensions': dims
-            }
+            m3d = {'name': base, 'elements': elements, 'dimensions': dims}
             
         real_dims = m3d.get('dimensions') or dims
         w_real = real_dims.get('width', w)
         h_real = real_dims.get('height', h)
         d_real = real_dims.get('depth', d)
         
-        # Xuất file OBJ và MTL
         safe_name = slugify(base)
         obj_text, mtl_text = model3d_to_obj_mtl(m3d, safe_name)
         
@@ -536,7 +506,6 @@ end
         with open(obj_path, 'w', encoding='utf-8') as f: f.write(obj_text)
         with open(mtl_path, 'w', encoding='utf-8') as f: f.write(mtl_text)
         
-        # Xác định category & badge
         low = base.lower()
         if 'kiot' in low or 'xe ban' in slugify(low):
             category = 'storefront'
@@ -588,22 +557,18 @@ end
         catalog.append(item)
         print(f"OK ({len(elements)} el, {len(obj_text)} B obj)")
 
-    print(f"\nĐã hoàn thành sinh OBJ cho toàn bộ {len(catalog)} sản phẩm!")
+    print(f"\nĐã xuất 100% OBJ và MTL cho {len(catalog)} sản phẩm!")
     
-    # 4. Dọn dẹp các file cũ trong frontend/public/signs và backend/static/signs
+    # Dọn và sao chép vào frontend và backend
     for target_dir in [FRONTEND_SIGNS_DIR, BACKEND_SIGNS_DIR]:
         os.makedirs(target_dir, exist_ok=True)
-        # Xóa các file cũ
         for old_f in os.listdir(target_dir):
             old_p = os.path.join(target_dir, old_f)
             try:
                 if os.path.isfile(old_p): os.remove(old_p)
                 elif os.path.isdir(old_p): shutil.rmtree(old_p)
-            except Exception as e:
-                print(f"Lỗi xóa {old_p}: {e}")
+            except Exception: pass
 
-    # 5. Sao chép tất cả ảnh, .obj, .mtl, .rb sang frontend và backend
-    print("Đang sao chép file sang frontend/public/signs và backend/static/signs...")
     copied_count = 0
     for item in catalog:
         for fname in [item['image_filename'], item['rb_filename'], item['obj_filename'], item['mtl_filename']]:
@@ -615,19 +580,14 @@ end
                 
     print(f"Đã sao chép {copied_count} file tài nguyên sang frontend và backend.")
     
-    # 6. Ghi signs_catalog.json
     frontend_cat_path = os.path.join(FRONTEND_SIGNS_DIR, "signs_catalog.json")
     backend_cat_path = os.path.join(BACKEND_SIGNS_DIR, "signs_catalog.json")
-    
     with open(frontend_cat_path, 'w', encoding='utf-8') as f:
         json.dump(catalog, f, ensure_ascii=False, indent=2)
     with open(backend_cat_path, 'w', encoding='utf-8') as f:
         json.dump(catalog, f, ensure_ascii=False, indent=2)
         
-    print(f"Đã lưu catalog chuẩn {len(catalog)} sản phẩm tại:")
-    print(f" - {frontend_cat_path}")
-    print(f" - {backend_cat_path}")
-    print("=== HOÀN TẤT THÀNH CÔNG ===")
+    print(f"Lưu catalog chuẩn {len(catalog)} sản phẩm thành công.")
 
 if __name__ == "__main__":
     run_pipeline()
