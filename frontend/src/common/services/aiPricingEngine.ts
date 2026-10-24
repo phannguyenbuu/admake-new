@@ -68,18 +68,32 @@ export interface SignboardQuoteResult {
 
 export const PRICING_STANDARDS = {
   iron_bars: [
+    { key: "vuong_14", name: "Sắt vuông 14x14 (1.0mm)", unitPrice: 53000, length: 6, unit: "cây (6m)" },
+    { key: "vuong_16", name: "Sắt vuông 16x16 (1.0mm)", unitPrice: 60000, length: 6, unit: "cây (6m)" },
     { key: "vuong_20", name: "Sắt vuông 20x20 (1.0mm)", unitPrice: 75000, length: 6, unit: "cây (6m)" },
     { key: "vuong_25", name: "Sắt vuông 25x25 (1.0mm)", unitPrice: 95000, length: 6, unit: "cây (6m)" },
     { key: "vuong_30", name: "Sắt vuông 30x30 (1.2mm)", unitPrice: 135000, length: 6, unit: "cây (6m)" },
+    { key: "hop_20x40", name: "Sắt hộp 20x40 (1.2mm)", unitPrice: 145000, length: 6, unit: "cây (6m)" },
+    { key: "vuong_40", name: "Sắt vuông 40x40 (1.2mm)", unitPrice: 180000, length: 6, unit: "cây (6m)" },
+    { key: "hop_30x60", name: "Sắt hộp 30x60 (1.4mm)", unitPrice: 240000, length: 6, unit: "cây (6m)" },
+    { key: "vuong_50", name: "Sắt vuông 50x50 (1.4mm)", unitPrice: 265000, length: 6, unit: "cây (6m)" },
+    { key: "hop_40x80", name: "Sắt hộp 40x80 (1.4mm)", unitPrice: 320000, length: 6, unit: "cây (6m)" },
+    { key: "hop_50x100", name: "Sắt hộp 50x100 (1.4mm)", unitPrice: 410000, length: 6, unit: "cây (6m)" },
   ],
   surfaces: [
-    { key: "bat_hiflex", name: "Bạt thường (Hiflex)", type: "canvas", unitPrice: 27000, unit: "m²", desc: "Giá rẻ, thông dụng" },
-    { key: "bat_2da", name: "Bạt 2 da (Đế xám chống xuyên sáng)", type: "canvas", unitPrice: 45000, unit: "m²", desc: "Chống xuyên sáng, bền" },
-    { key: "bat_khong_gan_uv", name: "Bạt không gân in UV", type: "canvas", unitPrice: 170000, unit: "m²", desc: "Mịn đẹp, in UV sắc nét" },
+    { key: "bat_hiflex", name: "Bạt thường (Hiflex)", type: "canvas", unitPrice: 28000, unit: "m²", desc: "Dày 3.2 zem, thông dụng" },
+    { key: "bat_2da", name: "Bạt 2 da (Đế xám chống xuyên sáng)", type: "canvas", unitPrice: 45000, unit: "m²", desc: "Chống xuyên sáng, bền đẹp" },
+    { key: "bat_khong_gan_uv", name: "Bạt không gân in UV", type: "canvas", unitPrice: 170000, unit: "m²", desc: "Mịn đẹp, in UV sắc nét cao cấp" },
     { key: "bat_3m_uv", name: "Bạt 3M in UV", type: "canvas", unitPrice: 450000, unit: "m²", desc: "Cao cấp chuẩn thương hiệu lớn" },
-    { key: "alu_3mm", name: "Tấm Alu (3mm 0.10)", type: "sheet", unitPrice: 480000, unit: "tấm", desc: "Khổ 1.22m x 2.44m" },
-    { key: "alu_guong_vang", name: "Tấm Alu đồng gương vàng (3mm)", type: "sheet", unitPrice: 480000, unit: "tấm", is_mirror: true, desc: "Bóng gương sang trọng" },
-    { key: "mica_2_3mm", name: "Tấm Mica (2mm/3mm)", type: "sheet", unitPrice: 690000, unit: "tấm", desc: "Khổ 1.22m x 2.44m" },
+    { key: "decal_sua", name: "Decal sữa dán ngoài trời", type: "canvas", unitPrice: 75000, unit: "m²", desc: "Bám dính tốt, in KTS sắc nét" },
+    { key: "decal_trong", name: "Decal trong ngoài trời", type: "canvas", unitPrice: 75000, unit: "m²", desc: "Nhìn xuyên suốt, sang trọng" },
+    { key: "decal_luoi", name: "Decal lưới chống chói", type: "canvas", unitPrice: 120000, unit: "m²", desc: "Dán kính, nhìn một chiều" },
+    { key: "alu_3mm", name: "Tấm Alu trong nhà PET (3mm)", type: "sheet", unitPrice: 480000, unit: "tấm", desc: "Khổ 1.22m x 2.44m" },
+    { key: "alu_pvdf_3mm", name: "Tấm Alu ngoài trời PVDF (3mm)", type: "sheet", unitPrice: 650000, unit: "tấm", desc: "Sơn PVDF chống chịu bão nắng" },
+    { key: "alu_guong_vang", name: "Tấm Alu đồng gương vàng (3mm)", type: "sheet", unitPrice: 480000, unit: "tấm", is_mirror: true, desc: "Bóng gương sang trọng (trong nhà)" },
+    { key: "mica_2_3mm", name: "Tấm Mica trong (2mm/3mm)", type: "sheet", unitPrice: 678000, unit: "tấm", desc: "Khổ 1.22m x 2.44m xuyên sáng tốt" },
+    { key: "fomex_5mm", name: "Tấm Fomex trắng (5mm)", type: "sheet", unitPrice: 245000, unit: "tấm", desc: "Khổ 1.22m x 2.44m đệm viền/nền" },
+    { key: "fomex_10mm", name: "Tấm Fomex trắng (10mm)", type: "sheet", unitPrice: 490000, unit: "tấm", desc: "Khổ 1.22m x 2.44m vách cứng" },
   ],
   sheet_iron_backing: { name: "Tôn lót mặt sau (Khổ 1.2m)", unitPrice: 75000, unit: "mét tới", width: 1.2 },
   aluminum_trim: { name: "V nhôm bọc viền (Cây 3m)", unitPrice: 35000, unit: "cây (3m)", length: 3 },
@@ -89,7 +103,35 @@ export const PRICING_STANDARDS = {
     transport: { name: "Vận chuyển", unitPrice: 200000, unit: "chuyến" },
     scaffolding: { name: "Dàn giáo", unitPrice: 50000, unit: "bộ/ngày" },
     canvas_seam_labor: { name: "Nhân công nối bạt", unitPrice: 15000, unit: "mét dài" },
-  }
+    crane_truck: { name: "Xe cẩu tải 5-10 tấn", unitPrice: 2500000, unit: "ca nửa ngày" },
+  },
+  fabrication: {
+    cnc_alu: { name: "Cắt CNC Alu", unitPrice: 80000, unit: "m" },
+    cnc_mica: { name: "Cắt CNC Mica", unitPrice: 80000, unit: "m" },
+    laser_inox: { name: "Cắt Laser sắt / inox", unitPrice: 6000, unit: "m" },
+    bend_profile: { name: "Chấn Alu / Tôn / Inox", unitPrice: 15000, unit: "m" },
+    weld_frame: { name: "Hàn khung sắt kẽm", unitPrice: 80000, unit: "m" },
+    letter_bending: { name: "Uốn chữ / viền / hộp", unitPrice: 50000, unit: "m" },
+    uv_printing: { name: "In UV phẳng/cuộn", unitPrice: 185000, unit: "m²" },
+    hiflex_printing: { name: "In bạt Hiflex", unitPrice: 40000, unit: "m²" },
+    decal_printing: { name: "In decal", unitPrice: 75000, unit: "m²" },
+    decal_pasting: { name: "Dán decal", unitPrice: 50000, unit: "m²" },
+    led_mounting: { name: "Gắn module / LED dây", unitPrice: 35000, unit: "m" },
+  },
+  led_modules: {
+    m2_mynice: { name: "LED Module M2 Mynice (1W 12V)", unitPrice: 1500, unit: "cái" },
+    m3_mynice: { name: "LED Module 3 bóng Mynice (1.5W 12V)", unitPrice: 2500, unit: "cái" },
+    m4_mynice: { name: "LED Module 4 bóng Mynice (2W 12V)", unitPrice: 3500, unit: "cái" },
+    led_neon_12v: { name: "LED Neon uốn dẻo 12V", unitPrice: 25000, unit: "mét" },
+    power_supply_12v: { name: "Nguồn 12V ngoài trời 33A 400W", unitPrice: 185000, unit: "cái" },
+    floodlight_50w: { name: "Đèn pha LED ngoài trời 50W", unitPrice: 160000, unit: "cái" },
+  },
+  special_packages: {
+    banner_package: { name: "Phướn dọc trọn gói (treo + tháo + giấy phép)", unitPrice: 350000, unit: "cái" },
+    house_number_mica: { name: "Bảng số nhà Mica xanh/trong", unitPrice: 70000, unit: "cái" },
+    house_number_inox: { name: "Bảng số nhà Inox ăn mòn", unitPrice: 350000, unit: "cái" },
+  },
+  overhead_rate: 0.10, // 10% chi phí cố định (điện, nước, khấu hao, vận hành)
 };
 
 export function formatVND(val: number): string {
@@ -255,6 +297,26 @@ export function calculateSignboardQuote(input: SignboardInput): SignboardQuoteRe
       level: "danger",
       title: "CẢNH BÁO TỪ CHỐI BẢO HÀNH",
       message: "CẢNH BÁO: Alu gương vàng ngoài trời KHÔNG BẢO HÀNH bay màu."
+    });
+  }
+
+  // Cảnh báo bảng pano lớn kết cấu nặng
+  if (area >= 15) {
+    warnings.push({
+      code: "PANO_HEAVY_STRUCTURE",
+      level: "warning",
+      title: "CẢNH BÁO PANO KẾT CẤU NẶNG",
+      message: `Bảng hiệu kích thước lớn (${area} m² ≥ 15m²). Bắt buộc bố trí thêm sắt xéo dằn hông chống rung lắc gió lốc (khoảng 30% lượng sắt mặt khung) và bố trí đèn pha chiếu sáng (khoảng cách 2m/đèn dọc chiều dài bảng).`
+    });
+  }
+
+  // Cảnh báo decal ngoài trời
+  if (surfaceSpec.key.startsWith("decal_") && location === "outdoor") {
+    warnings.push({
+      code: "OUTDOOR_DECAL_UNLAMINATED",
+      level: "warning",
+      title: "CẢNH BÁO CÁN MÀNG DECAL",
+      message: "Decal dán ngoài trời bắt buộc phải cán thêm màng bảo vệ (bóng hoặc mờ) để chống bay màu do tia UV và tránh trầy xước khi lau chùi."
     });
   }
 

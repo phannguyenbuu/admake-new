@@ -670,18 +670,32 @@ def call_openai_api(prompt_text, system_instruction=None, api_key=None):
 PRICING_STANDARDS = {
     "materials": {
         "iron_bars": {
+            "vuong_14": {"name": "Sắt vuông 14x14 (1.0mm)", "unit_price": 53000, "length": 6.0, "unit": "cây (6m)"},
+            "vuong_16": {"name": "Sắt vuông 16x16 (1.0mm)", "unit_price": 60000, "length": 6.0, "unit": "cây (6m)"},
             "vuong_20": {"name": "Sắt vuông 20x20 (1.0mm)", "unit_price": 75000, "length": 6.0, "unit": "cây (6m)"},
             "vuong_25": {"name": "Sắt vuông 25x25 (1.0mm)", "unit_price": 95000, "length": 6.0, "unit": "cây (6m)"},
             "vuong_30": {"name": "Sắt vuông 30x30 (1.2mm)", "unit_price": 135000, "length": 6.0, "unit": "cây (6m)"},
+            "hop_20x40": {"name": "Sắt hộp 20x40 (1.2mm)", "unit_price": 145000, "length": 6.0, "unit": "cây (6m)"},
+            "vuong_40": {"name": "Sắt vuông 40x40 (1.2mm)", "unit_price": 180000, "length": 6.0, "unit": "cây (6m)"},
+            "hop_30x60": {"name": "Sắt hộp 30x60 (1.4mm)", "unit_price": 240000, "length": 6.0, "unit": "cây (6m)"},
+            "vuong_50": {"name": "Sắt vuông 50x50 (1.4mm)", "unit_price": 265000, "length": 6.0, "unit": "cây (6m)"},
+            "hop_40x80": {"name": "Sắt hộp 40x80 (1.4mm)", "unit_price": 320000, "length": 6.0, "unit": "cây (6m)"},
+            "hop_50x100": {"name": "Sắt hộp 50x100 (1.4mm)", "unit_price": 410000, "length": 6.0, "unit": "cây (6m)"},
         },
         "surfaces": {
-            "bat_hiflex": {"name": "Bạt thường (Hiflex)", "type": "canvas", "unit_price": 27000, "unit": "m²"},
+            "bat_hiflex": {"name": "Bạt thường (Hiflex)", "type": "canvas", "unit_price": 28000, "unit": "m²"},
             "bat_2da": {"name": "Bạt 2 da (Đế xám chống xuyên sáng)", "type": "canvas", "unit_price": 45000, "unit": "m²"},
             "bat_khong_gan_uv": {"name": "Bạt không gân in UV", "type": "canvas", "unit_price": 170000, "unit": "m²"},
             "bat_3m_uv": {"name": "Bạt 3M in UV", "type": "canvas", "unit_price": 450000, "unit": "m²"},
-            "alu_3mm": {"name": "Tấm Alu (3mm 0.10)", "type": "sheet", "unit_price": 480000, "unit": "tấm", "sheet_w": 1.22, "sheet_h": 2.44},
+            "decal_sua": {"name": "Decal sữa dán ngoài trời", "type": "canvas", "unit_price": 75000, "unit": "m²"},
+            "decal_trong": {"name": "Decal trong ngoài trời", "type": "canvas", "unit_price": 75000, "unit": "m²"},
+            "decal_luoi": {"name": "Decal lưới chống chói", "type": "canvas", "unit_price": 120000, "unit": "m²"},
+            "alu_3mm": {"name": "Tấm Alu trong nhà PET (3mm)", "type": "sheet", "unit_price": 480000, "unit": "tấm", "sheet_w": 1.22, "sheet_h": 2.44},
+            "alu_pvdf_3mm": {"name": "Tấm Alu ngoài trời PVDF (3mm)", "type": "sheet", "unit_price": 650000, "unit": "tấm", "sheet_w": 1.22, "sheet_h": 2.44},
             "alu_guong_vang": {"name": "Tấm Alu đồng gương vàng (3mm)", "type": "sheet", "unit_price": 480000, "unit": "tấm", "is_mirror": True, "sheet_w": 1.22, "sheet_h": 2.44},
-            "mica_2_3mm": {"name": "Tấm Mica (2mm/3mm)", "type": "sheet", "unit_price": 690000, "unit": "tấm", "sheet_w": 1.22, "sheet_h": 2.44},
+            "mica_2_3mm": {"name": "Tấm Mica trong (2mm/3mm)", "type": "sheet", "unit_price": 678000, "unit": "tấm", "sheet_w": 1.22, "sheet_h": 2.44},
+            "fomex_5mm": {"name": "Tấm Fomex trắng (5mm)", "type": "sheet", "unit_price": 245000, "unit": "tấm", "sheet_w": 1.22, "sheet_h": 2.44},
+            "fomex_10mm": {"name": "Tấm Fomex trắng (10mm)", "type": "sheet", "unit_price": 490000, "unit": "tấm", "sheet_w": 1.22, "sheet_h": 2.44},
         },
         "sheet_iron_backing": {
             "name": "Tôn lót mặt sau (Khổ 1.2m)",
@@ -706,7 +720,35 @@ PRICING_STANDARDS = {
         "transport": {"name": "Vận chuyển", "unit_price": 200000, "unit": "chuyến"},
         "scaffolding": {"name": "Dàn giáo", "unit_price": 50000, "unit": "bộ/ngày"},
         "canvas_seam_labor": {"name": "Nhân công nối bạt", "unit_price": 15000, "unit": "mét dài", "condition": "cả 2 chiều > 3.1m"},
-    }
+        "crane_truck": {"name": "Xe cẩu tải 5-10 tấn", "unit_price": 2500000, "unit": "ca nửa ngày"},
+    },
+    "fabrication": {
+        "cnc_alu": {"name": "Cắt CNC Alu", "unit_price": 80000, "unit": "m"},
+        "cnc_mica": {"name": "Cắt CNC Mica", "unit_price": 80000, "unit": "m"},
+        "laser_inox": {"name": "Cắt Laser sắt / inox", "unit_price": 6000, "unit": "m"},
+        "bend_profile": {"name": "Chấn Alu / Tôn / Inox", "unit_price": 15000, "unit": "m"},
+        "weld_frame": {"name": "Hàn khung sắt kẽm", "unit_price": 80000, "unit": "m"},
+        "letter_bending": {"name": "Uốn chữ / viền / hộp", "unit_price": 50000, "unit": "m"},
+        "uv_printing": {"name": "In UV phẳng/cuộn", "unit_price": 185000, "unit": "m²"},
+        "hiflex_printing": {"name": "In bạt Hiflex", "unit_price": 40000, "unit": "m²"},
+        "decal_printing": {"name": "In decal", "unit_price": 75000, "unit": "m²"},
+        "decal_pasting": {"name": "Dán decal", "unit_price": 50000, "unit": "m²"},
+        "led_mounting": {"name": "Gắn module / LED dây", "unit_price": 35000, "unit": "m"},
+    },
+    "led_modules": {
+        "m2_mynice": {"name": "LED Module M2 Mynice (1W 12V)", "unit_price": 1500, "unit": "cái"},
+        "m3_mynice": {"name": "LED Module 3 bóng Mynice (1.5W 12V)", "unit_price": 2500, "unit": "cái"},
+        "m4_mynice": {"name": "LED Module 4 bóng Mynice (2W 12V)", "unit_price": 3500, "unit": "cái"},
+        "led_neon_12v": {"name": "LED Neon uốn dẻo 12V", "unit_price": 25000, "unit": "mét"},
+        "power_supply_12v": {"name": "Nguồn 12V ngoài trời 33A 400W", "unit_price": 185000, "unit": "cái"},
+        "floodlight_50w": {"name": "Đèn pha LED ngoài trời 50W", "unit_price": 160000, "unit": "cái"},
+    },
+    "special_packages": {
+        "banner_package": {"name": "Phướn dọc trọn gói (treo + tháo + giấy phép)", "unit_price": 350000, "unit": "cái"},
+        "house_number_mica": {"name": "Bảng số nhà Mica xanh/trong", "unit_price": 70000, "unit": "cái"},
+        "house_number_inox": {"name": "Bảng số nhà Inox ăn mòn", "unit_price": 350000, "unit": "cái"},
+    },
+    "overhead_rate": 0.10
 }
 
 
@@ -878,6 +920,24 @@ def calculate_signboard(data):
             "level": "danger",
             "title": "CẢNH BÁO TỪ CHỐI BẢO HÀNH",
             "message": "CẢNH BÁO: Alu gương vàng ngoài trời KHÔNG BẢO HÀNH bay màu."
+        })
+
+    # Cảnh báo pano kết cấu lớn
+    if area >= 15:
+        warnings.append({
+            "code": "PANO_HEAVY_STRUCTURE",
+            "level": "warning",
+            "title": "CẢNH BÁO PANO KẾT CẤU NẶNG",
+            "message": f"Bảng hiệu kích thước lớn ({area} m² ≥ 15m²). Bắt buộc bố trí thêm sắt xéo dằn hông chống rung lắc gió lốc (khoảng 30% lượng sắt mặt khung) và bố trí đèn pha chiếu sáng (khoảng cách 2m/đèn dọc chiều dài bảng)."
+        })
+
+    # Cảnh báo decal ngoài trời
+    if surface_key.startswith("decal_") and location == "outdoor":
+        warnings.append({
+            "code": "OUTDOOR_DECAL_UNLAMINATED",
+            "level": "warning",
+            "title": "CẢNH BÁO CÁN MÀNG DECAL",
+            "message": "Decal dán ngoài trời bắt buộc phải cán thêm màng bảo vệ (bóng hoặc mờ) để chống bay màu do tia UV và tránh trầy xước khi lau chùi."
         })
 
     # 9. Tổng chi phí
@@ -1305,6 +1365,71 @@ def api_ai_studio_status():
     }), 200
 
 
+ADMAKE_KNOWLEDGE_BASE = """
+BẠN LÀ CHUYÊN GIA BÓC TÁCH VẬT TƯ & BÁO GIÁ QUẢNG CÁO TẠI ADMAKE (CÔNG TY TNHH B-ONE VIỆT NAM).
+DƯỚI ĐÂY LÀ QUY CHUẨN ĐƠN GIÁ VẬT TƯ, ĐỊNH MỨC VÀ CẢNH BÁO KỸ THUẬT CHÍNH THỨC CỦA ADMAKE:
+
+1. BẢNG GIÁ SẮT HỘP KẼM (CÂY 6M):
+- Sắt 14x14 (1.0mm): 53.000 đ/cây
+- Sắt 16x16 (1.0mm): 60.000 đ/cây
+- Sắt 20x20 (1.0mm): 75.000 đ/cây
+- Sắt 25x25 (1.0mm): 95.000 đ/cây
+- Sắt 30x30 (1.2mm): 135.000 đ/cây
+- Sắt 20x40 (1.2mm): 145.000 đ/cây
+- Sắt 40x40 (1.2mm): 180.000 đ/cây
+- Sắt 30x60 (1.4mm): 240.000 đ/cây
+- Sắt 50x50 (1.4mm): 265.000 đ/cây
+- Sắt 40x80 (1.4mm): 320.000 đ/cây
+- Sắt 50x100 (1.4mm): 410.000 đ/cây
+
+2. BẢNG GIÁ MẶT BẢNG & BẠT / DECAL:
+- Bạt Hiflex thường (3.2 zem): 28.000 đ/m²
+- Bạt 2 da đế xám (3.6 zem chống xuyên sáng): 45.000 đ/m²
+- Bạt không gân in UV: 170.000 đ/m²
+- Bạt 3M in UV: 450.000 đ/m²
+- Decal sữa ngoài trời: 75.000 đ/m²
+- Decal trong ngoài trời: 75.000 đ/m²
+- Decal lưới: 120.000 đ/m²
+- Tấm Alu trong nhà PET 3mm: 480.000 đ/tấm (1.22x2.44m)
+- Tấm Alu ngoài trời PVDF 3mm: 650.000 đ/tấm
+- Tấm Alu đồng gương vàng 3mm: 480.000 đ/tấm (trong nhà)
+- Tấm Mica trong 2mm: 678.000 đ/tấm; 3mm: 980.000 đ/tấm; 5mm: 1.620.000 đ/tấm
+- Tấm Fomex 3mm: 155.000 đ; 5mm: 245.000 đ; 10mm: 490.000 đ/tấm
+- Tôn lót mặt sau: 75.000 đ/mét tới (khổ 1.2m)
+- V nhôm viền: 35.000 đ/cây (3m)
+- Vật tư phụ (keo, vít, que hàn): 100.000 đ khoán
+
+3. GIA CÔNG & DỊCH VỤ:
+- Cắt CNC Alu/Mica: 80.000 đ/m
+- Cắt Laser inox/sắt: 6.000 đ/m
+- Chấn Alu/Tôn/Inox: 15.000 đ/m
+- Hàn khung sắt kẽm: 80.000 đ/m
+- Uốn chữ / viền: 50.000 đ/m
+- In UV phẳng/cuộn: 185.000 đ/m²
+- In bạt Hiflex: 40.000 đ/m²
+- In decal: 75.000 đ/m²
+- Dán decal: 50.000 đ/m²
+- Gắn module LED: 35.000 đ/m
+- Dàn giáo: 50.000 đ/bộ/ngày
+- Xe vận chuyển nội thành: 200.000 đ/chuyến
+- Xe cẩu tải 5-10 tấn: 2.500.000 - 4.500.000 đ/ca (nửa ngày)
+- Phướn dọc trọn gói (treo + tháo + xin phép): 350.000 đ/cái
+- Bảng số nhà Mica: 70.000 đ/cái; Inox ăn mòn: 350.000 đ/cái
+- Tỷ lệ chi phí cố định: 10%
+
+4. QUY TẮC ĐỊNH MỨC & CẢNH BÁO BẮT BUỘC:
+- Bạt: Cả 2 cạnh > 3.1m bắt buộc nối bạt (+15.000 đ/mét dài đường nối). Bạt hộp đèn nếu nối phải cảnh báo vệt đen bóng đèn.
+- Bạt không lót tôn: Từ chối bảo hành rách do bão gió.
+- Alu gương vàng ngoài trời: Từ chối bảo hành bay màu do nắng mưa.
+- Khổ tấm chuẩn 1.22x2.44m: Nếu kích thước bảng lỡ cỡ thì tư vấn khách thu gọn về khổ chẵn để tiết kiệm.
+- Hộp đèn siêu mỏng (< 8cm): Cấm dùng LED mắt trâu trực tiếp, phải dùng LED tỏa 175° hoặc hắt cạnh.
+- Đèn LED ngoài trời đường dài: Phải chia nhỏ đường cấp nguồn DC mỗi 5m để tránh sụt áp.
+- Chữ nổi độc lập ngoài trời: Bắt buộc giằng chân và bịt hậu chịu gió.
+- Decal ngoài trời: Bắt buộc cán màng UV chống trầy và bay màu.
+- Pano lớn (≥ 15m²): Bắt buộc sắt xéo dằn hông (~30% lượng sắt mặt) và lắp đèn pha 2m/đèn.
+"""
+
+
 @ai_bp.route('/api/ai/chat', methods=['POST', 'OPTIONS'])
 def ai_chat():
     """Hội thoại thông minh đa năng với GPT (OpenAI) hoặc Gemini (Google)"""
@@ -1321,6 +1446,7 @@ def ai_chat():
     if not messages and single_msg:
         if current_quote:
             system_ctx = (
+                f"{ADMAKE_KNOWLEDGE_BASE}\n\n"
                 "Bạn là Chuyên gia bóc tách vật tư và báo giá bảng hiệu tại ADMAKE (Công ty TNHH B-One Việt Nam). "
                 "Hãy trả lời chuyên nghiệp, súc tích, tư vấn chính xác về vật tư và cảnh báo kỹ thuật."
             )
@@ -1329,7 +1455,15 @@ def ai_chat():
                 {"role": "user", "content": f"Thông số bảng hiệu hiện tại: {json.dumps(current_quote, ensure_ascii=False)}.\nCâu hỏi: {single_msg}"}
             ]
         else:
-            messages = [{"role": "user", "content": single_msg}]
+            messages = [
+                {"role": "system", "content": ADMAKE_KNOWLEDGE_BASE},
+                {"role": "user", "content": single_msg}
+            ]
+    elif messages:
+        # Kiểm tra xem đã có system role chưa, nếu chưa thì thêm vào đầu
+        has_system = any(m.get("role") == "system" for m in messages)
+        if not has_system:
+            messages = [{"role": "system", "content": ADMAKE_KNOWLEDGE_BASE}] + messages
 
     if not messages:
         return jsonify({"success": False, "error": "Vui lòng nhập nội dung câu hỏi."}), 400
