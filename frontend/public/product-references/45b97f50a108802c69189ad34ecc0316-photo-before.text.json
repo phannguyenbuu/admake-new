@@ -1,0 +1,194 @@
+{
+  "schema_version": 1,
+  "product_id": "45b97f50a108802c69189ad34ecc0316",
+  "view": "before",
+  "image": "/product-references/45b97f50a108802c69189ad34ecc0316-photo-before.png",
+  "sha256": "8e5d40becc13db94cbc4092c3e7d8219ba8028c1984869e2527d76f66e73a002",
+  "width": 1448,
+  "height": 1086,
+  "coordinate_system": "image_pixels_top_left",
+  "status": "detected",
+  "regions": [
+    {
+      "text": "TIỆM NHÀ",
+      "ocr_text": "TIỆM NHÀ",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        76.0,
+        432.0,
+        706.0,
+        162.0
+      ],
+      "quad": [
+        [
+          76.0,
+          432.0
+        ],
+        [
+          782.0,
+          432.0
+        ],
+        [
+          782.0,
+          594.0
+        ],
+        [
+          76.0,
+          594.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.052486,
+        0.39779,
+        0.487569,
+        0.149171
+      ],
+      "normalized_quad": [
+        [
+          0.052486,
+          0.39779
+        ],
+        [
+          0.540055,
+          0.39779
+        ],
+        [
+          0.540055,
+          0.546961
+        ],
+        [
+          0.052486,
+          0.546961
+        ]
+      ],
+      "id": "before-visual-001",
+      "source_region_ids": [
+        "before-001"
+      ],
+      "slot_id": "text-88935bec1c-1"
+    },
+    {
+      "text": "Giá bình dân",
+      "ocr_text": "Giá binh dân",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        280.0,
+        604.0,
+        510.0,
+        90.0
+      ],
+      "quad": [
+        [
+          280.0,
+          604.0
+        ],
+        [
+          790.0,
+          604.0
+        ],
+        [
+          790.0,
+          694.0
+        ],
+        [
+          280.0,
+          694.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.19337,
+        0.556169,
+        0.35221,
+        0.082873
+      ],
+      "normalized_quad": [
+        [
+          0.19337,
+          0.556169
+        ],
+        [
+          0.54558,
+          0.556169
+        ],
+        [
+          0.54558,
+          0.639042
+        ],
+        [
+          0.19337,
+          0.639042
+        ]
+      ],
+      "id": "before-visual-002",
+      "source_region_ids": [
+        "before-002"
+      ],
+      "slot_id": "text-a49ac498ee-1"
+    },
+    {
+      "id": "before-visual-003",
+      "text": "ỐC",
+      "ocr_text": "",
+      "confidence": 1,
+      "review": "verified",
+      "method": "visual_annotation",
+      "bbox": [
+        780,
+        350,
+        540,
+        420
+      ],
+      "quad": [
+        [
+          780,
+          350
+        ],
+        [
+          1320,
+          350
+        ],
+        [
+          1320,
+          770
+        ],
+        [
+          780,
+          770
+        ]
+      ],
+      "normalized_bbox": [
+        0.538674,
+        0.322284,
+        0.372928,
+        0.38674
+      ],
+      "normalized_quad": [
+        [
+          0.538674,
+          0.322284
+        ],
+        [
+          0.911602,
+          0.322284
+        ],
+        [
+          0.911602,
+          0.709024
+        ],
+        [
+          0.538674,
+          0.709024
+        ]
+      ],
+      "source_region_ids": [
+        "before-visual-001"
+      ],
+      "slot_id": "text-2a09998d72-1"
+    }
+  ],
+  "text_review": "image_review"
+}

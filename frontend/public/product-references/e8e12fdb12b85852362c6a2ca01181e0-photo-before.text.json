@@ -1,0 +1,72 @@
+{
+  "schema_version": 1,
+  "product_id": "e8e12fdb12b85852362c6a2ca01181e0",
+  "view": "before",
+  "image": "/product-references/e8e12fdb12b85852362c6a2ca01181e0-photo-before.png",
+  "sha256": "8c4a1a0834a0f4ac8441b4085021f54aa61727d135b6376f9f4de3482c6cff7b",
+  "width": 1448,
+  "height": 1086,
+  "coordinate_system": "image_pixels_top_left",
+  "status": "detected",
+  "regions": [
+    {
+      "text": "DÉNI MAISON",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        28.96,
+        356.21,
+        1390.08,
+        373.58
+      ],
+      "quad": [
+        [
+          28.96,
+          356.21
+        ],
+        [
+          1419.04,
+          356.21
+        ],
+        [
+          1419.04,
+          729.79
+        ],
+        [
+          28.96,
+          729.79
+        ]
+      ],
+      "normalized_bbox": [
+        0.02,
+        0.328002,
+        0.96,
+        0.343996
+      ],
+      "normalized_quad": [
+        [
+          0.02,
+          0.328002
+        ],
+        [
+          0.98,
+          0.328002
+        ],
+        [
+          0.98,
+          0.671998
+        ],
+        [
+          0.02,
+          0.671998
+        ]
+      ],
+      "id": "before-visual-001",
+      "source_region_ids": [],
+      "slot_id": "text-0404f33855-1"
+    }
+  ],
+  "text_review": "image_review"
+}

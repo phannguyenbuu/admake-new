@@ -1,0 +1,74 @@
+{
+  "schema_version": 1,
+  "product_id": "607d60aa9f71641305b60280a2582eb2",
+  "view": "before",
+  "image": "/product-references/607d60aa9f71641305b60280a2582eb2-photo-before.png",
+  "sha256": "fb6540eb8db33eed3d90b187b0fc2bacd699824b334a309f1100d0e77fd4788a",
+  "width": 1448,
+  "height": 1086,
+  "coordinate_system": "image_pixels_top_left",
+  "status": "detected",
+  "regions": [
+    {
+      "text": "THANH",
+      "ocr_text": "THANH",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        6.54,
+        66.29,
+        1441.46,
+        928.4200000000001
+      ],
+      "quad": [
+        [
+          6.54,
+          538.32
+        ],
+        [
+          1337.97,
+          66.29
+        ],
+        [
+          1448,
+          521.68
+        ],
+        [
+          151.03,
+          994.71
+        ]
+      ],
+      "normalized_bbox": [
+        0.004517,
+        0.061041,
+        0.995483,
+        0.854899
+      ],
+      "normalized_quad": [
+        [
+          0.004517,
+          0.495691
+        ],
+        [
+          0.924012,
+          0.061041
+        ],
+        [
+          1.0,
+          0.480368
+        ],
+        [
+          0.104302,
+          0.915939
+        ]
+      ],
+      "id": "before-visual-001",
+      "source_region_ids": [
+        "before-001"
+      ],
+      "slot_id": "text-7dc55c2e6b-1"
+    }
+  ],
+  "text_review": "image_review"
+}

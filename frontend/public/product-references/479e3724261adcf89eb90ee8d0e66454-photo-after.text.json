@@ -1,0 +1,140 @@
+{
+  "schema_version": 1,
+  "product_id": "479e3724261adcf89eb90ee8d0e66454",
+  "view": "after",
+  "image": "/product-references/479e3724261adcf89eb90ee8d0e66454-photo-after.png",
+  "sha256": "0f729acc707b5f932f4eac2c1a4ee6e74cde45470a60a8c7ed75d1bce9a20981",
+  "width": 1448,
+  "height": 1086,
+  "coordinate_system": "image_pixels_top_left",
+  "status": "detected",
+  "regions": [
+    {
+      "text": "NHÀ KHẾ",
+      "ocr_text": "KHÊ | NHÀ",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        308.42,
+        53.21,
+        1138.13,
+        426.8
+      ],
+      "quad": [
+        [
+          308.42,
+          53.21
+        ],
+        [
+          1446.55,
+          53.21
+        ],
+        [
+          1446.55,
+          480.01
+        ],
+        [
+          308.42,
+          480.01
+        ]
+      ],
+      "normalized_bbox": [
+        0.212997,
+        0.048996,
+        0.786001,
+        0.393002
+      ],
+      "normalized_quad": [
+        [
+          0.212997,
+          0.048996
+        ],
+        [
+          0.998999,
+          0.048996
+        ],
+        [
+          0.998999,
+          0.441998
+        ],
+        [
+          0.212997,
+          0.441998
+        ]
+      ],
+      "id": "after-visual-001",
+      "source_region_ids": [
+        "after-001",
+        "after-002"
+      ],
+      "slot_id": "text-058ade9455-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "BÒ NẦM NƯỚNG SỐT",
+      "ocr_text": "SỐT | NƯỚNG | NẦM | BÒ",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        301.18,
+        516.94,
+        1123.65,
+        217.2
+      ],
+      "quad": [
+        [
+          301.18,
+          516.94
+        ],
+        [
+          1424.83,
+          516.94
+        ],
+        [
+          1424.83,
+          734.14
+        ],
+        [
+          301.18,
+          734.14
+        ]
+      ],
+      "normalized_bbox": [
+        0.207997,
+        0.476004,
+        0.776001,
+        0.2
+      ],
+      "normalized_quad": [
+        [
+          0.207997,
+          0.476004
+        ],
+        [
+          0.983999,
+          0.476004
+        ],
+        [
+          0.983999,
+          0.676004
+        ],
+        [
+          0.207997,
+          0.676004
+        ]
+      ],
+      "id": "after-visual-002",
+      "source_region_ids": [
+        "after-003",
+        "after-004",
+        "after-005",
+        "after-006"
+      ],
+      "slot_id": "text-141f3c7bf8-1",
+      "match_confidence": 1.0
+    }
+  ],
+  "text_review": "image_review"
+}

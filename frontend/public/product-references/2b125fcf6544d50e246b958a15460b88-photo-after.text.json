@@ -1,0 +1,723 @@
+{
+  "schema_version": 1,
+  "product_id": "2b125fcf6544d50e246b958a15460b88",
+  "view": "after",
+  "image": "/product-references/2b125fcf6544d50e246b958a15460b88-photo-after.png",
+  "sha256": "29691125b3f7bb0846be5c07604ff5e65c2f39e71861302c3ad976d9b253a1c6",
+  "width": 1448,
+  "height": 1086,
+  "coordinate_system": "image_pixels_top_left",
+  "status": "detected",
+  "regions": [
+    {
+      "text": "DAIKIN",
+      "ocr_text": "DAIKIN",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        121.63,
+        262.81,
+        298.29,
+        105.34
+      ],
+      "quad": [
+        [
+          121.63,
+          262.81
+        ],
+        [
+          419.92,
+          262.81
+        ],
+        [
+          419.92,
+          368.15
+        ],
+        [
+          121.63,
+          368.15
+        ]
+      ],
+      "normalized_bbox": [
+        0.083999,
+        0.241998,
+        0.206001,
+        0.096998
+      ],
+      "normalized_quad": [
+        [
+          0.083999,
+          0.241998
+        ],
+        [
+          0.29,
+          0.241998
+        ],
+        [
+          0.29,
+          0.338996
+        ],
+        [
+          0.083999,
+          0.338996
+        ]
+      ],
+      "id": "after-visual-001",
+      "source_region_ids": [
+        "after-001"
+      ],
+      "slot_id": "text-b1915ce63c-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "Công trình sử dụng",
+      "ocr_text": "Công | trình | sử | dụng",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        308.42,
+        205.25,
+        292.5,
+        52.13
+      ],
+      "quad": [
+        [
+          308.42,
+          205.25
+        ],
+        [
+          600.92,
+          205.25
+        ],
+        [
+          600.92,
+          257.38
+        ],
+        [
+          308.42,
+          257.38
+        ]
+      ],
+      "normalized_bbox": [
+        0.212997,
+        0.188996,
+        0.202003,
+        0.048002
+      ],
+      "normalized_quad": [
+        [
+          0.212997,
+          0.188996
+        ],
+        [
+          0.415,
+          0.188996
+        ],
+        [
+          0.415,
+          0.236998
+        ],
+        [
+          0.212997,
+          0.236998
+        ]
+      ],
+      "id": "after-visual-002",
+      "source_region_ids": [
+        "after-002",
+        "after-003",
+        "after-004",
+        "after-005"
+      ],
+      "slot_id": "text-87a388a4b4-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "ĐIỀU HÒA KHÔNG KHÍ THƯƠNG MẠI",
+      "ocr_text": "ĐIỀU HÒA | KHÔNG | KHÍ | THƯƠNG | MẠI",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        341.73,
+        206.34,
+        642.91,
+        89.05
+      ],
+      "quad": [
+        [
+          341.73,
+          206.34
+        ],
+        [
+          984.64,
+          206.34
+        ],
+        [
+          984.64,
+          295.39
+        ],
+        [
+          341.73,
+          295.39
+        ]
+      ],
+      "normalized_bbox": [
+        0.236001,
+        0.19,
+        0.443999,
+        0.081998
+      ],
+      "normalized_quad": [
+        [
+          0.236001,
+          0.19
+        ],
+        [
+          0.68,
+          0.19
+        ],
+        [
+          0.68,
+          0.271998
+        ],
+        [
+          0.236001,
+          0.271998
+        ]
+      ],
+      "id": "after-visual-003",
+      "source_region_ids": [
+        "after-006",
+        "after-007",
+        "after-008",
+        "after-009",
+        "after-010"
+      ],
+      "slot_id": "text-1f285f016f-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "SkyAir",
+      "ocr_text": "SkyAir",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        697.94,
+        218.29,
+        390.96,
+        193.31
+      ],
+      "quad": [
+        [
+          697.94,
+          218.29
+        ],
+        [
+          1088.9,
+          218.29
+        ],
+        [
+          1088.9,
+          411.6
+        ],
+        [
+          697.94,
+          411.6
+        ]
+      ],
+      "normalized_bbox": [
+        0.482003,
+        0.201004,
+        0.27,
+        0.178002
+      ],
+      "normalized_quad": [
+        [
+          0.482003,
+          0.201004
+        ],
+        [
+          0.752003,
+          0.201004
+        ],
+        [
+          0.752003,
+          0.379006
+        ],
+        [
+          0.482003,
+          0.379006
+        ]
+      ],
+      "id": "after-visual-004",
+      "source_region_ids": [
+        "after-011"
+      ],
+      "slot_id": "text-45571ae436-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "GIẤU TRẦN NỐI ỐNG GIÓ",
+      "ocr_text": "GIẤU TRẦN NỐl | ỐNG | GIÓ",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        822.46,
+        626.62,
+        308.42,
+        84.71
+      ],
+      "quad": [
+        [
+          822.46,
+          626.62
+        ],
+        [
+          1130.88,
+          626.62
+        ],
+        [
+          1130.88,
+          711.33
+        ],
+        [
+          822.46,
+          711.33
+        ]
+      ],
+      "normalized_bbox": [
+        0.567997,
+        0.576998,
+        0.212997,
+        0.078002
+      ],
+      "normalized_quad": [
+        [
+          0.567997,
+          0.576998
+        ],
+        [
+          0.780994,
+          0.576998
+        ],
+        [
+          0.780994,
+          0.655
+        ],
+        [
+          0.567997,
+          0.655
+        ]
+      ],
+      "id": "after-visual-005",
+      "source_region_ids": [
+        "after-012",
+        "after-013",
+        "after-014"
+      ],
+      "slot_id": "text-ef3cdb5829-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "DaiPhong",
+      "ocr_text": "paiPhong",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        1022.29,
+        223.72,
+        82.54,
+        42.35
+      ],
+      "quad": [
+        [
+          1022.29,
+          223.72
+        ],
+        [
+          1104.83,
+          223.72
+        ],
+        [
+          1104.83,
+          266.07
+        ],
+        [
+          1022.29,
+          266.07
+        ]
+      ],
+      "normalized_bbox": [
+        0.706001,
+        0.206004,
+        0.057003,
+        0.038996
+      ],
+      "normalized_quad": [
+        [
+          0.706001,
+          0.206004
+        ],
+        [
+          0.763004,
+          0.206004
+        ],
+        [
+          0.763004,
+          0.245
+        ],
+        [
+          0.706001,
+          0.245
+        ]
+      ],
+      "id": "after-visual-006",
+      "source_region_ids": [
+        "after-022"
+      ],
+      "slot_id": "text-0de333e5f3-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "CÔNG TY TNHH DỊCH VỤ KỸ THUẬT ĐẠI PHONG",
+      "ocr_text": "CÔNG | TY | TNHH | DỊCH | VỤ KỸ | THUẬT | ĐẠl | PHONG",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        941.2,
+        307.34,
+        506.8,
+        112.94
+      ],
+      "quad": [
+        [
+          941.2,
+          307.34
+        ],
+        [
+          1448.0,
+          307.34
+        ],
+        [
+          1448.0,
+          420.28
+        ],
+        [
+          941.2,
+          420.28
+        ]
+      ],
+      "normalized_bbox": [
+        0.65,
+        0.283002,
+        0.35,
+        0.103996
+      ],
+      "normalized_quad": [
+        [
+          0.65,
+          0.283002
+        ],
+        [
+          1.0,
+          0.283002
+        ],
+        [
+          1.0,
+          0.386998
+        ],
+        [
+          0.65,
+          0.386998
+        ]
+      ],
+      "id": "after-visual-007",
+      "source_region_ids": [
+        "after-015",
+        "after-016",
+        "after-017",
+        "after-021",
+        "after-024",
+        "after-032",
+        "after-035",
+        "after-039"
+      ],
+      "slot_id": "text-319ccac1b5-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "ĐC: Số 286 đường Phạm Văn Đồng, P. Tân Lập, T.Đắk Lắk, Việt Nam",
+      "ocr_text": "ĐC: | Số | 286 | đuờng | Phạm | Văn | Đổng, | P | Tân | LậP,7 | TĐắk | Lắk, ` | Việt | Nam",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        991.88,
+        310.6,
+        456.12,
+        106.43
+      ],
+      "quad": [
+        [
+          991.88,
+          310.6
+        ],
+        [
+          1448.0,
+          310.6
+        ],
+        [
+          1448.0,
+          417.03
+        ],
+        [
+          991.88,
+          417.03
+        ]
+      ],
+      "normalized_bbox": [
+        0.685,
+        0.286004,
+        0.315,
+        0.098002
+      ],
+      "normalized_quad": [
+        [
+          0.685,
+          0.286004
+        ],
+        [
+          1.0,
+          0.286004
+        ],
+        [
+          1.0,
+          0.384006
+        ],
+        [
+          0.685,
+          0.384006
+        ]
+      ],
+      "id": "after-visual-008",
+      "source_region_ids": [
+        "after-018",
+        "after-019",
+        "after-020",
+        "after-023",
+        "after-026",
+        "after-027",
+        "after-030",
+        "after-031",
+        "after-034",
+        "after-037",
+        "after-038",
+        "after-040",
+        "after-043",
+        "after-044"
+      ],
+      "slot_id": "text-3409e20c9c-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "ĐT: (02623) 50 56 58",
+      "ocr_text": "ĐT:(02623) | 50 56 58",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        1032.42,
+        309.51,
+        220.1,
+        62.99
+      ],
+      "quad": [
+        [
+          1032.42,
+          309.51
+        ],
+        [
+          1252.52,
+          309.51
+        ],
+        [
+          1252.52,
+          372.5
+        ],
+        [
+          1032.42,
+          372.5
+        ]
+      ],
+      "normalized_bbox": [
+        0.712997,
+        0.285,
+        0.152003,
+        0.058002
+      ],
+      "normalized_quad": [
+        [
+          0.712997,
+          0.285
+        ],
+        [
+          0.865,
+          0.285
+        ],
+        [
+          0.865,
+          0.343002
+        ],
+        [
+          0.712997,
+          0.343002
+        ]
+      ],
+      "id": "after-visual-009",
+      "source_region_ids": [
+        "after-025",
+        "after-029"
+      ],
+      "slot_id": "text-342ccdcb06-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "Hotline: 0938.690.979",
+      "ocr_text": "Hotline: ' | 0938.690.979",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        1171.43,
+        646.17,
+        188.24,
+        79.28
+      ],
+      "quad": [
+        [
+          1171.43,
+          646.17
+        ],
+        [
+          1359.67,
+          646.17
+        ],
+        [
+          1359.67,
+          725.45
+        ],
+        [
+          1171.43,
+          725.45
+        ]
+      ],
+      "normalized_bbox": [
+        0.808999,
+        0.595,
+        0.13,
+        0.073002
+      ],
+      "normalized_quad": [
+        [
+          0.808999,
+          0.595
+        ],
+        [
+          0.938999,
+          0.595
+        ],
+        [
+          0.938999,
+          0.668002
+        ],
+        [
+          0.808999,
+          0.668002
+        ]
+      ],
+      "id": "after-visual-010",
+      "source_region_ids": [
+        "after-042",
+        "after-047"
+      ],
+      "slot_id": "text-6382849003-1"
+    },
+    {
+      "text": "HÂN HẠNH CUNG CẤP VÀ THI CÔNG TẠI CÔNG TRÌNH NÀY",
+      "ocr_text": "HÂN | HẠNH | CUNG | cẤP VÀ THI | CÔNG | TẠI | CÔNG | TRÌNH | NÀY",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        1081.66,
+        250.87,
+        366.34,
+        210.68
+      ],
+      "quad": [
+        [
+          1081.66,
+          250.87
+        ],
+        [
+          1448.0,
+          250.87
+        ],
+        [
+          1448.0,
+          461.55
+        ],
+        [
+          1081.66,
+          461.55
+        ]
+      ],
+      "normalized_bbox": [
+        0.747003,
+        0.231004,
+        0.252997,
+        0.193996
+      ],
+      "normalized_quad": [
+        [
+          0.747003,
+          0.231004
+        ],
+        [
+          1.0,
+          0.231004
+        ],
+        [
+          1.0,
+          0.425
+        ],
+        [
+          0.747003,
+          0.425
+        ]
+      ],
+      "id": "after-visual-011",
+      "source_region_ids": [
+        "after-028",
+        "after-033",
+        "after-036",
+        "after-041",
+        "after-045",
+        "after-046",
+        "after-048",
+        "after-049",
+        "after-050"
+      ],
+      "slot_id": "text-b43cc135f9-1",
+      "match_confidence": 1.0
+    }
+  ],
+  "text_review": "image_review"
+}

@@ -60,75 +60,41 @@
     }
 
     .sidebar {
-      width: 220px;
-      min-width: 220px;
-      flex: 0 0 220px;
-      background: linear-gradient(180deg, #111217 0%, #1b1d26 100%);
-      color: #f8fafc;
-      padding: 20px 16px;
+      width: 200px;
+      min-width: 200px;
+      flex: 0 0 200px;
+      background: #ffffff;
+      border-right: 1px solid #edf0f3;
+      color: #475569;
+      padding: 18px 12px;
       display: flex;
       flex-direction: column;
-      gap: 18px;
+      gap: 22px;
       position: sticky;
       top: 0;
       height: 100vh;
     }
 
-    .sidebar-brand {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-family: "Space Grotesk", "Trebuchet MS", sans-serif;
-    }
-
-    .sidebar-dot {
-      width: 12px;
-      height: 12px;
-      border-radius: 50%;
-      background: linear-gradient(130deg, #0aa3a6, #0dc2b3);
-      box-shadow: 0 0 0 6px rgba(13, 194, 179, 0.2);
-    }
-
-    .sidebar-title {
-      font-size: 18px;
-      letter-spacing: 1px;
-    }
-
-    .sidebar-subtitle {
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: 1.2px;
-      color: rgba(248, 250, 252, 0.6);
-    }
-
-    .sidebar-nav {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
+    .sidebar-brand { display: flex; align-items: center; gap: 10px; padding: 0 8px; font-weight: 400; }
+    .sidebar-dot { width: 8px; height: 8px; border-radius: 50%; background: #0aa3a6; }
+    .sidebar-title { font-size: 15px; letter-spacing: 1px; font-weight: 400; color: #334155; }
+    .sidebar-subtitle { font-size: 9px; text-transform: uppercase; letter-spacing: 1.2px; color: #94a3b8; font-weight: 400; }
+    .sidebar-nav { display: flex; flex-direction: column; gap: 4px; }
     .sidebar-link {
-      border: 1px solid rgba(248, 250, 252, 0.15);
-      background: rgba(248, 250, 252, 0.08);
-      color: #f8fafc;
-      border-radius: 12px;
-      padding: 10px 14px;
+      border: 1px solid transparent;
+      background: transparent;
+      color: #64748b;
+      border-radius: 5px;
+      padding: 7px 10px;
       text-align: left;
-      font-weight: 500;
-      transition: all 0.2s ease;
-      white-space: nowrap;
+      font-size: 13px;
+      line-height: 1.5;
+      font-weight: 400;
+      transition: background 0.15s ease, color 0.15s ease;
+      white-space: normal;
     }
-
-    .sidebar-link:hover {
-      background: rgba(248, 250, 252, 0.18);
-    }
-
-    .sidebar-link.is-active {
-      background: linear-gradient(130deg, #0aa3a6, #0dc2b3);
-      border-color: transparent;
-      color: #0b1d1e;
-      font-weight: 600;
-    }
+    .sidebar-link:hover { background: #f8fafc; color: #334155; }
+    .sidebar-link.is-active { background: #eef9f8; border-color: transparent; color: #0b7f86; font-weight: 400; }
 
     .content {
       flex: 1 1 auto;
@@ -961,6 +927,10 @@
       height: 14px;
       margin: auto;
     }
+  
+    body:has(#genaiServerTab.is-active) .topbar { display: none; }
+    body:has(#genaiServerTab.is-active) .page { padding-top: 12px; }
+    #genaiServerFrame { height: calc(100vh - 30px) !important; }
   </style>
 </head>
 
@@ -976,24 +946,25 @@
       </div>
       <div class="sidebar-nav">
         <button class="sidebar-link is-active" type="button" data-tab-target="leadManageTab">Lead manage</button>
-        <button class="sidebar-link" type="button" data-tab-target="materialSuppliersTab">🏪 Đại lý Vật tư</button>
-        <button class="sidebar-link" type="button" data-tab-target="materialsCatalogTab">📦 Danh mục Vật tư</button>
-        <button class="sidebar-link" type="button" data-tab-target="feedbackTab">💬 Góp ý Admake <span class="badge bg-danger ms-1" id="unreadFeedbackBadge" style="display:none;">0</span></button>
-        <button class="sidebar-link" type="button" data-tab-target="affiliateAdminTab">🎁 Affiliate & Giới thiệu</button>
+        <button class="sidebar-link" type="button" data-tab-target="materialsCatalogTab">Vật tư</button>
+        <button class="sidebar-link" type="button" data-tab-target="materialSuppliersTab">Đại lý</button>
+        <button class="sidebar-link" type="button" data-tab-target="productFormulasTab">Sản phẩm</button>
+        <button class="sidebar-link" type="button" data-tab-target="genaiServerTab">iAdmake</button>
+        <button class="sidebar-link" type="button" data-tab-target="feedbackTab">Góp ý Admake <span class="badge bg-danger ms-1" id="unreadFeedbackBadge" style="display:none;">0</span></button>
+        <button class="sidebar-link" type="button" data-tab-target="affiliateAdminTab">Affiliate & Giới thiệu</button>
         <button class="sidebar-link" type="button" data-tab-target="landingPageTab">Landing page</button>
         <button class="sidebar-link" type="button" data-tab-target="priceSettingTab">Price setting</button>
-        <button class="sidebar-link" type="button" data-tab-target="threeDStudioTab">📐 3D</button>
-        <button class="sidebar-link" type="button" data-tab-target="extensionBridgeTab">🔌 Chrome Extension <span class="badge bg-success ms-1" id="onlineWorkersBadge" style="font-size:10px;">0</span></button>
       </div>
     </aside>
 
     <div class="content">
-      <header class="topbar">
-        <h1>{{ labels.header_title or "ADMAKE Lead Management" }}</h1>
-        <span class="badge">{{ labels.header_badge or "Admin View" }}</span>
-      </header>
+
 
       <main class="page">
+        <section class="tab-panel" id="genaiServerTab"><iframe id="genaiServerFrame" title="iAdmake" style="width:100%;height:calc(100vh - 150px);border:0" data-src="/lead-manage/genai/"></iframe></section>
+        <section class="tab-panel" id="productFormulasTab">
+          <iframe id="productFormulasFrame" title="Sản phẩm" style="width:100%;height:calc(100vh - 150px);border:0;border-radius:12px" data-src="/lead-manage/product-formulas"></iframe>
+        </section>
         <section class="tab-panel is-active" id="leadManageTab">
           <section class="hero">
             <div>
@@ -1500,76 +1471,10 @@
           </div>
         </section>
 
-        <!-- ═══ TAB 1: ĐẠI LÝ VẬT TƯ ═══ -->
-        <section class="tab-panel" id="materialSuppliersTab">
+          <section class="tab-panel" id="materialsCatalogTab" aria-labelledby="materialsCatalogHeading">
           <div class="d-flex justify-content-between align-items-center mb-3">
             <div>
-              <h2 style="font-size:20px;font-weight:700;margin:0;color:#0f172a;">🏪 Đại lý Vật tư</h2>
-              <p class="text-muted mb-0" style="font-size:13px;">Dữ liệu từ Trang Vàng Việt Nam. Khai báo Tên Đại lý, Link Website/HTML, Điện thoại & Địa chỉ. Các Vật tư sẽ tự động chọn Đại lý từ đây.</p>
-            </div>
-            <div class="d-flex gap-2">
-              <button type="button" class="btn btn-warning btn-sm fw-bold text-dark shadow-sm" onclick="showAddSupplierModal()">
-                ➕ Thêm Đại Lý Mới
-              </button>
-            </div>
-          </div>
-
-          <!-- Search bar for suppliers -->
-          <div class="bg-white rounded-3 shadow-sm border p-3 mb-3">
-            <div class="row g-2 align-items-center">
-              <div class="col-md-8">
-                <input type="text" class="form-control form-control-sm" id="adminSupplierSearchInput" placeholder="🔍 Tìm đại lý theo tên, website, địa chỉ, SĐT..." oninput="renderAdminSuppliersTable()">
-              </div>
-              <div class="col-md-4 text-end text-muted font-mono" style="font-size:12px;" id="adminSupplierCountLabel">
-                Đang tải danh sách đại lý...
-              </div>
-            </div>
-          </div>
-
-          <!-- Table of Suppliers -->
-          <div class="table-responsive bg-white rounded-3 shadow-sm border mb-3">
-            <table class="table table-hover align-middle mb-0" style="font-size:13px;">
-              <thead class="table-light">
-                <tr>
-                  <th style="width: 280px;">Tên Đại Lý / Công Ty</th>
-                  <th style="width: 220px;">Link Website / HTML Đại Lý</th>
-                  <th style="width: 140px;">Số Điện Thoại</th>
-                  <th>Địa Chỉ Cung Cấp</th>
-                  <th style="width: 130px;" class="text-center">Thao Tác</th>
-                </tr>
-              </thead>
-              <tbody id="adminSuppliersTbody">
-                <tr>
-                  <td colspan="5" class="text-center py-4 text-muted">Đang tải dữ liệu đại lý...</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          <!-- Pagination navigation for Suppliers -->
-          <div class="d-flex justify-content-between align-items-center bg-white p-3 rounded-3 shadow-sm border mb-4">
-            <div class="d-flex align-items-center gap-2">
-              <span class="text-muted font-mono" style="font-size:12px;">Hiển thị mỗi trang:</span>
-              <select class="form-select form-select-sm w-auto" id="supLimitSelect" onchange="changeSupplierLimit(this.value)">
-                <option value="15">15</option>
-                <option value="25" selected>25</option>
-                <option value="50">50</option>
-                <option value="100">100</option>
-              </select>
-            </div>
-            <nav aria-label="Supplier Page navigation">
-              <ul class="pagination pagination-sm justify-content-center m-0" id="supPaginationList">
-                <!-- Dynamic pagination buttons -->
-              </ul>
-            </nav>
-          </div>
-        </section>
-
-        <!-- ═══ TAB 2: DANH MỤC VẬT TƯ ═══ -->
-        <section class="tab-panel" id="materialsCatalogTab">
-          <div class="d-flex justify-content-between align-items-center mb-3">
-            <div>
-              <h2 style="font-size:20px;font-weight:700;margin:0;color:#0f172a;">📦 Danh Mục Vật Tư (Thư Viện Dùng Chung ad205)</h2>
+              <h3 id="materialsCatalogHeading" style="font-size:20px;font-weight:700;margin:0;color:#0f172a;">📦 Danh Mục Vật Tư (Thư Viện Dùng Chung ad205)</h3>
               <p class="text-muted mb-0" style="font-size:13px;">Quản lý kho thư viện vật tư master. Click nút ✏️ để sửa chi tiết các trường dữ liệu qua Modal, hoặc chọn Đại lý từ Dropdown để lưu nhanh.</p>
             </div>
             <div class="d-flex gap-2">
@@ -1633,6 +1538,70 @@
             </nav>
           </div>
         </section>
+
+          <section class="tab-panel" id="materialSuppliersTab" aria-labelledby="materialSuppliersHeading">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+              <h3 id="materialSuppliersHeading" style="font-size:20px;font-weight:700;margin:0;color:#0f172a;">🏪 Đại lý Vật tư</h3>
+              <p class="text-muted mb-0" style="font-size:13px;">Dữ liệu từ Trang Vàng Việt Nam. Khai báo Tên Đại lý, Link Website/HTML, Điện thoại & Địa chỉ. Các Vật tư sẽ tự động chọn Đại lý từ đây.</p>
+            </div>
+            <div class="d-flex gap-2">
+              <button type="button" class="btn btn-warning btn-sm fw-bold text-dark shadow-sm" onclick="showAddSupplierModal()">
+                ➕ Thêm Đại Lý Mới
+              </button>
+            </div>
+          </div>
+
+          <!-- Search bar for suppliers -->
+          <div class="bg-white rounded-3 shadow-sm border p-3 mb-3">
+            <div class="row g-2 align-items-center">
+              <div class="col-md-8">
+                <input type="text" class="form-control form-control-sm" id="adminSupplierSearchInput" placeholder="🔍 Tìm đại lý theo tên, website, địa chỉ, SĐT..." oninput="renderAdminSuppliersTable()">
+              </div>
+              <div class="col-md-4 text-end text-muted font-mono" style="font-size:12px;" id="adminSupplierCountLabel">
+                Đang tải danh sách đại lý...
+              </div>
+            </div>
+          </div>
+
+          <!-- Table of Suppliers -->
+          <div class="table-responsive bg-white rounded-3 shadow-sm border mb-3">
+            <table class="table table-hover align-middle mb-0" style="font-size:13px;">
+              <thead class="table-light">
+                <tr>
+                  <th style="width: 280px;">Tên Đại Lý / Công Ty</th>
+                  <th style="width: 220px;">Link Website / HTML Đại Lý</th>
+                  <th style="width: 140px;">Số Điện Thoại</th>
+                  <th>Địa Chỉ Cung Cấp</th>
+                  <th style="width: 130px;" class="text-center">Thao Tác</th>
+                </tr>
+              </thead>
+              <tbody id="adminSuppliersTbody">
+                <tr>
+                  <td colspan="5" class="text-center py-4 text-muted">Đang tải dữ liệu đại lý...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Pagination navigation for Suppliers -->
+          <div class="d-flex justify-content-between align-items-center bg-white p-3 rounded-3 shadow-sm border mb-4">
+            <div class="d-flex align-items-center gap-2">
+              <span class="text-muted font-mono" style="font-size:12px;">Hiển thị mỗi trang:</span>
+              <select class="form-select form-select-sm w-auto" id="supLimitSelect" onchange="changeSupplierLimit(this.value)">
+                <option value="15">15</option>
+                <option value="25" selected>25</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+              </select>
+            </div>
+            <nav aria-label="Supplier Page navigation">
+              <ul class="pagination pagination-sm justify-content-center m-0" id="supPaginationList">
+                <!-- Dynamic pagination buttons -->
+              </ul>
+            </nav>
+          </div>
+          </section>
 
         <!-- ═══ TAB: 3D STUDIO & DEFAULT RB LOADED ═══ -->
         <section class="tab-panel" id="threeDStudioTab">
@@ -2189,6 +2158,11 @@
       const tabPanels = document.querySelectorAll('.tab-panel');
 
       const setActiveTab = (targetId) => {
+        if (targetId === 'genaiServerTab') { const frame = document.getElementById('genaiServerFrame'); if (!frame.src) frame.src = frame.dataset.src; history.replaceState(null, '', '#genai'); }
+        if (targetId === 'productFormulasTab') {
+          const frame = document.getElementById('productFormulasFrame');
+          if (!frame.getAttribute('src')) frame.src = frame.dataset.src;
+        }
         tabPanels.forEach(panel => {
           panel.classList.toggle('is-active', panel.id === targetId);
         });
@@ -2214,6 +2188,12 @@
           setActiveTab(btn.dataset.tabTarget);
           if (btn.dataset.tabTarget === 'threeDStudioTab') {
             try { history.replaceState(null, '', '#3d'); } catch (e) { window.location.hash = '3d'; }
+          } else if (btn.dataset.tabTarget === 'materialsCatalogTab') {
+            history.replaceState(null, '', '#materials');
+          } else if (btn.dataset.tabTarget === 'materialSuppliersTab') {
+            history.replaceState(null, '', '#suppliers');
+          } else if (btn.dataset.tabTarget === 'productFormulasTab') {
+            history.replaceState(null, '', '#product-formulas');
           } else if (btn.dataset.tabTarget === 'extensionBridgeTab') {
             try { history.replaceState(null, '', '#extension'); } catch (e) { window.location.hash = 'extension'; }
           }
@@ -2223,8 +2203,14 @@
       // Tự động kích hoạt tab nếu URL có hash #3d hoặc #extension
       const checkHashOnLoad = () => {
         const h = (window.location.hash || '').replace('#', '').toLowerCase();
-        if (h === '3d' || h === 'threedstudiotab') {
+        if (h === 'genai') { setActiveTab('genaiServerTab'); } else if (h === '3d' || h === 'threedstudiotab') {
           setActiveTab('threeDStudioTab');
+        } else if (h === 'materials') {
+          setActiveTab('materialsCatalogTab');
+        } else if (h === 'suppliers') {
+          setActiveTab('materialSuppliersTab');
+        } else if (h === 'product-formulas') {
+          setActiveTab('productFormulasTab');
         } else if (h === 'extension' || h === 'extensionbridgetab') {
           setActiveTab('extensionBridgeTab');
         }
@@ -5153,6 +5139,30 @@
         loadExtensionWorkers();
       }
     }, 3000);
+  
+    // Đồng bộ dữ liệu bảng hiệu và vật liệu sang hệ thống AI
+    async function syncDataToAi() {
+      const btn = document.getElementById('btnSyncAiData');
+      if (!btn) return;
+      const originalHtml = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '<span>⏳ Đang nạp data...</span>';
+      try {
+        const resp = await fetch('/lead-manage/sync-ai-data', { method: 'POST' });
+        const res = await resp.json();
+        if (res.success) {
+          alert(res.message || 'Đã nạp thành công dữ liệu bảng hiệu và vật liệu vào hệ thống AI!');
+        } else {
+          alert('Lỗi: ' + (res.error || 'Không thể nạp dữ liệu vào hệ thống AI'));
+        }
+      } catch (e) {
+        alert('Lỗi kết nối máy chủ: ' + e.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = originalHtml;
+      }
+    }
+
   </script>
 </body>
 

@@ -1,0 +1,194 @@
+{
+  "schema_version": 1,
+  "product_id": "55ad06241305576d1560f3e900f8df60",
+  "view": "before",
+  "image": "/product-references/55ad06241305576d1560f3e900f8df60-photo-before.png",
+  "sha256": "fd0d29587eee4bf958e6a23979bc6129b3efdb1857398643681dccfbbf8959d9",
+  "width": 1448,
+  "height": 1086,
+  "coordinate_system": "image_pixels_top_left",
+  "status": "detected",
+  "regions": [
+    {
+      "text": "PHỞ THU",
+      "ocr_text": "PuẵTCI9",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        439.0,
+        0,
+        553.0,
+        147.0
+      ],
+      "quad": [
+        [
+          439.0,
+          0
+        ],
+        [
+          992.0,
+          0
+        ],
+        [
+          992.0,
+          147.0
+        ],
+        [
+          439.0,
+          147.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.303177,
+        0.0,
+        0.381906,
+        0.135359
+      ],
+      "normalized_quad": [
+        [
+          0.303177,
+          0.0
+        ],
+        [
+          0.685083,
+          0.0
+        ],
+        [
+          0.685083,
+          0.135359
+        ],
+        [
+          0.303177,
+          0.135359
+        ]
+      ],
+      "id": "before-visual-001",
+      "source_region_ids": [
+        "before-001"
+      ],
+      "slot_id": "text-d8d637d958-1"
+    },
+    {
+      "text": "GIA TRUYỀN NAM ĐỊNH",
+      "ocr_text": "G/a tRUYEn nam ĐInH",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        422.0,
+        144.0,
+        582.0,
+        88.0
+      ],
+      "quad": [
+        [
+          422.0,
+          144.0
+        ],
+        [
+          1004.0,
+          144.0
+        ],
+        [
+          1004.0,
+          232.0
+        ],
+        [
+          422.0,
+          232.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.291436,
+        0.132597,
+        0.401934,
+        0.081031
+      ],
+      "normalized_quad": [
+        [
+          0.291436,
+          0.132597
+        ],
+        [
+          0.69337,
+          0.132597
+        ],
+        [
+          0.69337,
+          0.213628
+        ],
+        [
+          0.291436,
+          0.213628
+        ]
+      ],
+      "id": "before-visual-002",
+      "source_region_ids": [
+        "before-002"
+      ],
+      "slot_id": "text-7ada6a450d-1"
+    },
+    {
+      "text": "PHỞ THU",
+      "ocr_text": "PHO THU",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        641.0,
+        853.0,
+        146.0,
+        40.0
+      ],
+      "quad": [
+        [
+          641.0,
+          853.0
+        ],
+        [
+          787.0,
+          853.0
+        ],
+        [
+          787.0,
+          893.0
+        ],
+        [
+          641.0,
+          893.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.44268,
+        0.785451,
+        0.100829,
+        0.036832
+      ],
+      "normalized_quad": [
+        [
+          0.44268,
+          0.785451
+        ],
+        [
+          0.543508,
+          0.785451
+        ],
+        [
+          0.543508,
+          0.822284
+        ],
+        [
+          0.44268,
+          0.822284
+        ]
+      ],
+      "id": "before-visual-003",
+      "source_region_ids": [
+        "before-003"
+      ],
+      "slot_id": "text-d8d637d958-2"
+    }
+  ],
+  "text_review": "image_review"
+}

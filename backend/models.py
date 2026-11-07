@@ -138,6 +138,26 @@ class BaseModel(db.Model):
         return self.createdAt.date()
 
 
+class ProductFormula(BaseModel):
+    __tablename__ = "product_formulas"
+    id = db.Column(db.String(50), primary_key=True)
+    name = db.Column(db.String(255), nullable=False)
+    category = db.Column(db.String(120), nullable=False, default="Bảng hiệu")
+    image_url = db.Column(db.Text, nullable=True)
+    definition = db.Column(db.JSON, nullable=False, default=dict)
+    is_published = db.Column(db.Boolean, nullable=False, default=False)
+
+
+class ProductQuotation(BaseModel):
+    __tablename__ = "product_quotations"
+    id = db.Column(db.String(50), primary_key=True)
+    lead_id = db.Column(db.Integer, db.ForeignKey("lead.id"), nullable=False, index=True)
+    user_id = db.Column(db.String(50), db.ForeignKey("user.id"), nullable=False, index=True)
+    product_id = db.Column(db.String(50), db.ForeignKey("product_formulas.id"), nullable=False)
+    payload = db.Column(db.JSON, nullable=False, default=dict)
+    stage = db.Column(db.Integer, nullable=False, default=0)
+
+
 class Material(BaseModel):
     __tablename__ = 'material'
 

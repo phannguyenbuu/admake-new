@@ -1,0 +1,389 @@
+{
+  "schema_version": 1,
+  "product_id": "744d70e3baaac2fc650bee29e9cea895",
+  "view": "after",
+  "image": "/product-references/744d70e3baaac2fc650bee29e9cea895-photo-after.png",
+  "sha256": "0ac4c0af4d267e4fcf0965131708d9383b4c38e27d02d48c0eab0d7a42fdf903",
+  "width": 1448,
+  "height": 1086,
+  "coordinate_system": "image_pixels_top_left",
+  "status": "detected",
+  "regions": [
+    {
+      "text": "THỦY NaBi",
+      "ocr_text": "THỦx%4Bi",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        184.02,
+        159.0,
+        1047.96,
+        479.0
+      ],
+      "quad": [
+        [
+          246.76,
+          159.0
+        ],
+        [
+          1231.98,
+          366.33
+        ],
+        [
+          1168.24,
+          638.0
+        ],
+        [
+          184.02,
+          430.67
+        ]
+      ],
+      "normalized_bbox": [
+        0.127086,
+        0.146409,
+        0.723729,
+        0.441068
+      ],
+      "normalized_quad": [
+        [
+          0.170414,
+          0.146409
+        ],
+        [
+          0.850815,
+          0.33732
+        ],
+        [
+          0.806796,
+          0.587477
+        ],
+        [
+          0.127086,
+          0.396565
+        ]
+      ],
+      "id": "after-visual-001",
+      "source_region_ids": [
+        "after-002"
+      ],
+      "slot_id": "text-35874a1c69-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "Tiệm thuê đồ bmt",
+      "ocr_text": "Tiệm | thuê | đồ | bmt",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        388.06,
+        489.79,
+        548.79,
+        193.31
+      ],
+      "quad": [
+        [
+          388.06,
+          489.79
+        ],
+        [
+          936.85,
+          489.79
+        ],
+        [
+          936.85,
+          683.1
+        ],
+        [
+          388.06,
+          683.1
+        ]
+      ],
+      "normalized_bbox": [
+        0.267997,
+        0.451004,
+        0.378999,
+        0.178002
+      ],
+      "normalized_quad": [
+        [
+          0.267997,
+          0.451004
+        ],
+        [
+          0.646996,
+          0.451004
+        ],
+        [
+          0.646996,
+          0.629006
+        ],
+        [
+          0.267997,
+          0.629006
+        ]
+      ],
+      "id": "after-visual-002",
+      "source_region_ids": [
+        "after-003",
+        "after-004",
+        "after-006",
+        "after-010"
+      ],
+      "slot_id": "text-2e9bb5932a-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "ĐC: 09 Bà Triệu",
+      "ocr_text": "ĐC: 09 Bà | Triệu",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        246.16,
+        585.35,
+        201.27,
+        74.93
+      ],
+      "quad": [
+        [
+          246.16,
+          585.35
+        ],
+        [
+          447.43,
+          585.35
+        ],
+        [
+          447.43,
+          660.28
+        ],
+        [
+          246.16,
+          660.28
+        ]
+      ],
+      "normalized_bbox": [
+        0.17,
+        0.538996,
+        0.138999,
+        0.068996
+      ],
+      "normalized_quad": [
+        [
+          0.17,
+          0.538996
+        ],
+        [
+          0.308999,
+          0.538996
+        ],
+        [
+          0.308999,
+          0.607993
+        ],
+        [
+          0.17,
+          0.607993
+        ]
+      ],
+      "id": "after-visual-003",
+      "source_region_ids": [
+        "after-005",
+        "after-009"
+      ],
+      "slot_id": "text-7e9a6b8cf4-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "P. Buôn Ma Thuột",
+      "ocr_text": "P. | Buôn | Ma | Thuột",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        247.61,
+        626.62,
+        220.1,
+        80.36
+      ],
+      "quad": [
+        [
+          247.61,
+          626.62
+        ],
+        [
+          467.71,
+          626.62
+        ],
+        [
+          467.71,
+          706.98
+        ],
+        [
+          247.61,
+          706.98
+        ]
+      ],
+      "normalized_bbox": [
+        0.171001,
+        0.576998,
+        0.152003,
+        0.073996
+      ],
+      "normalized_quad": [
+        [
+          0.171001,
+          0.576998
+        ],
+        [
+          0.323004,
+          0.576998
+        ],
+        [
+          0.323004,
+          0.650994
+        ],
+        [
+          0.171001,
+          0.650994
+        ]
+      ],
+      "id": "after-visual-004",
+      "source_region_ids": [
+        "after-007",
+        "after-008",
+        "after-011",
+        "after-012"
+      ],
+      "slot_id": "text-945d352df5-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "Sđt: 0962085179",
+      "ocr_text": "Sđt: | 0962085179",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        642.91,
+        723.28,
+        227.34,
+        86.88
+      ],
+      "quad": [
+        [
+          642.91,
+          723.28
+        ],
+        [
+          870.25,
+          723.28
+        ],
+        [
+          870.25,
+          810.16
+        ],
+        [
+          642.91,
+          810.16
+        ]
+      ],
+      "normalized_bbox": [
+        0.443999,
+        0.666004,
+        0.157003,
+        0.08
+      ],
+      "normalized_quad": [
+        [
+          0.443999,
+          0.666004
+        ],
+        [
+          0.601001,
+          0.666004
+        ],
+        [
+          0.601001,
+          0.746004
+        ],
+        [
+          0.443999,
+          0.746004
+        ]
+      ],
+      "id": "after-visual-005",
+      "source_region_ids": [
+        "after-013",
+        "after-014"
+      ],
+      "slot_id": "text-a6eb5c4f0d-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "Thùy NaBi",
+      "ocr_text": "Thùy | NaBi",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        1059.94,
+        829.7,
+        157.83,
+        74.93
+      ],
+      "quad": [
+        [
+          1059.94,
+          829.7
+        ],
+        [
+          1217.77,
+          829.7
+        ],
+        [
+          1217.77,
+          904.63
+        ],
+        [
+          1059.94,
+          904.63
+        ]
+      ],
+      "normalized_bbox": [
+        0.732003,
+        0.763996,
+        0.108999,
+        0.068996
+      ],
+      "normalized_quad": [
+        [
+          0.732003,
+          0.763996
+        ],
+        [
+          0.841001,
+          0.763996
+        ],
+        [
+          0.841001,
+          0.832993
+        ],
+        [
+          0.732003,
+          0.832993
+        ]
+      ],
+      "id": "after-visual-006",
+      "source_region_ids": [
+        "after-015",
+        "after-016"
+      ],
+      "slot_id": "text-35874a1c69-2",
+      "match_confidence": 1.0
+    }
+  ],
+  "text_review": "image_review"
+}

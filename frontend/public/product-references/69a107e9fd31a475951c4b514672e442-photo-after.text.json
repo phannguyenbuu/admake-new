@@ -1,0 +1,500 @@
+{
+  "schema_version": 1,
+  "product_id": "69a107e9fd31a475951c4b514672e442",
+  "view": "after",
+  "image": "/product-references/69a107e9fd31a475951c4b514672e442-photo-after.png",
+  "sha256": "8f61cb3bbb0ce448ec618076aade94861d86405091854553026369d098ecfaf9",
+  "width": 1448,
+  "height": 1086,
+  "coordinate_system": "image_pixels_top_left",
+  "status": "detected",
+  "regions": [
+    {
+      "text": "HÄFELE",
+      "ocr_text": "HAFELE",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        306.9,
+        207.35,
+        649.2,
+        304.29999999999995
+      ],
+      "quad": [
+        [
+          306.9,
+          316.08
+        ],
+        [
+          928.12,
+          207.35
+        ],
+        [
+          956.1,
+          403.92
+        ],
+        [
+          334.88,
+          511.65
+        ]
+      ],
+      "normalized_bbox": [
+        0.211948,
+        0.19093,
+        0.448343,
+        0.280203
+      ],
+      "normalized_quad": [
+        [
+          0.211948,
+          0.29105
+        ],
+        [
+          0.640967,
+          0.19093
+        ],
+        [
+          0.66029,
+          0.371934
+        ],
+        [
+          0.231271,
+          0.471133
+        ]
+      ],
+      "id": "after-visual-001",
+      "source_region_ids": [
+        "after-001"
+      ],
+      "slot_id": "text-8a831db743-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "ĐĂNG TUẤN",
+      "ocr_text": "ĐANG TUÂN",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        725.45,
+        279.1,
+        379.38,
+        172.67
+      ],
+      "quad": [
+        [
+          725.45,
+          279.1
+        ],
+        [
+          1104.83,
+          279.1
+        ],
+        [
+          1104.83,
+          451.77
+        ],
+        [
+          725.45,
+          451.77
+        ]
+      ],
+      "normalized_bbox": [
+        0.501001,
+        0.256998,
+        0.262003,
+        0.158996
+      ],
+      "normalized_quad": [
+        [
+          0.501001,
+          0.256998
+        ],
+        [
+          0.763004,
+          0.256998
+        ],
+        [
+          0.763004,
+          0.415994
+        ],
+        [
+          0.501001,
+          0.415994
+        ]
+      ],
+      "id": "after-visual-002",
+      "source_region_ids": [
+        "after-002"
+      ],
+      "slot_id": "text-5105a0c4b8-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "Thiết Bị Gia Dụng Nhà Bếp",
+      "ocr_text": "Thêt Bi Gia Dung Nhà Bếp",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        999.12,
+        179.19,
+        146.25,
+        24.98
+      ],
+      "quad": [
+        [
+          999.12,
+          179.19
+        ],
+        [
+          1145.37,
+          179.19
+        ],
+        [
+          1145.37,
+          204.17
+        ],
+        [
+          999.12,
+          204.17
+        ]
+      ],
+      "normalized_bbox": [
+        0.69,
+        0.165,
+        0.101001,
+        0.023002
+      ],
+      "normalized_quad": [
+        [
+          0.69,
+          0.165
+        ],
+        [
+          0.791001,
+          0.165
+        ],
+        [
+          0.791001,
+          0.188002
+        ],
+        [
+          0.69,
+          0.188002
+        ]
+      ],
+      "id": "after-visual-003",
+      "source_region_ids": [
+        "after-003"
+      ],
+      "slot_id": "text-001d418158-1"
+    },
+    {
+      "text": "Phụ Kiện Đồ Gỗ Mỹ Thuật",
+      "ocr_text": "Phụ Kiện Đồ Gỗ Mỹ Thuật",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        996.22,
+        363.81,
+        194.03,
+        28.24
+      ],
+      "quad": [
+        [
+          996.22,
+          363.81
+        ],
+        [
+          1190.25,
+          363.81
+        ],
+        [
+          1190.25,
+          392.05
+        ],
+        [
+          996.22,
+          392.05
+        ]
+      ],
+      "normalized_bbox": [
+        0.687997,
+        0.335,
+        0.133999,
+        0.026004
+      ],
+      "normalized_quad": [
+        [
+          0.687997,
+          0.335
+        ],
+        [
+          0.821996,
+          0.335
+        ],
+        [
+          0.821996,
+          0.361004
+        ],
+        [
+          0.687997,
+          0.361004
+        ]
+      ],
+      "id": "after-visual-004",
+      "source_region_ids": [
+        "after-004"
+      ],
+      "slot_id": "text-7eb543d4c8-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "Phụ Kiện Cửa & Ngũ Kim",
+      "ocr_text": "Phụ Kiện Của & Ngủ Kim",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        996.22,
+        607.07,
+        231.68,
+        34.75
+      ],
+      "quad": [
+        [
+          996.22,
+          607.07
+        ],
+        [
+          1227.9,
+          607.07
+        ],
+        [
+          1227.9,
+          641.82
+        ],
+        [
+          996.22,
+          641.82
+        ]
+      ],
+      "normalized_bbox": [
+        0.687997,
+        0.558996,
+        0.16,
+        0.031998
+      ],
+      "normalized_quad": [
+        [
+          0.687997,
+          0.558996
+        ],
+        [
+          0.847997,
+          0.558996
+        ],
+        [
+          0.847997,
+          0.590994
+        ],
+        [
+          0.687997,
+          0.590994
+        ]
+      ],
+      "id": "after-visual-005",
+      "source_region_ids": [
+        "after-005"
+      ],
+      "slot_id": "text-4a9bf528c8-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "113 Nguyễn Hữu Thọ, TP. BMT, Tỉnh Đắk Lắk (Cạnh Phú Tài)",
+      "ocr_text": "1lggéHu Thọ TPBHI; Toh Đák Lék (Canh Phú Tài)",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        1059.94,
+        175.93,
+        273.67,
+        27.15
+      ],
+      "quad": [
+        [
+          1059.94,
+          175.93
+        ],
+        [
+          1333.61,
+          175.93
+        ],
+        [
+          1333.61,
+          203.08
+        ],
+        [
+          1059.94,
+          203.08
+        ]
+      ],
+      "normalized_bbox": [
+        0.732003,
+        0.161998,
+        0.188999,
+        0.025
+      ],
+      "normalized_quad": [
+        [
+          0.732003,
+          0.161998
+        ],
+        [
+          0.921001,
+          0.161998
+        ],
+        [
+          0.921001,
+          0.186998
+        ],
+        [
+          0.732003,
+          0.186998
+        ]
+      ],
+      "id": "after-visual-006",
+      "source_region_ids": [
+        "after-006"
+      ],
+      "slot_id": "text-eecb91017c-1"
+    },
+    {
+      "text": "Www.bepsongtuan.com",
+      "ocr_text": "Wwwbepsongtuancom",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        1071.52,
+        432.23,
+        170.86,
+        27.15
+      ],
+      "quad": [
+        [
+          1071.52,
+          432.23
+        ],
+        [
+          1242.38,
+          432.23
+        ],
+        [
+          1242.38,
+          459.38
+        ],
+        [
+          1071.52,
+          459.38
+        ]
+      ],
+      "normalized_bbox": [
+        0.74,
+        0.398002,
+        0.117997,
+        0.025
+      ],
+      "normalized_quad": [
+        [
+          0.74,
+          0.398002
+        ],
+        [
+          0.857997,
+          0.398002
+        ],
+        [
+          0.857997,
+          0.423002
+        ],
+        [
+          0.74,
+          0.423002
+        ]
+      ],
+      "id": "after-visual-007",
+      "source_region_ids": [
+        "after-007"
+      ],
+      "slot_id": "text-4f554950f8-1"
+    },
+    {
+      "text": "ĐT: 0841 09 09 92 - 0941 78 38 48",
+      "ocr_text": "ĐT: 0841 09 09 92 ~ | 0941 78 38 48",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        1086.0,
+        608.16,
+        233.13,
+        30.41
+      ],
+      "quad": [
+        [
+          1086.0,
+          608.16
+        ],
+        [
+          1319.13,
+          608.16
+        ],
+        [
+          1319.13,
+          638.57
+        ],
+        [
+          1086.0,
+          638.57
+        ]
+      ],
+      "normalized_bbox": [
+        0.75,
+        0.56,
+        0.161001,
+        0.028002
+      ],
+      "normalized_quad": [
+        [
+          0.75,
+          0.56
+        ],
+        [
+          0.911001,
+          0.56
+        ],
+        [
+          0.911001,
+          0.588002
+        ],
+        [
+          0.75,
+          0.588002
+        ]
+      ],
+      "id": "after-visual-008",
+      "source_region_ids": [
+        "after-008",
+        "after-009"
+      ],
+      "slot_id": "text-b6af4e8a85-1",
+      "match_confidence": 0.9091
+    }
+  ],
+  "text_review": "image_review"
+}

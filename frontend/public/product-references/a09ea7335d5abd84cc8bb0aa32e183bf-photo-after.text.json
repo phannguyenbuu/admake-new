@@ -1,0 +1,327 @@
+{
+  "schema_version": 1,
+  "product_id": "a09ea7335d5abd84cc8bb0aa32e183bf",
+  "view": "after",
+  "image": "/product-references/a09ea7335d5abd84cc8bb0aa32e183bf-photo-after.png",
+  "sha256": "40a0260b41e9f23bc60846103acc01b15c91ca22f29e3bdf1fc86a75d417249e",
+  "width": 1448,
+  "height": 1086,
+  "coordinate_system": "image_pixels_top_left",
+  "status": "detected",
+  "regions": [
+    {
+      "text": "VỰA SẦU RIÊNG",
+      "ocr_text": "VỰA SẦU | RIÊNG",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        483.63,
+        93.4,
+        960.02,
+        157.47
+      ],
+      "quad": [
+        [
+          483.63,
+          93.4
+        ],
+        [
+          1443.65,
+          93.4
+        ],
+        [
+          1443.65,
+          250.87
+        ],
+        [
+          483.63,
+          250.87
+        ]
+      ],
+      "normalized_bbox": [
+        0.333999,
+        0.086004,
+        0.662997,
+        0.145
+      ],
+      "normalized_quad": [
+        [
+          0.333999,
+          0.086004
+        ],
+        [
+          0.996996,
+          0.086004
+        ],
+        [
+          0.996996,
+          0.231004
+        ],
+        [
+          0.333999,
+          0.231004
+        ]
+      ],
+      "id": "after-visual-001",
+      "source_region_ids": [
+        "after-001",
+        "after-002"
+      ],
+      "slot_id": "text-f369cda067-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "Phúc",
+      "ocr_text": "Phúc",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        519.2,
+        185.01,
+        414.5999999999999,
+        219.98000000000002
+      ],
+      "quad": [
+        [
+          544.71,
+          185.01
+        ],
+        [
+          933.8,
+          240.47
+        ],
+        [
+          908.29,
+          404.99
+        ],
+        [
+          519.2,
+          349.53
+        ]
+      ],
+      "normalized_bbox": [
+        0.358564,
+        0.170359,
+        0.286326,
+        0.20256
+      ],
+      "normalized_quad": [
+        [
+          0.376181,
+          0.170359
+        ],
+        [
+          0.64489,
+          0.221427
+        ],
+        [
+          0.627272,
+          0.372919
+        ],
+        [
+          0.358564,
+          0.321851
+        ]
+      ],
+      "id": "after-visual-002",
+      "source_region_ids": [
+        "after-003"
+      ],
+      "slot_id": "text-9229ec79a2-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "Thuận",
+      "ocr_text": "Thuận",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        451.06,
+        320.0,
+        548.8800000000001,
+        288.0
+      ],
+      "quad": [
+        [
+          492.74,
+          320.0
+        ],
+        [
+          999.94,
+          429.12
+        ],
+        [
+          957.26,
+          608.0
+        ],
+        [
+          451.06,
+          498.88
+        ]
+      ],
+      "normalized_bbox": [
+        0.311506,
+        0.294659,
+        0.379061,
+        0.265193
+      ],
+      "normalized_quad": [
+        [
+          0.34029,
+          0.294659
+        ],
+        [
+          0.690566,
+          0.395138
+        ],
+        [
+          0.661091,
+          0.559853
+        ],
+        [
+          0.311506,
+          0.459374
+        ]
+      ],
+      "id": "after-visual-003",
+      "source_region_ids": [
+        "after-004"
+      ],
+      "slot_id": "text-1e45b1e7b9-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "Km14 - QL14 - CUÔR ĐĂNG - DAKLAK",
+      "ocr_text": "Kml4 - | QLI4 | CUÔR | ĐĂNG | DAKLAK",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        495.22,
+        547.34,
+        948.44,
+        43.44
+      ],
+      "quad": [
+        [
+          495.22,
+          547.34
+        ],
+        [
+          1443.66,
+          547.34
+        ],
+        [
+          1443.66,
+          590.78
+        ],
+        [
+          495.22,
+          590.78
+        ]
+      ],
+      "normalized_bbox": [
+        0.342003,
+        0.503996,
+        0.655,
+        0.04
+      ],
+      "normalized_quad": [
+        [
+          0.342003,
+          0.503996
+        ],
+        [
+          0.997003,
+          0.503996
+        ],
+        [
+          0.997003,
+          0.543996
+        ],
+        [
+          0.342003,
+          0.543996
+        ]
+      ],
+      "id": "after-visual-004",
+      "source_region_ids": [
+        "after-005",
+        "after-006",
+        "after-007",
+        "after-009",
+        "after-011"
+      ],
+      "slot_id": "text-b6a5e534a3-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "0764.39 68 68 - 0934.53 22 55",
+      "ocr_text": "0764.39 | 68 68 | 0934.53 | 22 55",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        531.42,
+        588.61,
+        906.45,
+        49.96
+      ],
+      "quad": [
+        [
+          531.42,
+          588.61
+        ],
+        [
+          1437.87,
+          588.61
+        ],
+        [
+          1437.87,
+          638.57
+        ],
+        [
+          531.42,
+          638.57
+        ]
+      ],
+      "normalized_bbox": [
+        0.367003,
+        0.541998,
+        0.626001,
+        0.046004
+      ],
+      "normalized_quad": [
+        [
+          0.367003,
+          0.541998
+        ],
+        [
+          0.993004,
+          0.541998
+        ],
+        [
+          0.993004,
+          0.588002
+        ],
+        [
+          0.367003,
+          0.588002
+        ]
+      ],
+      "id": "after-visual-005",
+      "source_region_ids": [
+        "after-008",
+        "after-010",
+        "after-012",
+        "after-013"
+      ],
+      "slot_id": "text-74d01515cf-1",
+      "match_confidence": 1.0
+    }
+  ],
+  "text_review": "image_review"
+}

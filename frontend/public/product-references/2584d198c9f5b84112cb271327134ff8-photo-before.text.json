@@ -1,0 +1,478 @@
+{
+  "schema_version": 1,
+  "product_id": "2584d198c9f5b84112cb271327134ff8",
+  "view": "before",
+  "image": "/product-references/2584d198c9f5b84112cb271327134ff8-photo-before.png",
+  "sha256": "0a25c9f1f0f7e3989fdc64d74e2d65df4344e64ae23531cf50aa2c3ac0cbe491",
+  "width": 1448,
+  "height": 1086,
+  "coordinate_system": "image_pixels_top_left",
+  "status": "detected",
+  "regions": [
+    {
+      "text": "ALCO",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        207.06,
+        698.3,
+        774.68,
+        387.7
+      ],
+      "quad": [
+        [
+          207.06,
+          698.3
+        ],
+        [
+          981.74,
+          698.3
+        ],
+        [
+          981.74,
+          1086.0
+        ],
+        [
+          207.06,
+          1086.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.142997,
+        0.643002,
+        0.535,
+        0.356998
+      ],
+      "normalized_quad": [
+        [
+          0.142997,
+          0.643002
+        ],
+        [
+          0.677997,
+          0.643002
+        ],
+        [
+          0.677997,
+          1.0
+        ],
+        [
+          0.142997,
+          1.0
+        ]
+      ],
+      "id": "before-visual-001",
+      "source_region_ids": [],
+      "slot_id": "text-94b9c68fbe-1"
+    },
+    {
+      "text": "Aluminum compos",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        207.06,
+        698.3,
+        774.68,
+        387.7
+      ],
+      "quad": [
+        [
+          207.06,
+          698.3
+        ],
+        [
+          981.74,
+          698.3
+        ],
+        [
+          981.74,
+          1086.0
+        ],
+        [
+          207.06,
+          1086.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.142997,
+        0.643002,
+        0.535,
+        0.356998
+      ],
+      "normalized_quad": [
+        [
+          0.142997,
+          0.643002
+        ],
+        [
+          0.677997,
+          0.643002
+        ],
+        [
+          0.677997,
+          1.0
+        ],
+        [
+          0.142997,
+          1.0
+        ]
+      ],
+      "id": "before-visual-002",
+      "source_region_ids": [],
+      "slot_id": "text-84fd69b2a5-1"
+    },
+    {
+      "text": "ALCO",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        335.94,
+        472.41,
+        948.44,
+        407.25
+      ],
+      "quad": [
+        [
+          335.94,
+          472.41
+        ],
+        [
+          1284.38,
+          472.41
+        ],
+        [
+          1284.38,
+          879.66
+        ],
+        [
+          335.94,
+          879.66
+        ]
+      ],
+      "normalized_bbox": [
+        0.232003,
+        0.435,
+        0.655,
+        0.375
+      ],
+      "normalized_quad": [
+        [
+          0.232003,
+          0.435
+        ],
+        [
+          0.887003,
+          0.435
+        ],
+        [
+          0.887003,
+          0.81
+        ],
+        [
+          0.232003,
+          0.81
+        ]
+      ],
+      "id": "before-visual-003",
+      "source_region_ids": [],
+      "slot_id": "text-94b9c68fbe-2"
+    },
+    {
+      "text": "Aluminum compos",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        335.94,
+        472.41,
+        948.44,
+        407.25
+      ],
+      "quad": [
+        [
+          335.94,
+          472.41
+        ],
+        [
+          1284.38,
+          472.41
+        ],
+        [
+          1284.38,
+          879.66
+        ],
+        [
+          335.94,
+          879.66
+        ]
+      ],
+      "normalized_bbox": [
+        0.232003,
+        0.435,
+        0.655,
+        0.375
+      ],
+      "normalized_quad": [
+        [
+          0.232003,
+          0.435
+        ],
+        [
+          0.887003,
+          0.435
+        ],
+        [
+          0.887003,
+          0.81
+        ],
+        [
+          0.232003,
+          0.81
+        ]
+      ],
+      "id": "before-visual-004",
+      "source_region_ids": [],
+      "slot_id": "text-84fd69b2a5-2"
+    },
+    {
+      "text": "ALCO",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        372.14,
+        173.76,
+        441.64,
+        336.66
+      ],
+      "quad": [
+        [
+          372.14,
+          173.76
+        ],
+        [
+          813.78,
+          173.76
+        ],
+        [
+          813.78,
+          510.42
+        ],
+        [
+          372.14,
+          510.42
+        ]
+      ],
+      "normalized_bbox": [
+        0.257003,
+        0.16,
+        0.305,
+        0.31
+      ],
+      "normalized_quad": [
+        [
+          0.257003,
+          0.16
+        ],
+        [
+          0.562003,
+          0.16
+        ],
+        [
+          0.562003,
+          0.47
+        ],
+        [
+          0.257003,
+          0.47
+        ]
+      ],
+      "id": "before-visual-005",
+      "source_region_ids": [],
+      "slot_id": "text-94b9c68fbe-3"
+    },
+    {
+      "text": "Aluminum compos",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        372.14,
+        173.76,
+        441.64,
+        336.66
+      ],
+      "quad": [
+        [
+          372.14,
+          173.76
+        ],
+        [
+          813.78,
+          173.76
+        ],
+        [
+          813.78,
+          510.42
+        ],
+        [
+          372.14,
+          510.42
+        ]
+      ],
+      "normalized_bbox": [
+        0.257003,
+        0.16,
+        0.305,
+        0.31
+      ],
+      "normalized_quad": [
+        [
+          0.257003,
+          0.16
+        ],
+        [
+          0.562003,
+          0.16
+        ],
+        [
+          0.562003,
+          0.47
+        ],
+        [
+          0.257003,
+          0.47
+        ]
+      ],
+      "id": "before-visual-006",
+      "source_region_ids": [],
+      "slot_id": "text-84fd69b2a5-3"
+    },
+    {
+      "text": "Redwood",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        821.02,
+        304.08,
+        626.98,
+        781.92
+      ],
+      "quad": [
+        [
+          821.02,
+          304.08
+        ],
+        [
+          1448.0,
+          304.08
+        ],
+        [
+          1448.0,
+          1086.0
+        ],
+        [
+          821.02,
+          1086.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.567003,
+        0.28,
+        0.432997,
+        0.72
+      ],
+      "normalized_quad": [
+        [
+          0.567003,
+          0.28
+        ],
+        [
+          1.0,
+          0.28
+        ],
+        [
+          1.0,
+          1.0
+        ],
+        [
+          0.567003,
+          1.0
+        ]
+      ],
+      "id": "before-visual-007",
+      "source_region_ids": [],
+      "slot_id": "text-eb56be0413-1"
+    },
+    {
+      "text": "Aluminum",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        821.02,
+        304.08,
+        626.98,
+        781.92
+      ],
+      "quad": [
+        [
+          821.02,
+          304.08
+        ],
+        [
+          1448.0,
+          304.08
+        ],
+        [
+          1448.0,
+          1086.0
+        ],
+        [
+          821.02,
+          1086.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.567003,
+        0.28,
+        0.432997,
+        0.72
+      ],
+      "normalized_quad": [
+        [
+          0.567003,
+          0.28
+        ],
+        [
+          1.0,
+          0.28
+        ],
+        [
+          1.0,
+          1.0
+        ],
+        [
+          0.567003,
+          1.0
+        ]
+      ],
+      "id": "before-visual-008",
+      "source_region_ids": [],
+      "slot_id": "text-a2c1d07df4-1"
+    }
+  ],
+  "text_review": "image_review"
+}

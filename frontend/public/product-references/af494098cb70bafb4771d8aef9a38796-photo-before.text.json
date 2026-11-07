@@ -1,0 +1,1704 @@
+{
+  "schema_version": 1,
+  "product_id": "af494098cb70bafb4771d8aef9a38796",
+  "view": "before",
+  "image": "/product-references/af494098cb70bafb4771d8aef9a38796-photo-before.png",
+  "sha256": "875a0c90414704fe604336238e5b9ca74eff726d14af43d3a9ec216dbba27eda",
+  "width": 1448,
+  "height": 1086,
+  "coordinate_system": "image_pixels_top_left",
+  "status": "detected",
+  "regions": [
+    {
+      "text": "NANOPXN",
+      "ocr_text": "NANOPXN",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        258.0,
+        282.0,
+        204.0,
+        48.0
+      ],
+      "quad": [
+        [
+          258.0,
+          282.0
+        ],
+        [
+          462.0,
+          282.0
+        ],
+        [
+          462.0,
+          330.0
+        ],
+        [
+          258.0,
+          330.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.178177,
+        0.259669,
+        0.140884,
+        0.044199
+      ],
+      "normalized_quad": [
+        [
+          0.178177,
+          0.259669
+        ],
+        [
+          0.319061,
+          0.259669
+        ],
+        [
+          0.319061,
+          0.303867
+        ],
+        [
+          0.178177,
+          0.303867
+        ]
+      ],
+      "id": "before-visual-001",
+      "source_region_ids": [
+        "before-001"
+      ],
+      "slot_id": "text-758b8f3958-1"
+    },
+    {
+      "text": "Made in Korea",
+      "ocr_text": "Madorea",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        457.0,
+        281.0,
+        70.0,
+        46.0
+      ],
+      "quad": [
+        [
+          457.0,
+          281.0
+        ],
+        [
+          527.0,
+          281.0
+        ],
+        [
+          527.0,
+          327.0
+        ],
+        [
+          457.0,
+          327.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.315608,
+        0.258748,
+        0.048343,
+        0.042357
+      ],
+      "normalized_quad": [
+        [
+          0.315608,
+          0.258748
+        ],
+        [
+          0.36395,
+          0.258748
+        ],
+        [
+          0.36395,
+          0.301105
+        ],
+        [
+          0.315608,
+          0.301105
+        ]
+      ],
+      "id": "before-visual-002",
+      "source_region_ids": [
+        "before-002"
+      ],
+      "slot_id": "text-e3913c53b2-1"
+    },
+    {
+      "text": "PHIẾU BẢO HÀNH",
+      "ocr_text": "PHIẾU BẢO HÀNH",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        548.0,
+        262.0,
+        488.0,
+        72.0
+      ],
+      "quad": [
+        [
+          548.0,
+          262.0
+        ],
+        [
+          1036.0,
+          262.0
+        ],
+        [
+          1036.0,
+          334.0
+        ],
+        [
+          548.0,
+          334.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.378453,
+        0.241252,
+        0.337017,
+        0.066298
+      ],
+      "normalized_quad": [
+        [
+          0.378453,
+          0.241252
+        ],
+        [
+          0.71547,
+          0.241252
+        ],
+        [
+          0.71547,
+          0.307551
+        ],
+        [
+          0.378453,
+          0.307551
+        ]
+      ],
+      "id": "before-visual-003",
+      "source_region_ids": [
+        "before-003"
+      ],
+      "slot_id": "text-a47d350330-1"
+    },
+    {
+      "text": "Số :",
+      "ocr_text": "Số",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        646.0,
+        336.0,
+        42.0,
+        32.0
+      ],
+      "quad": [
+        [
+          646.0,
+          336.0
+        ],
+        [
+          688.0,
+          336.0
+        ],
+        [
+          688.0,
+          368.0
+        ],
+        [
+          646.0,
+          368.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.446133,
+        0.309392,
+        0.029006,
+        0.029466
+      ],
+      "normalized_quad": [
+        [
+          0.446133,
+          0.309392
+        ],
+        [
+          0.475138,
+          0.309392
+        ],
+        [
+          0.475138,
+          0.338858
+        ],
+        [
+          0.446133,
+          0.338858
+        ]
+      ],
+      "id": "before-visual-004",
+      "source_region_ids": [
+        "before-004"
+      ],
+      "slot_id": "text-cd1b646ebd-1"
+    },
+    {
+      "text": "Khách hàng:",
+      "ocr_text": "Khách hàng:",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        258.0,
+        386.0,
+        110.0,
+        24.0
+      ],
+      "quad": [
+        [
+          258.0,
+          386.0
+        ],
+        [
+          368.0,
+          386.0
+        ],
+        [
+          368.0,
+          410.0
+        ],
+        [
+          258.0,
+          410.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.178177,
+        0.355433,
+        0.075967,
+        0.022099
+      ],
+      "normalized_quad": [
+        [
+          0.178177,
+          0.355433
+        ],
+        [
+          0.254144,
+          0.355433
+        ],
+        [
+          0.254144,
+          0.377532
+        ],
+        [
+          0.178177,
+          0.377532
+        ]
+      ],
+      "id": "before-visual-005",
+      "source_region_ids": [
+        "before-005"
+      ],
+      "slot_id": "text-926779c348-1"
+    },
+    {
+      "text": "Nhãn hiệu xe:",
+      "ocr_text": "Nhãn hiệu xe:",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        258.0,
+        424.0,
+        120.0,
+        24.0
+      ],
+      "quad": [
+        [
+          258.0,
+          424.0
+        ],
+        [
+          378.0,
+          424.0
+        ],
+        [
+          378.0,
+          448.0
+        ],
+        [
+          258.0,
+          448.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.178177,
+        0.390424,
+        0.082873,
+        0.022099
+      ],
+      "normalized_quad": [
+        [
+          0.178177,
+          0.390424
+        ],
+        [
+          0.26105,
+          0.390424
+        ],
+        [
+          0.26105,
+          0.412523
+        ],
+        [
+          0.178177,
+          0.412523
+        ]
+      ],
+      "id": "before-visual-006",
+      "source_region_ids": [
+        "before-007"
+      ],
+      "slot_id": "text-f5e1eaa9ae-1"
+    },
+    {
+      "text": "Biển KS/Số khung:",
+      "ocr_text": "Biển KSISố khung:",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        256.0,
+        462.0,
+        165.0,
+        29.0
+      ],
+      "quad": [
+        [
+          256.0,
+          462.0
+        ],
+        [
+          421.0,
+          462.0
+        ],
+        [
+          421.0,
+          491.0
+        ],
+        [
+          256.0,
+          491.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.176796,
+        0.425414,
+        0.11395,
+        0.026703
+      ],
+      "normalized_quad": [
+        [
+          0.176796,
+          0.425414
+        ],
+        [
+          0.290746,
+          0.425414
+        ],
+        [
+          0.290746,
+          0.452118
+        ],
+        [
+          0.176796,
+          0.452118
+        ]
+      ],
+      "id": "before-visual-007",
+      "source_region_ids": [
+        "before-010"
+      ],
+      "slot_id": "text-e34d85bdb1-1"
+    },
+    {
+      "text": "Thời hạn bảo hành:",
+      "ocr_text": "Thời hạn bảo hành:",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        254.0,
+        504.0,
+        172.0,
+        24.0
+      ],
+      "quad": [
+        [
+          254.0,
+          504.0
+        ],
+        [
+          426.0,
+          504.0
+        ],
+        [
+          426.0,
+          528.0
+        ],
+        [
+          254.0,
+          528.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.175414,
+        0.464088,
+        0.118785,
+        0.022099
+      ],
+      "normalized_quad": [
+        [
+          0.175414,
+          0.464088
+        ],
+        [
+          0.294199,
+          0.464088
+        ],
+        [
+          0.294199,
+          0.486188
+        ],
+        [
+          0.175414,
+          0.486188
+        ]
+      ],
+      "id": "before-visual-008",
+      "source_region_ids": [
+        "before-015"
+      ],
+      "slot_id": "text-50f3685332-1"
+    },
+    {
+      "text": "Thời gian lắp đặt:",
+      "ocr_text": "Thời gian lắp đặt:",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        254.0,
+        544.0,
+        152.0,
+        28.0
+      ],
+      "quad": [
+        [
+          254.0,
+          544.0
+        ],
+        [
+          406.0,
+          544.0
+        ],
+        [
+          406.0,
+          572.0
+        ],
+        [
+          254.0,
+          572.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.175414,
+        0.500921,
+        0.104972,
+        0.025783
+      ],
+      "normalized_quad": [
+        [
+          0.175414,
+          0.500921
+        ],
+        [
+          0.280387,
+          0.500921
+        ],
+        [
+          0.280387,
+          0.526703
+        ],
+        [
+          0.175414,
+          0.526703
+        ]
+      ],
+      "id": "before-visual-009",
+      "source_region_ids": [
+        "before-019"
+      ],
+      "slot_id": "text-fb48b45ba6-1"
+    },
+    {
+      "text": "Cảm ơn Quý khách hàng đã chọn sử dụng Nanopxn®",
+      "ocr_text": "Cảm ơn Quý khách hàng đă chọn sử dụng Nanopxn@",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        780.0,
+        385.0,
+        488.0,
+        32.0
+      ],
+      "quad": [
+        [
+          780.0,
+          385.0
+        ],
+        [
+          1268.0,
+          385.0
+        ],
+        [
+          1268.0,
+          417.0
+        ],
+        [
+          780.0,
+          417.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.538674,
+        0.354512,
+        0.337017,
+        0.029466
+      ],
+      "normalized_quad": [
+        [
+          0.538674,
+          0.354512
+        ],
+        [
+          0.875691,
+          0.354512
+        ],
+        [
+          0.875691,
+          0.383978
+        ],
+        [
+          0.538674,
+          0.383978
+        ]
+      ],
+      "id": "before-visual-010",
+      "source_region_ids": [
+        "before-006"
+      ],
+      "slot_id": "text-af9ff964c1-1"
+    },
+    {
+      "text": "Phim phản xạ nhiệt hàng đầu.",
+      "ocr_text": "Phim phản xạ nhiệt hàng đầu.",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        780.0,
+        410.0,
+        270.0,
+        30.0
+      ],
+      "quad": [
+        [
+          780.0,
+          410.0
+        ],
+        [
+          1050.0,
+          410.0
+        ],
+        [
+          1050.0,
+          440.0
+        ],
+        [
+          780.0,
+          440.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.538674,
+        0.377532,
+        0.186464,
+        0.027624
+      ],
+      "normalized_quad": [
+        [
+          0.538674,
+          0.377532
+        ],
+        [
+          0.725138,
+          0.377532
+        ],
+        [
+          0.725138,
+          0.405157
+        ],
+        [
+          0.538674,
+          0.405157
+        ]
+      ],
+      "id": "before-visual-011",
+      "source_region_ids": [
+        "before-008"
+      ],
+      "slot_id": "text-c960cb1015-1"
+    },
+    {
+      "text": "Xe ô tô của Quý khách hàng đã được bảo vệ bởi gói phim phản xạ nhiệt Nanopxn®.",
+      "ocr_text": "Xeôtô của Quý khách hàng đầ được bảo vệ bởi gói phim phản xạ nhiệt Nanopxn",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        778.0,
+        464.0,
+        484.0,
+        26.0
+      ],
+      "quad": [
+        [
+          778.0,
+          464.0
+        ],
+        [
+          1262.0,
+          464.0
+        ],
+        [
+          1262.0,
+          490.0
+        ],
+        [
+          778.0,
+          490.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.537293,
+        0.427256,
+        0.334254,
+        0.023941
+      ],
+      "normalized_quad": [
+        [
+          0.537293,
+          0.427256
+        ],
+        [
+          0.871547,
+          0.427256
+        ],
+        [
+          0.871547,
+          0.451197
+        ],
+        [
+          0.537293,
+          0.451197
+        ]
+      ],
+      "id": "before-visual-012",
+      "source_region_ids": [
+        "before-011"
+      ],
+      "slot_id": "text-407b47780f-1"
+    },
+    {
+      "text": "Đây là trang bị giúp nâng cao tính tiện nghi, giảm nhiệt hiệu quả, đồng thời bảo vệ",
+      "ocr_text": "Đảy là trang bị giúp nâng cao tinh ti(n nghi; giam nhiệt hiệu | 'quà; | đống thời bảo vệ",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        780.47,
+        490.87,
+        483.63,
+        17.38
+      ],
+      "quad": [
+        [
+          780.47,
+          490.87
+        ],
+        [
+          1264.1,
+          490.87
+        ],
+        [
+          1264.1,
+          508.25
+        ],
+        [
+          780.47,
+          508.25
+        ]
+      ],
+      "normalized_bbox": [
+        0.538999,
+        0.451998,
+        0.333999,
+        0.016004
+      ],
+      "normalized_quad": [
+        [
+          0.538999,
+          0.451998
+        ],
+        [
+          0.872997,
+          0.451998
+        ],
+        [
+          0.872997,
+          0.468002
+        ],
+        [
+          0.538999,
+          0.468002
+        ]
+      ],
+      "id": "before-visual-013",
+      "source_region_ids": [
+        "before-012",
+        "before-013",
+        "before-014"
+      ],
+      "slot_id": "text-95d2a17e47-1"
+    },
+    {
+      "text": "sức khỏe người dùng và nội thất xe.",
+      "ocr_text": "sức khòe người dùng và nội thẩt xe.",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        778.0,
+        510.0,
+        214.0,
+        22.0
+      ],
+      "quad": [
+        [
+          778.0,
+          510.0
+        ],
+        [
+          992.0,
+          510.0
+        ],
+        [
+          992.0,
+          532.0
+        ],
+        [
+          778.0,
+          532.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.537293,
+        0.469613,
+        0.14779,
+        0.020258
+      ],
+      "normalized_quad": [
+        [
+          0.537293,
+          0.469613
+        ],
+        [
+          0.685083,
+          0.469613
+        ],
+        [
+          0.685083,
+          0.489871
+        ],
+        [
+          0.537293,
+          0.489871
+        ]
+      ],
+      "id": "before-visual-014",
+      "source_region_ids": [
+        "before-016"
+      ],
+      "slot_id": "text-c82c47c4fd-1"
+    },
+    {
+      "text": "ĐIỀU KIỆN BẢO HÀNH PHIM PHẢN XẠ NHIỆT NANOPXN®",
+      "ocr_text": "ĐIÊU KIỆN BẢO HÀNH PHIM PHẢN XẠ NHIỆT NANOPXN'",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        778.0,
+        572.0,
+        480.0,
+        32.0
+      ],
+      "quad": [
+        [
+          778.0,
+          572.0
+        ],
+        [
+          1258.0,
+          572.0
+        ],
+        [
+          1258.0,
+          604.0
+        ],
+        [
+          778.0,
+          604.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.537293,
+        0.526703,
+        0.331492,
+        0.029466
+      ],
+      "normalized_quad": [
+        [
+          0.537293,
+          0.526703
+        ],
+        [
+          0.868785,
+          0.526703
+        ],
+        [
+          0.868785,
+          0.556169
+        ],
+        [
+          0.537293,
+          0.556169
+        ]
+      ],
+      "id": "before-visual-015",
+      "source_region_ids": [
+        "before-024"
+      ],
+      "slot_id": "text-31e67d21c6-1"
+    },
+    {
+      "text": "1. Phim phản xạ nhiệt Nanopxn® được bảo hành trong các",
+      "ocr_text": "1. Phim phản xạ nhiệt Nanopxn' được bảo hành trong các",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        780.0,
+        620.0,
+        470.0,
+        30.0
+      ],
+      "quad": [
+        [
+          780.0,
+          620.0
+        ],
+        [
+          1250.0,
+          620.0
+        ],
+        [
+          1250.0,
+          650.0
+        ],
+        [
+          780.0,
+          650.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.538674,
+        0.570902,
+        0.324586,
+        0.027624
+      ],
+      "normalized_quad": [
+        [
+          0.538674,
+          0.570902
+        ],
+        [
+          0.86326,
+          0.570902
+        ],
+        [
+          0.86326,
+          0.598527
+        ],
+        [
+          0.538674,
+          0.598527
+        ]
+      ],
+      "id": "before-visual-016",
+      "source_region_ids": [
+        "before-027"
+      ],
+      "slot_id": "text-2bad939f92-1"
+    },
+    {
+      "text": "trường hợp do lỗi kỹ thuật lắp đặt như: phồng rộp, bong tróc,",
+      "ocr_text": "trường hợp do lỗi ký thuật lấp đặt như: phông rộp,bong tróc,",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        777.0,
+        644.0,
+        495.0,
+        30.0
+      ],
+      "quad": [
+        [
+          777.0,
+          644.0
+        ],
+        [
+          1272.0,
+          644.0
+        ],
+        [
+          1272.0,
+          674.0
+        ],
+        [
+          777.0,
+          674.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.536602,
+        0.593002,
+        0.341851,
+        0.027624
+      ],
+      "normalized_quad": [
+        [
+          0.536602,
+          0.593002
+        ],
+        [
+          0.878453,
+          0.593002
+        ],
+        [
+          0.878453,
+          0.620626
+        ],
+        [
+          0.536602,
+          0.620626
+        ]
+      ],
+      "id": "before-visual-017",
+      "source_region_ids": [
+        "before-029"
+      ],
+      "slot_id": "text-4399613faf-1"
+    },
+    {
+      "text": "rạn nứt, tách lớp, bay màu phim. Không bảo hành các lỗi do",
+      "ocr_text": "ran nứt,tách lớp, bay màu phim | Không | bảo hành các lỗi do",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        780.47,
+        674.41,
+        495.22,
+        21.72
+      ],
+      "quad": [
+        [
+          780.47,
+          674.41
+        ],
+        [
+          1275.69,
+          674.41
+        ],
+        [
+          1275.69,
+          696.13
+        ],
+        [
+          780.47,
+          696.13
+        ]
+      ],
+      "normalized_bbox": [
+        0.538999,
+        0.621004,
+        0.342003,
+        0.02
+      ],
+      "normalized_quad": [
+        [
+          0.538999,
+          0.621004
+        ],
+        [
+          0.881001,
+          0.621004
+        ],
+        [
+          0.881001,
+          0.641004
+        ],
+        [
+          0.538999,
+          0.641004
+        ]
+      ],
+      "id": "before-visual-018",
+      "source_region_ids": [
+        "before-030",
+        "before-031",
+        "before-032"
+      ],
+      "slot_id": "text-da90901c74-1"
+    },
+    {
+      "text": "người sử dụng gây nên.",
+      "ocr_text": "người sử | dung | gây nên.",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        780.47,
+        698.3,
+        198.38,
+        19.55
+      ],
+      "quad": [
+        [
+          780.47,
+          698.3
+        ],
+        [
+          978.85,
+          698.3
+        ],
+        [
+          978.85,
+          717.85
+        ],
+        [
+          780.47,
+          717.85
+        ]
+      ],
+      "normalized_bbox": [
+        0.538999,
+        0.643002,
+        0.137003,
+        0.018002
+      ],
+      "normalized_quad": [
+        [
+          0.538999,
+          0.643002
+        ],
+        [
+          0.676001,
+          0.643002
+        ],
+        [
+          0.676001,
+          0.661004
+        ],
+        [
+          0.538999,
+          0.661004
+        ]
+      ],
+      "id": "before-visual-019",
+      "source_region_ids": [
+        "before-033",
+        "before-034",
+        "before-035"
+      ],
+      "slot_id": "text-863f073f92-1"
+    },
+    {
+      "text": "2. Trong quá trình sử dụng, chỉ nên dùng khăn mềm và nước",
+      "ocr_text": "Trong quá trình sử dụng, chỉ nên dùng khăn mểm và nước",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        794.0,
+        735.0,
+        476.0,
+        29.0
+      ],
+      "quad": [
+        [
+          794.0,
+          735.0
+        ],
+        [
+          1270.0,
+          735.0
+        ],
+        [
+          1270.0,
+          764.0
+        ],
+        [
+          794.0,
+          764.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.548343,
+        0.676796,
+        0.328729,
+        0.026703
+      ],
+      "normalized_quad": [
+        [
+          0.548343,
+          0.676796
+        ],
+        [
+          0.877072,
+          0.676796
+        ],
+        [
+          0.877072,
+          0.703499
+        ],
+        [
+          0.548343,
+          0.703499
+        ]
+      ],
+      "id": "before-visual-020",
+      "source_region_ids": [
+        "before-037"
+      ],
+      "slot_id": "text-0f26577b92-1"
+    },
+    {
+      "text": "sạch để lau bề mặt kính có phim bên trong xe; tuyệt đối",
+      "ocr_text": "sạch để lau bẻ mặt kính có phim bên trong xe; tuyệt đối",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        778.0,
+        758.0,
+        454.0,
+        30.0
+      ],
+      "quad": [
+        [
+          778.0,
+          758.0
+        ],
+        [
+          1232.0,
+          758.0
+        ],
+        [
+          1232.0,
+          788.0
+        ],
+        [
+          778.0,
+          788.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.537293,
+        0.697974,
+        0.313536,
+        0.027624
+      ],
+      "normalized_quad": [
+        [
+          0.537293,
+          0.697974
+        ],
+        [
+          0.850829,
+          0.697974
+        ],
+        [
+          0.850829,
+          0.725599
+        ],
+        [
+          0.537293,
+          0.725599
+        ]
+      ],
+      "id": "before-visual-021",
+      "source_region_ids": [
+        "before-039"
+      ],
+      "slot_id": "text-2d17d9b2c8-1"
+    },
+    {
+      "text": "không sử dụng vật cứng, nước rửa kính hoặc hóa chất có tính",
+      "ocr_text": "không sử | dung | vặt cứng, nước rửa kính hoặc hóa chất có tính",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        780.47,
+        789.52,
+        495.22,
+        21.72
+      ],
+      "quad": [
+        [
+          780.47,
+          789.52
+        ],
+        [
+          1275.69,
+          789.52
+        ],
+        [
+          1275.69,
+          811.24
+        ],
+        [
+          780.47,
+          811.24
+        ]
+      ],
+      "normalized_bbox": [
+        0.538999,
+        0.726998,
+        0.342003,
+        0.02
+      ],
+      "normalized_quad": [
+        [
+          0.538999,
+          0.726998
+        ],
+        [
+          0.881001,
+          0.726998
+        ],
+        [
+          0.881001,
+          0.746998
+        ],
+        [
+          0.538999,
+          0.746998
+        ]
+      ],
+      "id": "before-visual-022",
+      "source_region_ids": [
+        "before-041",
+        "before-042",
+        "before-043"
+      ],
+      "slot_id": "text-d93efe03ce-1"
+    },
+    {
+      "text": "tẩy mạnh để vệ sinh.",
+      "ocr_text": "tẩy mạnh để vệ sinh.",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        778.0,
+        806.0,
+        168.0,
+        24.0
+      ],
+      "quad": [
+        [
+          778.0,
+          806.0
+        ],
+        [
+          946.0,
+          806.0
+        ],
+        [
+          946.0,
+          830.0
+        ],
+        [
+          778.0,
+          830.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.537293,
+        0.742173,
+        0.116022,
+        0.022099
+      ],
+      "normalized_quad": [
+        [
+          0.537293,
+          0.742173
+        ],
+        [
+          0.653315,
+          0.742173
+        ],
+        [
+          0.653315,
+          0.764273
+        ],
+        [
+          0.537293,
+          0.764273
+        ]
+      ],
+      "id": "before-visual-023",
+      "source_region_ids": [
+        "before-044"
+      ],
+      "slot_id": "text-74e92d4f3b-1"
+    },
+    {
+      "text": "Mọi chi tiết xin liên hệ hotline: 0347.699.094 hoặc 0971.422.334",
+      "ocr_text": "Mọi chi tiết xin liên hệ hotline: 0347.699.094 hoặc 0971.422.334",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        778.0,
+        878.0,
+        498.0,
+        28.0
+      ],
+      "quad": [
+        [
+          778.0,
+          878.0
+        ],
+        [
+          1276.0,
+          878.0
+        ],
+        [
+          1276.0,
+          906.0
+        ],
+        [
+          778.0,
+          906.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.537293,
+        0.808471,
+        0.343923,
+        0.025783
+      ],
+      "normalized_quad": [
+        [
+          0.537293,
+          0.808471
+        ],
+        [
+          0.881215,
+          0.808471
+        ],
+        [
+          0.881215,
+          0.834254
+        ],
+        [
+          0.537293,
+          0.834254
+        ]
+      ],
+      "id": "before-visual-024",
+      "source_region_ids": [
+        "before-046"
+      ],
+      "slot_id": "text-3e805d1393-1"
+    },
+    {
+      "text": "Phim kính lái",
+      "ocr_text": "Phim kính lái",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        272.0,
+        590.0,
+        88.0,
+        18.0
+      ],
+      "quad": [
+        [
+          272.0,
+          590.0
+        ],
+        [
+          360.0,
+          590.0
+        ],
+        [
+          360.0,
+          608.0
+        ],
+        [
+          272.0,
+          608.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.187845,
+        0.543278,
+        0.060773,
+        0.016575
+      ],
+      "normalized_quad": [
+        [
+          0.187845,
+          0.543278
+        ],
+        [
+          0.248619,
+          0.543278
+        ],
+        [
+          0.248619,
+          0.559853
+        ],
+        [
+          0.187845,
+          0.559853
+        ]
+      ],
+      "id": "before-visual-025",
+      "source_region_ids": [
+        "before-021"
+      ],
+      "slot_id": "text-ac1be12a76-1"
+    },
+    {
+      "text": "Phim kính sườn trước",
+      "ocr_text": "Phim | kinh | sườn trước",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        635.67,
+        587.53,
+        88.33,
+        36.92
+      ],
+      "quad": [
+        [
+          635.67,
+          587.53
+        ],
+        [
+          724.0,
+          587.53
+        ],
+        [
+          724.0,
+          624.45
+        ],
+        [
+          635.67,
+          624.45
+        ]
+      ],
+      "normalized_bbox": [
+        0.438999,
+        0.541004,
+        0.061001,
+        0.033996
+      ],
+      "normalized_quad": [
+        [
+          0.438999,
+          0.541004
+        ],
+        [
+          0.5,
+          0.541004
+        ],
+        [
+          0.5,
+          0.575
+        ],
+        [
+          0.438999,
+          0.575
+        ]
+      ],
+      "id": "before-visual-026",
+      "source_region_ids": [
+        "before-022",
+        "before-023",
+        "before-025"
+      ],
+      "slot_id": "text-889d2d9a7e-1"
+    },
+    {
+      "text": "Phim kính sườn sau",
+      "ocr_text": "Phim kinh sườn",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        254.0,
+        772.0,
+        98.0,
+        20.0
+      ],
+      "quad": [
+        [
+          254.0,
+          772.0
+        ],
+        [
+          352.0,
+          772.0
+        ],
+        [
+          352.0,
+          792.0
+        ],
+        [
+          254.0,
+          792.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.175414,
+        0.710866,
+        0.06768,
+        0.018416
+      ],
+      "normalized_quad": [
+        [
+          0.175414,
+          0.710866
+        ],
+        [
+          0.243094,
+          0.710866
+        ],
+        [
+          0.243094,
+          0.729282
+        ],
+        [
+          0.175414,
+          0.729282
+        ]
+      ],
+      "id": "before-visual-027",
+      "source_region_ids": [
+        "before-038"
+      ],
+      "slot_id": "text-1a63767b73-1"
+    },
+    {
+      "text": "Phim kính hậu",
+      "ocr_text": "Phim kính hậu",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        622.64,
+        827.53,
+        104.26,
+        17.38
+      ],
+      "quad": [
+        [
+          622.64,
+          827.53
+        ],
+        [
+          726.9,
+          827.53
+        ],
+        [
+          726.9,
+          844.91
+        ],
+        [
+          622.64,
+          844.91
+        ]
+      ],
+      "normalized_bbox": [
+        0.43,
+        0.761998,
+        0.072003,
+        0.016004
+      ],
+      "normalized_quad": [
+        [
+          0.43,
+          0.761998
+        ],
+        [
+          0.502003,
+          0.761998
+        ],
+        [
+          0.502003,
+          0.778002
+        ],
+        [
+          0.43,
+          0.778002
+        ]
+      ],
+      "id": "before-visual-028",
+      "source_region_ids": [
+        "before-045"
+      ],
+      "slot_id": "text-491da88586-1"
+    }
+  ],
+  "text_review": "image_review"
+}

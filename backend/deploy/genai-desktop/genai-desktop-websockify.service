@@ -1,0 +1,11 @@
+[Unit]
+Description=GenAI authenticated noVNC websocket relay
+After=genai-desktop-desktop.service
+Requires=genai-desktop-desktop.service
+[Service]
+User=genai-desktop
+ExecStart=/usr/bin/websockify 127.0.0.1:6082 127.0.0.1:5912
+Restart=always
+RestartSec=3
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,1819 @@
+{
+  "schema_version": 1,
+  "product_id": "348445705d4fd7af388fc0375ddf8e6d",
+  "view": "before",
+  "image": "/product-references/348445705d4fd7af388fc0375ddf8e6d-photo-before.png",
+  "sha256": "1c93d1e5713e68e70a21ad6f95ef6f60358671363b3ae6612cf40aea95ed5344",
+  "width": 1448,
+  "height": 1086,
+  "coordinate_system": "image_pixels_top_left",
+  "status": "detected",
+  "regions": [
+    {
+      "text": "BIỂN BÁO DỰ ÁN",
+      "ocr_text": "BlỂN BÁO DỰ ÁN",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        881.0,
+        69.0,
+        248.0,
+        62.0
+      ],
+      "quad": [
+        [
+          881.0,
+          69.0
+        ],
+        [
+          1129.0,
+          69.0
+        ],
+        [
+          1129.0,
+          131.0
+        ],
+        [
+          881.0,
+          131.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.608425,
+        0.063536,
+        0.171271,
+        0.05709
+      ],
+      "normalized_quad": [
+        [
+          0.608425,
+          0.063536
+        ],
+        [
+          0.779696,
+          0.063536
+        ],
+        [
+          0.779696,
+          0.120626
+        ],
+        [
+          0.608425,
+          0.120626
+        ]
+      ],
+      "id": "before-visual-001",
+      "source_region_ids": [
+        "before-001"
+      ],
+      "slot_id": "text-9c2ba32959-1"
+    },
+    {
+      "text": "DỰ ÁN ĐẦU TƯ XÂY DỰNG VÀ KINH DOANH",
+      "ocr_text": "DỰ ÁN ĐẨU TƯ XÂY DỰNG VÀ KINH DOANH",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        826.0,
+        140.0,
+        362.0,
+        32.0
+      ],
+      "quad": [
+        [
+          826.0,
+          140.0
+        ],
+        [
+          1188.0,
+          140.0
+        ],
+        [
+          1188.0,
+          172.0
+        ],
+        [
+          826.0,
+          172.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.570442,
+        0.128913,
+        0.25,
+        0.029466
+      ],
+      "normalized_quad": [
+        [
+          0.570442,
+          0.128913
+        ],
+        [
+          0.820442,
+          0.128913
+        ],
+        [
+          0.820442,
+          0.158379
+        ],
+        [
+          0.570442,
+          0.158379
+        ]
+      ],
+      "id": "before-visual-002",
+      "source_region_ids": [
+        "before-002"
+      ],
+      "slot_id": "text-314a86eae0-1"
+    },
+    {
+      "text": "KẾT CẤU HẠ TẦNG KHU CÔNG NGHIỆP PHÚ XUÂN",
+      "ocr_text": "KẾT CẤU HẠ TẦNG KHU CÔNG NGHIỆP PHÚ XUÂN",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        775.0,
+        171.0,
+        454.0,
+        42.0
+      ],
+      "quad": [
+        [
+          775.0,
+          171.0
+        ],
+        [
+          1229.0,
+          171.0
+        ],
+        [
+          1229.0,
+          213.0
+        ],
+        [
+          775.0,
+          213.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.535221,
+        0.157459,
+        0.313536,
+        0.038674
+      ],
+      "normalized_quad": [
+        [
+          0.535221,
+          0.157459
+        ],
+        [
+          0.848757,
+          0.157459
+        ],
+        [
+          0.848757,
+          0.196133
+        ],
+        [
+          0.535221,
+          0.196133
+        ]
+      ],
+      "id": "before-visual-003",
+      "source_region_ids": [
+        "before-003"
+      ],
+      "slot_id": "text-cb16b473c9-1"
+    },
+    {
+      "text": "ĐỊA ĐIỂM:",
+      "ocr_text": "ĐỊA ĐIỂM:",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        834.0,
+        238.0,
+        80.0,
+        30.0
+      ],
+      "quad": [
+        [
+          834.0,
+          238.0
+        ],
+        [
+          914.0,
+          238.0
+        ],
+        [
+          914.0,
+          268.0
+        ],
+        [
+          834.0,
+          268.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.575967,
+        0.219153,
+        0.055249,
+        0.027624
+      ],
+      "normalized_quad": [
+        [
+          0.575967,
+          0.219153
+        ],
+        [
+          0.631215,
+          0.219153
+        ],
+        [
+          0.631215,
+          0.246777
+        ],
+        [
+          0.575967,
+          0.246777
+        ]
+      ],
+      "id": "before-visual-004",
+      "source_region_ids": [
+        "before-004"
+      ],
+      "slot_id": "text-012733f406-1"
+    },
+    {
+      "text": "Khu công nghiệp Phú Xuân",
+      "ocr_text": "Khu | công | nghiep Phú Xuan",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        1039.66,
+        238.92,
+        163.62,
+        14.12
+      ],
+      "quad": [
+        [
+          1039.66,
+          238.92
+        ],
+        [
+          1203.28,
+          238.92
+        ],
+        [
+          1203.28,
+          253.04
+        ],
+        [
+          1039.66,
+          253.04
+        ]
+      ],
+      "normalized_bbox": [
+        0.717997,
+        0.22,
+        0.112997,
+        0.013002
+      ],
+      "normalized_quad": [
+        [
+          0.717997,
+          0.22
+        ],
+        [
+          0.830994,
+          0.22
+        ],
+        [
+          0.830994,
+          0.233002
+        ],
+        [
+          0.717997,
+          0.233002
+        ]
+      ],
+      "id": "before-visual-005",
+      "source_region_ids": [
+        "before-005",
+        "before-006",
+        "before-007"
+      ],
+      "slot_id": "text-0cc997fd45-1"
+    },
+    {
+      "text": "Xã Cưor Đăng, Tỉnh Đắk Lắk",
+      "ocr_text": "Xa Cưor | Đáng; | Tinh Đẳk Lẳk",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        1038.22,
+        255.21,
+        167.97,
+        15.2
+      ],
+      "quad": [
+        [
+          1038.22,
+          255.21
+        ],
+        [
+          1206.19,
+          255.21
+        ],
+        [
+          1206.19,
+          270.41
+        ],
+        [
+          1038.22,
+          270.41
+        ]
+      ],
+      "normalized_bbox": [
+        0.717003,
+        0.235,
+        0.116001,
+        0.013996
+      ],
+      "normalized_quad": [
+        [
+          0.717003,
+          0.235
+        ],
+        [
+          0.833004,
+          0.235
+        ],
+        [
+          0.833004,
+          0.248996
+        ],
+        [
+          0.717003,
+          0.248996
+        ]
+      ],
+      "id": "before-visual-006",
+      "source_region_ids": [
+        "before-008",
+        "before-009",
+        "before-010"
+      ],
+      "slot_id": "text-e6fc02e1ed-1"
+    },
+    {
+      "text": "CHỦ ĐẦU TƯ:",
+      "ocr_text": "CHỦ ĐẨU TƯ:",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        834.0,
+        300.0,
+        104.0,
+        28.0
+      ],
+      "quad": [
+        [
+          834.0,
+          300.0
+        ],
+        [
+          938.0,
+          300.0
+        ],
+        [
+          938.0,
+          328.0
+        ],
+        [
+          834.0,
+          328.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.575967,
+        0.276243,
+        0.071823,
+        0.025783
+      ],
+      "normalized_quad": [
+        [
+          0.575967,
+          0.276243
+        ],
+        [
+          0.64779,
+          0.276243
+        ],
+        [
+          0.64779,
+          0.302026
+        ],
+        [
+          0.575967,
+          0.302026
+        ]
+      ],
+      "id": "before-visual-007",
+      "source_region_ids": [
+        "before-011"
+      ],
+      "slot_id": "text-8af6e2aa37-1"
+    },
+    {
+      "text": "Công Ty Cổ Phần DPV Đắk Lắk",
+      "ocr_text": "Công Ty Cổ Phẩn DPV Đắk Lắk",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        1034.0,
+        300.0,
+        198.0,
+        24.0
+      ],
+      "quad": [
+        [
+          1034.0,
+          300.0
+        ],
+        [
+          1232.0,
+          300.0
+        ],
+        [
+          1232.0,
+          324.0
+        ],
+        [
+          1034.0,
+          324.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.714088,
+        0.276243,
+        0.13674,
+        0.022099
+      ],
+      "normalized_quad": [
+        [
+          0.714088,
+          0.276243
+        ],
+        [
+          0.850829,
+          0.276243
+        ],
+        [
+          0.850829,
+          0.298343
+        ],
+        [
+          0.714088,
+          0.298343
+        ]
+      ],
+      "id": "before-visual-008",
+      "source_region_ids": [
+        "before-012"
+      ],
+      "slot_id": "text-854b2e5f07-1"
+    },
+    {
+      "text": "ĐƠN VỊ TƯ VẤN GIÁM SÁT:",
+      "ocr_text": "ĐƠN VỊ TU VẤN GIÁM SÁT:  Công Ty TNHH Tư vẩn và",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        835.5,
+        365.98,
+        194.03,
+        15.2
+      ],
+      "quad": [
+        [
+          835.5,
+          365.98
+        ],
+        [
+          1029.53,
+          365.98
+        ],
+        [
+          1029.53,
+          381.18
+        ],
+        [
+          835.5,
+          381.18
+        ]
+      ],
+      "normalized_bbox": [
+        0.577003,
+        0.336998,
+        0.133999,
+        0.013996
+      ],
+      "normalized_quad": [
+        [
+          0.577003,
+          0.336998
+        ],
+        [
+          0.711001,
+          0.336998
+        ],
+        [
+          0.711001,
+          0.350994
+        ],
+        [
+          0.577003,
+          0.350994
+        ]
+      ],
+      "id": "before-visual-009",
+      "source_region_ids": [
+        "before-014"
+      ],
+      "slot_id": "text-51629927b8-1"
+    },
+    {
+      "text": "Công Ty TNHH Tư vấn và",
+      "ocr_text": "ĐƠN VỊ TU VẤN GIÁM SÁT:  Công Ty TNHH Tư vẩn và",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        1038.22,
+        358.38,
+        172.31,
+        14.12
+      ],
+      "quad": [
+        [
+          1038.22,
+          358.38
+        ],
+        [
+          1210.53,
+          358.38
+        ],
+        [
+          1210.53,
+          372.5
+        ],
+        [
+          1038.22,
+          372.5
+        ]
+      ],
+      "normalized_bbox": [
+        0.717003,
+        0.33,
+        0.118999,
+        0.013002
+      ],
+      "normalized_quad": [
+        [
+          0.717003,
+          0.33
+        ],
+        [
+          0.836001,
+          0.33
+        ],
+        [
+          0.836001,
+          0.343002
+        ],
+        [
+          0.717003,
+          0.343002
+        ]
+      ],
+      "id": "before-visual-010",
+      "source_region_ids": [
+        "before-014"
+      ],
+      "slot_id": "text-0cc1cbe73a-1"
+    },
+    {
+      "text": "Xây dựng Quang Thịnh",
+      "ocr_text": "Xây dựng Quang Thịnh",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        1036.0,
+        378.0,
+        156.0,
+        22.0
+      ],
+      "quad": [
+        [
+          1036.0,
+          378.0
+        ],
+        [
+          1192.0,
+          378.0
+        ],
+        [
+          1192.0,
+          400.0
+        ],
+        [
+          1036.0,
+          400.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.71547,
+        0.348066,
+        0.107735,
+        0.020258
+      ],
+      "normalized_quad": [
+        [
+          0.71547,
+          0.348066
+        ],
+        [
+          0.823204,
+          0.348066
+        ],
+        [
+          0.823204,
+          0.368324
+        ],
+        [
+          0.71547,
+          0.368324
+        ]
+      ],
+      "id": "before-visual-011",
+      "source_region_ids": [
+        "before-015"
+      ],
+      "slot_id": "text-74dc27aac6-1"
+    },
+    {
+      "text": "ĐƠN VỊ TƯ VẤN THẨM TRA:",
+      "ocr_text": "ĐƠN VỊ TU VẤN THẨM TRA:",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        820.0,
+        424.0,
+        208.0,
+        26.0
+      ],
+      "quad": [
+        [
+          820.0,
+          424.0
+        ],
+        [
+          1028.0,
+          424.0
+        ],
+        [
+          1028.0,
+          450.0
+        ],
+        [
+          820.0,
+          450.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.566298,
+        0.390424,
+        0.143646,
+        0.023941
+      ],
+      "normalized_quad": [
+        [
+          0.566298,
+          0.390424
+        ],
+        [
+          0.709945,
+          0.390424
+        ],
+        [
+          0.709945,
+          0.414365
+        ],
+        [
+          0.566298,
+          0.414365
+        ]
+      ],
+      "id": "before-visual-012",
+      "source_region_ids": [
+        "before-016"
+      ],
+      "slot_id": "text-66ab0190b8-1"
+    },
+    {
+      "text": "Công Ty Cổ phần tư vấn",
+      "ocr_text": "Công | Ty Cổ phẳn tư vấn",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        1038.22,
+        418.11,
+        170.86,
+        15.2
+      ],
+      "quad": [
+        [
+          1038.22,
+          418.11
+        ],
+        [
+          1209.08,
+          418.11
+        ],
+        [
+          1209.08,
+          433.31
+        ],
+        [
+          1038.22,
+          433.31
+        ]
+      ],
+      "normalized_bbox": [
+        0.717003,
+        0.385,
+        0.117997,
+        0.013996
+      ],
+      "normalized_quad": [
+        [
+          0.717003,
+          0.385
+        ],
+        [
+          0.835,
+          0.385
+        ],
+        [
+          0.835,
+          0.398996
+        ],
+        [
+          0.717003,
+          0.398996
+        ]
+      ],
+      "id": "before-visual-013",
+      "source_region_ids": [
+        "before-017",
+        "before-018"
+      ],
+      "slot_id": "text-ba08bf5786-1"
+    },
+    {
+      "text": "đầu tư và xây dựng COCC",
+      "ocr_text": "đẩu tư và xđy dựng COCC",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        1038.0,
+        436.0,
+        180.0,
+        24.0
+      ],
+      "quad": [
+        [
+          1038.0,
+          436.0
+        ],
+        [
+          1218.0,
+          436.0
+        ],
+        [
+          1218.0,
+          460.0
+        ],
+        [
+          1038.0,
+          460.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.716851,
+        0.401473,
+        0.124309,
+        0.022099
+      ],
+      "normalized_quad": [
+        [
+          0.716851,
+          0.401473
+        ],
+        [
+          0.84116,
+          0.401473
+        ],
+        [
+          0.84116,
+          0.423573
+        ],
+        [
+          0.716851,
+          0.423573
+        ]
+      ],
+      "id": "before-visual-014",
+      "source_region_ids": [
+        "before-019"
+      ],
+      "slot_id": "text-d3c39ddb8a-1"
+    },
+    {
+      "text": "ĐƠN VỊ TƯ VẤN THIẾT KẾ:",
+      "ocr_text": "ĐƠN VỊ TƯ VẤN THIẾT KẾ:",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        818.0,
+        484.0,
+        198.0,
+        28.0
+      ],
+      "quad": [
+        [
+          818.0,
+          484.0
+        ],
+        [
+          1016.0,
+          484.0
+        ],
+        [
+          1016.0,
+          512.0
+        ],
+        [
+          818.0,
+          512.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.564917,
+        0.445672,
+        0.13674,
+        0.025783
+      ],
+      "normalized_quad": [
+        [
+          0.564917,
+          0.445672
+        ],
+        [
+          0.701657,
+          0.445672
+        ],
+        [
+          0.701657,
+          0.471455
+        ],
+        [
+          0.564917,
+          0.471455
+        ]
+      ],
+      "id": "before-visual-015",
+      "source_region_ids": [
+        "before-021"
+      ],
+      "slot_id": "text-39163bb6cd-1"
+    },
+    {
+      "text": "Công Ty Cổ Phần Coninco -",
+      "ocr_text": "Công Ty Cổ Phẳn Coninco",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        1040.0,
+        476.0,
+        176.0,
+        22.0
+      ],
+      "quad": [
+        [
+          1040.0,
+          476.0
+        ],
+        [
+          1216.0,
+          476.0
+        ],
+        [
+          1216.0,
+          498.0
+        ],
+        [
+          1040.0,
+          498.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.718232,
+        0.438306,
+        0.121547,
+        0.020258
+      ],
+      "normalized_quad": [
+        [
+          0.718232,
+          0.438306
+        ],
+        [
+          0.839779,
+          0.438306
+        ],
+        [
+          0.839779,
+          0.458564
+        ],
+        [
+          0.718232,
+          0.458564
+        ]
+      ],
+      "id": "before-visual-016",
+      "source_region_ids": [
+        "before-020"
+      ],
+      "slot_id": "text-7de32236fe-1"
+    },
+    {
+      "text": "Thăng Long",
+      "ocr_text": "Thẳng Long",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        1040.0,
+        496.0,
+        82.0,
+        22.0
+      ],
+      "quad": [
+        [
+          1040.0,
+          496.0
+        ],
+        [
+          1122.0,
+          496.0
+        ],
+        [
+          1122.0,
+          518.0
+        ],
+        [
+          1040.0,
+          518.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.718232,
+        0.456722,
+        0.05663,
+        0.020258
+      ],
+      "normalized_quad": [
+        [
+          0.718232,
+          0.456722
+        ],
+        [
+          0.774862,
+          0.456722
+        ],
+        [
+          0.774862,
+          0.47698
+        ],
+        [
+          0.718232,
+          0.47698
+        ]
+      ],
+      "id": "before-visual-017",
+      "source_region_ids": [
+        "before-022"
+      ],
+      "slot_id": "text-c3637b7c75-1"
+    },
+    {
+      "text": "ĐƠN VỊ THI CÔNG:",
+      "ocr_text": "ĐƠN VỊ THI CÔNG:",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        812.0,
+        542.0,
+        146.0,
+        26.0
+      ],
+      "quad": [
+        [
+          812.0,
+          542.0
+        ],
+        [
+          958.0,
+          542.0
+        ],
+        [
+          958.0,
+          568.0
+        ],
+        [
+          812.0,
+          568.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.560773,
+        0.499079,
+        0.100829,
+        0.023941
+      ],
+      "normalized_quad": [
+        [
+          0.560773,
+          0.499079
+        ],
+        [
+          0.661602,
+          0.499079
+        ],
+        [
+          0.661602,
+          0.52302
+        ],
+        [
+          0.560773,
+          0.52302
+        ]
+      ],
+      "id": "before-visual-018",
+      "source_region_ids": [
+        "before-024"
+      ],
+      "slot_id": "text-0235424a0c-1"
+    },
+    {
+      "text": "Công Ty Cổ Phần Đầu tư",
+      "ocr_text": "Công Ty Cổ Phẩn Đẩu tư",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        1040.0,
+        534.0,
+        168.0,
+        22.0
+      ],
+      "quad": [
+        [
+          1040.0,
+          534.0
+        ],
+        [
+          1208.0,
+          534.0
+        ],
+        [
+          1208.0,
+          556.0
+        ],
+        [
+          1040.0,
+          556.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.718232,
+        0.491713,
+        0.116022,
+        0.020258
+      ],
+      "normalized_quad": [
+        [
+          0.718232,
+          0.491713
+        ],
+        [
+          0.834254,
+          0.491713
+        ],
+        [
+          0.834254,
+          0.511971
+        ],
+        [
+          0.718232,
+          0.511971
+        ]
+      ],
+      "id": "before-visual-019",
+      "source_region_ids": [
+        "before-023"
+      ],
+      "slot_id": "text-90b83cfc5b-1"
+    },
+    {
+      "text": "và xây dựng EZ",
+      "ocr_text": "và xây dựng EZ",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        1042.0,
+        554.0,
+        102.0,
+        22.0
+      ],
+      "quad": [
+        [
+          1042.0,
+          554.0
+        ],
+        [
+          1144.0,
+          554.0
+        ],
+        [
+          1144.0,
+          576.0
+        ],
+        [
+          1042.0,
+          576.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.719613,
+        0.510129,
+        0.070442,
+        0.020258
+      ],
+      "normalized_quad": [
+        [
+          0.719613,
+          0.510129
+        ],
+        [
+          0.790055,
+          0.510129
+        ],
+        [
+          0.790055,
+          0.530387
+        ],
+        [
+          0.719613,
+          0.530387
+        ]
+      ],
+      "id": "before-visual-020",
+      "source_region_ids": [
+        "before-025"
+      ],
+      "slot_id": "text-2747450cd4-1"
+    },
+    {
+      "text": "NGÀY KHỞI CÔNG:",
+      "ocr_text": "NGÀY KHỞl CÔNG:",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        802.0,
+        596.0,
+        152.0,
+        28.0
+      ],
+      "quad": [
+        [
+          802.0,
+          596.0
+        ],
+        [
+          954.0,
+          596.0
+        ],
+        [
+          954.0,
+          624.0
+        ],
+        [
+          802.0,
+          624.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.553867,
+        0.548803,
+        0.104972,
+        0.025783
+      ],
+      "normalized_quad": [
+        [
+          0.553867,
+          0.548803
+        ],
+        [
+          0.65884,
+          0.548803
+        ],
+        [
+          0.65884,
+          0.574586
+        ],
+        [
+          0.553867,
+          0.574586
+        ]
+      ],
+      "id": "before-visual-021",
+      "source_region_ids": [
+        "before-026"
+      ],
+      "slot_id": "text-b035e8ab58-1"
+    },
+    {
+      "text": "24/4/2026",
+      "ocr_text": "24/4/2026",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        1042.0,
+        600.0,
+        78.0,
+        20.0
+      ],
+      "quad": [
+        [
+          1042.0,
+          600.0
+        ],
+        [
+          1120.0,
+          600.0
+        ],
+        [
+          1120.0,
+          620.0
+        ],
+        [
+          1042.0,
+          620.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.719613,
+        0.552486,
+        0.053867,
+        0.018416
+      ],
+      "normalized_quad": [
+        [
+          0.719613,
+          0.552486
+        ],
+        [
+          0.773481,
+          0.552486
+        ],
+        [
+          0.773481,
+          0.570902
+        ],
+        [
+          0.719613,
+          0.570902
+        ]
+      ],
+      "id": "before-visual-022",
+      "source_region_ids": [
+        "before-027"
+      ],
+      "slot_id": "text-fa27f2f0cc-1"
+    },
+    {
+      "text": "AN TOÀN",
+      "ocr_text": "AN TOÀN",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        384.0,
+        658.0,
+        80.0,
+        28.0
+      ],
+      "quad": [
+        [
+          384.0,
+          658.0
+        ],
+        [
+          464.0,
+          658.0
+        ],
+        [
+          464.0,
+          686.0
+        ],
+        [
+          384.0,
+          686.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.265193,
+        0.605893,
+        0.055249,
+        0.025783
+      ],
+      "normalized_quad": [
+        [
+          0.265193,
+          0.605893
+        ],
+        [
+          0.320442,
+          0.605893
+        ],
+        [
+          0.320442,
+          0.631676
+        ],
+        [
+          0.265193,
+          0.631676
+        ]
+      ],
+      "id": "before-visual-023",
+      "source_region_ids": [
+        "before-028"
+      ],
+      "slot_id": "text-162fc0bd59-1"
+    },
+    {
+      "text": "LÀ TRÊN HẾT",
+      "ocr_text": "LÀ TRÊN HẾT",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        384.0,
+        682.0,
+        94.0,
+        26.0
+      ],
+      "quad": [
+        [
+          384.0,
+          682.0
+        ],
+        [
+          478.0,
+          682.0
+        ],
+        [
+          478.0,
+          708.0
+        ],
+        [
+          384.0,
+          708.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.265193,
+        0.627993,
+        0.064917,
+        0.023941
+      ],
+      "normalized_quad": [
+        [
+          0.265193,
+          0.627993
+        ],
+        [
+          0.33011,
+          0.627993
+        ],
+        [
+          0.33011,
+          0.651934
+        ],
+        [
+          0.265193,
+          0.651934
+        ]
+      ],
+      "id": "before-visual-024",
+      "source_region_ids": [
+        "before-033"
+      ],
+      "slot_id": "text-2551d22179-1"
+    },
+    {
+      "text": "CHẤT LƯỢNG",
+      "ocr_text": "CHẤT LƯỢNG",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        636.0,
+        656.0,
+        104.0,
+        28.0
+      ],
+      "quad": [
+        [
+          636.0,
+          656.0
+        ],
+        [
+          740.0,
+          656.0
+        ],
+        [
+          740.0,
+          684.0
+        ],
+        [
+          636.0,
+          684.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.439227,
+        0.604052,
+        0.071823,
+        0.025783
+      ],
+      "normalized_quad": [
+        [
+          0.439227,
+          0.604052
+        ],
+        [
+          0.51105,
+          0.604052
+        ],
+        [
+          0.51105,
+          0.629834
+        ],
+        [
+          0.439227,
+          0.629834
+        ]
+      ],
+      "id": "before-visual-025",
+      "source_region_ids": [
+        "before-029"
+      ],
+      "slot_id": "text-dd6b3b7edd-1"
+    },
+    {
+      "text": "LÀ DANH DỰ",
+      "ocr_text": "LÀ DANH DỰ",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        636.0,
+        684.0,
+        86.0,
+        22.0
+      ],
+      "quad": [
+        [
+          636.0,
+          684.0
+        ],
+        [
+          722.0,
+          684.0
+        ],
+        [
+          722.0,
+          706.0
+        ],
+        [
+          636.0,
+          706.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.439227,
+        0.629834,
+        0.059392,
+        0.020258
+      ],
+      "normalized_quad": [
+        [
+          0.439227,
+          0.629834
+        ],
+        [
+          0.498619,
+          0.629834
+        ],
+        [
+          0.498619,
+          0.650092
+        ],
+        [
+          0.439227,
+          0.650092
+        ]
+      ],
+      "id": "before-visual-026",
+      "source_region_ids": [
+        "before-034"
+      ],
+      "slot_id": "text-e47376be31-1"
+    },
+    {
+      "text": "TIẾN ĐỘ",
+      "ocr_text": "TIẾN ĐỘ",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        886.0,
+        656.0,
+        68.0,
+        30.0
+      ],
+      "quad": [
+        [
+          886.0,
+          656.0
+        ],
+        [
+          954.0,
+          656.0
+        ],
+        [
+          954.0,
+          686.0
+        ],
+        [
+          886.0,
+          686.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.611878,
+        0.604052,
+        0.046961,
+        0.027624
+      ],
+      "normalized_quad": [
+        [
+          0.611878,
+          0.604052
+        ],
+        [
+          0.65884,
+          0.604052
+        ],
+        [
+          0.65884,
+          0.631676
+        ],
+        [
+          0.611878,
+          0.631676
+        ]
+      ],
+      "id": "before-visual-027",
+      "source_region_ids": [
+        "before-030"
+      ],
+      "slot_id": "text-4e515bd0fa-1"
+    },
+    {
+      "text": "LÀ CAM KẾT",
+      "ocr_text": "LÀ CAM KẾT",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        886.0,
+        682.0,
+        84.0,
+        24.0
+      ],
+      "quad": [
+        [
+          886.0,
+          682.0
+        ],
+        [
+          970.0,
+          682.0
+        ],
+        [
+          970.0,
+          706.0
+        ],
+        [
+          886.0,
+          706.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.611878,
+        0.627993,
+        0.058011,
+        0.022099
+      ],
+      "normalized_quad": [
+        [
+          0.611878,
+          0.627993
+        ],
+        [
+          0.66989,
+          0.627993
+        ],
+        [
+          0.66989,
+          0.650092
+        ],
+        [
+          0.611878,
+          0.650092
+        ]
+      ],
+      "id": "before-visual-028",
+      "source_region_ids": [
+        "before-035"
+      ],
+      "slot_id": "text-f13dd08cc7-1"
+    },
+    {
+      "text": "HIỆU QUẢ",
+      "ocr_text": "HIỆU QUẢ",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        1118.0,
+        656.0,
+        70.0,
+        28.0
+      ],
+      "quad": [
+        [
+          1118.0,
+          656.0
+        ],
+        [
+          1188.0,
+          656.0
+        ],
+        [
+          1188.0,
+          684.0
+        ],
+        [
+          1118.0,
+          684.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.772099,
+        0.604052,
+        0.048343,
+        0.025783
+      ],
+      "normalized_quad": [
+        [
+          0.772099,
+          0.604052
+        ],
+        [
+          0.820442,
+          0.604052
+        ],
+        [
+          0.820442,
+          0.629834
+        ],
+        [
+          0.772099,
+          0.629834
+        ]
+      ],
+      "id": "before-visual-029",
+      "source_region_ids": [
+        "before-031"
+      ],
+      "slot_id": "text-c5e80b5cc9-1"
+    },
+    {
+      "text": "LÀ MỤC TIÊU",
+      "ocr_text": "LA MUC TIÊU",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        1118.0,
+        682.0,
+        84.0,
+        22.0
+      ],
+      "quad": [
+        [
+          1118.0,
+          682.0
+        ],
+        [
+          1202.0,
+          682.0
+        ],
+        [
+          1202.0,
+          704.0
+        ],
+        [
+          1118.0,
+          704.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.772099,
+        0.627993,
+        0.058011,
+        0.020258
+      ],
+      "normalized_quad": [
+        [
+          0.772099,
+          0.627993
+        ],
+        [
+          0.83011,
+          0.627993
+        ],
+        [
+          0.83011,
+          0.64825
+        ],
+        [
+          0.772099,
+          0.64825
+        ]
+      ],
+      "id": "before-visual-030",
+      "source_region_ids": [
+        "before-032"
+      ],
+      "slot_id": "text-7a3a9ff10f-1"
+    }
+  ],
+  "text_review": "image_review"
+}

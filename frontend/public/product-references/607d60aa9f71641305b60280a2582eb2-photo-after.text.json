@@ -1,0 +1,75 @@
+{
+  "schema_version": 1,
+  "product_id": "607d60aa9f71641305b60280a2582eb2",
+  "view": "after",
+  "image": "/product-references/607d60aa9f71641305b60280a2582eb2-photo-after.png",
+  "sha256": "c350c21e8bd45e541b61242c38d610fd24762f3f629676449a8e0e40692de27f",
+  "width": 1448,
+  "height": 1086,
+  "coordinate_system": "image_pixels_top_left",
+  "status": "detected",
+  "regions": [
+    {
+      "text": "THANH",
+      "ocr_text": "HANI",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        296.22,
+        0,
+        1137.56,
+        936.34
+      ],
+      "quad": [
+        [
+          296.22,
+          522.02
+        ],
+        [
+          1164.96,
+          0
+        ],
+        [
+          1433.78,
+          305.98
+        ],
+        [
+          566.04,
+          936.34
+        ]
+      ],
+      "normalized_bbox": [
+        0.204572,
+        0.0,
+        0.785608,
+        0.862192
+      ],
+      "normalized_quad": [
+        [
+          0.204572,
+          0.480681
+        ],
+        [
+          0.80453,
+          0.0
+        ],
+        [
+          0.99018,
+          0.28175
+        ],
+        [
+          0.390912,
+          0.862192
+        ]
+      ],
+      "id": "after-visual-001",
+      "source_region_ids": [
+        "after-001"
+      ],
+      "slot_id": "text-7dc55c2e6b-1",
+      "match_confidence": 1.0
+    }
+  ],
+  "text_review": "image_review"
+}

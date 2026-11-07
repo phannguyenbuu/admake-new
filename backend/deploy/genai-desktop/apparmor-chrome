@@ -1,0 +1,6 @@
+# Same sandbox user-namespace allowance as Ubuntu's packaged Chrome profile.
+abi <abi/4.0>,
+include <tunables/global>
+profile genai_desktop_chrome /opt/genai-desktop/chrome-linux64/chrome flags=(unconfined) {
+  userns,
+}

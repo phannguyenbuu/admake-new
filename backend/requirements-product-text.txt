@@ -1,0 +1,6 @@
+# Offline annotation tooling only; not needed by the production Flask API.
+easyocr>=1.7,<2
+torch>=2,<3
+Pillow>=10
+numpy>=1.26
+scipy>=1.12

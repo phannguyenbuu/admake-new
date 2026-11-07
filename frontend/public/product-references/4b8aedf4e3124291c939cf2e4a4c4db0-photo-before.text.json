@@ -1,0 +1,74 @@
+{
+  "schema_version": 1,
+  "product_id": "4b8aedf4e3124291c939cf2e4a4c4db0",
+  "view": "before",
+  "image": "/product-references/4b8aedf4e3124291c939cf2e4a4c4db0-photo-before.png",
+  "sha256": "af66224021e5a6ac7cd89b20129d8da2a9549ee61e45435b27e89fb614fdef38",
+  "width": 1448,
+  "height": 1086,
+  "coordinate_system": "image_pixels_top_left",
+  "status": "detected",
+  "regions": [
+    {
+      "text": "PHEBOUON",
+      "ocr_text": "LE{ F +a",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        0,
+        0,
+        1436.15,
+        1051.0
+      ],
+      "quad": [
+        [
+          147.88,
+          0
+        ],
+        [
+          1436.15,
+          771.37
+        ],
+        [
+          1258.12,
+          1051.0
+        ],
+        [
+          0,
+          231.63
+        ]
+      ],
+      "normalized_bbox": [
+        0.0,
+        0.0,
+        0.991816,
+        0.967772
+      ],
+      "normalized_quad": [
+        [
+          0.102127,
+          0.0
+        ],
+        [
+          0.991816,
+          0.710285
+        ],
+        [
+          0.868867,
+          0.967772
+        ],
+        [
+          0.0,
+          0.213287
+        ]
+      ],
+      "id": "before-visual-001",
+      "source_region_ids": [
+        "before-001"
+      ],
+      "slot_id": "text-cfc6388732-1"
+    }
+  ],
+  "text_review": "image_review"
+}

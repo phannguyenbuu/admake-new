@@ -1,0 +1,324 @@
+{
+  "schema_version": 1,
+  "product_id": "c5065952cc9c63494acbc441ef7af441",
+  "view": "after",
+  "image": "/product-references/c5065952cc9c63494acbc441ef7af441-photo-after.png",
+  "sha256": "91ca9c4432404e13adc706558b838344462a72ea5761809cce9a92c64d4a9483",
+  "width": 1448,
+  "height": 1086,
+  "coordinate_system": "image_pixels_top_left",
+  "status": "detected",
+  "regions": [
+    {
+      "text": "NHẬT KHOA HƯNG",
+      "ocr_text": "KHOA | NHÂTNXM | HUNG",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        432.95,
+        220.46,
+        561.82,
+        106.43
+      ],
+      "quad": [
+        [
+          432.95,
+          220.46
+        ],
+        [
+          994.77,
+          220.46
+        ],
+        [
+          994.77,
+          326.89
+        ],
+        [
+          432.95,
+          326.89
+        ]
+      ],
+      "normalized_bbox": [
+        0.298999,
+        0.203002,
+        0.387997,
+        0.098002
+      ],
+      "normalized_quad": [
+        [
+          0.298999,
+          0.203002
+        ],
+        [
+          0.686996,
+          0.203002
+        ],
+        [
+          0.686996,
+          0.301004
+        ],
+        [
+          0.298999,
+          0.301004
+        ]
+      ],
+      "id": "after-visual-001",
+      "source_region_ids": [
+        "after-010",
+        "after-011",
+        "after-012"
+      ],
+      "slot_id": "text-2340c54b1b-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "NHAT KHOA HUNG",
+      "ocr_text": "NHAT | KHOA | HUNG",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        264.98,
+        307.34,
+        143.35,
+        30.41
+      ],
+      "quad": [
+        [
+          264.98,
+          307.34
+        ],
+        [
+          408.33,
+          307.34
+        ],
+        [
+          408.33,
+          337.75
+        ],
+        [
+          264.98,
+          337.75
+        ]
+      ],
+      "normalized_bbox": [
+        0.182997,
+        0.283002,
+        0.098999,
+        0.028002
+      ],
+      "normalized_quad": [
+        [
+          0.182997,
+          0.283002
+        ],
+        [
+          0.281996,
+          0.283002
+        ],
+        [
+          0.281996,
+          0.311004
+        ],
+        [
+          0.182997,
+          0.311004
+        ]
+      ],
+      "id": "after-visual-002",
+      "source_region_ids": [
+        "after-014",
+        "after-015",
+        "after-016"
+      ],
+      "slot_id": "text-2340c54b1b-2",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "CHI NHÁNH VĨNH LONG",
+      "ocr_text": "VĨNH | LONG",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        521.28,
+        300.82,
+        389.51,
+        68.42
+      ],
+      "quad": [
+        [
+          521.28,
+          300.82
+        ],
+        [
+          910.79,
+          300.82
+        ],
+        [
+          910.79,
+          369.24
+        ],
+        [
+          521.28,
+          369.24
+        ]
+      ],
+      "normalized_bbox": [
+        0.36,
+        0.276998,
+        0.268999,
+        0.063002
+      ],
+      "normalized_quad": [
+        [
+          0.36,
+          0.276998
+        ],
+        [
+          0.628999,
+          0.276998
+        ],
+        [
+          0.628999,
+          0.34
+        ],
+        [
+          0.36,
+          0.34
+        ]
+      ],
+      "id": "after-visual-003",
+      "source_region_ids": [
+        "after-017",
+        "after-018"
+      ],
+      "slot_id": "text-a4942db4ff-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "GIÁM ĐỐC",
+      "ocr_text": "GIÁM ĐỐC",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        595.0,
+        395.0,
+        240.0,
+        66.0
+      ],
+      "quad": [
+        [
+          595.0,
+          395.0
+        ],
+        [
+          835.0,
+          395.0
+        ],
+        [
+          835.0,
+          461.0
+        ],
+        [
+          595.0,
+          461.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.410912,
+        0.36372,
+        0.165746,
+        0.060773
+      ],
+      "normalized_quad": [
+        [
+          0.410912,
+          0.36372
+        ],
+        [
+          0.576657,
+          0.36372
+        ],
+        [
+          0.576657,
+          0.424494
+        ],
+        [
+          0.410912,
+          0.424494
+        ]
+      ],
+      "id": "after-visual-004",
+      "source_region_ids": [
+        "after-022"
+      ],
+      "slot_id": "text-8345e9c67e-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "KIM NHỚ",
+      "ocr_text": "KIM NHỚ",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        384.0,
+        411.0,
+        660.0,
+        203.0
+      ],
+      "quad": [
+        [
+          384.0,
+          411.0
+        ],
+        [
+          1044.0,
+          411.0
+        ],
+        [
+          1044.0,
+          614.0
+        ],
+        [
+          384.0,
+          614.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.265193,
+        0.378453,
+        0.455801,
+        0.186924
+      ],
+      "normalized_quad": [
+        [
+          0.265193,
+          0.378453
+        ],
+        [
+          0.720994,
+          0.378453
+        ],
+        [
+          0.720994,
+          0.565378
+        ],
+        [
+          0.265193,
+          0.565378
+        ]
+      ],
+      "id": "after-visual-005",
+      "source_region_ids": [
+        "after-025"
+      ],
+      "slot_id": "text-4a2d2a1478-1",
+      "match_confidence": 1.0
+    }
+  ],
+  "text_review": "image_review"
+}

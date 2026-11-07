@@ -1,0 +1,663 @@
+{
+  "schema_version": 1,
+  "product_id": "67712217ebe7da30efffb0d16f606acb",
+  "view": "after",
+  "image": "/product-references/67712217ebe7da30efffb0d16f606acb-photo-after.png",
+  "sha256": "03f91784a841971b7f842aba7b61d0dc0a9f8c1e2b80526b041fae7941db02bc",
+  "width": 1448,
+  "height": 1086,
+  "coordinate_system": "image_pixels_top_left",
+  "status": "detected",
+  "regions": [
+    {
+      "text": "PHUOCTIEN",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        105.7,
+        383.36,
+        217.2,
+        42.35
+      ],
+      "quad": [
+        [
+          105.7,
+          383.36
+        ],
+        [
+          322.9,
+          383.36
+        ],
+        [
+          322.9,
+          425.71
+        ],
+        [
+          105.7,
+          425.71
+        ]
+      ],
+      "normalized_bbox": [
+        0.072997,
+        0.353002,
+        0.15,
+        0.038996
+      ],
+      "normalized_quad": [
+        [
+          0.072997,
+          0.353002
+        ],
+        [
+          0.222997,
+          0.353002
+        ],
+        [
+          0.222997,
+          0.391998
+        ],
+        [
+          0.072997,
+          0.391998
+        ]
+      ],
+      "id": "after-visual-001",
+      "source_region_ids": [],
+      "slot_id": "text-5da0ed7172-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "TIỆM IN PHƯỚC TIÊN - IN NHANH LẤY LIỀN",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        266.43,
+        298.65,
+        1181.57,
+        108.6
+      ],
+      "quad": [
+        [
+          266.43,
+          298.65
+        ],
+        [
+          1448.0,
+          298.65
+        ],
+        [
+          1448.0,
+          407.25
+        ],
+        [
+          266.43,
+          407.25
+        ]
+      ],
+      "normalized_bbox": [
+        0.183999,
+        0.275,
+        0.816001,
+        0.1
+      ],
+      "normalized_quad": [
+        [
+          0.183999,
+          0.275
+        ],
+        [
+          1.0,
+          0.275
+        ],
+        [
+          1.0,
+          0.375
+        ],
+        [
+          0.183999,
+          0.375
+        ]
+      ],
+      "id": "after-visual-002",
+      "source_region_ids": [],
+      "slot_id": "text-08a7474b83-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "IN MÀU - PHOTOCOPY - ẢNH THẺ",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        267.88,
+        398.56,
+        1180.12,
+        139.01
+      ],
+      "quad": [
+        [
+          267.88,
+          398.56
+        ],
+        [
+          1448.0,
+          398.56
+        ],
+        [
+          1448.0,
+          537.57
+        ],
+        [
+          267.88,
+          537.57
+        ]
+      ],
+      "normalized_bbox": [
+        0.185,
+        0.366998,
+        0.815,
+        0.128002
+      ],
+      "normalized_quad": [
+        [
+          0.185,
+          0.366998
+        ],
+        [
+          1.0,
+          0.366998
+        ],
+        [
+          1.0,
+          0.495
+        ],
+        [
+          0.185,
+          0.495
+        ]
+      ],
+      "id": "after-visual-003",
+      "source_region_ids": [],
+      "slot_id": "text-4e0f7b6753-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "SCAN - PHOTOCOPY - IN MÀU - ĐÓNG SÁCH - IN MENU",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        81.09,
+        450.69,
+        806.54,
+        56.47
+      ],
+      "quad": [
+        [
+          81.09,
+          450.69
+        ],
+        [
+          887.63,
+          450.69
+        ],
+        [
+          887.63,
+          507.16
+        ],
+        [
+          81.09,
+          507.16
+        ]
+      ],
+      "normalized_bbox": [
+        0.056001,
+        0.415,
+        0.557003,
+        0.051998
+      ],
+      "normalized_quad": [
+        [
+          0.056001,
+          0.415
+        ],
+        [
+          0.613004,
+          0.415
+        ],
+        [
+          0.613004,
+          0.466998
+        ],
+        [
+          0.056001,
+          0.466998
+        ]
+      ],
+      "id": "after-visual-004",
+      "source_region_ids": [],
+      "slot_id": "text-22e1e69a2c-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "TEM NHÃN CARD VISIT - TỜ RƠI QUẢNG CÁO - CHỈNH SỬA",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        81.09,
+        493.04,
+        806.54,
+        56.47
+      ],
+      "quad": [
+        [
+          81.09,
+          493.04
+        ],
+        [
+          887.63,
+          493.04
+        ],
+        [
+          887.63,
+          549.51
+        ],
+        [
+          81.09,
+          549.51
+        ]
+      ],
+      "normalized_bbox": [
+        0.056001,
+        0.453996,
+        0.557003,
+        0.051998
+      ],
+      "normalized_quad": [
+        [
+          0.056001,
+          0.453996
+        ],
+        [
+          0.613004,
+          0.453996
+        ],
+        [
+          0.613004,
+          0.505994
+        ],
+        [
+          0.056001,
+          0.505994
+        ]
+      ],
+      "id": "after-visual-005",
+      "source_region_ids": [],
+      "slot_id": "text-c4c6830355-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "ĐỒ ÁN - IN 3D THEO YÊU CẦU - VĂN PHÒNG PHẨM - IN ẢNH",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        81.09,
+        535.4,
+        806.54,
+        56.47
+      ],
+      "quad": [
+        [
+          81.09,
+          535.4
+        ],
+        [
+          887.63,
+          535.4
+        ],
+        [
+          887.63,
+          591.87
+        ],
+        [
+          81.09,
+          591.87
+        ]
+      ],
+      "normalized_bbox": [
+        0.056001,
+        0.493002,
+        0.557003,
+        0.051998
+      ],
+      "normalized_quad": [
+        [
+          0.056001,
+          0.493002
+        ],
+        [
+          0.613004,
+          0.493002
+        ],
+        [
+          0.613004,
+          0.545
+        ],
+        [
+          0.056001,
+          0.545
+        ]
+      ],
+      "id": "after-visual-006",
+      "source_region_ids": [],
+      "slot_id": "text-93ab7fc66c-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "HỖ TRỢ NHẬN FILE",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        877.49,
+        554.95,
+        570.51,
+        62.99
+      ],
+      "quad": [
+        [
+          877.49,
+          554.95
+        ],
+        [
+          1448.0,
+          554.95
+        ],
+        [
+          1448.0,
+          617.94
+        ],
+        [
+          877.49,
+          617.94
+        ]
+      ],
+      "normalized_bbox": [
+        0.606001,
+        0.511004,
+        0.393999,
+        0.058002
+      ],
+      "normalized_quad": [
+        [
+          0.606001,
+          0.511004
+        ],
+        [
+          1.0,
+          0.511004
+        ],
+        [
+          1.0,
+          0.569006
+        ],
+        [
+          0.606001,
+          0.569006
+        ]
+      ],
+      "id": "after-visual-007",
+      "source_region_ids": [],
+      "slot_id": "text-68eda8e191-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "SỬA & IN ONLINE TỪ XA",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        896.31,
+        601.64,
+        551.69,
+        62.99
+      ],
+      "quad": [
+        [
+          896.31,
+          601.64
+        ],
+        [
+          1448.0,
+          601.64
+        ],
+        [
+          1448.0,
+          664.63
+        ],
+        [
+          896.31,
+          664.63
+        ]
+      ],
+      "normalized_bbox": [
+        0.618999,
+        0.553996,
+        0.381001,
+        0.058002
+      ],
+      "normalized_quad": [
+        [
+          0.618999,
+          0.553996
+        ],
+        [
+          1.0,
+          0.553996
+        ],
+        [
+          1.0,
+          0.611998
+        ],
+        [
+          0.618999,
+          0.611998
+        ]
+      ],
+      "id": "after-visual-008",
+      "source_region_ids": [],
+      "slot_id": "text-7e51b128d9-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "GIAO HÀNG TẬN NƠI",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        880.38,
+        640.74,
+        567.62,
+        62.99
+      ],
+      "quad": [
+        [
+          880.38,
+          640.74
+        ],
+        [
+          1448.0,
+          640.74
+        ],
+        [
+          1448.0,
+          703.73
+        ],
+        [
+          880.38,
+          703.73
+        ]
+      ],
+      "normalized_bbox": [
+        0.607997,
+        0.59,
+        0.392003,
+        0.058002
+      ],
+      "normalized_quad": [
+        [
+          0.607997,
+          0.59
+        ],
+        [
+          1.0,
+          0.59
+        ],
+        [
+          1.0,
+          0.648002
+        ],
+        [
+          0.607997,
+          0.648002
+        ]
+      ],
+      "id": "after-visual-009",
+      "source_region_ids": [],
+      "slot_id": "text-a29f267b68-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "395 LÊ DUẨN - BUÔN MA THUỘT - ĐẮK LẮK",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        125.98,
+        598.39,
+        852.87,
+        74.93
+      ],
+      "quad": [
+        [
+          125.98,
+          598.39
+        ],
+        [
+          978.85,
+          598.39
+        ],
+        [
+          978.85,
+          673.32
+        ],
+        [
+          125.98,
+          673.32
+        ]
+      ],
+      "normalized_bbox": [
+        0.087003,
+        0.551004,
+        0.588999,
+        0.068996
+      ],
+      "normalized_quad": [
+        [
+          0.087003,
+          0.551004
+        ],
+        [
+          0.676001,
+          0.551004
+        ],
+        [
+          0.676001,
+          0.62
+        ],
+        [
+          0.087003,
+          0.62
+        ]
+      ],
+      "id": "after-visual-010",
+      "source_region_ids": [],
+      "slot_id": "text-d1368892f7-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "LIÊN HỆ: 0329.663.642",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        906.45,
+        722.19,
+        541.55,
+        82.54
+      ],
+      "quad": [
+        [
+          906.45,
+          722.19
+        ],
+        [
+          1448.0,
+          722.19
+        ],
+        [
+          1448.0,
+          804.73
+        ],
+        [
+          906.45,
+          804.73
+        ]
+      ],
+      "normalized_bbox": [
+        0.626001,
+        0.665,
+        0.373999,
+        0.076004
+      ],
+      "normalized_quad": [
+        [
+          0.626001,
+          0.665
+        ],
+        [
+          1.0,
+          0.665
+        ],
+        [
+          1.0,
+          0.741004
+        ],
+        [
+          0.626001,
+          0.741004
+        ]
+      ],
+      "id": "after-visual-011",
+      "source_region_ids": [],
+      "slot_id": "text-57a2755e3f-1",
+      "match_confidence": 1.0
+    }
+  ],
+  "text_review": "image_review"
+}

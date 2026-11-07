@@ -1,0 +1,197 @@
+{
+  "schema_version": 1,
+  "product_id": "29fd5c8c0571eb516eccc601fec2298d",
+  "view": "after",
+  "image": "/product-references/29fd5c8c0571eb516eccc601fec2298d-photo-after.png",
+  "sha256": "0cae00cce90980ac9f05c5bdbcd356b9577dcf98a1b893b7aac38516c232f03b",
+  "width": 1448,
+  "height": 1086,
+  "coordinate_system": "image_pixels_top_left",
+  "status": "detected",
+  "regions": [
+    {
+      "id": "after-visual-001",
+      "text": "B",
+      "ocr_text": "",
+      "confidence": 1,
+      "review": "verified",
+      "method": "visual_annotation",
+      "bbox": [
+        190,
+        135,
+        365,
+        432
+      ],
+      "quad": [
+        [
+          190,
+          155
+        ],
+        [
+          465,
+          135
+        ],
+        [
+          555,
+          567
+        ],
+        [
+          205,
+          535
+        ]
+      ],
+      "normalized_bbox": [
+        0.131215,
+        0.124309,
+        0.252072,
+        0.39779
+      ],
+      "normalized_quad": [
+        [
+          0.131215,
+          0.142726
+        ],
+        [
+          0.321133,
+          0.124309
+        ],
+        [
+          0.383287,
+          0.522099
+        ],
+        [
+          0.141575,
+          0.492634
+        ]
+      ],
+      "match_confidence": 1.0,
+      "source_region_ids": [
+        "after-manual-001"
+      ],
+      "slot_id": "text-e9d71f5ee7-1"
+    },
+    {
+      "id": "after-visual-002",
+      "text": "B",
+      "ocr_text": "",
+      "confidence": 1,
+      "review": "verified",
+      "method": "visual_annotation",
+      "bbox": [
+        572,
+        154,
+        323,
+        486
+      ],
+      "quad": [
+        [
+          572,
+          175
+        ],
+        [
+          811,
+          154
+        ],
+        [
+          895,
+          640
+        ],
+        [
+          585,
+          582
+        ]
+      ],
+      "normalized_bbox": [
+        0.395028,
+        0.141805,
+        0.223066,
+        0.447514
+      ],
+      "normalized_quad": [
+        [
+          0.395028,
+          0.161142
+        ],
+        [
+          0.560083,
+          0.141805
+        ],
+        [
+          0.618094,
+          0.589319
+        ],
+        [
+          0.404006,
+          0.535912
+        ]
+      ],
+      "match_confidence": 1.0,
+      "source_region_ids": [
+        "after-manual-002"
+      ],
+      "slot_id": "text-e9d71f5ee7-2"
+    },
+    {
+      "id": "after-visual-003",
+      "text": "B",
+      "ocr_text": "",
+      "confidence": 1,
+      "review": "verified",
+      "method": "visual_annotation",
+      "bbox": [
+        896,
+        179,
+        354,
+        537
+      ],
+      "quad": [
+        [
+          896,
+          213
+        ],
+        [
+          1137,
+          179
+        ],
+        [
+          1250,
+          716
+        ],
+        [
+          906,
+          652
+        ]
+      ],
+      "normalized_bbox": [
+        0.618785,
+        0.164825,
+        0.244475,
+        0.494475
+      ],
+      "normalized_quad": [
+        [
+          0.618785,
+          0.196133
+        ],
+        [
+          0.785221,
+          0.164825
+        ],
+        [
+          0.86326,
+          0.6593
+        ],
+        [
+          0.625691,
+          0.600368
+        ]
+      ],
+      "match_confidence": 1.0,
+      "source_region_ids": [
+        "after-manual-003"
+      ],
+      "slot_id": "text-e9d71f5ee7-3"
+    }
+  ],
+  "text_review": "image_review"
+}

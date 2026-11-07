@@ -1,0 +1,72 @@
+{
+  "schema_version": 1,
+  "product_id": "da86f98fbc6cc52be09e6e8eb866d0ec",
+  "view": "after",
+  "image": "/product-references/da86f98fbc6cc52be09e6e8eb866d0ec-photo-after.png",
+  "sha256": "56b04a71698dec2f937df741b96499efe8525b2f2636b53b8d950504ef25f25c",
+  "width": 1448,
+  "height": 1086,
+  "coordinate_system": "image_pixels_top_left",
+  "status": "detected",
+  "regions": [
+    {
+      "text": "eBL",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "pending",
+      "method": "image_review",
+      "bbox": [
+        612.5,
+        11.95,
+        835.5,
+        1034.96
+      ],
+      "quad": [
+        [
+          612.5,
+          11.95
+        ],
+        [
+          1448.0,
+          11.95
+        ],
+        [
+          1448.0,
+          1046.91
+        ],
+        [
+          612.5,
+          1046.91
+        ]
+      ],
+      "normalized_bbox": [
+        0.422997,
+        0.011004,
+        0.577003,
+        0.953002
+      ],
+      "normalized_quad": [
+        [
+          0.422997,
+          0.011004
+        ],
+        [
+          1.0,
+          0.011004
+        ],
+        [
+          1.0,
+          0.964006
+        ],
+        [
+          0.422997,
+          0.964006
+        ]
+      ],
+      "id": "after-visual-001",
+      "source_region_ids": [],
+      "slot_id": "text-984f12a270-1"
+    }
+  ],
+  "text_review": "image_review"
+}

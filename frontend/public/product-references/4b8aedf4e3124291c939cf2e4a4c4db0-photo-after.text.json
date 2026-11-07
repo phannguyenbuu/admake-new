@@ -1,0 +1,75 @@
+{
+  "schema_version": 1,
+  "product_id": "4b8aedf4e3124291c939cf2e4a4c4db0",
+  "view": "after",
+  "image": "/product-references/4b8aedf4e3124291c939cf2e4a4c4db0-photo-after.png",
+  "sha256": "51d8a71b45a61559279fb9d55a169f7236cbb138669daa7b1112b6c29b8aff7e",
+  "width": 1448,
+  "height": 1086,
+  "coordinate_system": "image_pixels_top_left",
+  "status": "detected",
+  "regions": [
+    {
+      "text": "PHERBUON",
+      "ocr_text": "HHGRBHcin",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        20.23,
+        0,
+        1420.54,
+        1081.0
+      ],
+      "quad": [
+        [
+          204.9,
+          0
+        ],
+        [
+          1440.77,
+          831.71
+        ],
+        [
+          1256.1,
+          1081.0
+        ],
+        [
+          20.23,
+          155.29
+        ]
+      ],
+      "normalized_bbox": [
+        0.013971,
+        0.0,
+        0.981036,
+        0.995396
+      ],
+      "normalized_quad": [
+        [
+          0.141506,
+          0.0
+        ],
+        [
+          0.995007,
+          0.765847
+        ],
+        [
+          0.867472,
+          0.995396
+        ],
+        [
+          0.013971,
+          0.142993
+        ]
+      ],
+      "id": "after-visual-001",
+      "source_region_ids": [
+        "after-001"
+      ],
+      "slot_id": "text-cfc6388732-1",
+      "match_confidence": 0.875
+    }
+  ],
+  "text_review": "image_review"
+}

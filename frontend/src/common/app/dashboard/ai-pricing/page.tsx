@@ -5,7 +5,7 @@ import { AIPricingSplitView } from "../../../components/ai-pricing/AIPricingSpli
 import { Segmented } from "antd";
 
 const AIPricingDashboard: IPage["Component"] = () => {
-  const [viewMode, setViewMode] = useState<"3d_workflow" | "classic">("3d_workflow");
+  const [viewMode, setViewMode] = useState<"3d_workflow" | "classic">("classic");
 
   return (
     <div className="w-full h-full min-h-[calc(100vh-90px)] p-2 md:p-4 space-y-3">
@@ -14,8 +14,8 @@ const AIPricingDashboard: IPage["Component"] = () => {
           value={viewMode}
           onChange={(val) => setViewMode(val as "3d_workflow" | "classic")}
           options={[
-            { label: "🧊 Quy Trình 3D & Render GenAI (Mới)", value: "3d_workflow" },
-            { label: "📊 Báo Giá & Tách Vật Tư Cổ Điển", value: "classic" },
+            { label: "BOM & Báo giá", value: "classic" },
+            { label: "3D", value: "3d_workflow" },
           ]}
           className="bg-slate-900 border border-slate-800 text-slate-200"
         />

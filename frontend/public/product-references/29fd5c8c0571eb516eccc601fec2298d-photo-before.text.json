@@ -1,0 +1,194 @@
+{
+  "schema_version": 1,
+  "product_id": "29fd5c8c0571eb516eccc601fec2298d",
+  "view": "before",
+  "image": "/product-references/29fd5c8c0571eb516eccc601fec2298d-photo-before.png",
+  "sha256": "9020e4235684c4cf0d0a370f68a9077bb4526a1956786d1e2b66510d4f5671d9",
+  "width": 1448,
+  "height": 1086,
+  "coordinate_system": "image_pixels_top_left",
+  "status": "detected",
+  "regions": [
+    {
+      "id": "before-visual-001",
+      "text": "B",
+      "ocr_text": "",
+      "confidence": 1,
+      "review": "verified",
+      "method": "visual_annotation",
+      "bbox": [
+        80,
+        240,
+        417,
+        450
+      ],
+      "quad": [
+        [
+          80,
+          240
+        ],
+        [
+          460,
+          240
+        ],
+        [
+          497,
+          690
+        ],
+        [
+          80,
+          690
+        ]
+      ],
+      "normalized_bbox": [
+        0.055249,
+        0.220994,
+        0.287983,
+        0.414365
+      ],
+      "normalized_quad": [
+        [
+          0.055249,
+          0.220994
+        ],
+        [
+          0.31768,
+          0.220994
+        ],
+        [
+          0.343232,
+          0.635359
+        ],
+        [
+          0.055249,
+          0.635359
+        ]
+      ],
+      "source_region_ids": [
+        "before-manual-001"
+      ],
+      "slot_id": "text-e9d71f5ee7-1"
+    },
+    {
+      "id": "before-visual-002",
+      "text": "B",
+      "ocr_text": "",
+      "confidence": 1,
+      "review": "verified",
+      "method": "visual_annotation",
+      "bbox": [
+        530,
+        238,
+        405,
+        450
+      ],
+      "quad": [
+        [
+          530,
+          238
+        ],
+        [
+          900,
+          238
+        ],
+        [
+          935,
+          688
+        ],
+        [
+          530,
+          688
+        ]
+      ],
+      "normalized_bbox": [
+        0.366022,
+        0.219153,
+        0.279696,
+        0.414365
+      ],
+      "normalized_quad": [
+        [
+          0.366022,
+          0.219153
+        ],
+        [
+          0.621547,
+          0.219153
+        ],
+        [
+          0.645718,
+          0.633517
+        ],
+        [
+          0.366022,
+          0.633517
+        ]
+      ],
+      "source_region_ids": [
+        "before-manual-002"
+      ],
+      "slot_id": "text-e9d71f5ee7-2"
+    },
+    {
+      "id": "before-visual-003",
+      "text": "B",
+      "ocr_text": "",
+      "confidence": 1,
+      "review": "verified",
+      "method": "visual_annotation",
+      "bbox": [
+        970,
+        238,
+        395,
+        450
+      ],
+      "quad": [
+        [
+          970,
+          238
+        ],
+        [
+          1345,
+          238
+        ],
+        [
+          1365,
+          688
+        ],
+        [
+          970,
+          688
+        ]
+      ],
+      "normalized_bbox": [
+        0.66989,
+        0.219153,
+        0.27279,
+        0.414365
+      ],
+      "normalized_quad": [
+        [
+          0.66989,
+          0.219153
+        ],
+        [
+          0.928867,
+          0.219153
+        ],
+        [
+          0.94268,
+          0.633517
+        ],
+        [
+          0.66989,
+          0.633517
+        ]
+      ],
+      "source_region_ids": [
+        "before-manual-003"
+      ],
+      "slot_id": "text-e9d71f5ee7-3"
+    }
+  ],
+  "text_review": "image_review"
+}

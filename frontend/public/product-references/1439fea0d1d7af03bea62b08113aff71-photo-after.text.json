@@ -1,0 +1,486 @@
+{
+  "schema_version": 1,
+  "product_id": "1439fea0d1d7af03bea62b08113aff71",
+  "view": "after",
+  "image": "/product-references/1439fea0d1d7af03bea62b08113aff71-photo-after.png",
+  "sha256": "72eacaf46a453b64a74faaae6c5fe6cce638e888c5883ccf9f5457510d0ef14c",
+  "width": 1448,
+  "height": 1086,
+  "coordinate_system": "image_pixels_top_left",
+  "status": "detected",
+  "regions": [
+    {
+      "text": "Tiệm Trà Labubu",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        244.71,
+        5.43,
+        1180.12,
+        204.17
+      ],
+      "quad": [
+        [
+          244.71,
+          5.43
+        ],
+        [
+          1424.83,
+          5.43
+        ],
+        [
+          1424.83,
+          209.6
+        ],
+        [
+          244.71,
+          209.6
+        ]
+      ],
+      "normalized_bbox": [
+        0.168999,
+        0.005,
+        0.815,
+        0.188002
+      ],
+      "normalized_quad": [
+        [
+          0.168999,
+          0.005
+        ],
+        [
+          0.983999,
+          0.005
+        ],
+        [
+          0.983999,
+          0.193002
+        ],
+        [
+          0.168999,
+          0.193002
+        ]
+      ],
+      "id": "after-visual-001",
+      "source_region_ids": [],
+      "slot_id": "text-55f8672ec3-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "TRÀ SỮA FULL TOPPING",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        427.16,
+        630.97,
+        987.54,
+        73.85
+      ],
+      "quad": [
+        [
+          427.16,
+          630.97
+        ],
+        [
+          1414.7,
+          630.97
+        ],
+        [
+          1414.7,
+          704.82
+        ],
+        [
+          427.16,
+          704.82
+        ]
+      ],
+      "normalized_bbox": [
+        0.295,
+        0.581004,
+        0.682003,
+        0.068002
+      ],
+      "normalized_quad": [
+        [
+          0.295,
+          0.581004
+        ],
+        [
+          0.977003,
+          0.581004
+        ],
+        [
+          0.977003,
+          0.649006
+        ],
+        [
+          0.295,
+          0.649006
+        ]
+      ],
+      "id": "after-visual-002",
+      "source_region_ids": [],
+      "slot_id": "text-4909d7fece-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "MILO DẦM",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        545.9,
+        706.99,
+        748.62,
+        77.11
+      ],
+      "quad": [
+        [
+          545.9,
+          706.99
+        ],
+        [
+          1294.52,
+          706.99
+        ],
+        [
+          1294.52,
+          784.1
+        ],
+        [
+          545.9,
+          784.1
+        ]
+      ],
+      "normalized_bbox": [
+        0.377003,
+        0.651004,
+        0.517003,
+        0.071004
+      ],
+      "normalized_quad": [
+        [
+          0.377003,
+          0.651004
+        ],
+        [
+          0.894006,
+          0.651004
+        ],
+        [
+          0.894006,
+          0.722007
+        ],
+        [
+          0.377003,
+          0.722007
+        ]
+      ],
+      "id": "after-visual-003",
+      "source_region_ids": [],
+      "slot_id": "text-76d6e71dd3-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "YAOURT TRÁI CÂY",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        473.5,
+        753.68,
+        803.64,
+        84.71
+      ],
+      "quad": [
+        [
+          473.5,
+          753.68
+        ],
+        [
+          1277.14,
+          753.68
+        ],
+        [
+          1277.14,
+          838.39
+        ],
+        [
+          473.5,
+          838.39
+        ]
+      ],
+      "normalized_bbox": [
+        0.327003,
+        0.693996,
+        0.555,
+        0.078002
+      ],
+      "normalized_quad": [
+        [
+          0.327003,
+          0.693996
+        ],
+        [
+          0.882003,
+          0.693996
+        ],
+        [
+          0.882003,
+          0.771998
+        ],
+        [
+          0.327003,
+          0.771998
+        ]
+      ],
+      "id": "after-visual-004",
+      "source_region_ids": [],
+      "slot_id": "text-f59142e259-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "Alo ship: 0389 786 547",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        509.7,
+        830.79,
+        761.65,
+        255.21
+      ],
+      "quad": [
+        [
+          509.7,
+          830.79
+        ],
+        [
+          1271.35,
+          830.79
+        ],
+        [
+          1271.35,
+          1086.0
+        ],
+        [
+          509.7,
+          1086.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.352003,
+        0.765,
+        0.526001,
+        0.235
+      ],
+      "normalized_quad": [
+        [
+          0.352003,
+          0.765
+        ],
+        [
+          0.878004,
+          0.765
+        ],
+        [
+          0.878004,
+          1.0
+        ],
+        [
+          0.352003,
+          1.0
+        ]
+      ],
+      "id": "after-visual-005",
+      "source_region_ids": [],
+      "slot_id": "text-7c954583cc-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "Trà Tôbb - Topping - Milo Dầm - Yaourt Trái Cây",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        849.98,
+        762.37,
+        598.02,
+        323.63
+      ],
+      "quad": [
+        [
+          849.98,
+          762.37
+        ],
+        [
+          1448.0,
+          762.37
+        ],
+        [
+          1448.0,
+          1086.0
+        ],
+        [
+          849.98,
+          1086.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.587003,
+        0.701998,
+        0.412997,
+        0.298002
+      ],
+      "normalized_quad": [
+        [
+          0.587003,
+          0.701998
+        ],
+        [
+          1.0,
+          0.701998
+        ],
+        [
+          1.0,
+          1.0
+        ],
+        [
+          0.587003,
+          1.0
+        ]
+      ],
+      "id": "after-visual-006",
+      "source_region_ids": [],
+      "slot_id": "text-7eed235104-1",
+      "match_confidence": 0.8955
+    },
+    {
+      "text": "Tiệm Trà LABUBU",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        870.25,
+        884.0,
+        577.75,
+        202.0
+      ],
+      "quad": [
+        [
+          870.25,
+          884.0
+        ],
+        [
+          1448.0,
+          884.0
+        ],
+        [
+          1448.0,
+          1086.0
+        ],
+        [
+          870.25,
+          1086.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.601001,
+        0.813996,
+        0.398999,
+        0.186004
+      ],
+      "normalized_quad": [
+        [
+          0.601001,
+          0.813996
+        ],
+        [
+          1.0,
+          0.813996
+        ],
+        [
+          1.0,
+          1.0
+        ],
+        [
+          0.601001,
+          1.0
+        ]
+      ],
+      "id": "after-visual-007",
+      "source_region_ids": [],
+      "slot_id": "text-55f8672ec3-2",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "0389.786.547",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        890.52,
+        926.36,
+        557.48,
+        159.64
+      ],
+      "quad": [
+        [
+          890.52,
+          926.36
+        ],
+        [
+          1448.0,
+          926.36
+        ],
+        [
+          1448.0,
+          1086.0
+        ],
+        [
+          890.52,
+          1086.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.615,
+        0.853002,
+        0.385,
+        0.146998
+      ],
+      "normalized_quad": [
+        [
+          0.615,
+          0.853002
+        ],
+        [
+          1.0,
+          0.853002
+        ],
+        [
+          1.0,
+          1.0
+        ],
+        [
+          0.615,
+          1.0
+        ]
+      ],
+      "id": "after-visual-008",
+      "source_region_ids": [],
+      "slot_id": "text-8e3989185b-1",
+      "match_confidence": 1.0
+    }
+  ],
+  "text_review": "image_review"
+}

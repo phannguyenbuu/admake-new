@@ -1,0 +1,61 @@
+{
+  "manifest_version": 3,
+  "name": "Admake Tab Bridge V5",
+  "version": "5.3",
+  "description": "Cáº§u ná»‘i AI Há»£p Nháº¥t: Tá»± Ä‘á»™ng hÃ³a ChatGPT xá»­ lÃ½ Truy váº¥n ná»™i dung, PhÃ¢n tÃ­ch Vision, TrÃ­ch xuáº¥t Ruby SketchUp 3D, Táº¡o áº£nh DALL-E & Inpainting vá»›i Ä‘á»‹nh tuyáº¿n theo Ä‘Ãºng tÃªn mÃ¡y (Target PC).",
+  "permissions": [
+    "storage",
+    "activeTab",
+    "scripting",
+    "tabs",
+    "clipboardWrite",
+    "clipboardRead",
+    "alarms",
+    "unlimitedStorage"
+  ],
+  "host_permissions": [
+    "https://chatgpt.com/*",
+    "<all_urls>"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://chatgpt.com/*"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "ChatGPT AI Unified Bridge v4.0",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "icons/*"
+      ],
+      "matches": [
+        "https://chatgpt.com/*"
+      ]
+    }
+  ],
+  "minimum_chrome_version": "120"
+}

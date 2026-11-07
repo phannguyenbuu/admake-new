@@ -10,6 +10,12 @@ editor/node_modules/
 Include/
 Lib/
 Scripts/
+!backend/scripts/
+backend/scripts/*
+!backend/scripts/import_product_formulas.py
+!backend/scripts/annotate_product_text.py
+!backend/scripts/review_product_text.py
+!backend/scripts/configure_product_limits.py
 .pm2
 
 # Large binary files
@@ -39,3 +45,7 @@ frontend/.dev-logs/
 backup_static/
 *.sh
 .agents/
+
+# Product gallery thumbnail generator
+!frontend/scripts/
+!frontend/scripts/build-product-thumbnails.py

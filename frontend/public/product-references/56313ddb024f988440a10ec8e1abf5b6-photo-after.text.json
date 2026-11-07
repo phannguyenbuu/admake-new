@@ -1,0 +1,368 @@
+{
+  "schema_version": 1,
+  "product_id": "56313ddb024f988440a10ec8e1abf5b6",
+  "view": "after",
+  "image": "/product-references/56313ddb024f988440a10ec8e1abf5b6-photo-after.png",
+  "sha256": "5045c5b02c0d6c438bd7bb7bd045998a15dfdff569c81b2ae1f766e1396041f1",
+  "width": 1448,
+  "height": 1086,
+  "coordinate_system": "image_pixels_top_left",
+  "status": "detected",
+  "regions": [
+    {
+      "text": "Hàn Quốc đi",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        570.51,
+        78.19,
+        877.49,
+        364.9
+      ],
+      "quad": [
+        [
+          570.51,
+          78.19
+        ],
+        [
+          1448.0,
+          78.19
+        ],
+        [
+          1448.0,
+          443.09
+        ],
+        [
+          570.51,
+          443.09
+        ]
+      ],
+      "normalized_bbox": [
+        0.393999,
+        0.071998,
+        0.606001,
+        0.336004
+      ],
+      "normalized_quad": [
+        [
+          0.393999,
+          0.071998
+        ],
+        [
+          1.0,
+          0.071998
+        ],
+        [
+          1.0,
+          0.408002
+        ],
+        [
+          0.393999,
+          0.408002
+        ]
+      ],
+      "id": "after-visual-001",
+      "source_region_ids": [],
+      "slot_id": "text-2f5647a6b2-1",
+      "match_confidence": 0.8889
+    },
+    {
+      "text": "Chờ Tôi",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        548.79,
+        205.25,
+        899.21,
+        515.85
+      ],
+      "quad": [
+        [
+          548.79,
+          205.25
+        ],
+        [
+          1448.0,
+          205.25
+        ],
+        [
+          1448.0,
+          721.1
+        ],
+        [
+          548.79,
+          721.1
+        ]
+      ],
+      "normalized_bbox": [
+        0.378999,
+        0.188996,
+        0.621001,
+        0.475
+      ],
+      "normalized_quad": [
+        [
+          0.378999,
+          0.188996
+        ],
+        [
+          1.0,
+          0.188996
+        ],
+        [
+          1.0,
+          0.663996
+        ],
+        [
+          0.378999,
+          0.663996
+        ]
+      ],
+      "id": "after-visual-002",
+      "source_region_ids": [],
+      "slot_id": "text-629c84bfac-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "Nhé!!",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        657.39,
+        413.77,
+        771.78,
+        668.98
+      ],
+      "quad": [
+        [
+          657.39,
+          413.77
+        ],
+        [
+          1429.17,
+          413.77
+        ],
+        [
+          1429.17,
+          1082.75
+        ],
+        [
+          657.39,
+          1082.75
+        ]
+      ],
+      "normalized_bbox": [
+        0.453999,
+        0.381004,
+        0.532997,
+        0.616004
+      ],
+      "normalized_quad": [
+        [
+          0.453999,
+          0.381004
+        ],
+        [
+          0.986996,
+          0.381004
+        ],
+        [
+          0.986996,
+          0.997007
+        ],
+        [
+          0.453999,
+          0.997007
+        ]
+      ],
+      "id": "after-visual-003",
+      "source_region_ids": [],
+      "slot_id": "text-716f8cb070-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "DU",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        291.05,
+        285.62,
+        144.8,
+        405.08
+      ],
+      "quad": [
+        [
+          291.05,
+          285.62
+        ],
+        [
+          435.85,
+          285.62
+        ],
+        [
+          435.85,
+          690.7
+        ],
+        [
+          291.05,
+          690.7
+        ]
+      ],
+      "normalized_bbox": [
+        0.201001,
+        0.263002,
+        0.1,
+        0.373002
+      ],
+      "normalized_quad": [
+        [
+          0.201001,
+          0.263002
+        ],
+        [
+          0.301001,
+          0.263002
+        ],
+        [
+          0.301001,
+          0.636004
+        ],
+        [
+          0.201001,
+          0.636004
+        ]
+      ],
+      "id": "after-visual-004",
+      "source_region_ids": [],
+      "slot_id": "text-fa114377ef-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "HÀN",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        311.32,
+        377.93,
+        250.5,
+        494.13
+      ],
+      "quad": [
+        [
+          311.32,
+          377.93
+        ],
+        [
+          561.82,
+          377.93
+        ],
+        [
+          561.82,
+          872.06
+        ],
+        [
+          311.32,
+          872.06
+        ]
+      ],
+      "normalized_bbox": [
+        0.215,
+        0.348002,
+        0.172997,
+        0.455
+      ],
+      "normalized_quad": [
+        [
+          0.215,
+          0.348002
+        ],
+        [
+          0.387997,
+          0.348002
+        ],
+        [
+          0.387997,
+          0.803002
+        ],
+        [
+          0.215,
+          0.803002
+        ]
+      ],
+      "id": "after-visual-005",
+      "source_region_ids": [],
+      "slot_id": "text-4ff6152534-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "M",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        327.25,
+        495.22,
+        655.94,
+        590.78
+      ],
+      "quad": [
+        [
+          327.25,
+          495.22
+        ],
+        [
+          983.19,
+          495.22
+        ],
+        [
+          983.19,
+          1086.0
+        ],
+        [
+          327.25,
+          1086.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.226001,
+        0.456004,
+        0.452997,
+        0.543996
+      ],
+      "normalized_quad": [
+        [
+          0.226001,
+          0.456004
+        ],
+        [
+          0.678999,
+          0.456004
+        ],
+        [
+          0.678999,
+          1.0
+        ],
+        [
+          0.226001,
+          1.0
+        ]
+      ],
+      "id": "after-visual-006",
+      "source_region_ids": [],
+      "slot_id": "text-6b0d31c0d5-1",
+      "match_confidence": 1.0
+    }
+  ],
+  "text_review": "image_review"
+}

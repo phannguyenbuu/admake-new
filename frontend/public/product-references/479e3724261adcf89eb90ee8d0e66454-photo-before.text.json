@@ -1,0 +1,134 @@
+{
+  "schema_version": 1,
+  "product_id": "479e3724261adcf89eb90ee8d0e66454",
+  "view": "before",
+  "image": "/product-references/479e3724261adcf89eb90ee8d0e66454-photo-before.png",
+  "sha256": "171e4050e50b3c15640c0ef597179a19c804ac9fbef2cb4e96a41202773d589b",
+  "width": 1448,
+  "height": 1086,
+  "coordinate_system": "image_pixels_top_left",
+  "status": "detected",
+  "regions": [
+    {
+      "text": "NHÀ KHÊ",
+      "ocr_text": "NTIKHÊ",
+      "confidence": 0.2007,
+      "bbox": [
+        236.0,
+        238.0,
+        1088.0,
+        284.0
+      ],
+      "quad": [
+        [
+          236.0,
+          238.0
+        ],
+        [
+          1324.0,
+          238.0
+        ],
+        [
+          1324.0,
+          522.0
+        ],
+        [
+          236.0,
+          522.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.162983,
+        0.219153,
+        0.751381,
+        0.26151
+      ],
+      "normalized_quad": [
+        [
+          0.162983,
+          0.219153
+        ],
+        [
+          0.914365,
+          0.219153
+        ],
+        [
+          0.914365,
+          0.480663
+        ],
+        [
+          0.162983,
+          0.480663
+        ]
+      ],
+      "review": "verified",
+      "id": "before-visual-001",
+      "source_region_ids": [
+        "before-001"
+      ],
+      "method": "visual_annotation",
+      "slot_id": "text-058ade9455-1"
+    },
+    {
+      "text": "BÒ NẦM NƯỚNG SỐT",
+      "ocr_text": "BÒ NÂM NƯỚNG SỐT",
+      "confidence": 0.6562,
+      "bbox": [
+        182.0,
+        513.0,
+        1169.0,
+        156.0
+      ],
+      "quad": [
+        [
+          182.0,
+          513.0
+        ],
+        [
+          1351.0,
+          513.0
+        ],
+        [
+          1351.0,
+          669.0
+        ],
+        [
+          182.0,
+          669.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.125691,
+        0.472376,
+        0.80732,
+        0.143646
+      ],
+      "normalized_quad": [
+        [
+          0.125691,
+          0.472376
+        ],
+        [
+          0.933011,
+          0.472376
+        ],
+        [
+          0.933011,
+          0.616022
+        ],
+        [
+          0.125691,
+          0.616022
+        ]
+      ],
+      "review": "verified",
+      "id": "before-visual-002",
+      "source_region_ids": [
+        "before-002"
+      ],
+      "method": "visual_annotation",
+      "slot_id": "text-141f3c7bf8-1"
+    }
+  ],
+  "text_review": "image_review"
+}

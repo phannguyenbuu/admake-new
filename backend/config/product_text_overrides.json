@@ -1,0 +1,1082 @@
+{
+  "b117e051eb1e994fd49aa81a49f30ea3": {
+    "before": {
+      "sha256": "0df2f94ca0215cde10bcc25403d54cd91e8437433119ec92565864f474beddc6",
+      "extra_regions": [
+        {
+          "id": "before-manual-001",
+          "text": "B",
+          "quad": [
+            [
+              448,
+              12
+            ],
+            [
+              1018,
+              12
+            ],
+            [
+              1018,
+              1050
+            ],
+            [
+              448,
+              1050
+            ]
+          ]
+        }
+      ]
+    },
+    "after": {
+      "sha256": "9bac443cfe0dab45a6766d75d66846ad57f4d0af0e2b03ae0ff90ad7aca398a0",
+      "extra_regions": [
+        {
+          "id": "after-manual-001",
+          "text": "B",
+          "quad": [
+            [
+              435,
+              45
+            ],
+            [
+              1025,
+              45
+            ],
+            [
+              1025,
+              986
+            ],
+            [
+              435,
+              986
+            ]
+          ]
+        }
+      ]
+    }
+  },
+  "29fd5c8c0571eb516eccc601fec2298d": {
+    "before": {
+      "sha256": "9020e4235684c4cf0d0a370f68a9077bb4526a1956786d1e2b66510d4f5671d9",
+      "extra_regions": [
+        {
+          "id": "before-manual-001",
+          "text": "B",
+          "quad": [
+            [
+              80,
+              240
+            ],
+            [
+              460,
+              240
+            ],
+            [
+              497,
+              690
+            ],
+            [
+              80,
+              690
+            ]
+          ]
+        },
+        {
+          "id": "before-manual-002",
+          "text": "B",
+          "quad": [
+            [
+              530,
+              238
+            ],
+            [
+              900,
+              238
+            ],
+            [
+              935,
+              688
+            ],
+            [
+              530,
+              688
+            ]
+          ]
+        },
+        {
+          "id": "before-manual-003",
+          "text": "B",
+          "quad": [
+            [
+              970,
+              238
+            ],
+            [
+              1345,
+              238
+            ],
+            [
+              1365,
+              688
+            ],
+            [
+              970,
+              688
+            ]
+          ]
+        }
+      ]
+    },
+    "after": {
+      "sha256": "0cae00cce90980ac9f05c5bdbcd356b9577dcf98a1b893b7aac38516c232f03b",
+      "extra_regions": [
+        {
+          "id": "after-manual-001",
+          "text": "B",
+          "quad": [
+            [
+              190,
+              155
+            ],
+            [
+              465,
+              135
+            ],
+            [
+              555,
+              567
+            ],
+            [
+              205,
+              535
+            ]
+          ]
+        },
+        {
+          "id": "after-manual-002",
+          "text": "B",
+          "quad": [
+            [
+              572,
+              175
+            ],
+            [
+              811,
+              154
+            ],
+            [
+              895,
+              640
+            ],
+            [
+              585,
+              582
+            ]
+          ]
+        },
+        {
+          "id": "after-manual-003",
+          "text": "B",
+          "quad": [
+            [
+              896,
+              213
+            ],
+            [
+              1137,
+              179
+            ],
+            [
+              1250,
+              716
+            ],
+            [
+              906,
+              652
+            ]
+          ]
+        }
+      ]
+    }
+  },
+  "69a107e9fd31a475951c4b514672e442": {
+    "before": {
+      "sha256": "80236569865ca33ccfb10f70ebcfda3b84f62d5ae59419a694f7fc77d749d549",
+      "texts": {
+        "before-001": "HÄFELE",
+        "before-002": "ĐĂNG TUẤN",
+        "before-003": "Nhà Phân Phối Độc Quyền Miền Trung",
+        "before-004": "Phụ Kiện Đồ Gỗ Mỹ Thuật",
+        "before-005": "Phụ Kiện Cửa & Ngũ Kim",
+        "before-006": "113 Nguyễn Hữu Thọ, P. Bùi Thị Xuân, TP. Buôn Ma Thuột",
+        "before-007": "Www.hafelepdtn.com",
+        "before-008": "ĐT: 0614 09 09 92 - 0941 78 38 48"
+      }
+    }
+  },
+  "a45719d788a2eb7468783c05f3f2c8b8": {
+    "before": {
+      "sha256": "b06833c22e37c96d16866818cbde4833857bfbe0d4341f3b604530deb1e868b3",
+      "extra_regions": [
+        {
+          "id": "before-visual-001",
+          "text": "Ký tự nổi đơn",
+          "quad": [
+            [
+              55,
+              30
+            ],
+            [
+              1395,
+              30
+            ],
+            [
+              1395,
+              1055
+            ],
+            [
+              55,
+              1055
+            ]
+          ],
+          "review": "pending"
+        }
+      ]
+    },
+    "after": {
+      "sha256": "94219f946ca07206ebddc52e7e0a1fd34ba08138651c540dd73a7d42bf1c4a5a",
+      "extra_regions": [
+        {
+          "id": "after-visual-001",
+          "text": "Ký tự nổi đơn",
+          "quad": [
+            [
+              55,
+              30
+            ],
+            [
+              1395,
+              30
+            ],
+            [
+              1395,
+              1055
+            ],
+            [
+              55,
+              1055
+            ]
+          ],
+          "review": "pending"
+        }
+      ]
+    }
+  },
+  "9733ed86eabcd64c39611d092ed1b346": {
+    "before": {
+      "sha256": "03ec257a4fa3bd07320f7eb9ae2ab6220d79ee6c06ae64f033546f8123e23cc8",
+      "suppress_regions": [
+        "before-001"
+      ],
+      "extra_regions": [
+        {
+          "id": "before-visual-001",
+          "text": "Dòng chữ inox nét viết tay",
+          "quad": [
+            [
+              60,
+              155
+            ],
+            [
+              1400,
+              155
+            ],
+            [
+              1400,
+              975
+            ],
+            [
+              60,
+              975
+            ]
+          ],
+          "review": "pending"
+        }
+      ]
+    },
+    "after": {
+      "sha256": "c17a9b5a1c2c13fa1a2fdd37706378eccaae2c4c7c3ae81078e2eb9b85963a30",
+      "suppress_regions": [
+        "after-001"
+      ],
+      "extra_regions": [
+        {
+          "id": "after-visual-001",
+          "text": "Dòng chữ inox nét viết tay",
+          "quad": [
+            [
+              60,
+              155
+            ],
+            [
+              1400,
+              155
+            ],
+            [
+              1400,
+              975
+            ],
+            [
+              60,
+              975
+            ]
+          ],
+          "review": "pending"
+        }
+      ]
+    }
+  },
+  "b768e647d3dd0dc83c6b759a7147c8fe": {
+    "before": {
+      "sha256": "b916ddb605dc1746ffa59ab2ec3ad29857f855556822d169cbd0a0c3e7b5b302",
+      "extra_regions": [
+        {
+          "id": "before-visual-001",
+          "text": "D",
+          "quad": [
+            [
+              45,
+              300
+            ],
+            [
+              1025,
+              300
+            ],
+            [
+              1025,
+              1035
+            ],
+            [
+              45,
+              1035
+            ]
+          ],
+          "review": "verified"
+        },
+        {
+          "id": "before-visual-002",
+          "text": "E",
+          "quad": [
+            [
+              540,
+              130
+            ],
+            [
+              1425,
+              130
+            ],
+            [
+              1425,
+              790
+            ],
+            [
+              540,
+              790
+            ]
+          ],
+          "review": "verified"
+        }
+      ]
+    },
+    "after": {
+      "sha256": "ebef280ca2d39664bfec3b15b5b5e49d61c7d6d31938e4e52e5241618f4daefb",
+      "extra_regions": [
+        {
+          "id": "after-visual-001",
+          "text": "D",
+          "quad": [
+            [
+              45,
+              300
+            ],
+            [
+              1025,
+              300
+            ],
+            [
+              1025,
+              1035
+            ],
+            [
+              45,
+              1035
+            ]
+          ],
+          "review": "verified"
+        },
+        {
+          "id": "after-visual-002",
+          "text": "E",
+          "quad": [
+            [
+              540,
+              130
+            ],
+            [
+              1425,
+              130
+            ],
+            [
+              1425,
+              790
+            ],
+            [
+              540,
+              790
+            ]
+          ],
+          "review": "verified"
+        }
+      ]
+    }
+  },
+  "da86f98fbc6cc52be09e6e8eb866d0ec": {
+    "before": {
+      "sha256": "bcb9fbe916583f76385eb4069cf38f683e7ad439a2c791e38ffe272084a66d70",
+      "suppress_regions": [
+        "before-001"
+      ],
+      "extra_regions": [
+        {
+          "id": "before-visual-001",
+          "text": "Nhóm chữ mica xanh",
+          "quad": [
+            [
+              110,
+              0
+            ],
+            [
+              1400,
+              0
+            ],
+            [
+              1400,
+              1086
+            ],
+            [
+              110,
+              1086
+            ]
+          ],
+          "review": "pending"
+        }
+      ]
+    },
+    "after": {
+      "sha256": "56b04a71698dec2f937df741b96499efe8525b2f2636b53b8d950504ef25f25c",
+      "suppress_regions": [],
+      "extra_regions": [
+        {
+          "id": "after-visual-001",
+          "text": "Nhóm chữ mica xanh",
+          "quad": [
+            [
+              110,
+              0
+            ],
+            [
+              1400,
+              0
+            ],
+            [
+              1400,
+              1086
+            ],
+            [
+              110,
+              1086
+            ]
+          ],
+          "review": "pending"
+        }
+      ]
+    }
+  },
+  "9ef663543aaf7c2f0493cd32c9397dad": {
+    "before": {
+      "sha256": "6bbaf6b907342139b240535c5d369d0ade8db912aada8b9ca4933435eee46903",
+      "suppress_regions": [
+        "before-001",
+        "before-002",
+        "before-003",
+        "before-004",
+        "before-005",
+        "before-006",
+        "before-007",
+        "before-008",
+        "before-009",
+        "before-010",
+        "before-011",
+        "before-012",
+        "before-013",
+        "before-014",
+        "before-015",
+        "before-016",
+        "before-017",
+        "before-018"
+      ],
+      "extra_regions": [
+        {
+          "id": "before-visual-001",
+          "text": "THẢO",
+          "quad": [
+            [
+              50,
+              230
+            ],
+            [
+              1430,
+              230
+            ],
+            [
+              1430,
+              500
+            ],
+            [
+              50,
+              500
+            ]
+          ],
+          "review": "verified"
+        },
+        {
+          "id": "before-visual-002",
+          "text": "MIN",
+          "quad": [
+            [
+              50,
+              500
+            ],
+            [
+              1385,
+              500
+            ],
+            [
+              1385,
+              875
+            ],
+            [
+              50,
+              875
+            ]
+          ],
+          "review": "verified"
+        }
+      ]
+    },
+    "after": {
+      "sha256": "d258fe8a891735027a54db729a490346bd34e1a8e0f0be334a9abac978f3f1fc",
+      "suppress_regions": [
+        "after-001",
+        "after-002",
+        "after-003",
+        "after-004",
+        "after-005",
+        "after-006",
+        "after-007",
+        "after-008",
+        "after-009"
+      ],
+      "extra_regions": [
+        {
+          "id": "after-visual-001",
+          "text": "THẢO",
+          "quad": [
+            [
+              50,
+              160
+            ],
+            [
+              1430,
+              160
+            ],
+            [
+              1430,
+              530
+            ],
+            [
+              50,
+              530
+            ]
+          ],
+          "review": "verified"
+        },
+        {
+          "id": "after-visual-002",
+          "text": "MIN",
+          "quad": [
+            [
+              50,
+              450
+            ],
+            [
+              1385,
+              450
+            ],
+            [
+              1385,
+              900
+            ],
+            [
+              50,
+              900
+            ]
+          ],
+          "review": "verified"
+        }
+      ]
+    }
+  },
+  "15627f69d083cf176837309de4aa89eb": {
+    "before": {
+      "sha256": "90c9f955ee62fb0176b54d833a60fb33a173d592a73e8532ba3bc6239faa21c8",
+      "suppress_regions": [
+        "before-001"
+      ],
+      "extra_regions": [
+        {
+          "id": "before-visual-001",
+          "text": "ALWA",
+          "quad": [
+            [
+              20,
+              20
+            ],
+            [
+              1435,
+              20
+            ],
+            [
+              1435,
+              1060
+            ],
+            [
+              20,
+              1060
+            ]
+          ],
+          "review": "verified"
+        },
+        {
+          "id": "before-visual-002",
+          "text": "O",
+          "quad": [
+            [
+              690,
+              420
+            ],
+            [
+              1440,
+              420
+            ],
+            [
+              1440,
+              1070
+            ],
+            [
+              690,
+              1070
+            ]
+          ],
+          "review": "verified"
+        }
+      ]
+    },
+    "after": {
+      "sha256": "bc72e500063ac287ff469000abebdb6fd609afd1900617c149c223fc529a3383",
+      "suppress_regions": [
+        "after-001"
+      ],
+      "extra_regions": [
+        {
+          "id": "after-visual-001",
+          "text": "ALWA",
+          "quad": [
+            [
+              20,
+              20
+            ],
+            [
+              1435,
+              20
+            ],
+            [
+              1435,
+              1060
+            ],
+            [
+              20,
+              1060
+            ]
+          ],
+          "review": "verified"
+        }
+      ]
+    }
+  },
+  "0742663346cf948f656f9f6716f497a6": {
+    "before": {
+      "sha256": "b1b02ed3c42483e35f175196a5eed01de5a194050503770064b3a3f42474162f",
+      "suppress_regions": [
+        "before-001",
+        "before-002"
+      ],
+      "verified_no_text": true
+    },
+    "after": {
+      "sha256": "075989df7fcb0342438730bbd07e6c0537cc74c044bb93fe3f7883ec0352d8b5",
+      "suppress_regions": [
+        "after-001",
+        "after-002"
+      ],
+      "verified_no_text": true
+    }
+  },
+  "34a7ff12934336c498bf55ce4fa262f4": {
+    "before": {
+      "sha256": "95bc5497f60ce310eac7e1ed7b78524ee4e5c59c8cd1254ab97d71f53dcc7481",
+      "verified_no_text": true
+    },
+    "after": {
+      "sha256": "42184f23585fe8b5dbba821dec89ebf906038896de4bdfd2fb82ba7a539287fa",
+      "verified_no_text": true
+    }
+  },
+  "94ad47a5672b9de716ae7622a442c9eb": {
+    "before": {
+      "sha256": "60773cea569a4560ebc1100e488b2815a098dcfe410375b179abbbb1e8459df1",
+      "verified_no_text": true
+    },
+    "after": {
+      "sha256": "b3a2612efd18153512656d4e27e8a9cfe5e07866ecbe34ec0f793dd950fd7e8c",
+      "verified_no_text": true
+    }
+  },
+  "62e73674bdc7cd8f6e24f8dcf8ca677a": {
+    "before": {
+      "sha256": "f2cd0d44b07e137088f90d3f55a8199b11d92dbd86e581f2d24612eb3810bcf0",
+      "verified_no_text": true
+    },
+    "after": {
+      "sha256": "01f9afe22c7eeef482be616567b3f7471efa218b4a2042c806cd679751205d52",
+      "verified_no_text": true
+    }
+  },
+  "6ebcf97d0e28a633e1948a0ba6588a54": {
+    "before": {
+      "sha256": "6fa34079abb1c1fa41bc172c26358714d58154b5b1dd2a45d9ac3e3e887fc996",
+      "verified_no_text": true
+    },
+    "after": {
+      "sha256": "d7cc8cccc02517c21f3aa172a3bef219f966f3561284e309836275f7928befdd",
+      "verified_no_text": true
+    }
+  },
+  "79b305222285dcd133b9edb785cfbc46": {
+    "before": {
+      "sha256": "230ecd6726dace63a2f7ce47dc1a8cd63408d182e1378c0bbb3ba18f8972a9c8",
+      "texts": {
+        "before-001": "223"
+      }
+    },
+    "after": {
+      "sha256": "08d5cd73baa05b9d8e738dfa08cc684ac6fb3668b3997f9deea1c43a31fb7c15",
+      "texts": {
+        "after-001": "223"
+      }
+    }
+  },
+  "a09ea7335d5abd84cc8bb0aa32e183bf": {
+    "before": {
+      "sha256": "9cd04924b9c181cf6a2e2644e927c9142d87e04e8c19f04fcb6e6976912f5b2a",
+      "texts": {
+        "before-001": "VỰA SẦU RIÊNG"
+      }
+    },
+    "after": {
+      "sha256": "40a0260b41e9f23bc60846103acc01b15c91ca22f29e3bdf1fc86a75d417249e",
+      "texts": {
+        "after-001": "VỰA SẦU",
+        "after-002": "RIÊNG"
+      }
+    }
+  },
+  "45b97f50a108802c69189ad34ecc0316": {
+    "before": {
+      "sha256": "8e5d40becc13db94cbc4092c3e7d8219ba8028c1984869e2527d76f66e73a002",
+      "extra_regions": [
+        {
+          "id": "before-visual-001",
+          "text": "ỐC",
+          "quad": [
+            [
+              780,
+              350
+            ],
+            [
+              1320,
+              350
+            ],
+            [
+              1320,
+              770
+            ],
+            [
+              780,
+              770
+            ]
+          ],
+          "review": "verified"
+        }
+      ]
+    },
+    "after": {
+      "sha256": "0b5a9e428b5dd243e7f670a3e2cdb5beddcf0b16379cfab1a0bd73e47a66e79a",
+      "texts": {
+        "after-002": "ỐC"
+      }
+    }
+  },
+  "80bdc1f6fbc190eb10de2d8a8a749320": {
+    "before": {
+      "sha256": "6333d7e6280c8dbd32896579bb099f3d2cb6cb6cd1b19e4257bbfa0f1eb2be8d",
+      "suppress_regions": [
+        "before-002",
+        "before-004",
+        "before-005",
+        "before-006",
+        "before-009"
+      ]
+    },
+    "after": {
+      "sha256": "6a6196017c81ef453c4efa7d46ef6643883226b5b56aed213d841029a2d3bff5",
+      "suppress_regions": [
+        "after-003",
+        "after-011"
+      ]
+    }
+  },
+  "c5065952cc9c63494acbc441ef7af441": {
+    "before": {
+      "sha256": "0f758802479dda1fb00af5afbf844dac935768a0d6398dcf098b6be952775828",
+      "suppress_regions": [
+        "before-001",
+        "before-002",
+        "before-003",
+        "before-004",
+        "before-006",
+        "before-009",
+        "before-011",
+        "before-012",
+        "before-014",
+        "before-015",
+        "before-016",
+        "before-017"
+      ]
+    },
+    "after": {
+      "sha256": "91ca9c4432404e13adc706558b838344462a72ea5761809cce9a92c64d4a9483",
+      "suppress_regions": [
+        "after-003",
+        "after-004",
+        "after-005",
+        "after-006",
+        "after-008",
+        "after-013",
+        "after-019",
+        "after-020",
+        "after-021",
+        "after-023",
+        "after-024",
+        "after-026",
+        "after-027",
+        "after-030",
+        "after-032",
+        "after-034",
+        "after-035",
+        "after-036",
+        "after-038"
+      ]
+    }
+  },
+  "88f9f6fe140fa49f6fbe8ef76e4460d7": {
+    "before": {
+      "sha256": "fe7009714b02945250fa6bb12dc63d2653419f3b5fde231b0f04b68aba15b84c",
+      "suppress_regions": [
+        "before-001",
+        "before-002",
+        "before-004",
+        "before-005",
+        "before-009",
+        "before-010",
+        "before-014",
+        "before-015",
+        "before-016",
+        "before-018"
+      ]
+    },
+    "after": {
+      "sha256": "2b38339d47d2865f294f9542cc1fee1efa1fdaffce9cfd69590db8054b23678e",
+      "suppress_regions": [
+        "after-002",
+        "after-011",
+        "after-012",
+        "after-014",
+        "after-016",
+        "after-017",
+        "after-019",
+        "after-021",
+        "after-023",
+        "after-024",
+        "after-025",
+        "after-027",
+        "after-031",
+        "after-032",
+        "after-039",
+        "after-059"
+      ]
+    }
+  },
+  "479e3724261adcf89eb90ee8d0e66454": {
+    "before": {
+      "sha256": "171e4050e50b3c15640c0ef597179a19c804ac9fbef2cb4e96a41202773d589b",
+      "texts": {
+        "before-001": "NHÀ KHÊ",
+        "before-002": "BÒ NẦM NƯỚNG SỐT"
+      }
+    },
+    "after": {
+      "sha256": "0f729acc707b5f932f4eac2c1a4ee6e74cde45470a60a8c7ed75d1bce9a20981",
+      "texts": {
+        "after-001": "KHÊ",
+        "after-002": "NHÀ",
+        "after-003": "SỐT",
+        "after-004": "NƯỚNG",
+        "after-005": "NẦM",
+        "after-006": "BÒ"
+      }
+    }
+  },
+  "124443e014aaf5968dc5e8a7f548eaf5": {
+    "before": {
+      "sha256": "46eaf123a12fe7be5573d615bb2ff560c811c42b0508d701f281cf68e3c5618d",
+      "suppress_regions": [
+        "before-001",
+        "before-002"
+      ],
+      "extra_regions": [
+        {
+          "id": "before-verified-001",
+          "text": "Thiên",
+          "quad": [
+            [
+              85,
+              190
+            ],
+            [
+              895,
+              190
+            ],
+            [
+              895,
+              700
+            ],
+            [
+              85,
+              700
+            ]
+          ],
+          "review": "verified"
+        },
+        {
+          "id": "before-verified-002",
+          "text": "Thanh",
+          "quad": [
+            [
+              210,
+              430
+            ],
+            [
+              1170,
+              430
+            ],
+            [
+              1170,
+              965
+            ],
+            [
+              210,
+              965
+            ]
+          ],
+          "review": "verified"
+        }
+      ]
+    },
+    "after": {
+      "sha256": "e2d12df7fb20d7608031d99cd4457160b69916f7786503c8bcd4687043dafce1",
+      "suppress_regions": [
+        "after-001",
+        "after-002"
+      ],
+      "extra_regions": [
+        {
+          "id": "after-verified-001",
+          "text": "Thiên",
+          "quad": [
+            [
+              120,
+              175
+            ],
+            [
+              920,
+              175
+            ],
+            [
+              920,
+              715
+            ],
+            [
+              120,
+              715
+            ]
+          ],
+          "review": "verified"
+        },
+        {
+          "id": "after-verified-002",
+          "text": "Thanh",
+          "quad": [
+            [
+              270,
+              400
+            ],
+            [
+              1190,
+              400
+            ],
+            [
+              1190,
+              1000
+            ],
+            [
+              270,
+              1000
+            ]
+          ],
+          "review": "verified"
+        }
+      ]
+    }
+  }
+}

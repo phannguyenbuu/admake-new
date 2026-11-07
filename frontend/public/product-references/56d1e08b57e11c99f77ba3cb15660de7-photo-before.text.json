@@ -1,0 +1,311 @@
+{
+  "schema_version": 1,
+  "product_id": "56d1e08b57e11c99f77ba3cb15660de7",
+  "view": "before",
+  "image": "/product-references/56d1e08b57e11c99f77ba3cb15660de7-photo-before.png",
+  "sha256": "0a5bebbd25e72ebe209eb9923cc07c31481defb51b7a0fde3f31d64a64f7a3a9",
+  "width": 1448,
+  "height": 1086,
+  "coordinate_system": "image_pixels_top_left",
+  "status": "detected",
+  "regions": [
+    {
+      "text": "CÁ NHỎ YÊU BỘT",
+      "ocr_text": "GwHỎYÊOBBT",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        309.0,
+        368.0,
+        1083.0,
+        173.0
+      ],
+      "quad": [
+        [
+          309.0,
+          368.0
+        ],
+        [
+          1392.0,
+          368.0
+        ],
+        [
+          1392.0,
+          541.0
+        ],
+        [
+          309.0,
+          541.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.213398,
+        0.338858,
+        0.747928,
+        0.1593
+      ],
+      "normalized_quad": [
+        [
+          0.213398,
+          0.338858
+        ],
+        [
+          0.961326,
+          0.338858
+        ],
+        [
+          0.961326,
+          0.498158
+        ],
+        [
+          0.213398,
+          0.498158
+        ]
+      ],
+      "id": "before-visual-001",
+      "source_region_ids": [
+        "before-001"
+      ],
+      "slot_id": "text-1c6be40765-1"
+    },
+    {
+      "text": "小鱼爱上粉",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        118.74,
+        531.05,
+        221.54,
+        22.81
+      ],
+      "quad": [
+        [
+          118.74,
+          531.05
+        ],
+        [
+          340.28,
+          531.05
+        ],
+        [
+          340.28,
+          553.86
+        ],
+        [
+          118.74,
+          553.86
+        ]
+      ],
+      "normalized_bbox": [
+        0.082003,
+        0.488996,
+        0.152997,
+        0.021004
+      ],
+      "normalized_quad": [
+        [
+          0.082003,
+          0.488996
+        ],
+        [
+          0.235,
+          0.488996
+        ],
+        [
+          0.235,
+          0.51
+        ],
+        [
+          0.082003,
+          0.51
+        ]
+      ],
+      "id": "before-visual-002",
+      "source_region_ids": [],
+      "slot_id": "text-da39a3ee5e-1"
+    },
+    {
+      "text": "CÁ NHỎ YÊU BỘT",
+      "ocr_text": "CÁ NHỎ YÊU BỘT",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        70.0,
+        566.0,
+        206.0,
+        32.0
+      ],
+      "quad": [
+        [
+          70.0,
+          566.0
+        ],
+        [
+          276.0,
+          566.0
+        ],
+        [
+          276.0,
+          598.0
+        ],
+        [
+          70.0,
+          598.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.048343,
+        0.521179,
+        0.142265,
+        0.029466
+      ],
+      "normalized_quad": [
+        [
+          0.048343,
+          0.521179
+        ],
+        [
+          0.190608,
+          0.521179
+        ],
+        [
+          0.190608,
+          0.550645
+        ],
+        [
+          0.048343,
+          0.550645
+        ]
+      ],
+      "id": "before-visual-003",
+      "source_region_ids": [
+        "before-003"
+      ],
+      "slot_id": "text-1c6be40765-2"
+    },
+    {
+      "text": "小鱼爱上粉",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        430.06,
+        544.09,
+        1017.94,
+        148.78
+      ],
+      "quad": [
+        [
+          430.06,
+          544.09
+        ],
+        [
+          1448.0,
+          544.09
+        ],
+        [
+          1448.0,
+          692.87
+        ],
+        [
+          430.06,
+          692.87
+        ]
+      ],
+      "normalized_bbox": [
+        0.297003,
+        0.501004,
+        0.702997,
+        0.136998
+      ],
+      "normalized_quad": [
+        [
+          0.297003,
+          0.501004
+        ],
+        [
+          1.0,
+          0.501004
+        ],
+        [
+          1.0,
+          0.638002
+        ],
+        [
+          0.297003,
+          0.638002
+        ]
+      ],
+      "id": "before-visual-004",
+      "source_region_ids": [],
+      "slot_id": "text-da39a3ee5e-2"
+    },
+    {
+      "text": "0362 455 098 - 0794 637 672",
+      "ocr_text": "50362455098 | 0794637672",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        751.51,
+        696.13,
+        676.22,
+        61.9
+      ],
+      "quad": [
+        [
+          751.51,
+          696.13
+        ],
+        [
+          1427.73,
+          696.13
+        ],
+        [
+          1427.73,
+          758.03
+        ],
+        [
+          751.51,
+          758.03
+        ]
+      ],
+      "normalized_bbox": [
+        0.518999,
+        0.641004,
+        0.467003,
+        0.056998
+      ],
+      "normalized_quad": [
+        [
+          0.518999,
+          0.641004
+        ],
+        [
+          0.986001,
+          0.641004
+        ],
+        [
+          0.986001,
+          0.698002
+        ],
+        [
+          0.518999,
+          0.698002
+        ]
+      ],
+      "id": "before-visual-005",
+      "source_region_ids": [
+        "before-005",
+        "before-007"
+      ],
+      "slot_id": "text-7212c24711-1"
+    }
+  ],
+  "text_review": "image_review"
+}

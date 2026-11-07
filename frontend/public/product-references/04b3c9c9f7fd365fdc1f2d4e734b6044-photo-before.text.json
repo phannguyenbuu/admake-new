@@ -1,0 +1,72 @@
+{
+  "schema_version": 1,
+  "product_id": "04b3c9c9f7fd365fdc1f2d4e734b6044",
+  "view": "before",
+  "image": "/product-references/04b3c9c9f7fd365fdc1f2d4e734b6044-photo-before.png",
+  "sha256": "02dcc1b4c4a58ee3423a51920247783db8306d7b55ce98d57a6ff4ee9bd9db99",
+  "width": 1448,
+  "height": 1086,
+  "coordinate_system": "image_pixels_top_left",
+  "status": "detected",
+  "regions": [
+    {
+      "text": "DENIM",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        651.6,
+        18.46,
+        238.92,
+        1045.82
+      ],
+      "quad": [
+        [
+          651.6,
+          18.46
+        ],
+        [
+          890.52,
+          18.46
+        ],
+        [
+          890.52,
+          1064.28
+        ],
+        [
+          651.6,
+          1064.28
+        ]
+      ],
+      "normalized_bbox": [
+        0.45,
+        0.016998,
+        0.165,
+        0.963002
+      ],
+      "normalized_quad": [
+        [
+          0.45,
+          0.016998
+        ],
+        [
+          0.615,
+          0.016998
+        ],
+        [
+          0.615,
+          0.98
+        ],
+        [
+          0.45,
+          0.98
+        ]
+      ],
+      "id": "before-visual-001",
+      "source_region_ids": [],
+      "slot_id": "text-457c15a7e8-1"
+    }
+  ],
+  "text_review": "image_review"
+}

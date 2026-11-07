@@ -1,3 +1,4 @@
+import { AdmakeBrand } from "../../../components/AdmakeBrand";
 import { Button, Layout, Dropdown, Avatar, Popover, Modal, message, notification, Tooltip } from "antd";
 import { BellOutlined, UserOutlined, LogoutOutlined, FormOutlined, GiftOutlined } from "@ant-design/icons";
 import { Sparkles } from "lucide-react";
@@ -125,16 +126,7 @@ export default function AppHeader() {
       <ChatGroupProvider>
         <Header className="flex items-center gap-1 justify-between !px-4 md:!px-8 !bg-white shadow-sm h-14 md:h-16 sticky top-0 z-30 border-b border-gray-200">
           {/* Logo Section - Left side */}
-          <div className="flex items-center gap-3">
-            {/* Logo icon */}
-            <div>
-              <img src="/logo.jpg" alt="logo" style={{ width: 40, height: 'auto' }} />
-            </div>
-            {/* Logo text */}
-            <div className="flex items-center justify-center">
-              <img src="/ADMAKE.svg" alt="ADMAKE" className="h-8" />
-            </div>
-          </div>
+          <AdmakeBrand />
 
           {/* Right Section */}
           <div className="flex items-center gap-3 md:gap-4">

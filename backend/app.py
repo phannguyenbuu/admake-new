@@ -43,6 +43,7 @@ from api.attachments import attachments_bp
 from api.feedback import feedback_bp
 from api.ai import ai_bp
 from api.ai_maps import ai_maps_bp
+from api.product_bom import product_bom_bp
 
 app.register_blueprint(customer_bp)
 app.register_blueprint(material_bp)
@@ -70,6 +71,9 @@ app.register_blueprint(attachments_bp)
 app.register_blueprint(feedback_bp)
 app.register_blueprint(ai_bp)
 app.register_blueprint(ai_maps_bp)
+app.register_blueprint(product_bom_bp)
+from api.genai_admin import genai_admin_bp
+app.register_blueprint(genai_admin_bp)
 
 from api.chat import socketio
 

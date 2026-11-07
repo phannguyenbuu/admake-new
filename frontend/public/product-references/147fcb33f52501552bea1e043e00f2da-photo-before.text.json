@@ -1,0 +1,317 @@
+{
+  "schema_version": 1,
+  "product_id": "147fcb33f52501552bea1e043e00f2da",
+  "view": "before",
+  "image": "/product-references/147fcb33f52501552bea1e043e00f2da-photo-before.png",
+  "sha256": "752081ca03ccb06951098d4d867c1af0dfd19173d9b240ca31e5b72f8d8ce455",
+  "width": 1448,
+  "height": 1086,
+  "coordinate_system": "image_pixels_top_left",
+  "status": "detected",
+  "regions": [
+    {
+      "text": "LỐP 66",
+      "ocr_text": "LỐP66",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        419.0,
+        429.0,
+        545.0,
+        179.0
+      ],
+      "quad": [
+        [
+          419.0,
+          429.0
+        ],
+        [
+          964.0,
+          429.0
+        ],
+        [
+          964.0,
+          608.0
+        ],
+        [
+          419.0,
+          608.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.289365,
+        0.395028,
+        0.376381,
+        0.164825
+      ],
+      "normalized_quad": [
+        [
+          0.289365,
+          0.395028
+        ],
+        [
+          0.665746,
+          0.395028
+        ],
+        [
+          0.665746,
+          0.559853
+        ],
+        [
+          0.289365,
+          0.559853
+        ]
+      ],
+      "id": "before-visual-001",
+      "source_region_ids": [
+        "before-001"
+      ],
+      "slot_id": "text-71f4b4c1b0-1"
+    },
+    {
+      "text": "LỐP XE CHÍNH HÃNG",
+      "ocr_text": "LỔP | XE | LỔP XE | CHÍNH HÁNG",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        1078.76,
+        506.08,
+        309.87,
+        57.56
+      ],
+      "quad": [
+        [
+          1078.76,
+          506.08
+        ],
+        [
+          1388.63,
+          506.08
+        ],
+        [
+          1388.63,
+          563.64
+        ],
+        [
+          1078.76,
+          563.64
+        ]
+      ],
+      "normalized_bbox": [
+        0.745,
+        0.466004,
+        0.213999,
+        0.053002
+      ],
+      "normalized_quad": [
+        [
+          0.745,
+          0.466004
+        ],
+        [
+          0.958999,
+          0.466004
+        ],
+        [
+          0.958999,
+          0.519006
+        ],
+        [
+          0.745,
+          0.519006
+        ]
+      ],
+      "id": "before-visual-002",
+      "source_region_ids": [
+        "before-002",
+        "before-003",
+        "before-004",
+        "before-005"
+      ],
+      "slot_id": "text-9dcc7d4dfd-1"
+    },
+    {
+      "text": "66 ĐINH TIÊN HOÀNG, BMT, ĐẮK LẮK",
+      "ocr_text": "66 ĐINH TIÊN HOÁNG, BMT, ĐẮK LẮK",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        466.0,
+        642.0,
+        262.0,
+        28.0
+      ],
+      "quad": [
+        [
+          466.0,
+          642.0
+        ],
+        [
+          728.0,
+          642.0
+        ],
+        [
+          728.0,
+          670.0
+        ],
+        [
+          466.0,
+          670.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.321823,
+        0.59116,
+        0.180939,
+        0.025783
+      ],
+      "normalized_quad": [
+        [
+          0.321823,
+          0.59116
+        ],
+        [
+          0.502762,
+          0.59116
+        ],
+        [
+          0.502762,
+          0.616943
+        ],
+        [
+          0.321823,
+          0.616943
+        ]
+      ],
+      "id": "before-visual-003",
+      "source_region_ids": [
+        "before-007"
+      ],
+      "slot_id": "text-c2df035558-1"
+    },
+    {
+      "text": "0981 217 430",
+      "ocr_text": "0981 217 430",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        1060.0,
+        646.0,
+        108.0,
+        26.0
+      ],
+      "quad": [
+        [
+          1060.0,
+          646.0
+        ],
+        [
+          1168.0,
+          646.0
+        ],
+        [
+          1168.0,
+          672.0
+        ],
+        [
+          1060.0,
+          672.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.732044,
+        0.594843,
+        0.074586,
+        0.023941
+      ],
+      "normalized_quad": [
+        [
+          0.732044,
+          0.594843
+        ],
+        [
+          0.80663,
+          0.594843
+        ],
+        [
+          0.80663,
+          0.618785
+        ],
+        [
+          0.732044,
+          0.618785
+        ]
+      ],
+      "id": "before-visual-004",
+      "source_region_ids": [
+        "before-008"
+      ],
+      "slot_id": "text-f994166344-1"
+    },
+    {
+      "text": "0914 582 952",
+      "ocr_text": "0914 582 952",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        1276.0,
+        648.0,
+        112.0,
+        24.0
+      ],
+      "quad": [
+        [
+          1276.0,
+          648.0
+        ],
+        [
+          1388.0,
+          648.0
+        ],
+        [
+          1388.0,
+          672.0
+        ],
+        [
+          1276.0,
+          672.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.881215,
+        0.596685,
+        0.077348,
+        0.022099
+      ],
+      "normalized_quad": [
+        [
+          0.881215,
+          0.596685
+        ],
+        [
+          0.958564,
+          0.596685
+        ],
+        [
+          0.958564,
+          0.618785
+        ],
+        [
+          0.881215,
+          0.618785
+        ]
+      ],
+      "id": "before-visual-005",
+      "source_region_ids": [
+        "before-009"
+      ],
+      "slot_id": "text-234a386d3f-1"
+    }
+  ],
+  "text_review": "image_review"
+}

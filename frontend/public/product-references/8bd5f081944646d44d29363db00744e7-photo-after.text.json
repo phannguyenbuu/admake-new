@@ -1,0 +1,308 @@
+{
+  "schema_version": 1,
+  "product_id": "8bd5f081944646d44d29363db00744e7",
+  "view": "after",
+  "image": "/product-references/8bd5f081944646d44d29363db00744e7-photo-after.png",
+  "sha256": "368b658798e7d41d9dbf3506d578f0c286f9f651fa29f008f319c7db90e7460f",
+  "width": 1448,
+  "height": 1086,
+  "coordinate_system": "image_pixels_top_left",
+  "status": "detected",
+  "regions": [
+    {
+      "text": "sejin F&S",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        587.89,
+        247.61,
+        170.86,
+        81.45
+      ],
+      "quad": [
+        [
+          587.89,
+          247.61
+        ],
+        [
+          758.75,
+          247.61
+        ],
+        [
+          758.75,
+          329.06
+        ],
+        [
+          587.89,
+          329.06
+        ]
+      ],
+      "normalized_bbox": [
+        0.406001,
+        0.228002,
+        0.117997,
+        0.075
+      ],
+      "normalized_quad": [
+        [
+          0.406001,
+          0.228002
+        ],
+        [
+          0.523999,
+          0.228002
+        ],
+        [
+          0.523999,
+          0.303002
+        ],
+        [
+          0.406001,
+          0.303002
+        ]
+      ],
+      "id": "after-visual-001",
+      "source_region_ids": [],
+      "slot_id": "text-4439f40b0d-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "세진에프앤에스",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        598.02,
+        332.32,
+        152.04,
+        28.24
+      ],
+      "quad": [
+        [
+          598.02,
+          332.32
+        ],
+        [
+          750.06,
+          332.32
+        ],
+        [
+          750.06,
+          360.56
+        ],
+        [
+          598.02,
+          360.56
+        ]
+      ],
+      "normalized_bbox": [
+        0.412997,
+        0.306004,
+        0.105,
+        0.026004
+      ],
+      "normalized_quad": [
+        [
+          0.412997,
+          0.306004
+        ],
+        [
+          0.517997,
+          0.306004
+        ],
+        [
+          0.517997,
+          0.332007
+        ],
+        [
+          0.412997,
+          0.332007
+        ]
+      ],
+      "id": "after-visual-002",
+      "source_region_ids": [],
+      "slot_id": "text-da39a3ee5e-2"
+    },
+    {
+      "text": "SEJIN F&S VINA",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        327.25,
+        370.33,
+        1061.38,
+        220.46
+      ],
+      "quad": [
+        [
+          327.25,
+          370.33
+        ],
+        [
+          1388.63,
+          370.33
+        ],
+        [
+          1388.63,
+          590.79
+        ],
+        [
+          327.25,
+          590.79
+        ]
+      ],
+      "normalized_bbox": [
+        0.226001,
+        0.341004,
+        0.732997,
+        0.203002
+      ],
+      "normalized_quad": [
+        [
+          0.226001,
+          0.341004
+        ],
+        [
+          0.958999,
+          0.341004
+        ],
+        [
+          0.958999,
+          0.544006
+        ],
+        [
+          0.226001,
+          0.544006
+        ]
+      ],
+      "id": "after-visual-003",
+      "source_region_ids": [],
+      "slot_id": "text-40a2ae73fc-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "CÔNG TY TNHH SEJIN F&S VINA - MST: 6400 458 359",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        314.22,
+        500.65,
+        1016.5,
+        76.02
+      ],
+      "quad": [
+        [
+          314.22,
+          500.65
+        ],
+        [
+          1330.72,
+          500.65
+        ],
+        [
+          1330.72,
+          576.67
+        ],
+        [
+          314.22,
+          576.67
+        ]
+      ],
+      "normalized_bbox": [
+        0.217003,
+        0.461004,
+        0.702003,
+        0.07
+      ],
+      "normalized_quad": [
+        [
+          0.217003,
+          0.461004
+        ],
+        [
+          0.919006,
+          0.461004
+        ],
+        [
+          0.919006,
+          0.531004
+        ],
+        [
+          0.217003,
+          0.531004
+        ]
+      ],
+      "id": "after-visual-004",
+      "source_region_ids": [],
+      "slot_id": "text-849dd41d4e-1",
+      "match_confidence": 0.9706
+    },
+    {
+      "text": "LÔ CN1, KCN TÂM THẮNG, XÃ CƯ JÚT, TỈNH LÂM ĐỒNG, ĐT: 02613 616 989",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        314.22,
+        543.0,
+        1038.22,
+        81.45
+      ],
+      "quad": [
+        [
+          314.22,
+          543.0
+        ],
+        [
+          1352.44,
+          543.0
+        ],
+        [
+          1352.44,
+          624.45
+        ],
+        [
+          314.22,
+          624.45
+        ]
+      ],
+      "normalized_bbox": [
+        0.217003,
+        0.5,
+        0.717003,
+        0.075
+      ],
+      "normalized_quad": [
+        [
+          0.217003,
+          0.5
+        ],
+        [
+          0.934006,
+          0.5
+        ],
+        [
+          0.934006,
+          0.575
+        ],
+        [
+          0.217003,
+          0.575
+        ]
+      ],
+      "id": "after-visual-005",
+      "source_region_ids": [],
+      "slot_id": "text-ac8deab036-1",
+      "match_confidence": 0.9362
+    }
+  ],
+  "text_review": "image_review"
+}

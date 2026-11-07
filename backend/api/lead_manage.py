@@ -23,6 +23,12 @@ from models import (
 
 lead_manage_bp = Blueprint("lead_manage", __name__, url_prefix="/lead-manage")
 
+
+@lead_manage_bp.route("/product-formulas", methods=["GET"])
+def product_formula_manager():
+    # The shell is public like lead-manage; every data/write API enforces admin auth.
+    return render_template("product_formulas.html")
+
 @lead_manage_bp.route("/<int:lead_id>/update_inline", methods=["PUT"])
 def update_inline(lead_id):
     from flask import jsonify, request

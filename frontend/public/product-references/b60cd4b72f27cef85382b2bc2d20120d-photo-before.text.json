@@ -1,0 +1,132 @@
+{
+  "schema_version": 1,
+  "product_id": "b60cd4b72f27cef85382b2bc2d20120d",
+  "view": "before",
+  "image": "/product-references/b60cd4b72f27cef85382b2bc2d20120d-photo-before.png",
+  "sha256": "3abf0b12593039e2cbdb83e3790356d24312d77d59297ea7014f6b511ce7ec80",
+  "width": 1448,
+  "height": 1086,
+  "coordinate_system": "image_pixels_top_left",
+  "status": "detected",
+  "regions": [
+    {
+      "text": "PT",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        140.46,
+        475.67,
+        92.67,
+        104.26
+      ],
+      "quad": [
+        [
+          140.46,
+          475.67
+        ],
+        [
+          233.13,
+          475.67
+        ],
+        [
+          233.13,
+          579.93
+        ],
+        [
+          140.46,
+          579.93
+        ]
+      ],
+      "normalized_bbox": [
+        0.097003,
+        0.438002,
+        0.063999,
+        0.096004
+      ],
+      "normalized_quad": [
+        [
+          0.097003,
+          0.438002
+        ],
+        [
+          0.161001,
+          0.438002
+        ],
+        [
+          0.161001,
+          0.534006
+        ],
+        [
+          0.097003,
+          0.534006
+        ]
+      ],
+      "id": "before-visual-001",
+      "source_region_ids": [],
+      "slot_id": "text-bc811258ae-1"
+    },
+    {
+      "text": "Phúc Thuận 福顺",
+      "ocr_text": "Phúc Thuận à  J",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        338.0,
+        431.0,
+        1006.0,
+        170.0
+      ],
+      "quad": [
+        [
+          338.0,
+          431.0
+        ],
+        [
+          1344.0,
+          431.0
+        ],
+        [
+          1344.0,
+          601.0
+        ],
+        [
+          338.0,
+          601.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.233425,
+        0.396869,
+        0.694751,
+        0.156538
+      ],
+      "normalized_quad": [
+        [
+          0.233425,
+          0.396869
+        ],
+        [
+          0.928177,
+          0.396869
+        ],
+        [
+          0.928177,
+          0.553407
+        ],
+        [
+          0.233425,
+          0.553407
+        ]
+      ],
+      "id": "before-visual-002",
+      "source_region_ids": [
+        "before-001"
+      ],
+      "slot_id": "text-a9edf00213-1"
+    }
+  ],
+  "text_review": "image_review"
+}

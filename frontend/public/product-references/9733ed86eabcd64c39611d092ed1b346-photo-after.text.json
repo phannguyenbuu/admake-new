@@ -1,0 +1,74 @@
+{
+  "schema_version": 1,
+  "product_id": "9733ed86eabcd64c39611d092ed1b346",
+  "view": "after",
+  "image": "/product-references/9733ed86eabcd64c39611d092ed1b346-photo-after.png",
+  "sha256": "c17a9b5a1c2c13fa1a2fdd37706378eccaae2c4c7c3ae81078e2eb9b85963a30",
+  "width": 1448,
+  "height": 1086,
+  "coordinate_system": "image_pixels_top_left",
+  "status": "detected",
+  "regions": [
+    {
+      "text": "Rai",
+      "ocr_text": "Dòng chữ inox nét viết tay",
+      "confidence": null,
+      "review": "pending",
+      "method": "image_review",
+      "bbox": [
+        60,
+        155,
+        1340,
+        820
+      ],
+      "quad": [
+        [
+          60,
+          155
+        ],
+        [
+          1400,
+          155
+        ],
+        [
+          1400,
+          975
+        ],
+        [
+          60,
+          975
+        ]
+      ],
+      "normalized_bbox": [
+        0.041436,
+        0.142726,
+        0.925414,
+        0.755064
+      ],
+      "normalized_quad": [
+        [
+          0.041436,
+          0.142726
+        ],
+        [
+          0.966851,
+          0.142726
+        ],
+        [
+          0.966851,
+          0.89779
+        ],
+        [
+          0.041436,
+          0.89779
+        ]
+      ],
+      "id": "after-visual-001",
+      "source_region_ids": [
+        "after-visual-001"
+      ],
+      "slot_id": "text-d4c498b631-1"
+    }
+  ],
+  "text_review": "image_review"
+}

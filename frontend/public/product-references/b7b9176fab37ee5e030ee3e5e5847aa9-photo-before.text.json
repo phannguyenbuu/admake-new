@@ -1,0 +1,314 @@
+{
+  "schema_version": 1,
+  "product_id": "b7b9176fab37ee5e030ee3e5e5847aa9",
+  "view": "before",
+  "image": "/product-references/b7b9176fab37ee5e030ee3e5e5847aa9-photo-before.png",
+  "sha256": "a26b1de010d413b0f0ba5d8b7e8b84e41b86fa673660a4f72280650d616ec812",
+  "width": 1448,
+  "height": 1086,
+  "coordinate_system": "image_pixels_top_left",
+  "status": "detected",
+  "regions": [
+    {
+      "text": "CÔNG TY TNHH MỘT THÀNH VIÊN",
+      "ocr_text": "CÔNG TY TNHH MỘT THÀNH VIÊN",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        214.0,
+        200.0,
+        1016.0,
+        102.0
+      ],
+      "quad": [
+        [
+          214.0,
+          200.0
+        ],
+        [
+          1230.0,
+          200.0
+        ],
+        [
+          1230.0,
+          302.0
+        ],
+        [
+          214.0,
+          302.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.14779,
+        0.184162,
+        0.701657,
+        0.093923
+      ],
+      "normalized_quad": [
+        [
+          0.14779,
+          0.184162
+        ],
+        [
+          0.849448,
+          0.184162
+        ],
+        [
+          0.849448,
+          0.278085
+        ],
+        [
+          0.14779,
+          0.278085
+        ]
+      ],
+      "id": "before-visual-001",
+      "source_region_ids": [
+        "before-001"
+      ],
+      "slot_id": "text-3de75e4a2f-1"
+    },
+    {
+      "text": "TM - DV CHUNG LÝ",
+      "ocr_text": "TMI - DV CHUNG LÝ",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        221.0,
+        345.0,
+        1002.0,
+        194.0
+      ],
+      "quad": [
+        [
+          221.0,
+          345.0
+        ],
+        [
+          1223.0,
+          345.0
+        ],
+        [
+          1223.0,
+          539.0
+        ],
+        [
+          221.0,
+          539.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.152624,
+        0.31768,
+        0.691989,
+        0.178637
+      ],
+      "normalized_quad": [
+        [
+          0.152624,
+          0.31768
+        ],
+        [
+          0.844613,
+          0.31768
+        ],
+        [
+          0.844613,
+          0.496317
+        ],
+        [
+          0.152624,
+          0.496317
+        ]
+      ],
+      "id": "before-visual-002",
+      "source_region_ids": [
+        "before-002"
+      ],
+      "slot_id": "text-9a1b81c0c4-1"
+    },
+    {
+      "text": "MST: 6001802511",
+      "ocr_text": "MST: 6001802511",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        306.0,
+        558.0,
+        830.0,
+        94.0
+      ],
+      "quad": [
+        [
+          306.0,
+          558.0
+        ],
+        [
+          1136.0,
+          558.0
+        ],
+        [
+          1136.0,
+          652.0
+        ],
+        [
+          306.0,
+          652.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.211326,
+        0.513812,
+        0.573204,
+        0.086556
+      ],
+      "normalized_quad": [
+        [
+          0.211326,
+          0.513812
+        ],
+        [
+          0.78453,
+          0.513812
+        ],
+        [
+          0.78453,
+          0.600368
+        ],
+        [
+          0.211326,
+          0.600368
+        ]
+      ],
+      "id": "before-visual-003",
+      "source_region_ids": [
+        "before-003"
+      ],
+      "slot_id": "text-ebb3b45758-1"
+    },
+    {
+      "text": "ĐC:THÔN 2, XÃ EA KIẾT, T. ĐẮK LẮK",
+      "ocr_text": "DC:THÔN 2, XÃ EA KlẾT, I ĐẮK LẮK",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        268.0,
+        732.0,
+        906.0,
+        90.0
+      ],
+      "quad": [
+        [
+          268.0,
+          732.0
+        ],
+        [
+          1174.0,
+          732.0
+        ],
+        [
+          1174.0,
+          822.0
+        ],
+        [
+          268.0,
+          822.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.185083,
+        0.674033,
+        0.625691,
+        0.082873
+      ],
+      "normalized_quad": [
+        [
+          0.185083,
+          0.674033
+        ],
+        [
+          0.810773,
+          0.674033
+        ],
+        [
+          0.810773,
+          0.756906
+        ],
+        [
+          0.185083,
+          0.756906
+        ]
+      ],
+      "id": "before-visual-004",
+      "source_region_ids": [
+        "before-004"
+      ],
+      "slot_id": "text-2d6325e292-1"
+    },
+    {
+      "text": "ĐT: 0985 177 457",
+      "ocr_text": "ĐT: 0985 177 457",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        493.0,
+        827.0,
+        452.0,
+        68.0
+      ],
+      "quad": [
+        [
+          493.0,
+          827.0
+        ],
+        [
+          945.0,
+          827.0
+        ],
+        [
+          945.0,
+          895.0
+        ],
+        [
+          493.0,
+          895.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.34047,
+        0.76151,
+        0.312155,
+        0.062615
+      ],
+      "normalized_quad": [
+        [
+          0.34047,
+          0.76151
+        ],
+        [
+          0.652624,
+          0.76151
+        ],
+        [
+          0.652624,
+          0.824125
+        ],
+        [
+          0.34047,
+          0.824125
+        ]
+      ],
+      "id": "before-visual-005",
+      "source_region_ids": [
+        "before-005"
+      ],
+      "slot_id": "text-768c70ec24-1"
+    }
+  ],
+  "text_review": "image_review"
+}

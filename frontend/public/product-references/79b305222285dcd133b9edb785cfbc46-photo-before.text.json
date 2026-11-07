@@ -1,0 +1,134 @@
+{
+  "schema_version": 1,
+  "product_id": "79b305222285dcd133b9edb785cfbc46",
+  "view": "before",
+  "image": "/product-references/79b305222285dcd133b9edb785cfbc46-photo-before.png",
+  "sha256": "230ecd6726dace63a2f7ce47dc1a8cd63408d182e1378c0bbb3ba18f8972a9c8",
+  "width": 1448,
+  "height": 1086,
+  "coordinate_system": "image_pixels_top_left",
+  "status": "detected",
+  "regions": [
+    {
+      "text": "223",
+      "ocr_text": "228",
+      "confidence": 0.966,
+      "bbox": [
+        185.0,
+        200.0,
+        1119.0,
+        474.0
+      ],
+      "quad": [
+        [
+          185.0,
+          200.0
+        ],
+        [
+          1304.0,
+          200.0
+        ],
+        [
+          1304.0,
+          674.0
+        ],
+        [
+          185.0,
+          674.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.127762,
+        0.184162,
+        0.77279,
+        0.436464
+      ],
+      "normalized_quad": [
+        [
+          0.127762,
+          0.184162
+        ],
+        [
+          0.900552,
+          0.184162
+        ],
+        [
+          0.900552,
+          0.620626
+        ],
+        [
+          0.127762,
+          0.620626
+        ]
+      ],
+      "review": "verified",
+      "id": "before-visual-001",
+      "source_region_ids": [
+        "before-001"
+      ],
+      "method": "visual_annotation",
+      "slot_id": "text-af06318c33-1"
+    },
+    {
+      "text": "TRƯỜNG PHƯỚC PHAN,P.BTĐ,Q.BTÂN",
+      "ocr_text": "TRUỜNG PHUÓC PHAI,PBTD Q BTÂN",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        965.82,
+        107.51,
+        482.18,
+        82.54
+      ],
+      "quad": [
+        [
+          965.82,
+          107.51
+        ],
+        [
+          1448.0,
+          107.51
+        ],
+        [
+          1448.0,
+          190.05
+        ],
+        [
+          965.82,
+          190.05
+        ]
+      ],
+      "normalized_bbox": [
+        0.667003,
+        0.098996,
+        0.332997,
+        0.076004
+      ],
+      "normalized_quad": [
+        [
+          0.667003,
+          0.098996
+        ],
+        [
+          1.0,
+          0.098996
+        ],
+        [
+          1.0,
+          0.175
+        ],
+        [
+          0.667003,
+          0.175
+        ]
+      ],
+      "id": "before-visual-002",
+      "source_region_ids": [
+        "before-002"
+      ],
+      "slot_id": "text-8b3e9deecf-1"
+    }
+  ],
+  "text_review": "image_review"
+}

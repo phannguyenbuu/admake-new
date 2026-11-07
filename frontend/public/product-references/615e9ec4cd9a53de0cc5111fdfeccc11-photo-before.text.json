@@ -1,0 +1,134 @@
+{
+  "schema_version": 1,
+  "product_id": "615e9ec4cd9a53de0cc5111fdfeccc11",
+  "view": "before",
+  "image": "/product-references/615e9ec4cd9a53de0cc5111fdfeccc11-photo-before.png",
+  "sha256": "76504468d4518b68f159785bcbd00e16283ccaff6c869c359366066fe1fff0c8",
+  "width": 1448,
+  "height": 1086,
+  "coordinate_system": "image_pixels_top_left",
+  "status": "detected",
+  "regions": [
+    {
+      "text": "Nhà Khế",
+      "ocr_text": "nhà Khế",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        285.0,
+        270.0,
+        736.0,
+        315.0
+      ],
+      "quad": [
+        [
+          285.0,
+          270.0
+        ],
+        [
+          1021.0,
+          270.0
+        ],
+        [
+          1021.0,
+          585.0
+        ],
+        [
+          285.0,
+          585.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.196823,
+        0.248619,
+        0.508287,
+        0.290055
+      ],
+      "normalized_quad": [
+        [
+          0.196823,
+          0.248619
+        ],
+        [
+          0.70511,
+          0.248619
+        ],
+        [
+          0.70511,
+          0.538674
+        ],
+        [
+          0.196823,
+          0.538674
+        ]
+      ],
+      "id": "before-visual-001",
+      "source_region_ids": [
+        "before-001"
+      ],
+      "slot_id": "text-058ade9455-1"
+    },
+    {
+      "text": "37 Nguyễn Khuyến",
+      "ocr_text": "37 nquyễn Khuyến",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        348.0,
+        665.0,
+        603.0,
+        148.0
+      ],
+      "quad": [
+        [
+          348.0,
+          665.0
+        ],
+        [
+          951.0,
+          665.0
+        ],
+        [
+          951.0,
+          813.0
+        ],
+        [
+          348.0,
+          813.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.240331,
+        0.612339,
+        0.416436,
+        0.13628
+      ],
+      "normalized_quad": [
+        [
+          0.240331,
+          0.612339
+        ],
+        [
+          0.656768,
+          0.612339
+        ],
+        [
+          0.656768,
+          0.748619
+        ],
+        [
+          0.240331,
+          0.748619
+        ]
+      ],
+      "id": "before-visual-002",
+      "source_region_ids": [
+        "before-002"
+      ],
+      "slot_id": "text-fa19552c00-1"
+    }
+  ],
+  "text_review": "image_review"
+}

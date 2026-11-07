@@ -1,0 +1,74 @@
+{
+  "schema_version": 1,
+  "product_id": "3451b563cd78c63448026590f72a9637",
+  "view": "before",
+  "image": "/product-references/3451b563cd78c63448026590f72a9637-photo-before.png",
+  "sha256": "3d49527e310785a0345691092f0932416d5175621eea5b1211f52b43b6f91590",
+  "width": 1448,
+  "height": 1086,
+  "coordinate_system": "image_pixels_top_left",
+  "status": "detected",
+  "regions": [
+    {
+      "text": "AN LAND GARDEN",
+      "ocr_text": "AN LAND GARDEN",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        388.0,
+        546.0,
+        890.0,
+        159.0
+      ],
+      "quad": [
+        [
+          388.0,
+          546.0
+        ],
+        [
+          1278.0,
+          546.0
+        ],
+        [
+          1278.0,
+          705.0
+        ],
+        [
+          388.0,
+          705.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.267956,
+        0.502762,
+        0.614641,
+        0.146409
+      ],
+      "normalized_quad": [
+        [
+          0.267956,
+          0.502762
+        ],
+        [
+          0.882597,
+          0.502762
+        ],
+        [
+          0.882597,
+          0.649171
+        ],
+        [
+          0.267956,
+          0.649171
+        ]
+      ],
+      "id": "before-visual-001",
+      "source_region_ids": [
+        "before-002"
+      ],
+      "slot_id": "text-76b4388e06-1"
+    }
+  ],
+  "text_review": "image_review"
+}

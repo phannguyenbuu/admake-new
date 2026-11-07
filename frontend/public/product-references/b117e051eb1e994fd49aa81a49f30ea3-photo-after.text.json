@@ -1,0 +1,75 @@
+{
+  "schema_version": 1,
+  "product_id": "b117e051eb1e994fd49aa81a49f30ea3",
+  "view": "after",
+  "image": "/product-references/b117e051eb1e994fd49aa81a49f30ea3-photo-after.png",
+  "sha256": "9bac443cfe0dab45a6766d75d66846ad57f4d0af0e2b03ae0ff90ad7aca398a0",
+  "width": 1448,
+  "height": 1086,
+  "coordinate_system": "image_pixels_top_left",
+  "status": "detected",
+  "regions": [
+    {
+      "id": "after-visual-001",
+      "text": "B",
+      "ocr_text": "",
+      "confidence": 1,
+      "review": "verified",
+      "method": "visual_annotation",
+      "bbox": [
+        435,
+        45,
+        590,
+        941
+      ],
+      "quad": [
+        [
+          435,
+          45
+        ],
+        [
+          1025,
+          45
+        ],
+        [
+          1025,
+          986
+        ],
+        [
+          435,
+          986
+        ]
+      ],
+      "normalized_bbox": [
+        0.300414,
+        0.041436,
+        0.407459,
+        0.866483
+      ],
+      "normalized_quad": [
+        [
+          0.300414,
+          0.041436
+        ],
+        [
+          0.707873,
+          0.041436
+        ],
+        [
+          0.707873,
+          0.907919
+        ],
+        [
+          0.300414,
+          0.907919
+        ]
+      ],
+      "match_confidence": 1.0,
+      "source_region_ids": [
+        "after-manual-001"
+      ],
+      "slot_id": "text-e9d71f5ee7-1"
+    }
+  ],
+  "text_review": "image_review"
+}

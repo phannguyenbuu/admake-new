@@ -1,0 +1,13 @@
+[Unit]
+Description=GenAI private desktop console
+After=network.target chatgpt-bridge.service
+[Service]
+User=genai-desktop
+WorkingDirectory=/opt/genai-desktop
+ExecStart=/var/www/chatgpt_bridge/venv/bin/python3 /opt/genai-desktop/console_server.py
+Restart=always
+RestartSec=3
+NoNewPrivileges=true
+PrivateTmp=true
+[Install]
+WantedBy=multi-user.target

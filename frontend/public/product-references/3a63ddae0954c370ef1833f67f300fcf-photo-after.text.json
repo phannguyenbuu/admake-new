@@ -1,0 +1,385 @@
+{
+  "schema_version": 1,
+  "product_id": "3a63ddae0954c370ef1833f67f300fcf",
+  "view": "after",
+  "image": "/product-references/3a63ddae0954c370ef1833f67f300fcf-photo-after.png",
+  "sha256": "60f654e1837eedddc441a9b345fc8f23d474360aaa75d6b9d567c13264e1915a",
+  "width": 1448,
+  "height": 1086,
+  "coordinate_system": "image_pixels_top_left",
+  "status": "detected",
+  "regions": [
+    {
+      "text": "BÚN",
+      "ocr_text": "BUN",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        138.23,
+        142.01,
+        281.53999999999996,
+        191.98000000000002
+      ],
+      "quad": [
+        [
+          168.73,
+          142.01
+        ],
+        [
+          419.77,
+          193.49
+        ],
+        [
+          389.27,
+          333.99
+        ],
+        [
+          138.23,
+          282.51
+        ]
+      ],
+      "normalized_bbox": [
+        0.095463,
+        0.130764,
+        0.194434,
+        0.176777
+      ],
+      "normalized_quad": [
+        [
+          0.116526,
+          0.130764
+        ],
+        [
+          0.289896,
+          0.178168
+        ],
+        [
+          0.268833,
+          0.307541
+        ],
+        [
+          0.095463,
+          0.260138
+        ]
+      ],
+      "id": "after-visual-001",
+      "source_region_ids": [
+        "after-001"
+      ],
+      "slot_id": "text-b14615a7fd-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "ĐẬU",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        305.53,
+        331.23,
+        238.92,
+        162.9
+      ],
+      "quad": [
+        [
+          305.53,
+          331.23
+        ],
+        [
+          544.45,
+          331.23
+        ],
+        [
+          544.45,
+          494.13
+        ],
+        [
+          305.53,
+          494.13
+        ]
+      ],
+      "normalized_bbox": [
+        0.211001,
+        0.305,
+        0.165,
+        0.15
+      ],
+      "normalized_quad": [
+        [
+          0.211001,
+          0.305
+        ],
+        [
+          0.376001,
+          0.305
+        ],
+        [
+          0.376001,
+          0.455
+        ],
+        [
+          0.211001,
+          0.455
+        ]
+      ],
+      "id": "after-visual-002",
+      "source_region_ids": [],
+      "slot_id": "text-386ece946e-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "CÔ HẬU",
+      "ocr_text": "ữuCỔ HẬU",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        294.0,
+        276.0,
+        972.0,
+        366.0
+      ],
+      "quad": [
+        [
+          294.0,
+          276.0
+        ],
+        [
+          1266.0,
+          276.0
+        ],
+        [
+          1266.0,
+          642.0
+        ],
+        [
+          294.0,
+          642.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.203039,
+        0.254144,
+        0.671271,
+        0.337017
+      ],
+      "normalized_quad": [
+        [
+          0.203039,
+          0.254144
+        ],
+        [
+          0.874309,
+          0.254144
+        ],
+        [
+          0.874309,
+          0.59116
+        ],
+        [
+          0.203039,
+          0.59116
+        ]
+      ],
+      "id": "after-visual-003",
+      "source_region_ids": [
+        "after-002"
+      ],
+      "slot_id": "text-919f57fdb2-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "HƯƠNG VỊ HÀ THÀNH",
+      "ocr_text": "HƯỔNG? | VQgÀ | THÀNH",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        291.05,
+        532.14,
+        880.38,
+        266.07
+      ],
+      "quad": [
+        [
+          291.05,
+          532.14
+        ],
+        [
+          1171.43,
+          532.14
+        ],
+        [
+          1171.43,
+          798.21
+        ],
+        [
+          291.05,
+          798.21
+        ]
+      ],
+      "normalized_bbox": [
+        0.201001,
+        0.49,
+        0.607997,
+        0.245
+      ],
+      "normalized_quad": [
+        [
+          0.201001,
+          0.49
+        ],
+        [
+          0.808999,
+          0.49
+        ],
+        [
+          0.808999,
+          0.735
+        ],
+        [
+          0.201001,
+          0.735
+        ]
+      ],
+      "id": "after-visual-004",
+      "source_region_ids": [
+        "after-003",
+        "after-004",
+        "after-007"
+      ],
+      "slot_id": "text-a96bdeb139-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "2122 PHẠM THẾ HIỂN P 6 Q 8",
+      "ocr_text": "2122 | PHAM | THỄ | HIẾN | P6 @ 8",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        231.68,
+        663.55,
+        540.1,
+        177.02
+      ],
+      "quad": [
+        [
+          231.68,
+          663.55
+        ],
+        [
+          771.78,
+          663.55
+        ],
+        [
+          771.78,
+          840.57
+        ],
+        [
+          231.68,
+          840.57
+        ]
+      ],
+      "normalized_bbox": [
+        0.16,
+        0.611004,
+        0.372997,
+        0.163002
+      ],
+      "normalized_quad": [
+        [
+          0.16,
+          0.611004
+        ],
+        [
+          0.532997,
+          0.611004
+        ],
+        [
+          0.532997,
+          0.774006
+        ],
+        [
+          0.16,
+          0.774006
+        ]
+      ],
+      "id": "after-visual-005",
+      "source_region_ids": [
+        "after-005",
+        "after-006",
+        "after-008",
+        "after-009",
+        "after-010"
+      ],
+      "slot_id": "text-0db9e218fb-1"
+    },
+    {
+      "text": "0375 038 008",
+      "ocr_text": "0375 | 038 | 008",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        1035.32,
+        876.4,
+        240.37,
+        104.26
+      ],
+      "quad": [
+        [
+          1035.32,
+          876.4
+        ],
+        [
+          1275.69,
+          876.4
+        ],
+        [
+          1275.69,
+          980.66
+        ],
+        [
+          1035.32,
+          980.66
+        ]
+      ],
+      "normalized_bbox": [
+        0.715,
+        0.806998,
+        0.166001,
+        0.096004
+      ],
+      "normalized_quad": [
+        [
+          0.715,
+          0.806998
+        ],
+        [
+          0.881001,
+          0.806998
+        ],
+        [
+          0.881001,
+          0.903002
+        ],
+        [
+          0.715,
+          0.903002
+        ]
+      ],
+      "id": "after-visual-006",
+      "source_region_ids": [
+        "after-011",
+        "after-012",
+        "after-013"
+      ],
+      "slot_id": "text-ff1b491fea-1",
+      "match_confidence": 1.0
+    }
+  ],
+  "text_review": "image_review"
+}

@@ -1,0 +1,91 @@
+{
+  "products": 79,
+  "images": 158,
+  "regions": 1058,
+  "review_pending": [
+    {
+      "product_id": "a45719d788a2eb7468783c05f3f2c8b8",
+      "view": "before",
+      "regions": [
+        "before-visual-001"
+      ]
+    },
+    {
+      "product_id": "a45719d788a2eb7468783c05f3f2c8b8",
+      "view": "after",
+      "regions": [
+        "after-visual-001"
+      ]
+    },
+    {
+      "product_id": "9733ed86eabcd64c39611d092ed1b346",
+      "view": "before",
+      "regions": [
+        "before-visual-001"
+      ]
+    },
+    {
+      "product_id": "9733ed86eabcd64c39611d092ed1b346",
+      "view": "after",
+      "regions": [
+        "after-visual-001"
+      ]
+    },
+    {
+      "product_id": "da86f98fbc6cc52be09e6e8eb866d0ec",
+      "view": "before",
+      "regions": [
+        "before-visual-001"
+      ]
+    },
+    {
+      "product_id": "da86f98fbc6cc52be09e6e8eb866d0ec",
+      "view": "after",
+      "regions": [
+        "after-visual-001"
+      ]
+    }
+  ],
+  "no_text_detected": [
+    {
+      "product_id": "34a7ff12934336c498bf55ce4fa262f4",
+      "view": "before"
+    },
+    {
+      "product_id": "34a7ff12934336c498bf55ce4fa262f4",
+      "view": "after"
+    },
+    {
+      "product_id": "94ad47a5672b9de716ae7622a442c9eb",
+      "view": "before"
+    },
+    {
+      "product_id": "94ad47a5672b9de716ae7622a442c9eb",
+      "view": "after"
+    },
+    {
+      "product_id": "0742663346cf948f656f9f6716f497a6",
+      "view": "before"
+    },
+    {
+      "product_id": "0742663346cf948f656f9f6716f497a6",
+      "view": "after"
+    },
+    {
+      "product_id": "62e73674bdc7cd8f6e24f8dcf8ca677a",
+      "view": "before"
+    },
+    {
+      "product_id": "62e73674bdc7cd8f6e24f8dcf8ca677a",
+      "view": "after"
+    },
+    {
+      "product_id": "6ebcf97d0e28a633e1948a0ba6588a54",
+      "view": "before"
+    },
+    {
+      "product_id": "6ebcf97d0e28a633e1948a0ba6588a54",
+      "view": "after"
+    }
+  ]
+}

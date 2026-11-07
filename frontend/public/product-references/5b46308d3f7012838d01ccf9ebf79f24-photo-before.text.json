@@ -1,0 +1,134 @@
+{
+  "schema_version": 1,
+  "product_id": "5b46308d3f7012838d01ccf9ebf79f24",
+  "view": "before",
+  "image": "/product-references/5b46308d3f7012838d01ccf9ebf79f24-photo-before.png",
+  "sha256": "b4751843f99f8f2c73a1a8f4edaaa0bc087a51eb74d71ff24765f743a86ffb03",
+  "width": 1448,
+  "height": 1086,
+  "coordinate_system": "image_pixels_top_left",
+  "status": "detected",
+  "regions": [
+    {
+      "text": "28",
+      "ocr_text": "\"\"3",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        450.0,
+        184.0,
+        606.0,
+        312.0
+      ],
+      "quad": [
+        [
+          450.0,
+          184.0
+        ],
+        [
+          1056.0,
+          184.0
+        ],
+        [
+          1056.0,
+          496.0
+        ],
+        [
+          450.0,
+          496.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.310773,
+        0.169429,
+        0.418508,
+        0.287293
+      ],
+      "normalized_quad": [
+        [
+          0.310773,
+          0.169429
+        ],
+        [
+          0.729282,
+          0.169429
+        ],
+        [
+          0.729282,
+          0.456722
+        ],
+        [
+          0.310773,
+          0.456722
+        ]
+      ],
+      "id": "before-visual-001",
+      "source_region_ids": [
+        "before-001"
+      ],
+      "slot_id": "text-0a57cb53ba-1"
+    },
+    {
+      "text": "PI NĂNG TÁC",
+      "ocr_text": "PI NĂNG TAC",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        195.0,
+        579.0,
+        1078.0,
+        208.0
+      ],
+      "quad": [
+        [
+          195.0,
+          579.0
+        ],
+        [
+          1273.0,
+          579.0
+        ],
+        [
+          1273.0,
+          787.0
+        ],
+        [
+          195.0,
+          787.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.134669,
+        0.533149,
+        0.744475,
+        0.191529
+      ],
+      "normalized_quad": [
+        [
+          0.134669,
+          0.533149
+        ],
+        [
+          0.879144,
+          0.533149
+        ],
+        [
+          0.879144,
+          0.724678
+        ],
+        [
+          0.134669,
+          0.724678
+        ]
+      ],
+      "id": "before-visual-002",
+      "source_region_ids": [
+        "before-002"
+      ],
+      "slot_id": "text-f478ad8b7b-1"
+    }
+  ],
+  "text_review": "image_review"
+}

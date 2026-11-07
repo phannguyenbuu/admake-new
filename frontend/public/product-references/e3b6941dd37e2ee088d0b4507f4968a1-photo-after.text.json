@@ -1,0 +1,366 @@
+{
+  "schema_version": 1,
+  "product_id": "e3b6941dd37e2ee088d0b4507f4968a1",
+  "view": "after",
+  "image": "/product-references/e3b6941dd37e2ee088d0b4507f4968a1-photo-after.png",
+  "sha256": "c4689f1eb4a8f22eedde812c5bd8031e8dc26138b05a7155b1511ed6c3d97dac",
+  "width": 1448,
+  "height": 1086,
+  "coordinate_system": "image_pixels_top_left",
+  "status": "detected",
+  "regions": [
+    {
+      "text": "KYODO SOJITZ VIETNAM CO.",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        63.71,
+        178.1,
+        185.34,
+        21.72
+      ],
+      "quad": [
+        [
+          63.71,
+          178.1
+        ],
+        [
+          249.05,
+          178.1
+        ],
+        [
+          249.05,
+          199.82
+        ],
+        [
+          63.71,
+          199.82
+        ]
+      ],
+      "normalized_bbox": [
+        0.043999,
+        0.163996,
+        0.127997,
+        0.02
+      ],
+      "normalized_quad": [
+        [
+          0.043999,
+          0.163996
+        ],
+        [
+          0.171996,
+          0.163996
+        ],
+        [
+          0.171996,
+          0.183996
+        ],
+        [
+          0.043999,
+          0.183996
+        ]
+      ],
+      "id": "after-visual-001",
+      "source_region_ids": [],
+      "slot_id": "text-c63016472c-1"
+    },
+    {
+      "text": "ĐẠI LÝ THỨC ĂN CHĂN NUÔI KYODO SOJITZ",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        338.83,
+        234.58,
+        1109.17,
+        146.61
+      ],
+      "quad": [
+        [
+          338.83,
+          234.58
+        ],
+        [
+          1448.0,
+          234.58
+        ],
+        [
+          1448.0,
+          381.19
+        ],
+        [
+          338.83,
+          381.19
+        ]
+      ],
+      "normalized_bbox": [
+        0.233999,
+        0.216004,
+        0.766001,
+        0.135
+      ],
+      "normalized_quad": [
+        [
+          0.233999,
+          0.216004
+        ],
+        [
+          1.0,
+          0.216004
+        ],
+        [
+          1.0,
+          0.351004
+        ],
+        [
+          0.233999,
+          0.351004
+        ]
+      ],
+      "id": "after-visual-002",
+      "source_region_ids": [],
+      "slot_id": "text-b1bba33c91-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "CHỨNG NHẬN BỞI:",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        224.44,
+        438.74,
+        108.6,
+        19.55
+      ],
+      "quad": [
+        [
+          224.44,
+          438.74
+        ],
+        [
+          333.04,
+          438.74
+        ],
+        [
+          333.04,
+          458.29
+        ],
+        [
+          224.44,
+          458.29
+        ]
+      ],
+      "normalized_bbox": [
+        0.155,
+        0.403996,
+        0.075,
+        0.018002
+      ],
+      "normalized_quad": [
+        [
+          0.155,
+          0.403996
+        ],
+        [
+          0.23,
+          0.403996
+        ],
+        [
+          0.23,
+          0.421998
+        ],
+        [
+          0.155,
+          0.421998
+        ]
+      ],
+      "id": "after-visual-003",
+      "source_region_ids": [],
+      "slot_id": "text-a032d0b75c-1"
+    },
+    {
+      "text": "NGỌC TIỆP",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        296.84,
+        319.28,
+        1151.16,
+        720.02
+      ],
+      "quad": [
+        [
+          296.84,
+          319.28
+        ],
+        [
+          1448.0,
+          319.28
+        ],
+        [
+          1448.0,
+          1039.3
+        ],
+        [
+          296.84,
+          1039.3
+        ]
+      ],
+      "normalized_bbox": [
+        0.205,
+        0.293996,
+        0.795,
+        0.663002
+      ],
+      "normalized_quad": [
+        [
+          0.205,
+          0.293996
+        ],
+        [
+          1.0,
+          0.293996
+        ],
+        [
+          1.0,
+          0.956998
+        ],
+        [
+          0.205,
+          0.956998
+        ]
+      ],
+      "id": "after-visual-004",
+      "source_region_ids": [],
+      "slot_id": "text-372889ef96-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "Địa Chỉ: Ấp An Quý, Xã Thanh An, Huyện Hớn Quản, Tỉnh Bình Phước",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        388.06,
+        522.37,
+        1059.94,
+        86.88
+      ],
+      "quad": [
+        [
+          388.06,
+          522.37
+        ],
+        [
+          1448.0,
+          522.37
+        ],
+        [
+          1448.0,
+          609.25
+        ],
+        [
+          388.06,
+          609.25
+        ]
+      ],
+      "normalized_bbox": [
+        0.267997,
+        0.481004,
+        0.732003,
+        0.08
+      ],
+      "normalized_quad": [
+        [
+          0.267997,
+          0.481004
+        ],
+        [
+          1.0,
+          0.481004
+        ],
+        [
+          1.0,
+          0.561004
+        ],
+        [
+          0.267997,
+          0.561004
+        ]
+      ],
+      "id": "after-visual-005",
+      "source_region_ids": [],
+      "slot_id": "text-ac8f9cbc56-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "Điện thoại: 0978.080.339 - 0919.43.81.41",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        514.04,
+        597.3,
+        933.96,
+        81.45
+      ],
+      "quad": [
+        [
+          514.04,
+          597.3
+        ],
+        [
+          1448.0,
+          597.3
+        ],
+        [
+          1448.0,
+          678.75
+        ],
+        [
+          514.04,
+          678.75
+        ]
+      ],
+      "normalized_bbox": [
+        0.355,
+        0.55,
+        0.645,
+        0.075
+      ],
+      "normalized_quad": [
+        [
+          0.355,
+          0.55
+        ],
+        [
+          1.0,
+          0.55
+        ],
+        [
+          1.0,
+          0.625
+        ],
+        [
+          0.355,
+          0.625
+        ]
+      ],
+      "id": "after-visual-006",
+      "source_region_ids": [],
+      "slot_id": "text-558e7c7b6a-1",
+      "match_confidence": 1.0
+    }
+  ],
+  "text_review": "image_review"
+}

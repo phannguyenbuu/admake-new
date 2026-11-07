@@ -1,0 +1,554 @@
+{
+  "schema_version": 1,
+  "product_id": "606d4ba6df98767146c9757daf5326e7",
+  "view": "before",
+  "image": "/product-references/606d4ba6df98767146c9757daf5326e7-photo-before.png",
+  "sha256": "4737e01a792909b558f90446556fd88178115f1ca19a6bf0ab19f2cfc0f78163",
+  "width": 1448,
+  "height": 1086,
+  "coordinate_system": "image_pixels_top_left",
+  "status": "detected",
+  "regions": [
+    {
+      "text": "MEAT Deli",
+      "ocr_text": "MEATJDeli",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        60.0,
+        486.0,
+        239.0,
+        72.0
+      ],
+      "quad": [
+        [
+          60.0,
+          486.0
+        ],
+        [
+          299.0,
+          486.0
+        ],
+        [
+          299.0,
+          558.0
+        ],
+        [
+          60.0,
+          558.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.041436,
+        0.447514,
+        0.165055,
+        0.066298
+      ],
+      "normalized_quad": [
+        [
+          0.041436,
+          0.447514
+        ],
+        [
+          0.206492,
+          0.447514
+        ],
+        [
+          0.206492,
+          0.513812
+        ],
+        [
+          0.041436,
+          0.513812
+        ]
+      ],
+      "id": "before-visual-001",
+      "source_region_ids": [
+        "before-002"
+      ],
+      "slot_id": "text-ad59b6ff27-1"
+    },
+    {
+      "text": "Thịt sạch",
+      "ocr_text": "Thịt sạch",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        189.0,
+        559.0,
+        106.0,
+        40.0
+      ],
+      "quad": [
+        [
+          189.0,
+          559.0
+        ],
+        [
+          295.0,
+          559.0
+        ],
+        [
+          295.0,
+          599.0
+        ],
+        [
+          189.0,
+          599.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.130525,
+        0.514733,
+        0.073204,
+        0.036832
+      ],
+      "normalized_quad": [
+        [
+          0.130525,
+          0.514733
+        ],
+        [
+          0.203729,
+          0.514733
+        ],
+        [
+          0.203729,
+          0.551565
+        ],
+        [
+          0.130525,
+          0.551565
+        ]
+      ],
+      "id": "before-visual-002",
+      "source_region_ids": [
+        "before-003"
+      ],
+      "slot_id": "text-b7cd265426-1"
+    },
+    {
+      "text": "Ủ MÁT CHUẨN ÂU - TƯƠI NGON MỀM MỌNG",
+      "ocr_text": "ỦMÁT CHUẨN ÂU - TƯƠI NGON MÊM MỌNG",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        368.0,
+        442.0,
+        1044.0,
+        89.0
+      ],
+      "quad": [
+        [
+          368.0,
+          442.0
+        ],
+        [
+          1412.0,
+          442.0
+        ],
+        [
+          1412.0,
+          531.0
+        ],
+        [
+          368.0,
+          531.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.254144,
+        0.406998,
+        0.720994,
+        0.081952
+      ],
+      "normalized_quad": [
+        [
+          0.254144,
+          0.406998
+        ],
+        [
+          0.975138,
+          0.406998
+        ],
+        [
+          0.975138,
+          0.48895
+        ],
+        [
+          0.254144,
+          0.48895
+        ]
+      ],
+      "id": "before-visual-003",
+      "source_region_ids": [
+        "before-001"
+      ],
+      "slot_id": "text-0b837d5f44-1"
+    },
+    {
+      "text": "AN TOÀN",
+      "ocr_text": "AN TOAN",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        500.0,
+        566.0,
+        68.0,
+        20.0
+      ],
+      "quad": [
+        [
+          500.0,
+          566.0
+        ],
+        [
+          568.0,
+          566.0
+        ],
+        [
+          568.0,
+          586.0
+        ],
+        [
+          500.0,
+          586.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.345304,
+        0.521179,
+        0.046961,
+        0.018416
+      ],
+      "normalized_quad": [
+        [
+          0.345304,
+          0.521179
+        ],
+        [
+          0.392265,
+          0.521179
+        ],
+        [
+          0.392265,
+          0.539595
+        ],
+        [
+          0.345304,
+          0.539595
+        ]
+      ],
+      "id": "before-visual-004",
+      "source_region_ids": [
+        "before-004"
+      ],
+      "slot_id": "text-162fc0bd59-1"
+    },
+    {
+      "text": "3 KHÔNG",
+      "ocr_text": "3 KHÔNG",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        499.0,
+        579.0,
+        110.0,
+        40.0
+      ],
+      "quad": [
+        [
+          499.0,
+          579.0
+        ],
+        [
+          609.0,
+          579.0
+        ],
+        [
+          609.0,
+          619.0
+        ],
+        [
+          499.0,
+          619.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.344613,
+        0.533149,
+        0.075967,
+        0.036832
+      ],
+      "normalized_quad": [
+        [
+          0.344613,
+          0.533149
+        ],
+        [
+          0.42058,
+          0.533149
+        ],
+        [
+          0.42058,
+          0.569982
+        ],
+        [
+          0.344613,
+          0.569982
+        ]
+      ],
+      "id": "before-visual-005",
+      "source_region_ids": [
+        "before-007"
+      ],
+      "slot_id": "text-47dd80dd38-1"
+    },
+    {
+      "text": "BẢO QUẢN VỚI",
+      "ocr_text": "BÁO QUAN VỚI",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        810.0,
+        566.0,
+        96.0,
+        20.0
+      ],
+      "quad": [
+        [
+          810.0,
+          566.0
+        ],
+        [
+          906.0,
+          566.0
+        ],
+        [
+          906.0,
+          586.0
+        ],
+        [
+          810.0,
+          586.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.559392,
+        0.521179,
+        0.066298,
+        0.018416
+      ],
+      "normalized_quad": [
+        [
+          0.559392,
+          0.521179
+        ],
+        [
+          0.625691,
+          0.521179
+        ],
+        [
+          0.625691,
+          0.539595
+        ],
+        [
+          0.559392,
+          0.539595
+        ]
+      ],
+      "id": "before-visual-006",
+      "source_region_ids": [
+        "before-005"
+      ],
+      "slot_id": "text-6728972d52-1"
+    },
+    {
+      "text": "OXY-FRESH",
+      "ocr_text": "02) @2YAFRESH",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        812.33,
+        586.44,
+        144.8,
+        40.18
+      ],
+      "quad": [
+        [
+          812.33,
+          586.44
+        ],
+        [
+          957.13,
+          586.44
+        ],
+        [
+          957.13,
+          626.62
+        ],
+        [
+          812.33,
+          626.62
+        ]
+      ],
+      "normalized_bbox": [
+        0.561001,
+        0.54,
+        0.1,
+        0.036998
+      ],
+      "normalized_quad": [
+        [
+          0.561001,
+          0.54
+        ],
+        [
+          0.661001,
+          0.54
+        ],
+        [
+          0.661001,
+          0.576998
+        ],
+        [
+          0.561001,
+          0.576998
+        ]
+      ],
+      "id": "before-visual-007",
+      "source_region_ids": [
+        "before-008"
+      ],
+      "slot_id": "text-7d9f955ce2-1"
+    },
+    {
+      "text": "THỊT SẠCH",
+      "ocr_text": "Thit",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        1168.0,
+        568.0,
+        38.0,
+        18.0
+      ],
+      "quad": [
+        [
+          1168.0,
+          568.0
+        ],
+        [
+          1206.0,
+          568.0
+        ],
+        [
+          1206.0,
+          586.0
+        ],
+        [
+          1168.0,
+          586.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.80663,
+        0.52302,
+        0.026243,
+        0.016575
+      ],
+      "normalized_quad": [
+        [
+          0.80663,
+          0.52302
+        ],
+        [
+          0.832873,
+          0.52302
+        ],
+        [
+          0.832873,
+          0.539595
+        ],
+        [
+          0.80663,
+          0.539595
+        ]
+      ],
+      "id": "before-visual-008",
+      "source_region_ids": [
+        "before-006"
+      ],
+      "slot_id": "text-b7cd265426-2"
+    },
+    {
+      "text": "KHÔNG AI CHẠM",
+      "ocr_text": "KHONG AI CHẠM",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        1169.98,
+        586.44,
+        211.41,
+        40.18
+      ],
+      "quad": [
+        [
+          1169.98,
+          586.44
+        ],
+        [
+          1381.39,
+          586.44
+        ],
+        [
+          1381.39,
+          626.62
+        ],
+        [
+          1169.98,
+          626.62
+        ]
+      ],
+      "normalized_bbox": [
+        0.807997,
+        0.54,
+        0.146001,
+        0.036998
+      ],
+      "normalized_quad": [
+        [
+          0.807997,
+          0.54
+        ],
+        [
+          0.953999,
+          0.54
+        ],
+        [
+          0.953999,
+          0.576998
+        ],
+        [
+          0.807997,
+          0.576998
+        ]
+      ],
+      "id": "before-visual-009",
+      "source_region_ids": [
+        "before-009"
+      ],
+      "slot_id": "text-602c6fd607-1"
+    }
+  ],
+  "text_review": "image_review"
+}

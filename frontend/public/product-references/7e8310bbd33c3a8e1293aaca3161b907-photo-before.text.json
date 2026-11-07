@@ -1,0 +1,304 @@
+{
+  "schema_version": 1,
+  "product_id": "7e8310bbd33c3a8e1293aaca3161b907",
+  "view": "before",
+  "image": "/product-references/7e8310bbd33c3a8e1293aaca3161b907-photo-before.png",
+  "sha256": "bbf0114ce5944f894f9e9eaf74a033b21e796f36c51f6e71ccd4ffcc64a55f01",
+  "width": 1448,
+  "height": 1086,
+  "coordinate_system": "image_pixels_top_left",
+  "status": "detected",
+  "regions": [
+    {
+      "text": "IE OE",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        638.57,
+        274.76,
+        212.86,
+        35.84
+      ],
+      "quad": [
+        [
+          638.57,
+          274.76
+        ],
+        [
+          851.43,
+          274.76
+        ],
+        [
+          851.43,
+          310.6
+        ],
+        [
+          638.57,
+          310.6
+        ]
+      ],
+      "normalized_bbox": [
+        0.441001,
+        0.253002,
+        0.147003,
+        0.033002
+      ],
+      "normalized_quad": [
+        [
+          0.441001,
+          0.253002
+        ],
+        [
+          0.588004,
+          0.253002
+        ],
+        [
+          0.588004,
+          0.286004
+        ],
+        [
+          0.441001,
+          0.286004
+        ]
+      ],
+      "id": "before-visual-001",
+      "source_region_ids": [],
+      "slot_id": "text-f9d9ecf69b-1"
+    },
+    {
+      "text": "MOON",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        340.28,
+        318.2,
+        1104.82,
+        605.99
+      ],
+      "quad": [
+        [
+          340.28,
+          318.2
+        ],
+        [
+          1445.1,
+          318.2
+        ],
+        [
+          1445.1,
+          924.19
+        ],
+        [
+          340.28,
+          924.19
+        ]
+      ],
+      "normalized_bbox": [
+        0.235,
+        0.293002,
+        0.762997,
+        0.558002
+      ],
+      "normalized_quad": [
+        [
+          0.235,
+          0.293002
+        ],
+        [
+          0.997997,
+          0.293002
+        ],
+        [
+          0.997997,
+          0.851004
+        ],
+        [
+          0.235,
+          0.851004
+        ]
+      ],
+      "id": "before-visual-002",
+      "source_region_ids": [],
+      "slot_id": "text-46dcd4dd65-1"
+    },
+    {
+      "text": "COFFEE",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        444.54,
+        515.85,
+        931.06,
+        217.2
+      ],
+      "quad": [
+        [
+          444.54,
+          515.85
+        ],
+        [
+          1375.6,
+          515.85
+        ],
+        [
+          1375.6,
+          733.05
+        ],
+        [
+          444.54,
+          733.05
+        ]
+      ],
+      "normalized_bbox": [
+        0.307003,
+        0.475,
+        0.642997,
+        0.2
+      ],
+      "normalized_quad": [
+        [
+          0.307003,
+          0.475
+        ],
+        [
+          0.95,
+          0.475
+        ],
+        [
+          0.95,
+          0.675
+        ],
+        [
+          0.307003,
+          0.675
+        ]
+      ],
+      "id": "before-visual-003",
+      "source_region_ids": [],
+      "slot_id": "text-44213f9f4d-1"
+    },
+    {
+      "text": "AND",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        624.09,
+        624.45,
+        221.54,
+        79.28
+      ],
+      "quad": [
+        [
+          624.09,
+          624.45
+        ],
+        [
+          845.63,
+          624.45
+        ],
+        [
+          845.63,
+          703.73
+        ],
+        [
+          624.09,
+          703.73
+        ]
+      ],
+      "normalized_bbox": [
+        0.431001,
+        0.575,
+        0.152997,
+        0.073002
+      ],
+      "normalized_quad": [
+        [
+          0.431001,
+          0.575
+        ],
+        [
+          0.583999,
+          0.575
+        ],
+        [
+          0.583999,
+          0.648002
+        ],
+        [
+          0.431001,
+          0.648002
+        ]
+      ],
+      "id": "before-visual-004",
+      "source_region_ids": [],
+      "slot_id": "text-cffa50a32c-1"
+    },
+    {
+      "text": "Tea",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        528.52,
+        678.75,
+        603.82,
+        263.9
+      ],
+      "quad": [
+        [
+          528.52,
+          678.75
+        ],
+        [
+          1132.34,
+          678.75
+        ],
+        [
+          1132.34,
+          942.65
+        ],
+        [
+          528.52,
+          942.65
+        ]
+      ],
+      "normalized_bbox": [
+        0.365,
+        0.625,
+        0.417003,
+        0.243002
+      ],
+      "normalized_quad": [
+        [
+          0.365,
+          0.625
+        ],
+        [
+          0.782003,
+          0.625
+        ],
+        [
+          0.782003,
+          0.868002
+        ],
+        [
+          0.365,
+          0.868002
+        ]
+      ],
+      "id": "before-visual-005",
+      "source_region_ids": [],
+      "slot_id": "text-75490f32c0-1"
+    }
+  ],
+  "text_review": "image_review"
+}

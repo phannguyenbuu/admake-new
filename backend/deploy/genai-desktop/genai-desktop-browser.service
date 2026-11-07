@@ -1,0 +1,15 @@
+[Unit]
+Description=GenAI persistent Chrome worker
+Requires=genai-desktop-desktop.service chatgpt-bridge.service
+After=genai-desktop-desktop.service chatgpt-bridge.service
+[Service]
+User=genai-desktop
+Environment=HOME=/var/lib/genai-desktop
+Environment=DISPLAY=:12
+Environment=CHROME_DEVEL_SANDBOX=/opt/genai-desktop/chrome-linux64/chrome_sandbox
+ExecStart=/opt/genai-desktop/chrome-linux64/chrome --user-data-dir=/var/lib/genai-desktop/chrome-profile --load-extension=/opt/genai-desktop/extension --disable-extensions-except=/opt/genai-desktop/extension --no-first-run --no-default-browser-check --disable-dev-shm-usage --disable-background-networking --disable-sync --renderer-process-limit=2 --window-size=1280,800 --window-position=0,0 https://chatgpt.com/
+Restart=always
+RestartSec=10
+MemoryMax=1800M
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,11 @@
+[Unit]
+Description=GenAI private VNC display
+After=network.target
+[Service]
+User=genai-desktop
+Environment=HOME=/var/lib/genai-desktop
+ExecStart=/usr/bin/Xtigervnc :12 -geometry 1280x800 -depth 24 -rfbport 5912 -localhost yes -SecurityTypes None -AlwaysShared
+Restart=always
+RestartSec=3
+[Install]
+WantedBy=multi-user.target

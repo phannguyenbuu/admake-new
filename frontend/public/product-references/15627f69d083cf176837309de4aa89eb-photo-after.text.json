@@ -1,0 +1,75 @@
+{
+  "schema_version": 1,
+  "product_id": "15627f69d083cf176837309de4aa89eb",
+  "view": "after",
+  "image": "/product-references/15627f69d083cf176837309de4aa89eb-photo-after.png",
+  "sha256": "bc72e500063ac287ff469000abebdb6fd609afd1900617c149c223fc529a3383",
+  "width": 1448,
+  "height": 1086,
+  "coordinate_system": "image_pixels_top_left",
+  "status": "detected",
+  "regions": [
+    {
+      "id": "after-visual-001",
+      "text": "ALWA",
+      "ocr_text": "",
+      "confidence": 1,
+      "review": "verified",
+      "method": "visual_annotation",
+      "bbox": [
+        20,
+        20,
+        1415,
+        1040
+      ],
+      "quad": [
+        [
+          20,
+          20
+        ],
+        [
+          1435,
+          20
+        ],
+        [
+          1435,
+          1060
+        ],
+        [
+          20,
+          1060
+        ]
+      ],
+      "normalized_bbox": [
+        0.013812,
+        0.018416,
+        0.97721,
+        0.957643
+      ],
+      "normalized_quad": [
+        [
+          0.013812,
+          0.018416
+        ],
+        [
+          0.991022,
+          0.018416
+        ],
+        [
+          0.991022,
+          0.976059
+        ],
+        [
+          0.013812,
+          0.976059
+        ]
+      ],
+      "match_confidence": 1.0,
+      "source_region_ids": [
+        "after-visual-001"
+      ],
+      "slot_id": "text-2da97fa42f-1"
+    }
+  ],
+  "text_review": "image_review"
+}

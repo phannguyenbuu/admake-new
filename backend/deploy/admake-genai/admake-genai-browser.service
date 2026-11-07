@@ -1,0 +1,15 @@
+[Unit]
+Description=Admake persistent Chrome worker
+Requires=admake-genai-desktop.service admake-genai.service
+After=admake-genai-desktop.service admake-genai.service
+[Service]
+User=admake-genai
+Environment=HOME=/var/lib/admake-genai
+Environment=DISPLAY=:12
+Environment=CHROME_DEVEL_SANDBOX=/opt/admake-genai/chrome-linux64/chrome_sandbox
+ExecStart=/opt/admake-genai/chrome-linux64/chrome --user-data-dir=/var/lib/admake-genai/chrome-profile --load-extension=/opt/admake-genai/extension --disable-extensions-except=/opt/admake-genai/extension --no-first-run --no-default-browser-check --disable-dev-shm-usage --disable-background-networking --disable-sync --renderer-process-limit=2 --window-size=1280,800 --window-position=0,0 https://chatgpt.com/
+Restart=always
+RestartSec=10
+MemoryMax=800M
+[Install]
+WantedBy=multi-user.target

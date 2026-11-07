@@ -1,0 +1,188 @@
+{
+  "schema_version": 1,
+  "product_id": "fef8cf5222cec713e86b1f7deb23162b",
+  "view": "before",
+  "image": "/product-references/fef8cf5222cec713e86b1f7deb23162b-photo-before.png",
+  "sha256": "d99f980c124b76f21a9b924b18846b3458dcee4fcaa9590c59e963223dc05354",
+  "width": 1448,
+  "height": 1086,
+  "coordinate_system": "image_pixels_top_left",
+  "status": "detected",
+  "regions": [
+    {
+      "text": "VIỆN THẨM MỸ",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        613.95,
+        156.38,
+        797.85,
+        69.5
+      ],
+      "quad": [
+        [
+          613.95,
+          156.38
+        ],
+        [
+          1411.8,
+          156.38
+        ],
+        [
+          1411.8,
+          225.88
+        ],
+        [
+          613.95,
+          225.88
+        ]
+      ],
+      "normalized_bbox": [
+        0.423999,
+        0.143996,
+        0.551001,
+        0.063996
+      ],
+      "normalized_quad": [
+        [
+          0.423999,
+          0.143996
+        ],
+        [
+          0.975,
+          0.143996
+        ],
+        [
+          0.975,
+          0.207993
+        ],
+        [
+          0.423999,
+          0.207993
+        ]
+      ],
+      "id": "before-visual-001",
+      "source_region_ids": [],
+      "slot_id": "text-cfa8525f7c-1"
+    },
+    {
+      "text": "175",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        645.81,
+        236.75,
+        154.94,
+        108.6
+      ],
+      "quad": [
+        [
+          645.81,
+          236.75
+        ],
+        [
+          800.75,
+          236.75
+        ],
+        [
+          800.75,
+          345.35
+        ],
+        [
+          645.81,
+          345.35
+        ]
+      ],
+      "normalized_bbox": [
+        0.446001,
+        0.218002,
+        0.107003,
+        0.1
+      ],
+      "normalized_quad": [
+        [
+          0.446001,
+          0.218002
+        ],
+        [
+          0.553004,
+          0.218002
+        ],
+        [
+          0.553004,
+          0.318002
+        ],
+        [
+          0.446001,
+          0.318002
+        ]
+      ],
+      "id": "before-visual-002",
+      "source_region_ids": [],
+      "slot_id": "text-04f1241ed2-1"
+    },
+    {
+      "text": "VIỆN THẨM MỸ 175",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        425.71,
+        469.15,
+        1022.29,
+        125.98
+      ],
+      "quad": [
+        [
+          425.71,
+          469.15
+        ],
+        [
+          1448.0,
+          469.15
+        ],
+        [
+          1448.0,
+          595.13
+        ],
+        [
+          425.71,
+          595.13
+        ]
+      ],
+      "normalized_bbox": [
+        0.293999,
+        0.431998,
+        0.706001,
+        0.116004
+      ],
+      "normalized_quad": [
+        [
+          0.293999,
+          0.431998
+        ],
+        [
+          1.0,
+          0.431998
+        ],
+        [
+          1.0,
+          0.548002
+        ],
+        [
+          0.293999,
+          0.548002
+        ]
+      ],
+      "id": "before-visual-003",
+      "source_region_ids": [],
+      "slot_id": "text-7257893484-1"
+    }
+  ],
+  "text_review": "image_review"
+}

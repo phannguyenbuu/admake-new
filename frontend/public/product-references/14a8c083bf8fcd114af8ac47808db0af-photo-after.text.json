@@ -1,0 +1,76 @@
+{
+  "schema_version": 1,
+  "product_id": "14a8c083bf8fcd114af8ac47808db0af",
+  "view": "after",
+  "image": "/product-references/14a8c083bf8fcd114af8ac47808db0af-photo-after.png",
+  "sha256": "4ad8dfdf1da9062515e4b008fd55d61b862a7350248f1c6e420f0b4f9206675c",
+  "width": 1448,
+  "height": 1086,
+  "coordinate_system": "image_pixels_top_left",
+  "status": "detected",
+  "regions": [
+    {
+      "text": "Highcut Vintage",
+      "ocr_text": "Highcut~ | Vintage",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        91.22,
+        322.54,
+        1356.78,
+        448.52
+      ],
+      "quad": [
+        [
+          91.22,
+          322.54
+        ],
+        [
+          1448.0,
+          322.54
+        ],
+        [
+          1448.0,
+          771.06
+        ],
+        [
+          91.22,
+          771.06
+        ]
+      ],
+      "normalized_bbox": [
+        0.062997,
+        0.296998,
+        0.937003,
+        0.413002
+      ],
+      "normalized_quad": [
+        [
+          0.062997,
+          0.296998
+        ],
+        [
+          1.0,
+          0.296998
+        ],
+        [
+          1.0,
+          0.71
+        ],
+        [
+          0.062997,
+          0.71
+        ]
+      ],
+      "id": "after-visual-001",
+      "source_region_ids": [
+        "after-001",
+        "after-002"
+      ],
+      "slot_id": "text-59b7db3830-1",
+      "match_confidence": 1.0
+    }
+  ],
+  "text_review": "image_review"
+}

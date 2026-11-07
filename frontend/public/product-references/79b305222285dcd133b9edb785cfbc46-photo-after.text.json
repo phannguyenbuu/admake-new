@@ -1,0 +1,138 @@
+{
+  "schema_version": 1,
+  "product_id": "79b305222285dcd133b9edb785cfbc46",
+  "view": "after",
+  "image": "/product-references/79b305222285dcd133b9edb785cfbc46-photo-after.png",
+  "sha256": "08d5cd73baa05b9d8e738dfa08cc684ac6fb3668b3997f9deea1c43a31fb7c15",
+  "width": 1448,
+  "height": 1086,
+  "coordinate_system": "image_pixels_top_left",
+  "status": "detected",
+  "regions": [
+    {
+      "text": "223",
+      "ocr_text": "228",
+      "confidence": 0.8715,
+      "bbox": [
+        192.0,
+        229.0,
+        976.0,
+        382.0
+      ],
+      "quad": [
+        [
+          192.0,
+          229.0
+        ],
+        [
+          1168.0,
+          229.0
+        ],
+        [
+          1168.0,
+          611.0
+        ],
+        [
+          192.0,
+          611.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.132597,
+        0.210866,
+        0.674033,
+        0.35175
+      ],
+      "normalized_quad": [
+        [
+          0.132597,
+          0.210866
+        ],
+        [
+          0.80663,
+          0.210866
+        ],
+        [
+          0.80663,
+          0.562615
+        ],
+        [
+          0.132597,
+          0.562615
+        ]
+      ],
+      "review": "verified",
+      "id": "after-visual-001",
+      "match_confidence": 1.0,
+      "source_region_ids": [
+        "after-001"
+      ],
+      "method": "visual_annotation",
+      "slot_id": "text-af06318c33-1"
+    },
+    {
+      "text": "TRƯƠNG PHƯỚC PHAN,P.BTĐ,Q.BTÂN",
+      "ocr_text": "PHAN,PBTD, Q BTÂN | PHUỚC | TRUƠNG",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        185.34,
+        574.49,
+        1154.06,
+        245.44
+      ],
+      "quad": [
+        [
+          185.34,
+          574.49
+        ],
+        [
+          1339.4,
+          574.49
+        ],
+        [
+          1339.4,
+          819.93
+        ],
+        [
+          185.34,
+          819.93
+        ]
+      ],
+      "normalized_bbox": [
+        0.127997,
+        0.528996,
+        0.797003,
+        0.226004
+      ],
+      "normalized_quad": [
+        [
+          0.127997,
+          0.528996
+        ],
+        [
+          0.925,
+          0.528996
+        ],
+        [
+          0.925,
+          0.755
+        ],
+        [
+          0.127997,
+          0.755
+        ]
+      ],
+      "id": "after-visual-002",
+      "source_region_ids": [
+        "after-002",
+        "after-003",
+        "after-004"
+      ],
+      "slot_id": "text-8b3e9deecf-1",
+      "match_confidence": 1.0
+    }
+  ],
+  "text_review": "image_review"
+}

@@ -1,0 +1,2693 @@
+{
+  "version": 1,
+  "dimension_unit": "cm",
+  "currency": "VND",
+  "products": {
+    "80bdc1f6fbc190eb10de2d8a8a749320": {
+      "name": "Biển chức danh chân gỗ 30 x 15",
+      "profile": "desk",
+      "constraints": {
+        "dimensions": {
+          "L": {
+            "min": 15
+          },
+          "H": {
+            "min": 5
+          },
+          "W": {
+            "min": 1
+          }
+        },
+        "minimum_unit_price": 200000,
+        "minimum_order_price": 0,
+        "note": "Giá tối thiểu chưa VAT, chưa vận chuyển. Ngưỡng khởi tạo theo quy cách; quản trị có thể điều chỉnh."
+      },
+      "previous_defaults": {
+        "L": 30.0,
+        "H": 15.0,
+        "W": 6,
+        "F": 1,
+        "count": 1
+      },
+      "recommended_defaults": {
+        "L": 30.0,
+        "H": 15.0,
+        "W": 6,
+        "F": 1,
+        "count": 1
+      }
+    },
+    "c5065952cc9c63494acbc441ef7af441": {
+      "name": "Biển chức danh chân gỗ in UV",
+      "profile": "desk",
+      "constraints": {
+        "dimensions": {
+          "L": {
+            "min": 15
+          },
+          "H": {
+            "min": 5
+          },
+          "W": {
+            "min": 1
+          }
+        },
+        "minimum_unit_price": 250000,
+        "minimum_order_price": 0,
+        "note": "Giá tối thiểu chưa VAT, chưa vận chuyển. Ngưỡng khởi tạo theo quy cách; quản trị có thể điều chỉnh."
+      },
+      "previous_defaults": {
+        "L": 30.0,
+        "H": 15.0,
+        "W": 4.0,
+        "F": 1,
+        "count": 1
+      },
+      "recommended_defaults": {
+        "L": 30.0,
+        "H": 15.0,
+        "W": 4.0,
+        "F": 1,
+        "count": 1
+      }
+    },
+    "88f9f6fe140fa49f6fbe8ef76e4460d7": {
+      "name": "bảng chức danh đế gỗ ăn mòn",
+      "profile": "desk",
+      "constraints": {
+        "dimensions": {
+          "L": {
+            "min": 15
+          },
+          "H": {
+            "min": 5
+          },
+          "W": {
+            "min": 1
+          }
+        },
+        "minimum_unit_price": 200000,
+        "minimum_order_price": 0,
+        "note": "Giá tối thiểu chưa VAT, chưa vận chuyển. Ngưỡng khởi tạo theo quy cách; quản trị có thể điều chỉnh."
+      },
+      "previous_defaults": {
+        "L": 30.0,
+        "H": 15.0,
+        "W": 1.0,
+        "F": 1,
+        "count": 1
+      },
+      "recommended_defaults": {
+        "L": 30.0,
+        "H": 15.0,
+        "W": 1.0,
+        "F": 1,
+        "count": 1
+      }
+    },
+    "5b46308d3f7012838d01ccf9ebf79f24": {
+      "name": "Biển số nhà inox số nổi nền vân gỗ 30 x 20",
+      "profile": "house",
+      "constraints": {
+        "dimensions": {
+          "L": {
+            "min": 10
+          },
+          "H": {
+            "min": 8
+          },
+          "W": {
+            "min": 0.2
+          }
+        },
+        "minimum_unit_price": 200000,
+        "minimum_order_price": 0,
+        "note": "Giá tối thiểu chưa VAT, chưa vận chuyển. Ngưỡng khởi tạo theo quy cách; quản trị có thể điều chỉnh."
+      },
+      "previous_defaults": {
+        "L": 30.0,
+        "H": 20.0,
+        "W": 6,
+        "F": 1,
+        "count": 1
+      },
+      "recommended_defaults": {
+        "L": 30.0,
+        "H": 20.0,
+        "W": 1,
+        "F": 1,
+        "count": 1
+      }
+    },
+    "79b305222285dcd133b9edb785cfbc46": {
+      "name": "Biển số nhà mica",
+      "profile": "house",
+      "constraints": {
+        "dimensions": {
+          "L": {
+            "min": 10
+          },
+          "H": {
+            "min": 8
+          },
+          "W": {
+            "min": 0.2
+          }
+        },
+        "minimum_unit_price": 150000,
+        "minimum_order_price": 0,
+        "note": "Giá tối thiểu chưa VAT, chưa vận chuyển. Ngưỡng khởi tạo theo quy cách; quản trị có thể điều chỉnh."
+      },
+      "previous_defaults": {
+        "L": 30.0,
+        "H": 20.0,
+        "W": 0.5,
+        "F": 1,
+        "count": 1
+      },
+      "recommended_defaults": {
+        "L": 30.0,
+        "H": 20.0,
+        "W": 0.5,
+        "F": 1,
+        "count": 1
+      }
+    },
+    "0eebb7cdc02d2fad6914ac40649cc90f": {
+      "name": "Biển số nhà nền alu chữ nổi đồng",
+      "profile": "house",
+      "constraints": {
+        "dimensions": {
+          "L": {
+            "min": 10
+          },
+          "H": {
+            "min": 8
+          },
+          "W": {
+            "min": 0.2
+          }
+        },
+        "minimum_unit_price": 200000,
+        "minimum_order_price": 0,
+        "note": "Giá tối thiểu chưa VAT, chưa vận chuyển. Ngưỡng khởi tạo theo quy cách; quản trị có thể điều chỉnh."
+      },
+      "previous_defaults": {
+        "L": 30.0,
+        "H": 20.0,
+        "W": 2.5,
+        "F": 1,
+        "count": 1
+      },
+      "recommended_defaults": {
+        "L": 30.0,
+        "H": 20.0,
+        "W": 2.5,
+        "F": 1,
+        "count": 1
+      }
+    },
+    "b7b9176fab37ee5e030ee3e5e5847aa9": {
+      "name": "Biển tên công ty inox ăn mòn 40 x 30",
+      "profile": "company",
+      "constraints": {
+        "dimensions": {
+          "L": {
+            "min": 15
+          },
+          "H": {
+            "min": 10
+          },
+          "W": {
+            "min": 0.1
+          }
+        },
+        "minimum_unit_price": 250000,
+        "minimum_order_price": 0,
+        "note": "Giá tối thiểu chưa VAT, chưa vận chuyển. Ngưỡng khởi tạo theo quy cách; quản trị có thể điều chỉnh."
+      },
+      "previous_defaults": {
+        "L": 40.0,
+        "H": 30.0,
+        "W": 6,
+        "F": 1,
+        "count": 1
+      },
+      "recommended_defaults": {
+        "L": 40.0,
+        "H": 30.0,
+        "W": 0.5,
+        "F": 1,
+        "count": 1
+      }
+    },
+    "ae54d49b3d076750ff45e674343083e6": {
+      "name": "Bảng mica tên phòng 20 x 10",
+      "profile": "room",
+      "constraints": {
+        "dimensions": {
+          "L": {
+            "min": 8
+          },
+          "H": {
+            "min": 4
+          },
+          "W": {
+            "min": 0.2
+          }
+        },
+        "minimum_unit_price": 50000,
+        "minimum_order_price": 0,
+        "note": "Giá tối thiểu chưa VAT, chưa vận chuyển. Ngưỡng khởi tạo theo quy cách; quản trị có thể điều chỉnh."
+      },
+      "previous_defaults": {
+        "L": 20.0,
+        "H": 10.0,
+        "W": 6,
+        "F": 1,
+        "count": 1
+      },
+      "recommended_defaults": {
+        "L": 20.0,
+        "H": 10.0,
+        "W": 0.5,
+        "F": 1,
+        "count": 1
+      }
+    },
+    "744d70e3baaac2fc650bee29e9cea895": {
+      "name": "Bảng hiệu alu chữ nổi 450 x 160",
+      "profile": "alu",
+      "constraints": {
+        "dimensions": {
+          "L": {
+            "min": 60
+          },
+          "H": {
+            "min": 30
+          },
+          "W": {
+            "min": 3
+          }
+        },
+        "minimum_unit_price": 600000,
+        "minimum_order_price": 0,
+        "note": "Giá tối thiểu chưa VAT, chưa vận chuyển. Ngưỡng khởi tạo theo quy cách; quản trị có thể điều chỉnh."
+      },
+      "previous_defaults": {
+        "L": 450.0,
+        "H": 160.0,
+        "W": 6,
+        "F": 1,
+        "count": 1
+      },
+      "recommended_defaults": {
+        "L": 450.0,
+        "H": 160.0,
+        "W": 6,
+        "F": 1,
+        "count": 1
+      }
+    },
+    "69a107e9fd31a475951c4b514672e442": {
+      "name": "Bảng hiệu alu chữ nổi mica",
+      "profile": "alu",
+      "constraints": {
+        "dimensions": {
+          "L": {
+            "min": 60
+          },
+          "H": {
+            "min": 30
+          },
+          "W": {
+            "min": 3
+          }
+        },
+        "minimum_unit_price": 600000,
+        "minimum_order_price": 0,
+        "note": "Giá tối thiểu chưa VAT, chưa vận chuyển. Ngưỡng khởi tạo theo quy cách; quản trị có thể điều chỉnh."
+      },
+      "previous_defaults": {
+        "L": 120.0,
+        "H": 40.0,
+        "W": 6.0,
+        "F": 1,
+        "count": 1
+      },
+      "recommended_defaults": {
+        "L": 120.0,
+        "H": 40.0,
+        "W": 6.0,
+        "F": 1,
+        "count": 1
+      }
+    },
+    "147fcb33f52501552bea1e043e00f2da": {
+      "name": "Bảng hiệu alu dán decal chữ nổi 500 x 90",
+      "profile": "alu",
+      "constraints": {
+        "dimensions": {
+          "L": {
+            "min": 60
+          },
+          "H": {
+            "min": 30
+          },
+          "W": {
+            "min": 3
+          }
+        },
+        "minimum_unit_price": 600000,
+        "minimum_order_price": 0,
+        "note": "Giá tối thiểu chưa VAT, chưa vận chuyển. Ngưỡng khởi tạo theo quy cách; quản trị có thể điều chỉnh."
+      },
+      "previous_defaults": {
+        "L": 500.0,
+        "H": 90.0,
+        "W": 6,
+        "F": 1,
+        "count": 1
+      },
+      "recommended_defaults": {
+        "L": 500.0,
+        "H": 90.0,
+        "W": 6,
+        "F": 1,
+        "count": 1
+      }
+    },
+    "3a63ddae0954c370ef1833f67f300fcf": {
+      "name": "Bảng hiệu tôn sóng chữ mica",
+      "profile": "alu",
+      "constraints": {
+        "dimensions": {
+          "L": {
+            "min": 60
+          },
+          "H": {
+            "min": 30
+          },
+          "W": {
+            "min": 3
+          }
+        },
+        "minimum_unit_price": 600000,
+        "minimum_order_price": 0,
+        "note": "Giá tối thiểu chưa VAT, chưa vận chuyển. Ngưỡng khởi tạo theo quy cách; quản trị có thể điều chỉnh."
+      },
+      "previous_defaults": {
+        "L": 120.0,
+        "H": 40.0,
+        "W": 6.0,
+        "F": 1,
+        "count": 1
+      },
+      "recommended_defaults": {
+        "L": 120.0,
+        "H": 40.0,
+        "W": 6.0,
+        "F": 1,
+        "count": 1
+      }
+    },
+    "45b97f50a108802c69189ad34ecc0316": {
+      "name": "Bảng hiệu alu chữ nổi mica đèn LED",
+      "profile": "ledsign",
+      "constraints": {
+        "dimensions": {
+          "L": {
+            "min": 60
+          },
+          "H": {
+            "min": 30
+          },
+          "W": {
+            "min": 4
+          }
+        },
+        "minimum_unit_price": 900000,
+        "minimum_order_price": 0,
+        "note": "Giá tối thiểu chưa VAT, chưa vận chuyển. Ngưỡng khởi tạo theo quy cách; quản trị có thể điều chỉnh."
+      },
+      "previous_defaults": {
+        "L": 120.0,
+        "H": 40.0,
+        "W": 6.0,
+        "F": 1,
+        "count": 1
+      },
+      "recommended_defaults": {
+        "L": 120.0,
+        "H": 40.0,
+        "W": 6.0,
+        "F": 1,
+        "count": 1
+      }
+    },
+    "ef22bf3380894b598377f3d9768d7c50": {
+      "name": "Bảng hiệu chữ nổi mica LED viền full màu 400 x 140",
+      "profile": "ledsign",
+      "constraints": {
+        "dimensions": {
+          "L": {
+            "min": 60
+          },
+          "H": {
+            "min": 30
+          },
+          "W": {
+            "min": 4
+          }
+        },
+        "minimum_unit_price": 900000,
+        "minimum_order_price": 0,
+        "note": "Giá tối thiểu chưa VAT, chưa vận chuyển. Ngưỡng khởi tạo theo quy cách; quản trị có thể điều chỉnh."
+      },
+      "previous_defaults": {
+        "L": 400.0,
+        "H": 140.0,
+        "W": 6,
+        "F": 1,
+        "count": 1
+      },
+      "recommended_defaults": {
+        "L": 400.0,
+        "H": 140.0,
+        "W": 6,
+        "F": 1,
+        "count": 1
+      }
+    },
+    "fc591e421adab510adbe37624d9eb14b": {
+      "name": "Bảng hiệu tôn sóng chữ nổi mica đèn LED",
+      "profile": "ledsign",
+      "constraints": {
+        "dimensions": {
+          "L": {
+            "min": 60
+          },
+          "H": {
+            "min": 30
+          },
+          "W": {
+            "min": 4
+          }
+        },
+        "minimum_unit_price": 900000,
+        "minimum_order_price": 0,
+        "note": "Giá tối thiểu chưa VAT, chưa vận chuyển. Ngưỡng khởi tạo theo quy cách; quản trị có thể điều chỉnh."
+      },
+      "previous_defaults": {
+        "L": 120.0,
+        "H": 40.0,
+        "W": 6.0,
+        "F": 1,
+        "count": 1
+      },
+      "recommended_defaults": {
+        "L": 120.0,
+        "H": 40.0,
+        "W": 6.0,
+        "F": 1,
+        "count": 1
+      }
+    },
+    "b60cd4b72f27cef85382b2bc2d20120d": {
+      "name": "bảng hiệu bạt lot tôn 1300 x 120",
+      "profile": "banner",
+      "constraints": {
+        "dimensions": {
+          "L": {
+            "min": 40
+          },
+          "H": {
+            "min": 30
+          },
+          "W": {
+            "min": 2
+          }
+        },
+        "minimum_unit_price": 250000,
+        "minimum_order_price": 0,
+        "note": "Giá tối thiểu chưa VAT, chưa vận chuyển. Ngưỡng khởi tạo theo quy cách; quản trị có thể điều chỉnh."
+      },
+      "previous_defaults": {
+        "L": 1300.0,
+        "H": 120.0,
+        "W": 6,
+        "F": 1,
+        "count": 1
+      },
+      "recommended_defaults": {
+        "L": 1300.0,
+        "H": 120.0,
+        "W": 6,
+        "F": 1,
+        "count": 1
+      }
+    },
+    "2b125fcf6544d50e246b958a15460b88": {
+      "name": "Bảng hiệu bạt lót tôn 330 x 330",
+      "profile": "banner",
+      "constraints": {
+        "dimensions": {
+          "L": {
+            "min": 40
+          },
+          "H": {
+            "min": 30
+          },
+          "W": {
+            "min": 2
+          }
+        },
+        "minimum_unit_price": 250000,
+        "minimum_order_price": 0,
+        "note": "Giá tối thiểu chưa VAT, chưa vận chuyển. Ngưỡng khởi tạo theo quy cách; quản trị có thể điều chỉnh."
+      },
+      "previous_defaults": {
+        "L": 330.0,
+        "H": 330.0,
+        "W": 6,
+        "F": 1,
+        "count": 1
+      },
+      "recommended_defaults": {
+        "L": 330.0,
+        "H": 330.0,
+        "W": 6,
+        "F": 1,
+        "count": 1
+      }
+    },
+    "8e643c556c439f732266407a8545462e": {
+      "name": "Bảng hiệu bạt lót tôn 400 x 130",
+      "profile": "banner",
+      "constraints": {
+        "dimensions": {
+          "L": {
+            "min": 40
+          },
+          "H": {
+            "min": 30
+          },
+          "W": {
+            "min": 2
+          }
+        },
+        "minimum_unit_price": 250000,
+        "minimum_order_price": 0,
+        "note": "Giá tối thiểu chưa VAT, chưa vận chuyển. Ngưỡng khởi tạo theo quy cách; quản trị có thể điều chỉnh."
+      },
+      "previous_defaults": {
+        "L": 400.0,
+        "H": 130.0,
+        "W": 6,
+        "F": 1,
+        "count": 1
+      },
+      "recommended_defaults": {
+        "L": 400.0,
+        "H": 130.0,
+        "W": 6,
+        "F": 1,
+        "count": 1
+      }
+    },
+    "e3b6941dd37e2ee088d0b4507f4968a1": {
+      "name": "Bảng hiệu tôn dán decal 600 x 120",
+      "profile": "banner",
+      "constraints": {
+        "dimensions": {
+          "L": {
+            "min": 40
+          },
+          "H": {
+            "min": 30
+          },
+          "W": {
+            "min": 2
+          }
+        },
+        "minimum_unit_price": 250000,
+        "minimum_order_price": 0,
+        "note": "Giá tối thiểu chưa VAT, chưa vận chuyển. Ngưỡng khởi tạo theo quy cách; quản trị có thể điều chỉnh."
+      },
+      "previous_defaults": {
+        "L": 600.0,
+        "H": 120.0,
+        "W": 6,
+        "F": 1,
+        "count": 1
+      },
+      "recommended_defaults": {
+        "L": 600.0,
+        "H": 120.0,
+        "W": 6,
+        "F": 1,
+        "count": 1
+      }
+    },
+    "f04ba9830f9cb2de9c2a4264fcebe786": {
+      "name": "Bảng hiệu bạt lót tôn 2 mặt có trụ 250 x 150",
+      "profile": "pylon",
+      "constraints": {
+        "dimensions": {
+          "L": {
+            "min": 60
+          },
+          "H": {
+            "min": 60
+          },
+          "W": {
+            "min": 5
+          }
+        },
+        "minimum_unit_price": 1200000,
+        "minimum_order_price": 0,
+        "note": "Giá tối thiểu chưa VAT, chưa vận chuyển. Ngưỡng khởi tạo theo quy cách; quản trị có thể điều chỉnh."
+      },
+      "previous_defaults": {
+        "L": 250.0,
+        "H": 150.0,
+        "W": 6,
+        "F": 2,
+        "count": 1
+      },
+      "recommended_defaults": {
+        "L": 250.0,
+        "H": 150.0,
+        "W": 6,
+        "F": 2,
+        "count": 1
+      }
+    },
+    "348445705d4fd7af388fc0375ddf8e6d": {
+      "name": "Bảng hiệu bạt lót tôn 2 mặt có trụ 300 x 150",
+      "profile": "pylon",
+      "constraints": {
+        "dimensions": {
+          "L": {
+            "min": 60
+          },
+          "H": {
+            "min": 60
+          },
+          "W": {
+            "min": 5
+          }
+        },
+        "minimum_unit_price": 1200000,
+        "minimum_order_price": 0,
+        "note": "Giá tối thiểu chưa VAT, chưa vận chuyển. Ngưỡng khởi tạo theo quy cách; quản trị có thể điều chỉnh."
+      },
+      "previous_defaults": {
+        "L": 300.0,
+        "H": 150.0,
+        "W": 6,
+        "F": 2,
+        "count": 1
+      },
+      "recommended_defaults": {
+        "L": 300.0,
+        "H": 150.0,
+        "W": 6,
+        "F": 2,
+        "count": 1
+      }
+    },
+    "a09ea7335d5abd84cc8bb0aa32e183bf": {
+      "name": "bảng hiệu xinhan bạt 2 mặt có trụ 150 x 150",
+      "profile": "pylon",
+      "constraints": {
+        "dimensions": {
+          "L": {
+            "min": 60
+          },
+          "H": {
+            "min": 60
+          },
+          "W": {
+            "min": 5
+          }
+        },
+        "minimum_unit_price": 1200000,
+        "minimum_order_price": 0,
+        "note": "Giá tối thiểu chưa VAT, chưa vận chuyển. Ngưỡng khởi tạo theo quy cách; quản trị có thể điều chỉnh."
+      },
+      "previous_defaults": {
+        "L": 150.0,
+        "H": 150.0,
+        "W": 6,
+        "F": 2,
+        "count": 1
+      },
+      "recommended_defaults": {
+        "L": 150.0,
+        "H": 150.0,
+        "W": 6,
+        "F": 2,
+        "count": 1
+      }
+    },
+    "56d1e08b57e11c99f77ba3cb15660de7": {
+      "name": "Bảng hiệu chữ nổi thanh lam nhôm",
+      "profile": "lam",
+      "constraints": {
+        "dimensions": {
+          "L": {
+            "min": 60
+          },
+          "H": {
+            "min": 30
+          },
+          "W": {
+            "min": 3
+          }
+        },
+        "minimum_unit_price": 900000,
+        "minimum_order_price": 0,
+        "note": "Giá tối thiểu chưa VAT, chưa vận chuyển. Ngưỡng khởi tạo theo quy cách; quản trị có thể điều chỉnh."
+      },
+      "previous_defaults": {
+        "L": 120.0,
+        "H": 40.0,
+        "W": 6.0,
+        "F": 1,
+        "count": 1
+      },
+      "recommended_defaults": {
+        "L": 120.0,
+        "H": 40.0,
+        "W": 6.0,
+        "F": 1,
+        "count": 1
+      }
+    },
+    "fef8cf5222cec713e86b1f7deb23162b": {
+      "name": "Bảng hiệu vách PVC vân đá",
+      "profile": "pvc",
+      "constraints": {
+        "dimensions": {
+          "L": {
+            "min": 60
+          },
+          "H": {
+            "min": 40
+          },
+          "W": {
+            "min": 1
+          }
+        },
+        "minimum_unit_price": 800000,
+        "minimum_order_price": 0,
+        "note": "Giá tối thiểu chưa VAT, chưa vận chuyển. Ngưỡng khởi tạo theo quy cách; quản trị có thể điều chỉnh."
+      },
+      "previous_defaults": {
+        "L": 300.0,
+        "H": 100.0,
+        "W": 15.0,
+        "F": 1,
+        "count": 1
+      },
+      "recommended_defaults": {
+        "L": 300.0,
+        "H": 100.0,
+        "W": 15.0,
+        "F": 1,
+        "count": 1
+      }
+    },
+    "b117e051eb1e994fd49aa81a49f30ea3": {
+      "name": "Chữ chân nhôm không gờ",
+      "profile": "single",
+      "constraints": {
+        "dimensions": {
+          "L": {
+            "min": 5
+          },
+          "H": {
+            "min": 8
+          },
+          "W": {
+            "min": 2
+          }
+        },
+        "minimum_unit_price": 150000,
+        "minimum_order_price": 0,
+        "note": "Giá tối thiểu chưa VAT, chưa vận chuyển. Ngưỡng khởi tạo theo quy cách; quản trị có thể điều chỉnh."
+      },
+      "previous_defaults": {
+        "L": 120.0,
+        "H": 40.0,
+        "W": 6.0,
+        "F": 1,
+        "count": 1
+      },
+      "recommended_defaults": {
+        "L": 28,
+        "H": 40,
+        "W": 6.0,
+        "F": 1,
+        "count": 1
+      }
+    },
+    "a45719d788a2eb7468783c05f3f2c8b8": {
+      "name": "Chữ chân nhôm xước có gờ",
+      "profile": "single",
+      "constraints": {
+        "dimensions": {
+          "L": {
+            "min": 5
+          },
+          "H": {
+            "min": 8
+          },
+          "W": {
+            "min": 2
+          }
+        },
+        "minimum_unit_price": 150000,
+        "minimum_order_price": 0,
+        "note": "Giá tối thiểu chưa VAT, chưa vận chuyển. Ngưỡng khởi tạo theo quy cách; quản trị có thể điều chỉnh."
+      },
+      "previous_defaults": {
+        "L": 120.0,
+        "H": 40.0,
+        "W": 6.0,
+        "F": 1,
+        "count": 1
+      },
+      "recommended_defaults": {
+        "L": 30,
+        "H": 40,
+        "W": 6.0,
+        "F": 1,
+        "count": 1
+      }
+    },
+    "15627f69d083cf176837309de4aa89eb": {
+      "name": "Chữ inox 304  mặt mica",
+      "profile": "metal",
+      "constraints": {
+        "dimensions": {
+          "L": {
+            "min": 5
+          },
+          "H": {
+            "min": 5
+          },
+          "W": {
+            "min": 0.2
+          }
+        },
+        "minimum_unit_price": 250000,
+        "minimum_order_price": 0,
+        "note": "Giá tối thiểu chưa VAT, chưa vận chuyển. Ngưỡng khởi tạo theo quy cách; quản trị có thể điều chỉnh."
+      },
+      "previous_defaults": {
+        "L": 120.0,
+        "H": 40.0,
+        "W": 6.0,
+        "F": 1,
+        "count": 1
+      },
+      "recommended_defaults": {
+        "L": 120.0,
+        "H": 40.0,
+        "W": 6.0,
+        "F": 1,
+        "count": 1
+      }
+    },
+    "8bd5f081944646d44d29363db00744e7": {
+      "name": "Chữ inox 304 gắn nền đá",
+      "profile": "metal",
+      "constraints": {
+        "dimensions": {
+          "L": {
+            "min": 5
+          },
+          "H": {
+            "min": 5
+          },
+          "W": {
+            "min": 0.2
+          }
+        },
+        "minimum_unit_price": 250000,
+        "minimum_order_price": 0,
+        "note": "Giá tối thiểu chưa VAT, chưa vận chuyển. Ngưỡng khởi tạo theo quy cách; quản trị có thể điều chỉnh."
+      },
+      "previous_defaults": {
+        "L": 120.0,
+        "H": 40.0,
+        "W": 6.0,
+        "F": 1,
+        "count": 1
+      },
+      "recommended_defaults": {
+        "L": 120.0,
+        "H": 40.0,
+        "W": 6.0,
+        "F": 1,
+        "count": 1
+      }
+    },
+    "5215e129dce7bcaff0317280f9e750db": {
+      "name": "Chữ inox vàng gương 304",
+      "profile": "metal",
+      "constraints": {
+        "dimensions": {
+          "L": {
+            "min": 5
+          },
+          "H": {
+            "min": 5
+          },
+          "W": {
+            "min": 0.2
+          }
+        },
+        "minimum_unit_price": 250000,
+        "minimum_order_price": 0,
+        "note": "Giá tối thiểu chưa VAT, chưa vận chuyển. Ngưỡng khởi tạo theo quy cách; quản trị có thể điều chỉnh."
+      },
+      "previous_defaults": {
+        "L": 120.0,
+        "H": 40.0,
+        "W": 0.8,
+        "F": 1,
+        "count": 1
+      },
+      "recommended_defaults": {
+        "L": 120.0,
+        "H": 40.0,
+        "W": 0.8,
+        "F": 1,
+        "count": 1
+      }
+    },
+    "9733ed86eabcd64c39611d092ed1b346": {
+      "name": "Chữ inox 304 Chân cháo LED",
+      "profile": "litletter",
+      "constraints": {
+        "dimensions": {
+          "L": {
+            "min": 10
+          },
+          "H": {
+            "min": 10
+          },
+          "W": {
+            "min": 2
+          }
+        },
+        "minimum_unit_price": 350000,
+        "minimum_order_price": 0,
+        "note": "Giá tối thiểu chưa VAT, chưa vận chuyển. Ngưỡng khởi tạo theo quy cách; quản trị có thể điều chỉnh."
+      },
+      "previous_defaults": {
+        "L": 120.0,
+        "H": 40.0,
+        "W": 6,
+        "F": 1,
+        "count": 1
+      },
+      "recommended_defaults": {
+        "L": 120.0,
+        "H": 40.0,
+        "W": 6,
+        "F": 1,
+        "count": 1
+      }
+    },
+    "607d60aa9f71641305b60280a2582eb2": {
+      "name": "Chữ inox 304 sáng hắt chân",
+      "profile": "litletter",
+      "constraints": {
+        "dimensions": {
+          "L": {
+            "min": 10
+          },
+          "H": {
+            "min": 10
+          },
+          "W": {
+            "min": 2
+          }
+        },
+        "minimum_unit_price": 350000,
+        "minimum_order_price": 0,
+        "note": "Giá tối thiểu chưa VAT, chưa vận chuyển. Ngưỡng khởi tạo theo quy cách; quản trị có thể điều chỉnh."
+      },
+      "previous_defaults": {
+        "L": 60,
+        "H": 40.0,
+        "W": 6,
+        "F": 1,
+        "count": 1
+      },
+      "recommended_defaults": {
+        "L": 60,
+        "H": 40.0,
+        "W": 6,
+        "F": 1,
+        "count": 1
+      }
+    },
+    "e8e12fdb12b85852362c6a2ca01181e0": {
+      "name": "Chữ inox gắn đá arylic",
+      "profile": "litletter",
+      "constraints": {
+        "dimensions": {
+          "L": {
+            "min": 10
+          },
+          "H": {
+            "min": 10
+          },
+          "W": {
+            "min": 2
+          }
+        },
+        "minimum_unit_price": 350000,
+        "minimum_order_price": 0,
+        "note": "Giá tối thiểu chưa VAT, chưa vận chuyển. Ngưỡng khởi tạo theo quy cách; quản trị có thể điều chỉnh."
+      },
+      "previous_defaults": {
+        "L": 120.0,
+        "H": 40.0,
+        "W": 6.0,
+        "F": 1,
+        "count": 1
+      },
+      "recommended_defaults": {
+        "L": 120.0,
+        "H": 40.0,
+        "W": 6.0,
+        "F": 1,
+        "count": 1
+      }
+    },
+    "04b3c9c9f7fd365fdc1f2d4e734b6044": {
+      "name": "Chữ inox hông lổ gắn đá arylic LED",
+      "profile": "litletter",
+      "constraints": {
+        "dimensions": {
+          "L": {
+            "min": 10
+          },
+          "H": {
+            "min": 10
+          },
+          "W": {
+            "min": 2
+          }
+        },
+        "minimum_unit_price": 350000,
+        "minimum_order_price": 0,
+        "note": "Giá tối thiểu chưa VAT, chưa vận chuyển. Ngưỡng khởi tạo theo quy cách; quản trị có thể điều chỉnh."
+      },
+      "previous_defaults": {
+        "L": 120.0,
+        "H": 40.0,
+        "W": 6.0,
+        "F": 1,
+        "count": 1
+      },
+      "recommended_defaults": {
+        "L": 120.0,
+        "H": 40.0,
+        "W": 6.0,
+        "F": 1,
+        "count": 1
+      }
+    },
+    "b768e647d3dd0dc83c6b759a7147c8fe": {
+      "name": "Chữ inox hông lổ gắn đá LED",
+      "profile": "litletter",
+      "constraints": {
+        "dimensions": {
+          "L": {
+            "min": 10
+          },
+          "H": {
+            "min": 10
+          },
+          "W": {
+            "min": 2
+          }
+        },
+        "minimum_unit_price": 350000,
+        "minimum_order_price": 0,
+        "note": "Giá tối thiểu chưa VAT, chưa vận chuyển. Ngưỡng khởi tạo theo quy cách; quản trị có thể điều chỉnh."
+      },
+      "previous_defaults": {
+        "L": 60,
+        "H": 80,
+        "W": 6,
+        "F": 1,
+        "count": 1
+      },
+      "recommended_defaults": {
+        "L": 60,
+        "H": 80,
+        "W": 6,
+        "F": 1,
+        "count": 1
+      }
+    },
+    "14a8c083bf8fcd114af8ac47808db0af": {
+      "name": "Chữ mica sáng hắt chân",
+      "profile": "litletter",
+      "constraints": {
+        "dimensions": {
+          "L": {
+            "min": 10
+          },
+          "H": {
+            "min": 10
+          },
+          "W": {
+            "min": 2
+          }
+        },
+        "minimum_unit_price": 350000,
+        "minimum_order_price": 0,
+        "note": "Giá tối thiểu chưa VAT, chưa vận chuyển. Ngưỡng khởi tạo theo quy cách; quản trị có thể điều chỉnh."
+      },
+      "previous_defaults": {
+        "L": 120.0,
+        "H": 40.0,
+        "W": 6.0,
+        "F": 1,
+        "count": 1
+      },
+      "recommended_defaults": {
+        "L": 120.0,
+        "H": 40.0,
+        "W": 6.0,
+        "F": 1,
+        "count": 1
+      }
+    },
+    "479e3724261adcf89eb90ee8d0e66454": {
+      "name": "Chữ mica sáng mặt chân đứng đơn",
+      "profile": "litletter",
+      "constraints": {
+        "dimensions": {
+          "L": {
+            "min": 10
+          },
+          "H": {
+            "min": 10
+          },
+          "W": {
+            "min": 2
+          }
+        },
+        "minimum_unit_price": 350000,
+        "minimum_order_price": 0,
+        "note": "Giá tối thiểu chưa VAT, chưa vận chuyển. Ngưỡng khởi tạo theo quy cách; quản trị có thể điều chỉnh."
+      },
+      "previous_defaults": {
+        "L": 120.0,
+        "H": 40.0,
+        "W": 6.0,
+        "F": 1,
+        "count": 1
+      },
+      "recommended_defaults": {
+        "L": 120.0,
+        "H": 40.0,
+        "W": 6.0,
+        "F": 1,
+        "count": 1
+      }
+    },
+    "da86f98fbc6cc52be09e6e8eb866d0ec": {
+      "name": "Chữ mica uốn nổi fom đèn LED",
+      "profile": "litletter",
+      "constraints": {
+        "dimensions": {
+          "L": {
+            "min": 10
+          },
+          "H": {
+            "min": 10
+          },
+          "W": {
+            "min": 2
+          }
+        },
+        "minimum_unit_price": 350000,
+        "minimum_order_price": 0,
+        "note": "Giá tối thiểu chưa VAT, chưa vận chuyển. Ngưỡng khởi tạo theo quy cách; quản trị có thể điều chỉnh."
+      },
+      "previous_defaults": {
+        "L": 120.0,
+        "H": 40.0,
+        "W": 6.0,
+        "F": 1,
+        "count": 1
+      },
+      "recommended_defaults": {
+        "L": 120.0,
+        "H": 40.0,
+        "W": 6.0,
+        "F": 1,
+        "count": 1
+      }
+    },
+    "cb2cfba05da98ad710f6aec5c68e8b81": {
+      "name": "Chữ nổi alu đồng sáng hắt chân",
+      "profile": "litletter",
+      "constraints": {
+        "dimensions": {
+          "L": {
+            "min": 10
+          },
+          "H": {
+            "min": 10
+          },
+          "W": {
+            "min": 2
+          }
+        },
+        "minimum_unit_price": 350000,
+        "minimum_order_price": 0,
+        "note": "Giá tối thiểu chưa VAT, chưa vận chuyển. Ngưỡng khởi tạo theo quy cách; quản trị có thể điều chỉnh."
+      },
+      "previous_defaults": {
+        "L": 120.0,
+        "H": 40.0,
+        "W": 6,
+        "F": 1,
+        "count": 1
+      },
+      "recommended_defaults": {
+        "L": 120.0,
+        "H": 40.0,
+        "W": 6,
+        "F": 1,
+        "count": 1
+      }
+    },
+    "29fd5c8c0571eb516eccc601fec2298d": {
+      "name": "Chữ tôn rỉ set gắn LED bub",
+      "profile": "litletter",
+      "constraints": {
+        "dimensions": {
+          "L": {
+            "min": 10
+          },
+          "H": {
+            "min": 10
+          },
+          "W": {
+            "min": 2
+          }
+        },
+        "minimum_unit_price": 350000,
+        "minimum_order_price": 0,
+        "note": "Giá tối thiểu chưa VAT, chưa vận chuyển. Ngưỡng khởi tạo theo quy cách; quản trị có thể điều chỉnh."
+      },
+      "previous_defaults": {
+        "L": 120.0,
+        "H": 40.0,
+        "W": 6.0,
+        "F": 1,
+        "count": 1
+      },
+      "recommended_defaults": {
+        "L": 120.0,
+        "H": 40.0,
+        "W": 6.0,
+        "F": 1,
+        "count": 1
+      }
+    },
+    "e66e0453b9ea41ef0ebfdec89d39b7d4": {
+      "name": "Chữ nổi alu dán tường",
+      "profile": "foam",
+      "constraints": {
+        "dimensions": {
+          "L": {
+            "min": 5
+          },
+          "H": {
+            "min": 5
+          },
+          "W": {
+            "min": 0.3
+          }
+        },
+        "minimum_unit_price": 80000,
+        "minimum_order_price": 0,
+        "note": "Giá tối thiểu chưa VAT, chưa vận chuyển. Ngưỡng khởi tạo theo quy cách; quản trị có thể điều chỉnh."
+      },
+      "previous_defaults": {
+        "L": 120.0,
+        "H": 40.0,
+        "W": 6.0,
+        "F": 1,
+        "count": 1
+      },
+      "recommended_defaults": {
+        "L": 120.0,
+        "H": 40.0,
+        "W": 6.0,
+        "F": 1,
+        "count": 1
+      }
+    },
+    "446d22a960d9f382cb5143528a2ad29b": {
+      "name": "Chữ nổi dán tường",
+      "profile": "foam",
+      "constraints": {
+        "dimensions": {
+          "L": {
+            "min": 5
+          },
+          "H": {
+            "min": 5
+          },
+          "W": {
+            "min": 0.3
+          }
+        },
+        "minimum_unit_price": 80000,
+        "minimum_order_price": 0,
+        "note": "Giá tối thiểu chưa VAT, chưa vận chuyển. Ngưỡng khởi tạo theo quy cách; quản trị có thể điều chỉnh."
+      },
+      "previous_defaults": {
+        "L": 120.0,
+        "H": 40.0,
+        "W": 6,
+        "F": 1,
+        "count": 1
+      },
+      "recommended_defaults": {
+        "L": 120.0,
+        "H": 40.0,
+        "W": 6,
+        "F": 1,
+        "count": 1
+      }
+    },
+    "9ef663543aaf7c2f0493cd32c9397dad": {
+      "name": "Chữ nổi mica chân fomex",
+      "profile": "foam",
+      "constraints": {
+        "dimensions": {
+          "L": {
+            "min": 5
+          },
+          "H": {
+            "min": 5
+          },
+          "W": {
+            "min": 0.3
+          }
+        },
+        "minimum_unit_price": 80000,
+        "minimum_order_price": 0,
+        "note": "Giá tối thiểu chưa VAT, chưa vận chuyển. Ngưỡng khởi tạo theo quy cách; quản trị có thể điều chỉnh."
+      },
+      "previous_defaults": {
+        "L": 120.0,
+        "H": 40.0,
+        "W": 6,
+        "F": 1,
+        "count": 1
+      },
+      "recommended_defaults": {
+        "L": 120.0,
+        "H": 40.0,
+        "W": 6,
+        "F": 1,
+        "count": 1
+      }
+    },
+    "4b8aedf4e3124291c939cf2e4a4c4db0": {
+      "name": "Chữ nổi mica khung sắt",
+      "profile": "foam",
+      "constraints": {
+        "dimensions": {
+          "L": {
+            "min": 5
+          },
+          "H": {
+            "min": 5
+          },
+          "W": {
+            "min": 0.3
+          }
+        },
+        "minimum_unit_price": 80000,
+        "minimum_order_price": 0,
+        "note": "Giá tối thiểu chưa VAT, chưa vận chuyển. Ngưỡng khởi tạo theo quy cách; quản trị có thể điều chỉnh."
+      },
+      "previous_defaults": {
+        "L": 120.0,
+        "H": 40.0,
+        "W": 6,
+        "F": 1,
+        "count": 1
+      },
+      "recommended_defaults": {
+        "L": 120.0,
+        "H": 40.0,
+        "W": 6,
+        "F": 1,
+        "count": 1
+      }
+    },
+    "2584d198c9f5b84112cb271327134ff8": {
+      "name": "Chữ nổi mặt alu chân fomex",
+      "profile": "foam",
+      "constraints": {
+        "dimensions": {
+          "L": {
+            "min": 5
+          },
+          "H": {
+            "min": 5
+          },
+          "W": {
+            "min": 0.3
+          }
+        },
+        "minimum_unit_price": 80000,
+        "minimum_order_price": 0,
+        "note": "Giá tối thiểu chưa VAT, chưa vận chuyển. Ngưỡng khởi tạo theo quy cách; quản trị có thể điều chỉnh."
+      },
+      "previous_defaults": {
+        "L": 120.0,
+        "H": 40.0,
+        "W": 3.0,
+        "F": 1,
+        "count": 1
+      },
+      "recommended_defaults": {
+        "L": 120.0,
+        "H": 40.0,
+        "W": 3.0,
+        "F": 1,
+        "count": 1
+      }
+    },
+    "1f1bb7f6e7bc912a62da6a45503f5118": {
+      "name": "decal bế dán kính",
+      "profile": "window",
+      "constraints": {
+        "dimensions": {
+          "L": {
+            "min": 10
+          },
+          "H": {
+            "min": 10
+          },
+          "W": {
+            "min": 0.005
+          }
+        },
+        "minimum_unit_price": 50000,
+        "minimum_order_price": 150000,
+        "note": "Giá tối thiểu chưa VAT, chưa vận chuyển. Ngưỡng khởi tạo theo quy cách; quản trị có thể điều chỉnh."
+      },
+      "previous_defaults": {
+        "L": 300.0,
+        "H": 100.0,
+        "W": 6,
+        "F": 1,
+        "count": 1
+      },
+      "recommended_defaults": {
+        "L": 300.0,
+        "H": 100.0,
+        "W": 0.01,
+        "F": 1,
+        "count": 1
+      }
+    },
+    "238b7eb972ebbaaecfa4862ebdece25e": {
+      "name": "decal bế dán kính 1",
+      "profile": "window",
+      "constraints": {
+        "dimensions": {
+          "L": {
+            "min": 10
+          },
+          "H": {
+            "min": 10
+          },
+          "W": {
+            "min": 0.005
+          }
+        },
+        "minimum_unit_price": 50000,
+        "minimum_order_price": 150000,
+        "note": "Giá tối thiểu chưa VAT, chưa vận chuyển. Ngưỡng khởi tạo theo quy cách; quản trị có thể điều chỉnh."
+      },
+      "previous_defaults": {
+        "L": 60,
+        "H": 80,
+        "W": 6,
+        "F": 1,
+        "count": 1
+      },
+      "recommended_defaults": {
+        "L": 60,
+        "H": 80,
+        "W": 0.01,
+        "F": 1,
+        "count": 1
+      }
+    },
+    "77a010d2a4b64a098102e29effa5ade2": {
+      "name": "Giấy in Voucher",
+      "profile": "paper",
+      "constraints": {
+        "dimensions": {
+          "L": {
+            "min": 3
+          },
+          "H": {
+            "min": 2
+          },
+          "W": {
+            "min": 0.01
+          }
+        },
+        "minimum_unit_price": 1000,
+        "minimum_order_price": 100000,
+        "note": "Giá tối thiểu chưa VAT, chưa vận chuyển. Ngưỡng khởi tạo theo quy cách; quản trị có thể điều chỉnh."
+      },
+      "previous_defaults": {
+        "L": 20.0,
+        "H": 10.0,
+        "W": 0.2,
+        "F": 1,
+        "count": 1
+      },
+      "recommended_defaults": {
+        "L": 20.0,
+        "H": 10.0,
+        "W": 0.03,
+        "F": 1,
+        "count": 1
+      }
+    },
+    "af494098cb70bafb4771d8aef9a38796": {
+      "name": "Phiếu bảo hành in giấy",
+      "profile": "paper",
+      "constraints": {
+        "dimensions": {
+          "L": {
+            "min": 3
+          },
+          "H": {
+            "min": 2
+          },
+          "W": {
+            "min": 0.01
+          }
+        },
+        "minimum_unit_price": 1000,
+        "minimum_order_price": 100000,
+        "note": "Giá tối thiểu chưa VAT, chưa vận chuyển. Ngưỡng khởi tạo theo quy cách; quản trị có thể điều chỉnh."
+      },
+      "previous_defaults": {
+        "L": 20.0,
+        "H": 10.0,
+        "W": 0.2,
+        "F": 1,
+        "count": 1
+      },
+      "recommended_defaults": {
+        "L": 20.0,
+        "H": 10.0,
+        "W": 0.03,
+        "F": 1,
+        "count": 1
+      }
+    },
+    "9bb9d04440951bd433e98e12dd196713": {
+      "name": "Hagtags Fomex cán decal",
+      "profile": "tag",
+      "constraints": {
+        "dimensions": {
+          "L": {
+            "min": 5
+          },
+          "H": {
+            "min": 5
+          },
+          "W": {
+            "min": 0.2
+          }
+        },
+        "minimum_unit_price": 15000,
+        "minimum_order_price": 100000,
+        "note": "Giá tối thiểu chưa VAT, chưa vận chuyển. Ngưỡng khởi tạo theo quy cách; quản trị có thể điều chỉnh."
+      },
+      "previous_defaults": {
+        "L": 40.0,
+        "H": 30.0,
+        "W": 0.5,
+        "F": 1,
+        "count": 1
+      },
+      "recommended_defaults": {
+        "L": 40.0,
+        "H": 30.0,
+        "W": 0.5,
+        "F": 1,
+        "count": 1
+      }
+    },
+    "56313ddb024f988440a10ec8e1abf5b6": {
+      "name": "Hagtags Fomex cán decal 5mm",
+      "profile": "tag",
+      "constraints": {
+        "dimensions": {
+          "L": {
+            "min": 5
+          },
+          "H": {
+            "min": 5
+          },
+          "W": {
+            "min": 0.2
+          }
+        },
+        "minimum_unit_price": 15000,
+        "minimum_order_price": 100000,
+        "note": "Giá tối thiểu chưa VAT, chưa vận chuyển. Ngưỡng khởi tạo theo quy cách; quản trị có thể điều chỉnh."
+      },
+      "previous_defaults": {
+        "L": 30.0,
+        "H": 20.0,
+        "W": 0.5,
+        "F": 1,
+        "count": 1
+      },
+      "recommended_defaults": {
+        "L": 30.0,
+        "H": 20.0,
+        "W": 0.5,
+        "F": 1,
+        "count": 1
+      }
+    },
+    "147525d618a666c15e93af6d2212cb1e": {
+      "name": "Bản hiệu LED viền sáng mặt 60 x 80",
+      "profile": "lightbox",
+      "constraints": {
+        "dimensions": {
+          "L": {
+            "min": 20
+          },
+          "H": {
+            "min": 20
+          },
+          "W": {
+            "min": 4
+          }
+        },
+        "minimum_unit_price": 600000,
+        "minimum_order_price": 0,
+        "note": "Giá tối thiểu chưa VAT, chưa vận chuyển. Ngưỡng khởi tạo theo quy cách; quản trị có thể điều chỉnh."
+      },
+      "previous_defaults": {
+        "L": 60.0,
+        "H": 80.0,
+        "W": 6,
+        "F": 1,
+        "count": 1
+      },
+      "recommended_defaults": {
+        "L": 60.0,
+        "H": 80.0,
+        "W": 6,
+        "F": 1,
+        "count": 1
+      }
+    },
+    "b1a97720e1ddfaaeca543fb06e3bf31f": {
+      "name": "bảng hiệu xinhan bạt 2 mặt 80 x 120",
+      "profile": "lightbox",
+      "constraints": {
+        "dimensions": {
+          "L": {
+            "min": 20
+          },
+          "H": {
+            "min": 20
+          },
+          "W": {
+            "min": 4
+          }
+        },
+        "minimum_unit_price": 600000,
+        "minimum_order_price": 0,
+        "note": "Giá tối thiểu chưa VAT, chưa vận chuyển. Ngưỡng khởi tạo theo quy cách; quản trị có thể điều chỉnh."
+      },
+      "previous_defaults": {
+        "L": 80.0,
+        "H": 120.0,
+        "W": 6,
+        "F": 2,
+        "count": 1
+      },
+      "recommended_defaults": {
+        "L": 80.0,
+        "H": 120.0,
+        "W": 6,
+        "F": 2,
+        "count": 1
+      }
+    },
+    "67712217ebe7da30efffb0d16f606acb": {
+      "name": "hộp đèn bạt in UV 1 mặt 400 x 90",
+      "profile": "lightbox",
+      "constraints": {
+        "dimensions": {
+          "L": {
+            "min": 20
+          },
+          "H": {
+            "min": 20
+          },
+          "W": {
+            "min": 4
+          }
+        },
+        "minimum_unit_price": 600000,
+        "minimum_order_price": 0,
+        "note": "Giá tối thiểu chưa VAT, chưa vận chuyển. Ngưỡng khởi tạo theo quy cách; quản trị có thể điều chỉnh."
+      },
+      "previous_defaults": {
+        "L": 400.0,
+        "H": 90.0,
+        "W": 6,
+        "F": 1,
+        "count": 1
+      },
+      "recommended_defaults": {
+        "L": 400.0,
+        "H": 90.0,
+        "W": 6,
+        "F": 1,
+        "count": 1
+      }
+    },
+    "606d4ba6df98767146c9757daf5326e7": {
+      "name": "Hộp đèn bạt không gân in UV viền nhôm nhét cạnh",
+      "profile": "lightbox",
+      "constraints": {
+        "dimensions": {
+          "L": {
+            "min": 20
+          },
+          "H": {
+            "min": 20
+          },
+          "W": {
+            "min": 4
+          }
+        },
+        "minimum_unit_price": 600000,
+        "minimum_order_price": 0,
+        "note": "Giá tối thiểu chưa VAT, chưa vận chuyển. Ngưỡng khởi tạo theo quy cách; quản trị có thể điều chỉnh."
+      },
+      "previous_defaults": {
+        "L": 300.0,
+        "H": 100.0,
+        "W": 15.0,
+        "F": 1,
+        "count": 1
+      },
+      "recommended_defaults": {
+        "L": 300.0,
+        "H": 100.0,
+        "W": 15.0,
+        "F": 1,
+        "count": 1
+      }
+    },
+    "dc14344fd818f1391d31c609aa5c79f3": {
+      "name": "Hộp đèn chibi 2 mặt 60 x 140",
+      "profile": "chibi",
+      "constraints": {
+        "dimensions": {
+          "L": {
+            "min": 30
+          },
+          "H": {
+            "min": 40
+          },
+          "W": {
+            "min": 4
+          }
+        },
+        "minimum_unit_price": 650000,
+        "minimum_order_price": 0,
+        "note": "Giá tối thiểu chưa VAT, chưa vận chuyển. Ngưỡng khởi tạo theo quy cách; quản trị có thể điều chỉnh."
+      },
+      "previous_defaults": {
+        "L": 60.0,
+        "H": 140.0,
+        "W": 6,
+        "F": 2,
+        "count": 1
+      },
+      "recommended_defaults": {
+        "L": 60.0,
+        "H": 140.0,
+        "W": 6,
+        "F": 2,
+        "count": 1
+      }
+    },
+    "f8523224f8b8ba05501880f36984890f": {
+      "name": "Hộp đèn chibi 2 mặt 80 x 160",
+      "profile": "chibi",
+      "constraints": {
+        "dimensions": {
+          "L": {
+            "min": 30
+          },
+          "H": {
+            "min": 40
+          },
+          "W": {
+            "min": 4
+          }
+        },
+        "minimum_unit_price": 650000,
+        "minimum_order_price": 0,
+        "note": "Giá tối thiểu chưa VAT, chưa vận chuyển. Ngưỡng khởi tạo theo quy cách; quản trị có thể điều chỉnh."
+      },
+      "previous_defaults": {
+        "L": 80.0,
+        "H": 160.0,
+        "W": 6,
+        "F": 2,
+        "count": 1
+      },
+      "recommended_defaults": {
+        "L": 80.0,
+        "H": 160.0,
+        "W": 6,
+        "F": 2,
+        "count": 1
+      }
+    },
+    "a055404da679aea0655e8b5730301d61": {
+      "name": "Hộp đèn chibi 2 mặt LED viền 120 x120",
+      "profile": "chibi",
+      "constraints": {
+        "dimensions": {
+          "L": {
+            "min": 30
+          },
+          "H": {
+            "min": 40
+          },
+          "W": {
+            "min": 4
+          }
+        },
+        "minimum_unit_price": 800000,
+        "minimum_order_price": 0,
+        "note": "Giá tối thiểu chưa VAT, chưa vận chuyển. Ngưỡng khởi tạo theo quy cách; quản trị có thể điều chỉnh."
+      },
+      "previous_defaults": {
+        "L": 120.0,
+        "H": 120.0,
+        "W": 6,
+        "F": 2,
+        "count": 1
+      },
+      "recommended_defaults": {
+        "L": 120.0,
+        "H": 120.0,
+        "W": 6,
+        "F": 2,
+        "count": 1
+      }
+    },
+    "34a7ff12934336c498bf55ce4fa262f4": {
+      "name": "Hộp đèn hút nổi tròn 60",
+      "profile": "round",
+      "constraints": {
+        "dimensions": {
+          "L": {
+            "min": 20
+          },
+          "H": {
+            "min": 20
+          },
+          "W": {
+            "min": 4
+          }
+        },
+        "minimum_unit_price": 350000,
+        "minimum_order_price": 0,
+        "note": "Giá tối thiểu chưa VAT, chưa vận chuyển. Ngưỡng khởi tạo theo quy cách; quản trị có thể điều chỉnh."
+      },
+      "previous_defaults": {
+        "L": 60,
+        "H": 60,
+        "W": 10.0,
+        "F": 1,
+        "count": 1
+      },
+      "recommended_defaults": {
+        "L": 60,
+        "H": 60,
+        "W": 10.0,
+        "F": 1,
+        "count": 1
+      }
+    },
+    "94ad47a5672b9de716ae7622a442c9eb": {
+      "name": "Hộp đèn hút nổi vuông 60",
+      "profile": "round",
+      "constraints": {
+        "dimensions": {
+          "L": {
+            "min": 20
+          },
+          "H": {
+            "min": 20
+          },
+          "W": {
+            "min": 4
+          }
+        },
+        "minimum_unit_price": 350000,
+        "minimum_order_price": 0,
+        "note": "Giá tối thiểu chưa VAT, chưa vận chuyển. Ngưỡng khởi tạo theo quy cách; quản trị có thể điều chỉnh."
+      },
+      "previous_defaults": {
+        "L": 60.0,
+        "H": 60.0,
+        "W": 6.0,
+        "F": 1,
+        "count": 1
+      },
+      "recommended_defaults": {
+        "L": 60.0,
+        "H": 60.0,
+        "W": 6.0,
+        "F": 1,
+        "count": 1
+      }
+    },
+    "340bccddc39de89ff73d7e3a8781e944": {
+      "name": "Hộp đèn tròn xinhan 40",
+      "profile": "round",
+      "constraints": {
+        "dimensions": {
+          "L": {
+            "min": 20
+          },
+          "H": {
+            "min": 20
+          },
+          "W": {
+            "min": 4
+          }
+        },
+        "minimum_unit_price": 350000,
+        "minimum_order_price": 0,
+        "note": "Giá tối thiểu chưa VAT, chưa vận chuyển. Ngưỡng khởi tạo theo quy cách; quản trị có thể điều chỉnh."
+      },
+      "previous_defaults": {
+        "L": 60,
+        "H": 60,
+        "W": 12.0,
+        "F": 1,
+        "count": 1
+      },
+      "recommended_defaults": {
+        "L": 40,
+        "H": 40,
+        "W": 12.0,
+        "F": 1,
+        "count": 1
+      }
+    },
+    "5ea481bdd37d7c30913ae50af2de5874": {
+      "name": "Hộp đèn sáng 5 mặt",
+      "profile": "fivefaces",
+      "constraints": {
+        "dimensions": {
+          "L": {
+            "min": 20
+          },
+          "H": {
+            "min": 20
+          },
+          "W": {
+            "min": 5
+          }
+        },
+        "minimum_unit_price": 1200000,
+        "minimum_order_price": 0,
+        "note": "Giá tối thiểu chưa VAT, chưa vận chuyển. Ngưỡng khởi tạo theo quy cách; quản trị có thể điều chỉnh."
+      },
+      "previous_defaults": {
+        "L": 300.0,
+        "H": 100.0,
+        "W": 15.0,
+        "F": 1,
+        "count": 1
+      },
+      "recommended_defaults": {
+        "L": 300.0,
+        "H": 100.0,
+        "W": 15.0,
+        "F": 1,
+        "count": 1
+      }
+    },
+    "615e9ec4cd9a53de0cc5111fdfeccc11": {
+      "name": "Hộp đèn tôn rỉ sét 45 x 25",
+      "profile": "rust",
+      "constraints": {
+        "dimensions": {
+          "L": {
+            "min": 15
+          },
+          "H": {
+            "min": 15
+          },
+          "W": {
+            "min": 3
+          }
+        },
+        "minimum_unit_price": 300000,
+        "minimum_order_price": 0,
+        "note": "Giá tối thiểu chưa VAT, chưa vận chuyển. Ngưỡng khởi tạo theo quy cách; quản trị có thể điều chỉnh."
+      },
+      "previous_defaults": {
+        "L": 45.0,
+        "H": 25.0,
+        "W": 6,
+        "F": 1,
+        "count": 1
+      },
+      "recommended_defaults": {
+        "L": 45.0,
+        "H": 25.0,
+        "W": 6,
+        "F": 1,
+        "count": 1
+      }
+    },
+    "d6c93a9a7d1822521dc381959d159bcc": {
+      "name": "Hộp đèn đường xinhan đèn LED",
+      "profile": "pole",
+      "constraints": {
+        "dimensions": {
+          "L": {
+            "min": 40
+          },
+          "H": {
+            "min": 40
+          },
+          "W": {
+            "min": 4
+          }
+        },
+        "minimum_unit_price": 800000,
+        "minimum_order_price": 0,
+        "note": "Giá tối thiểu chưa VAT, chưa vận chuyển. Ngưỡng khởi tạo theo quy cách; quản trị có thể điều chỉnh."
+      },
+      "previous_defaults": {
+        "L": 120.0,
+        "H": 150.0,
+        "W": 10.0,
+        "F": 1,
+        "count": 1
+      },
+      "recommended_defaults": {
+        "L": 120.0,
+        "H": 150.0,
+        "W": 10.0,
+        "F": 1,
+        "count": 1
+      }
+    },
+    "605029588cb07d933dce923069bf47b2": {
+      "name": "Kiot, đèn led 140 x 160 x 200",
+      "profile": "kiosk",
+      "constraints": {
+        "dimensions": {
+          "L": {
+            "min": 80
+          },
+          "H": {
+            "min": 150
+          },
+          "W": {
+            "min": 60
+          }
+        },
+        "minimum_unit_price": 8000000,
+        "minimum_order_price": 0,
+        "note": "Giá tối thiểu chưa VAT, chưa vận chuyển. Ngưỡng khởi tạo theo quy cách; quản trị có thể điều chỉnh."
+      },
+      "previous_defaults": {
+        "L": 140.0,
+        "H": 200.0,
+        "W": 160.0,
+        "F": 1,
+        "count": 1
+      },
+      "recommended_defaults": {
+        "L": 140.0,
+        "H": 200.0,
+        "W": 160.0,
+        "F": 1,
+        "count": 1
+      }
+    },
+    "55ad06241305576d1560f3e900f8df60": {
+      "name": "Kiot, đèn led 240 x 160 x 200",
+      "profile": "kiosk",
+      "constraints": {
+        "dimensions": {
+          "L": {
+            "min": 80
+          },
+          "H": {
+            "min": 150
+          },
+          "W": {
+            "min": 60
+          }
+        },
+        "minimum_unit_price": 8000000,
+        "minimum_order_price": 0,
+        "note": "Giá tối thiểu chưa VAT, chưa vận chuyển. Ngưỡng khởi tạo theo quy cách; quản trị có thể điều chỉnh."
+      },
+      "previous_defaults": {
+        "L": 240.0,
+        "H": 200.0,
+        "W": 160.0,
+        "F": 1,
+        "count": 1
+      },
+      "recommended_defaults": {
+        "L": 240.0,
+        "H": 200.0,
+        "W": 160.0,
+        "F": 1,
+        "count": 1
+      }
+    },
+    "124443e014aaf5968dc5e8a7f548eaf5": {
+      "name": "Led neon nhiều màu 90 x 60",
+      "profile": "neon",
+      "constraints": {
+        "dimensions": {
+          "L": {
+            "min": 15
+          },
+          "H": {
+            "min": 15
+          },
+          "W": {
+            "min": 1
+          }
+        },
+        "minimum_unit_price": 400000,
+        "minimum_order_price": 0,
+        "note": "Giá tối thiểu chưa VAT, chưa vận chuyển. Ngưỡng khởi tạo theo quy cách; quản trị có thể điều chỉnh."
+      },
+      "previous_defaults": {
+        "L": 90.0,
+        "H": 60.0,
+        "W": 6,
+        "F": 1,
+        "count": 1
+      },
+      "recommended_defaults": {
+        "L": 90.0,
+        "H": 60.0,
+        "W": 3,
+        "F": 1,
+        "count": 1
+      }
+    },
+    "3451b563cd78c63448026590f72a9637": {
+      "name": "Led xinhan mũi tên 120 x 50",
+      "profile": "arrow",
+      "constraints": {
+        "dimensions": {
+          "L": {
+            "min": 40
+          },
+          "H": {
+            "min": 20
+          },
+          "W": {
+            "min": 4
+          }
+        },
+        "minimum_unit_price": 600000,
+        "minimum_order_price": 0,
+        "note": "Giá tối thiểu chưa VAT, chưa vận chuyển. Ngưỡng khởi tạo theo quy cách; quản trị có thể điều chỉnh."
+      },
+      "previous_defaults": {
+        "L": 120.0,
+        "H": 50.0,
+        "W": 6,
+        "F": 1,
+        "count": 1
+      },
+      "recommended_defaults": {
+        "L": 120.0,
+        "H": 50.0,
+        "W": 6,
+        "F": 1,
+        "count": 1
+      }
+    },
+    "214918596a108bdf175827f5aadeb756": {
+      "name": "Menu A4 fomex cán decal",
+      "profile": "menu",
+      "constraints": {
+        "dimensions": {
+          "L": {
+            "min": 10
+          },
+          "H": {
+            "min": 10
+          },
+          "W": {
+            "min": 0.2
+          }
+        },
+        "minimum_unit_price": 35000,
+        "minimum_order_price": 50000,
+        "note": "Giá tối thiểu chưa VAT, chưa vận chuyển. Ngưỡng khởi tạo theo quy cách; quản trị có thể điều chỉnh."
+      },
+      "previous_defaults": {
+        "L": 21.0,
+        "H": 29.700000000000003,
+        "W": 1.0,
+        "F": 1,
+        "count": 1
+      },
+      "recommended_defaults": {
+        "L": 21.0,
+        "H": 29.700000000000003,
+        "W": 0.5,
+        "F": 1,
+        "count": 1
+      }
+    },
+    "b81c04d2333b86fa1a5e8612271f2b1d": {
+      "name": "Menu cầm tay A4 Fomex cán decal",
+      "profile": "menu",
+      "constraints": {
+        "dimensions": {
+          "L": {
+            "min": 10
+          },
+          "H": {
+            "min": 10
+          },
+          "W": {
+            "min": 0.2
+          }
+        },
+        "minimum_unit_price": 35000,
+        "minimum_order_price": 50000,
+        "note": "Giá tối thiểu chưa VAT, chưa vận chuyển. Ngưỡng khởi tạo theo quy cách; quản trị có thể điều chỉnh."
+      },
+      "previous_defaults": {
+        "L": 21.0,
+        "H": 29.700000000000003,
+        "W": 0.5,
+        "F": 1,
+        "count": 1
+      },
+      "recommended_defaults": {
+        "L": 21.0,
+        "H": 29.700000000000003,
+        "W": 0.5,
+        "F": 1,
+        "count": 1
+      }
+    },
+    "0742663346cf948f656f9f6716f497a6": {
+      "name": "Mica hút nổi ngôi sao búa liềm",
+      "profile": "star",
+      "constraints": {
+        "dimensions": {
+          "L": {
+            "min": 10
+          },
+          "H": {
+            "min": 10
+          },
+          "W": {
+            "min": 1
+          }
+        },
+        "minimum_unit_price": 200000,
+        "minimum_order_price": 0,
+        "note": "Giá tối thiểu chưa VAT, chưa vận chuyển. Ngưỡng khởi tạo theo quy cách; quản trị có thể điều chỉnh."
+      },
+      "previous_defaults": {
+        "L": 60,
+        "H": 80,
+        "W": 6,
+        "F": 1,
+        "count": 1
+      },
+      "recommended_defaults": {
+        "L": 60,
+        "H": 80,
+        "W": 3,
+        "F": 1,
+        "count": 1
+      }
+    },
+    "62e73674bdc7cd8f6e24f8dcf8ca677a": {
+      "name": "Quầy thu ngân mặt đá, lam nhựa",
+      "profile": "counter",
+      "constraints": {
+        "dimensions": {
+          "L": {
+            "min": 60
+          },
+          "H": {
+            "min": 70
+          },
+          "W": {
+            "min": 30
+          }
+        },
+        "minimum_unit_price": 3500000,
+        "minimum_order_price": 0,
+        "note": "Giá tối thiểu chưa VAT, chưa vận chuyển. Ngưỡng khởi tạo theo quy cách; quản trị có thể điều chỉnh."
+      },
+      "previous_defaults": {
+        "L": 150.0,
+        "H": 70.0,
+        "W": 120.0,
+        "F": 1,
+        "count": 1
+      },
+      "recommended_defaults": {
+        "L": 150.0,
+        "H": 100,
+        "W": 60,
+        "F": 1,
+        "count": 1
+      }
+    },
+    "54727938bb45249b21f3a83a72c91abb": {
+      "name": "Standee chân chữ X 60 x 160",
+      "profile": "standee",
+      "constraints": {
+        "dimensions": {
+          "L": {
+            "min": 40
+          },
+          "H": {
+            "min": 60
+          },
+          "W": {
+            "min": 5
+          }
+        },
+        "minimum_unit_price": 180000,
+        "minimum_order_price": 0,
+        "note": "Giá tối thiểu chưa VAT, chưa vận chuyển. Ngưỡng khởi tạo theo quy cách; quản trị có thể điều chỉnh."
+      },
+      "previous_defaults": {
+        "L": 60.0,
+        "H": 160.0,
+        "W": 6,
+        "F": 1,
+        "count": 1
+      },
+      "recommended_defaults": {
+        "L": 60.0,
+        "H": 160.0,
+        "W": 40,
+        "F": 1,
+        "count": 1
+      }
+    },
+    "7e8310bbd33c3a8e1293aaca3161b907": {
+      "name": "Tem decal in bế",
+      "profile": "label",
+      "constraints": {
+        "dimensions": {
+          "L": {
+            "min": 1
+          },
+          "H": {
+            "min": 1
+          },
+          "W": {
+            "min": 0.005
+          }
+        },
+        "minimum_unit_price": 500,
+        "minimum_order_price": 100000,
+        "note": "Giá tối thiểu chưa VAT, chưa vận chuyển. Ngưỡng khởi tạo theo quy cách; quản trị có thể điều chỉnh."
+      },
+      "previous_defaults": {
+        "L": 20.0,
+        "H": 10.0,
+        "W": 0.2,
+        "F": 1,
+        "count": 1
+      },
+      "recommended_defaults": {
+        "L": 5,
+        "H": 5,
+        "W": 0.01,
+        "F": 1,
+        "count": 1
+      }
+    },
+    "ae190871dac07627be48bdd5ee09015a": {
+      "name": "Tranh điện siêu mỏng",
+      "profile": "slim",
+      "constraints": {
+        "dimensions": {
+          "L": {
+            "min": 15
+          },
+          "H": {
+            "min": 15
+          },
+          "W": {
+            "min": 0.8
+          }
+        },
+        "minimum_unit_price": 400000,
+        "minimum_order_price": 0,
+        "note": "Giá tối thiểu chưa VAT, chưa vận chuyển. Ngưỡng khởi tạo theo quy cách; quản trị có thể điều chỉnh."
+      },
+      "previous_defaults": {
+        "L": 60.0,
+        "H": 90.0,
+        "W": 2.0,
+        "F": 1,
+        "count": 1
+      },
+      "recommended_defaults": {
+        "L": 60.0,
+        "H": 90.0,
+        "W": 2.0,
+        "F": 1,
+        "count": 1
+      }
+    },
+    "d4325ccb610b1046b08671a563417802": {
+      "name": "Tranh điện siêu mỏng 60 x 80",
+      "profile": "slim",
+      "constraints": {
+        "dimensions": {
+          "L": {
+            "min": 15
+          },
+          "H": {
+            "min": 15
+          },
+          "W": {
+            "min": 0.8
+          }
+        },
+        "minimum_unit_price": 400000,
+        "minimum_order_price": 0,
+        "note": "Giá tối thiểu chưa VAT, chưa vận chuyển. Ngưỡng khởi tạo theo quy cách; quản trị có thể điều chỉnh."
+      },
+      "previous_defaults": {
+        "L": 60.0,
+        "H": 80.0,
+        "W": 6,
+        "F": 1,
+        "count": 1
+      },
+      "recommended_defaults": {
+        "L": 60.0,
+        "H": 80.0,
+        "W": 2,
+        "F": 1,
+        "count": 1
+      }
+    },
+    "6ebcf97d0e28a633e1948a0ba6588a54": {
+      "name": "Trần alu gương bóng BUB viền khung nhôm",
+      "profile": "ceiling",
+      "constraints": {
+        "dimensions": {
+          "L": {
+            "min": 100
+          },
+          "H": {
+            "min": 100
+          },
+          "W": {
+            "min": 5
+          }
+        },
+        "minimum_unit_price": 1500000,
+        "minimum_order_price": 0,
+        "note": "Giá tối thiểu chưa VAT, chưa vận chuyển. Ngưỡng khởi tạo theo quy cách; quản trị có thể điều chỉnh."
+      },
+      "previous_defaults": {
+        "L": 300.0,
+        "H": 100.0,
+        "W": 15.0,
+        "F": 1,
+        "count": 1
+      },
+      "recommended_defaults": {
+        "L": 300.0,
+        "H": 100.0,
+        "W": 15.0,
+        "F": 1,
+        "count": 1
+      }
+    },
+    "4cb11b8db03ede443756aea85fab266d": {
+      "name": "Tấm QR để bàn mica",
+      "profile": "qr",
+      "constraints": {
+        "dimensions": {
+          "L": {
+            "min": 6
+          },
+          "H": {
+            "min": 8
+          },
+          "W": {
+            "min": 2
+          }
+        },
+        "minimum_unit_price": 80000,
+        "minimum_order_price": 0,
+        "note": "Giá tối thiểu chưa VAT, chưa vận chuyển. Ngưỡng khởi tạo theo quy cách; quản trị có thể điều chỉnh."
+      },
+      "previous_defaults": {
+        "L": 12.0,
+        "H": 18.0,
+        "W": 5.0,
+        "F": 1,
+        "count": 1
+      },
+      "recommended_defaults": {
+        "L": 12.0,
+        "H": 18.0,
+        "W": 5.0,
+        "F": 1,
+        "count": 1
+      }
+    },
+    "71c555a6be3695dd6ac7369d61cc989f": {
+      "name": "Xe bán hàng, đèn led + kính 60 x 140 x 200",
+      "profile": "cart",
+      "constraints": {
+        "dimensions": {
+          "L": {
+            "min": 50
+          },
+          "H": {
+            "min": 100
+          },
+          "W": {
+            "min": 40
+          }
+        },
+        "minimum_unit_price": 4500000,
+        "minimum_order_price": 0,
+        "note": "Giá tối thiểu chưa VAT, chưa vận chuyển. Ngưỡng khởi tạo theo quy cách; quản trị có thể điều chỉnh."
+      },
+      "previous_defaults": {
+        "L": 60.0,
+        "H": 200.0,
+        "W": 140.0,
+        "F": 1,
+        "count": 1
+      },
+      "recommended_defaults": {
+        "L": 140,
+        "H": 200.0,
+        "W": 60,
+        "F": 1,
+        "count": 1
+      }
+    },
+    "1439fea0d1d7af03bea62b08113aff71": {
+      "name": "Xe bán hàng, đèn led + kính 60 x 150 x 200",
+      "profile": "cart",
+      "constraints": {
+        "dimensions": {
+          "L": {
+            "min": 50
+          },
+          "H": {
+            "min": 100
+          },
+          "W": {
+            "min": 40
+          }
+        },
+        "minimum_unit_price": 4500000,
+        "minimum_order_price": 0,
+        "note": "Giá tối thiểu chưa VAT, chưa vận chuyển. Ngưỡng khởi tạo theo quy cách; quản trị có thể điều chỉnh."
+      },
+      "previous_defaults": {
+        "L": 60.0,
+        "H": 200.0,
+        "W": 150.0,
+        "F": 1,
+        "count": 1
+      },
+      "recommended_defaults": {
+        "L": 150,
+        "H": 200.0,
+        "W": 60,
+        "F": 1,
+        "count": 1
+      }
+    }
+  }
+}

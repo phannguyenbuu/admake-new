@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "product_id": "62e73674bdc7cd8f6e24f8dcf8ca677a",
+  "view": "before",
+  "image": "/product-references/62e73674bdc7cd8f6e24f8dcf8ca677a-photo-before.png",
+  "sha256": "f2cd0d44b07e137088f90d3f55a8199b11d92dbd86e581f2d24612eb3810bcf0",
+  "width": 1448,
+  "height": 1086,
+  "coordinate_system": "image_pixels_top_left",
+  "status": "image_reviewed_no_text",
+  "regions": [],
+  "text_review": "image_review"
+}

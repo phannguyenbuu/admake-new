@@ -1,0 +1,315 @@
+{
+  "schema_version": 1,
+  "product_id": "2584d198c9f5b84112cb271327134ff8",
+  "view": "after",
+  "image": "/product-references/2584d198c9f5b84112cb271327134ff8-photo-after.png",
+  "sha256": "bb81bc3e574debbc2a34a5d912c90b835adc2381cb85efc3905fd8467aaf8242",
+  "width": 1448,
+  "height": 1086,
+  "coordinate_system": "image_pixels_top_left",
+  "status": "detected",
+  "regions": [
+    {
+      "text": "ALCOBEST",
+      "ocr_text": "LCODEST",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        337.55,
+        329.37,
+        631.9000000000001,
+        397.26
+      ],
+      "quad": [
+        [
+          337.55,
+          588.02
+        ],
+        [
+          914.78,
+          329.37
+        ],
+        [
+          969.45,
+          467.98
+        ],
+        [
+          391.22,
+          726.63
+        ]
+      ],
+      "normalized_bbox": [
+        0.233115,
+        0.303287,
+        0.436395,
+        0.365801
+      ],
+      "normalized_quad": [
+        [
+          0.233115,
+          0.541455
+        ],
+        [
+          0.631754,
+          0.303287
+        ],
+        [
+          0.66951,
+          0.430921
+        ],
+        [
+          0.27018,
+          0.669088
+        ]
+      ],
+      "id": "after-visual-001",
+      "source_region_ids": [
+        "after-005"
+      ],
+      "slot_id": "text-e96f57a8b5-1"
+    },
+    {
+      "text": "Aluminum Composite Panel",
+      "ocr_text": "Aluminum",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        376.48,
+        352.95,
+        441.64,
+        117.29
+      ],
+      "quad": [
+        [
+          376.48,
+          352.95
+        ],
+        [
+          818.12,
+          352.95
+        ],
+        [
+          818.12,
+          470.24
+        ],
+        [
+          376.48,
+          470.24
+        ]
+      ],
+      "normalized_bbox": [
+        0.26,
+        0.325,
+        0.305,
+        0.108002
+      ],
+      "normalized_quad": [
+        [
+          0.26,
+          0.325
+        ],
+        [
+          0.565,
+          0.325
+        ],
+        [
+          0.565,
+          0.433002
+        ],
+        [
+          0.26,
+          0.433002
+        ]
+      ],
+      "id": "after-visual-002",
+      "source_region_ids": [
+        "after-006"
+      ],
+      "slot_id": "text-ca83f35fa1-1"
+    },
+    {
+      "text": "ALCOBEST",
+      "ocr_text": "ALCOFST",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        944.67,
+        130.82,
+        262.65999999999997,
+        161.36
+      ],
+      "quad": [
+        [
+          944.67,
+          240.03
+        ],
+        [
+          1185.61,
+          130.82
+        ],
+        [
+          1207.33,
+          183.97
+        ],
+        [
+          965.39,
+          292.18
+        ]
+      ],
+      "normalized_bbox": [
+        0.652396,
+        0.12046,
+        0.181395,
+        0.148582
+      ],
+      "normalized_quad": [
+        [
+          0.652396,
+          0.221022
+        ],
+        [
+          0.818791,
+          0.12046
+        ],
+        [
+          0.833791,
+          0.169401
+        ],
+        [
+          0.666706,
+          0.269042
+        ]
+      ],
+      "id": "after-visual-003",
+      "source_region_ids": [
+        "after-001"
+      ],
+      "slot_id": "text-e96f57a8b5-2"
+    },
+    {
+      "text": "Aluminum Composite Panel",
+      "ocr_text": "Aluminum Composite Panel",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        988.86,
+        179.5,
+        223.2800000000001,
+        118.0
+      ],
+      "quad": [
+        [
+          988.86,
+          272.01
+        ],
+        [
+          1201.86,
+          179.5
+        ],
+        [
+          1212.14,
+          203.99
+        ],
+        [
+          999.14,
+          297.5
+        ]
+      ],
+      "normalized_bbox": [
+        0.682914,
+        0.165285,
+        0.154199,
+        0.108656
+      ],
+      "normalized_quad": [
+        [
+          0.682914,
+          0.25047
+        ],
+        [
+          0.830014,
+          0.165285
+        ],
+        [
+          0.837113,
+          0.187836
+        ],
+        [
+          0.690014,
+          0.273941
+        ]
+      ],
+      "id": "after-visual-004",
+      "source_region_ids": [
+        "after-002"
+      ],
+      "slot_id": "text-ca83f35fa1-2"
+    },
+    {
+      "text": "Number 01",
+      "ocr_text": "A3 | ULàk",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        390.96,
+        412.68,
+        1054.14,
+        672.23
+      ],
+      "quad": [
+        [
+          390.96,
+          412.68
+        ],
+        [
+          1445.1,
+          412.68
+        ],
+        [
+          1445.1,
+          1084.91
+        ],
+        [
+          390.96,
+          1084.91
+        ]
+      ],
+      "normalized_bbox": [
+        0.27,
+        0.38,
+        0.727997,
+        0.618996
+      ],
+      "normalized_quad": [
+        [
+          0.27,
+          0.38
+        ],
+        [
+          0.997997,
+          0.38
+        ],
+        [
+          0.997997,
+          0.998996
+        ],
+        [
+          0.27,
+          0.998996
+        ]
+      ],
+      "id": "after-visual-005",
+      "source_region_ids": [
+        "after-007",
+        "after-008"
+      ],
+      "slot_id": "text-234bf1c299-1"
+    }
+  ],
+  "text_review": "image_review"
+}

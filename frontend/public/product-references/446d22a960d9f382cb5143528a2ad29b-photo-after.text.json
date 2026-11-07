@@ -1,0 +1,250 @@
+{
+  "schema_version": 1,
+  "product_id": "446d22a960d9f382cb5143528a2ad29b",
+  "view": "after",
+  "image": "/product-references/446d22a960d9f382cb5143528a2ad29b-photo-after.png",
+  "sha256": "358febbe63c46f2c9823f617cd89c5cc79c8173152543a24794697e807f442e4",
+  "width": 1448,
+  "height": 1086,
+  "coordinate_system": "image_pixels_top_left",
+  "status": "detected",
+  "regions": [
+    {
+      "text": "TRƯỜNG MẦM NON",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        540.1,
+        93.4,
+        366.34,
+        144.44
+      ],
+      "quad": [
+        [
+          540.1,
+          93.4
+        ],
+        [
+          906.44,
+          93.4
+        ],
+        [
+          906.44,
+          237.84
+        ],
+        [
+          540.1,
+          237.84
+        ]
+      ],
+      "normalized_bbox": [
+        0.372997,
+        0.086004,
+        0.252997,
+        0.133002
+      ],
+      "normalized_quad": [
+        [
+          0.372997,
+          0.086004
+        ],
+        [
+          0.625994,
+          0.086004
+        ],
+        [
+          0.625994,
+          0.219006
+        ],
+        [
+          0.372997,
+          0.219006
+        ]
+      ],
+      "id": "after-visual-001",
+      "source_region_ids": [],
+      "slot_id": "text-c1c994f631-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "HOA BABY",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        576.3,
+        396.39,
+        191.14,
+        45.61
+      ],
+      "quad": [
+        [
+          576.3,
+          396.39
+        ],
+        [
+          767.44,
+          396.39
+        ],
+        [
+          767.44,
+          442.0
+        ],
+        [
+          576.3,
+          442.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.397997,
+        0.365,
+        0.132003,
+        0.041998
+      ],
+      "normalized_quad": [
+        [
+          0.397997,
+          0.365
+        ],
+        [
+          0.53,
+          0.365
+        ],
+        [
+          0.53,
+          0.406998
+        ],
+        [
+          0.397997,
+          0.406998
+        ]
+      ],
+      "id": "after-visual-002",
+      "source_region_ids": [],
+      "slot_id": "text-0056403b78-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "Trường Mầm Non",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        225.89,
+        453.95,
+        1222.11,
+        259.55
+      ],
+      "quad": [
+        [
+          225.89,
+          453.95
+        ],
+        [
+          1448.0,
+          453.95
+        ],
+        [
+          1448.0,
+          713.5
+        ],
+        [
+          225.89,
+          713.5
+        ]
+      ],
+      "normalized_bbox": [
+        0.156001,
+        0.418002,
+        0.843999,
+        0.238996
+      ],
+      "normalized_quad": [
+        [
+          0.156001,
+          0.418002
+        ],
+        [
+          1.0,
+          0.418002
+        ],
+        [
+          1.0,
+          0.656998
+        ],
+        [
+          0.156001,
+          0.656998
+        ]
+      ],
+      "id": "after-visual-003",
+      "source_region_ids": [],
+      "slot_id": "text-c1c994f631-2",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "HoaBaby",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        134.66,
+        561.46,
+        1313.34,
+        476.75
+      ],
+      "quad": [
+        [
+          134.66,
+          561.46
+        ],
+        [
+          1448.0,
+          561.46
+        ],
+        [
+          1448.0,
+          1038.21
+        ],
+        [
+          134.66,
+          1038.21
+        ]
+      ],
+      "normalized_bbox": [
+        0.092997,
+        0.516998,
+        0.907003,
+        0.438996
+      ],
+      "normalized_quad": [
+        [
+          0.092997,
+          0.516998
+        ],
+        [
+          1.0,
+          0.516998
+        ],
+        [
+          1.0,
+          0.955994
+        ],
+        [
+          0.092997,
+          0.955994
+        ]
+      ],
+      "id": "after-visual-004",
+      "source_region_ids": [],
+      "slot_id": "text-0056403b78-2",
+      "match_confidence": 1.0
+    }
+  ],
+  "text_review": "image_review"
+}

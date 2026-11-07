@@ -1,0 +1,201 @@
+{
+  "schema_version": 1,
+  "product_id": "fc591e421adab510adbe37624d9eb14b",
+  "view": "after",
+  "image": "/product-references/fc591e421adab510adbe37624d9eb14b-photo-after.png",
+  "sha256": "8afbdc82683d91b51082e02e712751a11a38208601d8a8b429583cd3d6cb6251",
+  "width": 1448,
+  "height": 1086,
+  "coordinate_system": "image_pixels_top_left",
+  "status": "detected",
+  "regions": [
+    {
+      "text": "BÁNH BAO TUỔI",
+      "ocr_text": "BANEBATGOI",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        247.0,
+        16.0,
+        897.0,
+        234.0
+      ],
+      "quad": [
+        [
+          265.78,
+          16.0
+        ],
+        [
+          1144.0,
+          113.79
+        ],
+        [
+          1125.22,
+          250.0
+        ],
+        [
+          247.0,
+          152.21
+        ]
+      ],
+      "normalized_bbox": [
+        0.17058,
+        0.014733,
+        0.619475,
+        0.21547
+      ],
+      "normalized_quad": [
+        [
+          0.18355,
+          0.014733
+        ],
+        [
+          0.790055,
+          0.104779
+        ],
+        [
+          0.777086,
+          0.230203
+        ],
+        [
+          0.17058,
+          0.140157
+        ]
+      ],
+      "id": "after-visual-001",
+      "source_region_ids": [
+        "after-001"
+      ],
+      "slot_id": "text-cf54c7ade5-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "Ăn Ngon Sống Khỏe",
+      "ocr_text": "ĂD | Ngon | 5ốn9 | Khoe",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        372.14,
+        190.05,
+        980.3,
+        135.75
+      ],
+      "quad": [
+        [
+          372.14,
+          190.05
+        ],
+        [
+          1352.44,
+          190.05
+        ],
+        [
+          1352.44,
+          325.8
+        ],
+        [
+          372.14,
+          325.8
+        ]
+      ],
+      "normalized_bbox": [
+        0.257003,
+        0.175,
+        0.677003,
+        0.125
+      ],
+      "normalized_quad": [
+        [
+          0.257003,
+          0.175
+        ],
+        [
+          0.934006,
+          0.175
+        ],
+        [
+          0.934006,
+          0.3
+        ],
+        [
+          0.257003,
+          0.3
+        ]
+      ],
+      "id": "after-visual-002",
+      "source_region_ids": [
+        "after-002",
+        "after-003",
+        "after-004",
+        "after-005"
+      ],
+      "slot_id": "text-3e57ca66bb-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "BÁNH\nBAO\nTUỔI",
+      "ocr_text": "BÉII | BiD | TUOI",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        926.72,
+        735.22,
+        181.0,
+        333.4
+      ],
+      "quad": [
+        [
+          926.72,
+          735.22
+        ],
+        [
+          1107.72,
+          735.22
+        ],
+        [
+          1107.72,
+          1068.62
+        ],
+        [
+          926.72,
+          1068.62
+        ]
+      ],
+      "normalized_bbox": [
+        0.64,
+        0.676998,
+        0.125,
+        0.306998
+      ],
+      "normalized_quad": [
+        [
+          0.64,
+          0.676998
+        ],
+        [
+          0.765,
+          0.676998
+        ],
+        [
+          0.765,
+          0.983996
+        ],
+        [
+          0.64,
+          0.983996
+        ]
+      ],
+      "id": "after-visual-003",
+      "source_region_ids": [
+        "after-006",
+        "after-007",
+        "after-008"
+      ],
+      "slot_id": "text-cf54c7ade5-2"
+    }
+  ],
+  "text_review": "image_review"
+}

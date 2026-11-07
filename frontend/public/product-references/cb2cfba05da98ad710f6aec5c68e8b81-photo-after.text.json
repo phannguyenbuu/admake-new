@@ -1,0 +1,191 @@
+{
+  "schema_version": 1,
+  "product_id": "cb2cfba05da98ad710f6aec5c68e8b81",
+  "view": "after",
+  "image": "/product-references/cb2cfba05da98ad710f6aec5c68e8b81-photo-after.png",
+  "sha256": "dce4ac2d97d29e71a452bc39b0dfb834807545dd4097cf8aee3857b037d41d84",
+  "width": 1448,
+  "height": 1086,
+  "coordinate_system": "image_pixels_top_left",
+  "status": "detected",
+  "regions": [
+    {
+      "text": "2h",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        328.7,
+        44.53,
+        835.5,
+        698.3
+      ],
+      "quad": [
+        [
+          328.7,
+          44.53
+        ],
+        [
+          1164.2,
+          44.53
+        ],
+        [
+          1164.2,
+          742.83
+        ],
+        [
+          328.7,
+          742.83
+        ]
+      ],
+      "normalized_bbox": [
+        0.227003,
+        0.041004,
+        0.577003,
+        0.643002
+      ],
+      "normalized_quad": [
+        [
+          0.227003,
+          0.041004
+        ],
+        [
+          0.804006,
+          0.041004
+        ],
+        [
+          0.804006,
+          0.684006
+        ],
+        [
+          0.227003,
+          0.684006
+        ]
+      ],
+      "id": "after-visual-001",
+      "source_region_ids": [],
+      "slot_id": "text-79e4bac618-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "STORE",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        321.46,
+        589.7,
+        1126.54,
+        279.1
+      ],
+      "quad": [
+        [
+          321.46,
+          589.7
+        ],
+        [
+          1448.0,
+          589.7
+        ],
+        [
+          1448.0,
+          868.8
+        ],
+        [
+          321.46,
+          868.8
+        ]
+      ],
+      "normalized_bbox": [
+        0.222003,
+        0.543002,
+        0.777997,
+        0.256998
+      ],
+      "normalized_quad": [
+        [
+          0.222003,
+          0.543002
+        ],
+        [
+          1.0,
+          0.543002
+        ],
+        [
+          1.0,
+          0.8
+        ],
+        [
+          0.222003,
+          0.8
+        ]
+      ],
+      "id": "after-visual-002",
+      "source_region_ids": [],
+      "slot_id": "text-3a21295d81-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "MĨ PHẨM CHÍNH HÃNG",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        328.7,
+        742.82,
+        1093.24,
+        285.62
+      ],
+      "quad": [
+        [
+          328.7,
+          742.82
+        ],
+        [
+          1421.94,
+          742.82
+        ],
+        [
+          1421.94,
+          1028.44
+        ],
+        [
+          328.7,
+          1028.44
+        ]
+      ],
+      "normalized_bbox": [
+        0.227003,
+        0.683996,
+        0.755,
+        0.263002
+      ],
+      "normalized_quad": [
+        [
+          0.227003,
+          0.683996
+        ],
+        [
+          0.982003,
+          0.683996
+        ],
+        [
+          0.982003,
+          0.946998
+        ],
+        [
+          0.227003,
+          0.946998
+        ]
+      ],
+      "id": "after-visual-003",
+      "source_region_ids": [],
+      "slot_id": "text-4ffd3576d4-1",
+      "match_confidence": 1.0
+    }
+  ],
+  "text_review": "image_review"
+}

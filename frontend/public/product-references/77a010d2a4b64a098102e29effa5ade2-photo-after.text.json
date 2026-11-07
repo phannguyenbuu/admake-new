@@ -1,0 +1,602 @@
+{
+  "schema_version": 1,
+  "product_id": "77a010d2a4b64a098102e29effa5ade2",
+  "view": "after",
+  "image": "/product-references/77a010d2a4b64a098102e29effa5ade2-photo-after.png",
+  "sha256": "453e13bb2f12717942fedf797378d9961710da58c4a7c1bad256600a9a77981c",
+  "width": 1448,
+  "height": 1086,
+  "coordinate_system": "image_pixels_top_left",
+  "status": "detected",
+  "regions": [
+    {
+      "text": "PHẦN MỀM QUẢN LÝ BÁN HÀNG",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        388.06,
+        154.21,
+        338.83,
+        23.89
+      ],
+      "quad": [
+        [
+          388.06,
+          154.21
+        ],
+        [
+          726.89,
+          154.21
+        ],
+        [
+          726.89,
+          178.1
+        ],
+        [
+          388.06,
+          178.1
+        ]
+      ],
+      "normalized_bbox": [
+        0.267997,
+        0.141998,
+        0.233999,
+        0.021998
+      ],
+      "normalized_quad": [
+        [
+          0.267997,
+          0.141998
+        ],
+        [
+          0.501996,
+          0.141998
+        ],
+        [
+          0.501996,
+          0.163996
+        ],
+        [
+          0.267997,
+          0.163996
+        ]
+      ],
+      "id": "after-visual-001",
+      "source_region_ids": [],
+      "slot_id": "text-d3ee15d6ba-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "PHẦN MỀM QUẢN LÝ BÁN HÀNG",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        448.88,
+        215.03,
+        338.83,
+        23.89
+      ],
+      "quad": [
+        [
+          448.88,
+          215.03
+        ],
+        [
+          787.71,
+          215.03
+        ],
+        [
+          787.71,
+          238.92
+        ],
+        [
+          448.88,
+          238.92
+        ]
+      ],
+      "normalized_bbox": [
+        0.31,
+        0.198002,
+        0.233999,
+        0.021998
+      ],
+      "normalized_quad": [
+        [
+          0.31,
+          0.198002
+        ],
+        [
+          0.543999,
+          0.198002
+        ],
+        [
+          0.543999,
+          0.22
+        ],
+        [
+          0.31,
+          0.22
+        ]
+      ],
+      "id": "after-visual-002",
+      "source_region_ids": [],
+      "slot_id": "text-d3ee15d6ba-2",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "PHẦN MỀM QUẢN LÝ BÁN HÀNG",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        502.46,
+        288.88,
+        338.83,
+        23.89
+      ],
+      "quad": [
+        [
+          502.46,
+          288.88
+        ],
+        [
+          841.29,
+          288.88
+        ],
+        [
+          841.29,
+          312.77
+        ],
+        [
+          502.46,
+          312.77
+        ]
+      ],
+      "normalized_bbox": [
+        0.347003,
+        0.266004,
+        0.233999,
+        0.021998
+      ],
+      "normalized_quad": [
+        [
+          0.347003,
+          0.266004
+        ],
+        [
+          0.581001,
+          0.266004
+        ],
+        [
+          0.581001,
+          0.288002
+        ],
+        [
+          0.347003,
+          0.288002
+        ]
+      ],
+      "id": "after-visual-003",
+      "source_region_ids": [],
+      "slot_id": "text-d3ee15d6ba-3",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "KiotViet",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        220.1,
+        325.8,
+        118.74,
+        28.24
+      ],
+      "quad": [
+        [
+          220.1,
+          325.8
+        ],
+        [
+          338.84,
+          325.8
+        ],
+        [
+          338.84,
+          354.04
+        ],
+        [
+          220.1,
+          354.04
+        ]
+      ],
+      "normalized_bbox": [
+        0.152003,
+        0.3,
+        0.082003,
+        0.026004
+      ],
+      "normalized_quad": [
+        [
+          0.152003,
+          0.3
+        ],
+        [
+          0.234006,
+          0.3
+        ],
+        [
+          0.234006,
+          0.326004
+        ],
+        [
+          0.152003,
+          0.326004
+        ]
+      ],
+      "id": "after-visual-004",
+      "source_region_ids": [],
+      "slot_id": "text-2d3ff1403d-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "PHẦN MỀM QUẢN LÝ BÁN HÀNG",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        551.69,
+        375.76,
+        338.83,
+        23.89
+      ],
+      "quad": [
+        [
+          551.69,
+          375.76
+        ],
+        [
+          890.52,
+          375.76
+        ],
+        [
+          890.52,
+          399.65
+        ],
+        [
+          551.69,
+          399.65
+        ]
+      ],
+      "normalized_bbox": [
+        0.381001,
+        0.346004,
+        0.233999,
+        0.021998
+      ],
+      "normalized_quad": [
+        [
+          0.381001,
+          0.346004
+        ],
+        [
+          0.615,
+          0.346004
+        ],
+        [
+          0.615,
+          0.368002
+        ],
+        [
+          0.381001,
+          0.368002
+        ]
+      ],
+      "id": "after-visual-005",
+      "source_region_ids": [],
+      "slot_id": "text-d3ee15d6ba-4"
+    },
+    {
+      "text": "Gift VOUCHER",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        486.53,
+        451.78,
+        474.94,
+        58.64
+      ],
+      "quad": [
+        [
+          486.53,
+          451.78
+        ],
+        [
+          961.47,
+          451.78
+        ],
+        [
+          961.47,
+          510.42
+        ],
+        [
+          486.53,
+          510.42
+        ]
+      ],
+      "normalized_bbox": [
+        0.336001,
+        0.416004,
+        0.327997,
+        0.053996
+      ],
+      "normalized_quad": [
+        [
+          0.336001,
+          0.416004
+        ],
+        [
+          0.663999,
+          0.416004
+        ],
+        [
+          0.663999,
+          0.47
+        ],
+        [
+          0.336001,
+          0.47
+        ]
+      ],
+      "id": "after-visual-006",
+      "source_region_ids": [],
+      "slot_id": "text-713f7c3318-1"
+    },
+    {
+      "text": "500.000đ",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        569.06,
+        540.83,
+        309.87,
+        67.33
+      ],
+      "quad": [
+        [
+          569.06,
+          540.83
+        ],
+        [
+          878.93,
+          540.83
+        ],
+        [
+          878.93,
+          608.16
+        ],
+        [
+          569.06,
+          608.16
+        ]
+      ],
+      "normalized_bbox": [
+        0.392997,
+        0.498002,
+        0.213999,
+        0.061998
+      ],
+      "normalized_quad": [
+        [
+          0.392997,
+          0.498002
+        ],
+        [
+          0.606996,
+          0.498002
+        ],
+        [
+          0.606996,
+          0.56
+        ],
+        [
+          0.392997,
+          0.56
+        ]
+      ],
+      "id": "after-visual-007",
+      "source_region_ids": [],
+      "slot_id": "text-5319897539-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "Áp dụng cho gói chuyên nghiệp",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        642.91,
+        616.85,
+        306.98,
+        19.55
+      ],
+      "quad": [
+        [
+          642.91,
+          616.85
+        ],
+        [
+          949.89,
+          616.85
+        ],
+        [
+          949.89,
+          636.4
+        ],
+        [
+          642.91,
+          636.4
+        ]
+      ],
+      "normalized_bbox": [
+        0.443999,
+        0.568002,
+        0.212003,
+        0.018002
+      ],
+      "normalized_quad": [
+        [
+          0.443999,
+          0.568002
+        ],
+        [
+          0.656001,
+          0.568002
+        ],
+        [
+          0.656001,
+          0.586004
+        ],
+        [
+          0.443999,
+          0.586004
+        ]
+      ],
+      "id": "after-visual-008",
+      "source_region_ids": [],
+      "slot_id": "text-2ea1e61cff-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "Gọi ngay để được tư vấn",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        554.58,
+        736.31,
+        194.03,
+        17.38
+      ],
+      "quad": [
+        [
+          554.58,
+          736.31
+        ],
+        [
+          748.61,
+          736.31
+        ],
+        [
+          748.61,
+          753.69
+        ],
+        [
+          554.58,
+          753.69
+        ]
+      ],
+      "normalized_bbox": [
+        0.382997,
+        0.678002,
+        0.133999,
+        0.016004
+      ],
+      "normalized_quad": [
+        [
+          0.382997,
+          0.678002
+        ],
+        [
+          0.516996,
+          0.678002
+        ],
+        [
+          0.516996,
+          0.694006
+        ],
+        [
+          0.382997,
+          0.694006
+        ]
+      ],
+      "id": "after-visual-009",
+      "source_region_ids": [],
+      "slot_id": "text-2eb2059250-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "Địa chỉ: L08 Tôn Đức Thắng, Phường Buôn Ma Thuột, Tỉnh Đắk Lắk",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        554.58,
+        762.37,
+        582.1,
+        17.38
+      ],
+      "quad": [
+        [
+          554.58,
+          762.37
+        ],
+        [
+          1136.68,
+          762.37
+        ],
+        [
+          1136.68,
+          779.75
+        ],
+        [
+          554.58,
+          779.75
+        ]
+      ],
+      "normalized_bbox": [
+        0.382997,
+        0.701998,
+        0.402003,
+        0.016004
+      ],
+      "normalized_quad": [
+        [
+          0.382997,
+          0.701998
+        ],
+        [
+          0.785,
+          0.701998
+        ],
+        [
+          0.785,
+          0.718002
+        ],
+        [
+          0.382997,
+          0.718002
+        ]
+      ],
+      "id": "after-visual-010",
+      "source_region_ids": [],
+      "slot_id": "text-4fb0510ea1-1",
+      "match_confidence": 1.0
+    }
+  ],
+  "text_review": "image_review"
+}

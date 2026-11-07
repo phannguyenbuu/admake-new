@@ -1,0 +1,15 @@
+export type Kind = "material" | "labor" | "transport" | "extra";
+export const kindLabels: Record<Kind, string> = { material: "Vật tư", labor: "Nhân công", transport: "Vận chuyển", extra: "Phát sinh" };
+export type Dimensions = { L: number; H: number; W: number; F: number; count: number };
+export type Item = { quantity_on_hand?: number; inventory_value?: number; below_min_stock?: boolean; balances?: { warehouse_name: string; quantity_on_hand: number; average_cost: number; inventory_value: number }[]; sku?: string; item_type?: string; category_name?: string; warehouse_name?: string; default_supplier_name?: string; supplier_link?: string; standard_cost?: number; average_cost?: number; min_stock_level?: number; item_status?: string; note?: string; id: string; code: string; name: string; unit: string; price: number; specs: { spec: string; unit?: string; price?: number }[] };
+export type ProductConstraints = { dimensions: Record<'L' | 'H' | 'W', { min: number; max?: number }>; minimum_unit_price: number; minimum_order_price: number; note?: string };
+export type Formula = { materials_text?: string; image_assets?: { id: string; url: string; name: string }[]; gallery_ids?: string[]; defaults: Dimensions; constraints?: ProductConstraints; parameters: { key: string; label: string; default: number; unit?: string; min?: number; max?: number }[]; lines: unknown[]; note?: string };
+export type Product = { id: string; name: string; category: string; image_url: string; definition: Formula; version: number; is_published: boolean };
+export type Override = { quantity?: number; unit_price?: number; selected?: boolean };
+export type Extra = { id: string; code: string; name: string; unit: string; quantity: number; unit_price: number; kind: Kind; selected: boolean };
+export type Row = Extra & { base_quantity: number; formula: string; note: string; manual: boolean; overridden: boolean; total: number };
+export type Result = { rows: Row[]; issues: string[]; subtotals: Record<Kind, number>; cost: number; profit: number; tax: number; total: number; unit_total: number; minimum_unit_price?: number; minimum_order_price?: number; minimum_adjustment?: number; price_before_tax?: number };
+export type Brief = { customer_name?: string; customer_phone?: string; customer_address?: string; company_name?: string; company_address?: string; company_phone?: string; company_email?: string; company_logo_url?: string; request_text: string; sign_content: string; notes: string; sign_type: string; materials: string; generated_image_url?: string; render_signature?: string };
+export type Draft = { product_id: string; brief?: Brief; dimensions: Dimensions; parameters: Record<string, number>; overrides: Record<string, Override>; extras: Extra[]; markup: number; vat: number };
+export type Quote = { id: string; version: number; stage: number; payload: Omit<Draft, "product_id"> & { product: Product; result: Result; confirmations: { step: number; at: string }[] } };
+export const money = (value: number) => new Intl.NumberFormat("vi-VN", { maximumFractionDigits: 0 }).format(value) + " ₫";

@@ -1,0 +1,76 @@
+{
+  "schema_version": 1,
+  "product_id": "ae54d49b3d076750ff45e674343083e6",
+  "view": "after",
+  "image": "/product-references/ae54d49b3d076750ff45e674343083e6-photo-after.png",
+  "sha256": "8ab470a09f3c23942ad45de6b7e0b2ea7a62432e3d3b3771a3f32d4f5e3ba776",
+  "width": 1448,
+  "height": 1086,
+  "coordinate_system": "image_pixels_top_left",
+  "status": "detected",
+  "regions": [
+    {
+      "text": "PHÒNG THUỐC",
+      "ocr_text": "PHDNG | THUÔC",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        199.82,
+        330.14,
+        1048.35,
+        523.45
+      ],
+      "quad": [
+        [
+          199.82,
+          330.14
+        ],
+        [
+          1248.17,
+          330.14
+        ],
+        [
+          1248.17,
+          853.59
+        ],
+        [
+          199.82,
+          853.59
+        ]
+      ],
+      "normalized_bbox": [
+        0.137997,
+        0.303996,
+        0.723999,
+        0.481998
+      ],
+      "normalized_quad": [
+        [
+          0.137997,
+          0.303996
+        ],
+        [
+          0.861996,
+          0.303996
+        ],
+        [
+          0.861996,
+          0.785994
+        ],
+        [
+          0.137997,
+          0.785994
+        ]
+      ],
+      "id": "after-visual-001",
+      "source_region_ids": [
+        "after-001",
+        "after-002"
+      ],
+      "slot_id": "text-b972f8637a-1",
+      "match_confidence": 1.0
+    }
+  ],
+  "text_review": "image_review"
+}

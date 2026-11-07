@@ -1,0 +1,136 @@
+{
+  "schema_version": 1,
+  "product_id": "e66e0453b9ea41ef0ebfdec89d39b7d4",
+  "view": "before",
+  "image": "/product-references/e66e0453b9ea41ef0ebfdec89d39b7d4-photo-before.png",
+  "sha256": "20b9cfa4261ce9e84b367ab6a42bde28a5a44be797f04217020575facc756f90",
+  "width": 1448,
+  "height": 1086,
+  "coordinate_system": "image_pixels_top_left",
+  "status": "detected",
+  "regions": [
+    {
+      "text": "THẢO MIN",
+      "ocr_text": "THẢOMIN",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        31.0,
+        296.0,
+        1402.0,
+        430.0
+      ],
+      "quad": [
+        [
+          31.0,
+          296.0
+        ],
+        [
+          1433.0,
+          296.0
+        ],
+        [
+          1433.0,
+          726.0
+        ],
+        [
+          31.0,
+          726.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.021409,
+        0.27256,
+        0.968232,
+        0.395948
+      ],
+      "normalized_quad": [
+        [
+          0.021409,
+          0.27256
+        ],
+        [
+          0.989641,
+          0.27256
+        ],
+        [
+          0.989641,
+          0.668508
+        ],
+        [
+          0.021409,
+          0.668508
+        ]
+      ],
+      "id": "before-visual-001",
+      "source_region_ids": [
+        "before-001"
+      ],
+      "slot_id": "text-1b67a5474a-1"
+    },
+    {
+      "text": "StepHi - BodyFit",
+      "ocr_text": "StepHi | 9 | BodyFit",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        292.5,
+        660.29,
+        902.1,
+        187.88
+      ],
+      "quad": [
+        [
+          292.5,
+          660.29
+        ],
+        [
+          1194.6,
+          660.29
+        ],
+        [
+          1194.6,
+          848.17
+        ],
+        [
+          292.5,
+          848.17
+        ]
+      ],
+      "normalized_bbox": [
+        0.202003,
+        0.608002,
+        0.622997,
+        0.173002
+      ],
+      "normalized_quad": [
+        [
+          0.202003,
+          0.608002
+        ],
+        [
+          0.825,
+          0.608002
+        ],
+        [
+          0.825,
+          0.781004
+        ],
+        [
+          0.202003,
+          0.781004
+        ]
+      ],
+      "id": "before-visual-002",
+      "source_region_ids": [
+        "before-002",
+        "before-003",
+        "before-004"
+      ],
+      "slot_id": "text-1dfd311ee7-1"
+    }
+  ],
+  "text_review": "image_review"
+}

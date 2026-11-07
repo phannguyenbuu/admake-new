@@ -1,0 +1,74 @@
+{
+  "schema_version": 1,
+  "product_id": "ae54d49b3d076750ff45e674343083e6",
+  "view": "before",
+  "image": "/product-references/ae54d49b3d076750ff45e674343083e6-photo-before.png",
+  "sha256": "487a51968cbf1632616a914595607c9ef1ed0faa817571d9e2493c414f3e989d",
+  "width": 1448,
+  "height": 1086,
+  "coordinate_system": "image_pixels_top_left",
+  "status": "detected",
+  "regions": [
+    {
+      "text": "PHÒNG THUỐC",
+      "ocr_text": "PHÒHG THUÓC",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        140.0,
+        332.0,
+        1176.0,
+        384.0
+      ],
+      "quad": [
+        [
+          140.0,
+          332.0
+        ],
+        [
+          1316.0,
+          332.0
+        ],
+        [
+          1316.0,
+          716.0
+        ],
+        [
+          140.0,
+          716.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.096685,
+        0.305709,
+        0.812155,
+        0.353591
+      ],
+      "normalized_quad": [
+        [
+          0.096685,
+          0.305709
+        ],
+        [
+          0.90884,
+          0.305709
+        ],
+        [
+          0.90884,
+          0.6593
+        ],
+        [
+          0.096685,
+          0.6593
+        ]
+      ],
+      "id": "before-visual-001",
+      "source_region_ids": [
+        "before-001"
+      ],
+      "slot_id": "text-b972f8637a-1"
+    }
+  ],
+  "text_review": "image_review"
+}

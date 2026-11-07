@@ -1,0 +1,367 @@
+{
+  "schema_version": 1,
+  "product_id": "71c555a6be3695dd6ac7369d61cc989f",
+  "view": "after",
+  "image": "/product-references/71c555a6be3695dd6ac7369d61cc989f-photo-after.png",
+  "sha256": "fd5e0ce3f002fe7e166c7b7fb5b350027262c97c8fae4b159100e200d59547aa",
+  "width": 1448,
+  "height": 1086,
+  "coordinate_system": "image_pixels_top_left",
+  "status": "detected",
+  "regions": [
+    {
+      "text": "TIỆM TRÀ NHÀ MEOW",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        383.72,
+        30.41,
+        1035.32,
+        190.05
+      ],
+      "quad": [
+        [
+          383.72,
+          30.41
+        ],
+        [
+          1419.04,
+          30.41
+        ],
+        [
+          1419.04,
+          220.46
+        ],
+        [
+          383.72,
+          220.46
+        ]
+      ],
+      "normalized_bbox": [
+        0.265,
+        0.028002,
+        0.715,
+        0.175
+      ],
+      "normalized_quad": [
+        [
+          0.265,
+          0.028002
+        ],
+        [
+          0.98,
+          0.028002
+        ],
+        [
+          0.98,
+          0.203002
+        ],
+        [
+          0.265,
+          0.203002
+        ]
+      ],
+      "id": "after-visual-001",
+      "source_region_ids": [],
+      "slot_id": "text-301f83693d-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "TRÀ NGON - ĐẬM VỊ",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        422.82,
+        157.47,
+        970.16,
+        255.21
+      ],
+      "quad": [
+        [
+          422.82,
+          157.47
+        ],
+        [
+          1392.98,
+          157.47
+        ],
+        [
+          1392.98,
+          412.68
+        ],
+        [
+          422.82,
+          412.68
+        ]
+      ],
+      "normalized_bbox": [
+        0.292003,
+        0.145,
+        0.67,
+        0.235
+      ],
+      "normalized_quad": [
+        [
+          0.292003,
+          0.145
+        ],
+        [
+          0.962003,
+          0.145
+        ],
+        [
+          0.962003,
+          0.38
+        ],
+        [
+          0.292003,
+          0.38
+        ]
+      ],
+      "id": "after-visual-002",
+      "source_region_ids": [],
+      "slot_id": "text-a4ded7cdf8-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "TRÀ SỮA FULL TOPPING",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        388.06,
+        644.0,
+        984.64,
+        442.0
+      ],
+      "quad": [
+        [
+          388.06,
+          644.0
+        ],
+        [
+          1372.7,
+          644.0
+        ],
+        [
+          1372.7,
+          1086.0
+        ],
+        [
+          388.06,
+          1086.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.267997,
+        0.593002,
+        0.68,
+        0.406998
+      ],
+      "normalized_quad": [
+        [
+          0.267997,
+          0.593002
+        ],
+        [
+          0.947997,
+          0.593002
+        ],
+        [
+          0.947997,
+          1.0
+        ],
+        [
+          0.267997,
+          1.0
+        ]
+      ],
+      "id": "after-visual-003",
+      "source_region_ids": [],
+      "slot_id": "text-4909d7fece-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "TRÀ TRÁI CÂY",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        388.06,
+        722.19,
+        724.0,
+        363.81
+      ],
+      "quad": [
+        [
+          388.06,
+          722.19
+        ],
+        [
+          1112.06,
+          722.19
+        ],
+        [
+          1112.06,
+          1086.0
+        ],
+        [
+          388.06,
+          1086.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.267997,
+        0.665,
+        0.5,
+        0.335
+      ],
+      "normalized_quad": [
+        [
+          0.267997,
+          0.665
+        ],
+        [
+          0.767997,
+          0.665
+        ],
+        [
+          0.767997,
+          1.0
+        ],
+        [
+          0.267997,
+          1.0
+        ]
+      ],
+      "id": "after-visual-004",
+      "source_region_ids": [],
+      "slot_id": "text-aacacd789f-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "MÌ CAY - ĂN VẶT",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        388.06,
+        798.21,
+        767.44,
+        287.79
+      ],
+      "quad": [
+        [
+          388.06,
+          798.21
+        ],
+        [
+          1155.5,
+          798.21
+        ],
+        [
+          1155.5,
+          1086.0
+        ],
+        [
+          388.06,
+          1086.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.267997,
+        0.735,
+        0.53,
+        0.265
+      ],
+      "normalized_quad": [
+        [
+          0.267997,
+          0.735
+        ],
+        [
+          0.797997,
+          0.735
+        ],
+        [
+          0.797997,
+          1.0
+        ],
+        [
+          0.267997,
+          1.0
+        ]
+      ],
+      "id": "after-visual-005",
+      "source_region_ids": [],
+      "slot_id": "text-108fe5aebd-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "TIỆM TRÀ NHÀ MEOW 0962 750 569",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        796.4,
+        773.23,
+        651.6,
+        312.77
+      ],
+      "quad": [
+        [
+          796.4,
+          773.23
+        ],
+        [
+          1448.0,
+          773.23
+        ],
+        [
+          1448.0,
+          1086.0
+        ],
+        [
+          796.4,
+          1086.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.55,
+        0.711998,
+        0.45,
+        0.288002
+      ],
+      "normalized_quad": [
+        [
+          0.55,
+          0.711998
+        ],
+        [
+          1.0,
+          0.711998
+        ],
+        [
+          1.0,
+          1.0
+        ],
+        [
+          0.55,
+          1.0
+        ]
+      ],
+      "id": "after-visual-006",
+      "source_region_ids": [],
+      "slot_id": "text-28f6ab27e4-1"
+    }
+  ],
+  "text_review": "image_review"
+}

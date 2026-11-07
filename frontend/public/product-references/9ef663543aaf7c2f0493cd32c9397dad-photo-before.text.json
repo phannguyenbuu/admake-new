@@ -1,0 +1,134 @@
+{
+  "schema_version": 1,
+  "product_id": "9ef663543aaf7c2f0493cd32c9397dad",
+  "view": "before",
+  "image": "/product-references/9ef663543aaf7c2f0493cd32c9397dad-photo-before.png",
+  "sha256": "6bbaf6b907342139b240535c5d369d0ade8db912aada8b9ca4933435eee46903",
+  "width": 1448,
+  "height": 1086,
+  "coordinate_system": "image_pixels_top_left",
+  "status": "detected",
+  "regions": [
+    {
+      "id": "before-visual-001",
+      "text": "THẢO",
+      "ocr_text": "",
+      "confidence": 1,
+      "review": "verified",
+      "method": "visual_annotation",
+      "bbox": [
+        50,
+        230,
+        1380,
+        270
+      ],
+      "quad": [
+        [
+          50,
+          230
+        ],
+        [
+          1430,
+          230
+        ],
+        [
+          1430,
+          500
+        ],
+        [
+          50,
+          500
+        ]
+      ],
+      "normalized_bbox": [
+        0.03453,
+        0.211786,
+        0.953039,
+        0.248619
+      ],
+      "normalized_quad": [
+        [
+          0.03453,
+          0.211786
+        ],
+        [
+          0.987569,
+          0.211786
+        ],
+        [
+          0.987569,
+          0.460405
+        ],
+        [
+          0.03453,
+          0.460405
+        ]
+      ],
+      "source_region_ids": [
+        "before-visual-001"
+      ],
+      "slot_id": "text-f638c25321-1"
+    },
+    {
+      "id": "before-visual-002",
+      "text": "MIN",
+      "ocr_text": "",
+      "confidence": 1,
+      "review": "verified",
+      "method": "visual_annotation",
+      "bbox": [
+        50,
+        500,
+        1335,
+        375
+      ],
+      "quad": [
+        [
+          50,
+          500
+        ],
+        [
+          1385,
+          500
+        ],
+        [
+          1385,
+          875
+        ],
+        [
+          50,
+          875
+        ]
+      ],
+      "normalized_bbox": [
+        0.03453,
+        0.460405,
+        0.921961,
+        0.345304
+      ],
+      "normalized_quad": [
+        [
+          0.03453,
+          0.460405
+        ],
+        [
+          0.956492,
+          0.460405
+        ],
+        [
+          0.956492,
+          0.805709
+        ],
+        [
+          0.03453,
+          0.805709
+        ]
+      ],
+      "source_region_ids": [
+        "before-visual-002"
+      ],
+      "slot_id": "text-b6c935d4f3-1"
+    }
+  ],
+  "text_review": "image_review"
+}

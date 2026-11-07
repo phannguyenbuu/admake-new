@@ -1,0 +1,722 @@
+{
+  "schema_version": 1,
+  "product_id": "ae190871dac07627be48bdd5ee09015a",
+  "view": "after",
+  "image": "/product-references/ae190871dac07627be48bdd5ee09015a-photo-after.png",
+  "sha256": "6e1e6bc17bb6b09d7c2dc3f59fc83fee84d15655882452321d6db3f7b508a3ce",
+  "width": 1448,
+  "height": 1086,
+  "coordinate_system": "image_pixels_top_left",
+  "status": "detected",
+  "regions": [
+    {
+      "text": "1 KG",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        586.44,
+        224.8,
+        123.08,
+        65.16
+      ],
+      "quad": [
+        [
+          586.44,
+          224.8
+        ],
+        [
+          709.52,
+          224.8
+        ],
+        [
+          709.52,
+          289.96
+        ],
+        [
+          586.44,
+          289.96
+        ]
+      ],
+      "normalized_bbox": [
+        0.405,
+        0.206998,
+        0.085,
+        0.06
+      ],
+      "normalized_quad": [
+        [
+          0.405,
+          0.206998
+        ],
+        [
+          0.49,
+          0.206998
+        ],
+        [
+          0.49,
+          0.266998
+        ],
+        [
+          0.405,
+          0.266998
+        ]
+      ],
+      "id": "after-visual-001",
+      "source_region_ids": [],
+      "slot_id": "text-d82c9525a6-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "HÀU SỮA",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        557.48,
+        280.19,
+        296.84,
+        92.31
+      ],
+      "quad": [
+        [
+          557.48,
+          280.19
+        ],
+        [
+          854.32,
+          280.19
+        ],
+        [
+          854.32,
+          372.5
+        ],
+        [
+          557.48,
+          372.5
+        ]
+      ],
+      "normalized_bbox": [
+        0.385,
+        0.258002,
+        0.205,
+        0.085
+      ],
+      "normalized_quad": [
+        [
+          0.385,
+          0.258002
+        ],
+        [
+          0.59,
+          0.258002
+        ],
+        [
+          0.59,
+          0.343002
+        ],
+        [
+          0.385,
+          0.343002
+        ]
+      ],
+      "id": "after-visual-002",
+      "source_region_ids": [],
+      "slot_id": "text-c59bc506d9-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "HẤP SẢ",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        644.36,
+        363.81,
+        209.96,
+        70.59
+      ],
+      "quad": [
+        [
+          644.36,
+          363.81
+        ],
+        [
+          854.32,
+          363.81
+        ],
+        [
+          854.32,
+          434.4
+        ],
+        [
+          644.36,
+          434.4
+        ]
+      ],
+      "normalized_bbox": [
+        0.445,
+        0.335,
+        0.145,
+        0.065
+      ],
+      "normalized_quad": [
+        [
+          0.445,
+          0.335
+        ],
+        [
+          0.59,
+          0.335
+        ],
+        [
+          0.59,
+          0.4
+        ],
+        [
+          0.445,
+          0.4
+        ]
+      ],
+      "id": "after-visual-003",
+      "source_region_ids": [],
+      "slot_id": "text-6620161bb2-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "CHỈ",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        783.37,
+        464.81,
+        79.64,
+        38.01
+      ],
+      "quad": [
+        [
+          783.37,
+          464.81
+        ],
+        [
+          863.01,
+          464.81
+        ],
+        [
+          863.01,
+          502.82
+        ],
+        [
+          783.37,
+          502.82
+        ]
+      ],
+      "normalized_bbox": [
+        0.541001,
+        0.428002,
+        0.055,
+        0.035
+      ],
+      "normalized_quad": [
+        [
+          0.541001,
+          0.428002
+        ],
+        [
+          0.596001,
+          0.428002
+        ],
+        [
+          0.596001,
+          0.463002
+        ],
+        [
+          0.541001,
+          0.463002
+        ]
+      ],
+      "id": "after-visual-004",
+      "source_region_ids": [],
+      "slot_id": "text-bc32c6fe02-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "39",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        750.06,
+        494.13,
+        152.04,
+        114.03
+      ],
+      "quad": [
+        [
+          750.06,
+          494.13
+        ],
+        [
+          902.1,
+          494.13
+        ],
+        [
+          902.1,
+          608.16
+        ],
+        [
+          750.06,
+          608.16
+        ]
+      ],
+      "normalized_bbox": [
+        0.517997,
+        0.455,
+        0.105,
+        0.105
+      ],
+      "normalized_quad": [
+        [
+          0.517997,
+          0.455
+        ],
+        [
+          0.622997,
+          0.455
+        ],
+        [
+          0.622997,
+          0.56
+        ],
+        [
+          0.517997,
+          0.56
+        ]
+      ],
+      "id": "after-visual-005",
+      "source_region_ids": [],
+      "slot_id": "text-ca3512f4df-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "XU",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        793.5,
+        595.13,
+        65.16,
+        38.01
+      ],
+      "quad": [
+        [
+          793.5,
+          595.13
+        ],
+        [
+          858.66,
+          595.13
+        ],
+        [
+          858.66,
+          633.14
+        ],
+        [
+          793.5,
+          633.14
+        ]
+      ],
+      "normalized_bbox": [
+        0.547997,
+        0.548002,
+        0.045,
+        0.035
+      ],
+      "normalized_quad": [
+        [
+          0.547997,
+          0.548002
+        ],
+        [
+          0.592997,
+          0.548002
+        ],
+        [
+          0.592997,
+          0.583002
+        ],
+        [
+          0.547997,
+          0.583002
+        ]
+      ],
+      "id": "after-visual-006",
+      "source_region_ids": [],
+      "slot_id": "text-2383e70692-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "SỮA",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        1013.6,
+        334.49,
+        152.04,
+        70.59
+      ],
+      "quad": [
+        [
+          1013.6,
+          334.49
+        ],
+        [
+          1165.64,
+          334.49
+        ],
+        [
+          1165.64,
+          405.08
+        ],
+        [
+          1013.6,
+          405.08
+        ]
+      ],
+      "normalized_bbox": [
+        0.7,
+        0.308002,
+        0.105,
+        0.065
+      ],
+      "normalized_quad": [
+        [
+          0.7,
+          0.308002
+        ],
+        [
+          0.805,
+          0.308002
+        ],
+        [
+          0.805,
+          0.373002
+        ],
+        [
+          0.7,
+          0.373002
+        ]
+      ],
+      "id": "after-visual-007",
+      "source_region_ids": [],
+      "slot_id": "text-840e247e10-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "SỐT THÁI",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        977.4,
+        407.25,
+        311.32,
+        81.45
+      ],
+      "quad": [
+        [
+          977.4,
+          407.25
+        ],
+        [
+          1288.72,
+          407.25
+        ],
+        [
+          1288.72,
+          488.7
+        ],
+        [
+          977.4,
+          488.7
+        ]
+      ],
+      "normalized_bbox": [
+        0.675,
+        0.375,
+        0.215,
+        0.075
+      ],
+      "normalized_quad": [
+        [
+          0.675,
+          0.375
+        ],
+        [
+          0.89,
+          0.375
+        ],
+        [
+          0.89,
+          0.45
+        ],
+        [
+          0.675,
+          0.45
+        ]
+      ],
+      "id": "after-visual-008",
+      "source_region_ids": [],
+      "slot_id": "text-9bdfe91e07-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "GIÒN MÁT",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        1049.8,
+        477.84,
+        238.92,
+        54.3
+      ],
+      "quad": [
+        [
+          1049.8,
+          477.84
+        ],
+        [
+          1288.72,
+          477.84
+        ],
+        [
+          1288.72,
+          532.14
+        ],
+        [
+          1049.8,
+          532.14
+        ]
+      ],
+      "normalized_bbox": [
+        0.725,
+        0.44,
+        0.165,
+        0.05
+      ],
+      "normalized_quad": [
+        [
+          0.725,
+          0.44
+        ],
+        [
+          0.89,
+          0.44
+        ],
+        [
+          0.89,
+          0.49
+        ],
+        [
+          0.725,
+          0.49
+        ]
+      ],
+      "id": "after-visual-009",
+      "source_region_ids": [],
+      "slot_id": "text-3bc94e3fca-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "CHỈ",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        1184.46,
+        540.83,
+        79.64,
+        38.01
+      ],
+      "quad": [
+        [
+          1184.46,
+          540.83
+        ],
+        [
+          1264.1,
+          540.83
+        ],
+        [
+          1264.1,
+          578.84
+        ],
+        [
+          1184.46,
+          578.84
+        ]
+      ],
+      "normalized_bbox": [
+        0.817997,
+        0.498002,
+        0.055,
+        0.035
+      ],
+      "normalized_quad": [
+        [
+          0.817997,
+          0.498002
+        ],
+        [
+          0.872997,
+          0.498002
+        ],
+        [
+          0.872997,
+          0.533002
+        ],
+        [
+          0.817997,
+          0.533002
+        ]
+      ],
+      "id": "after-visual-010",
+      "source_region_ids": [],
+      "slot_id": "text-bc32c6fe02-2",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "69",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        1141.02,
+        570.15,
+        152.04,
+        114.03
+      ],
+      "quad": [
+        [
+          1141.02,
+          570.15
+        ],
+        [
+          1293.06,
+          570.15
+        ],
+        [
+          1293.06,
+          684.18
+        ],
+        [
+          1141.02,
+          684.18
+        ]
+      ],
+      "normalized_bbox": [
+        0.787997,
+        0.525,
+        0.105,
+        0.105
+      ],
+      "normalized_quad": [
+        [
+          0.787997,
+          0.525
+        ],
+        [
+          0.892997,
+          0.525
+        ],
+        [
+          0.892997,
+          0.63
+        ],
+        [
+          0.787997,
+          0.63
+        ]
+      ],
+      "id": "after-visual-011",
+      "source_region_ids": [],
+      "slot_id": "text-a72b20062e-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "XU",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        1187.36,
+        671.15,
+        65.16,
+        38.01
+      ],
+      "quad": [
+        [
+          1187.36,
+          671.15
+        ],
+        [
+          1252.52,
+          671.15
+        ],
+        [
+          1252.52,
+          709.16
+        ],
+        [
+          1187.36,
+          709.16
+        ]
+      ],
+      "normalized_bbox": [
+        0.82,
+        0.618002,
+        0.045,
+        0.035
+      ],
+      "normalized_quad": [
+        [
+          0.82,
+          0.618002
+        ],
+        [
+          0.865,
+          0.618002
+        ],
+        [
+          0.865,
+          0.653002
+        ],
+        [
+          0.82,
+          0.653002
+        ]
+      ],
+      "id": "after-visual-012",
+      "source_region_ids": [],
+      "slot_id": "text-2383e70692-2",
+      "match_confidence": 1.0
+    }
+  ],
+  "text_review": "image_review"
+}

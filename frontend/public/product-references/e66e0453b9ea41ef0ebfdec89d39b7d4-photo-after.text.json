@@ -1,0 +1,137 @@
+{
+  "schema_version": 1,
+  "product_id": "e66e0453b9ea41ef0ebfdec89d39b7d4",
+  "view": "after",
+  "image": "/product-references/e66e0453b9ea41ef0ebfdec89d39b7d4-photo-after.png",
+  "sha256": "509ab29f8ceb91dd3fe4acf2ab79a7ba9f46e8569f8c1c4429206510728e7756",
+  "width": 1448,
+  "height": 1086,
+  "coordinate_system": "image_pixels_top_left",
+  "status": "detected",
+  "regions": [
+    {
+      "text": "THẢO MIN",
+      "ocr_text": "THẢOMIN",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        49.04,
+        220.0,
+        1361.92,
+        498.0
+      ],
+      "quad": [
+        [
+          101.75,
+          220.0
+        ],
+        [
+          1410.96,
+          409.96
+        ],
+        [
+          1358.25,
+          718.0
+        ],
+        [
+          49.04,
+          528.04
+        ]
+      ],
+      "normalized_bbox": [
+        0.033867,
+        0.202578,
+        0.940552,
+        0.458564
+      ],
+      "normalized_quad": [
+        [
+          0.070269,
+          0.202578
+        ],
+        [
+          0.97442,
+          0.377495
+        ],
+        [
+          0.938018,
+          0.661142
+        ],
+        [
+          0.033867,
+          0.486225
+        ]
+      ],
+      "id": "after-visual-001",
+      "source_region_ids": [
+        "after-001"
+      ],
+      "slot_id": "text-1b67a5474a-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "StepHi - BodyFit",
+      "ocr_text": "StepHi | BodyFit",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        118.74,
+        570.15,
+        1329.26,
+        515.85
+      ],
+      "quad": [
+        [
+          118.74,
+          570.15
+        ],
+        [
+          1448.0,
+          570.15
+        ],
+        [
+          1448.0,
+          1086.0
+        ],
+        [
+          118.74,
+          1086.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.082003,
+        0.525,
+        0.917997,
+        0.475
+      ],
+      "normalized_quad": [
+        [
+          0.082003,
+          0.525
+        ],
+        [
+          1.0,
+          0.525
+        ],
+        [
+          1.0,
+          1.0
+        ],
+        [
+          0.082003,
+          1.0
+        ]
+      ],
+      "id": "after-visual-002",
+      "source_region_ids": [
+        "after-002",
+        "after-003"
+      ],
+      "slot_id": "text-1dfd311ee7-1",
+      "match_confidence": 1.0
+    }
+  ],
+  "text_review": "image_review"
+}

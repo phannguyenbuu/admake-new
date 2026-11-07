@@ -100,13 +100,12 @@ export function useStudioRenderGenAI({
             reference_images: [snapshot],
             style: renderStyle,
             aspect_ratio: targetRatio,
-            new_chat: true,
           });
         } catch {
-          job = await genAISignboardService.createRenderJob({ prompt: renderPrompt, style: renderStyle, aspect_ratio: targetRatio, new_chat: true });
+          job = await genAISignboardService.createRenderJob({ prompt: renderPrompt, style: renderStyle, aspect_ratio: targetRatio });
         }
       } else {
-        job = await genAISignboardService.createRenderJob({ prompt: renderPrompt, style: renderStyle, aspect_ratio: targetRatio, new_chat: true });
+        job = await genAISignboardService.createRenderJob({ prompt: renderPrompt, style: renderStyle, aspect_ratio: targetRatio });
       }
       if (!job?.id) throw new Error((job as any)?.error || "GenAI không tạo được tác vụ render");
       if (!mountedRef.current) return;

@@ -1,0 +1,73 @@
+{
+  "schema_version": 1,
+  "product_id": "5ea481bdd37d7c30913ae50af2de5874",
+  "view": "after",
+  "image": "/product-references/5ea481bdd37d7c30913ae50af2de5874-photo-after.png",
+  "sha256": "d92e2da01fee1e4f81778155d87004902795cec8908bdcaf74faa427bb81871d",
+  "width": 1448,
+  "height": 1086,
+  "coordinate_system": "image_pixels_top_left",
+  "status": "detected",
+  "regions": [
+    {
+      "text": "SUE BRIDAL",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        273.67,
+        305.17,
+        1049.8,
+        703.73
+      ],
+      "quad": [
+        [
+          273.67,
+          305.17
+        ],
+        [
+          1323.47,
+          305.17
+        ],
+        [
+          1323.47,
+          1008.9
+        ],
+        [
+          273.67,
+          1008.9
+        ]
+      ],
+      "normalized_bbox": [
+        0.188999,
+        0.281004,
+        0.725,
+        0.648002
+      ],
+      "normalized_quad": [
+        [
+          0.188999,
+          0.281004
+        ],
+        [
+          0.913999,
+          0.281004
+        ],
+        [
+          0.913999,
+          0.929006
+        ],
+        [
+          0.188999,
+          0.929006
+        ]
+      ],
+      "id": "after-visual-001",
+      "source_region_ids": [],
+      "slot_id": "text-e625bc5cf5-1",
+      "match_confidence": 1.0
+    }
+  ],
+  "text_review": "image_review"
+}

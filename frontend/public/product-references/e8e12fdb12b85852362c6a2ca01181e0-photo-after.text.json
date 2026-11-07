@@ -1,0 +1,134 @@
+{
+  "schema_version": 1,
+  "product_id": "e8e12fdb12b85852362c6a2ca01181e0",
+  "view": "after",
+  "image": "/product-references/e8e12fdb12b85852362c6a2ca01181e0-photo-after.png",
+  "sha256": "836b8990d6cd6304f6a69c3583f794c7a1ae7431e44c4fe6c3183f72c1b37a5f",
+  "width": 1448,
+  "height": 1086,
+  "coordinate_system": "image_pixels_top_left",
+  "status": "detected",
+  "regions": [
+    {
+      "text": "DÈNI",
+      "ocr_text": "DÈNI",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        37.0,
+        387.0,
+        486.0,
+        254.0
+      ],
+      "quad": [
+        [
+          37.0,
+          387.0
+        ],
+        [
+          523.0,
+          387.0
+        ],
+        [
+          523.0,
+          641.0
+        ],
+        [
+          37.0,
+          641.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.025552,
+        0.356354,
+        0.335635,
+        0.233886
+      ],
+      "normalized_quad": [
+        [
+          0.025552,
+          0.356354
+        ],
+        [
+          0.361188,
+          0.356354
+        ],
+        [
+          0.361188,
+          0.590239
+        ],
+        [
+          0.025552,
+          0.590239
+        ]
+      ],
+      "id": "after-visual-001",
+      "source_region_ids": [
+        "after-001"
+      ],
+      "slot_id": "text-e184865de1-1"
+    },
+    {
+      "text": "MAISON",
+      "ocr_text": "AALQ",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        513.08,
+        338.0,
+        918.84,
+        352.0
+      ],
+      "quad": [
+        [
+          549.73,
+          338.0
+        ],
+        [
+          1431.92,
+          451.78
+        ],
+        [
+          1396.27,
+          690.0
+        ],
+        [
+          513.08,
+          577.22
+        ]
+      ],
+      "normalized_bbox": [
+        0.354337,
+        0.311234,
+        0.634558,
+        0.324125
+      ],
+      "normalized_quad": [
+        [
+          0.379648,
+          0.311234
+        ],
+        [
+          0.988895,
+          0.416004
+        ],
+        [
+          0.964275,
+          0.635359
+        ],
+        [
+          0.354337,
+          0.53151
+        ]
+      ],
+      "id": "after-visual-002",
+      "source_region_ids": [
+        "after-002"
+      ],
+      "slot_id": "text-996c8da3ca-1"
+    }
+  ],
+  "text_review": "image_review"
+}

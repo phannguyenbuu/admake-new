@@ -1,0 +1,136 @@
+{
+  "schema_version": 1,
+  "product_id": "5b46308d3f7012838d01ccf9ebf79f24",
+  "view": "after",
+  "image": "/product-references/5b46308d3f7012838d01ccf9ebf79f24-photo-after.png",
+  "sha256": "c5b0626d5050aade47bad4162e1b0a8dd2b09b9bda00b2e7d89f3f4ab89eae36",
+  "width": 1448,
+  "height": 1086,
+  "coordinate_system": "image_pixels_top_left",
+  "status": "detected",
+  "regions": [
+    {
+      "text": "28",
+      "ocr_text": "9",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        461.23,
+        70.34,
+        528.54,
+        395.32000000000005
+      ],
+      "quad": [
+        [
+          461.23,
+          186.03
+        ],
+        [
+          929.9,
+          70.34
+        ],
+        [
+          989.77,
+          349.97
+        ],
+        [
+          522.1,
+          465.66
+        ]
+      ],
+      "normalized_bbox": [
+        0.318529,
+        0.06477,
+        0.365014,
+        0.364015
+      ],
+      "normalized_quad": [
+        [
+          0.318529,
+          0.171298
+        ],
+        [
+          0.642196,
+          0.06477
+        ],
+        [
+          0.683543,
+          0.322256
+        ],
+        [
+          0.360566,
+          0.428785
+        ]
+      ],
+      "id": "after-visual-001",
+      "source_region_ids": [
+        "after-001"
+      ],
+      "slot_id": "text-0a57cb53ba-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "PI NĂNG TẮC",
+      "ocr_text": "PI NĂNG",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        380.31,
+        386.53,
+        720.3800000000001,
+        537.94
+      ],
+      "quad": [
+        [
+          380.31,
+          712.03
+        ],
+        [
+          1001.26,
+          386.53
+        ],
+        [
+          1100.69,
+          598.97
+        ],
+        [
+          480.74,
+          924.47
+        ]
+      ],
+      "normalized_bbox": [
+        0.262645,
+        0.355921,
+        0.4975,
+        0.495341
+      ],
+      "normalized_quad": [
+        [
+          0.262645,
+          0.655645
+        ],
+        [
+          0.691478,
+          0.355921
+        ],
+        [
+          0.760145,
+          0.551538
+        ],
+        [
+          0.332003,
+          0.851262
+        ]
+      ],
+      "id": "after-visual-002",
+      "source_region_ids": [
+        "after-003"
+      ],
+      "slot_id": "text-f478ad8b7b-1",
+      "match_confidence": 1.0
+    }
+  ],
+  "text_review": "image_review"
+}

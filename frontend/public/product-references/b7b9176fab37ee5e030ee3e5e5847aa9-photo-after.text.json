@@ -1,0 +1,335 @@
+{
+  "schema_version": 1,
+  "product_id": "b7b9176fab37ee5e030ee3e5e5847aa9",
+  "view": "after",
+  "image": "/product-references/b7b9176fab37ee5e030ee3e5e5847aa9-photo-after.png",
+  "sha256": "ebafa1f0295621674f877b19c347065422c26be59c2422cbba1daea90fe68f8b",
+  "width": 1448,
+  "height": 1086,
+  "coordinate_system": "image_pixels_top_left",
+  "status": "detected",
+  "regions": [
+    {
+      "text": "CÔNG TY TNHH MỘT THÀNH VIÊN",
+      "ocr_text": "CÔNG | TY | TNHH | MỘT | THÀNH | VIÊN",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        288.15,
+        188.96,
+        836.94,
+        147.7
+      ],
+      "quad": [
+        [
+          288.15,
+          188.96
+        ],
+        [
+          1125.09,
+          188.96
+        ],
+        [
+          1125.09,
+          336.66
+        ],
+        [
+          288.15,
+          336.66
+        ]
+      ],
+      "normalized_bbox": [
+        0.198999,
+        0.173996,
+        0.577997,
+        0.136004
+      ],
+      "normalized_quad": [
+        [
+          0.198999,
+          0.173996
+        ],
+        [
+          0.776996,
+          0.173996
+        ],
+        [
+          0.776996,
+          0.31
+        ],
+        [
+          0.198999,
+          0.31
+        ]
+      ],
+      "id": "after-visual-001",
+      "source_region_ids": [
+        "after-001",
+        "after-002",
+        "after-003",
+        "after-004",
+        "after-005",
+        "after-006"
+      ],
+      "slot_id": "text-3de75e4a2f-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "TM - DV CHUNG LÝ",
+      "ocr_text": "TI | 2 | DV | CHUNG | LÝ",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        291.05,
+        330.14,
+        812.33,
+        243.26
+      ],
+      "quad": [
+        [
+          291.05,
+          330.14
+        ],
+        [
+          1103.38,
+          330.14
+        ],
+        [
+          1103.38,
+          573.4
+        ],
+        [
+          291.05,
+          573.4
+        ]
+      ],
+      "normalized_bbox": [
+        0.201001,
+        0.303996,
+        0.561001,
+        0.223996
+      ],
+      "normalized_quad": [
+        [
+          0.201001,
+          0.303996
+        ],
+        [
+          0.762003,
+          0.303996
+        ],
+        [
+          0.762003,
+          0.527993
+        ],
+        [
+          0.201001,
+          0.527993
+        ]
+      ],
+      "id": "after-visual-002",
+      "source_region_ids": [
+        "after-007",
+        "after-008",
+        "after-009",
+        "after-010",
+        "after-011"
+      ],
+      "slot_id": "text-9a1b81c0c4-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "MST: 6001802511",
+      "ocr_text": "MST: | 6001802511",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        338.83,
+        499.56,
+        674.77,
+        173.76
+      ],
+      "quad": [
+        [
+          338.83,
+          499.56
+        ],
+        [
+          1013.6,
+          499.56
+        ],
+        [
+          1013.6,
+          673.32
+        ],
+        [
+          338.83,
+          673.32
+        ]
+      ],
+      "normalized_bbox": [
+        0.233999,
+        0.46,
+        0.466001,
+        0.16
+      ],
+      "normalized_quad": [
+        [
+          0.233999,
+          0.46
+        ],
+        [
+          0.7,
+          0.46
+        ],
+        [
+          0.7,
+          0.62
+        ],
+        [
+          0.233999,
+          0.62
+        ]
+      ],
+      "id": "after-visual-003",
+      "source_region_ids": [
+        "after-012",
+        "after-013"
+      ],
+      "slot_id": "text-ebb3b45758-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "ĐC:THÔN 2, XÃ EA KIẾT, T. ĐẮK LẮK",
+      "ocr_text": "DC:THÔN | 2,XÃ EA | KIẾT; I ĐẮK | LẮK",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        308.42,
+        649.43,
+        728.34,
+        196.57
+      ],
+      "quad": [
+        [
+          308.42,
+          649.43
+        ],
+        [
+          1036.76,
+          649.43
+        ],
+        [
+          1036.76,
+          846.0
+        ],
+        [
+          308.42,
+          846.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.212997,
+        0.598002,
+        0.502997,
+        0.181004
+      ],
+      "normalized_quad": [
+        [
+          0.212997,
+          0.598002
+        ],
+        [
+          0.715994,
+          0.598002
+        ],
+        [
+          0.715994,
+          0.779006
+        ],
+        [
+          0.212997,
+          0.779006
+        ]
+      ],
+      "id": "after-visual-004",
+      "source_region_ids": [
+        "after-014",
+        "after-015",
+        "after-017",
+        "after-019"
+      ],
+      "slot_id": "text-2d6325e292-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "ĐT: 0985 177 457",
+      "ocr_text": "ĐT: | 0985 | 177 | 457",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        487.98,
+        752.6,
+        343.18,
+        121.63
+      ],
+      "quad": [
+        [
+          487.98,
+          752.6
+        ],
+        [
+          831.16,
+          752.6
+        ],
+        [
+          831.16,
+          874.23
+        ],
+        [
+          487.98,
+          874.23
+        ]
+      ],
+      "normalized_bbox": [
+        0.337003,
+        0.693002,
+        0.237003,
+        0.111998
+      ],
+      "normalized_quad": [
+        [
+          0.337003,
+          0.693002
+        ],
+        [
+          0.574006,
+          0.693002
+        ],
+        [
+          0.574006,
+          0.805
+        ],
+        [
+          0.337003,
+          0.805
+        ]
+      ],
+      "id": "after-visual-005",
+      "source_region_ids": [
+        "after-016",
+        "after-018",
+        "after-020",
+        "after-021"
+      ],
+      "slot_id": "text-768c70ec24-1",
+      "match_confidence": 1.0
+    }
+  ],
+  "text_review": "image_review"
+}

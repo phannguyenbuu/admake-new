@@ -1,0 +1,492 @@
+{
+  "schema_version": 1,
+  "product_id": "4cb11b8db03ede443756aea85fab266d",
+  "view": "before",
+  "image": "/product-references/4cb11b8db03ede443756aea85fab266d-photo-before.png",
+  "sha256": "b2bbe722088d1ac26772a06ed4697b45d5a5414cb63c1bf928919b08318deb09",
+  "width": 1448,
+  "height": 1086,
+  "coordinate_system": "image_pixels_top_left",
+  "status": "detected",
+  "regions": [
+    {
+      "text": "福",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        557.48,
+        839.48,
+        634.22,
+        246.52
+      ],
+      "quad": [
+        [
+          557.48,
+          839.48
+        ],
+        [
+          1191.7,
+          839.48
+        ],
+        [
+          1191.7,
+          1086.0
+        ],
+        [
+          557.48,
+          1086.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.385,
+        0.773002,
+        0.437997,
+        0.226998
+      ],
+      "normalized_quad": [
+        [
+          0.385,
+          0.773002
+        ],
+        [
+          0.822997,
+          0.773002
+        ],
+        [
+          0.822997,
+          1.0
+        ],
+        [
+          0.385,
+          1.0
+        ]
+      ],
+      "id": "before-visual-001",
+      "source_region_ids": [],
+      "slot_id": "text-da39a3ee5e-1"
+    },
+    {
+      "text": "Xin Chào",
+      "ocr_text": "Xin Chào",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        461.0,
+        735.0,
+        196.0,
+        52.0
+      ],
+      "quad": [
+        [
+          461.0,
+          735.0
+        ],
+        [
+          657.0,
+          735.0
+        ],
+        [
+          657.0,
+          787.0
+        ],
+        [
+          461.0,
+          787.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.31837,
+        0.676796,
+        0.135359,
+        0.047882
+      ],
+      "normalized_quad": [
+        [
+          0.31837,
+          0.676796
+        ],
+        [
+          0.453729,
+          0.676796
+        ],
+        [
+          0.453729,
+          0.724678
+        ],
+        [
+          0.31837,
+          0.724678
+        ]
+      ],
+      "id": "before-visual-002",
+      "source_region_ids": [
+        "before-006"
+      ],
+      "slot_id": "text-5914514a5f-1"
+    },
+    {
+      "text": "VIETQR",
+      "ocr_text": "VIET@R",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        844.18,
+        524.54,
+        603.82,
+        35.84
+      ],
+      "quad": [
+        [
+          844.18,
+          524.54
+        ],
+        [
+          1448.0,
+          524.54
+        ],
+        [
+          1448.0,
+          560.38
+        ],
+        [
+          844.18,
+          560.38
+        ]
+      ],
+      "normalized_bbox": [
+        0.582997,
+        0.483002,
+        0.417003,
+        0.033002
+      ],
+      "normalized_quad": [
+        [
+          0.582997,
+          0.483002
+        ],
+        [
+          1.0,
+          0.483002
+        ],
+        [
+          1.0,
+          0.516004
+        ],
+        [
+          0.582997,
+          0.516004
+        ]
+      ],
+      "id": "before-visual-003",
+      "source_region_ids": [
+        "before-004"
+      ],
+      "slot_id": "text-1d5c9251e0-1"
+    },
+    {
+      "text": "ACB",
+      "ocr_text": "ACB",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        974.5,
+        524.54,
+        473.5,
+        35.84
+      ],
+      "quad": [
+        [
+          974.5,
+          524.54
+        ],
+        [
+          1448.0,
+          524.54
+        ],
+        [
+          1448.0,
+          560.38
+        ],
+        [
+          974.5,
+          560.38
+        ]
+      ],
+      "normalized_bbox": [
+        0.672997,
+        0.483002,
+        0.327003,
+        0.033002
+      ],
+      "normalized_quad": [
+        [
+          0.672997,
+          0.483002
+        ],
+        [
+          1.0,
+          0.483002
+        ],
+        [
+          1.0,
+          0.516004
+        ],
+        [
+          0.672997,
+          0.516004
+        ]
+      ],
+      "id": "before-visual-004",
+      "source_region_ids": [
+        "before-005"
+      ],
+      "slot_id": "text-6fee74066d-1"
+    },
+    {
+      "text": "napas 247",
+      "ocr_text": "napas 247",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        893.42,
+        748.25,
+        554.58,
+        32.58
+      ],
+      "quad": [
+        [
+          893.42,
+          748.25
+        ],
+        [
+          1448.0,
+          748.25
+        ],
+        [
+          1448.0,
+          780.83
+        ],
+        [
+          893.42,
+          780.83
+        ]
+      ],
+      "normalized_bbox": [
+        0.617003,
+        0.688996,
+        0.382997,
+        0.03
+      ],
+      "normalized_quad": [
+        [
+          0.617003,
+          0.688996
+        ],
+        [
+          1.0,
+          0.688996
+        ],
+        [
+          1.0,
+          0.718996
+        ],
+        [
+          0.617003,
+          0.718996
+        ]
+      ],
+      "id": "before-visual-005",
+      "source_region_ids": [
+        "before-007"
+      ],
+      "slot_id": "text-cb07edcd42-1"
+    },
+    {
+      "text": "66642888",
+      "ocr_text": "66642888",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        814.0,
+        782.0,
+        288.0,
+        78.0
+      ],
+      "quad": [
+        [
+          814.0,
+          782.0
+        ],
+        [
+          1102.0,
+          782.0
+        ],
+        [
+          1102.0,
+          860.0
+        ],
+        [
+          814.0,
+          860.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.562155,
+        0.720074,
+        0.198895,
+        0.071823
+      ],
+      "normalized_quad": [
+        [
+          0.562155,
+          0.720074
+        ],
+        [
+          0.76105,
+          0.720074
+        ],
+        [
+          0.76105,
+          0.791897
+        ],
+        [
+          0.562155,
+          0.791897
+        ]
+      ],
+      "id": "before-visual-006",
+      "source_region_ids": [
+        "before-008"
+      ],
+      "slot_id": "text-e2b6decb8a-1"
+    },
+    {
+      "text": "CONG TY TNHH DA",
+      "ocr_text": "CONG TY TNHH DA",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        835.0,
+        859.0,
+        234.0,
+        40.0
+      ],
+      "quad": [
+        [
+          835.0,
+          859.0
+        ],
+        [
+          1069.0,
+          859.0
+        ],
+        [
+          1069.0,
+          899.0
+        ],
+        [
+          835.0,
+          899.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.576657,
+        0.790976,
+        0.161602,
+        0.036832
+      ],
+      "normalized_quad": [
+        [
+          0.576657,
+          0.790976
+        ],
+        [
+          0.73826,
+          0.790976
+        ],
+        [
+          0.73826,
+          0.827808
+        ],
+        [
+          0.576657,
+          0.827808
+        ]
+      ],
+      "id": "before-visual-007",
+      "source_region_ids": [
+        "before-009"
+      ],
+      "slot_id": "text-9b1fd3ab93-1"
+    },
+    {
+      "text": "SAN VUON DUC HIEU",
+      "ocr_text": "SAN VUON DUC HIEU",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        823.0,
+        897.0,
+        266.0,
+        40.0
+      ],
+      "quad": [
+        [
+          823.0,
+          897.0
+        ],
+        [
+          1089.0,
+          897.0
+        ],
+        [
+          1089.0,
+          937.0
+        ],
+        [
+          823.0,
+          937.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.56837,
+        0.825967,
+        0.183702,
+        0.036832
+      ],
+      "normalized_quad": [
+        [
+          0.56837,
+          0.825967
+        ],
+        [
+          0.752072,
+          0.825967
+        ],
+        [
+          0.752072,
+          0.862799
+        ],
+        [
+          0.56837,
+          0.862799
+        ]
+      ],
+      "id": "before-visual-008",
+      "source_region_ids": [
+        "before-010"
+      ],
+      "slot_id": "text-e0b3e81193-1"
+    }
+  ],
+  "text_review": "image_review"
+}

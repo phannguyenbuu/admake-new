@@ -1,0 +1,314 @@
+{
+  "schema_version": 1,
+  "product_id": "0eebb7cdc02d2fad6914ac40649cc90f",
+  "view": "before",
+  "image": "/product-references/0eebb7cdc02d2fad6914ac40649cc90f-photo-before.png",
+  "sha256": "048f35e47902bcacfa3ec2bde3efe58245a51d0f6124c040206d86720049a62d",
+  "width": 1448,
+  "height": 1086,
+  "coordinate_system": "image_pixels_top_left",
+  "status": "detected",
+  "regions": [
+    {
+      "text": "CÔNG TY TNHH",
+      "ocr_text": "CÔNG TY TNHH",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        236.0,
+        216.0,
+        975.0,
+        139.0
+      ],
+      "quad": [
+        [
+          236.0,
+          216.0
+        ],
+        [
+          1211.0,
+          216.0
+        ],
+        [
+          1211.0,
+          355.0
+        ],
+        [
+          236.0,
+          355.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.162983,
+        0.198895,
+        0.673343,
+        0.127993
+      ],
+      "normalized_quad": [
+        [
+          0.162983,
+          0.198895
+        ],
+        [
+          0.836326,
+          0.198895
+        ],
+        [
+          0.836326,
+          0.326888
+        ],
+        [
+          0.162983,
+          0.326888
+        ]
+      ],
+      "id": "before-visual-001",
+      "source_region_ids": [
+        "before-001"
+      ],
+      "slot_id": "text-a528dcf7c7-1"
+    },
+    {
+      "text": "CÀ BIỂN MŨI",
+      "ocr_text": "CA BlEN MŨI",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        163.0,
+        395.0,
+        1122.0,
+        200.0
+      ],
+      "quad": [
+        [
+          163.0,
+          395.0
+        ],
+        [
+          1285.0,
+          395.0
+        ],
+        [
+          1285.0,
+          595.0
+        ],
+        [
+          163.0,
+          595.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.112569,
+        0.36372,
+        0.774862,
+        0.184162
+      ],
+      "normalized_quad": [
+        [
+          0.112569,
+          0.36372
+        ],
+        [
+          0.887431,
+          0.36372
+        ],
+        [
+          0.887431,
+          0.547882
+        ],
+        [
+          0.112569,
+          0.547882
+        ]
+      ],
+      "id": "before-visual-002",
+      "source_region_ids": [
+        "before-002"
+      ],
+      "slot_id": "text-c6ee6574f5-1"
+    },
+    {
+      "text": "MST: 3401291249",
+      "ocr_text": "MST: 3401291249",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        364.0,
+        645.0,
+        690.0,
+        86.0
+      ],
+      "quad": [
+        [
+          364.0,
+          645.0
+        ],
+        [
+          1054.0,
+          645.0
+        ],
+        [
+          1054.0,
+          731.0
+        ],
+        [
+          364.0,
+          731.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.251381,
+        0.593923,
+        0.476519,
+        0.07919
+      ],
+      "normalized_quad": [
+        [
+          0.251381,
+          0.593923
+        ],
+        [
+          0.727901,
+          0.593923
+        ],
+        [
+          0.727901,
+          0.673112
+        ],
+        [
+          0.251381,
+          0.673112
+        ]
+      ],
+      "id": "before-visual-003",
+      "source_region_ids": [
+        "before-003"
+      ],
+      "slot_id": "text-7b48b3a946-1"
+    },
+    {
+      "text": "ĐỊA CHỈ: D12 LƯƠNG THẾ VINH,",
+      "ocr_text": "ĐỊA CHỈ: DI2 LƯƠNG THẾ VINH,",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        358.0,
+        760.0,
+        713.0,
+        71.0
+      ],
+      "quad": [
+        [
+          358.0,
+          760.0
+        ],
+        [
+          1071.0,
+          760.0
+        ],
+        [
+          1071.0,
+          831.0
+        ],
+        [
+          358.0,
+          831.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.247238,
+        0.699816,
+        0.492403,
+        0.065378
+      ],
+      "normalized_quad": [
+        [
+          0.247238,
+          0.699816
+        ],
+        [
+          0.739641,
+          0.699816
+        ],
+        [
+          0.739641,
+          0.765193
+        ],
+        [
+          0.247238,
+          0.765193
+        ]
+      ],
+      "id": "before-visual-004",
+      "source_region_ids": [
+        "before-004"
+      ],
+      "slot_id": "text-f477ac273e-1"
+    },
+    {
+      "text": "PHƯỜNG PHÚ THỦY, TỈNH LÂM ĐỒNG, VIỆT NAM",
+      "ocr_text": "PHƯỜNG PHÚ THỦY; TỈNH LÂM ĐỒNG, VIỆT NAM",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        178.0,
+        828.0,
+        1088.0,
+        78.0
+      ],
+      "quad": [
+        [
+          178.0,
+          828.0
+        ],
+        [
+          1266.0,
+          828.0
+        ],
+        [
+          1266.0,
+          906.0
+        ],
+        [
+          178.0,
+          906.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.122928,
+        0.762431,
+        0.751381,
+        0.071823
+      ],
+      "normalized_quad": [
+        [
+          0.122928,
+          0.762431
+        ],
+        [
+          0.874309,
+          0.762431
+        ],
+        [
+          0.874309,
+          0.834254
+        ],
+        [
+          0.122928,
+          0.834254
+        ]
+      ],
+      "id": "before-visual-005",
+      "source_region_ids": [
+        "before-005"
+      ],
+      "slot_id": "text-c8f4c94fa2-1"
+    }
+  ],
+  "text_review": "image_review"
+}

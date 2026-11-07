@@ -1,0 +1,436 @@
+{
+  "schema_version": 1,
+  "product_id": "f8523224f8b8ba05501880f36984890f",
+  "view": "before",
+  "image": "/product-references/f8523224f8b8ba05501880f36984890f-photo-before.png",
+  "sha256": "4b18146e61b66f7ecb67ea2b94bb855edfedd048948f85578ab76870377ed1b5",
+  "width": 1448,
+  "height": 1086,
+  "coordinate_system": "image_pixels_top_left",
+  "status": "detected",
+  "regions": [
+    {
+      "text": "SachiJuice",
+      "ocr_text": "(sochijuice",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        542.37,
+        49.04,
+        289.26,
+        147.92000000000002
+      ],
+      "quad": [
+        [
+          542.37,
+          87.05
+        ],
+        [
+          818.49,
+          49.04
+        ],
+        [
+          831.63,
+          157.95
+        ],
+        [
+          555.51,
+          196.96
+        ]
+      ],
+      "normalized_bbox": [
+        0.374565,
+        0.045157,
+        0.199765,
+        0.136206
+      ],
+      "normalized_quad": [
+        [
+          0.374565,
+          0.080157
+        ],
+        [
+          0.565256,
+          0.045157
+        ],
+        [
+          0.57433,
+          0.145442
+        ],
+        [
+          0.38364,
+          0.181363
+        ]
+      ],
+      "id": "before-visual-001",
+      "source_region_ids": [
+        "before-001"
+      ],
+      "slot_id": "text-051a308f44-1"
+    },
+    {
+      "text": "Thức uống Healthy",
+      "ocr_text": "Healthy | Thức uống",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        590.78,
+        165.07,
+        492.32,
+        39.1
+      ],
+      "quad": [
+        [
+          590.78,
+          165.07
+        ],
+        [
+          1083.1,
+          165.07
+        ],
+        [
+          1083.1,
+          204.17
+        ],
+        [
+          590.78,
+          204.17
+        ]
+      ],
+      "normalized_bbox": [
+        0.407997,
+        0.151998,
+        0.34,
+        0.036004
+      ],
+      "normalized_quad": [
+        [
+          0.407997,
+          0.151998
+        ],
+        [
+          0.747997,
+          0.151998
+        ],
+        [
+          0.747997,
+          0.188002
+        ],
+        [
+          0.407997,
+          0.188002
+        ]
+      ],
+      "id": "before-visual-002",
+      "source_region_ids": [
+        "before-002",
+        "before-003"
+      ],
+      "slot_id": "text-b898d7cc9b-1"
+    },
+    {
+      "text": "ngại gì không Thử",
+      "ocr_text": "nggi gi không Thử",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        589.0,
+        189.0,
+        182.0,
+        52.0
+      ],
+      "quad": [
+        [
+          589.0,
+          189.0
+        ],
+        [
+          771.0,
+          189.0
+        ],
+        [
+          771.0,
+          241.0
+        ],
+        [
+          589.0,
+          241.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.406768,
+        0.174033,
+        0.125691,
+        0.047882
+      ],
+      "normalized_quad": [
+        [
+          0.406768,
+          0.174033
+        ],
+        [
+          0.532459,
+          0.174033
+        ],
+        [
+          0.532459,
+          0.221915
+        ],
+        [
+          0.406768,
+          0.221915
+        ]
+      ],
+      "id": "before-visual-003",
+      "source_region_ids": [
+        "before-004"
+      ],
+      "slot_id": "text-98e8405ff2-1"
+    },
+    {
+      "text": "Nước ép Detox",
+      "ocr_text": "Yuuóc ép | Debox",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        613.95,
+        301.91,
+        474.94,
+        78.19
+      ],
+      "quad": [
+        [
+          613.95,
+          301.91
+        ],
+        [
+          1088.89,
+          301.91
+        ],
+        [
+          1088.89,
+          380.1
+        ],
+        [
+          613.95,
+          380.1
+        ]
+      ],
+      "normalized_bbox": [
+        0.423999,
+        0.278002,
+        0.327997,
+        0.071998
+      ],
+      "normalized_quad": [
+        [
+          0.423999,
+          0.278002
+        ],
+        [
+          0.751996,
+          0.278002
+        ],
+        [
+          0.751996,
+          0.35
+        ],
+        [
+          0.423999,
+          0.35
+        ]
+      ],
+      "id": "before-visual-004",
+      "source_region_ids": [
+        "before-005",
+        "before-006"
+      ],
+      "slot_id": "text-72f7e1a554-1"
+    },
+    {
+      "text": "Nước Ép Thơm Táo",
+      "ocr_text": "Thom Táe",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        547.34,
+        453.95,
+        393.86,
+        91.22
+      ],
+      "quad": [
+        [
+          547.34,
+          453.95
+        ],
+        [
+          941.2,
+          453.95
+        ],
+        [
+          941.2,
+          545.17
+        ],
+        [
+          547.34,
+          545.17
+        ]
+      ],
+      "normalized_bbox": [
+        0.377997,
+        0.418002,
+        0.272003,
+        0.083996
+      ],
+      "normalized_quad": [
+        [
+          0.377997,
+          0.418002
+        ],
+        [
+          0.65,
+          0.418002
+        ],
+        [
+          0.65,
+          0.501998
+        ],
+        [
+          0.377997,
+          0.501998
+        ]
+      ],
+      "id": "before-visual-005",
+      "source_region_ids": [
+        "before-010"
+      ],
+      "slot_id": "text-226bdaa340-1"
+    },
+    {
+      "text": "Trà Bí Đao Hạt Chia",
+      "ocr_text": "Tà Bi | Yuge & | Hat GiQao",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        715.31,
+        427.88,
+        483.63,
+        95.57
+      ],
+      "quad": [
+        [
+          715.31,
+          427.88
+        ],
+        [
+          1198.94,
+          427.88
+        ],
+        [
+          1198.94,
+          523.45
+        ],
+        [
+          715.31,
+          523.45
+        ]
+      ],
+      "normalized_bbox": [
+        0.493999,
+        0.393996,
+        0.333999,
+        0.088002
+      ],
+      "normalized_quad": [
+        [
+          0.493999,
+          0.393996
+        ],
+        [
+          0.827997,
+          0.393996
+        ],
+        [
+          0.827997,
+          0.481998
+        ],
+        [
+          0.493999,
+          0.481998
+        ]
+      ],
+      "id": "before-visual-006",
+      "source_region_ids": [
+        "before-007",
+        "before-008",
+        "before-009"
+      ],
+      "slot_id": "text-159fdf37a6-1"
+    },
+    {
+      "text": "SachiJuice",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        695.04,
+        645.08,
+        222.99,
+        71.68
+      ],
+      "quad": [
+        [
+          695.04,
+          645.08
+        ],
+        [
+          918.03,
+          645.08
+        ],
+        [
+          918.03,
+          716.76
+        ],
+        [
+          695.04,
+          716.76
+        ]
+      ],
+      "normalized_bbox": [
+        0.48,
+        0.593996,
+        0.153999,
+        0.066004
+      ],
+      "normalized_quad": [
+        [
+          0.48,
+          0.593996
+        ],
+        [
+          0.633999,
+          0.593996
+        ],
+        [
+          0.633999,
+          0.66
+        ],
+        [
+          0.48,
+          0.66
+        ]
+      ],
+      "id": "before-visual-007",
+      "source_region_ids": [],
+      "slot_id": "text-051a308f44-2"
+    }
+  ],
+  "text_review": "image_review"
+}

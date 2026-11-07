@@ -1,0 +1,72 @@
+{
+  "schema_version": 1,
+  "product_id": "a45719d788a2eb7468783c05f3f2c8b8",
+  "view": "before",
+  "image": "/product-references/a45719d788a2eb7468783c05f3f2c8b8-photo-before.png",
+  "sha256": "b06833c22e37c96d16866818cbde4833857bfbe0d4341f3b604530deb1e868b3",
+  "width": 1448,
+  "height": 1086,
+  "coordinate_system": "image_pixels_top_left",
+  "status": "detected",
+  "regions": [
+    {
+      "text": "E",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "pending",
+      "method": "image_review",
+      "bbox": [
+        60.82,
+        31.49,
+        1059.94,
+        898.12
+      ],
+      "quad": [
+        [
+          60.82,
+          31.49
+        ],
+        [
+          1120.76,
+          31.49
+        ],
+        [
+          1120.76,
+          929.61
+        ],
+        [
+          60.82,
+          929.61
+        ]
+      ],
+      "normalized_bbox": [
+        0.042003,
+        0.028996,
+        0.732003,
+        0.826998
+      ],
+      "normalized_quad": [
+        [
+          0.042003,
+          0.028996
+        ],
+        [
+          0.774006,
+          0.028996
+        ],
+        [
+          0.774006,
+          0.855994
+        ],
+        [
+          0.042003,
+          0.855994
+        ]
+      ],
+      "id": "before-visual-001",
+      "source_region_ids": [],
+      "slot_id": "text-58e6b3a414-1"
+    }
+  ],
+  "text_review": "image_review"
+}

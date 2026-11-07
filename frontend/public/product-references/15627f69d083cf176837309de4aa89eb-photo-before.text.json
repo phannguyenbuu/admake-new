@@ -1,0 +1,130 @@
+{
+  "schema_version": 1,
+  "product_id": "15627f69d083cf176837309de4aa89eb",
+  "view": "before",
+  "image": "/product-references/15627f69d083cf176837309de4aa89eb-photo-before.png",
+  "sha256": "90c9f955ee62fb0176b54d833a60fb33a173d592a73e8532ba3bc6239faa21c8",
+  "width": 1448,
+  "height": 1086,
+  "coordinate_system": "image_pixels_top_left",
+  "status": "detected",
+  "regions": [
+    {
+      "id": "before-visual-001",
+      "text": "ALWA",
+      "ocr_text": "",
+      "confidence": 1,
+      "review": "verified",
+      "method": "visual_annotation",
+      "bbox": [
+        20,
+        20,
+        1415,
+        1040
+      ],
+      "quad": [
+        [
+          20,
+          20
+        ],
+        [
+          1435,
+          20
+        ],
+        [
+          1435,
+          1060
+        ],
+        [
+          20,
+          1060
+        ]
+      ],
+      "normalized_bbox": [
+        0.013812,
+        0.018416,
+        0.97721,
+        0.957643
+      ],
+      "normalized_quad": [
+        [
+          0.013812,
+          0.018416
+        ],
+        [
+          0.991022,
+          0.018416
+        ],
+        [
+          0.991022,
+          0.976059
+        ],
+        [
+          0.013812,
+          0.976059
+        ]
+      ],
+      "source_region_ids": [],
+      "slot_id": "text-2da97fa42f-1"
+    },
+    {
+      "text": "DI",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        744.27,
+        374.67,
+        703.73,
+        711.33
+      ],
+      "quad": [
+        [
+          744.27,
+          374.67
+        ],
+        [
+          1448.0,
+          374.67
+        ],
+        [
+          1448.0,
+          1086.0
+        ],
+        [
+          744.27,
+          1086.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.513999,
+        0.345,
+        0.486001,
+        0.655
+      ],
+      "normalized_quad": [
+        [
+          0.513999,
+          0.345
+        ],
+        [
+          1.0,
+          0.345
+        ],
+        [
+          1.0,
+          1.0
+        ],
+        [
+          0.513999,
+          1.0
+        ]
+      ],
+      "id": "before-visual-002",
+      "source_region_ids": [],
+      "slot_id": "text-f502e82c25-1"
+    }
+  ],
+  "text_review": "image_review"
+}

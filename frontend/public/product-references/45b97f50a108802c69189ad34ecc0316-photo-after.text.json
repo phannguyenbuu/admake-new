@@ -1,0 +1,199 @@
+{
+  "schema_version": 1,
+  "product_id": "45b97f50a108802c69189ad34ecc0316",
+  "view": "after",
+  "image": "/product-references/45b97f50a108802c69189ad34ecc0316-photo-after.png",
+  "sha256": "0b5a9e428b5dd243e7f670a3e2cdb5beddcf0b16379cfab1a0bd73e47a66e79a",
+  "width": 1448,
+  "height": 1086,
+  "coordinate_system": "image_pixels_top_left",
+  "status": "detected",
+  "regions": [
+    {
+      "text": "TIỆM NHÀ",
+      "ocr_text": "TIỆM NHÀ",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        81.0,
+        323.0,
+        605.0,
+        208.0
+      ],
+      "quad": [
+        [
+          81.0,
+          323.0
+        ],
+        [
+          686.0,
+          323.0
+        ],
+        [
+          686.0,
+          531.0
+        ],
+        [
+          81.0,
+          531.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.055939,
+        0.297422,
+        0.417818,
+        0.191529
+      ],
+      "normalized_quad": [
+        [
+          0.055939,
+          0.297422
+        ],
+        [
+          0.473757,
+          0.297422
+        ],
+        [
+          0.473757,
+          0.48895
+        ],
+        [
+          0.055939,
+          0.48895
+        ]
+      ],
+      "id": "after-visual-001",
+      "source_region_ids": [
+        "after-001"
+      ],
+      "slot_id": "text-88935bec1c-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "ỐC",
+      "ocr_text": "ỗ0",
+      "confidence": 0.3973,
+      "bbox": [
+        673.21,
+        272.0,
+        611.5799999999999,
+        486.0
+      ],
+      "quad": [
+        [
+          757.67,
+          272.0
+        ],
+        [
+          1284.79,
+          384.1
+        ],
+        [
+          1199.33,
+          758.0
+        ],
+        [
+          673.21,
+          645.9
+        ]
+      ],
+      "normalized_bbox": [
+        0.464924,
+        0.25046,
+        0.422362,
+        0.447514
+      ],
+      "normalized_quad": [
+        [
+          0.523253,
+          0.25046
+        ],
+        [
+          0.887286,
+          0.353683
+        ],
+        [
+          0.828267,
+          0.697974
+        ],
+        [
+          0.464924,
+          0.594751
+        ]
+      ],
+      "review": "verified",
+      "id": "after-visual-002",
+      "match_confidence": 1.0,
+      "source_region_ids": [
+        "after-002"
+      ],
+      "method": "visual_annotation",
+      "slot_id": "text-2a09998d72-1"
+    },
+    {
+      "text": "Giá bình dân",
+      "ocr_text": "Giá | binh | dân",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        237.47,
+        493.04,
+        463.36,
+        165.07
+      ],
+      "quad": [
+        [
+          237.47,
+          493.04
+        ],
+        [
+          700.83,
+          493.04
+        ],
+        [
+          700.83,
+          658.11
+        ],
+        [
+          237.47,
+          658.11
+        ]
+      ],
+      "normalized_bbox": [
+        0.163999,
+        0.453996,
+        0.32,
+        0.151998
+      ],
+      "normalized_quad": [
+        [
+          0.163999,
+          0.453996
+        ],
+        [
+          0.483999,
+          0.453996
+        ],
+        [
+          0.483999,
+          0.605994
+        ],
+        [
+          0.163999,
+          0.605994
+        ]
+      ],
+      "id": "after-visual-003",
+      "source_region_ids": [
+        "after-003",
+        "after-004",
+        "after-005"
+      ],
+      "slot_id": "text-a49ac498ee-1",
+      "match_confidence": 1.0
+    }
+  ],
+  "text_review": "image_review"
+}

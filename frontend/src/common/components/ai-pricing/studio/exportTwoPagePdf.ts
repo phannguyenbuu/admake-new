@@ -29,7 +29,16 @@ function makeRow(stt: any, name: string, detail: string, unit: string, qty: any,
   </tr>`;
 }
 
-export async function exportTwoPageStudioPdf(data: TwoPagePdfData) {
+/**
+ * - `pages`: chỉ số trang (0-based) cần xuất; mặc định xuất tất cả.
+ * - `preview`: không lưu file, trả về ảnh JPEG (data URL) của từng trang để xem trước.
+ */
+export async function exportTwoPageStudioPdf(data: TwoPagePdfData, options: { pages?: number[]; preview?: boolean } = {}): Promise<string[]> {
+  if (data.bomPages) {
+    const { exportBomPages } = await import("../../product-bom/exportBomPages");
+    return exportBomPages(data, options);
+  }
+  const { preview = false } = options;
   const {
     orientation = "landscape",
     renderImageUrl,
@@ -38,12 +47,14 @@ export async function exportTwoPageStudioPdf(data: TwoPagePdfData) {
     model3DName = "Biển Hiệu Quảng Cáo Cao Cấp",
     dimensions = { width: 3, height: 1.2, depth: 0.12 },
     quoteResult,
+    bomQuote,
     profitMargin = 30,
   } = data;
 
   const isPortrait = orientation === "portrait";
   const now = new Date().toLocaleDateString("vi-VN");
   const area = (dimensions.width * dimensions.height).toFixed(2);
+  const dimensionLabel = (value: number) => bomQuote ? `${Number((value * 1000).toFixed(2))} mm` : `${value}m`;
 
   // Kích thước chuẩn pixel của trang A4 tại 96 DPI
   const sheetW = isPortrait ? 794 : 1123;
@@ -175,11 +186,18 @@ export async function exportTwoPageStudioPdf(data: TwoPagePdfData) {
   const laborTotal = laborDays * laborRate;
   const transportTotal = transportKm * transportRate;
   const scrapAmount = Math.round((rawMaterials * scrapPercent) / 100);
-  const costPrice = rawMaterials + scrapAmount + laborTotal + transportTotal;
-  const profitAmount = Math.round((costPrice * profitMargin) / 100);
-  const quotePrice = costPrice + profitAmount;
-  const vatAmount = Math.round(quotePrice * 0.08); // VAT 8%
-  const grandTotal = quotePrice + vatAmount;
+  const costPrice = bomQuote?.result.cost ?? (rawMaterials + scrapAmount + laborTotal + transportTotal);
+  const profitAmount = bomQuote?.result.profit ?? Math.round((costPrice * profitMargin) / 100);
+  const minimumAdjustment = bomQuote?.result.minimum_adjustment || 0;
+  const quotePrice = costPrice + profitAmount + minimumAdjustment;
+  const vatAmount = bomQuote?.result.tax ?? Math.round(quotePrice * 0.08); // VAT ${bomQuote?.vat ?? 8}%
+  const grandTotal = bomQuote?.result.total ?? (quotePrice + vatAmount);
+  if (bomQuote) {
+    quoteRows.length = 0;
+    bomQuote.result.rows.filter(row => row.selected && row.quantity > 0).forEach((row, index) => {
+      quoteRows.push(makeRow(index + 1, row.name, row.note || row.code, row.unit, Number(row.quantity.toFixed(4)), row.unit_price, row.total));
+    });
+  }
 
   const html = `<!doctype html>
   <html>
@@ -187,8 +205,8 @@ export async function exportTwoPageStudioPdf(data: TwoPagePdfData) {
     <meta charset="utf-8">
     <title>Ho-So-Thiet-Ke-Bao-Gia-${Date.now()}</title>
     <style>
-      * { box-sizing: border-box; }
-      body {
+      .page-sheet, .page-sheet * { box-sizing: border-box; }
+      .page-sheet {
         margin: 0;
         padding: 0;
         font-family: 'Segoe UI', Arial, sans-serif;
@@ -207,9 +225,9 @@ export async function exportTwoPageStudioPdf(data: TwoPagePdfData) {
         flex-direction: column;
         box-sizing: border-box;
       }
-      table { width: 100%; border-collapse: collapse; font-size: ${isPortrait ? "11px" : "10.5px"}; }
-      th, td { border: 1px solid #cbd5e1; padding: ${isPortrait ? "5px 7px" : "4px 6px"}; }
-      th { background: #f1f5f9; color: #334155; font-weight: 700; text-align: left; }
+      .page-sheet table { width: 100%; border-collapse: collapse; font-size: ${isPortrait ? "11px" : "10.5px"}; }
+      .page-sheet th, .page-sheet td { border: 1px solid #cbd5e1; padding: ${isPortrait ? "5px 7px" : "4px 6px"}; }
+      .page-sheet th { background: #f1f5f9; color: #334155; font-weight: 700; text-align: left; }
     </style>
   </head>
   <body>
@@ -222,7 +240,7 @@ export async function exportTwoPageStudioPdf(data: TwoPagePdfData) {
           <span style="font-weight: 800; font-size: 13px; letter-spacing: 0.5px;">HỒ SƠ PHỐI CẢNH KIẾN TRÚC & QUẢNG CÁO</span>
         </div>
         <div style="font-size: 11px; color: #94a3b8;">
-          Công trình: <strong>${escapeHtml(model3DName)}</strong> • Kích thước: <strong>${dimensions.width}m × ${dimensions.height}m</strong>
+          Công trình: <strong>${escapeHtml(model3DName)}</strong> • Kích thước: <strong>${dimensionLabel(dimensions.width)} × ${dimensionLabel(dimensions.height)}</strong>
         </div>
       </div>
 
@@ -264,7 +282,7 @@ export async function exportTwoPageStudioPdf(data: TwoPagePdfData) {
           }
           <div>
             <div style="font-size: 15px; font-weight: 800; color: #0f172a; text-transform: uppercase;">BẢNG DỰ TOÁN & BÁO GIÁ THI CÔNG BIỂN HIỆU</div>
-            <div style="font-size: 10.5px; color: #64748b;">Công trình: <strong>${escapeHtml(model3DName)}</strong> • Kích thước: <strong>${dimensions.width}m × ${dimensions.height}m × ${dimensions.depth || 0.12}m (Diện tích: ${area} m²)</strong></div>
+            <div style="font-size: 10.5px; color: #64748b;">Công trình: <strong>${escapeHtml(model3DName)}</strong> • Kích thước: <strong>${dimensionLabel(dimensions.width)} × ${dimensionLabel(dimensions.height)} × ${dimensionLabel(dimensions.depth ?? 0.12)} (Diện tích: ${area} m²)</strong></div>
           </div>
         </div>
         <div style="text-align: right; font-size: 10.5px; color: #475569;">
@@ -293,7 +311,7 @@ export async function exportTwoPageStudioPdf(data: TwoPagePdfData) {
         </thead>
         <tbody>
           ${quoteRows.join("")}
-          <tr>
+          ${bomQuote ? "" : `          <tr>
             <td style="text-align: center;">•</td>
             <td><strong>Nhân công sản xuất & lắp đặt</strong></td>
             <td>Thợ cơ khí hàn khung + thợ dán căng bề mặt + kỹ thuật treo gắn</td>
@@ -317,6 +335,7 @@ export async function exportTwoPageStudioPdf(data: TwoPagePdfData) {
             <td colspan="4">Bao gồm cắt góc dư, hao mòn mũi dao CNC, que hàn, điện nước nhà xưởng</td>
             <td style="text-align: right; font-family: monospace; font-weight: bold;">+${formatVND(scrapAmount)}</td>
           </tr>
+`}
         </tbody>
       </table>
 
@@ -338,12 +357,13 @@ export async function exportTwoPageStudioPdf(data: TwoPagePdfData) {
             <span>Lợi nhuận kỳ vọng (${profitMargin}%):</span>
             <strong style="font-family: monospace;">+${formatVND(profitAmount)}</strong>
           </div>
+          ${minimumAdjustment > 0 ? `<div style="display: flex; justify-content: space-between; margin-bottom: 2px; color: #0f766e;"><span>Điều chỉnh giá tối thiểu:</span><strong style="font-family: monospace;">+${formatVND(minimumAdjustment)}</strong></div>` : ''}
           <div style="display: flex; justify-content: space-between; margin-bottom: 2px; border-top: 1px solid #99f6e4; padding-top: 2px; color: #0f766e; font-weight: 700;">
             <span>Tổng giá bán trước thuế:</span>
             <strong style="font-family: monospace;">${formatVND(quotePrice)}</strong>
           </div>
           <div style="display: flex; justify-content: space-between; margin-bottom: 2px; color: #64748b;">
-            <span>Thuế GTGT (VAT 8%):</span>
+            <span>Thuế GTGT (VAT ${bomQuote?.vat ?? 8}%):</span>
             <strong style="font-family: monospace;">${formatVND(vatAmount)}</strong>
           </div>
           <div style="display: flex; justify-content: space-between; border-top: 1.5px solid #00b4b6; padding-top: 3px; font-size: 12.5px; font-weight: 900; color: #0f766e;">
@@ -370,16 +390,21 @@ export async function exportTwoPageStudioPdf(data: TwoPagePdfData) {
   </body>
   </html>`;
 
-  message.loading({ content: `Đang tạo file PDF 2 trang (${isPortrait ? "Khổ Đứng A4" : "Khổ Nằm A4"})...`, key: "export_pdf", duration: 0 });
+  if (!preview) message.loading({ content: `Đang tạo file PDF (${isPortrait ? "Khổ Đứng A4" : "Khổ Nằm A4"})...`, key: "export_pdf", duration: 0 });
 
+  let container: HTMLDivElement | undefined;
   try {
-    const container = document.createElement("div");
+    container = document.createElement("div");
     container.style.position = "fixed";
     container.style.left = "-99999px";
     container.style.top = "0";
     container.style.width = `${sheetW}px`;
     container.style.zIndex = "-9999";
-    container.innerHTML = html;
+    // Scope each render's CSS: eager landscape/portrait previews and downloads
+    // can otherwise overwrite one another's page dimensions.
+    const scopeId = `pdf-sheet-${Math.random().toString(36).slice(2)}`;
+    container.id = scopeId;
+    container.innerHTML = html.replace(/\.page-sheet/g, `#${scopeId} .page-sheet`);
     document.body.appendChild(container);
 
     // Chờ tất cả hình ảnh trong container tải xong
@@ -413,18 +438,29 @@ export async function exportTwoPageStudioPdf(data: TwoPagePdfData) {
       compress: true,
     });
 
-    for (let i = 0; i < pageSheets.length; i++) {
+    const selected = Array.from(pageSheets.keys()).filter(i => preview || !options.pages || options.pages.includes(i));
+    if (!selected.length) throw new Error("Chưa chọn trang để in.");
+    const previews: string[] = [];
+    for (const i of selected) {
       const sheet = pageSheets[i];
+      if (bomQuote && i === 1) {
+        Array.from(sheet.children).forEach(child => { (child as HTMLElement).style.flexShrink = "0"; });
+        sheet.style.height = `${Math.max(sheetH, sheet.scrollHeight)}px`;
+      }
       const canvas = await html2canvas(sheet, {
-        scale: 2,
+        scale: preview ? 0.6 : 2,
         useCORS: true,
         allowTaint: true,
         backgroundColor: "#ffffff",
         logging: false,
       });
 
-      const imgData = canvas.toDataURL("image/jpeg", 0.95);
-      if (i > 0) {
+      const imgData = canvas.toDataURL("image/jpeg", preview ? 0.8 : 0.95);
+      if (preview) {
+        previews.push(imgData);
+        continue;
+      }
+      if (i !== selected[0]) {
         doc.addPage("a4", orientation);
       }
 
@@ -437,6 +473,7 @@ export async function exportTwoPageStudioPdf(data: TwoPagePdfData) {
 
       doc.addImage(imgData, "JPEG", offX, offY, drawW, drawH);
     }
+    if (preview) return previews;
 
     // Đặt tên file và kích hoạt tải trực tiếp về máy người dùng
     const cleanName = (model3DName || "Bien_Hieu")
@@ -448,10 +485,13 @@ export async function exportTwoPageStudioPdf(data: TwoPagePdfData) {
 
     doc.save(filename);
 
-    document.body.removeChild(container);
     message.success({ content: `✨ Đã tải xuống file PDF: ${filename}`, key: "export_pdf", duration: 3 });
   } catch (err: any) {
+    if (preview) throw err;
     console.error("Lỗi khi tạo file PDF:", err);
     message.error({ content: "Lỗi xuất PDF: " + (err?.message || "Không thể tạo file"), key: "export_pdf", duration: 4 });
+  } finally {
+    container?.remove();
   }
+  return [];
 }

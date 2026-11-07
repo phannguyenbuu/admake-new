@@ -3,7 +3,7 @@ import { useApiHost } from "../common/hooks/useApiHost";
 import { formatVND, type SignboardQuoteResult } from "./aiPricingEngine";
 import { DEFAULT_SIGNBOARD_HINTS } from "./genaiSignboardHints";
 
-export const GENAI_REMOTE_URL = "https://genai.toolxprint.com";
+export const GENAI_REMOTE_URL = "https://admake.vn/genai";
 
 export interface Mesh3DElement {
   name: string;
@@ -122,13 +122,8 @@ class GenAISignboardService {
 
   // 1. Kiểm tra trạng thái kết nối GenAI Bridge
   async getStatus() {
-    try {
-      const res = await axios.get(this.getApiUrl("/genai/status"), { timeout: 6000 });
-      return res.data;
-    } catch {
-      const fallback = await axios.get(`${GENAI_REMOTE_URL}/api/status`, { timeout: 6000 });
-      return fallback.data;
-    }
+    const res = await axios.get(this.getApiUrl("/iadmake/status"), { timeout: 6000 });
+    return res.data;
   }
 
   // 2. Lấy danh sách Mẫu thiết kế chuyên dụng (bao gồm 6 mẫu thực tế từ ảnh chụp)
@@ -162,15 +157,9 @@ class GenAISignboardService {
     prompt: string;
     style?: string;
     aspect_ratio?: string;
-    new_chat?: boolean;
   }): Promise<GenAIJob> {
-    try {
-      const res = await axios.post(this.getApiUrl("/genai/jobs/create"), params, { timeout: 25000 });
-      return res.data;
-    } catch {
-      const fallback = await axios.post(`${GENAI_REMOTE_URL}/api/jobs/create`, params, { timeout: 25000 });
-      return fallback.data;
-    }
+    const res = await axios.post(this.getApiUrl("/iadmake/jobs/create"), params, { timeout: 25000 });
+    return res.data;
   }
 
   // 5. Chỉnh sửa toàn bộ ảnh bằng GenAI
@@ -179,15 +168,9 @@ class GenAISignboardService {
     reference_images: string[];
     style?: string;
     aspect_ratio?: string;
-    new_chat?: boolean;
   }): Promise<GenAIJob> {
-    try {
-      const res = await axios.post(this.getApiUrl("/genai/jobs/edit-full"), params, { timeout: 25000 });
-      return res.data;
-    } catch {
-      const fallback = await axios.post(`${GENAI_REMOTE_URL}/api/jobs/edit-full`, params, { timeout: 25000 });
-      return fallback.data;
-    }
+    const res = await axios.post(this.getApiUrl("/iadmake/jobs/edit-full"), params, { timeout: 25000 });
+    return res.data;
   }
 
   // 6. Chỉnh sửa cục bộ (Inpaint với pins tọa độ) bằng GenAI
@@ -198,15 +181,9 @@ class GenAISignboardService {
     preserve_surroundings?: boolean;
     style?: string;
     aspect_ratio?: string;
-    new_chat?: boolean;
   }): Promise<GenAIJob> {
-    try {
-      const res = await axios.post(this.getApiUrl("/genai/jobs/edit-inpaint"), params, { timeout: 25000 });
-      return res.data;
-    } catch {
-      const fallback = await axios.post(`${GENAI_REMOTE_URL}/api/jobs/edit-inpaint`, params, { timeout: 25000 });
-      return fallback.data;
-    }
+    const res = await axios.post(this.getApiUrl("/iadmake/jobs/edit-inpaint"), params, { timeout: 25000 });
+    return res.data;
   }
 
   private sanitizeJob(job: GenAIJob): GenAIJob {
@@ -223,13 +200,8 @@ class GenAISignboardService {
 
   // 7. Polling trạng thái job đến khi hoàn tất
   async pollJobStatus(jobId: string): Promise<GenAIJob> {
-    try {
-      const res = await axios.get(this.getApiUrl(`/genai/jobs/${jobId}`), { timeout: 10000 });
-      return this.sanitizeJob(res.data);
-    } catch {
-      const fallback = await axios.get(`${GENAI_REMOTE_URL}/api/jobs/${jobId}`, { timeout: 10000 });
-      return this.sanitizeJob(fallback.data);
-    }
+    const res = await axios.get(this.getApiUrl(`/iadmake/jobs/${jobId}`), { timeout: 10000 });
+    return this.sanitizeJob(res.data);
   }
 
   // 8. Đợi hoàn tất job với callback cập nhật tiến trình
@@ -268,7 +240,7 @@ class GenAISignboardService {
         consecutiveErrors += 1;
         console.warn(`[GenAI] Lỗi polling job ${jobId} (${consecutiveErrors}/${maxConsecutiveErrors})`, err);
         if (consecutiveErrors >= maxConsecutiveErrors) {
-          throw new Error("Mất kết nối tới GenAI Worker quá nhiều lần, vui lòng thử lại");
+          throw new Error("Mất kết nối tới iAdmake quá nhiều lần, vui lòng thử lại");
         }
       }
 
@@ -284,7 +256,7 @@ class GenAISignboardService {
 
       await sleep(consecutiveErrors > 0 ? 3000 : 2000);
     }
-    throw new Error("Quá thời gian chờ phản hồi từ GenAI Worker");
+    throw new Error("Quá thời gian chờ phản hồi từ iAdmake");
   }
 }
 

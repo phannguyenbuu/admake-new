@@ -1,0 +1,329 @@
+{
+  "schema_version": 1,
+  "product_id": "80bdc1f6fbc190eb10de2d8a8a749320",
+  "view": "after",
+  "image": "/product-references/80bdc1f6fbc190eb10de2d8a8a749320-photo-after.png",
+  "sha256": "6a6196017c81ef453c4efa7d46ef6643883226b5b56aed213d841029a2d3bff5",
+  "width": 1448,
+  "height": 1086,
+  "coordinate_system": "image_pixels_top_left",
+  "status": "detected",
+  "regions": [
+    {
+      "text": "VIỆT NAM",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        318.56,
+        368.15,
+        53.58,
+        13.03
+      ],
+      "quad": [
+        [
+          318.56,
+          368.15
+        ],
+        [
+          372.14,
+          368.15
+        ],
+        [
+          372.14,
+          381.18
+        ],
+        [
+          318.56,
+          381.18
+        ]
+      ],
+      "normalized_bbox": [
+        0.22,
+        0.338996,
+        0.037003,
+        0.011998
+      ],
+      "normalized_quad": [
+        [
+          0.22,
+          0.338996
+        ],
+        [
+          0.257003,
+          0.338996
+        ],
+        [
+          0.257003,
+          0.350994
+        ],
+        [
+          0.22,
+          0.350994
+        ]
+      ],
+      "id": "after-visual-001",
+      "source_region_ids": [],
+      "slot_id": "text-ec285935b4-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "ỦY BAN NHÂN DÂN PHƯỜNG DĨ AN",
+      "ocr_text": "ỦY BAN NHÂN | DÂN PHƯỜNG DĨ AN",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        461.91,
+        206.34,
+        600.92,
+        96.65
+      ],
+      "quad": [
+        [
+          461.91,
+          206.34
+        ],
+        [
+          1062.83,
+          206.34
+        ],
+        [
+          1062.83,
+          302.99
+        ],
+        [
+          461.91,
+          302.99
+        ]
+      ],
+      "normalized_bbox": [
+        0.318999,
+        0.19,
+        0.415,
+        0.088996
+      ],
+      "normalized_quad": [
+        [
+          0.318999,
+          0.19
+        ],
+        [
+          0.733999,
+          0.19
+        ],
+        [
+          0.733999,
+          0.278996
+        ],
+        [
+          0.318999,
+          0.278996
+        ]
+      ],
+      "id": "after-visual-002",
+      "source_region_ids": [
+        "after-001",
+        "after-002"
+      ],
+      "slot_id": "text-fb8ab4e837-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "TĂNG NGỌC ĐĂNG TÂM",
+      "ocr_text": "TĂNG | NGoC | DĂNG | TÂM",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        453.22,
+        296.48,
+        628.43,
+        161.81
+      ],
+      "quad": [
+        [
+          453.22,
+          296.48
+        ],
+        [
+          1081.65,
+          296.48
+        ],
+        [
+          1081.65,
+          458.29
+        ],
+        [
+          453.22,
+          458.29
+        ]
+      ],
+      "normalized_bbox": [
+        0.312997,
+        0.273002,
+        0.433999,
+        0.148996
+      ],
+      "normalized_quad": [
+        [
+          0.312997,
+          0.273002
+        ],
+        [
+          0.746996,
+          0.273002
+        ],
+        [
+          0.746996,
+          0.421998
+        ],
+        [
+          0.312997,
+          0.421998
+        ]
+      ],
+      "id": "after-visual-003",
+      "source_region_ids": [
+        "after-005",
+        "after-008",
+        "after-009",
+        "after-010"
+      ],
+      "slot_id": "text-39cd4260d5-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "PHÓ CHÁNH VĂN PHÒNG",
+      "ocr_text": "PHÓ | CHÁNH | VĂN | PHÒNG",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        545.9,
+        459.38,
+        424.26,
+        99.91
+      ],
+      "quad": [
+        [
+          545.9,
+          459.38
+        ],
+        [
+          970.16,
+          459.38
+        ],
+        [
+          970.16,
+          559.29
+        ],
+        [
+          545.9,
+          559.29
+        ]
+      ],
+      "normalized_bbox": [
+        0.377003,
+        0.423002,
+        0.292997,
+        0.091998
+      ],
+      "normalized_quad": [
+        [
+          0.377003,
+          0.423002
+        ],
+        [
+          0.67,
+          0.423002
+        ],
+        [
+          0.67,
+          0.515
+        ],
+        [
+          0.377003,
+          0.515
+        ]
+      ],
+      "id": "after-visual-004",
+      "source_region_ids": [
+        "after-012",
+        "after-013",
+        "after-015",
+        "after-017"
+      ],
+      "slot_id": "text-03b11334ca-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "VĂN PHÒNG HĐND VÀ UBND PHƯỜNG",
+      "ocr_text": "VĂN | PHÒNG | HĐND | VÀ | UBND | PHUỜNG",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        438.74,
+        488.7,
+        650.15,
+        143.35
+      ],
+      "quad": [
+        [
+          438.74,
+          488.7
+        ],
+        [
+          1088.89,
+          488.7
+        ],
+        [
+          1088.89,
+          632.05
+        ],
+        [
+          438.74,
+          632.05
+        ]
+      ],
+      "normalized_bbox": [
+        0.302997,
+        0.45,
+        0.448999,
+        0.131998
+      ],
+      "normalized_quad": [
+        [
+          0.302997,
+          0.45
+        ],
+        [
+          0.751996,
+          0.45
+        ],
+        [
+          0.751996,
+          0.581998
+        ],
+        [
+          0.302997,
+          0.581998
+        ]
+      ],
+      "id": "after-visual-005",
+      "source_region_ids": [
+        "after-014",
+        "after-016",
+        "after-018",
+        "after-019",
+        "after-020",
+        "after-021"
+      ],
+      "slot_id": "text-43d2906007-1",
+      "match_confidence": 1.0
+    }
+  ],
+  "text_review": "image_review"
+}

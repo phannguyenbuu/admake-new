@@ -1,0 +1,420 @@
+{
+  "schema_version": 1,
+  "product_id": "71c555a6be3695dd6ac7369d61cc989f",
+  "view": "before",
+  "image": "/product-references/71c555a6be3695dd6ac7369d61cc989f-photo-before.png",
+  "sha256": "e4f70000a2a7fb57805f70098dcb5abba20e9c16daded2655e9acead3faab478",
+  "width": 1448,
+  "height": 1086,
+  "coordinate_system": "image_pixels_top_left",
+  "status": "detected",
+  "regions": [
+    {
+      "text": "TIỆM TRÀ NHÀ MEOW",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        424.26,
+        23.89,
+        1023.74,
+        146.61
+      ],
+      "quad": [
+        [
+          424.26,
+          23.89
+        ],
+        [
+          1448.0,
+          23.89
+        ],
+        [
+          1448.0,
+          170.5
+        ],
+        [
+          424.26,
+          170.5
+        ]
+      ],
+      "normalized_bbox": [
+        0.292997,
+        0.021998,
+        0.707003,
+        0.135
+      ],
+      "normalized_quad": [
+        [
+          0.292997,
+          0.021998
+        ],
+        [
+          1.0,
+          0.021998
+        ],
+        [
+          1.0,
+          0.156998
+        ],
+        [
+          0.292997,
+          0.156998
+        ]
+      ],
+      "id": "before-visual-001",
+      "source_region_ids": [],
+      "slot_id": "text-301f83693d-1"
+    },
+    {
+      "text": "TRÀ NGON - ĐẬM VỊ",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        479.29,
+        139.01,
+        968.71,
+        202.0
+      ],
+      "quad": [
+        [
+          479.29,
+          139.01
+        ],
+        [
+          1448.0,
+          139.01
+        ],
+        [
+          1448.0,
+          341.01
+        ],
+        [
+          479.29,
+          341.01
+        ]
+      ],
+      "normalized_bbox": [
+        0.331001,
+        0.128002,
+        0.668999,
+        0.186004
+      ],
+      "normalized_quad": [
+        [
+          0.331001,
+          0.128002
+        ],
+        [
+          1.0,
+          0.128002
+        ],
+        [
+          1.0,
+          0.314006
+        ],
+        [
+          0.331001,
+          0.314006
+        ]
+      ],
+      "id": "before-visual-002",
+      "source_region_ids": [],
+      "slot_id": "text-a4ded7cdf8-1"
+    },
+    {
+      "text": "TRÀ SỮA FULL TOPPING",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        399.65,
+        671.15,
+        1025.18,
+        71.68
+      ],
+      "quad": [
+        [
+          399.65,
+          671.15
+        ],
+        [
+          1424.83,
+          671.15
+        ],
+        [
+          1424.83,
+          742.83
+        ],
+        [
+          399.65,
+          742.83
+        ]
+      ],
+      "normalized_bbox": [
+        0.276001,
+        0.618002,
+        0.707997,
+        0.066004
+      ],
+      "normalized_quad": [
+        [
+          0.276001,
+          0.618002
+        ],
+        [
+          0.983999,
+          0.618002
+        ],
+        [
+          0.983999,
+          0.684006
+        ],
+        [
+          0.276001,
+          0.684006
+        ]
+      ],
+      "id": "before-visual-003",
+      "source_region_ids": [],
+      "slot_id": "text-4909d7fece-1"
+    },
+    {
+      "text": "TRÀ TRÁI CÂY",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        398.2,
+        754.77,
+        763.1,
+        71.68
+      ],
+      "quad": [
+        [
+          398.2,
+          754.77
+        ],
+        [
+          1161.3,
+          754.77
+        ],
+        [
+          1161.3,
+          826.45
+        ],
+        [
+          398.2,
+          826.45
+        ]
+      ],
+      "normalized_bbox": [
+        0.275,
+        0.695,
+        0.527003,
+        0.066004
+      ],
+      "normalized_quad": [
+        [
+          0.275,
+          0.695
+        ],
+        [
+          0.802003,
+          0.695
+        ],
+        [
+          0.802003,
+          0.761004
+        ],
+        [
+          0.275,
+          0.761004
+        ]
+      ],
+      "id": "before-visual-004",
+      "source_region_ids": [],
+      "slot_id": "text-aacacd789f-1"
+    },
+    {
+      "text": "MÌ CAY - ĂN VẶT",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        399.65,
+        845.99,
+        812.33,
+        71.68
+      ],
+      "quad": [
+        [
+          399.65,
+          845.99
+        ],
+        [
+          1211.98,
+          845.99
+        ],
+        [
+          1211.98,
+          917.67
+        ],
+        [
+          399.65,
+          917.67
+        ]
+      ],
+      "normalized_bbox": [
+        0.276001,
+        0.778996,
+        0.561001,
+        0.066004
+      ],
+      "normalized_quad": [
+        [
+          0.276001,
+          0.778996
+        ],
+        [
+          0.837003,
+          0.778996
+        ],
+        [
+          0.837003,
+          0.845
+        ],
+        [
+          0.276001,
+          0.845
+        ]
+      ],
+      "id": "before-visual-005",
+      "source_region_ids": [],
+      "slot_id": "text-108fe5aebd-1"
+    },
+    {
+      "text": "TIỆM TRÀ NHÀ MEOW",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        864.46,
+        739.57,
+        170.86,
+        128.15
+      ],
+      "quad": [
+        [
+          864.46,
+          739.57
+        ],
+        [
+          1035.32,
+          739.57
+        ],
+        [
+          1035.32,
+          867.72
+        ],
+        [
+          864.46,
+          867.72
+        ]
+      ],
+      "normalized_bbox": [
+        0.597003,
+        0.681004,
+        0.117997,
+        0.118002
+      ],
+      "normalized_quad": [
+        [
+          0.597003,
+          0.681004
+        ],
+        [
+          0.715,
+          0.681004
+        ],
+        [
+          0.715,
+          0.799006
+        ],
+        [
+          0.597003,
+          0.799006
+        ]
+      ],
+      "id": "before-visual-006",
+      "source_region_ids": [],
+      "slot_id": "text-301f83693d-2"
+    },
+    {
+      "text": "0962 750 569",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        881.83,
+        867.71,
+        136.11,
+        38.01
+      ],
+      "quad": [
+        [
+          881.83,
+          867.71
+        ],
+        [
+          1017.94,
+          867.71
+        ],
+        [
+          1017.94,
+          905.72
+        ],
+        [
+          881.83,
+          905.72
+        ]
+      ],
+      "normalized_bbox": [
+        0.608999,
+        0.798996,
+        0.093999,
+        0.035
+      ],
+      "normalized_quad": [
+        [
+          0.608999,
+          0.798996
+        ],
+        [
+          0.702997,
+          0.798996
+        ],
+        [
+          0.702997,
+          0.833996
+        ],
+        [
+          0.608999,
+          0.833996
+        ]
+      ],
+      "id": "before-visual-007",
+      "source_region_ids": [],
+      "slot_id": "text-345996741d-1"
+    }
+  ],
+  "text_review": "image_review"
+}

@@ -1,0 +1,72 @@
+{
+  "schema_version": 1,
+  "product_id": "04b3c9c9f7fd365fdc1f2d4e734b6044",
+  "view": "after",
+  "image": "/product-references/04b3c9c9f7fd365fdc1f2d4e734b6044-photo-after.png",
+  "sha256": "7a551ae3e79777e22088d3d56c08996752eb71626374147ef078628325d3936a",
+  "width": 1448,
+  "height": 1086,
+  "coordinate_system": "image_pixels_top_left",
+  "status": "detected",
+  "regions": [
+    {
+      "text": "DENIZMMINO",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        199.82,
+        149.87,
+        1248.18,
+        936.13
+      ],
+      "quad": [
+        [
+          199.82,
+          149.87
+        ],
+        [
+          1448.0,
+          149.87
+        ],
+        [
+          1448.0,
+          1086.0
+        ],
+        [
+          199.82,
+          1086.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.137997,
+        0.138002,
+        0.862003,
+        0.861998
+      ],
+      "normalized_quad": [
+        [
+          0.137997,
+          0.138002
+        ],
+        [
+          1.0,
+          0.138002
+        ],
+        [
+          1.0,
+          1.0
+        ],
+        [
+          0.137997,
+          1.0
+        ]
+      ],
+      "id": "after-visual-001",
+      "source_region_ids": [],
+      "slot_id": "text-8da8ef5554-1"
+    }
+  ],
+  "text_review": "image_review"
+}

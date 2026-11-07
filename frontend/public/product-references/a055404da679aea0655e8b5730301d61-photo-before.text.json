@@ -1,0 +1,255 @@
+{
+  "schema_version": 1,
+  "product_id": "a055404da679aea0655e8b5730301d61",
+  "view": "before",
+  "image": "/product-references/a055404da679aea0655e8b5730301d61-photo-before.png",
+  "sha256": "8049dbb5884da3bb9f331f256d5f171509ebe5270b38ea58bd4e5ae1bc03b1e8",
+  "width": 1448,
+  "height": 1086,
+  "coordinate_system": "image_pixels_top_left",
+  "status": "detected",
+  "regions": [
+    {
+      "text": "KARAOKE",
+      "ocr_text": "KARAOKE",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        478.0,
+        438.0,
+        502.0,
+        102.0
+      ],
+      "quad": [
+        [
+          478.0,
+          438.0
+        ],
+        [
+          980.0,
+          438.0
+        ],
+        [
+          980.0,
+          540.0
+        ],
+        [
+          478.0,
+          540.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.33011,
+        0.403315,
+        0.346685,
+        0.093923
+      ],
+      "normalized_quad": [
+        [
+          0.33011,
+          0.403315
+        ],
+        [
+          0.676796,
+          0.403315
+        ],
+        [
+          0.676796,
+          0.497238
+        ],
+        [
+          0.33011,
+          0.497238
+        ]
+      ],
+      "id": "before-visual-001",
+      "source_region_ids": [
+        "before-001"
+      ],
+      "slot_id": "text-f9d20f9bd7-1"
+    },
+    {
+      "text": "Song Mã",
+      "ocr_text": "~ong | ốMã",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        477.84,
+        524.54,
+        677.66,
+        181.36
+      ],
+      "quad": [
+        [
+          477.84,
+          524.54
+        ],
+        [
+          1155.5,
+          524.54
+        ],
+        [
+          1155.5,
+          705.9
+        ],
+        [
+          477.84,
+          705.9
+        ]
+      ],
+      "normalized_bbox": [
+        0.33,
+        0.483002,
+        0.467997,
+        0.166998
+      ],
+      "normalized_quad": [
+        [
+          0.33,
+          0.483002
+        ],
+        [
+          0.797997,
+          0.483002
+        ],
+        [
+          0.797997,
+          0.65
+        ],
+        [
+          0.33,
+          0.65
+        ]
+      ],
+      "id": "before-visual-002",
+      "source_region_ids": [
+        "before-002",
+        "before-003"
+      ],
+      "slot_id": "text-9b4d448dc6-1"
+    },
+    {
+      "text": "25",
+      "ocr_text": "25",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        662.0,
+        736.0,
+        134.0,
+        94.0
+      ],
+      "quad": [
+        [
+          662.0,
+          736.0
+        ],
+        [
+          796.0,
+          736.0
+        ],
+        [
+          796.0,
+          830.0
+        ],
+        [
+          662.0,
+          830.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.457182,
+        0.677716,
+        0.092541,
+        0.086556
+      ],
+      "normalized_quad": [
+        [
+          0.457182,
+          0.677716
+        ],
+        [
+          0.549724,
+          0.677716
+        ],
+        [
+          0.549724,
+          0.764273
+        ],
+        [
+          0.457182,
+          0.764273
+        ]
+      ],
+      "id": "before-visual-003",
+      "source_region_ids": [
+        "before-004"
+      ],
+      "slot_id": "text-f6e1126ced-1"
+    },
+    {
+      "text": "NAM QUỐC CANG",
+      "ocr_text": "NAM QUỐC CANG",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        593.0,
+        831.0,
+        268.0,
+        44.0
+      ],
+      "quad": [
+        [
+          593.0,
+          831.0
+        ],
+        [
+          861.0,
+          831.0
+        ],
+        [
+          861.0,
+          875.0
+        ],
+        [
+          593.0,
+          875.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.40953,
+        0.765193,
+        0.185083,
+        0.040516
+      ],
+      "normalized_quad": [
+        [
+          0.40953,
+          0.765193
+        ],
+        [
+          0.594613,
+          0.765193
+        ],
+        [
+          0.594613,
+          0.805709
+        ],
+        [
+          0.40953,
+          0.805709
+        ]
+      ],
+      "id": "before-visual-004",
+      "source_region_ids": [
+        "before-005"
+      ],
+      "slot_id": "text-175ab6cd41-1"
+    }
+  ],
+  "text_review": "image_review"
+}

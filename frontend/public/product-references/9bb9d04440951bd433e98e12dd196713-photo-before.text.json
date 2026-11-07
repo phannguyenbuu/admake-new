@@ -1,0 +1,318 @@
+{
+  "schema_version": 1,
+  "product_id": "9bb9d04440951bd433e98e12dd196713",
+  "view": "before",
+  "image": "/product-references/9bb9d04440951bd433e98e12dd196713-photo-before.png",
+  "sha256": "b3b19ee26fa6d63bab8673509158207facf2f418d57b73ff817bd55e5d41e4b8",
+  "width": 1448,
+  "height": 1086,
+  "coordinate_system": "image_pixels_top_left",
+  "status": "detected",
+  "regions": [
+    {
+      "text": "M",
+      "ocr_text": "M",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        217.0,
+        317.0,
+        200.0,
+        222.0
+      ],
+      "quad": [
+        [
+          217.0,
+          317.0
+        ],
+        [
+          417.0,
+          317.0
+        ],
+        [
+          417.0,
+          539.0
+        ],
+        [
+          217.0,
+          539.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.149862,
+        0.291897,
+        0.138122,
+        0.20442
+      ],
+      "normalized_quad": [
+        [
+          0.149862,
+          0.291897
+        ],
+        [
+          0.287983,
+          0.291897
+        ],
+        [
+          0.287983,
+          0.496317
+        ],
+        [
+          0.149862,
+          0.496317
+        ]
+      ],
+      "id": "before-visual-001",
+      "source_region_ids": [
+        "before-006"
+      ],
+      "slot_id": "text-6b0d31c0d5-1"
+    },
+    {
+      "text": "ĐẾN L",
+      "ocr_text": "ĐẾNL",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        345.46,
+        483.64,
+        299.08,
+        179.72000000000003
+      ],
+      "quad": [
+        [
+          345.46,
+          558.31
+        ],
+        [
+          618.23,
+          483.64
+        ],
+        [
+          644.54,
+          589.69
+        ],
+        [
+          371.77,
+          663.36
+        ]
+      ],
+      "normalized_bbox": [
+        0.238577,
+        0.445341,
+        0.206547,
+        0.165488
+      ],
+      "normalized_quad": [
+        [
+          0.238577,
+          0.514098
+        ],
+        [
+          0.426954,
+          0.445341
+        ],
+        [
+          0.445124,
+          0.542993
+        ],
+        [
+          0.256747,
+          0.610829
+        ]
+      ],
+      "id": "before-visual-002",
+      "source_region_ids": [
+        "before-010"
+      ],
+      "slot_id": "text-ffbca902e6-1"
+    },
+    {
+      "text": "Ngoại ngữ",
+      "ocr_text": "Ngoại | ngữ",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        687.8,
+        156.38,
+        511.14,
+        140.09
+      ],
+      "quad": [
+        [
+          687.8,
+          156.38
+        ],
+        [
+          1198.94,
+          156.38
+        ],
+        [
+          1198.94,
+          296.47
+        ],
+        [
+          687.8,
+          296.47
+        ]
+      ],
+      "normalized_bbox": [
+        0.475,
+        0.143996,
+        0.352997,
+        0.128996
+      ],
+      "normalized_quad": [
+        [
+          0.475,
+          0.143996
+        ],
+        [
+          0.827997,
+          0.143996
+        ],
+        [
+          0.827997,
+          0.272993
+        ],
+        [
+          0.475,
+          0.272993
+        ]
+      ],
+      "id": "before-visual-003",
+      "source_region_ids": [
+        "before-001",
+        "before-003"
+      ],
+      "slot_id": "text-8fe6c7105c-1"
+    },
+    {
+      "text": "và ngoại quốc",
+      "ocr_text": "ngoại | quốc",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        603.82,
+        231.32,
+        641.46,
+        152.04
+      ],
+      "quad": [
+        [
+          603.82,
+          231.32
+        ],
+        [
+          1245.28,
+          231.32
+        ],
+        [
+          1245.28,
+          383.36
+        ],
+        [
+          603.82,
+          383.36
+        ]
+      ],
+      "normalized_bbox": [
+        0.417003,
+        0.213002,
+        0.442997,
+        0.14
+      ],
+      "normalized_quad": [
+        [
+          0.417003,
+          0.213002
+        ],
+        [
+          0.86,
+          0.213002
+        ],
+        [
+          0.86,
+          0.353002
+        ],
+        [
+          0.417003,
+          0.353002
+        ]
+      ],
+      "id": "before-visual-004",
+      "source_region_ids": [
+        "before-004",
+        "before-005"
+      ],
+      "slot_id": "text-5463be3280-1"
+    },
+    {
+      "text": "Để ngoại tệ",
+      "ocr_text": "Để | ngoại | tệ",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        528.52,
+        396.39,
+        608.16,
+        135.75
+      ],
+      "quad": [
+        [
+          528.52,
+          396.39
+        ],
+        [
+          1136.68,
+          396.39
+        ],
+        [
+          1136.68,
+          532.14
+        ],
+        [
+          528.52,
+          532.14
+        ]
+      ],
+      "normalized_bbox": [
+        0.365,
+        0.365,
+        0.42,
+        0.125
+      ],
+      "normalized_quad": [
+        [
+          0.365,
+          0.365
+        ],
+        [
+          0.785,
+          0.365
+        ],
+        [
+          0.785,
+          0.49
+        ],
+        [
+          0.365,
+          0.49
+        ]
+      ],
+      "id": "before-visual-005",
+      "source_region_ids": [
+        "before-007",
+        "before-008",
+        "before-009"
+      ],
+      "slot_id": "text-79e61324e7-1"
+    }
+  ],
+  "text_review": "image_review"
+}

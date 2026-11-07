@@ -1,0 +1,447 @@
+{
+  "schema_version": 1,
+  "product_id": "605029588cb07d933dce923069bf47b2",
+  "view": "after",
+  "image": "/product-references/605029588cb07d933dce923069bf47b2-photo-after.png",
+  "sha256": "a4ec9b66512e7f516b21f11acca134bc97536d14347c80960bc15c4b3fbe4aa4",
+  "width": 1448,
+  "height": 1086,
+  "coordinate_system": "image_pixels_top_left",
+  "status": "detected",
+  "regions": [
+    {
+      "text": "TIK TAK",
+      "ocr_text": "TAK | TIK",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        689.25,
+        163.99,
+        729.79,
+        174.85
+      ],
+      "quad": [
+        [
+          689.25,
+          163.99
+        ],
+        [
+          1419.04,
+          163.99
+        ],
+        [
+          1419.04,
+          338.84
+        ],
+        [
+          689.25,
+          338.84
+        ]
+      ],
+      "normalized_bbox": [
+        0.476001,
+        0.151004,
+        0.503999,
+        0.161004
+      ],
+      "normalized_quad": [
+        [
+          0.476001,
+          0.151004
+        ],
+        [
+          0.98,
+          0.151004
+        ],
+        [
+          0.98,
+          0.312007
+        ],
+        [
+          0.476001,
+          0.312007
+        ]
+      ],
+      "id": "after-visual-001",
+      "source_region_ids": [
+        "after-001",
+        "after-002"
+      ],
+      "slot_id": "text-0c7fe91fba-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "ĂN VẶT - MÌ CAY - TRÀ SỮA",
+      "ocr_text": "TRÀ SuA | vÁT' | Micay. | ÁN",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        894.86,
+        696.13,
+        383.72,
+        35.84
+      ],
+      "quad": [
+        [
+          894.86,
+          696.13
+        ],
+        [
+          1278.58,
+          696.13
+        ],
+        [
+          1278.58,
+          731.97
+        ],
+        [
+          894.86,
+          731.97
+        ]
+      ],
+      "normalized_bbox": [
+        0.617997,
+        0.641004,
+        0.265,
+        0.033002
+      ],
+      "normalized_quad": [
+        [
+          0.617997,
+          0.641004
+        ],
+        [
+          0.882997,
+          0.641004
+        ],
+        [
+          0.882997,
+          0.674006
+        ],
+        [
+          0.617997,
+          0.674006
+        ]
+      ],
+      "id": "after-visual-002",
+      "source_region_ids": [
+        "after-003",
+        "after-004",
+        "after-005",
+        "after-006"
+      ],
+      "slot_id": "text-138ac3ab09-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "TIKTAK",
+      "ocr_text": "TIKTAK",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        888.0,
+        724.44,
+        144.0,
+        81.11999999999989
+      ],
+      "quad": [
+        [
+          888.0,
+          764.9
+        ],
+        [
+          1019.83,
+          724.44
+        ],
+        [
+          1032.0,
+          764.1
+        ],
+        [
+          900.17,
+          805.56
+        ]
+      ],
+      "normalized_bbox": [
+        0.61326,
+        0.667072,
+        0.099448,
+        0.074696
+      ],
+      "normalized_quad": [
+        [
+          0.61326,
+          0.704328
+        ],
+        [
+          0.704302,
+          0.667072
+        ],
+        [
+          0.712707,
+          0.703591
+        ],
+        [
+          0.621664,
+          0.741768
+        ]
+      ],
+      "id": "after-visual-003",
+      "source_region_ids": [
+        "after-007"
+      ],
+      "slot_id": "text-0c7fe91fba-2",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "yum!",
+      "ocr_text": "YyuM!",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        777.49,
+        832.36,
+        64.01999999999998,
+        42.27999999999997
+      ],
+      "quad": [
+        [
+          777.49,
+          844.14
+        ],
+        [
+          834.77,
+          832.36
+        ],
+        [
+          841.51,
+          862.86
+        ],
+        [
+          784.23,
+          874.64
+        ]
+      ],
+      "normalized_bbox": [
+        0.536941,
+        0.766446,
+        0.044213,
+        0.038932
+      ],
+      "normalized_quad": [
+        [
+          0.536941,
+          0.777293
+        ],
+        [
+          0.576499,
+          0.766446
+        ],
+        [
+          0.581153,
+          0.79453
+        ],
+        [
+          0.541595,
+          0.805378
+        ]
+      ],
+      "id": "after-visual-004",
+      "source_region_ids": [
+        "after-012"
+      ],
+      "slot_id": "text-3c14423e8d-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "Face Book: TikTak Ăn Vặt - Mì Cay & Trà Sữa",
+      "ocr_text": "TikTak Án VAt - MCay & Trà Sũa",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        902.0,
+        776.0,
+        147.0,
+        64.0
+      ],
+      "quad": [
+        [
+          902.0,
+          824.0
+        ],
+        [
+          1043.0,
+          776.0
+        ],
+        [
+          1049.0,
+          793.0
+        ],
+        [
+          907.0,
+          840.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.622928,
+        0.714549,
+        0.101519,
+        0.058932
+      ],
+      "normalized_quad": [
+        [
+          0.622928,
+          0.758748
+        ],
+        [
+          0.720304,
+          0.714549
+        ],
+        [
+          0.724448,
+          0.730203
+        ],
+        [
+          0.626381,
+          0.773481
+        ]
+      ],
+      "id": "after-visual-005",
+      "source_region_ids": [
+        "after-008"
+      ],
+      "slot_id": "text-d114cfc7ed-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "Hotline - Zalo: 0963 38 12 12",
+      "ocr_text": "096338 12 12 | Zalo: | Hocline",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        854.32,
+        831.88,
+        340.28,
+        33.67
+      ],
+      "quad": [
+        [
+          854.32,
+          831.88
+        ],
+        [
+          1194.6,
+          831.88
+        ],
+        [
+          1194.6,
+          865.55
+        ],
+        [
+          854.32,
+          865.55
+        ]
+      ],
+      "normalized_bbox": [
+        0.59,
+        0.766004,
+        0.235,
+        0.031004
+      ],
+      "normalized_quad": [
+        [
+          0.59,
+          0.766004
+        ],
+        [
+          0.825,
+          0.766004
+        ],
+        [
+          0.825,
+          0.797007
+        ],
+        [
+          0.59,
+          0.797007
+        ]
+      ],
+      "id": "after-visual-006",
+      "source_region_ids": [
+        "after-009",
+        "after-011",
+        "after-014"
+      ],
+      "slot_id": "text-9d79854e53-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "SHIP TẬN NƠI",
+      "ocr_text": "'ayNof",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        943.0,
+        837.0,
+        40.0,
+        26.0
+      ],
+      "quad": [
+        [
+          943.0,
+          849.0
+        ],
+        [
+          979.0,
+          837.0
+        ],
+        [
+          983.0,
+          851.0
+        ],
+        [
+          947.0,
+          863.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.651243,
+        0.770718,
+        0.027624,
+        0.023941
+      ],
+      "normalized_quad": [
+        [
+          0.651243,
+          0.781768
+        ],
+        [
+          0.676105,
+          0.770718
+        ],
+        [
+          0.678867,
+          0.78361
+        ],
+        [
+          0.654006,
+          0.794659
+        ]
+      ],
+      "id": "after-visual-007",
+      "source_region_ids": [
+        "after-015"
+      ],
+      "slot_id": "text-e68bf4560a-1",
+      "match_confidence": 1.0
+    }
+  ],
+  "text_review": "image_review"
+}

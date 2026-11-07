@@ -1,0 +1,132 @@
+{
+  "schema_version": 1,
+  "product_id": "dc14344fd818f1391d31c609aa5c79f3",
+  "view": "after",
+  "image": "/product-references/dc14344fd818f1391d31c609aa5c79f3-photo-after.png",
+  "sha256": "07a6c4530e2123ce84feeab304b9690beb58cf854aebe9dbfb1361fb22871520",
+  "width": 1448,
+  "height": 1086,
+  "coordinate_system": "image_pixels_top_left",
+  "status": "detected",
+  "regions": [
+    {
+      "text": "Bánh Tráng Trộn",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        518.38,
+        28.24,
+        890.52,
+        184.62
+      ],
+      "quad": [
+        [
+          518.38,
+          28.24
+        ],
+        [
+          1408.9,
+          28.24
+        ],
+        [
+          1408.9,
+          212.86
+        ],
+        [
+          518.38,
+          212.86
+        ]
+      ],
+      "normalized_bbox": [
+        0.357997,
+        0.026004,
+        0.615,
+        0.17
+      ],
+      "normalized_quad": [
+        [
+          0.357997,
+          0.026004
+        ],
+        [
+          0.972997,
+          0.026004
+        ],
+        [
+          0.972997,
+          0.196004
+        ],
+        [
+          0.357997,
+          0.196004
+        ]
+      ],
+      "id": "after-visual-001",
+      "source_region_ids": [],
+      "slot_id": "text-ea73f1dcb1-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "Nước Ép",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        595.13,
+        155.3,
+        845.63,
+        111.86
+      ],
+      "quad": [
+        [
+          595.13,
+          155.3
+        ],
+        [
+          1440.76,
+          155.3
+        ],
+        [
+          1440.76,
+          267.16
+        ],
+        [
+          595.13,
+          267.16
+        ]
+      ],
+      "normalized_bbox": [
+        0.411001,
+        0.143002,
+        0.583999,
+        0.103002
+      ],
+      "normalized_quad": [
+        [
+          0.411001,
+          0.143002
+        ],
+        [
+          0.995,
+          0.143002
+        ],
+        [
+          0.995,
+          0.246004
+        ],
+        [
+          0.411001,
+          0.246004
+        ]
+      ],
+      "id": "after-visual-002",
+      "source_region_ids": [],
+      "slot_id": "text-7a1a314823-1",
+      "match_confidence": 1.0
+    }
+  ],
+  "text_review": "image_review"
+}

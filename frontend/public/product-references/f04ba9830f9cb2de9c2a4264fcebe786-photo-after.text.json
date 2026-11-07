@@ -1,0 +1,604 @@
+{
+  "schema_version": 1,
+  "product_id": "f04ba9830f9cb2de9c2a4264fcebe786",
+  "view": "after",
+  "image": "/product-references/f04ba9830f9cb2de9c2a4264fcebe786-photo-after.png",
+  "sha256": "8a49c9d2aa8a5690360e3dcd18f75b17bf798312a0fa07493d02b2ec8f9cf1e4",
+  "width": 1448,
+  "height": 1086,
+  "coordinate_system": "image_pixels_top_left",
+  "status": "detected",
+  "regions": [
+    {
+      "text": "ĐỘI SẢN XUẤT",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        487.98,
+        69.5,
+        960.02,
+        147.7
+      ],
+      "quad": [
+        [
+          487.98,
+          69.5
+        ],
+        [
+          1448.0,
+          69.5
+        ],
+        [
+          1448.0,
+          217.2
+        ],
+        [
+          487.98,
+          217.2
+        ]
+      ],
+      "normalized_bbox": [
+        0.337003,
+        0.063996,
+        0.662997,
+        0.136004
+      ],
+      "normalized_quad": [
+        [
+          0.337003,
+          0.063996
+        ],
+        [
+          1.0,
+          0.063996
+        ],
+        [
+          1.0,
+          0.2
+        ],
+        [
+          0.337003,
+          0.2
+        ]
+      ],
+      "id": "after-visual-001",
+      "source_region_ids": [],
+      "slot_id": "text-0092789f97-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "KÔ SIÊR II",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        569.06,
+        192.22,
+        878.94,
+        171.59
+      ],
+      "quad": [
+        [
+          569.06,
+          192.22
+        ],
+        [
+          1448.0,
+          192.22
+        ],
+        [
+          1448.0,
+          363.81
+        ],
+        [
+          569.06,
+          363.81
+        ]
+      ],
+      "normalized_bbox": [
+        0.392997,
+        0.176998,
+        0.607003,
+        0.158002
+      ],
+      "normalized_quad": [
+        [
+          0.392997,
+          0.176998
+        ],
+        [
+          1.0,
+          0.176998
+        ],
+        [
+          1.0,
+          0.335
+        ],
+        [
+          0.392997,
+          0.335
+        ]
+      ],
+      "id": "after-visual-002",
+      "source_region_ids": [],
+      "slot_id": "text-518b28dee8-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "ĐC: TỔ LIÊN GIA 19, B. KÔ SIÊR, P. BUÔN MA THUỘT, ĐẮK LẮK",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        505.35,
+        282.36,
+        942.65,
+        48.87
+      ],
+      "quad": [
+        [
+          505.35,
+          282.36
+        ],
+        [
+          1448.0,
+          282.36
+        ],
+        [
+          1448.0,
+          331.23
+        ],
+        [
+          505.35,
+          331.23
+        ]
+      ],
+      "normalized_bbox": [
+        0.348999,
+        0.26,
+        0.651001,
+        0.045
+      ],
+      "normalized_quad": [
+        [
+          0.348999,
+          0.26
+        ],
+        [
+          1.0,
+          0.26
+        ],
+        [
+          1.0,
+          0.305
+        ],
+        [
+          0.348999,
+          0.305
+        ]
+      ],
+      "id": "after-visual-003",
+      "source_region_ids": [],
+      "slot_id": "text-596a0439a4-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "ĐƠN VỊ CUNG ỨNG",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        447.43,
+        329.06,
+        615.4,
+        35.84
+      ],
+      "quad": [
+        [
+          447.43,
+          329.06
+        ],
+        [
+          1062.83,
+          329.06
+        ],
+        [
+          1062.83,
+          364.9
+        ],
+        [
+          447.43,
+          364.9
+        ]
+      ],
+      "normalized_bbox": [
+        0.308999,
+        0.303002,
+        0.425,
+        0.033002
+      ],
+      "normalized_quad": [
+        [
+          0.308999,
+          0.303002
+        ],
+        [
+          0.733999,
+          0.303002
+        ],
+        [
+          0.733999,
+          0.336004
+        ],
+        [
+          0.308999,
+          0.336004
+        ]
+      ],
+      "id": "after-visual-004",
+      "source_region_ids": [],
+      "slot_id": "text-0781b36e23-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "PHÂN BÓN & THUỐC BVTV",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        447.43,
+        365.98,
+        645.81,
+        35.84
+      ],
+      "quad": [
+        [
+          447.43,
+          365.98
+        ],
+        [
+          1093.24,
+          365.98
+        ],
+        [
+          1093.24,
+          401.82
+        ],
+        [
+          447.43,
+          401.82
+        ]
+      ],
+      "normalized_bbox": [
+        0.308999,
+        0.336998,
+        0.446001,
+        0.033002
+      ],
+      "normalized_quad": [
+        [
+          0.308999,
+          0.336998
+        ],
+        [
+          0.755,
+          0.336998
+        ],
+        [
+          0.755,
+          0.37
+        ],
+        [
+          0.308999,
+          0.37
+        ]
+      ],
+      "id": "after-visual-005",
+      "source_region_ids": [],
+      "slot_id": "text-17e5291c71-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "BACONCO",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        511.14,
+        475.67,
+        146.25,
+        27.15
+      ],
+      "quad": [
+        [
+          511.14,
+          475.67
+        ],
+        [
+          657.39,
+          475.67
+        ],
+        [
+          657.39,
+          502.82
+        ],
+        [
+          511.14,
+          502.82
+        ]
+      ],
+      "normalized_bbox": [
+        0.352997,
+        0.438002,
+        0.101001,
+        0.025
+      ],
+      "normalized_quad": [
+        [
+          0.352997,
+          0.438002
+        ],
+        [
+          0.453999,
+          0.438002
+        ],
+        [
+          0.453999,
+          0.463002
+        ],
+        [
+          0.352997,
+          0.463002
+        ]
+      ],
+      "id": "after-visual-006",
+      "source_region_ids": [],
+      "slot_id": "text-05d381b725-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "ĐƠN VỊ TƯ VẤN KỸ THUẬT",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        803.64,
+        388.79,
+        434.4,
+        35.84
+      ],
+      "quad": [
+        [
+          803.64,
+          388.79
+        ],
+        [
+          1238.04,
+          388.79
+        ],
+        [
+          1238.04,
+          424.63
+        ],
+        [
+          803.64,
+          424.63
+        ]
+      ],
+      "normalized_bbox": [
+        0.555,
+        0.358002,
+        0.3,
+        0.033002
+      ],
+      "normalized_quad": [
+        [
+          0.555,
+          0.358002
+        ],
+        [
+          0.855,
+          0.358002
+        ],
+        [
+          0.855,
+          0.391004
+        ],
+        [
+          0.555,
+          0.391004
+        ]
+      ],
+      "id": "after-visual-007",
+      "source_region_ids": [],
+      "slot_id": "text-7727bdb1bd-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "& CUNG ỨNG VẬT TƯ",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        822.46,
+        415.94,
+        396.75,
+        35.84
+      ],
+      "quad": [
+        [
+          822.46,
+          415.94
+        ],
+        [
+          1219.21,
+          415.94
+        ],
+        [
+          1219.21,
+          451.78
+        ],
+        [
+          822.46,
+          451.78
+        ]
+      ],
+      "normalized_bbox": [
+        0.567997,
+        0.383002,
+        0.273999,
+        0.033002
+      ],
+      "normalized_quad": [
+        [
+          0.567997,
+          0.383002
+        ],
+        [
+          0.841996,
+          0.383002
+        ],
+        [
+          0.841996,
+          0.416004
+        ],
+        [
+          0.567997,
+          0.416004
+        ]
+      ],
+      "id": "after-visual-008",
+      "source_region_ids": [],
+      "slot_id": "text-691dd3473d-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "NPP THÀNH DŨNG",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        761.65,
+        452.86,
+        518.38,
+        57.56
+      ],
+      "quad": [
+        [
+          761.65,
+          452.86
+        ],
+        [
+          1280.03,
+          452.86
+        ],
+        [
+          1280.03,
+          510.42
+        ],
+        [
+          761.65,
+          510.42
+        ]
+      ],
+      "normalized_bbox": [
+        0.526001,
+        0.416998,
+        0.357997,
+        0.053002
+      ],
+      "normalized_quad": [
+        [
+          0.526001,
+          0.416998
+        ],
+        [
+          0.883999,
+          0.416998
+        ],
+        [
+          0.883999,
+          0.47
+        ],
+        [
+          0.526001,
+          0.47
+        ]
+      ],
+      "id": "after-visual-009",
+      "source_region_ids": [],
+      "slot_id": "text-3cf5063303-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "ĐT: 0983 00 47 53",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        819.57,
+        533.23,
+        402.54,
+        35.84
+      ],
+      "quad": [
+        [
+          819.57,
+          533.23
+        ],
+        [
+          1222.11,
+          533.23
+        ],
+        [
+          1222.11,
+          569.07
+        ],
+        [
+          819.57,
+          569.07
+        ]
+      ],
+      "normalized_bbox": [
+        0.566001,
+        0.491004,
+        0.277997,
+        0.033002
+      ],
+      "normalized_quad": [
+        [
+          0.566001,
+          0.491004
+        ],
+        [
+          0.843999,
+          0.491004
+        ],
+        [
+          0.843999,
+          0.524006
+        ],
+        [
+          0.566001,
+          0.524006
+        ]
+      ],
+      "id": "after-visual-010",
+      "source_region_ids": [],
+      "slot_id": "text-4f03715f17-1",
+      "match_confidence": 1.0
+    }
+  ],
+  "text_review": "image_review"
+}

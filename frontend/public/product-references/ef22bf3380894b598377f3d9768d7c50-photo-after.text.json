@@ -1,0 +1,208 @@
+{
+  "schema_version": 1,
+  "product_id": "ef22bf3380894b598377f3d9768d7c50",
+  "view": "after",
+  "image": "/product-references/ef22bf3380894b598377f3d9768d7c50-photo-after.png",
+  "sha256": "bc97f48dbb8722740839d8675ebe587e8857b05553f25b965efc7ed4a77a09e3",
+  "width": 1448,
+  "height": 1086,
+  "coordinate_system": "image_pixels_top_left",
+  "status": "detected",
+  "regions": [
+    {
+      "text": "BURGER VIET",
+      "ocr_text": "BURGER | VIET",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        385.17,
+        410.51,
+        887.62,
+        195.48
+      ],
+      "quad": [
+        [
+          385.17,
+          410.51
+        ],
+        [
+          1272.79,
+          410.51
+        ],
+        [
+          1272.79,
+          605.99
+        ],
+        [
+          385.17,
+          605.99
+        ]
+      ],
+      "normalized_bbox": [
+        0.266001,
+        0.378002,
+        0.612997,
+        0.18
+      ],
+      "normalized_quad": [
+        [
+          0.266001,
+          0.378002
+        ],
+        [
+          0.878999,
+          0.378002
+        ],
+        [
+          0.878999,
+          0.558002
+        ],
+        [
+          0.266001,
+          0.558002
+        ]
+      ],
+      "id": "after-visual-001",
+      "source_region_ids": [
+        "after-001",
+        "after-002"
+      ],
+      "slot_id": "text-2fded9adc6-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "CN BUÔN MÊ THUỘT",
+      "ocr_text": "CN | BUÔN | MÊ THUỘT",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        221.54,
+        599.47,
+        941.2,
+        119.46
+      ],
+      "quad": [
+        [
+          221.54,
+          599.47
+        ],
+        [
+          1162.74,
+          599.47
+        ],
+        [
+          1162.74,
+          718.93
+        ],
+        [
+          221.54,
+          718.93
+        ]
+      ],
+      "normalized_bbox": [
+        0.152997,
+        0.551998,
+        0.65,
+        0.11
+      ],
+      "normalized_quad": [
+        [
+          0.152997,
+          0.551998
+        ],
+        [
+          0.802997,
+          0.551998
+        ],
+        [
+          0.802997,
+          0.661998
+        ],
+        [
+          0.152997,
+          0.661998
+        ]
+      ],
+      "id": "after-visual-002",
+      "source_region_ids": [
+        "after-003",
+        "after-004",
+        "after-007"
+      ],
+      "slot_id": "text-f4ce36b304-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "74 Mai Hắc Đế, P. Tân Thành, Tp. Buôn Mê Thuột",
+      "ocr_text": "74 | Mai | Hắc Đế,P | Tân | Thành, | Tp. | Buôn | Mê | Thuột",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        224.44,
+        670.06,
+        993.33,
+        124.89
+      ],
+      "quad": [
+        [
+          224.44,
+          670.06
+        ],
+        [
+          1217.77,
+          670.06
+        ],
+        [
+          1217.77,
+          794.95
+        ],
+        [
+          224.44,
+          794.95
+        ]
+      ],
+      "normalized_bbox": [
+        0.155,
+        0.616998,
+        0.686001,
+        0.115
+      ],
+      "normalized_quad": [
+        [
+          0.155,
+          0.616998
+        ],
+        [
+          0.841001,
+          0.616998
+        ],
+        [
+          0.841001,
+          0.731998
+        ],
+        [
+          0.155,
+          0.731998
+        ]
+      ],
+      "id": "after-visual-003",
+      "source_region_ids": [
+        "after-005",
+        "after-006",
+        "after-008",
+        "after-009",
+        "after-010",
+        "after-011",
+        "after-012",
+        "after-013",
+        "after-014"
+      ],
+      "slot_id": "text-ae6a67fc70-1",
+      "match_confidence": 1.0
+    }
+  ],
+  "text_review": "image_review"
+}

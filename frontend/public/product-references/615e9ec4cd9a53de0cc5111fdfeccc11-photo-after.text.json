@@ -1,0 +1,139 @@
+{
+  "schema_version": 1,
+  "product_id": "615e9ec4cd9a53de0cc5111fdfeccc11",
+  "view": "after",
+  "image": "/product-references/615e9ec4cd9a53de0cc5111fdfeccc11-photo-after.png",
+  "sha256": "5864724495f4ac2965a0de82b22d86225243c6fb69bdfe79d87289512e64d60e",
+  "width": 1448,
+  "height": 1086,
+  "coordinate_system": "image_pixels_top_left",
+  "status": "detected",
+  "regions": [
+    {
+      "text": "Nhà Khế",
+      "ocr_text": "nhà | khế",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        315.66,
+        281.27,
+        964.37,
+        329.06
+      ],
+      "quad": [
+        [
+          315.66,
+          281.27
+        ],
+        [
+          1280.03,
+          281.27
+        ],
+        [
+          1280.03,
+          610.33
+        ],
+        [
+          315.66,
+          610.33
+        ]
+      ],
+      "normalized_bbox": [
+        0.217997,
+        0.258996,
+        0.666001,
+        0.303002
+      ],
+      "normalized_quad": [
+        [
+          0.217997,
+          0.258996
+        ],
+        [
+          0.883999,
+          0.258996
+        ],
+        [
+          0.883999,
+          0.561998
+        ],
+        [
+          0.217997,
+          0.561998
+        ]
+      ],
+      "id": "after-visual-001",
+      "source_region_ids": [
+        "after-001",
+        "after-002"
+      ],
+      "slot_id": "text-058ade9455-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "37 Nguyễn Khuyến",
+      "ocr_text": "37 | nguyễn | Khuqến",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        353.31,
+        588.61,
+        931.06,
+        285.62
+      ],
+      "quad": [
+        [
+          353.31,
+          588.61
+        ],
+        [
+          1284.37,
+          588.61
+        ],
+        [
+          1284.37,
+          874.23
+        ],
+        [
+          353.31,
+          874.23
+        ]
+      ],
+      "normalized_bbox": [
+        0.243999,
+        0.541998,
+        0.642997,
+        0.263002
+      ],
+      "normalized_quad": [
+        [
+          0.243999,
+          0.541998
+        ],
+        [
+          0.886996,
+          0.541998
+        ],
+        [
+          0.886996,
+          0.805
+        ],
+        [
+          0.243999,
+          0.805
+        ]
+      ],
+      "id": "after-visual-002",
+      "source_region_ids": [
+        "after-003",
+        "after-004",
+        "after-005"
+      ],
+      "slot_id": "text-fa19552c00-1",
+      "match_confidence": 1.0
+    }
+  ],
+  "text_review": "image_review"
+}

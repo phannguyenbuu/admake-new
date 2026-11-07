@@ -1,0 +1,252 @@
+{
+  "schema_version": 1,
+  "product_id": "54727938bb45249b21f3a83a72c91abb",
+  "view": "before",
+  "image": "/product-references/54727938bb45249b21f3a83a72c91abb-photo-before.png",
+  "sha256": "501c4c843a58762bba54491cbe7f3b1750d16715a7ffdb3f58190a714376bf1a",
+  "width": 1448,
+  "height": 1086,
+  "coordinate_system": "image_pixels_top_left",
+  "status": "detected",
+  "regions": [
+    {
+      "text": "Tiệm Chè Ngoại Tui",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        605.26,
+        89.05,
+        305.53,
+        263.9
+      ],
+      "quad": [
+        [
+          605.26,
+          89.05
+        ],
+        [
+          910.79,
+          89.05
+        ],
+        [
+          910.79,
+          352.95
+        ],
+        [
+          605.26,
+          352.95
+        ]
+      ],
+      "normalized_bbox": [
+        0.417997,
+        0.081998,
+        0.211001,
+        0.243002
+      ],
+      "normalized_quad": [
+        [
+          0.417997,
+          0.081998
+        ],
+        [
+          0.628999,
+          0.081998
+        ],
+        [
+          0.628999,
+          0.325
+        ],
+        [
+          0.417997,
+          0.325
+        ]
+      ],
+      "id": "before-visual-001",
+      "source_region_ids": [],
+      "slot_id": "text-3dad12154b-1"
+    },
+    {
+      "text": "MUA",
+      "ocr_text": "MUA",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        605.0,
+        300.0,
+        178.0,
+        78.0
+      ],
+      "quad": [
+        [
+          605.0,
+          300.0
+        ],
+        [
+          783.0,
+          300.0
+        ],
+        [
+          783.0,
+          378.0
+        ],
+        [
+          605.0,
+          378.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.417818,
+        0.276243,
+        0.122928,
+        0.071823
+      ],
+      "normalized_quad": [
+        [
+          0.417818,
+          0.276243
+        ],
+        [
+          0.540746,
+          0.276243
+        ],
+        [
+          0.540746,
+          0.348066
+        ],
+        [
+          0.417818,
+          0.348066
+        ]
+      ],
+      "id": "before-visual-002",
+      "source_region_ids": [
+        "before-002"
+      ],
+      "slot_id": "text-c29de68cf8-1"
+    },
+    {
+      "text": "5LY",
+      "ocr_text": "5LY",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        599.0,
+        369.0,
+        229.0,
+        123.0
+      ],
+      "quad": [
+        [
+          599.0,
+          369.0
+        ],
+        [
+          828.0,
+          369.0
+        ],
+        [
+          828.0,
+          492.0
+        ],
+        [
+          599.0,
+          492.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.413674,
+        0.339779,
+        0.158149,
+        0.11326
+      ],
+      "normalized_quad": [
+        [
+          0.413674,
+          0.339779
+        ],
+        [
+          0.571823,
+          0.339779
+        ],
+        [
+          0.571823,
+          0.453039
+        ],
+        [
+          0.413674,
+          0.453039
+        ]
+      ],
+      "id": "before-visual-003",
+      "source_region_ids": [
+        "before-003"
+      ],
+      "slot_id": "text-9843d186da-1"
+    },
+    {
+      "text": "TẶNG 1LY",
+      "ocr_text": "TẶNG ILY",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        593.0,
+        504.0,
+        275.0,
+        78.0
+      ],
+      "quad": [
+        [
+          593.0,
+          504.0
+        ],
+        [
+          868.0,
+          504.0
+        ],
+        [
+          868.0,
+          582.0
+        ],
+        [
+          593.0,
+          582.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.40953,
+        0.464088,
+        0.189917,
+        0.071823
+      ],
+      "normalized_quad": [
+        [
+          0.40953,
+          0.464088
+        ],
+        [
+          0.599448,
+          0.464088
+        ],
+        [
+          0.599448,
+          0.535912
+        ],
+        [
+          0.40953,
+          0.535912
+        ]
+      ],
+      "id": "before-visual-004",
+      "source_region_ids": [
+        "before-004"
+      ],
+      "slot_id": "text-f676a3571d-1"
+    }
+  ],
+  "text_review": "image_review"
+}

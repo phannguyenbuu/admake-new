@@ -1,0 +1,375 @@
+{
+  "schema_version": 1,
+  "product_id": "744d70e3baaac2fc650bee29e9cea895",
+  "view": "before",
+  "image": "/product-references/744d70e3baaac2fc650bee29e9cea895-photo-before.png",
+  "sha256": "be56070e8346ea149236b978b6fb53f458c931d0ad651f8230d7b4b8bb3ce61d",
+  "width": 1448,
+  "height": 1086,
+  "coordinate_system": "image_pixels_top_left",
+  "status": "detected",
+  "regions": [
+    {
+      "text": "THỦY NaBi",
+      "ocr_text": "2 | THỦYIaBi",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        199.82,
+        306.25,
+        1094.69,
+        243.26
+      ],
+      "quad": [
+        [
+          199.82,
+          306.25
+        ],
+        [
+          1294.51,
+          306.25
+        ],
+        [
+          1294.51,
+          549.51
+        ],
+        [
+          199.82,
+          549.51
+        ]
+      ],
+      "normalized_bbox": [
+        0.137997,
+        0.281998,
+        0.756001,
+        0.223996
+      ],
+      "normalized_quad": [
+        [
+          0.137997,
+          0.281998
+        ],
+        [
+          0.893999,
+          0.281998
+        ],
+        [
+          0.893999,
+          0.505994
+        ],
+        [
+          0.137997,
+          0.505994
+        ]
+      ],
+      "id": "before-visual-001",
+      "source_region_ids": [
+        "before-001",
+        "before-002"
+      ],
+      "slot_id": "text-35874a1c69-1"
+    },
+    {
+      "text": "Tiệm thuê đồ bmt",
+      "ocr_text": "Tiệm thuê đồ bmt",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        398.0,
+        602.0,
+        654.0,
+        88.0
+      ],
+      "quad": [
+        [
+          398.0,
+          602.0
+        ],
+        [
+          1052.0,
+          602.0
+        ],
+        [
+          1052.0,
+          690.0
+        ],
+        [
+          398.0,
+          690.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.274862,
+        0.554328,
+        0.451657,
+        0.081031
+      ],
+      "normalized_quad": [
+        [
+          0.274862,
+          0.554328
+        ],
+        [
+          0.726519,
+          0.554328
+        ],
+        [
+          0.726519,
+          0.635359
+        ],
+        [
+          0.274862,
+          0.635359
+        ]
+      ],
+      "id": "before-visual-002",
+      "source_region_ids": [
+        "before-003"
+      ],
+      "slot_id": "text-2e9bb5932a-1"
+    },
+    {
+      "text": "Đc: 09 Bà Triệu",
+      "ocr_text": "Đc: 09 Bà Triệu",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        191.0,
+        741.0,
+        266.0,
+        42.0
+      ],
+      "quad": [
+        [
+          191.0,
+          741.0
+        ],
+        [
+          457.0,
+          741.0
+        ],
+        [
+          457.0,
+          783.0
+        ],
+        [
+          191.0,
+          783.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.131906,
+        0.68232,
+        0.183702,
+        0.038674
+      ],
+      "normalized_quad": [
+        [
+          0.131906,
+          0.68232
+        ],
+        [
+          0.315608,
+          0.68232
+        ],
+        [
+          0.315608,
+          0.720994
+        ],
+        [
+          0.131906,
+          0.720994
+        ]
+      ],
+      "id": "before-visual-003",
+      "source_region_ids": [
+        "before-004"
+      ],
+      "slot_id": "text-7e9a6b8cf4-1"
+    },
+    {
+      "text": "P. Buôn Ma Thuột",
+      "ocr_text": "P. Buôn Ma Thuột",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        187.0,
+        783.0,
+        300.0,
+        42.0
+      ],
+      "quad": [
+        [
+          187.0,
+          783.0
+        ],
+        [
+          487.0,
+          783.0
+        ],
+        [
+          487.0,
+          825.0
+        ],
+        [
+          187.0,
+          825.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.129144,
+        0.720994,
+        0.207182,
+        0.038674
+      ],
+      "normalized_quad": [
+        [
+          0.129144,
+          0.720994
+        ],
+        [
+          0.336326,
+          0.720994
+        ],
+        [
+          0.336326,
+          0.759669
+        ],
+        [
+          0.129144,
+          0.759669
+        ]
+      ],
+      "id": "before-visual-004",
+      "source_region_ids": [
+        "before-007"
+      ],
+      "slot_id": "text-945d352df5-1"
+    },
+    {
+      "text": "Sđt: 0962085179",
+      "ocr_text": "Sđt: 0962085179",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        709.0,
+        777.0,
+        260.0,
+        38.0
+      ],
+      "quad": [
+        [
+          709.0,
+          777.0
+        ],
+        [
+          969.0,
+          777.0
+        ],
+        [
+          969.0,
+          815.0
+        ],
+        [
+          709.0,
+          815.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.489641,
+        0.71547,
+        0.179558,
+        0.034991
+      ],
+      "normalized_quad": [
+        [
+          0.489641,
+          0.71547
+        ],
+        [
+          0.669199,
+          0.71547
+        ],
+        [
+          0.669199,
+          0.75046
+        ],
+        [
+          0.489641,
+          0.75046
+        ]
+      ],
+      "id": "before-visual-005",
+      "source_region_ids": [
+        "before-005"
+      ],
+      "slot_id": "text-a6eb5c4f0d-1"
+    },
+    {
+      "text": "Thùy NaBi",
+      "ocr_text": "Thùy NaBi",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        1187.0,
+        776.0,
+        166.0,
+        45.0
+      ],
+      "quad": [
+        [
+          1187.0,
+          776.0
+        ],
+        [
+          1353.0,
+          776.0
+        ],
+        [
+          1353.0,
+          821.0
+        ],
+        [
+          1187.0,
+          821.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.819751,
+        0.714549,
+        0.114641,
+        0.041436
+      ],
+      "normalized_quad": [
+        [
+          0.819751,
+          0.714549
+        ],
+        [
+          0.934392,
+          0.714549
+        ],
+        [
+          0.934392,
+          0.755985
+        ],
+        [
+          0.819751,
+          0.755985
+        ]
+      ],
+      "id": "before-visual-006",
+      "source_region_ids": [
+        "before-006"
+      ],
+      "slot_id": "text-35874a1c69-2"
+    }
+  ],
+  "text_review": "image_review"
+}

@@ -1,0 +1,131 @@
+{
+  "schema_version": 1,
+  "product_id": "5215e129dce7bcaff0317280f9e750db",
+  "view": "after",
+  "image": "/product-references/5215e129dce7bcaff0317280f9e750db-photo-after.png",
+  "sha256": "e5204e4d2e180601bb9acedb2f380c925f9bf1f5bfde75fdaf134c914d6adb5b",
+  "width": 1448,
+  "height": 1086,
+  "coordinate_system": "image_pixels_top_left",
+  "status": "detected",
+  "regions": [
+    {
+      "text": "DOANH",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        166.52,
+        23.89,
+        1267.0,
+        385.53
+      ],
+      "quad": [
+        [
+          166.52,
+          23.89
+        ],
+        [
+          1433.52,
+          23.89
+        ],
+        [
+          1433.52,
+          409.42
+        ],
+        [
+          166.52,
+          409.42
+        ]
+      ],
+      "normalized_bbox": [
+        0.115,
+        0.021998,
+        0.875,
+        0.355
+      ],
+      "normalized_quad": [
+        [
+          0.115,
+          0.021998
+        ],
+        [
+          0.99,
+          0.021998
+        ],
+        [
+          0.99,
+          0.376998
+        ],
+        [
+          0.115,
+          0.376998
+        ]
+      ],
+      "id": "after-visual-001",
+      "source_region_ids": [],
+      "slot_id": "text-4f1bcc5173-1"
+    },
+    {
+      "text": "TRANG SỨC THỦY",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        17.38,
+        157.47,
+        1397.32,
+        928.53
+      ],
+      "quad": [
+        [
+          17.38,
+          157.47
+        ],
+        [
+          1414.7,
+          157.47
+        ],
+        [
+          1414.7,
+          1086.0
+        ],
+        [
+          17.38,
+          1086.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.012003,
+        0.145,
+        0.965,
+        0.855
+      ],
+      "normalized_quad": [
+        [
+          0.012003,
+          0.145
+        ],
+        [
+          0.977003,
+          0.145
+        ],
+        [
+          0.977003,
+          1.0
+        ],
+        [
+          0.012003,
+          1.0
+        ]
+      ],
+      "id": "after-visual-002",
+      "source_region_ids": [],
+      "slot_id": "text-2883b12333-1",
+      "match_confidence": 0.88
+    }
+  ],
+  "text_review": "image_review"
+}

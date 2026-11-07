@@ -1,0 +1,72 @@
+{
+  "schema_version": 1,
+  "product_id": "da86f98fbc6cc52be09e6e8eb866d0ec",
+  "view": "before",
+  "image": "/product-references/da86f98fbc6cc52be09e6e8eb866d0ec-photo-before.png",
+  "sha256": "bcb9fbe916583f76385eb4069cf38f683e7ad439a2c791e38ffe272084a66d70",
+  "width": 1448,
+  "height": 1086,
+  "coordinate_system": "image_pixels_top_left",
+  "status": "detected",
+  "regions": [
+    {
+      "text": "JBL",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "pending",
+      "method": "image_review",
+      "bbox": [
+        136.11,
+        27.15,
+        1301.75,
+        1057.76
+      ],
+      "quad": [
+        [
+          136.11,
+          27.15
+        ],
+        [
+          1437.86,
+          27.15
+        ],
+        [
+          1437.86,
+          1084.91
+        ],
+        [
+          136.11,
+          1084.91
+        ]
+      ],
+      "normalized_bbox": [
+        0.093999,
+        0.025,
+        0.898999,
+        0.973996
+      ],
+      "normalized_quad": [
+        [
+          0.093999,
+          0.025
+        ],
+        [
+          0.992997,
+          0.025
+        ],
+        [
+          0.992997,
+          0.998996
+        ],
+        [
+          0.093999,
+          0.998996
+        ]
+      ],
+      "id": "before-visual-001",
+      "source_region_ids": [],
+      "slot_id": "text-86450ab1ce-1"
+    }
+  ],
+  "text_review": "image_review"
+}

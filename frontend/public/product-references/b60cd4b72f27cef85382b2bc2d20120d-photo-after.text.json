@@ -1,0 +1,136 @@
+{
+  "schema_version": 1,
+  "product_id": "b60cd4b72f27cef85382b2bc2d20120d",
+  "view": "after",
+  "image": "/product-references/b60cd4b72f27cef85382b2bc2d20120d-photo-after.png",
+  "sha256": "ed0a1d33d527599dfc4ae64a668edf19ef687851e0b2bf1d4ae24c986f63cd4e",
+  "width": 1448,
+  "height": 1086,
+  "coordinate_system": "image_pixels_top_left",
+  "status": "detected",
+  "regions": [
+    {
+      "text": "Phúc Thuận",
+      "ocr_text": "Phúc | Thuận",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        304.08,
+        398.56,
+        722.55,
+        180.28
+      ],
+      "quad": [
+        [
+          304.08,
+          398.56
+        ],
+        [
+          1026.63,
+          398.56
+        ],
+        [
+          1026.63,
+          578.84
+        ],
+        [
+          304.08,
+          578.84
+        ]
+      ],
+      "normalized_bbox": [
+        0.21,
+        0.366998,
+        0.498999,
+        0.166004
+      ],
+      "normalized_quad": [
+        [
+          0.21,
+          0.366998
+        ],
+        [
+          0.708999,
+          0.366998
+        ],
+        [
+          0.708999,
+          0.533002
+        ],
+        [
+          0.21,
+          0.533002
+        ]
+      ],
+      "id": "after-visual-001",
+      "source_region_ids": [
+        "after-001",
+        "after-002"
+      ],
+      "slot_id": "text-a9edf00213-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "福顺",
+      "ocr_text": "7ẵ Jlb",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        1034.0,
+        469.0,
+        267.0,
+        169.0
+      ],
+      "quad": [
+        [
+          1034.0,
+          469.0
+        ],
+        [
+          1301.0,
+          469.0
+        ],
+        [
+          1301.0,
+          638.0
+        ],
+        [
+          1034.0,
+          638.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.714088,
+        0.43186,
+        0.184392,
+        0.155617
+      ],
+      "normalized_quad": [
+        [
+          0.714088,
+          0.43186
+        ],
+        [
+          0.898481,
+          0.43186
+        ],
+        [
+          0.898481,
+          0.587477
+        ],
+        [
+          0.714088,
+          0.587477
+        ]
+      ],
+      "id": "after-visual-002",
+      "source_region_ids": [
+        "after-003"
+      ],
+      "slot_id": "text-da39a3ee5e-1"
+    }
+  ],
+  "text_review": "image_review"
+}

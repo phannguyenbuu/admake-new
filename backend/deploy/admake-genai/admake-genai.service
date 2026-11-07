@@ -1,0 +1,14 @@
+[Unit]
+Description=Admake local image bridge
+After=network.target
+[Service]
+User=admake-genai
+WorkingDirectory=/opt/admake-genai/bridge
+Environment=PORT=6002
+Environment=PYTHONUNBUFFERED=1
+ExecStart=/opt/admake-genai/venv/bin/python3 /opt/admake-genai/bridge/server.py
+Restart=always
+RestartSec=5
+MemoryMax=300M
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,420 @@
+{
+  "schema_version": 1,
+  "product_id": "e3b6941dd37e2ee088d0b4507f4968a1",
+  "view": "before",
+  "image": "/product-references/e3b6941dd37e2ee088d0b4507f4968a1-photo-before.png",
+  "sha256": "a2aa5188c6ad26c9bbd0ca9a9ffb4ce42ded769e910fce35967d413a3cd2c4be",
+  "width": 1448,
+  "height": 1086,
+  "coordinate_system": "image_pixels_top_left",
+  "status": "detected",
+  "regions": [
+    {
+      "text": "THỨC ĂN GIA SÚC GIA CẦM CAO CẤP",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        47.78,
+        327.97,
+        192.58,
+        19.55
+      ],
+      "quad": [
+        [
+          47.78,
+          327.97
+        ],
+        [
+          240.36,
+          327.97
+        ],
+        [
+          240.36,
+          347.52
+        ],
+        [
+          47.78,
+          347.52
+        ]
+      ],
+      "normalized_bbox": [
+        0.032997,
+        0.301998,
+        0.132997,
+        0.018002
+      ],
+      "normalized_quad": [
+        [
+          0.032997,
+          0.301998
+        ],
+        [
+          0.165994,
+          0.301998
+        ],
+        [
+          0.165994,
+          0.32
+        ],
+        [
+          0.032997,
+          0.32
+        ]
+      ],
+      "id": "before-visual-001",
+      "source_region_ids": [],
+      "slot_id": "text-5c93f523a8-1"
+    },
+    {
+      "text": "ĐẠI LÝ THỨC ĂN CHĂN NUÔI KYODO SOJITZ",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        334.49,
+        331.23,
+        849.98,
+        84.71
+      ],
+      "quad": [
+        [
+          334.49,
+          331.23
+        ],
+        [
+          1184.47,
+          331.23
+        ],
+        [
+          1184.47,
+          415.94
+        ],
+        [
+          334.49,
+          415.94
+        ]
+      ],
+      "normalized_bbox": [
+        0.231001,
+        0.305,
+        0.587003,
+        0.078002
+      ],
+      "normalized_quad": [
+        [
+          0.231001,
+          0.305
+        ],
+        [
+          0.818004,
+          0.305
+        ],
+        [
+          0.818004,
+          0.383002
+        ],
+        [
+          0.231001,
+          0.383002
+        ]
+      ],
+      "id": "before-visual-002",
+      "source_region_ids": [],
+      "slot_id": "text-b1bba33c91-1"
+    },
+    {
+      "text": "ksf",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        82.54,
+        515.85,
+        199.82,
+        120.55
+      ],
+      "quad": [
+        [
+          82.54,
+          515.85
+        ],
+        [
+          282.36,
+          515.85
+        ],
+        [
+          282.36,
+          636.4
+        ],
+        [
+          82.54,
+          636.4
+        ]
+      ],
+      "normalized_bbox": [
+        0.057003,
+        0.475,
+        0.137997,
+        0.111004
+      ],
+      "normalized_quad": [
+        [
+          0.057003,
+          0.475
+        ],
+        [
+          0.195,
+          0.475
+        ],
+        [
+          0.195,
+          0.586004
+        ],
+        [
+          0.057003,
+          0.586004
+        ]
+      ],
+      "id": "before-visual-003",
+      "source_region_ids": [],
+      "slot_id": "text-c3e9a4cc41-1"
+    },
+    {
+      "text": "ISO 9001:2015",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        218.65,
+        570.15,
+        79.64,
+        30.41
+      ],
+      "quad": [
+        [
+          218.65,
+          570.15
+        ],
+        [
+          298.29,
+          570.15
+        ],
+        [
+          298.29,
+          600.56
+        ],
+        [
+          218.65,
+          600.56
+        ]
+      ],
+      "normalized_bbox": [
+        0.151001,
+        0.525,
+        0.055,
+        0.028002
+      ],
+      "normalized_quad": [
+        [
+          0.151001,
+          0.525
+        ],
+        [
+          0.206001,
+          0.525
+        ],
+        [
+          0.206001,
+          0.553002
+        ],
+        [
+          0.151001,
+          0.553002
+        ]
+      ],
+      "id": "before-visual-004",
+      "source_region_ids": [],
+      "slot_id": "text-f82a5a2799-1"
+    },
+    {
+      "text": "NGỌC TIỆP",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        293.94,
+        426.8,
+        1154.06,
+        260.64
+      ],
+      "quad": [
+        [
+          293.94,
+          426.8
+        ],
+        [
+          1448.0,
+          426.8
+        ],
+        [
+          1448.0,
+          687.44
+        ],
+        [
+          293.94,
+          687.44
+        ]
+      ],
+      "normalized_bbox": [
+        0.202997,
+        0.393002,
+        0.797003,
+        0.24
+      ],
+      "normalized_quad": [
+        [
+          0.202997,
+          0.393002
+        ],
+        [
+          1.0,
+          0.393002
+        ],
+        [
+          1.0,
+          0.633002
+        ],
+        [
+          0.202997,
+          0.633002
+        ]
+      ],
+      "id": "before-visual-005",
+      "source_region_ids": [],
+      "slot_id": "text-372889ef96-1"
+    },
+    {
+      "text": "Địa Chỉ: Ấp An Quý, Xã Thanh An, Huyện Hớn Quản, Tỉnh Bình Phước",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        370.69,
+        617.93,
+        996.22,
+        77.11
+      ],
+      "quad": [
+        [
+          370.69,
+          617.93
+        ],
+        [
+          1366.91,
+          617.93
+        ],
+        [
+          1366.91,
+          695.04
+        ],
+        [
+          370.69,
+          695.04
+        ]
+      ],
+      "normalized_bbox": [
+        0.256001,
+        0.568996,
+        0.687997,
+        0.071004
+      ],
+      "normalized_quad": [
+        [
+          0.256001,
+          0.568996
+        ],
+        [
+          0.943999,
+          0.568996
+        ],
+        [
+          0.943999,
+          0.64
+        ],
+        [
+          0.256001,
+          0.64
+        ]
+      ],
+      "id": "before-visual-006",
+      "source_region_ids": [],
+      "slot_id": "text-ac8f9cbc56-1"
+    },
+    {
+      "text": "Điện thoại: 0978.080.339 - 0919.43.81.41",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        509.7,
+        678.75,
+        818.12,
+        77.11
+      ],
+      "quad": [
+        [
+          509.7,
+          678.75
+        ],
+        [
+          1327.82,
+          678.75
+        ],
+        [
+          1327.82,
+          755.86
+        ],
+        [
+          509.7,
+          755.86
+        ]
+      ],
+      "normalized_bbox": [
+        0.352003,
+        0.625,
+        0.565,
+        0.071004
+      ],
+      "normalized_quad": [
+        [
+          0.352003,
+          0.625
+        ],
+        [
+          0.917003,
+          0.625
+        ],
+        [
+          0.917003,
+          0.696004
+        ],
+        [
+          0.352003,
+          0.696004
+        ]
+      ],
+      "id": "before-visual-007",
+      "source_region_ids": [],
+      "slot_id": "text-558e7c7b6a-1"
+    }
+  ],
+  "text_review": "image_review"
+}

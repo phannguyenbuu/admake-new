@@ -1,0 +1,134 @@
+{
+  "schema_version": 1,
+  "product_id": "124443e014aaf5968dc5e8a7f548eaf5",
+  "view": "before",
+  "image": "/product-references/124443e014aaf5968dc5e8a7f548eaf5-photo-before.png",
+  "sha256": "46eaf123a12fe7be5573d615bb2ff560c811c42b0508d701f281cf68e3c5618d",
+  "width": 1448,
+  "height": 1086,
+  "coordinate_system": "image_pixels_top_left",
+  "status": "detected",
+  "regions": [
+    {
+      "id": "before-visual-001",
+      "text": "Thiên",
+      "ocr_text": "",
+      "confidence": 1,
+      "review": "verified",
+      "method": "visual_annotation",
+      "bbox": [
+        85,
+        190,
+        810,
+        510
+      ],
+      "quad": [
+        [
+          85,
+          190
+        ],
+        [
+          895,
+          190
+        ],
+        [
+          895,
+          700
+        ],
+        [
+          85,
+          700
+        ]
+      ],
+      "normalized_bbox": [
+        0.058702,
+        0.174954,
+        0.559392,
+        0.469613
+      ],
+      "normalized_quad": [
+        [
+          0.058702,
+          0.174954
+        ],
+        [
+          0.618094,
+          0.174954
+        ],
+        [
+          0.618094,
+          0.644567
+        ],
+        [
+          0.058702,
+          0.644567
+        ]
+      ],
+      "source_region_ids": [
+        "before-verified-001"
+      ],
+      "slot_id": "text-a1c1e37bc1-1"
+    },
+    {
+      "id": "before-visual-002",
+      "text": "Thanh",
+      "ocr_text": "",
+      "confidence": 1,
+      "review": "verified",
+      "method": "visual_annotation",
+      "bbox": [
+        210,
+        430,
+        960,
+        535
+      ],
+      "quad": [
+        [
+          210,
+          430
+        ],
+        [
+          1170,
+          430
+        ],
+        [
+          1170,
+          965
+        ],
+        [
+          210,
+          965
+        ]
+      ],
+      "normalized_bbox": [
+        0.145028,
+        0.395948,
+        0.662983,
+        0.492634
+      ],
+      "normalized_quad": [
+        [
+          0.145028,
+          0.395948
+        ],
+        [
+          0.808011,
+          0.395948
+        ],
+        [
+          0.808011,
+          0.888582
+        ],
+        [
+          0.145028,
+          0.888582
+        ]
+      ],
+      "source_region_ids": [
+        "before-verified-002"
+      ],
+      "slot_id": "text-7dc55c2e6b-1"
+    }
+  ],
+  "text_review": "image_review"
+}

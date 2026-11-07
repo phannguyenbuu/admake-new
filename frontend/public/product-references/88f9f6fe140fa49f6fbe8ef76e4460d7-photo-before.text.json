@@ -1,0 +1,256 @@
+{
+  "schema_version": 1,
+  "product_id": "88f9f6fe140fa49f6fbe8ef76e4460d7",
+  "view": "before",
+  "image": "/product-references/88f9f6fe140fa49f6fbe8ef76e4460d7-photo-before.png",
+  "sha256": "fe7009714b02945250fa6bb12dc63d2653419f3b5fde231b0f04b68aba15b84c",
+  "width": 1448,
+  "height": 1086,
+  "coordinate_system": "image_pixels_top_left",
+  "status": "detected",
+  "regions": [
+    {
+      "text": "CỘNG HOÀ XÃ HỘI CHỦ NGHĨA VIỆT NAM",
+      "ocr_text": "CHỦ | NGHIA | Hoa",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        234.58,
+        343.18,
+        194.03,
+        80.36
+      ],
+      "quad": [
+        [
+          234.58,
+          343.18
+        ],
+        [
+          428.61,
+          343.18
+        ],
+        [
+          428.61,
+          423.54
+        ],
+        [
+          234.58,
+          423.54
+        ]
+      ],
+      "normalized_bbox": [
+        0.162003,
+        0.316004,
+        0.133999,
+        0.073996
+      ],
+      "normalized_quad": [
+        [
+          0.162003,
+          0.316004
+        ],
+        [
+          0.296001,
+          0.316004
+        ],
+        [
+          0.296001,
+          0.39
+        ],
+        [
+          0.162003,
+          0.39
+        ]
+      ],
+      "id": "before-visual-001",
+      "source_region_ids": [
+        "before-003",
+        "before-006",
+        "before-007"
+      ],
+      "slot_id": "text-90b81e744b-1"
+    },
+    {
+      "text": "TÒA ÁN NHÂN DÂN",
+      "ocr_text": "TÓÁ ÁN NHẮN DẢN",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        276.0,
+        512.0,
+        116.0,
+        28.0
+      ],
+      "quad": [
+        [
+          276.0,
+          512.0
+        ],
+        [
+          392.0,
+          512.0
+        ],
+        [
+          392.0,
+          540.0
+        ],
+        [
+          276.0,
+          540.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.190608,
+        0.471455,
+        0.08011,
+        0.025783
+      ],
+      "normalized_quad": [
+        [
+          0.190608,
+          0.471455
+        ],
+        [
+          0.270718,
+          0.471455
+        ],
+        [
+          0.270718,
+          0.497238
+        ],
+        [
+          0.190608,
+          0.497238
+        ]
+      ],
+      "id": "before-visual-002",
+      "source_region_ids": [
+        "before-012"
+      ],
+      "slot_id": "text-ba58f24bbd-1"
+    },
+    {
+      "text": "Luật sư",
+      "ocr_text": "Luật sư",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        689.0,
+        325.0,
+        383.0,
+        110.0
+      ],
+      "quad": [
+        [
+          689.0,
+          325.0
+        ],
+        [
+          1072.0,
+          325.0
+        ],
+        [
+          1072.0,
+          435.0
+        ],
+        [
+          689.0,
+          435.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.475829,
+        0.299263,
+        0.264503,
+        0.101289
+      ],
+      "normalized_quad": [
+        [
+          0.475829,
+          0.299263
+        ],
+        [
+          0.740331,
+          0.299263
+        ],
+        [
+          0.740331,
+          0.400552
+        ],
+        [
+          0.475829,
+          0.400552
+        ]
+      ],
+      "id": "before-visual-003",
+      "source_region_ids": [
+        "before-008"
+      ],
+      "slot_id": "text-d2e5a4ee32-1"
+    },
+    {
+      "text": "HUỲNH TẤN ĐÔ",
+      "ocr_text": "HUỲNH TẤN ĐÔ",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        500.0,
+        428.0,
+        760.0,
+        160.0
+      ],
+      "quad": [
+        [
+          500.0,
+          428.0
+        ],
+        [
+          1260.0,
+          428.0
+        ],
+        [
+          1260.0,
+          588.0
+        ],
+        [
+          500.0,
+          588.0
+        ]
+      ],
+      "normalized_bbox": [
+        0.345304,
+        0.394107,
+        0.524862,
+        0.14733
+      ],
+      "normalized_quad": [
+        [
+          0.345304,
+          0.394107
+        ],
+        [
+          0.870166,
+          0.394107
+        ],
+        [
+          0.870166,
+          0.541436
+        ],
+        [
+          0.345304,
+          0.541436
+        ]
+      ],
+      "id": "before-visual-004",
+      "source_region_ids": [
+        "before-011"
+      ],
+      "slot_id": "text-36d131ddb0-1"
+    }
+  ],
+  "text_review": "image_review"
+}

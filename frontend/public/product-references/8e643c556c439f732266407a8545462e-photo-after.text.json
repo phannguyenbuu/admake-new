@@ -1,0 +1,427 @@
+{
+  "schema_version": 1,
+  "product_id": "8e643c556c439f732266407a8545462e",
+  "view": "after",
+  "image": "/product-references/8e643c556c439f732266407a8545462e-photo-after.png",
+  "sha256": "238bbbe29a7cb76d777e5f234e3b68872b3f9a72605c58684803dd34ca053e4e",
+  "width": 1448,
+  "height": 1086,
+  "coordinate_system": "image_pixels_top_left",
+  "status": "detected",
+  "regions": [
+    {
+      "text": "XE ĐIỆN THU HIỀN",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        81.09,
+        306.25,
+        1293.06,
+        597.3
+      ],
+      "quad": [
+        [
+          81.09,
+          306.25
+        ],
+        [
+          1374.15,
+          306.25
+        ],
+        [
+          1374.15,
+          903.55
+        ],
+        [
+          81.09,
+          903.55
+        ]
+      ],
+      "normalized_bbox": [
+        0.056001,
+        0.281998,
+        0.892997,
+        0.55
+      ],
+      "normalized_quad": [
+        [
+          0.056001,
+          0.281998
+        ],
+        [
+          0.948999,
+          0.281998
+        ],
+        [
+          0.948999,
+          0.831998
+        ],
+        [
+          0.056001,
+          0.831998
+        ]
+      ],
+      "id": "after-visual-001",
+      "source_region_ids": [],
+      "slot_id": "text-ed95eec968-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "XE ĐIỆN",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        314.22,
+        543.0,
+        139.01,
+        52.13
+      ],
+      "quad": [
+        [
+          314.22,
+          543.0
+        ],
+        [
+          453.23,
+          543.0
+        ],
+        [
+          453.23,
+          595.13
+        ],
+        [
+          314.22,
+          595.13
+        ]
+      ],
+      "normalized_bbox": [
+        0.217003,
+        0.5,
+        0.096001,
+        0.048002
+      ],
+      "normalized_quad": [
+        [
+          0.217003,
+          0.5
+        ],
+        [
+          0.313004,
+          0.5
+        ],
+        [
+          0.313004,
+          0.548002
+        ],
+        [
+          0.217003,
+          0.548002
+        ]
+      ],
+      "id": "after-visual-002",
+      "source_region_ids": [],
+      "slot_id": "text-30e536eac4-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "XE MÁY ĐIỆN",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        519.83,
+        578.84,
+        202.72,
+        54.3
+      ],
+      "quad": [
+        [
+          519.83,
+          578.84
+        ],
+        [
+          722.55,
+          578.84
+        ],
+        [
+          722.55,
+          633.14
+        ],
+        [
+          519.83,
+          633.14
+        ]
+      ],
+      "normalized_bbox": [
+        0.358999,
+        0.533002,
+        0.14,
+        0.05
+      ],
+      "normalized_quad": [
+        [
+          0.358999,
+          0.533002
+        ],
+        [
+          0.498999,
+          0.533002
+        ],
+        [
+          0.498999,
+          0.583002
+        ],
+        [
+          0.358999,
+          0.583002
+        ]
+      ],
+      "id": "after-visual-003",
+      "source_region_ids": [],
+      "slot_id": "text-de1bd544ac-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "PHỤ KIỆN",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        839.84,
+        632.05,
+        152.04,
+        48.87
+      ],
+      "quad": [
+        [
+          839.84,
+          632.05
+        ],
+        [
+          991.88,
+          632.05
+        ],
+        [
+          991.88,
+          680.92
+        ],
+        [
+          839.84,
+          680.92
+        ]
+      ],
+      "normalized_bbox": [
+        0.58,
+        0.581998,
+        0.105,
+        0.045
+      ],
+      "normalized_quad": [
+        [
+          0.58,
+          0.581998
+        ],
+        [
+          0.685,
+          0.581998
+        ],
+        [
+          0.685,
+          0.626998
+        ],
+        [
+          0.58,
+          0.626998
+        ]
+      ],
+      "id": "after-visual-004",
+      "source_region_ids": [],
+      "slot_id": "text-46241a397b-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "CHẤT LƯỢNG - BỀN BỈ - TIẾT KIỆM",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        137.56,
+        665.72,
+        503.9,
+        73.85
+      ],
+      "quad": [
+        [
+          137.56,
+          665.72
+        ],
+        [
+          641.46,
+          665.72
+        ],
+        [
+          641.46,
+          739.57
+        ],
+        [
+          137.56,
+          739.57
+        ]
+      ],
+      "normalized_bbox": [
+        0.095,
+        0.613002,
+        0.347997,
+        0.068002
+      ],
+      "normalized_quad": [
+        [
+          0.095,
+          0.613002
+        ],
+        [
+          0.442997,
+          0.613002
+        ],
+        [
+          0.442997,
+          0.681004
+        ],
+        [
+          0.095,
+          0.681004
+        ]
+      ],
+      "id": "after-visual-005",
+      "source_region_ids": [],
+      "slot_id": "text-a115404050-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "05 GIẢI PHÓNG",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        754.41,
+        752.6,
+        250.5,
+        56.47
+      ],
+      "quad": [
+        [
+          754.41,
+          752.6
+        ],
+        [
+          1004.91,
+          752.6
+        ],
+        [
+          1004.91,
+          809.07
+        ],
+        [
+          754.41,
+          809.07
+        ]
+      ],
+      "normalized_bbox": [
+        0.521001,
+        0.693002,
+        0.172997,
+        0.051998
+      ],
+      "normalized_quad": [
+        [
+          0.521001,
+          0.693002
+        ],
+        [
+          0.693999,
+          0.693002
+        ],
+        [
+          0.693999,
+          0.745
+        ],
+        [
+          0.521001,
+          0.745
+        ]
+      ],
+      "id": "after-visual-006",
+      "source_region_ids": [],
+      "slot_id": "text-175fab859b-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "0835 47 6789",
+      "ocr_text": "",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        1081.66,
+        801.47,
+        195.48,
+        52.13
+      ],
+      "quad": [
+        [
+          1081.66,
+          801.47
+        ],
+        [
+          1277.14,
+          801.47
+        ],
+        [
+          1277.14,
+          853.6
+        ],
+        [
+          1081.66,
+          853.6
+        ]
+      ],
+      "normalized_bbox": [
+        0.747003,
+        0.738002,
+        0.135,
+        0.048002
+      ],
+      "normalized_quad": [
+        [
+          0.747003,
+          0.738002
+        ],
+        [
+          0.882003,
+          0.738002
+        ],
+        [
+          0.882003,
+          0.786004
+        ],
+        [
+          0.747003,
+          0.786004
+        ]
+      ],
+      "id": "after-visual-007",
+      "source_region_ids": [],
+      "slot_id": "text-b0999eab3b-1",
+      "match_confidence": 1.0
+    }
+  ],
+  "text_review": "image_review"
+}

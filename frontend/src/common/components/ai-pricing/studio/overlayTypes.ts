@@ -32,6 +32,9 @@ export interface OverlayTextItem {
 }
 
 export interface TwoPagePdfData {
+  /** Live final-tab regions: capture the same typography/content for PDF. */
+  bomPages?: HTMLElement[];
+  bomQuote?: { result: import("../../product-bom/types").Result; vat: number };
   orientation?: PdfOrientation;
   renderImageUrl: string | null;
   logo: OverlayLogo | null;

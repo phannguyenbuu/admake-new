@@ -1,0 +1,18 @@
+BEGIN;
+CREATE TABLE IF NOT EXISTS product_formulas (
+ id VARCHAR(50) PRIMARY KEY, name VARCHAR(255) NOT NULL, category VARCHAR(120) NOT NULL,
+ image_url TEXT, definition JSON NOT NULL DEFAULT '{}', is_published BOOLEAN NOT NULL DEFAULT FALSE,
+ version INTEGER NOT NULL DEFAULT 1,
+ "createdAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "updatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+ "deletedAt" TIMESTAMP
+);
+CREATE TABLE IF NOT EXISTS product_quotations (
+ id VARCHAR(50) PRIMARY KEY, lead_id INTEGER NOT NULL REFERENCES lead(id),
+ user_id VARCHAR(50) NOT NULL REFERENCES "user"(id), product_id VARCHAR(50) NOT NULL REFERENCES product_formulas(id),
+ payload JSON NOT NULL DEFAULT '{}', stage INTEGER NOT NULL DEFAULT 0, version INTEGER NOT NULL DEFAULT 1,
+ "createdAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "updatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+ "deletedAt" TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS ix_product_quotations_lead_id ON product_quotations(lead_id);
+CREATE INDEX IF NOT EXISTS ix_product_quotations_user_id ON product_quotations(user_id);
+COMMIT;

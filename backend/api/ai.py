@@ -1649,6 +1649,7 @@ def api_ai_image_edit():
 # GENAI TOOLXPRINT API INTEGRATION & 3D SIGNBOARD WORKFLOW
 # ==============================================================================
 GENAI_BASE_URL = "https://genai.toolxprint.com"
+IMAGE_BRIDGE_URL = os.environ.get("ADMAKE_IMAGE_BRIDGE_URL", "http://127.0.0.1:6002").rstrip("/")
 
 SIGNBOARD_HINTS = [
     # --- 6 MẪU BẢNG HIỆU 3D CHUẨN TỪ THƯ VIỆN HÌNH ẢNH THỰC TẾ ---
@@ -2239,18 +2240,18 @@ SIGNBOARD_HINTS = [
     }
 ]
 
-@ai_bp.route('/api/ai/genai/status', methods=['GET', 'OPTIONS'])
+@ai_bp.route('/api/ai/iadmake/status', methods=['GET', 'OPTIONS'])
 def api_genai_status():
-    """Proxy kiểm tra trạng thái từ GenAI Toolxprint Bridge"""
+    """Proxy kiểm tra trạng thái từ iAdmake Bridge"""
     if request.method == 'OPTIONS':
         return jsonify({"ok": True}), 200
     try:
-        r = requests.get(f"{GENAI_BASE_URL}/api/status", timeout=10)
+        r = requests.get(f"{IMAGE_BRIDGE_URL}/api/status", timeout=10)
         return jsonify(r.json()), r.status_code
     except Exception as e:
-        return jsonify({"status": "offline", "error": str(e), "service": "GenAI Bridge"}), 502
+        return jsonify({"status": "offline", "error": str(e), "service": "iAdmake Bridge"}), 502
 
-@ai_bp.route('/api/ai/genai/prompt-hints', methods=['GET', 'OPTIONS'])
+@ai_bp.route('/api/ai/iadmake/prompt-hints', methods=['GET', 'OPTIONS'])
 def api_genai_prompt_hints():
     """Lấy danh sách Prompt Hints kết hợp giữa GenAI và bộ Hint quảng cáo Admake"""
     if request.method == 'OPTIONS':
@@ -2272,60 +2273,60 @@ def api_genai_prompt_hints():
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
 
-@ai_bp.route('/api/ai/genai/jobs/create', methods=['POST', 'OPTIONS'])
+@ai_bp.route('/api/ai/iadmake/jobs/create', methods=['POST', 'OPTIONS'])
 def api_genai_job_create():
-    """Tạo tác vụ sinh ảnh phối cảnh thực tế từ GenAI Toolxprint"""
+    """Tạo tác vụ sinh ảnh phối cảnh thực tế từ iAdmake"""
     if request.method == 'OPTIONS':
         return jsonify({"ok": True}), 200
     data = request.get_json(force=True, silent=True) or {}
     try:
-        r = requests.post(f"{GENAI_BASE_URL}/api/jobs/create", json=data, timeout=30)
+        r = requests.post(f"{IMAGE_BRIDGE_URL}/api/jobs/create", json=data, timeout=30)
         return jsonify(r.json()), r.status_code
     except Exception as e:
-        return jsonify({"error": f"Lỗi kết nối GenAI Bridge: {str(e)}"}), 502
+        return jsonify({"error": f"Lỗi kết nối iAdmake Bridge: {str(e)}"}), 502
 
-@ai_bp.route('/api/ai/genai/jobs/edit-full', methods=['POST', 'OPTIONS'])
+@ai_bp.route('/api/ai/iadmake/jobs/edit-full', methods=['POST', 'OPTIONS'])
 def api_genai_job_edit_full():
-    """Chỉnh sửa toàn bộ ảnh phối cảnh theo yêu cầu mới qua GenAI"""
+    """Chỉnh sửa toàn bộ ảnh phối cảnh theo yêu cầu mới qua iAdmake"""
     if request.method == 'OPTIONS':
         return jsonify({"ok": True}), 200
     data = request.get_json(force=True, silent=True) or {}
     try:
-        r = requests.post(f"{GENAI_BASE_URL}/api/jobs/edit-full", json=data, timeout=30)
+        r = requests.post(f"{IMAGE_BRIDGE_URL}/api/jobs/edit-full", json=data, timeout=30)
         return jsonify(r.json()), r.status_code
     except Exception as e:
-        return jsonify({"error": f"Lỗi kết nối GenAI Bridge: {str(e)}"}), 502
+        return jsonify({"error": f"Lỗi kết nối iAdmake Bridge: {str(e)}"}), 502
 
-@ai_bp.route('/api/ai/genai/jobs/edit-inpaint', methods=['POST', 'OPTIONS'])
+@ai_bp.route('/api/ai/iadmake/jobs/edit-inpaint', methods=['POST', 'OPTIONS'])
 def api_genai_job_edit_inpaint():
-    """Chỉnh sửa cục bộ (Inpaint với tọa độ pins) qua GenAI"""
+    """Chỉnh sửa cục bộ (Inpaint với tọa độ pins) qua iAdmake"""
     if request.method == 'OPTIONS':
         return jsonify({"ok": True}), 200
     data = request.get_json(force=True, silent=True) or {}
     try:
-        r = requests.post(f"{GENAI_BASE_URL}/api/jobs/edit-inpaint", json=data, timeout=30)
+        r = requests.post(f"{IMAGE_BRIDGE_URL}/api/jobs/edit-inpaint", json=data, timeout=30)
         return jsonify(r.json()), r.status_code
     except Exception as e:
-        return jsonify({"error": f"Lỗi kết nối GenAI Bridge: {str(e)}"}), 502
+        return jsonify({"error": f"Lỗi kết nối iAdmake Bridge: {str(e)}"}), 502
 
-@ai_bp.route('/api/ai/genai/jobs/<job_id>', methods=['GET', 'OPTIONS'])
+@ai_bp.route('/api/ai/iadmake/jobs/<job_id>', methods=['GET', 'OPTIONS'])
 def api_genai_job_get(job_id):
     """Polling lấy trạng thái và URL kết quả ảnh của job"""
     if request.method == 'OPTIONS':
         return jsonify({"ok": True}), 200
     try:
-        r = requests.get(f"{GENAI_BASE_URL}/api/jobs/{job_id}", timeout=10)
+        r = requests.get(f"{IMAGE_BRIDGE_URL}/api/jobs/{job_id}", timeout=10)
         return jsonify(r.json()), r.status_code
     except Exception as e:
         return jsonify({"error": f"Lỗi lấy trạng thái job: {str(e)}"}), 502
 
-@ai_bp.route('/api/ai/genai/gallery', methods=['GET', 'OPTIONS'])
+@ai_bp.route('/api/ai/iadmake/gallery', methods=['GET', 'OPTIONS'])
 def api_genai_gallery():
-    """Lấy danh sách ảnh đã tạo từ GenAI Gallery"""
+    """Lấy danh sách ảnh đã tạo từ iAdmake Gallery"""
     if request.method == 'OPTIONS':
         return jsonify({"ok": True}), 200
     try:
-        r = requests.get(f"{GENAI_BASE_URL}/api/gallery", timeout=15)
+        r = requests.get(f"{IMAGE_BRIDGE_URL}/api/gallery", timeout=15)
         return jsonify(r.json()), r.status_code
     except Exception as e:
         return jsonify({"error": f"Lỗi lấy gallery: {str(e)}"}), 502

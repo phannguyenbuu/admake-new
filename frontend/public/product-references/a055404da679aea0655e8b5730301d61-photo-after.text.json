@@ -1,0 +1,260 @@
+{
+  "schema_version": 1,
+  "product_id": "a055404da679aea0655e8b5730301d61",
+  "view": "after",
+  "image": "/product-references/a055404da679aea0655e8b5730301d61-photo-after.png",
+  "sha256": "2c7550c888c3819f37de5a4a5b0d895a30f264e21a05a48f2196eda490a21090",
+  "width": 1447,
+  "height": 1087,
+  "coordinate_system": "image_pixels_top_left",
+  "status": "detected",
+  "regions": [
+    {
+      "text": "KARAOKE",
+      "ocr_text": "K8RAOKEà",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        428.15,
+        395.0,
+        523.7,
+        319.0
+      ],
+      "quad": [
+        [
+          479.74,
+          395.0
+        ],
+        [
+          951.85,
+          502.44
+        ],
+        [
+          900.26,
+          714.0
+        ],
+        [
+          428.15,
+          606.56
+        ]
+      ],
+      "normalized_bbox": [
+        0.295888,
+        0.363385,
+        0.361921,
+        0.293468
+      ],
+      "normalized_quad": [
+        [
+          0.331541,
+          0.363385
+        ],
+        [
+          0.657809,
+          0.462226
+        ],
+        [
+          0.622156,
+          0.656854
+        ],
+        [
+          0.295888,
+          0.558013
+        ]
+      ],
+      "id": "after-visual-001",
+      "source_region_ids": [
+        "after-001"
+      ],
+      "slot_id": "text-f9d20f9bd7-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "Song Mã",
+      "ocr_text": "~8ong",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        450.0,
+        467.01,
+        294.0,
+        206.98000000000002
+      ],
+      "quad": [
+        [
+          494.8,
+          467.01
+        ],
+        [
+          744.0,
+          565.87
+        ],
+        [
+          699.2,
+          673.99
+        ],
+        [
+          450.0,
+          575.13
+        ]
+      ],
+      "normalized_bbox": [
+        0.310988,
+        0.429632,
+        0.203179,
+        0.190414
+      ],
+      "normalized_quad": [
+        [
+          0.341949,
+          0.429632
+        ],
+        [
+          0.514167,
+          0.52058
+        ],
+        [
+          0.483207,
+          0.620046
+        ],
+        [
+          0.310988,
+          0.529098
+        ]
+      ],
+      "id": "after-visual-002",
+      "source_region_ids": [
+        "after-002"
+      ],
+      "slot_id": "text-9b4d448dc6-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "25",
+      "ocr_text": "25",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        613.16,
+        688.01,
+        140.68000000000006,
+        109.98000000000002
+      ],
+      "quad": [
+        [
+          634.71,
+          688.01
+        ],
+        [
+          753.84,
+          719.03
+        ],
+        [
+          732.29,
+          797.99
+        ],
+        [
+          613.16,
+          766.97
+        ]
+      ],
+      "normalized_bbox": [
+        0.423746,
+        0.632944,
+        0.097222,
+        0.101178
+      ],
+      "normalized_quad": [
+        [
+          0.438639,
+          0.632944
+        ],
+        [
+          0.520968,
+          0.661481
+        ],
+        [
+          0.506075,
+          0.734121
+        ],
+        [
+          0.423746,
+          0.705584
+        ]
+      ],
+      "id": "after-visual-003",
+      "source_region_ids": [
+        "after-003"
+      ],
+      "slot_id": "text-f6e1126ced-1",
+      "match_confidence": 1.0
+    },
+    {
+      "text": "NAM QUỐC CANG",
+      "ocr_text": "NAM | Quốc | CANG",
+      "confidence": null,
+      "review": "image_reviewed",
+      "method": "image_review",
+      "bbox": [
+        568.67,
+        769.6,
+        309.66,
+        55.44
+      ],
+      "quad": [
+        [
+          568.67,
+          769.6
+        ],
+        [
+          878.33,
+          769.6
+        ],
+        [
+          878.33,
+          825.04
+        ],
+        [
+          568.67,
+          825.04
+        ]
+      ],
+      "normalized_bbox": [
+        0.392999,
+        0.708004,
+        0.214001,
+        0.051003
+      ],
+      "normalized_quad": [
+        [
+          0.392999,
+          0.708004
+        ],
+        [
+          0.607001,
+          0.708004
+        ],
+        [
+          0.607001,
+          0.759006
+        ],
+        [
+          0.392999,
+          0.759006
+        ]
+      ],
+      "id": "after-visual-004",
+      "source_region_ids": [
+        "after-004",
+        "after-005",
+        "after-006"
+      ],
+      "slot_id": "text-175ab6cd41-1",
+      "match_confidence": 1.0
+    }
+  ],
+  "text_review": "image_review"
+}

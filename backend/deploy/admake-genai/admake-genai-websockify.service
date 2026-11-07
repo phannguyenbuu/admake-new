@@ -1,0 +1,11 @@
+[Unit]
+Description=Admake authenticated noVNC websocket relay
+After=admake-genai-desktop.service
+Requires=admake-genai-desktop.service
+[Service]
+User=admake-genai
+ExecStart=/usr/bin/websockify 127.0.0.1:6082 127.0.0.1:5912
+Restart=always
+RestartSec=3
+[Install]
+WantedBy=multi-user.target
